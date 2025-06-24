@@ -1,4 +1,60 @@
 [tools]
 pre-commit = "latest"
+dprint = "latest"
 
-[env]
+[tasks.fmt]
+run = [
+  "dprint fmt",
+  "cargo fmt --all",
+]
+
+[tasks.lint]
+run = [
+  "dprint check",
+  "cargo fmt --all -- --check",
+  "cargo clippy --all-targets --all-features -- -D warnings",
+]
+
+[tasks.test]
+run = [
+  "cargo test --all-features",
+]
+
+[tasks.test-lib]
+run = ["cargo test --lib"]
+
+[tasks.test-enhanced]
+run = ["cargo test --test enhanced_pmc_parser_tests"]
+
+[tasks.test-comprehensive]
+run = ["cargo test --test comprehensive_pmc_tests"]
+
+[tasks.test-comprehensive-verbose]
+run = ["cargo test --test comprehensive_pmc_tests -- --nocapture"]
+
+[tasks.test-basic]
+run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_basic_validity -- --nocapture"]
+
+[tasks.test-metadata]
+run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_metadata_extraction -- --nocapture"]
+
+[tasks.test-authors]
+run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_author_analysis -- --nocapture"]
+
+[tasks.test-content]
+run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_content_structure -- --nocapture"]
+
+[tasks.test-references]
+run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_references_analysis -- --nocapture"]
+
+[tasks.test-journals]
+run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_journal_information -- --nocapture"]
+
+[tasks.build]
+run = ["cargo build"]
+
+[tasks.check]
+run = ["cargo check"]
+
+[tasks.doc]
+run = ["cargo doc --open"]

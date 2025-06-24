@@ -9,5 +9,8 @@ pub mod parser;
 
 // Re-export public types
 pub use client::PmcClient;
-pub use models::{ArticleSection, PmcFullText, Reference};
+pub use models::{
+    Affiliation, ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcFullText, Reference,
+    Table,
+};
 pub use parser::PmcXmlParser;

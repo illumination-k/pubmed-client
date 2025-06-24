@@ -30,20 +30,11 @@ cargo check
 ### Code Quality
 
 ```bash
-# Run clippy for linting
-cargo clippy
+# linting
+mise r clippy
 
 # Format code
-cargo fmt
-
-# Check formatting without modifying
-cargo fmt --check
-
-# Format non-Rust files (JSON, TOML, Markdown, YAML)
-dprint fmt
-
-# Check dprint formatting
-dprint check
+mise r fmt
 ```
 
 ## Architecture
