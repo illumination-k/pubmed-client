@@ -1,0 +1,33 @@
+# nextest configuration
+# https://nexte.st/book/configuration
+
+[profile.default]
+# Show output for passing tests
+success-output = "immediate"
+# Show output for failing tests
+failure-output = "immediate"
+# Test retries
+retries = { backoff = "exponential", count = 2, delay = "1s" }
+
+[profile.ci]
+# More retries for CI
+retries = { backoff = "exponential", count = 3, delay = "1s" }
+# Archive failed test outputs
+fail-fast = false
+# JUnit report for CI
+junit = { path = "junit.xml" }
+
+# Test groups for organization
+[[profile.default.overrides]]
+filter = "test(comprehensive)"
+threads-required = 1
+slow-timeout = "120s"
+
+[[profile.default.overrides]]
+filter = "test(markdown)"
+threads-required = 2
+slow-timeout = "60s"
+
+# Set environment variables
+[profile.default.env]
+RUST_LOG = "debug"

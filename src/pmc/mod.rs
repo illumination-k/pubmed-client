@@ -4,11 +4,13 @@
 //! full-text articles, check availability, and parse structured content.
 
 pub mod client;
+pub mod markdown;
 pub mod models;
 pub mod parser;
 
 // Re-export public types
 pub use client::PmcClient;
+pub use markdown::{HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle};
 pub use models::{
     Affiliation, ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcFullText, Reference,
     Table,
