@@ -944,17 +944,6 @@ impl PmcXmlParser {
 
         result.trim().to_string()
     }
-
-    // Legacy methods for backward compatibility
-    #[allow(dead_code)]
-    fn extract_sections(&self, content: &str) -> Vec<ArticleSection> {
-        self.extract_sections_enhanced(content)
-    }
-
-    #[allow(dead_code)]
-    fn extract_references(&self, content: &str) -> Vec<Reference> {
-        self.extract_references_detailed(content)
-    }
 }
 
 #[cfg(test)]

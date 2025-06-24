@@ -1,6 +1,7 @@
 [tools]
 pre-commit = "latest"
 dprint = "latest"
+"cargo:cargo-nextest" = "latest"
 
 [tasks.fmt]
 run = [
@@ -17,38 +18,18 @@ run = [
 
 [tasks.test]
 run = [
-  "cargo test --all-features",
+  "cargo nextest run --all-features",
 ]
 
-[tasks.test-lib]
-run = ["cargo test --lib"]
+[tasks."test:watch"]
+run = [
+  "cargo watch -x 'nextest run --all-features'",
+]
 
-[tasks.test-enhanced]
-run = ["cargo test --test enhanced_pmc_parser_tests"]
-
-[tasks.test-comprehensive]
-run = ["cargo test --test comprehensive_pmc_tests"]
-
-[tasks.test-comprehensive-verbose]
-run = ["cargo test --test comprehensive_pmc_tests -- --nocapture"]
-
-[tasks.test-basic]
-run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_basic_validity -- --nocapture"]
-
-[tasks.test-metadata]
-run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_metadata_extraction -- --nocapture"]
-
-[tasks.test-authors]
-run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_author_analysis -- --nocapture"]
-
-[tasks.test-content]
-run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_content_structure -- --nocapture"]
-
-[tasks.test-references]
-run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_references_analysis -- --nocapture"]
-
-[tasks.test-journals]
-run = ["cargo test --test comprehensive_pmc_tests test_xml_parsing_journal_information -- --nocapture"]
+[tasks."test:verbose"]
+run = [
+  "cargo nextest run --all-features --nocapture",
+]
 
 [tasks.build]
 run = ["cargo build"]
