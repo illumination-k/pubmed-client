@@ -3,3 +3,10 @@
 .claude/*.local*
 
 .vscode/
+
+# Coverage reports
+/target/llvm-cov-target/
+coverage.lcov
+coverage.json
+coverage/
+*.profraw
