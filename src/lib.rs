@@ -17,7 +17,7 @@
 //! ### Searching for Articles
 //!
 //! ```no_run
-//! use pubmed_client::PubMedClient;
+//! use pubmed_client_rs::PubMedClient;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -45,7 +45,7 @@
 //! ### Fetching Full Text from PMC
 //!
 //! ```no_run
-//! use pubmed_client::PmcClient;
+//! use pubmed_client_rs::PmcClient;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -72,7 +72,7 @@ pub mod query;
 
 // Re-export main types for convenience
 pub use error::{PubMedError, Result};
-pub use pmc::{ArticleSection, PmcClient, PmcFullText, Reference};
+pub use pmc::{ArticleSection, PmcClient, PmcFullText, PmcXmlParser, Reference};
 pub use pubmed::{PubMedArticle, PubMedClient};
 pub use query::{ArticleType, Language, SearchQuery};
 
@@ -91,7 +91,7 @@ impl Client {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client::Client;
+    /// use pubmed_client_rs::Client;
     ///
     /// let client = Client::new();
     /// ```
@@ -111,7 +111,7 @@ impl Client {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client::Client;
+    /// use pubmed_client_rs::Client;
     /// use reqwest::ClientBuilder;
     /// use std::time::Duration;
     ///
@@ -143,7 +143,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client::Client;
+    /// use pubmed_client_rs::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {

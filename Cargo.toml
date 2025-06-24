@@ -12,3 +12,8 @@ serde_json = "1.0"
 thiserror = "1.0"
 tokio = { version = "1.0", features = ["full"] }
 urlencoding = "2.1"
+
+[build-dependencies]
+# XSD parsing tools - will be evaluated
+# xsd-parser-rs = "1.0"  # Not available on crates.io
+# xml-schema = "0.2"     # Alternative option
