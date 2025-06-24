@@ -2,6 +2,7 @@
 pre-commit = "latest"
 dprint = "latest"
 "cargo:cargo-nextest" = "latest"
+"cargo:cargo-llvm-cov" = "latest"
 
 [tasks.fmt]
 run = [
@@ -39,3 +40,23 @@ run = ["cargo check"]
 
 [tasks.doc]
 run = ["cargo doc --open"]
+
+[tasks.coverage]
+run = [
+  "cargo llvm-cov nextest --all-features --html",
+]
+
+[tasks."coverage:lcov"]
+run = [
+  "cargo llvm-cov nextest --all-features --lcov --output-path coverage.lcov",
+]
+
+[tasks."coverage:json"]
+run = [
+  "cargo llvm-cov nextest --all-features --json --output-path coverage.json",
+]
+
+[tasks."coverage:open"]
+run = [
+  "cargo llvm-cov nextest --all-features --html --open",
+]
