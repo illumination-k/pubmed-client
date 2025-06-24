@@ -159,6 +159,28 @@ cargo check
 mise run check
 ```
 
+### Code Coverage
+
+Generate and view test coverage reports:
+
+```bash
+# Generate HTML coverage report
+cargo llvm-cov nextest --all-features --html
+mise run coverage
+
+# Generate and open HTML report
+cargo llvm-cov nextest --all-features --html --open
+mise run coverage:open
+
+# Generate LCOV format for CI
+cargo llvm-cov nextest --all-features --lcov --output-path coverage.lcov
+mise run coverage:lcov
+
+# Generate JSON format
+cargo llvm-cov nextest --all-features --json --output-path coverage.json
+mise run coverage:json
+```
+
 ### Documentation
 
 Generate and view documentation:
