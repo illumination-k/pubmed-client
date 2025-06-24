@@ -22,7 +22,7 @@
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let client = PubMedClient::new();
-//!     
+//!
 //!     // Search for articles with query builder
 //!     let articles = client
 //!         .search()
@@ -32,12 +32,12 @@
 //!         .limit(10)
 //!         .search_and_fetch(&client)
 //!         .await?;
-//!     
+//!
 //!     for article in articles {
 //!         println!("Title: {}", article.title);
 //!         println!("Authors: {}", article.authors.join(", "));
 //!     }
-//!     
+//!
 //!     Ok(())
 //! }
 //! ```
@@ -50,17 +50,17 @@
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let client = PmcClient::new();
-//!     
+//!
 //!     // Check if PMC full text is available
 //!     if let Some(pmcid) = client.check_pmc_availability("33515491").await? {
 //!         // Fetch structured full text
 //!         let full_text = client.fetch_full_text(&pmcid).await?;
-//!         
+//!
 //!         println!("Title: {}", full_text.title);
 //!         println!("Sections: {}", full_text.sections.len());
 //!         println!("References: {}", full_text.references.len());
 //!     }
-//!     
+//!
 //!     Ok(())
 //! }
 //! ```
@@ -149,7 +149,7 @@ impl Client {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = Client::new();
     ///     let results = client.search_with_full_text("covid-19", 5).await?;
-    ///     
+    ///
     ///     for (article, full_text) in results {
     ///         println!("Article: {}", article.title);
     ///         if let Some(ft) = full_text {
@@ -158,7 +158,7 @@ impl Client {
     ///             println!("  Full text not available");
     ///         }
     ///     }
-    ///     
+    ///
     ///     Ok(())
     /// }
     /// ```

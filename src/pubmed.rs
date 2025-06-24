@@ -86,7 +86,7 @@ impl PubMedClient {
     ///         .limit(10)
     ///         .search_and_fetch(&client)
     ///         .await?;
-    ///     
+    ///
     ///     println!("Found {} articles", articles.len());
     ///     Ok(())
     /// }

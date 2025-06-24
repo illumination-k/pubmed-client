@@ -415,7 +415,7 @@ impl SearchQuery {
     ///         .limit(10)
     ///         .search(&client)
     ///         .await?;
-    ///     
+    ///
     ///     println!("Found {} articles", pmids.len());
     ///     Ok(())
     /// }
@@ -452,7 +452,7 @@ impl SearchQuery {
     ///         .limit(5)
     ///         .search_and_fetch(&client)
     ///         .await?;
-    ///     
+    ///
     ///     for article in articles {
     ///         println!("{}: {}", article.pmid, article.title);
     ///     }
