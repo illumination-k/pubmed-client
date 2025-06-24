@@ -1,0 +1,13 @@
+//! PMC (PubMed Central) client for fetching full-text articles
+//!
+//! This module provides functionality to interact with PMC APIs to fetch
+//! full-text articles, check availability, and parse structured content.
+
+pub mod client;
+pub mod models;
+pub mod parser;
+
+// Re-export public types
+pub use client::PmcClient;
+pub use models::{ArticleSection, PmcFullText, Reference};
+pub use parser::PmcXmlParser;

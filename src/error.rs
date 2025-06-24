@@ -23,6 +23,10 @@ pub enum PubMedError {
     #[error("PMC full text not available for PMID {pmid}")]
     PmcNotAvailable { pmid: String },
 
+    /// PMC full text not available for PMCID
+    #[error("PMC full text not available for PMCID {pmcid}")]
+    PmcNotAvailableById { pmcid: String },
+
     /// Invalid PMID format
     #[error("Invalid PMID format: {pmid}")]
     InvalidPmid { pmid: String },
