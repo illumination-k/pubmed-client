@@ -72,7 +72,10 @@ pub mod query;
 
 // Re-export main types for convenience
 pub use error::{PubMedError, Result};
-pub use pmc::{ArticleSection, PmcClient, PmcFullText, PmcXmlParser, Reference};
+pub use pmc::{
+    Affiliation, ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcClient, PmcFullText,
+    PmcXmlParser, Reference, Table,
+};
 pub use pubmed::{PubMedArticle, PubMedClient};
 pub use query::{ArticleType, Language, SearchQuery};
 

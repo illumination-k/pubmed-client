@@ -1,5 +1,7 @@
 use crate::error::Result;
-use crate::pmc::models::{ArticleSection, PmcFullText, Reference};
+use crate::pmc::models::{
+    ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcFullText, Reference, Table,
+};
 
 /// XML parser for PMC articles
 pub struct PmcXmlParser;
@@ -14,13 +16,11 @@ impl PmcXmlParser {
             .extract_text_between(xml_content, "<article-title>", "</article-title>")
             .unwrap_or_else(|| "Unknown Title".to_string());
 
-        // Extract authors
-        let authors = parser.extract_authors(xml_content);
+        // Extract authors with detailed information
+        let authors = parser.extract_authors_detailed(xml_content);
 
-        // Extract journal
-        let journal = parser
-            .extract_text_between(xml_content, "<journal-title>", "</journal-title>")
-            .unwrap_or_else(|| "Unknown Journal".to_string());
+        // Extract comprehensive journal information
+        let journal = parser.extract_journal_info(xml_content);
 
         // Extract publication date
         let pub_date = parser.extract_pub_date(xml_content);
@@ -31,11 +31,29 @@ impl PmcXmlParser {
         // Extract PMID
         let pmid = parser.extract_pmid(xml_content);
 
-        // Extract sections
-        let sections = parser.extract_sections(xml_content);
+        // Extract article type
+        let article_type = parser.extract_article_type(xml_content);
 
-        // Extract references
-        let references = parser.extract_references(xml_content);
+        // Extract keywords
+        let keywords = parser.extract_keywords(xml_content);
+
+        // Extract funding information
+        let funding = parser.extract_funding(xml_content);
+
+        // Extract conflict of interest
+        let conflict_of_interest = parser.extract_conflict_of_interest(xml_content);
+
+        // Extract acknowledgments
+        let acknowledgments = parser.extract_acknowledgments(xml_content);
+
+        // Extract data availability
+        let data_availability = parser.extract_data_availability(xml_content);
+
+        // Extract sections with enhanced parsing
+        let sections = parser.extract_sections_enhanced(xml_content);
+
+        // Extract references with detailed information
+        let references = parser.extract_references_detailed(xml_content);
 
         Ok(PmcFullText {
             pmcid: pmcid.to_string(),
@@ -47,7 +65,12 @@ impl PmcXmlParser {
             doi,
             sections,
             references,
-            article_type: None, // Article type extraction would require more complex XML parsing
+            article_type,
+            keywords,
+            funding,
+            conflict_of_interest,
+            acknowledgments,
+            data_availability,
         })
     }
 
@@ -58,7 +81,7 @@ impl PmcXmlParser {
         Some(content[start_pos..end_pos].trim().to_string())
     }
 
-    /// Extract authors from contributor group
+    /// Extract authors from contributor group (legacy method for compatibility)
     fn extract_authors(&self, content: &str) -> Vec<String> {
         let mut authors = Vec::new();
 
@@ -104,6 +127,156 @@ impl PmcXmlParser {
         }
 
         authors
+    }
+
+    /// Extract detailed author information with affiliations and ORCID
+    fn extract_authors_detailed(&self, content: &str) -> Vec<Author> {
+        let mut authors = Vec::new();
+
+        if let Some(contrib_start) = content.find("<contrib-group>") {
+            if let Some(contrib_end) = content[contrib_start..].find("</contrib-group>") {
+                let contrib_section = &content[contrib_start..contrib_start + contrib_end];
+
+                let mut pos = 0;
+                while let Some(contrib_start) = contrib_section[pos..].find("<contrib") {
+                    let contrib_start = pos + contrib_start;
+                    if let Some(contrib_end) = contrib_section[contrib_start..].find("</contrib>") {
+                        let contrib_end = contrib_start + contrib_end;
+                        let contrib_content = &contrib_section[contrib_start..contrib_end];
+
+                        if let Some(author) = self.parse_single_author(contrib_content) {
+                            authors.push(author);
+                        }
+
+                        pos = contrib_end;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Fallback to simple author extraction if detailed extraction fails
+        if authors.is_empty() {
+            let simple_authors = self.extract_authors(content);
+            authors = simple_authors.into_iter().map(Author::new).collect();
+        }
+
+        authors
+    }
+
+    /// Parse a single author from contrib XML
+    fn parse_single_author(&self, contrib_content: &str) -> Option<Author> {
+        let surname = self.extract_text_between(contrib_content, "<surname>", "</surname>");
+        let given_names = self
+            .extract_text_between(contrib_content, "<given-names>", "</given-names>")
+            .or_else(|| {
+                // Handle self-closing given-names tag
+                if let Some(start) = contrib_content.find("<given-names") {
+                    if let Some(end) = contrib_content[start..].find(">") {
+                        let tag_content = &contrib_content[start..start + end + 1];
+                        if tag_content.contains("/>") {
+                            return None; // Self-closing tag with no content
+                        }
+                    }
+                }
+                None
+            });
+
+        let mut author = Author::with_names(given_names, surname);
+
+        // Extract ORCID
+        if let Some(orcid_start) = contrib_content.find("https://orcid.org/") {
+            if let Some(orcid_end) = contrib_content[orcid_start..].find('"') {
+                let orcid = contrib_content[orcid_start..orcid_start + orcid_end].to_string();
+                author.orcid = Some(orcid);
+            }
+        }
+
+        // Extract email
+        author.email = self
+            .extract_text_between(contrib_content, "<email", "</email>")
+            .and_then(|email_content| {
+                // Extract actual email from the tag content
+                email_content
+                    .find(">")
+                    .map(|start| email_content[start + 1..].to_string())
+            });
+
+        // Check if corresponding author
+        author.is_corresponding = contrib_content.contains("corresp=\"yes\"");
+
+        // Extract roles
+        let mut roles = Vec::new();
+        let mut pos = 0;
+        while let Some(role_start) = contrib_content[pos..].find("<role") {
+            let role_start = pos + role_start;
+            if let Some(role_end) = contrib_content[role_start..].find("</role>") {
+                let role_end = role_start + role_end;
+                let role_section = &contrib_content[role_start..role_end];
+
+                if let Some(content_start) = role_section.find(">") {
+                    let role_content = &role_section[content_start + 1..];
+                    if !role_content.trim().is_empty() {
+                        roles.push(role_content.trim().to_string());
+                    }
+                }
+                pos = role_end;
+            } else {
+                break;
+            }
+        }
+        author.roles = roles;
+
+        Some(author)
+    }
+
+    /// Extract comprehensive journal information
+    fn extract_journal_info(&self, content: &str) -> JournalInfo {
+        let mut journal = JournalInfo::new(
+            self.extract_text_between(content, "<journal-title>", "</journal-title>")
+                .unwrap_or_else(|| "Unknown Journal".to_string()),
+        );
+
+        // Extract journal abbreviation
+        journal.abbreviation = self.extract_text_between(
+            content,
+            "<journal-id journal-id-type=\"iso-abbrev\">",
+            "</journal-id>",
+        );
+
+        // Extract ISSNs
+        let mut pos = 0;
+        while let Some(issn_start) = content[pos..].find("<issn") {
+            let issn_start = pos + issn_start;
+            if let Some(issn_end) = content[issn_start..].find("</issn>") {
+                let issn_end = issn_start + issn_end;
+                let issn_section = &content[issn_start..issn_end];
+
+                if let Some(content_start) = issn_section.find(">") {
+                    let issn_value = &issn_section[content_start + 1..];
+
+                    if issn_section.contains("pub-type=\"epub\"") {
+                        journal.issn_electronic = Some(issn_value.to_string());
+                    } else if issn_section.contains("pub-type=\"ppub\"") {
+                        journal.issn_print = Some(issn_value.to_string());
+                    }
+                }
+                pos = issn_end;
+            } else {
+                break;
+            }
+        }
+
+        // Extract publisher
+        journal.publisher =
+            self.extract_text_between(content, "<publisher-name>", "</publisher-name>");
+
+        // Extract volume and issue
+        journal.volume = self.extract_text_between(content, "<volume>", "</volume>");
+        journal.issue = self.extract_text_between(content, "<issue>", "</issue>");
+
+        journal
     }
 
     /// Extract publication date
@@ -159,28 +332,189 @@ impl PmcXmlParser {
         None
     }
 
-    /// Extract article sections from body
-    fn extract_sections(&self, content: &str) -> Vec<ArticleSection> {
+    /// Extract article type
+    fn extract_article_type(&self, content: &str) -> Option<String> {
+        // Look for article-type attribute in article tag
+        if let Some(article_start) = content.find("<article") {
+            if let Some(article_end) = content[article_start..].find(">") {
+                let article_tag = &content[article_start..article_start + article_end];
+                if let Some(type_start) = article_tag.find("article-type=\"") {
+                    let type_start = type_start + 14; // Length of "article-type=\""
+                    if let Some(type_end) = article_tag[type_start..].find('"') {
+                        return Some(article_tag[type_start..type_start + type_end].to_string());
+                    }
+                }
+            }
+        }
+
+        // Fallback: look in article-categories
+        self.extract_text_between(content, "<subject>", "</subject>")
+    }
+
+    /// Extract keywords
+    fn extract_keywords(&self, content: &str) -> Vec<String> {
+        let mut keywords = Vec::new();
+
+        if let Some(kwd_start) = content.find("<kwd-group") {
+            if let Some(kwd_end) = content[kwd_start..].find("</kwd-group>") {
+                let kwd_section = &content[kwd_start..kwd_start + kwd_end];
+
+                let mut pos = 0;
+                while let Some(kwd_start) = kwd_section[pos..].find("<kwd>") {
+                    let kwd_start = pos + kwd_start + 5; // Length of "<kwd>"
+                    if let Some(kwd_end) = kwd_section[kwd_start..].find("</kwd>") {
+                        let keyword = kwd_section[kwd_start..kwd_start + kwd_end]
+                            .trim()
+                            .to_string();
+                        if !keyword.is_empty() {
+                            keywords.push(keyword);
+                        }
+                        pos = kwd_start + kwd_end;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        keywords
+    }
+
+    /// Extract funding information
+    fn extract_funding(&self, content: &str) -> Vec<FundingInfo> {
+        let mut funding = Vec::new();
+
+        if let Some(funding_start) = content.find("<funding-group>") {
+            if let Some(funding_end) = content[funding_start..].find("</funding-group>") {
+                let funding_section = &content[funding_start..funding_start + funding_end];
+
+                let mut pos = 0;
+                while let Some(award_start) = funding_section[pos..].find("<award-group") {
+                    let award_start = pos + award_start;
+                    if let Some(award_end) = funding_section[award_start..].find("</award-group>") {
+                        let award_end = award_start + award_end;
+                        let award_section = &funding_section[award_start..award_end];
+
+                        let source = self
+                            .extract_text_between(
+                                award_section,
+                                "<funding-source>",
+                                "</funding-source>",
+                            )
+                            .unwrap_or_else(|| "Unknown Source".to_string());
+
+                        let mut funding_info = FundingInfo::new(source);
+                        funding_info.award_id =
+                            self.extract_text_between(award_section, "<award-id>", "</award-id>");
+
+                        funding.push(funding_info);
+                        pos = award_end;
+                    } else {
+                        break;
+                    }
+                }
+
+                // Extract funding statements
+                if let Some(statement) = self.extract_text_between(
+                    funding_section,
+                    "<funding-statement>",
+                    "</funding-statement>",
+                ) {
+                    if funding.is_empty() {
+                        let mut funding_info = FundingInfo::new("General Funding".to_string());
+                        funding_info.statement = Some(statement);
+                        funding.push(funding_info);
+                    } else {
+                        funding[0].statement = Some(statement);
+                    }
+                }
+            }
+        }
+
+        funding
+    }
+
+    /// Extract conflict of interest statement
+    fn extract_conflict_of_interest(&self, content: &str) -> Option<String> {
+        // Look for COI statement in various locations
+        if let Some(coi) =
+            self.extract_text_between(content, "<fn fn-type=\"COI-statement\">", "</fn>")
+        {
+            return Some(self.strip_xml_tags(&coi));
+        }
+
+        if let Some(coi) = self.extract_text_between(content, "<fn fn-type=\"conflict\">", "</fn>")
+        {
+            return Some(self.strip_xml_tags(&coi));
+        }
+
+        // Look in notes section
+        if let Some(notes_start) = content.find("<author-notes>") {
+            if let Some(notes_end) = content[notes_start..].find("</author-notes>") {
+                let notes_section = &content[notes_start..notes_start + notes_end];
+                if let Some(coi) = self.extract_text_between(notes_section, "<fn", "</fn>") {
+                    if coi.to_lowercase().contains("conflict")
+                        || coi.to_lowercase().contains("competing")
+                    {
+                        return Some(self.strip_xml_tags(&coi));
+                    }
+                }
+            }
+        }
+
+        None
+    }
+
+    /// Extract acknowledgments
+    fn extract_acknowledgments(&self, content: &str) -> Option<String> {
+        self.extract_text_between(content, "<ack>", "</ack>")
+            .map(|ack| self.strip_xml_tags(&ack))
+    }
+
+    /// Extract data availability statement
+    fn extract_data_availability(&self, content: &str) -> Option<String> {
+        // Look for data availability in various sections
+        if let Some(data_avail) =
+            self.extract_text_between(content, "<sec sec-type=\"data-availability\">", "</sec>")
+        {
+            return Some(self.strip_xml_tags(&data_avail));
+        }
+
+        // Look in supplementary material
+        if let Some(supp_start) = content.find("<supplementary-material") {
+            if let Some(supp_end) = content[supp_start..].find("</supplementary-material>") {
+                let supp_section = &content[supp_start..supp_start + supp_end];
+                if supp_section.to_lowercase().contains("data") {
+                    return Some(self.strip_xml_tags(supp_section));
+                }
+            }
+        }
+
+        None
+    }
+
+    /// Enhanced section extraction with nested sections and rich content
+    fn extract_sections_enhanced(&self, content: &str) -> Vec<ArticleSection> {
         let mut sections = Vec::new();
 
         // Extract abstract first
-        if let Some(abstract_section) = self.extract_abstract_section(content) {
+        if let Some(abstract_section) = self.extract_abstract_section_enhanced(content) {
             sections.push(abstract_section);
         }
 
-        // Extract body sections
+        // Extract body sections with enhanced parsing
         if let Some(body_start) = content.find("<body>") {
             if let Some(body_end) = content[body_start..].find("</body>") {
                 let body_content = &content[body_start + 6..body_start + body_end];
-                sections.extend(self.extract_body_sections(body_content));
+                sections.extend(self.extract_body_sections_enhanced(body_content));
             }
         }
 
         sections
     }
 
-    /// Extract abstract section
-    fn extract_abstract_section(&self, content: &str) -> Option<ArticleSection> {
+    /// Enhanced abstract section extraction
+    fn extract_abstract_section_enhanced(&self, content: &str) -> Option<ArticleSection> {
         if let Some(abstract_start) = content.find("<abstract") {
             if let Some(abstract_end) = content[abstract_start..].find("</abstract>") {
                 let abstract_content = &content[abstract_start..abstract_start + abstract_end];
@@ -188,14 +522,22 @@ impl PmcXmlParser {
                 // Find the actual content start (after the opening tag)
                 if let Some(content_start) = abstract_content.find(">") {
                     let content_part = &abstract_content[content_start + 1..];
+
+                    // Extract figures and tables from abstract
+                    let figures = self.extract_figures_from_section(content_part);
+                    let tables = self.extract_tables_from_section(content_part);
+
                     let clean_content = self.strip_xml_tags(content_part);
 
                     if !clean_content.trim().is_empty() {
-                        return Some(ArticleSection::with_title(
+                        let mut section = ArticleSection::with_title(
                             "abstract".to_string(),
                             "Abstract".to_string(),
                             clean_content,
-                        ));
+                        );
+                        section.figures = figures;
+                        section.tables = tables;
+                        return Some(section);
                     }
                 }
             }
@@ -203,8 +545,8 @@ impl PmcXmlParser {
         None
     }
 
-    /// Extract sections from body content
-    fn extract_body_sections(&self, content: &str) -> Vec<ArticleSection> {
+    /// Enhanced body sections extraction with nested sections
+    fn extract_body_sections_enhanced(&self, content: &str) -> Vec<ArticleSection> {
         let mut sections = Vec::new();
 
         // Extract sections marked with <sec> tags
@@ -215,7 +557,7 @@ impl PmcXmlParser {
                 let sec_end = sec_start + sec_end;
                 let section_content = &content[sec_start..sec_end];
 
-                if let Some(section) = self.parse_section(section_content) {
+                if let Some(section) = self.parse_section_enhanced(section_content) {
                     sections.push(section);
                 }
 
@@ -227,7 +569,7 @@ impl PmcXmlParser {
 
         // If no sections found, extract paragraphs as a single section
         if sections.is_empty() {
-            if let Some(body_section) = self.extract_paragraphs_as_section(content) {
+            if let Some(body_section) = self.extract_paragraphs_as_section_enhanced(content) {
                 sections.push(body_section);
             }
         }
@@ -235,8 +577,11 @@ impl PmcXmlParser {
         sections
     }
 
-    /// Parse a single section
-    fn parse_section(&self, content: &str) -> Option<ArticleSection> {
+    /// Enhanced section parsing with figures, tables, and nested sections
+    fn parse_section_enhanced(&self, content: &str) -> Option<ArticleSection> {
+        // Extract section ID
+        let id = self.extract_attribute_value(content, "id");
+
         let title = self.extract_text_between(content, "<title>", "</title>");
 
         // Extract content from paragraphs
@@ -264,8 +609,19 @@ impl PmcXmlParser {
             }
         }
 
-        if !section_content.trim().is_empty() {
-            Some(match title {
+        // Extract figures and tables
+        let figures = self.extract_figures_from_section(content);
+        let tables = self.extract_tables_from_section(content);
+
+        // Extract nested subsections
+        let subsections = self.extract_nested_sections(content);
+
+        if !section_content.trim().is_empty()
+            || !subsections.is_empty()
+            || !figures.is_empty()
+            || !tables.is_empty()
+        {
+            let mut section = match title {
                 Some(t) => ArticleSection::with_title(
                     "section".to_string(),
                     t,
@@ -274,14 +630,51 @@ impl PmcXmlParser {
                 None => {
                     ArticleSection::new("section".to_string(), section_content.trim().to_string())
                 }
-            })
+            };
+
+            section.id = id;
+            section.figures = figures;
+            section.tables = tables;
+            section.subsections = subsections;
+
+            Some(section)
         } else {
             None
         }
     }
 
-    /// Extract paragraphs as a single section
-    fn extract_paragraphs_as_section(&self, content: &str) -> Option<ArticleSection> {
+    /// Extract nested sections within a section
+    fn extract_nested_sections(&self, content: &str) -> Vec<ArticleSection> {
+        let mut nested_sections = Vec::new();
+
+        // Look for nested <sec> tags
+        let mut depth = 0;
+        let mut start_pos = None;
+
+        for (i, _) in content.char_indices() {
+            if content[i..].starts_with("<sec") {
+                if depth == 0 {
+                    start_pos = Some(i);
+                }
+                depth += 1;
+            } else if content[i..].starts_with("</sec>") {
+                depth -= 1;
+                if depth == 0 {
+                    if let Some(start) = start_pos {
+                        let nested_content = &content[start..i + 6]; // +6 for "</sec>"
+                        if let Some(nested_section) = self.parse_section_enhanced(nested_content) {
+                            nested_sections.push(nested_section);
+                        }
+                    }
+                }
+            }
+        }
+
+        nested_sections
+    }
+
+    /// Extract paragraphs as enhanced section
+    fn extract_paragraphs_as_section_enhanced(&self, content: &str) -> Option<ArticleSection> {
         let mut para_content = String::new();
         let mut pos = 0;
 
@@ -307,18 +700,116 @@ impl PmcXmlParser {
         }
 
         if !para_content.trim().is_empty() {
-            Some(ArticleSection::with_title(
+            let mut section = ArticleSection::with_title(
                 "body".to_string(),
                 "Main Content".to_string(),
                 para_content.trim().to_string(),
-            ))
+            );
+
+            // Extract figures and tables from the entire content
+            section.figures = self.extract_figures_from_section(content);
+            section.tables = self.extract_tables_from_section(content);
+
+            Some(section)
         } else {
             None
         }
     }
 
-    /// Extract references from reference list
-    fn extract_references(&self, content: &str) -> Vec<Reference> {
+    /// Extract figures from a section
+    fn extract_figures_from_section(&self, content: &str) -> Vec<Figure> {
+        let mut figures = Vec::new();
+
+        let mut pos = 0;
+        while let Some(fig_start) = content[pos..].find("<fig") {
+            let fig_start = pos + fig_start;
+            if let Some(fig_end) = content[fig_start..].find("</fig>") {
+                let fig_end = fig_start + fig_end;
+                let fig_content = &content[fig_start..fig_end];
+
+                let id = self
+                    .extract_attribute_value(fig_content, "id")
+                    .unwrap_or_else(|| format!("fig_{}", figures.len() + 1));
+
+                let label = self.extract_text_between(fig_content, "<label>", "</label>");
+                let caption = self
+                    .extract_text_between(fig_content, "<caption>", "</caption>")
+                    .map(|c| self.strip_xml_tags(&c))
+                    .unwrap_or_else(|| "No caption available".to_string());
+
+                let alt_text = self.extract_text_between(fig_content, "<alt-text>", "</alt-text>");
+                let fig_type = self.extract_attribute_value(fig_content, "fig-type");
+
+                let mut figure = Figure::new(id, caption);
+                figure.label = label;
+                figure.alt_text = alt_text;
+                figure.fig_type = fig_type;
+
+                figures.push(figure);
+                pos = fig_end;
+            } else {
+                break;
+            }
+        }
+
+        figures
+    }
+
+    /// Extract tables from a section
+    fn extract_tables_from_section(&self, content: &str) -> Vec<Table> {
+        let mut tables = Vec::new();
+
+        let mut pos = 0;
+        while let Some(table_start) = content[pos..].find("<table-wrap") {
+            let table_start = pos + table_start;
+            if let Some(table_end) = content[table_start..].find("</table-wrap>") {
+                let table_end = table_start + table_end;
+                let table_content = &content[table_start..table_end];
+
+                let id = self
+                    .extract_attribute_value(table_content, "id")
+                    .unwrap_or_else(|| format!("table_{}", tables.len() + 1));
+
+                let label = self.extract_text_between(table_content, "<label>", "</label>");
+                let caption = self
+                    .extract_text_between(table_content, "<caption>", "</caption>")
+                    .map(|c| self.strip_xml_tags(&c))
+                    .unwrap_or_else(|| "No caption available".to_string());
+
+                // Extract table footnotes
+                let mut footnotes = Vec::new();
+                let mut fn_pos = 0;
+                while let Some(fn_start) = table_content[fn_pos..].find("<table-wrap-foot") {
+                    let fn_start = fn_pos + fn_start;
+                    if let Some(fn_end) = table_content[fn_start..].find("</table-wrap-foot>") {
+                        let fn_end = fn_start + fn_end;
+                        let fn_content = &table_content[fn_start..fn_end];
+                        let footnote = self.strip_xml_tags(fn_content);
+                        if !footnote.trim().is_empty() {
+                            footnotes.push(footnote);
+                        }
+                        fn_pos = fn_end;
+                    } else {
+                        break;
+                    }
+                }
+
+                let mut table = Table::new(id, caption);
+                table.label = label;
+                table.footnotes = footnotes;
+
+                tables.push(table);
+                pos = table_end;
+            } else {
+                break;
+            }
+        }
+
+        tables
+    }
+
+    /// Extract enhanced reference information
+    fn extract_references_detailed(&self, content: &str) -> Vec<Reference> {
         let mut references = Vec::new();
 
         if let Some(ref_start) = content.find("<ref-list") {
@@ -328,26 +819,13 @@ impl PmcXmlParser {
                 let mut pos = 0;
                 while let Some(ref_start) = ref_content[pos..].find("<ref id=\"") {
                     let ref_start = pos + ref_start;
-                    if let Some(id_end) = ref_content[ref_start + 9..].find("\"") {
+                    if let Some(id_end) = ref_content[ref_start + 9..].find('"') {
                         let id = ref_content[ref_start + 9..ref_start + 9 + id_end].to_string();
 
                         if let Some(ref_end) = ref_content[ref_start..].find("</ref>") {
                             let ref_section = &ref_content[ref_start..ref_start + ref_end];
 
-                            let title = self.extract_text_between(
-                                ref_section,
-                                "<article-title>",
-                                "</article-title>",
-                            );
-                            let journal =
-                                self.extract_text_between(ref_section, "<source>", "</source>");
-                            let year = self.extract_text_between(ref_section, "<year>", "</year>");
-
-                            let mut reference = Reference::new(id);
-                            reference.title = title;
-                            reference.journal = journal;
-                            reference.year = year;
-
+                            let reference = self.parse_detailed_reference(ref_section, id);
                             references.push(reference);
                             pos = ref_start + ref_end;
                         } else {
@@ -361,6 +839,93 @@ impl PmcXmlParser {
         }
 
         references
+    }
+
+    /// Parse detailed reference information
+    fn parse_detailed_reference(&self, ref_content: &str, id: String) -> Reference {
+        let mut reference = Reference::new(id);
+
+        // Extract title
+        reference.title =
+            self.extract_text_between(ref_content, "<article-title>", "</article-title>");
+
+        // Extract journal
+        reference.journal = self.extract_text_between(ref_content, "<source>", "</source>");
+
+        // Extract year
+        reference.year = self.extract_text_between(ref_content, "<year>", "</year>");
+
+        // Extract volume
+        reference.volume = self.extract_text_between(ref_content, "<volume>", "</volume>");
+
+        // Extract issue
+        reference.issue = self.extract_text_between(ref_content, "<issue>", "</issue>");
+
+        // Extract pages
+        if let Some(fpage) = self.extract_text_between(ref_content, "<fpage>", "</fpage>") {
+            if let Some(lpage) = self.extract_text_between(ref_content, "<lpage>", "</lpage>") {
+                reference.pages = Some(format!("{}-{}", fpage, lpage));
+            } else {
+                reference.pages = Some(fpage);
+            }
+        }
+
+        // Extract DOI
+        reference.doi =
+            self.extract_text_between(ref_content, "<pub-id pub-id-type=\"doi\">", "</pub-id>");
+
+        // Extract PMID
+        reference.pmid =
+            self.extract_text_between(ref_content, "<pub-id pub-id-type=\"pmid\">", "</pub-id>");
+
+        // Extract authors
+        reference.authors = self.extract_reference_authors(ref_content);
+
+        // Determine reference type
+        if ref_content.contains("<element-citation publication-type") {
+            reference.ref_type = self.extract_attribute_value(ref_content, "publication-type");
+        }
+
+        reference
+    }
+
+    /// Extract authors from reference
+    fn extract_reference_authors(&self, ref_content: &str) -> Vec<Author> {
+        let mut authors = Vec::new();
+
+        let mut pos = 0;
+        while let Some(name_start) = ref_content[pos..].find("<name>") {
+            let name_start = pos + name_start;
+            if let Some(name_end) = ref_content[name_start..].find("</name>") {
+                let name_end = name_start + name_end;
+                let name_content = &ref_content[name_start..name_end];
+
+                let surname = self.extract_text_between(name_content, "<surname>", "</surname>");
+                let given_names =
+                    self.extract_text_between(name_content, "<given-names>", "</given-names>");
+
+                let author = Author::with_names(given_names, surname);
+                authors.push(author);
+
+                pos = name_end;
+            } else {
+                break;
+            }
+        }
+
+        authors
+    }
+
+    /// Extract attribute value from XML tag
+    fn extract_attribute_value(&self, content: &str, attribute: &str) -> Option<String> {
+        let pattern = format!("{}=\"", attribute);
+        if let Some(attr_start) = content.find(&pattern) {
+            let value_start = attr_start + pattern.len();
+            if let Some(value_end) = content[value_start..].find('"') {
+                return Some(content[value_start..value_start + value_end].to_string());
+            }
+        }
+        None
     }
 
     /// Strip XML tags from content
@@ -378,6 +943,17 @@ impl PmcXmlParser {
         }
 
         result.trim().to_string()
+    }
+
+    // Legacy methods for backward compatibility
+    #[allow(dead_code)]
+    fn extract_sections(&self, content: &str) -> Vec<ArticleSection> {
+        self.extract_sections_enhanced(content)
+    }
+
+    #[allow(dead_code)]
+    fn extract_references(&self, content: &str) -> Vec<Reference> {
+        self.extract_references_detailed(content)
     }
 }
 

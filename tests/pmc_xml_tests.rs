@@ -18,7 +18,7 @@ mod tests {
 
             if path.extension().and_then(|s| s.to_str()) == Some("xml") {
                 let xml_content = fs::read_to_string(&path)
-                    .expect(&format!("Failed to read XML file: {:?}", path));
+                    .unwrap_or_else(|_| panic!("Failed to read XML file: {:?}", path));
 
                 println!("Testing file: {:?}", path.file_name().unwrap());
 
