@@ -8,6 +8,7 @@
 //!
 //! - **PubMed API Integration**: Search and fetch article metadata
 //! - **PMC Full Text**: Retrieve and parse structured full-text articles
+//! - **Markdown Export**: Convert PMC articles to well-formatted Markdown
 //! - **Async Support**: Built on tokio for async/await support
 //! - **Error Handling**: Comprehensive error types for robust error handling
 //! - **Type Safety**: Strongly typed data structures for all API responses
@@ -64,6 +65,36 @@
 //!     Ok(())
 //! }
 //! ```
+//!
+//! ### Converting PMC Articles to Markdown
+//!
+//! ```no_run
+//! use pubmed_client_rs::{PmcClient, PmcMarkdownConverter, HeadingStyle, ReferenceStyle};
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = PmcClient::new();
+//!
+//!     // Fetch and parse a PMC article
+//!     if let Ok(full_text) = client.fetch_full_text("PMC1234567").await {
+//!         // Create a markdown converter with custom configuration
+//!         let converter = PmcMarkdownConverter::new()
+//!             .with_include_metadata(true)
+//!             .with_include_toc(true)
+//!             .with_heading_style(HeadingStyle::ATX)
+//!             .with_reference_style(ReferenceStyle::Numbered);
+//!
+//!         // Convert to markdown
+//!         let markdown = converter.convert(&full_text);
+//!         println!("{}", markdown);
+//!
+//!         // Or save to file
+//!         std::fs::write("article.md", markdown)?;
+//!     }
+//!
+//!     Ok(())
+//! }
+//! ```
 
 pub mod error;
 pub mod pmc;
@@ -73,8 +104,9 @@ pub mod query;
 // Re-export main types for convenience
 pub use error::{PubMedError, Result};
 pub use pmc::{
-    Affiliation, ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcClient, PmcFullText,
-    PmcXmlParser, Reference, Table,
+    Affiliation, ArticleSection, Author, Figure, FundingInfo, HeadingStyle, JournalInfo,
+    MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter, PmcXmlParser, Reference,
+    ReferenceStyle, Table,
 };
 pub use pubmed::{PubMedArticle, PubMedClient};
 pub use query::{ArticleType, Language, SearchQuery};
