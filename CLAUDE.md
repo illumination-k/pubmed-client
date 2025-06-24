@@ -9,6 +9,7 @@ This is a Rust client library for accessing PubMed and PMC (PubMed Central) APIs
 ## Commands
 
 ### Build & Development
+
 ```bash
 # Build the project
 cargo build
@@ -27,6 +28,7 @@ cargo check
 ```
 
 ### Code Quality
+
 ```bash
 # Run clippy for linting
 cargo clippy
@@ -47,6 +49,7 @@ dprint check
 ## Architecture
 
 ### Module Structure
+
 - `src/lib.rs` - Main library entry point, re-exports public API
 - `src/pubmed.rs` - PubMed API client for article metadata search and retrieval
 - `src/pmc.rs` - PMC client for full-text article access
@@ -54,12 +57,14 @@ dprint check
 - `src/error.rs` - Error types and result aliases
 
 ### Key Types
+
 - `Client` - Combined client that provides both PubMed and PMC functionality
 - `PubMedClient` - Handles article metadata searches via PubMed E-utilities
 - `PmcClient` - Fetches structured full-text from PubMed Central
 - `SearchQuery` - Builder pattern for constructing complex search queries with filters
 
 ### API Design Patterns
+
 - Async/await using tokio runtime
 - Builder pattern for search queries
 - Result<T> type alias for error handling
@@ -67,6 +72,7 @@ dprint check
 - Support for custom HTTP clients via reqwest
 
 ### Dependencies
+
 - `tokio` - Async runtime
 - `reqwest` - HTTP client
 - `serde` - Serialization/deserialization
