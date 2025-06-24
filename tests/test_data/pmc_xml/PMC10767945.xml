@@ -1,0 +1,1853 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:16:46Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:10767945" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:10767945</identifier><datestamp>2024-01-06</datestamp><setSpec>nar</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" dtd-version="1.3" xml:lang="en" article-type="research-article">
+  <processing-meta base-tagset="archiving" mathml-version="3.0" table-model="xhtml" tagset-family="jats">
+    <restricted-by>pmc</restricted-by>
+  </processing-meta>
+  <front><journal-meta><journal-id journal-id-type="nlm-ta">Nucleic Acids Res</journal-id><journal-id journal-id-type="iso-abbrev">Nucleic Acids Res</journal-id><journal-id journal-id-type="publisher-id">nar</journal-id><journal-title-group><journal-title>Nucleic Acids Research</journal-title></journal-title-group><issn pub-type="ppub">0305-1048</issn><issn pub-type="epub">1362-4962</issn><publisher><publisher-name>Oxford University Press</publisher-name></publisher></journal-meta>
+<article-meta><article-id pub-id-type="accession">PMC10767945</article-id><article-id pub-id-type="pmcid">PMC10767945</article-id><article-id pub-id-type="pmc-uid">10767945</article-id><article-id pub-id-type="pmid">38035367</article-id><article-id pub-id-type="pmid">38035367</article-id>
+<article-id pub-id-type="doi">10.1093/nar/gkad1173</article-id><article-id pub-id-type="publisher-id">gkad1173</article-id><article-categories><subj-group subj-group-type="category-taxonomy-collection"><subject>AcademicSubjects/SCI00010</subject></subj-group><subj-group subj-group-type="heading"><subject>Editorial</subject></subj-group><subj-group subj-group-type="heading"><subject>Database Issue</subject></subj-group></article-categories><title-group><article-title>The 2024 <italic toggle="yes">Nucleic Acids Research</italic> database issue and the online molecular biology database collection</article-title></title-group><contrib-group><contrib contrib-type="author" corresp="yes"><name><surname>Rigden</surname><given-names>Daniel J</given-names></name><!--nardatabase@gmail.com--><aff>
+<institution>Institute of Systems, Molecular and Integrative Biology, University of Liverpool</institution>, <addr-line>Crown Street</addr-line>, Liverpool <addr-line>L69 7ZB</addr-line>, <country country="GB">UK</country></aff><xref rid="COR1" ref-type="corresp"/></contrib><contrib contrib-type="author"><contrib-id contrib-id-type="orcid" authenticated="false">https://orcid.org/0000-0001-7139-6215</contrib-id><name><surname>Fernández</surname><given-names>Xosé M</given-names></name><aff>
+<institution>IQVIA Ltd.</institution>, The Point, <addr-line>37 North Wharf Road</addr-line>, London <addr-line>W2 1AF</addr-line>, <country country="GB">UK</country></aff></contrib></contrib-group><author-notes><corresp id="COR1">To whom correspondence should be addressed. Tel: +44 151 795 4467; Email: <email>nardatabase@gmail.com</email></corresp></author-notes><pub-date pub-type="collection"><day>05</day><month>1</month><year>2024</year></pub-date><pub-date pub-type="epub" iso-8601-date="2023-11-30"><day>30</day><month>11</month><year>2023</year></pub-date><pub-date pub-type="pmc-release"><day>30</day><month>11</month><year>2023</year></pub-date><volume>52</volume><issue>D1</issue><fpage>D1</fpage><lpage>D9</lpage><history><date date-type="accepted"><day>23</day><month>11</month><year>2023</year></date><date date-type="received"><day>22</day><month>11</month><year>2023</year></date></history><permissions><copyright-statement>© The Author(s) 2023. Published by Oxford University Press on behalf of Nucleic Acids Research.</copyright-statement><copyright-year>2024</copyright-year><license><ali:license_ref specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>This is an Open Access article distributed under the terms of the Creative Commons Attribution License (<ext-link ext-link-type="uri" xlink:href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</ext-link>), which permits unrestricted reuse, distribution, and reproduction in any medium, provided the original work is properly cited.</license-p></license></permissions><self-uri xlink:href="gkad1173.pdf"/><abstract><title>Abstract</title><p>The 2024 <italic toggle="yes">Nucleic Acids Research</italic> database issue contains 180 papers from across biology and neighbouring disciplines. There are 90 papers reporting on new databases and 83 updates from resources previously published in the Issue. Updates from databases most recently published elsewhere account for a further seven. Nucleic acid databases include the new NAKB for structural information and updates from Genbank, ENA, GEO, Tarbase and JASPAR. The Issue's Breakthrough Article concerns NMPFamsDB for novel prokaryotic protein families and the AlphaFold Protein Structure Database has an important update. Metabolism is covered by updates from Reactome, Wikipathways and Metabolights. Microbes are covered by RefSeq, UNITE, SPIRE and P10K; viruses by ViralZone and PhageScope. Medically-oriented databases include the familiar COSMIC, Drugbank and TTD. Genomics-related resources include Ensembl, UCSC Genome Browser and Monarch. New arrivals cover plant imaging (OPIA and PlantPAD) and crop plants (SoyMD, TCOD and CropGS-Hub). The entire Database Issue is freely available online on the <italic toggle="yes">Nucleic Acids Research</italic> website (<ext-link xlink:href="https://academic.oup.com/nar" ext-link-type="uri">https://academic.oup.com/nar</ext-link>). Over the last year the <italic toggle="yes">NAR</italic> online Molecular Biology Database Collection has been updated, reviewing 1060 entries, adding 97 new resources and eliminating 388 discontinued URLs bringing the current total to 1959 databases. It is available at <ext-link xlink:href="http://www.oxfordjournals.org/nar/database/c/" ext-link-type="uri">http://www.oxfordjournals.org/nar/database/c/</ext-link>.</p></abstract><funding-group><award-group award-type="grant"><funding-source>
+<institution-wrap><institution>Oxford University Press</institution><institution-id institution-id-type="DOI">10.13039/501100007723</institution-id></institution-wrap>
+</funding-source></award-group></funding-group><counts><page-count count="9"/></counts></article-meta></front>
+  <body>
+    <sec id="SEC1">
+      <title>New and updated databases</title>
+      <p>The 31st <italic toggle="yes">Nucleic Acids Research</italic> database issue, in customary fashion, ranges broadly across biology with a total of 180 papers. Last year's recent record of 90 new databases is matched this year (Table <xref rid="tbl1" ref-type="table">1</xref>) while 83 papers report developments from resources previously covered by <italic toggle="yes">NAR</italic>. Seven further papers provide updates on databases most recently published elsewhere (Table <xref rid="tbl2" ref-type="table">2</xref>). As usual, the Issue leads off with reports from the major database providers at the European Bioinformatics Institute (EBI), the U.S. National Center for Biotechnology Information (NCBI), and the National Genomics Data Center (NGDC) in China (<xref rid="B1" ref-type="bibr">1–3</xref>). This year they are joined by an article from the SIB Swiss Institute of Bioinformatics (<xref rid="B4" ref-type="bibr">4</xref>). The following papers on individual databases are, as usual, grouped into categories: (i) nucleic acid sequence and structure, transcriptional regulation; (ii) protein sequence and structure, proteomics; (iii) metabolic and signalling pathways, enzymes and networks; (iv) genomics of viruses, bacteria, protozoa and fungi; (v) genomics of human and model organisms plus comparative genomics; (vi) human genomic variation, diseases and drugs; (vii) plants and (viii) other topics. As usual, many papers defy easy categorisation and so it is recommended that readers browse the full list.</p>
+      <table-wrap position="float" id="tbl1">
+        <label>Table 1.</label>
+        <caption>
+          <p>Descriptions of new databases in the 2023 NAR Database issue</p>
+        </caption>
+        <table frame="hsides" rules="groups">
+          <thead>
+            <tr>
+              <th rowspan="1" colspan="1">Database name</th>
+              <th rowspan="1" colspan="1">URL</th>
+              <th rowspan="1" colspan="1">Short description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="1" colspan="1">A3D Model Organism Database</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://biocomp.chem.uw.edu.pl/A3D2/MODB" ext-link-type="uri">http://biocomp.chem.uw.edu.pl/A3D2/MODB</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Aggregation predictions for model organism proteomes</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">ABC-HuMi</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://www.ccb.uni-saarland.de/abc_humi/" ext-link-type="uri">https://www.ccb.uni-saarland.de/abc_humi/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Biosynthetic Gene Clusters in the Human Microbiome</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">ADC-DB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://idrblab.org/adcdb/" ext-link-type="uri">https://idrblab.org/adcdb/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Antibody-drug conjugates</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">AgeAnnoMO</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://relab.xidian.edu.cn/AgeAnnoMO/#/" ext-link-type="uri">https://relab.xidian.edu.cn/AgeAnnoMO/#/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Multi-omics of animal ageing</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">AGIDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://agidb.pro/" ext-link-type="uri">https://agidb.pro/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Animal Genotype Imputation DataBase</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">AnimalMetaOmics</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://yanglab.hzau.edu.cn/animalmetaomics#" ext-link-type="uri">https://yanglab.hzau.edu.cn/animalmetaomics#</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Multi-omics of animal microbiomes</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">ATLAS</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://www.dsimb.inserm.fr/ATLAS" ext-link-type="uri">https://www.dsimb.inserm.fr/ATLAS</ext-link>
+</td>
+              <td rowspan="1" colspan="1">ATLAS of protein dynamics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">BioExcel-CV19</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://bioexcel-cv19.bsc.es/#/" ext-link-type="uri">https://bioexcel-cv19.bsc.es/#/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Molecular Dynamics of Covid-19 proteins</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">BioKA</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/bioka" ext-link-type="uri">https://ngdc.cncb.ac.cn/bioka</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Biomarker Knowledgebase for Animals</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">CancerProteome</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://bio-bigdata.hrbmu.edu.cn/CancerProteome" ext-link-type="uri">http://bio-bigdata.hrbmu.edu.cn/CancerProteome</ext-link>
+</td>
+              <td rowspan="1" colspan="1">The Cancer Proteome</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">CASpedia</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://caspedia.org" ext-link-type="uri">http://caspedia.org</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Class 2 CRISPR associated enzymes,</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">CDS-DB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://cdsdb.cloudna.cn/" ext-link-type="uri">http://cdsdb.cloudna.cn/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Cancer Drug-induced gene expression Signature DataBase</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">CellCommuNet</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.inbirg.com/cellcommunet/" ext-link-type="uri">http://www.inbirg.com/cellcommunet/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Cell−cell communication analysis from scRNAseq</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">CellSTAR</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://idrblab.org/cellstar" ext-link-type="uri">https://idrblab.org/cellstar</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Single-cell Transcriptomic Annotation Resources</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">cfOmics</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://cfomics.ncRNAlab.org/" ext-link-type="uri">https://cfomics.ncRNAlab.org/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Cell-free multi-omics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">ClinicalOmicsDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://trials.linkedomics.org/" ext-link-type="uri">http://trials.linkedomics.org/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Transcriptomics and cancer clinical trials</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">COLOCdb</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/colocdb" ext-link-type="uri">https://ngdc.cncb.ac.cn/colocdb</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Cross-model colocalization for traits and phenotypes</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">COV2Var</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://biomedbdc.wchscu.cn/COV2Var/" ext-link-type="uri">http://biomedbdc.wchscu.cn/COV2Var/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">SARS-CoV-2 genetic variation and consequences</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">CropGS-Hub</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://iagr.genomics.cn/CropGS/" ext-link-type="uri">https://iagr.genomics.cn/CropGS/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Crop Genotypes and Phenotypes</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">CROST</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/crost" ext-link-type="uri">https://ngdc.cncb.ac.cn/crost</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Comprehensive Repository Of Spatial Transcriptomics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">dbAPIS</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://bcb.unl.edu/dbAPIS" ext-link-type="uri">https://bcb.unl.edu/dbAPIS</ext-link>
+</td>
+              <td rowspan="1" colspan="1">database of Anti-Prokaryotic Immune System genes</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">DDA</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.bioinformaticspa.com/DDA/" ext-link-type="uri">http://www.bioinformaticspa.com/DDA/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">DNA Damage Atlas</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">DiSignAtlas</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.inbirg.com/disignatlas/" ext-link-type="uri">http://www.inbirg.com/disignatlas/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Disease signatures based on bulk and single-cell transcriptomics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">DRMref</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ccsm.uth.edu/DRMref/" ext-link-type="uri">https://ccsm.uth.edu/DRMref/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Cancer drug resistance mechanisms from single cell data</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">EndoQuad</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://EndoQuad.chenzxlab.cn/" ext-link-type="uri">https://EndoQuad.chenzxlab.cn/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Experimental and predicted DNA G-quadruplexes</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">eRNAbase</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://bio.liclab.net/eRNAbase/index.php" ext-link-type="uri">http://bio.liclab.net/eRNAbase/index.php</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Enhancer RNA (eRNA) in human and mouse</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">FL-circAS</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://cosbi.ee.ncku.edu.tw/FL-circAS/" ext-link-type="uri">https://cosbi.ee.ncku.edu.tw/FL-circAS/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Full-length sequences and splicing of circular RNAs</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">FLIBase</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.flibase.org" ext-link-type="uri">http://www.flibase.org</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Full length isoforms in cancers and normal tissues</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">FusionNeoAntigen</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://compbio.uth.edu/FusionNeoAntigen" ext-link-type="uri">https://compbio.uth.edu/FusionNeoAntigen</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Fusion gene-specific neoantigens</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">FusionPDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://compbio.uth.edu/FusionPDB" ext-link-type="uri">https://compbio.uth.edu/FusionPDB</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Fusion protein annotation database</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">gcPathogen</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://nmdc.cn/gcpathogen/" ext-link-type="uri">https://nmdc.cn/gcpathogen/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Global Catalogue of Pathogens</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">GDPF</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://bioinfo.qd.sdu.edu.cn/GDPF/" ext-link-type="uri">http://bioinfo.qd.sdu.edu.cn/GDPF/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Global Distribution of Protein Families</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">HALL</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/hall/index" ext-link-type="uri">https://ngdc.cncb.ac.cn/hall/index</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Human Aging and Longevity Landscape</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">HervD Atlas</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/hervd/" ext-link-type="uri">https://ngdc.cncb.ac.cn/hervd/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Human endogenous retroviruses-disease associations</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">HHCDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://hhcdb.edbc.org/" ext-link-type="uri">http://hhcdb.edbc.org/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Human heterochromatin regions</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">IMG/PR</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://img.jgi.doe.gov/pr" ext-link-type="uri">https://img.jgi.doe.gov/pr</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Plasmid sequences</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">IMP</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://www.bic.ac.cn/IMP" ext-link-type="uri">https://www.bic.ac.cn/IMP</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Integrated Medicinal Plantomics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">iNClusive</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://non-canonical-aas.biologie.uni-freiburg.de/" ext-link-type="uri">https://non-canonical-aas.biologie.uni-freiburg.de/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Non-canonical amino acids</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">M2OR</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://m2or.chemsensim.fr/" ext-link-type="uri">https://m2or.chemsensim.fr/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Molecules to Olfactory Receptors</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">MACC</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://macc.badd-cao.net/" ext-link-type="uri">http://macc.badd-cao.net/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Metabolite-Associated Cell Communications</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">MAJIQlopedia</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://majiq.biociphers.org/majiqlopedia/" ext-link-type="uri">https://majiq.biociphers.org/majiqlopedia/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Human splice junctions</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">MAMI</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://bioinfo.biols.ac.cn/mami/" ext-link-type="uri">https://bioinfo.biols.ac.cn/mami/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Microbiome Atlas of Mothers and Infants</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">MethMarkerDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://methmarkerdb.hzau.edu.cn/" ext-link-type="uri">https://methmarkerdb.hzau.edu.cn/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Cancer DNA Methylation Biomarker</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">mHapBrowser</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://mhap.sibcb.ac.cn/" ext-link-type="uri">http://mhap.sibcb.ac.cn/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">DNA Methylation Haplotype Browser</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">MINRbase</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://cm.jefferson.edu/MINRbase/" ext-link-type="uri">http://cm.jefferson.edu/MINRbase/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">rRNA-derived fragments (rRFs)</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">MultifacetedProtDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://multifacetedprotdb.biocomp.unibo.it/" ext-link-type="uri">https://multifacetedprotdb.biocomp.unibo.it/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Proteins with multiple functions</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">ncRNADrug</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.jianglab.cn/ncRNADrug" ext-link-type="uri">http://www.jianglab.cn/ncRNADrug</ext-link>
+</td>
+              <td rowspan="1" colspan="1">ncRNAs targeted by drugs or linked to drug resistance</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">NMPFamsDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.nmpfamsdb.org/" ext-link-type="uri">http://www.nmpfamsdb.org/</ext-link> or <ext-link xlink:href="https://bib.fleming.gr/NMPFamsDB" ext-link-type="uri">https://bib.fleming.gr/NMPFamsDB</ext-link></td>
+              <td rowspan="1" colspan="1">Novel Metagenome Protein Families</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">NAKB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://nakb.org" ext-link-type="uri">https://nakb.org</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Nucleic Acid Knowledgebase</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">Open Genes</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://open-genes.org/" ext-link-type="uri">https://open-genes.org/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Human genes associated with aging and longevity</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">OPIA</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/opia/" ext-link-type="uri">https://ngdc.cncb.ac.cn/opia/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Open Plant Image Archive</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">P10K</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/p10k/" ext-link-type="uri">https://ngdc.cncb.ac.cn/p10k/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Protist 10000 Genomes Project</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PGS-depot</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.pgsdepot.net" ext-link-type="uri">http://www.pgsdepot.net</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Polygenic risk scores</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PhageScope</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://phagescope.deepomics.org" ext-link-type="uri">https://phagescope.deepomics.org</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Bacteriophages</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PharmGWAS</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/pharmgwas" ext-link-type="uri">https://ngdc.cncb.ac.cn/pharmgwas</ext-link>
+</td>
+              <td rowspan="1" colspan="1">GWAS for drug repurposing</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PigBioBank</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://pigbiobank.farmgtex.org" ext-link-type="uri">http://pigbiobank.farmgtex.org</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Pig genotypes and phenotypes</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PLAbDab</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://opig.stats.ox.ac.uk/webapps/plabdab/" ext-link-type="uri">https://opig.stats.ox.ac.uk/webapps/plabdab/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Patent and Literature Antibody Database</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PlantPAD</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://plantpad.samlab.cn" ext-link-type="uri">http://plantpad.samlab.cn</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Plant image phenomics and disease</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PMhub</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://pmhub.org.cn" ext-link-type="uri">https://pmhub.org.cn</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Plant Metabolite hub</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PPGR</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/ppgr/" ext-link-type="uri">https://ngdc.cncb.ac.cn/ppgr/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Resource for Perennial Plant Genomes and Regulation</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">PRMD</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://bioinformatics.sc.cn/PRMD" ext-link-type="uri">http://bioinformatics.sc.cn/PRMD</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Plant RNA Modification Database</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">RAVAR</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.ravar.bio" ext-link-type="uri">http://www.ravar.bio</ext-link>
+</td>
+              <td rowspan="1" colspan="1">RAre Variant Association Repository</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">RefMetaPlant</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://www.biosino.org/RefMetaDB/" ext-link-type="uri">https://www.biosino.org/RefMetaDB/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Reference Metabolome Database for Plants</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">Ribocentre-switch</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://riboswitch.ribocentre.org" ext-link-type="uri">https://riboswitch.ribocentre.org</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Riboswitches: Sequence, Structure, Function and Applications</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">RVdb</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://rvdb.mgc.ac.cn" ext-link-type="uri">http://rvdb.mgc.ac.cn</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Rhinovirus database</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SCAN</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://scanatlas.net" ext-link-type="uri">http://scanatlas.net</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Spatiotemporal Cloud Atlas for Neural cells</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SCAR</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://8.142.154.29/SCAR2023" ext-link-type="uri">http://8.142.154.29/SCAR2023</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Single-cell and Spatially-resolved CAncer Resources</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">scGRN</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://bio.liclab.net/scGRN/" ext-link-type="uri">https://bio.liclab.net/scGRN/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Single-cell gene regulatory networks in human and mouse</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">scPlantDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://biobigdata.nju.edu.cn/scplantdb" ext-link-type="uri">https://biobigdata.nju.edu.cn/scplantdb</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Plant scRNA-seq datasets</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">scQTLbase</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://bioinfo.szbl.ac.cn/scQTLbase" ext-link-type="uri">http://bioinfo.szbl.ac.cn/scQTLbase</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Single cell QTLs</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">scATAC-Ref</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://bio.liclab.net/scATAC-Ref/" ext-link-type="uri">https://bio.liclab.net/scATAC-Ref/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Single cell ATAC-seq data</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">scTEA-db</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.scTEA-db.org" ext-link-type="uri">http://www.scTEA-db.org</ext-link>
+</td>
+              <td rowspan="1" colspan="1">single cell-based Terminal Exon Annotation database</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SilkMeta</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://silkmeta.org.cn" ext-link-type="uri">http://silkmeta.org.cn</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Silkworm pan-genome and multi-omic database</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SingPro</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://idrblab.org/singpro/" ext-link-type="uri">http://idrblab.org/singpro/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Single cell proteomics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SLKB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://slkb.osubmi.org" ext-link-type="uri">https://slkb.osubmi.org</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Synthetic lethality knowledge base</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SORC</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://bio-bigdata.hrbmu.edu.cn/SORC" ext-link-type="uri">http://bio-bigdata.hrbmu.edu.cn/SORC</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Spatial Omics Resource in Cancer</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SoyMD</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://yanglab.hzau.edu.cn/SoyMD/#/" ext-link-type="uri">https://yanglab.hzau.edu.cn/SoyMD/#/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Soybean multi-omics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SPDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://scproteomicsdb.com/" ext-link-type="uri">https://scproteomicsdb.com/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Single cell proteomics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">SPIRE</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://spire.embl.de" ext-link-type="uri">https://spire.embl.de</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Searchable Planetary-scale mIcrobiome REsource</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">StemDriver</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://biomedbdc.wchscu.cn/StemDriver/" ext-link-type="uri">http://biomedbdc.wchscu.cn/StemDriver/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Hematopoietic stem cell differentiation by scRNAseq</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">STOmicsDB</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://db.cngb.org/stomics/" ext-link-type="uri">https://db.cngb.org/stomics/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Spatial transcriptomics</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">TargetGene</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/targetgene/" ext-link-type="uri">https://ngdc.cncb.ac.cn/targetgene/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Target genes for human genetic variants</td>
+            </tr>
+            <tr>
+              <td align="left" rowspan="1" colspan="1">TCOD</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/tcod" ext-link-type="uri">https://ngdc.cncb.ac.cn/tcod</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Tropical Crop omics Database</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">Telobase</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://cfb.ceitec.muni.cz/telobase/" ext-link-type="uri">http://cfb.ceitec.muni.cz/telobase/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Telomere sequences</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">TETSS</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://xozhanglab.com/TETSS" ext-link-type="uri">http://xozhanglab.com/TETSS</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Transposon (TE)-derived transcription start sites</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">TheMarker</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://idrblab.org/themarker" ext-link-type="uri">https://idrblab.org/themarker</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Therapeutic biomarkers</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">UniTmp</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.unitmp.org/" ext-link-type="uri">http://www.unitmp.org/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Transmembrane protein structures and topologies</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">UTexas Aptamer Database</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://sites.utexas.edu/aptamerdatabase/" ext-link-type="uri">https://sites.utexas.edu/aptamerdatabase/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Aptamers</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">VarEPS-influ</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://nmdc.cn/influvar/" ext-link-type="uri">https://nmdc.cn/influvar/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Influenza virus variation risk evaluation system</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">ZEBRA</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://www.ccb.uni-saarland.de/brain_atlas" ext-link-type="uri">https://www.ccb.uni-saarland.de/brain_atlas</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Brain gene expression at single cell resolution</td>
+            </tr>
+          </tbody>
+        </table>
+      </table-wrap>
+      <table-wrap position="float" id="tbl2">
+        <label>Table 2.</label>
+        <caption>
+          <p>Updated descriptions of databases most recently published elsewhere</p>
+        </caption>
+        <table frame="hsides" rules="groups">
+          <thead>
+            <tr>
+              <th rowspan="1" colspan="1">Database name</th>
+              <th rowspan="1" colspan="1">URL</th>
+              <th rowspan="1" colspan="1">Short description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="1" colspan="1">BATMAN-TCM</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://bionet.ncpsb.org.cn/batman-tcm/" ext-link-type="uri">http://bionet.ncpsb.org.cn/batman-tcm/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Bioinformatics Annotation daTabase for Molecular mechANism of Traditional Chinese Medicine</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">circAtlas</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://ngdc.cncb.ac.cn/circatlas/" ext-link-type="uri">https://ngdc.cncb.ac.cn/circatlas/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Vertebrate circular RNAs</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">circRNADisease</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://cgga.org.cn/circRNADisease/" ext-link-type="uri">http://cgga.org.cn/circRNADisease/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Circular RNA and disease</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">m7GHub</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://www.rnamd.org/m7GHub2" ext-link-type="uri">http://www.rnamd.org/m7GHub2</ext-link>
+</td>
+              <td rowspan="1" colspan="1">mRNA N7-methylguanosine (m7G) sites</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">OrthoMAM</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://orthomam.mbb.cnrs.fr/" ext-link-type="uri">https://orthomam.mbb.cnrs.fr/</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Curated alignments of mammalian orthologs</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">TPIA</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="http://tpia.teaplants.cn" ext-link-type="uri">http://tpia.teaplants.cn</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Tea Plant Information Archive</td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="1">TFcheckpoint</td>
+              <td rowspan="1" colspan="1">
+<ext-link xlink:href="https://www.tfcheckpoint.org/index.php" ext-link-type="uri">https://www.tfcheckpoint.org/index.php</ext-link>
+</td>
+              <td rowspan="1" colspan="1">Transcription factors from human, mouse, rat</td>
+            </tr>
+          </tbody>
+        </table>
+      </table-wrap>
+      <p>The ‘Nucleic acid databases’ section contains a report on a major new repository of nucleic acid structural information, named NAKB (<xref rid="B5" ref-type="bibr">5</xref>). Updated weekly, this resource is the successor of the Nucleic Acid Database (<xref rid="B6" ref-type="bibr">6</xref>) and provides new annotations, visualisations, search options and database links for Protein Data Bank (PDB) (<xref rid="B7" ref-type="bibr">7</xref>) structures that contain nucleic acids. Other interesting new databases cover specific classes of sequence: Ribocentre-switch covers sequence, structure, function and applications of riboswitches (<xref rid="B8" ref-type="bibr">8</xref>), the UTex Aptamer Database (<xref rid="B9" ref-type="bibr">9</xref>) captures literature on aptamers, notably harnessing undergraduate power to increase curation capacity, and TeloBase covers telomere sequences across the tree of life, mining both the literature and sequence databases (<xref rid="B10" ref-type="bibr">10</xref>). For sequence information in general, the INSDC consortium (<xref rid="B11" ref-type="bibr">11</xref>) members all report updates (<xref rid="B12" ref-type="bibr">12–14</xref>): perhaps the most notable is the DDBJ paper which emphasises how their activities increasingly reach beyond nucleic acid sequences, most recently to metabolomics with the establishment of the MetaboBank (<xref rid="B14" ref-type="bibr">14</xref>). Elsewhere, two new databases cover full-length sequences from long read technologies. FLIBase (<xref rid="B15" ref-type="bibr">15</xref>) covers isoforms in normal and cancerous human tissues, while FL-circAS focuses specifically on circular RNAs and their splice forms (<xref rid="B16" ref-type="bibr">16</xref>). They are joined, for the first time in <italic toggle="yes">NAR</italic>, by the popular circAtlas for vertebrate circular RNAs reporting a tripling of content, inclusion of clinical cancer samples and, importantly, adoption of a standardised circRNA nomenclature (<xref rid="B17" ref-type="bibr">17</xref>). Specific epitranscriptomic modifications are covered by updates from m6A-Atlas (<xref rid="B18" ref-type="bibr">18</xref>) and m7GHub (<xref rid="B19" ref-type="bibr">19</xref>) while RMBase (<xref rid="B20" ref-type="bibr">20</xref>) covers data related to 73 distinct modifications in 62 species, and the general database of RNA modifications, pathways and compounds MODOMICS adds novel modifications, both those seen experimentally in ribosome structures and artificial modifications used as experimental tools (<xref rid="B21" ref-type="bibr">21</xref>).</p>
+      <p>In gene expression and regulation, the foundational NCBI Gene Expression Omnibus (GEO) database returns (<xref rid="B22" ref-type="bibr">22</xref>) after a gap of 11 years to reflect on the gradual replacement of array-based data with next-generation sequence information, and the growing proportion of studies with a single-cell focus (also very visible in this Issue, see below). The venerable Tarbase, for miRNA-gene interactions, reports a six-fold increase in content since the previous version and new data types such as virally encoded miRNAs and interactions leading to target-directed miRNA degradation (<xref rid="B23" ref-type="bibr">23</xref>). Finally, major databases of transcription factor (TF) binding sites publish updates: HOCOMOCO reports its latest collection of carefully processed and curated human and mouse TF motifs (<xref rid="B24" ref-type="bibr">24</xref>) while JASPAR celebrates its 20th anniversary with useful increases in curated content across taxa and a reflection on the challenges to be addressed as the spread of deep learning methods across biology continues (<xref rid="B25" ref-type="bibr">25</xref>).</p>
+      <p>The protein section contains a ‘Breakthrough Article’ in the form of the NMPFamsDB paper (<xref rid="B26" ref-type="bibr">26</xref>). This database contains the results of mining metagenome sequences for novel families that are unrelated to those in the well-known Pfam database (<xref rid="B27" ref-type="bibr">27</xref>) or reference proteomes. Each entry in this veritable gold mine is comprehensively presented as a sequence alignment and (in most cases) an AlphaFold 2 model (<xref rid="B28" ref-type="bibr">28</xref>), alongside genome context, taxonomic mapping and geographical distribution. Equally momentous is an update article from the AlphaFold Protein Structure Database (<xref rid="B29" ref-type="bibr">29</xref>) which now covers around 90% of the sequence space in the UniProt database (<xref rid="B30" ref-type="bibr">30</xref>) with state of the art protein models. A range of improvements to the website cover, for example, a new sequence search by BLAST (<xref rid="B31" ref-type="bibr">31</xref>), easy access to different clusters of models, and improved interaction with content, both coordinates and the crucial PAE. Another update from the EBI covers EMDB, the Electron Microscopy Data Bank which reports continued experimental growth, responses to rapid technological change, and plans for validating data and metadata (<xref rid="B32" ref-type="bibr">32</xref>).</p>
+      <p>Elsewhere among protein-related databases, interesting new arrivals include inCLusive (<xref rid="B33" ref-type="bibr">33</xref>) capturing information on over 400 non-canonical amino acids and their incorporation into proteins, and MultifacetedProtDB (<xref rid="B34" ref-type="bibr">34</xref>) with &gt;1000 multi-functional aka moonlighting proteins. Two new databases SingPro (<xref rid="B35" ref-type="bibr">35</xref>) and SPDB (<xref rid="B36" ref-type="bibr">36</xref>) capture single-cell proteomics data and each offer sophisticated visualisation and analytical options. Elsewhere a pair of new databases cover Molecular Dynamics simulations, surely a significant growth area in the post-AlphaFold 2 era. BioExcel-CV19 (<xref rid="B37" ref-type="bibr">37</xref>) majors on simulations of Covid19 proteins but establishes an infrastructure designed to be reused elsewhere, while ATLAS (<xref rid="B38" ref-type="bibr">38</xref>) covers simulations of almost 1400 proteins selected to span most of structure space as defined by high level X-class domains in the ECOD hierarchical classification (<xref rid="B39" ref-type="bibr">39</xref>). Another notable new name is UniTmp which brings together a number of well-known resources for transmembrane proteins, including previous Database Issue regulars (<xref rid="B40" ref-type="bibr">40</xref>, <xref rid="B41" ref-type="bibr">41</xref>), into an integrated one-stop shop (<xref rid="B42" ref-type="bibr">42</xref>). A trio of well-known returning databases cover proteins that are not conventionally folded. The update from PED (<xref rid="B43" ref-type="bibr">43</xref>), covering ensembles of intrinsically disordered proteins (IDPs), reports a tripling of size and the new inclusion of purely computationally generated ensembles from eg. Machine Learning methods. It is complemented by a report from DisProt (<xref rid="B44" ref-type="bibr">44</xref>) which emphasises the importance of adoption of community standards in the protein disorder field (<xref rid="B45" ref-type="bibr">45</xref>) and reports an interesting bi-directional relationship with Gene Ontology (<xref rid="B46" ref-type="bibr">46</xref>) whose terms are used for annotation, but whose vocabulary is also expanded with input from the DisProt team. IDPs commonly contain linear interaction motifs of the kind documented by ELM (<xref rid="B47" ref-type="bibr">47</xref>) which reports interesting new motifs in eg RNA processing and protein degradation, and the news that ELM is now integrated into InterPro (<xref rid="B48" ref-type="bibr">48</xref>). Finally, two databases returning after 10 or more years cover protein-ligand interactions observed in the PDB: BioLiP (<xref rid="B49" ref-type="bibr">49</xref>) returns with its analysis of biologically relevant bound ligands, while MESPEUS (<xref rid="B50" ref-type="bibr">50</xref>) focuses on bound metals, usefully including sites that lie at crystal lattice interfaces, and offering pan-PDB coordination number distributions and measures of deviation from ideal geometry.</p>
+      <p>In the section for metabolism, signalling and enzymes, two new databases focus on cell–cell communications. CellCommuNet (<xref rid="B51" ref-type="bibr">51</xref>) exploits single cell RNAseq information to illuminate human and mouse cell-cell communication networks in health and disease while MACC (<xref rid="B52" ref-type="bibr">52</xref>) focuses on the role of metabolites and offers a bespoke visualisation tool for metabolite-cell regulatory networks. In the field of gene clusters, the popular antiSMASH database contributes an update (<xref rid="B53" ref-type="bibr">53</xref>) and is joined by the new ABC-HuMi (<xref rid="B54" ref-type="bibr">54</xref>) which considers distributions across different human microbiomes associated with different tissues. Metabolic pathways in general are amply covered by updates from three important returning databases: Reactome (<xref rid="B55" ref-type="bibr">55</xref>) now covers more than 11 000 human proteins (around 56%) and the paper discusses approaches to cover the remainder; WikiPathways (<xref rid="B56" ref-type="bibr">56</xref>) reaches almost 2000 pathways and 27 species, and benefits from an intriguing new tool to recognise terms in static pathway figures from the literature (pfocr.wikipathways.org); and PathBank (<xref rid="B57" ref-type="bibr">57</xref>) reports massively increased content, better pathway images and pathway enrichment tools. Finally, the major metabolomics resource Metabolights contributes an update (<xref rid="B58" ref-type="bibr">58</xref>) reporting its growth six-fold in studies since the last report, but also showcasing the MetaboLights Labs for exposing and distributing relevant computational workflows.</p>
+      <p>Viruses are particularly well represented in the next section they share with microbes. New arrivals VarEPS-influ (<xref rid="B59" ref-type="bibr">59</xref>), RVdb (<xref rid="B60" ref-type="bibr">60</xref>) and COV2Var (<xref rid="B61" ref-type="bibr">61</xref>) focus respectively on influenza, with an especial aim to understand and evaluate the risks of future epidemics; on rhinovirus, responsible for many common colds and linked to more serious conditions; and on SARS-CoV-2 genetic variation among 13 billion genome sequences. Returning virus databases include PhageScope (<xref rid="B62" ref-type="bibr">62</xref>) which covers almost a million comprehensively annotated bacteriophage sequences, and ViralZone (<xref rid="B63" ref-type="bibr">63</xref>) the beautifully illustrated educational virology resource. Eukaryotes are covered firstly by the interesting new P10K database (<xref rid="B64" ref-type="bibr">64</xref>), the home of the protist 10 000 Genomes Project. This has already covered almost half of protist orders by using single cell techniques to avoid difficulties in culturing, and has revealed intriguing variability in genetic codes among ciliates. There are also the returning VEuPathDB (<xref rid="B65" ref-type="bibr">65</xref>) for eukaryotic pathogens and hosts which adds new data types—AlphaFold 2 structure predictions and single cell transcriptomics; and UNITE (<xref rid="B66" ref-type="bibr">66</xref>), the extremely popular resource for eukaryote molecular identification which expands from a fungal focus to cover all eukaryotes. Finally, two new databases map sequence data geographically: SPIRE (<xref rid="B67" ref-type="bibr">67</xref>) includes curated global metagenomes annotated with habitat and geography, while GDPF (<xref rid="B68" ref-type="bibr">68</xref>) maps prokaryotic protein families in terms of global distribution and environmental abundance.</p>
+      <p>In the human, model organism and comparative genomics section, no fewer than four papers cover aging. Open Genes (<xref rid="B69" ref-type="bibr">69</xref>), a new arrival, majors on easy access to carefully curated and scored (meta)data of diverse types—gene expression, methylation, protein activity, genetic variants and so on—in both human and model organism orthologs. The popular returning resource HAGR (<xref rid="B70" ref-type="bibr">70</xref>), brings updates to its set of six database components, and two new databases, AgeAnnoMO (<xref rid="B71" ref-type="bibr">71</xref>) and HALL (<xref rid="B72" ref-type="bibr">72</xref>) each report impressive coverage of multi-omics data relating to ageing and longevity. Elsewhere the trends towards single cell and spatial expression data are again evident. For example, CellSTAR (<xref rid="B73" ref-type="bibr">73</xref>) is a new database for single-cell transcriptomics which offers annotation of hundreds of different cell types and markers across 18 species and 139 tissues. Spatial transcriptomics is covered by two new databases, STOmicsDB (<xref rid="B74" ref-type="bibr">74</xref>) and CROST (<xref rid="B75" ref-type="bibr">75</xref>) which each cover a range of species, tissues and diseases, and offer a superb range of visualisation options. Notably, the latter offers a cancer module integrating other kinds of relevant information such as copy number variation and epigenomics. In comparative genomics, two cornerstone resources provide updates. Ensembl (<xref rid="B76" ref-type="bibr">76</xref>) reports efforts on its Rapid Release site to provide quick annotations for outputs of biodiversity projects such as the Darwin Tree of Life; work in the area of food security, from livestock to ‘orphan crops’ to pests; and continued engagement with users around new features on its new Beta website. An update on the UCSC Genome Browser (<xref rid="B77" ref-type="bibr">77</xref>) reports on new species browsers, new data tracks for model species, and even new forms of data visualisation such as sequence logos. Finally Monarch updates (<xref rid="B78" ref-type="bibr">78</xref>) on its efforts to map genes, phenotypes and diseases across model organisms. Their Knowledge Graph is suitable for Machine Learning methods, both to extract new biological insights but also for querying by their new ChatGPT plugin. Monarch is far from the only database looking at such large language models to summarise and present content to the user: it will clearly be important to understand both the opportunities and the risks, and to share best practice in the area.</p>
+      <p>As usual, cancer has a strong presence in the section on human genomic variation, diseases and drugs. COSMIC, the foundational database of variants and clinical data, returns to report new features such as a mutational signatures catalogue and an Actionability section to record clinical trials linked to particular variants (<xref rid="B79" ref-type="bibr">79</xref>). A valuable pair of new databases, CDS-DB (<xref rid="B80" ref-type="bibr">80</xref>) and ClinicalOmicsDB (<xref rid="B81" ref-type="bibr">81</xref>), focus on transcriptomics responses to cancer drug treatment. Another pair of new databases focus on fusion proteins, the result of gene fusion events: FusionPDB (<xref rid="B82" ref-type="bibr">82</xref>) catalogues and annotates fusion protein sequences, additionally taking some through to AlphaFold 2 modelling and small molecule screening; while FusionNeoAntigen (<xref rid="B83" ref-type="bibr">83</xref>) predicts neoantigens that span fusion gene breakpoints, testing their putative interaction with HLA molecules by explicit docking studies. A further duo of new arrivals, SCAR (<xref rid="B84" ref-type="bibr">84</xref>) and SORC (<xref rid="B85" ref-type="bibr">85</xref>) each cover spatial omics in cancer and offer similarly comprehensive resources for single cell transcriptomics data, biomarkers, cell-cell communications and so on. For drug targets, two major resources submit updates: the Therapeutic Target Database (<xref rid="B86" ref-type="bibr">86</xref>) features a major new focus on methods for predicting druggability while DGIdb (<xref rid="B87" ref-type="bibr">87</xref>) has new data sources, a new interface and improved FAIRness (i.e. findability, accessibility, interoperability and reusability). Major drug and chemical databases contributing updates are DrugBank (<xref rid="B88" ref-type="bibr">88</xref>), which reports a range of improvements including inclusion of mass spectrometry data and concise graphics illustrating drug mechanisms and metabolic pathways; and ChEMBL (<xref rid="B89" ref-type="bibr">89</xref>) which now covers 2 million unique compounds and 20 million bioactivity measurements. A number of databases address drug behaviour in the body including returning databases VARIDT (<xref rid="B90" ref-type="bibr">90</xref>) and INTEDE (<xref rid="B91" ref-type="bibr">91</xref>) for drug transporters and metabolism respectively. The former now covers the influence of microbiota, post-translational modifications and differential expression on drug transporters while the latter offers superbly detailed and -presented information on drug metabolic pathways and their intermediates. The new DRMref (<xref rid="B92" ref-type="bibr">92</xref>) uses scRNA-seq to identify drug resistance-related molecular mechanisms across different drugs, cell types and cancers.</p>
+      <p>Variant interpretation remains a key scientific challenge and two returning databases publish updates. The very popular CADD (<xref rid="B93" ref-type="bibr">93</xref>) reports improved performance from addition of new component scores, including from natural language methods, while VarCards (<xref rid="B94" ref-type="bibr">94</xref>) is designed especially to support clinical interpretation of variants by genetic counsellors. A trio of returning databases linking ncRNA to disease publish updates: HMDD (<xref rid="B95" ref-type="bibr">95</xref>) grows substantially and covers new categories of data such as exosomal or virus-encoded miRNAs; LncRNADisease (<xref rid="B96" ref-type="bibr">96</xref>) doubles in size and now distinguishes between causative and correlative disease relationships; and CircRNADisease (<xref rid="B97" ref-type="bibr">97</xref>) grows 20-fold in content and includes new information, for example on circRNA mutations and cancer. Finally, two major ontologies report updates in this section: the Human Disease Ontology celebrates 20 years (<xref rid="B98" ref-type="bibr">98</xref>) with a new Knowledgebase and provides insights into the exhaustive community discussions driving expansion of the resource; while the Human Phenotype Ontology reports similar collaborative efforts, as well as impressive progress in translating the ontology into other languages (<xref rid="B99" ref-type="bibr">99</xref>).</p>
+      <p>The plant database section features a particular rich crop of new databases. Two cover plant imaging: OPIA (<xref rid="B100" ref-type="bibr">100</xref>) has half a million images and links genomic rice and wheat data to phenotypic i-traits (characteristics from image analysis such as plant height); while the PlantPAD paper (<xref rid="B101" ref-type="bibr">101</xref>) offers interesting cases studies relating to their image data, such as machine learning for automated disease diagnosis. Other new resources cover crop plants: SoyMD (<xref rid="B102" ref-type="bibr">102</xref>) offers comprehensive multi-omics data on soybean to aid breeding efforts; TCOD (<xref rid="B103" ref-type="bibr">103</xref>) offers a variety of data related to 15 tropical crops; and CropGS-Hub (<xref rid="B104" ref-type="bibr">104</xref>) links genotype and phenotype in seven major crops. Elsewhere, PPGR (<xref rid="B105" ref-type="bibr">105</xref>) covers multi-omics and related analytical tools for the study of woody perennial plants, including 60 genome assemblies. A pair of new databases cover plant metabolomics: RefMetaPlant (<xref rid="B106" ref-type="bibr">106</xref>) constructs a reference metabolome from mass spectrometry measurements of more than 150 plants across the five major phyla while PMhub (<xref rid="B107" ref-type="bibr">107</xref>) notably includes genomic and transcriptomic information to enable genetic analysis of metabolites.</p>
+      <p>The final section features databases not readily accommodated elsewhere. LIPID MAPS returns after a long absence (<xref rid="B108" ref-type="bibr">108</xref>) to support lipidomics research with manual curation of literature, a defined lipid classification, and a renewed focus on FAIR principles. The UniLectin update (<xref rid="B109" ref-type="bibr">109</xref>) reports a new focused HumanLectome module while the popular Vesiclepedia database (<xref rid="B110" ref-type="bibr">110</xref>) now extends its coverage to new classes of extracellular particle such as exomeres and supermeres.</p>
+    </sec>
+    <sec id="SEC2">
+      <title>NAR online molecular biology database collection</title>
+      <p>Since the previous update, our <italic toggle="yes">NAR</italic> online Molecular Biology Database Collection (freely available at <ext-link xlink:href="http://www.oxfordjournals.org/nar/database/c/" ext-link-type="uri">http://www.oxfordjournals.org/nar/database/c/</ext-link>) has been extensively updated, reviewing 1060 entries. 97 new resources listed in this issue were added to the database and 388 obsolete entries have been removed accordingly. Further curation efforts were made reviewing recent updates and user feedback bringing the total to 1959 databases in this new update. We encourage authors to submit their updates to XMF at <email xlink:href="xose.m.fernandez@gmail.com">xose.m.fernandez@gmail.com</email> in plain text, ideally according to the template found in <ext-link xlink:href="http://www.oxfordjournals.org/nar/database/summary/1" ext-link-type="uri">http://www.oxfordjournals.org/nar/database/summary/1</ext-link>.</p>
+      <p>In times of fast-moving technological change, we are keen to hear from the community about any changes we could make to the database collection to enhance its value. Feedback can be sent to <email xlink:href="nardatabase@gmail.com">nardatabase@gmail.com</email>.</p>
+    </sec>
+  </body>
+  <back>
+    <ack id="ACK1">
+      <title>Acknowledgements</title>
+      <p>We thank Dr Martine Bernardes-Silva, especially, and the rest of the Oxford University Press team led by Rhiannon Meaden for their help in compiling this issue.</p>
+    </ack>
+    <sec id="SEC3">
+      <title>Funding</title>
+      <p>Funding for open access charge: Oxford University Press.</p>
+      <p>
+<italic toggle="yes">Conflict of interest statement</italic>. The authors' opinions do not necessarily reflect the views of their respective institutions.</p>
+    </sec>
+    <ref-list id="REF1">
+      <title>References</title>
+      <ref id="B1">
+        <label>1.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Thakur</surname>
+<given-names>M.</given-names>
+</string-name>, <string-name><surname>Buniello</surname><given-names>A.</given-names></string-name>, <string-name><surname>Brooksbank</surname><given-names>C.</given-names></string-name>, <string-name><surname>Gurwitz</surname><given-names>K.T.</given-names></string-name>, <string-name><surname>Hall</surname><given-names>M.</given-names></string-name>, <string-name><surname>Hartley</surname><given-names>M.</given-names></string-name>, <string-name><surname>Hulcoop</surname><given-names>D.G.</given-names></string-name>, <string-name><surname>Leach</surname><given-names>A.R.</given-names></string-name>, <string-name><surname>Marques</surname><given-names>D.</given-names></string-name>, <string-name><surname>Martin</surname><given-names>M.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>EMBL’s European Bioinformatics Institute (EMBL-EBI) in 2023</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1088</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B2">
+        <label>2.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Sayers</surname>
+<given-names>E.W.</given-names>
+</string-name>, <string-name><surname>Beck</surname><given-names>J.</given-names></string-name>, <string-name><surname>Bolton</surname><given-names>E.E.</given-names></string-name>, <string-name><surname>Brister</surname><given-names>J.R.</given-names></string-name>, <string-name><surname>Chan</surname><given-names>J.</given-names></string-name>, <string-name><surname>Comeau</surname><given-names>D.C.</given-names></string-name>, <string-name><surname>Connor</surname><given-names>R.</given-names></string-name>, <string-name><surname>DiCuccio</surname><given-names>M.</given-names></string-name>, <string-name><surname>Farrell</surname><given-names>C.M.</given-names></string-name>, <string-name><surname>Feldgarden</surname><given-names>M.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Database resources of the National Center for Biotechnology Information</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1044</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B3">
+        <label>3.</label>
+        <mixed-citation publication-type="journal">
+<collab>CNCB-NGDC Members and Partners</collab>
+<article-title>Database Resources of the National Genomics Data Center, China National Center for Bioinformation in 2024</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1078</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B4">
+        <label>4.</label>
+        <mixed-citation publication-type="journal">
+<collab>SIB Swiss Institute of Bioinformatics RDF Group Members</collab>
+<article-title>The SIB Swiss Institute of Bioinformatics Semantic Web of data</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad902</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B5">
+        <label>5.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Lawson</surname>
+<given-names>C.L.</given-names>
+</string-name>, <string-name><surname>Berman</surname><given-names>H.M.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>L.</given-names></string-name>, <string-name><surname>Vallat</surname><given-names>B.</given-names></string-name>, <string-name><surname>Zirbel</surname><given-names>C.L.</given-names></string-name></person-group>
+<article-title>The Nucleic Acid Knowledgebase: a new portal for 3D structural information about nucleic acids</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad957</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B6">
+        <label>6.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Coimbatore Narayanan</surname>
+<given-names>B.</given-names>
+</string-name>, <string-name><surname>Westbrook</surname><given-names>J.</given-names></string-name>, <string-name><surname>Ghosh</surname><given-names>S.</given-names></string-name>, <string-name><surname>Petrov</surname><given-names>A.I.</given-names></string-name>, <string-name><surname>Sweeney</surname><given-names>B.</given-names></string-name>, <string-name><surname>Zirbel</surname><given-names>C.L.</given-names></string-name>, <string-name><surname>Leontis</surname><given-names>N.B.</given-names></string-name>, <string-name><surname>Berman</surname><given-names>H.M</given-names></string-name></person-group>
+<article-title>The Nucleic Acid Database: new features and capabilities</article-title>. <source>Nucleic Acids Res.</source><year>2014</year>; <volume>42</volume>:<fpage>D114</fpage>–<lpage>D122</lpage>.<pub-id pub-id-type="pmid">24185695</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B7">
+        <label>7.</label>
+        <mixed-citation publication-type="journal">
+<collab>wwPDB consortium</collab>
+<article-title>Protein Data Bank: the single global archive for 3D macromolecular structure data</article-title>. <source>Nucleic Acids Res.</source><year>2019</year>; <volume>47</volume>:<fpage>D520</fpage>–<lpage>D528</lpage>.<pub-id pub-id-type="pmid">30357364</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B8">
+        <label>8.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Bu</surname>
+<given-names>F.</given-names>
+</string-name>, <string-name><surname>Lin</surname><given-names>X.</given-names></string-name>, <string-name><surname>Liao</surname><given-names>W.</given-names></string-name>, <string-name><surname>Lu</surname><given-names>Z.</given-names></string-name>, <string-name><surname>He</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Luo</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Peng</surname><given-names>X.</given-names></string-name>, <string-name><surname>Li</surname><given-names>M.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>X.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Ribocentre-switch: a database of riboswitches</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad891</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B9">
+        <label>9.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Askari</surname>
+<given-names>A.</given-names>
+</string-name>, <string-name><surname>Kota</surname><given-names>S.</given-names></string-name>, <string-name><surname>Ferrell</surname><given-names>H.</given-names></string-name>, <string-name><surname>Swamy</surname><given-names>S.</given-names></string-name>, <string-name><surname>Goodman</surname><given-names>K.S.</given-names></string-name>, <string-name><surname>Okoro</surname><given-names>C.C.</given-names></string-name>, <string-name><surname>Spruell Crenshaw</surname><given-names>I.C.</given-names></string-name>, <string-name><surname>Hernandez</surname><given-names>D.K.</given-names></string-name>, <string-name><surname>Oliphant</surname><given-names>T.E.</given-names></string-name>, <string-name><surname>Badrayani</surname><given-names>A.A.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>UTexas Aptamer Database: the collection and long-term preservation of aptamer sequence information</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad959</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B10">
+        <label>10.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Lyčka</surname>
+<given-names>M.</given-names>
+</string-name>, <string-name><surname>Bubeník</surname><given-names>M.</given-names></string-name>, <string-name><surname>Závodník</surname><given-names>M.</given-names></string-name>, <string-name><surname>Peska</surname><given-names>V.</given-names></string-name>, <string-name><surname>Fajkus</surname><given-names>P.</given-names></string-name>, <string-name><surname>Demko</surname><given-names>M.</given-names></string-name>, <string-name><surname>Fajkus</surname><given-names>J.</given-names></string-name>, <string-name><surname>Fojtová</surname><given-names>M.</given-names></string-name></person-group>
+<article-title>TeloBase: a community-curated database of telomere sequences across the tree of life</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad672</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B11">
+        <label>11.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Arita</surname>
+<given-names>M.</given-names>
+</string-name>, <string-name><surname>Karsch-Mizrachi</surname><given-names>I.</given-names></string-name>, <string-name><surname>Cochrane</surname><given-names>G.</given-names></string-name></person-group>
+<article-title>The international nucleotide sequence database collaboration</article-title>. <source>Nucleic Acids Res.</source><year>2021</year>; <volume>49</volume>:<fpage>D121</fpage>–<lpage>D124</lpage>.<pub-id pub-id-type="pmid">33166387</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B12">
+        <label>12.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Sayers</surname>
+<given-names>E.W.</given-names>
+</string-name>, <string-name><surname>Cavanaugh</surname><given-names>M.</given-names></string-name>, <string-name><surname>Clark</surname><given-names>K.</given-names></string-name>, <string-name><surname>Pruitt</surname><given-names>K.D.</given-names></string-name>, <string-name><surname>Sherry</surname><given-names>S.T.</given-names></string-name>, <string-name><surname>Yankie</surname><given-names>L.</given-names></string-name>, <string-name><surname>Karsch-Mizrachi</surname><given-names>I.</given-names></string-name></person-group>
+<article-title>GenBank 2024 update</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad903</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B13">
+        <label>13.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Yuan</surname>
+<given-names>D.</given-names>
+</string-name>, <string-name><surname>Ahamed</surname><given-names>A.</given-names></string-name>, <string-name><surname>Burgin</surname><given-names>J.</given-names></string-name>, <string-name><surname>Cummins</surname><given-names>C.</given-names></string-name>, <string-name><surname>Devraj</surname><given-names>R.</given-names></string-name>, <string-name><surname>Gueye</surname><given-names>K.</given-names></string-name>, <string-name><surname>Gupta</surname><given-names>D.</given-names></string-name>, <string-name><surname>Gupta</surname><given-names>V.</given-names></string-name>, <string-name><surname>Haseeb</surname><given-names>M.</given-names></string-name>, <string-name><surname>Ihsan</surname><given-names>M.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The European Nucleotide Archive in 2023</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1067</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B14">
+        <label>14.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Ara</surname>
+<given-names>T.</given-names>
+</string-name>, <string-name><surname>Kodama</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Tokimatsu</surname><given-names>T.</given-names></string-name>, <string-name><surname>Fukuda</surname><given-names>A.</given-names></string-name>, <string-name><surname>Kosuge</surname><given-names>T.</given-names></string-name>, <string-name><surname>Mashima</surname><given-names>J.</given-names></string-name>, <string-name><surname>Tanizawa</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Tanjo</surname><given-names>T.</given-names></string-name>, <string-name><surname>Ogasawara</surname><given-names>O.</given-names></string-name>, <string-name><surname>Fujisawa</surname><given-names>T.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>DDBJ update in 2023: the MetaboBank for metabolomics data and associated metadata</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1046</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B15">
+        <label>15.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Shi</surname>
+<given-names>Q.</given-names>
+</string-name>, <string-name><surname>Li</surname><given-names>X.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>Z.</given-names></string-name>, <string-name><surname>He</surname><given-names>X.</given-names></string-name></person-group>
+<article-title>FLIBase: a comprehensive repository of full-length isoforms across human cancers and tissues</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad745</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B16">
+        <label>16.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Chiang</surname>
+<given-names>T.W.</given-names>
+</string-name>, <string-name><surname>Jhong</surname><given-names>S.E.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>Y.C.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>C.Y.</given-names></string-name>, <string-name><surname>Wu</surname><given-names>W.S.</given-names></string-name>, <string-name><surname>Chuang</surname><given-names>T.J.</given-names></string-name></person-group>
+<article-title>FL-circAS: an integrative resource and analysis for full-length sequences and alternative splicing of circular RNAs with nanopore sequencing</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad829</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B17">
+        <label>17.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wu</surname>
+<given-names>W.</given-names>
+</string-name>, <string-name><surname>Zhao</surname><given-names>F.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>J.</given-names></string-name></person-group>
+<article-title>circAtlas 3.0: a gateway to 3 million curated vertebrate circular RNAs based on a standardized nomenclature scheme</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad770</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B18">
+        <label>18.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Liang</surname>
+<given-names>Z.</given-names>
+</string-name>, <string-name><surname>Ye</surname><given-names>H.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>J.</given-names></string-name>, <string-name><surname>Wei</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>D.</given-names></string-name>, <string-name><surname>Song</surname><given-names>B.</given-names></string-name>, <string-name><surname>Meng</surname><given-names>J.</given-names></string-name>, <string-name><surname>Rigden</surname><given-names>D.J.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>m6A-Atlas v2.0: updated resources for unraveling the N6-methyladenosine (m6A) epitranscriptome among multiple species</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad691</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B19">
+        <label>19.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wang</surname>
+<given-names>X.</given-names>
+</string-name>, <string-name><surname>Zhang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>K.</given-names></string-name>, <string-name><surname>Liang</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>J.</given-names></string-name>, <string-name><surname>Xia</surname><given-names>R.</given-names></string-name>, <string-name><surname>de Magalhães</surname><given-names>J.P.</given-names></string-name>, <string-name><surname>Rigden</surname><given-names>D.J.</given-names></string-name>, <string-name><surname>Meng</surname><given-names>J.</given-names></string-name>, <string-name><surname>Song</surname><given-names>B.</given-names></string-name></person-group>
+<article-title>m7GHub V2.0: an updated database for decoding the N7-methylguanosine (m7G) epitranscriptome</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad789</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B20">
+        <label>20.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Xuan</surname>
+<given-names>J.</given-names>
+</string-name>, <string-name><surname>Chen</surname><given-names>L.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Pang</surname><given-names>J.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>J.</given-names></string-name>, <string-name><surname>Lin</surname><given-names>J.</given-names></string-name>, <string-name><surname>Zheng</surname><given-names>L.</given-names></string-name>, <string-name><surname>Li</surname><given-names>B.</given-names></string-name>, <string-name><surname>Qu</surname><given-names>L.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>J.</given-names></string-name></person-group>
+<article-title>RMBase v3.0: decode the landscape, mechanisms and functions of RNA modifications</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1070</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B21">
+        <label>21.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Cappannini</surname>
+<given-names>A.</given-names>
+</string-name>, <string-name><surname>Ray</surname><given-names>A.</given-names></string-name>, <string-name><surname>Purta</surname><given-names>E.</given-names></string-name>, <string-name><surname>Mukherjee</surname><given-names>S.</given-names></string-name>, <string-name><surname>Boccaletto</surname><given-names>P.</given-names></string-name>, <string-name><surname>Moafinejad</surname><given-names>S.N.</given-names></string-name>, <string-name><surname>Lechner</surname><given-names>A.</given-names></string-name>, <string-name><surname>Barchet</surname><given-names>C.</given-names></string-name>, <string-name><surname>Klaholz</surname><given-names>B.P.</given-names></string-name>, <string-name><surname>Stefaniak</surname><given-names>F.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>MODOMICS: a database of RNA modifications and related information. 2023 update</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1083</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B22">
+        <label>22.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Clough</surname>
+<given-names>E.</given-names>
+</string-name>, <string-name><surname>Barrett</surname><given-names>T.</given-names></string-name>, <string-name><surname>Wilhite</surname><given-names>S.E.</given-names></string-name>, <string-name><surname>Ledoux</surname><given-names>P.</given-names></string-name>, <string-name><surname>Evangelista</surname><given-names>C.</given-names></string-name>, <string-name><surname>Kim</surname><given-names>I.F.</given-names></string-name>, <string-name><surname>Tomashevsky</surname><given-names>M.</given-names></string-name>, <string-name><surname>Marshall</surname><given-names>K.A.</given-names></string-name>, <string-name><surname>Phillippy</surname><given-names>K.H.</given-names></string-name>, <string-name><surname>Sherman</surname><given-names>P.M.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>NCBI GEO: archive for gene expression and epigenomics data sets: 23-year update</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad965</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B23">
+        <label>23.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Skoufos</surname>
+<given-names>G.</given-names>
+</string-name>, <string-name><surname>Kakoulidis</surname><given-names>P.</given-names></string-name>, <string-name><surname>Tastsoglou</surname><given-names>S.</given-names></string-name>, <string-name><surname>Zacharopoulou</surname><given-names>E.</given-names></string-name>, <string-name><surname>Kotsira</surname><given-names>V.</given-names></string-name>, <string-name><surname>Miliotis</surname><given-names>M.</given-names></string-name>, <string-name><surname>Mavromati</surname><given-names>G.</given-names></string-name>, <string-name><surname>Grigoriadis</surname><given-names>D.</given-names></string-name>, <string-name><surname>Zioga</surname><given-names>M.</given-names></string-name>, <string-name><surname>Velli</surname><given-names>A.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>TarBase-v9.0 extends experimentally supported miRNA-gene interactions to cell-types and virally encoded miRNAs</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1071</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B24">
+        <label>24.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Vorontsov</surname>
+<given-names>I.E.</given-names>
+</string-name>, <string-name><surname>Eliseeva</surname><given-names>I.A.</given-names></string-name>, <string-name><surname>Zinkevich</surname><given-names>A.</given-names></string-name>, <string-name><surname>Nikonov</surname><given-names>M.</given-names></string-name>, <string-name><surname>Abramov</surname><given-names>S.</given-names></string-name>, <string-name><surname>Boytsov</surname><given-names>A.</given-names></string-name>, <string-name><surname>Kamenets</surname><given-names>V.</given-names></string-name>, <string-name><surname>Kasianova</surname><given-names>A.</given-names></string-name>, <string-name><surname>Kolmykov</surname><given-names>S.</given-names></string-name>, <string-name><surname>Yevshin</surname><given-names>I.S.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>HOCOMOCO in 2024: a rebuild of the curated collection of binding models for human and mouse transcription factors</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1077</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B25">
+        <label>25.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Rauluseviciute</surname>
+<given-names>I.</given-names>
+</string-name>, <string-name><surname>Riudavets-Puig</surname><given-names>R.</given-names></string-name>, <string-name><surname>Blanc-Mathieu</surname><given-names>R.</given-names></string-name>, <string-name><surname>Castro-Mondragon</surname><given-names>J.A.</given-names></string-name>, <string-name><surname>Ferenc</surname><given-names>K.</given-names></string-name>, <string-name><surname>Kumar</surname><given-names>V.</given-names></string-name>, <string-name><surname>Lemma</surname><given-names>R.B.</given-names></string-name>, <string-name><surname>Lucas</surname><given-names>J.</given-names></string-name>, <string-name><surname>Chèneby</surname><given-names>J.</given-names></string-name>, <string-name><surname>Baranasic</surname><given-names>D.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>JASPAR 2024: 20th anniversary of the open-access database of transcription factor binding profiles</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1059</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B26">
+        <label>26.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Baltoumas</surname>
+<given-names>F.A.</given-names>
+</string-name>, <string-name><surname>Karatzas</surname><given-names>E.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>S.</given-names></string-name>, <string-name><surname>Ovchinnikov</surname><given-names>S.</given-names></string-name>, <string-name><surname>Sofianatos</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>I.M.</given-names></string-name>, <string-name><surname>Kyrpides</surname><given-names>N.C.</given-names></string-name>, <string-name><surname>Pavlopoulos</surname><given-names>G.A.</given-names></string-name></person-group>
+<article-title>NMPFamsDB: a database of novel protein families from microbial metagenomes and metatranscriptomes</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad800</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B27">
+        <label>27.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Mistry</surname>
+<given-names>J.</given-names>
+</string-name>, <string-name><surname>Chuguransky</surname><given-names>S.</given-names></string-name>, <string-name><surname>Williams</surname><given-names>L.</given-names></string-name>, <string-name><surname>Qureshi</surname><given-names>M.</given-names></string-name>, <string-name><surname>Salazar</surname><given-names>G.A.</given-names></string-name>, <string-name><surname>Sonnhammer</surname><given-names>E.L.</given-names></string-name>, <string-name><surname>Tosatto</surname><given-names>S.C.</given-names></string-name>, <string-name><surname>Paladin</surname><given-names>L.</given-names></string-name>, <string-name><surname>Raj</surname><given-names>S.</given-names></string-name>, <string-name><surname>Richardson</surname><given-names>L.J.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Pfam: the protein families database in 2021</article-title>. <source>Nucleic Acids Res.</source><year>2021</year>; <volume>49</volume>:<fpage>D412</fpage>–<lpage>D419</lpage>.<pub-id pub-id-type="pmid">33125078</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B28">
+        <label>28.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Jumper</surname>
+<given-names>J.</given-names>
+</string-name>, <string-name><surname>Evans</surname><given-names>R.</given-names></string-name>, <string-name><surname>Pritzel</surname><given-names>A.</given-names></string-name>, <string-name><surname>Green</surname><given-names>T.</given-names></string-name>, <string-name><surname>Figurnov</surname><given-names>M.</given-names></string-name>, <string-name><surname>Ronneberger</surname><given-names>O.</given-names></string-name>, <string-name><surname>Tunyasuvunakool</surname><given-names>K.</given-names></string-name>, <string-name><surname>Bates</surname><given-names>R.</given-names></string-name>, <string-name><surname>Žídek</surname><given-names>A.</given-names></string-name>, <string-name><surname>Potapenko</surname><given-names>A.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Highly accurate protein structure prediction with AlphaFold</article-title>. <source>Nature</source>. <year>2021</year>; <volume>596</volume>:<fpage>583</fpage>–<lpage>589</lpage>.<pub-id pub-id-type="pmid">34265844</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B29">
+        <label>29.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Varadi</surname>
+<given-names>M.</given-names>
+</string-name>, <string-name><surname>Bertoni</surname><given-names>D.</given-names></string-name>, <string-name><surname>Magana</surname><given-names>P.</given-names></string-name>, <string-name><surname>Paramval</surname><given-names>U.</given-names></string-name>, <string-name><surname>Pidruchna</surname><given-names>I.</given-names></string-name>, <string-name><surname>Radhakrishnan</surname><given-names>M.</given-names></string-name>, <string-name><surname>Tsenkov</surname><given-names>M.</given-names></string-name>, <string-name><surname>Nair</surname><given-names>S.</given-names></string-name>, <string-name><surname>Mirdita</surname><given-names>M.</given-names></string-name>, <string-name><surname>Yeo</surname><given-names>J.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>AlphaFold Protein Structure Database in 2024: providing structure coverage for over 214 million protein sequences</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1011</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B30">
+        <label>30.</label>
+        <mixed-citation publication-type="journal">
+<collab>UniProt Consortium</collab>
+<article-title>UniProt: the Universal Protein Knowledgebase in 2023</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <volume>51</volume>:<fpage>D523</fpage>–<lpage>D531</lpage>.<pub-id pub-id-type="pmid">36408920</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B31">
+        <label>31.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Altschul</surname>
+<given-names>S.F.</given-names>
+</string-name>, <string-name><surname>Madden</surname><given-names>T.L.</given-names></string-name>, <string-name><surname>Schäffer</surname><given-names>A.A.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>J.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Miller</surname><given-names>W.</given-names></string-name>, <string-name><surname>Lipman</surname><given-names>D.J.</given-names></string-name></person-group>
+<article-title>Gapped BLAST and PSI-BLAST: a new generation of protein database search programs</article-title>. <source>Nucleic Acids Res.</source><year>1997</year>; <volume>25</volume>:<fpage>3389</fpage>–<lpage>3402</lpage>.<pub-id pub-id-type="pmid">9254694</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B32">
+        <label>32.</label>
+        <mixed-citation publication-type="journal">
+<collab>The wwPDB Consortium</collab>
+<article-title>EMDB—the Electron Microscopy Data Bank</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1019</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B33">
+        <label>33.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Icking</surname>
+<given-names>L.S.</given-names>
+</string-name>, <string-name><surname>Riedlberger</surname><given-names>A.M.</given-names></string-name>, <string-name><surname>Krause</surname><given-names>F.</given-names></string-name>, <string-name><surname>Widder</surname><given-names>J.</given-names></string-name>, <string-name><surname>Frederiksen</surname><given-names>A.S.</given-names></string-name>, <string-name><surname>Stockert</surname><given-names>F.</given-names></string-name>, <string-name><surname>Spädt</surname><given-names>M.</given-names></string-name>, <string-name><surname>Edel</surname><given-names>N.</given-names></string-name>, <string-name><surname>Armbruster</surname><given-names>D.</given-names></string-name>, <string-name><surname>Forlani</surname><given-names>G.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>iNClusive: a database collecting useful information on non-canonical amino acids and their incorporation into proteins for easier genetic code expansion implementation</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1090</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B34">
+        <label>34.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Bertolini</surname>
+<given-names>E.</given-names>
+</string-name>, <string-name><surname>Babbi</surname><given-names>G.</given-names></string-name>, <string-name><surname>Savojardo</surname><given-names>C.</given-names></string-name>, <string-name><surname>Martelli</surname><given-names>P.L.</given-names></string-name>, <string-name><surname>Casadio</surname><given-names>R.</given-names></string-name></person-group>
+<article-title>MultifacetedProtDB: a database of human proteins with multiple functions</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad783</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B35">
+        <label>35.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Lian</surname>
+<given-names>X.</given-names>
+</string-name>, <string-name><surname>Zhang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Zhou</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Sun</surname><given-names>X.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>S.</given-names></string-name>, <string-name><surname>Dai</surname><given-names>H.</given-names></string-name>, <string-name><surname>Han</surname><given-names>L.</given-names></string-name>, <string-name><surname>Zhu</surname><given-names>F.</given-names></string-name></person-group>
+<article-title>SingPro: a knowledge base providing single-cell proteomic data</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad830</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B36">
+        <label>36.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wang</surname>
+<given-names>F.</given-names>
+</string-name>, <string-name><surname>Liu</surname><given-names>C.</given-names></string-name>, <string-name><surname>Li</surname><given-names>J.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>F.</given-names></string-name>, <string-name><surname>Song</surname><given-names>J.</given-names></string-name>, <string-name><surname>Zang</surname><given-names>T.</given-names></string-name>, <string-name><surname>Yao</surname><given-names>J.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>G.</given-names></string-name></person-group>
+<article-title>SPDB: a comprehensive resource and knowledgebase for proteomic data at the single-cell resolution</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1018</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B37">
+        <label>37.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Beltrán</surname>
+<given-names>D.</given-names>
+</string-name>, <string-name><surname>Hospital</surname><given-names>A.</given-names></string-name>, <string-name><surname>Gelpí</surname><given-names>J.L.</given-names></string-name>, <string-name><surname>Orozco</surname><given-names>M.</given-names></string-name></person-group>
+<article-title>A new paradigm for molecular dynamics databases: the COVID-19 database, the legacy of a titanic community effort</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad991</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B38">
+        <label>38.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Vander Meersche</surname>
+<given-names>Y.</given-names>
+</string-name>, <string-name><surname>Cretin</surname><given-names>G.</given-names></string-name>, <string-name><surname>Gheeraert</surname><given-names>A.</given-names></string-name>, <string-name><surname>Gelly</surname><given-names>J.C.</given-names></string-name>, <string-name><surname>Galochkina</surname><given-names>T.</given-names></string-name></person-group>
+<article-title>ATLAS: protein flexibility description from atomistic molecular dynamics simulations</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1084</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B39">
+        <label>39.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Cheng</surname>
+<given-names>H.</given-names>
+</string-name>, <string-name><surname>Schaeffer</surname><given-names>R.D.</given-names></string-name>, <string-name><surname>Liao</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Kinch</surname><given-names>L.N.</given-names></string-name>, <string-name><surname>Pei</surname><given-names>J.</given-names></string-name>, <string-name><surname>Shi</surname><given-names>S.</given-names></string-name>, <string-name><surname>Kim</surname><given-names>B.H.</given-names></string-name>, <string-name><surname>Grishin</surname><given-names>N.V.</given-names></string-name></person-group>
+<article-title>ECOD: an evolutionary classification of protein domains</article-title>. <source>PLoS Comput. Biol.</source><year>2014</year>; <volume>10</volume>:<fpage>e1003926</fpage>.<pub-id pub-id-type="pmid">25474468</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B40">
+        <label>40.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Kozma</surname>
+<given-names>D.</given-names>
+</string-name>, <string-name><surname>Simon</surname><given-names>I.</given-names></string-name>, <string-name><surname>Tusnady</surname><given-names>G.E.</given-names></string-name></person-group>
+<article-title>PDBTM: protein Data Bank of transmembrane proteins after 8 years</article-title>. <source>Nucleic Acids Res.</source><year>2012</year>; <volume>41</volume>:<fpage>D524</fpage>–<lpage>D529</lpage>.<pub-id pub-id-type="pmid">23203988</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B41">
+        <label>41.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Dobson</surname>
+<given-names>L.</given-names>
+</string-name>, <string-name><surname>Lango</surname><given-names>T.</given-names></string-name>, <string-name><surname>Reményi</surname><given-names>I.</given-names></string-name>, <string-name><surname>Tusnády</surname><given-names>G.E.</given-names></string-name></person-group>
+<article-title>Expediting topology data gathering for the TOPDB database</article-title>. <source>Nucleic Acids Res.</source><year>2015</year>; <volume>43</volume>:<fpage>D283</fpage>–<lpage>D289</lpage>.<pub-id pub-id-type="pmid">25392424</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B42">
+        <label>42.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Dobson</surname>
+<given-names>L.</given-names>
+</string-name>, <string-name><surname>Gerdán</surname><given-names>C.</given-names></string-name>, <string-name><surname>Tusnády</surname><given-names>S.</given-names></string-name>, <string-name><surname>Szekeres</surname><given-names>L.</given-names></string-name>, <string-name><surname>Kuffa</surname><given-names>K.</given-names></string-name>, <string-name><surname>Langó</surname><given-names>T.</given-names></string-name>, <string-name><surname>Zeke</surname><given-names>A.</given-names></string-name>, <string-name><surname>Tusnády</surname><given-names>G.E.</given-names></string-name></person-group>
+<article-title>UniTmp: unified resources for transmembrane proteins</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad897</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B43">
+        <label>43.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Ghafouri</surname>
+<given-names>H.</given-names>
+</string-name>, <string-name><surname>Lazar</surname><given-names>T.</given-names></string-name>, <string-name><surname>Del Conte</surname><given-names>A.</given-names></string-name>, <string-name><surname>Ku</surname><given-names>T.</given-names></string-name>, <string-name><surname>L.</surname><given-names>G.</given-names></string-name>, <string-name><surname>Consortium</surname><given-names>P.E.D.</given-names></string-name>, <string-name><surname>Tompa</surname><given-names>P.</given-names></string-name>, <string-name><surname>Tosatto</surname><given-names>S.C.E.</given-names></string-name>, <string-name><surname>Monzon</surname><given-names>A.M</given-names></string-name></person-group>
+<article-title>PED in 2024: improving the community deposition of structural ensembles for intrinsically disordered proteins</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad947</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B44">
+        <label>44.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Aspromonte</surname>
+<given-names>M.C.</given-names>
+</string-name>, <string-name><surname>Nugnes</surname><given-names>M.V.</given-names></string-name>, <string-name><surname>Quaglia</surname><given-names>F.</given-names></string-name>, <string-name><surname>Bouharoua</surname><given-names>A.</given-names></string-name>, <string-name><surname>Consortium</surname><given-names>D.P.</given-names></string-name>, <string-name><surname>Tosatto</surname><given-names>S.C.E.</given-names></string-name>, <string-name><surname>Piovesan</surname><given-names>D</given-names></string-name></person-group>
+<article-title>DisProt in 2024: improving function annotation of intrinsically disordered proteins</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad928</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B45">
+        <label>45.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Mészáros</surname>
+<given-names>B.</given-names>
+</string-name>, <string-name><surname>Hatos</surname><given-names>A.</given-names></string-name>, <string-name><surname>Palopoli</surname><given-names>N.</given-names></string-name>, <string-name><surname>Quaglia</surname><given-names>F.</given-names></string-name>, <string-name><surname>Salladini</surname><given-names>E.</given-names></string-name>, <string-name><surname>Van Roey</surname><given-names>K.</given-names></string-name>, <string-name><surname>Arthanari</surname><given-names>H.</given-names></string-name>, <string-name><surname>Dosztányi</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Felli</surname><given-names>I.C.</given-names></string-name>, <string-name><surname>Fischer</surname><given-names>P.D.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Minimum information guidelines for experiments structurally characterizing intrinsically disordered protein regions</article-title>. <source>Nat. Methods</source>. <year>2023</year>; <volume>20</volume>:<fpage>1291</fpage>–<lpage>1303</lpage>.<pub-id pub-id-type="pmid">37400558</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B46">
+        <label>46.</label>
+        <mixed-citation publication-type="journal">
+<collab>Gene Ontology Consortium</collab>
+<article-title>The Gene Ontology resource: enriching a GOld mine</article-title>. <source>Nucleic Acids Res.</source><year>2021</year>; <volume>49</volume>:<fpage>D325</fpage>–<lpage>D334</lpage>.<pub-id pub-id-type="pmid">33290552</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B47">
+        <label>47.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Kumar</surname>
+<given-names>M.</given-names>
+</string-name>, <string-name><surname>Michael</surname><given-names>S.</given-names></string-name>, <string-name><surname>Alvarado-Valverde</surname><given-names>J.</given-names></string-name>, <string-name><surname>Zeke</surname><given-names>A.</given-names></string-name>, <string-name><surname>Lazar</surname><given-names>T.</given-names></string-name>, <string-name><surname>Glavina</surname><given-names>J.</given-names></string-name>, <string-name><surname>Nagy-Kanta</surname><given-names>E.</given-names></string-name>, <string-name><surname>Donagh</surname><given-names>J.M.</given-names></string-name>, <string-name><surname>Kalman</surname><given-names>Z.E.</given-names></string-name>, <string-name><surname>Pascarelli</surname><given-names>S.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>ELM-the Eukaryotic Linear Motif resource-2024 update</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1058</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B48">
+        <label>48.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Paysan-Lafosse</surname>
+<given-names>T.</given-names>
+</string-name>, <string-name><surname>Blum</surname><given-names>M.</given-names></string-name>, <string-name><surname>Chuguransky</surname><given-names>S.</given-names></string-name>, <string-name><surname>Grego</surname><given-names>T.</given-names></string-name>, <string-name><surname>Pinto</surname><given-names>B.L.</given-names></string-name>, <string-name><surname>Salazar</surname><given-names>G.A.</given-names></string-name>, <string-name><surname>Bileschi</surname><given-names>M.L.</given-names></string-name>, <string-name><surname>Bork</surname><given-names>P.</given-names></string-name>, <string-name><surname>Bridge</surname><given-names>A.</given-names></string-name>, <string-name><surname>Colwell</surname><given-names>L.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>InterPro in 2022</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <volume>51</volume>:<fpage>D418</fpage>–<lpage>D427</lpage>.<pub-id pub-id-type="pmid">36350672</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B49">
+        <label>49.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zhang</surname>
+<given-names>C.</given-names>
+</string-name>, <string-name><surname>Zhang</surname><given-names>X.</given-names></string-name>, <string-name><surname>Freddolino</surname><given-names>P.L.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>Y.</given-names></string-name></person-group>
+<article-title>BioLiP2: an updated structure database for biologically relevant ligand-protein interactions</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad630</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B50">
+        <label>50.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Lin</surname>
+<given-names>G.Y.</given-names>
+</string-name>, <string-name><surname>Su</surname><given-names>Y.C.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>Y.L.</given-names></string-name>, <string-name><surname>Hsin</surname><given-names>K.Y.</given-names></string-name></person-group>
+<article-title>MESPEUS: a database of metal coordination groups in proteins</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1009</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B51">
+        <label>51.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Ma</surname>
+<given-names>Q.</given-names>
+</string-name>, <string-name><surname>Li</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Zheng</surname><given-names>X.</given-names></string-name>, <string-name><surname>Pan</surname><given-names>J.</given-names></string-name></person-group>
+<article-title>CellCommuNet: an atlas of cell-cell communication networks from single-cell RNA sequencing of human and mouse tissues in normal and disease states</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad906</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B52">
+        <label>52.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Gao</surname>
+<given-names>J.</given-names>
+</string-name>, <string-name><surname>Mo</surname><given-names>S.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>J.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>M.</given-names></string-name>, <string-name><surname>Shi</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Zhu</surname><given-names>C.</given-names></string-name>, <string-name><surname>Shang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Tang</surname><given-names>X.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>S.</given-names></string-name>, <string-name><surname>Wu</surname><given-names>X.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>MACC: a visual interactive knowledgebase of metabolite-associated cell communications</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad914</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B53">
+        <label>53.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Blin</surname>
+<given-names>K.</given-names>
+</string-name>, <string-name><surname>Shaw</surname><given-names>S.</given-names></string-name>, <string-name><surname>Medema</surname><given-names>M.H.</given-names></string-name>, <string-name><surname>Weber</surname><given-names>T.</given-names></string-name></person-group>
+<article-title>The antiSMASH database version 4: additional genomes and BGCs, new sequence-based searches and more</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad984</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B54">
+        <label>54.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Hirsch</surname>
+<given-names>P.</given-names>
+</string-name>, <string-name><surname>Tagirdzhanov</surname><given-names>A.</given-names></string-name>, <string-name><surname>Kushnareva</surname><given-names>A.</given-names></string-name>, <string-name><surname>Olkhovskii</surname><given-names>I.</given-names></string-name>, <string-name><surname>Graf</surname><given-names>S.</given-names></string-name>, <string-name><surname>Schmartz</surname><given-names>G.P.</given-names></string-name>, <string-name><surname>Hegemann</surname><given-names>J.D.</given-names></string-name>, <string-name><surname>Bozhüyük</surname><given-names>K.A.J.</given-names></string-name>, <string-name><surname>Müller</surname><given-names>R.</given-names></string-name>, <string-name><surname>Keller</surname><given-names>A.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>ABC-HuMi: the Atlas of Biosynthetic Gene Clusters in the Human Microbiome</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1086</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B55">
+        <label>55.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Milacic</surname>
+<given-names>M.</given-names>
+</string-name>, <string-name><surname>Beavers</surname><given-names>D.</given-names></string-name>, <string-name><surname>Conley</surname><given-names>P.</given-names></string-name>, <string-name><surname>Gong</surname><given-names>C.</given-names></string-name>, <string-name><surname>Gillespie</surname><given-names>M.</given-names></string-name>, <string-name><surname>Griss</surname><given-names>J.</given-names></string-name>, <string-name><surname>Haw</surname><given-names>R.</given-names></string-name>, <string-name><surname>Jassal</surname><given-names>B.</given-names></string-name>, <string-name><surname>Matthews</surname><given-names>L.</given-names></string-name>, <string-name><surname>May</surname><given-names>B.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The Reactome Pathway Knowledgebase 2024</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1025</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B56">
+        <label>56.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Agrawal</surname>
+<given-names>A.</given-names>
+</string-name>, <string-name><surname>Balcı</surname><given-names>H.</given-names></string-name>, <string-name><surname>Hanspers</surname><given-names>K.</given-names></string-name>, <string-name><surname>Coort</surname><given-names>S.L.</given-names></string-name>, <string-name><surname>Martens</surname><given-names>M.</given-names></string-name>, <string-name><surname>Slenter</surname><given-names>D.N.</given-names></string-name>, <string-name><surname>Ehrhart</surname><given-names>F.</given-names></string-name>, <string-name><surname>Digles</surname><given-names>D.</given-names></string-name>, <string-name><surname>Waagmeester</surname><given-names>A.</given-names></string-name>, <string-name><surname>Wassink</surname><given-names>I.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>WikiPathways 2024: next generation pathway database</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad960</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B57">
+        <label>57.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wishart</surname>
+<given-names>D.S.</given-names>
+</string-name>, <string-name><surname>Kruger</surname><given-names>R.</given-names></string-name>, <string-name><surname>Sivakumaran</surname><given-names>A.</given-names></string-name>, <string-name><surname>Harford</surname><given-names>K.</given-names></string-name>, <string-name><surname>Sanford</surname><given-names>S.</given-names></string-name>, <string-name><surname>Doshi</surname><given-names>R.</given-names></string-name>, <string-name><surname>Kehrtarpal</surname><given-names>N.</given-names></string-name>, <string-name><surname>Fatokun</surname><given-names>O.</given-names></string-name>, <string-name><surname>Doucet</surname><given-names>D.</given-names></string-name>, <string-name><surname>Zubkowski</surname><given-names>A.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>PathBank 2.0-the pathway database for model organism metabolomics</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1041</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B58">
+        <label>58.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Yurekten</surname>
+<given-names>O.</given-names>
+</string-name>, <string-name><surname>Payne</surname><given-names>T.</given-names></string-name>, <string-name><surname>Tejera</surname><given-names>N.</given-names></string-name>, <string-name><surname>Amaladoss</surname><given-names>F.X.</given-names></string-name>, <string-name><surname>Martin</surname><given-names>C.</given-names></string-name>, <string-name><surname>Williams</surname><given-names>M.</given-names></string-name>, <string-name><surname>O’Donovan</surname><given-names>C</given-names></string-name></person-group>
+<article-title>MetaboLights: open data repository for metabolomics</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1045</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B59">
+        <label>59.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Shu</surname>
+<given-names>C.</given-names>
+</string-name>, <string-name><surname>Sun</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Fan</surname><given-names>G.</given-names></string-name>, <string-name><surname>Peng</surname><given-names>K.</given-names></string-name>, <string-name><surname>Yu</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Luo</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Gao</surname><given-names>S.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>J.</given-names></string-name>, <string-name><surname>Deng</surname><given-names>T.</given-names></string-name>, <string-name><surname>Hu</surname><given-names>S.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>VarEPS-Influ:an risk evaluation system of occurred and virtual variations of influenza virus genomes</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad912</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B60">
+        <label>60.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zhao</surname>
+<given-names>P.</given-names>
+</string-name>, <string-name><surname>Zhou</surname><given-names>S.</given-names></string-name>, <string-name><surname>Xu</surname><given-names>P.</given-names></string-name>, <string-name><surname>Su</surname><given-names>H.</given-names></string-name>, <string-name><surname>Han</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Dong</surname><given-names>J.</given-names></string-name>, <string-name><surname>Sui</surname><given-names>H.</given-names></string-name>, <string-name><surname>Li</surname><given-names>X.</given-names></string-name>, <string-name><surname>Hu</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Wu</surname><given-names>Z.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>RVdb: a comprehensive resource and analysis platform for rhinovirus research</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad937</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B61">
+        <label>61.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Feng</surname>
+<given-names>Y.</given-names>
+</string-name>, <string-name><surname>Yi</surname><given-names>J.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>L.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Wen</surname><given-names>J.</given-names></string-name>, <string-name><surname>Zhao</surname><given-names>W.</given-names></string-name>, <string-name><surname>Kim</surname><given-names>P.</given-names></string-name>, <string-name><surname>Zhou</surname><given-names>X.</given-names></string-name></person-group>
+<article-title>COV2Var, a function annotation database of SARS-CoV-2 genetic variation</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad958</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B62">
+        <label>62.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wang</surname>
+<given-names>R.H.</given-names>
+</string-name>, <string-name><surname>Yang</surname><given-names>S.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>X.</given-names></string-name>, <string-name><surname>Xu</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>J.</given-names></string-name>, <string-name><surname>Li</surname><given-names>S.C.</given-names></string-name></person-group>
+<article-title>PhageScope: a well-annotated bacteriophage database with automatic analyses and visualizations</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad979</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B63">
+        <label>63.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>De Castro</surname>
+<given-names>E.</given-names>
+</string-name>, <string-name><surname>Hulo</surname><given-names>C.</given-names></string-name>, <string-name><surname>Masson</surname><given-names>P.</given-names></string-name>, <string-name><surname>Auchincloss</surname><given-names>A.</given-names></string-name>, <string-name><surname>Bridge</surname><given-names>A.</given-names></string-name>, <string-name><surname>Le Mercier</surname><given-names>P</given-names></string-name></person-group>
+<article-title>ViralZone 2024 provides higher-resolution images and advanced virus-specific resources</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad946</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B64">
+        <label>64.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Gao</surname>
+<given-names>X.</given-names>
+</string-name>, <string-name><surname>Chen</surname><given-names>K.</given-names></string-name>, <string-name><surname>Xiong</surname><given-names>J.</given-names></string-name>, <string-name><surname>Zou</surname><given-names>D.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>F.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Jiang</surname><given-names>C.</given-names></string-name>, <string-name><surname>Gao</surname><given-names>X.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>G.</given-names></string-name>, <string-name><surname>Gu</surname><given-names>S.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The P10K database: a data portal for the protist 10 000 genomes project</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad992</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B65">
+        <label>65.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Alvarez-Jarreta</surname>
+<given-names>J.</given-names>
+</string-name>, <string-name><surname>Amos</surname><given-names>B.</given-names></string-name>, <string-name><surname>Aurrecoechea</surname><given-names>C.</given-names></string-name>, <string-name><surname>Bah</surname><given-names>S.</given-names></string-name>, <string-name><surname>Barba</surname><given-names>M.</given-names></string-name>, <string-name><surname>Barreto</surname><given-names>A.</given-names></string-name>, <string-name><surname>Basenko</surname><given-names>E.Y.</given-names></string-name>, <string-name><surname>Belnap</surname><given-names>R.</given-names></string-name>, <string-name><surname>Blevins</surname><given-names>A.</given-names></string-name>, <string-name><surname>Böhme</surname><given-names>U.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>VEuPathDB: the eukaryotic pathogen, vector and host bioinformatics resource center in 2023</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1003</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B66">
+        <label>66.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Abarenkov</surname>
+<given-names>K.</given-names>
+</string-name>, <string-name><surname>Nilsson</surname><given-names>R.H.</given-names></string-name>, <string-name><surname>Larsson</surname><given-names>K.H.</given-names></string-name>, <string-name><surname>Taylor</surname><given-names>A.F.S.</given-names></string-name>, <string-name><surname>May</surname><given-names>T.W.</given-names></string-name>, <string-name><surname>Frøslev</surname><given-names>T.G.</given-names></string-name>, <string-name><surname>Pawlowska</surname><given-names>J.</given-names></string-name>, <string-name><surname>Lindahl</surname><given-names>B.</given-names></string-name>, <string-name><surname>Põldmaa</surname><given-names>K.</given-names></string-name>, <string-name><surname>Truong</surname><given-names>C.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The UNITE database for molecular identification and taxonomic communication of fungi and other eukaryotes: sequences, taxa and classifications reconsidered</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1039</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B67">
+        <label>67.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Schmidt</surname>
+<given-names>T.S.B.</given-names>
+</string-name>, <string-name><surname>Fullam</surname><given-names>A.</given-names></string-name>, <string-name><surname>Ferretti</surname><given-names>P.</given-names></string-name>, <string-name><surname>Orakov</surname><given-names>A.</given-names></string-name>, <string-name><surname>Maistrenko</surname><given-names>O.M.</given-names></string-name>, <string-name><surname>Ruscheweyh</surname><given-names>H.J.</given-names></string-name>, <string-name><surname>Letunic</surname><given-names>I.</given-names></string-name>, <string-name><surname>Duan</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Van Rossum</surname><given-names>T.</given-names></string-name>, <string-name><surname>Sunagawa</surname><given-names>S.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>SPIRE: a Searchable, Planetary-scale mIcrobiome REsoure</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad943</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B68">
+        <label>68.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Pan</surname>
+<given-names>Z.</given-names>
+</string-name>, <string-name><surname>Li</surname><given-names>D.D.</given-names></string-name>, <string-name><surname>Li</surname><given-names>P.</given-names></string-name>, <string-name><surname>Geng</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Jiang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Li</surname><given-names>Y.Z.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>Z.</given-names></string-name></person-group>
+<article-title>GDPF: a data resource for the distribution of prokaryotic protein families across the global biosphere</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad869</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B69">
+        <label>69.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Rafikova</surname>
+<given-names>E.</given-names>
+</string-name>, <string-name><surname>Nemirovich-Danchenko</surname><given-names>N.</given-names></string-name>, <string-name><surname>Ogmen</surname><given-names>A.</given-names></string-name>, <string-name><surname>Parfenenkova</surname><given-names>A.</given-names></string-name>, <string-name><surname>Velikanova</surname><given-names>A.</given-names></string-name>, <string-name><surname>Tikhonov</surname><given-names>S.</given-names></string-name>, <string-name><surname>Peshkin</surname><given-names>L.</given-names></string-name>, <string-name><surname>Rafikov</surname><given-names>K.</given-names></string-name>, <string-name><surname>Spiridonova</surname><given-names>O.</given-names></string-name>, <string-name><surname>Belova</surname><given-names>Y.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Open Genes-a new comprehensive database of human genes associated with aging and longevity</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad712</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B70">
+        <label>70.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>de Magalhães</surname>
+<given-names>J.P.</given-names>
+</string-name>, <string-name><surname>Abidi</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Santos</surname><given-names>D.</given-names></string-name>, <string-name><surname>G.</surname><given-names>A.</given-names></string-name>, <string-name><surname>Avelar</surname><given-names>R.A.</given-names></string-name>, <string-name><surname>Barardo</surname><given-names>D.</given-names></string-name>, <string-name><surname>Chatsirisupachai</surname><given-names>K.</given-names></string-name>, <string-name><surname>Clark</surname><given-names>P.</given-names></string-name>, <string-name><surname>De-Souza</surname><given-names>E.A.</given-names></string-name>, <string-name><surname>Johnson</surname><given-names>E.J.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Human Ageing Genomic Resources: updates on key databases in ageing research</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad927</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B71">
+        <label>71.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Huang</surname>
+<given-names>K.</given-names>
+</string-name>, <string-name><surname>Liu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>T.</given-names></string-name>, <string-name><surname>Xu</surname><given-names>H.</given-names></string-name>, <string-name><surname>Li</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Jia</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>L.</given-names></string-name>, <string-name><surname>Kim</surname><given-names>P.</given-names></string-name>, <string-name><surname>Zhou</surname><given-names>X.</given-names></string-name></person-group>
+<article-title>AgeAnnoMO: a knowledgebase of multi-omics annotation for animal aging</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad884</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B72">
+        <label>72.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Li</surname>
+<given-names>H.</given-names>
+</string-name>, <string-name><surname>Wu</surname><given-names>S.</given-names></string-name>, <string-name><surname>Li</surname><given-names>J.</given-names></string-name>, <string-name><surname>Xiong</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>K.</given-names></string-name>, <string-name><surname>Ye</surname><given-names>W.</given-names></string-name>, <string-name><surname>Ren</surname><given-names>J.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Xiong</surname><given-names>M.</given-names></string-name>, <string-name><surname>Zheng</surname><given-names>Z.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>HALL: a comprehensive database for human aging and longevity studies</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad880</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B73">
+        <label>73.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zhang</surname>
+<given-names>Y.</given-names>
+</string-name>, <string-name><surname>Sun</surname><given-names>H.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>W.</given-names></string-name>, <string-name><surname>Fu</surname><given-names>T.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>S.</given-names></string-name>, <string-name><surname>Mou</surname><given-names>M.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>J.</given-names></string-name>, <string-name><surname>Gao</surname><given-names>J.</given-names></string-name>, <string-name><surname>Ge</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>Q.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>CellSTAR: a comprehensive resource for single-cell transcriptomic annotation</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad874</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B74">
+        <label>74.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Xu</surname>
+<given-names>Z.</given-names>
+</string-name>, <string-name><surname>Wang</surname><given-names>W.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>T.</given-names></string-name>, <string-name><surname>Li</surname><given-names>L.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>X.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>J.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>J.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Gould</surname><given-names>J.</given-names></string-name>, <string-name><surname>Lu</surname><given-names>H.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>STOmicsDB: a comprehensive database for spatial transcriptomics data sharing, analysis and visualization</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad933</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B75">
+        <label>75.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wang</surname>
+<given-names>G.</given-names>
+</string-name>, <string-name><surname>Wu</surname><given-names>S.</given-names></string-name>, <string-name><surname>Xiong</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Qu</surname><given-names>H.</given-names></string-name>, <string-name><surname>Fang</surname><given-names>X.</given-names></string-name>, <string-name><surname>Bao</surname><given-names>Y.</given-names></string-name></person-group>
+<article-title>CROST: a comprehensive repository of spatial transcriptomics</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad782</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B76">
+        <label>76.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Harrison</surname>
+<given-names>P.W.</given-names>
+</string-name>, <string-name><surname>Amode</surname><given-names>M.R.</given-names></string-name>, <string-name><surname>Austine-Orimoloye</surname><given-names>O.</given-names></string-name>, <string-name><surname>Azov</surname><given-names>A.G.</given-names></string-name>, <string-name><surname>Barba</surname><given-names>M.</given-names></string-name>, <string-name><surname>Barnes</surname><given-names>I.</given-names></string-name>, <string-name><surname>Becker</surname><given-names>A.</given-names></string-name>, <string-name><surname>Bennett</surname><given-names>R.</given-names></string-name>, <string-name><surname>Berry</surname><given-names>A.</given-names></string-name>, <string-name><surname>Bhai</surname><given-names>J.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Ensembl 2024</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad782</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B77">
+        <label>77.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Raney</surname>
+<given-names>B.J.</given-names>
+</string-name>, <string-name><surname>Barber</surname><given-names>G.P.</given-names></string-name>, <string-name><surname>Benet-Pagès</surname><given-names>A.</given-names></string-name>, <string-name><surname>Casper</surname><given-names>J.</given-names></string-name>, <string-name><surname>Clawson</surname><given-names>H.</given-names></string-name>, <string-name><surname>Cline</surname><given-names>M.S.</given-names></string-name>, <string-name><surname>Diekhans</surname><given-names>M.</given-names></string-name>, <string-name><surname>Fischer</surname><given-names>C.</given-names></string-name>, <string-name><surname>Navarro Gonzalez</surname><given-names>J.</given-names></string-name>, <string-name><surname>Hickey</surname><given-names>G.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The UCSC Genome Browser database: 2024 update</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad987</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B78">
+        <label>78.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Putman</surname>
+<given-names>T.E.</given-names>
+</string-name>, <string-name><surname>Schaper</surname><given-names>K.</given-names></string-name>, <string-name><surname>Matentzoglu</surname><given-names>N.</given-names></string-name>, <string-name><surname>Rubinetti</surname><given-names>V.P.</given-names></string-name>, <string-name><surname>Alquaddoomi</surname><given-names>F.S.</given-names></string-name>, <string-name><surname>Cox</surname><given-names>C.</given-names></string-name>, <string-name><surname>Caufield</surname><given-names>J.H.</given-names></string-name>, <string-name><surname>Elsarboukh</surname><given-names>G.</given-names></string-name>, <string-name><surname>Gehrke</surname><given-names>S.</given-names></string-name>, <string-name><surname>Hegde</surname><given-names>H.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The Monarch Initiative in 2024: an analytic platform integrating phenotypes, genes and diseases across species</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1082</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B79">
+        <label>79.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Sondka</surname>
+<given-names>Z.</given-names>
+</string-name>, <string-name><surname>Dhir</surname><given-names>N.B.</given-names></string-name>, <string-name><surname>Carvalho-Silva</surname><given-names>D.</given-names></string-name>, <string-name><surname>Jupe</surname><given-names>S.</given-names></string-name>, <string-name><surname>Madhumita</surname><given-names>K.M.</given-names></string-name>, <string-name><surname>Starkey</surname><given-names>M.</given-names></string-name>, <string-name><surname>Ward</surname><given-names>S.</given-names></string-name>, <string-name><surname>Wilding</surname><given-names>J.</given-names></string-name>, <string-name><surname>Ahmed</surname><given-names>M.</given-names></string-name>, <string-name><surname>Argasinska</surname><given-names>J.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>COSMIC: a curated database of somatic variants and clinical data for cancer</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad986</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B80">
+        <label>80.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Liu</surname>
+<given-names>Z.</given-names>
+</string-name>, <string-name><surname>Chen</surname><given-names>R.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>L.</given-names></string-name>, <string-name><surname>Jiang</surname><given-names>J.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>S.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>L.</given-names></string-name>, <string-name><surname>He</surname><given-names>M.</given-names></string-name>, <string-name><surname>Mao</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Guo</surname><given-names>C.</given-names></string-name>, <string-name><surname>Kong</surname><given-names>X.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>CDS-DB, an omnibus for patient-derived gene expression signatures induced by cancer treatment</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad888</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B81">
+        <label>81.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Moon</surname>
+<given-names>C.I.</given-names>
+</string-name>, <string-name><surname>Elizarraras</surname><given-names>J.M.</given-names></string-name>, <string-name><surname>Lei</surname><given-names>J.T.</given-names></string-name>, <string-name><surname>Jia</surname><given-names>B.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>B.</given-names></string-name></person-group>
+<article-title>ClinicalOmicsDB: exploring molecular associations of oncology drug responses in clinical trials</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad871</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B82">
+        <label>82.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Kumar</surname>
+<given-names>H.</given-names>
+</string-name>, <string-name><surname>Tang</surname><given-names>L.Y.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>C.</given-names></string-name>, <string-name><surname>Kim</surname><given-names>P.</given-names></string-name></person-group>
+<article-title>FusionPDB: a knowledgebase of human fusion proteins</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad920</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B83">
+        <label>83.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Kumar</surname>
+<given-names>H.</given-names>
+</string-name>, <string-name><surname>Luo</surname><given-names>R.</given-names></string-name>, <string-name><surname>Wen</surname><given-names>J.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>C.</given-names></string-name>, <string-name><surname>Zhou</surname><given-names>X.</given-names></string-name>, <string-name><surname>Kim</surname><given-names>P.</given-names></string-name></person-group>
+<article-title>FusionNeoAntigen: a resource of fusion gene-specific neoantigens</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad922</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B84">
+        <label>84.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Deng</surname>
+<given-names>Y.</given-names>
+</string-name>, <string-name><surname>Chen</surname><given-names>P.</given-names></string-name>, <string-name><surname>Xiao</surname><given-names>J.</given-names></string-name>, <string-name><surname>Li</surname><given-names>M.</given-names></string-name>, <string-name><surname>Shen</surname><given-names>J.</given-names></string-name>, <string-name><surname>Qin</surname><given-names>S.</given-names></string-name>, <string-name><surname>Jia</surname><given-names>T.</given-names></string-name>, <string-name><surname>Li</surname><given-names>C.</given-names></string-name>, <string-name><surname>Chang</surname><given-names>A.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>W.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>SCAR: single-cell and Spatially-resolved Cancer Resources</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad753</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B85">
+        <label>85.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zhou</surname>
+<given-names>W.</given-names>
+</string-name>, <string-name><surname>Su</surname><given-names>M.</given-names></string-name>, <string-name><surname>Jiang</surname><given-names>T.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Sun</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Xu</surname><given-names>K.</given-names></string-name>, <string-name><surname>Shi</surname><given-names>J.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>C.</given-names></string-name>, <string-name><surname>Ding</surname><given-names>N.</given-names></string-name>, <string-name><surname>Li</surname><given-names>Y.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>SORC: an integrated spatial omics resource in cancer</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad820</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B86">
+        <label>86.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zhou</surname>
+<given-names>Y.</given-names>
+</string-name>, <string-name><surname>Zhang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Zhao</surname><given-names>D.</given-names></string-name>, <string-name><surname>Yu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Shen</surname><given-names>X.</given-names></string-name>, <string-name><surname>Zhou</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>S.</given-names></string-name>, <string-name><surname>Qiu</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Zhu</surname><given-names>F.</given-names></string-name></person-group>
+<article-title>TTD: therapeutic Target Database describing target druggability information</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad751</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B87">
+        <label>87.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Cannon</surname>
+<given-names>M.</given-names>
+</string-name>, <string-name><surname>Stevenson</surname><given-names>J.</given-names></string-name>, <string-name><surname>Stahl</surname><given-names>K.</given-names></string-name>, <string-name><surname>Basu</surname><given-names>R.</given-names></string-name>, <string-name><surname>Coffman</surname><given-names>A.</given-names></string-name>, <string-name><surname>Kiwala</surname><given-names>S.</given-names></string-name>, <string-name><surname>McMichael</surname><given-names>J.F.</given-names></string-name>, <string-name><surname>Kuzma</surname><given-names>K.</given-names></string-name>, <string-name><surname>Morrissey</surname><given-names>D.</given-names></string-name>, <string-name><surname>Cotto</surname><given-names>K.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>DGIdb 5.0: rebuilding the drug-gene interaction database for precision medicine and drug discovery platforms</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1040</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B88">
+        <label>88.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Knox</surname>
+<given-names>C.</given-names>
+</string-name>, <string-name><surname>Wilson</surname><given-names>M.</given-names></string-name>, <string-name><surname>Klinger</surname><given-names>C.M.</given-names></string-name>, <string-name><surname>Franklin</surname><given-names>M.</given-names></string-name>, <string-name><surname>Oler</surname><given-names>E.</given-names></string-name>, <string-name><surname>Wilson</surname><given-names>A.</given-names></string-name>, <string-name><surname>Pon</surname><given-names>A.</given-names></string-name>, <string-name><surname>Cox</surname><given-names>J.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>DrugBank 6.0: the DrugBank Knowledgebase for 2024</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad976</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B89">
+        <label>89.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zdrazil</surname>
+<given-names>B.</given-names>
+</string-name>, <string-name><surname>Felix</surname><given-names>E.</given-names></string-name>, <string-name><surname>Hunter</surname><given-names>F.</given-names></string-name>, <string-name><surname>Manners</surname><given-names>E.J.</given-names></string-name>, <string-name><surname>Blackshaw</surname><given-names>J.</given-names></string-name>, <string-name><surname>Corbett</surname><given-names>S.</given-names></string-name>, <string-name><surname>de Veij</surname><given-names>M.</given-names></string-name>, <string-name><surname>Ioannidis</surname><given-names>H.</given-names></string-name>, <string-name><surname>Lopez</surname><given-names>D.M.</given-names></string-name>, <string-name><surname>Mosquera</surname><given-names>J.F.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The ChEMBL Database in 2023: a drug discovery platform spanning multiple bioactivity data types and time periods</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1004</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B90">
+        <label>90.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Yin</surname>
+<given-names>J.</given-names>
+</string-name>, <string-name><surname>Chen</surname><given-names>Z.</given-names></string-name>, <string-name><surname>You</surname><given-names>N.</given-names></string-name>, <string-name><surname>Li</surname><given-names>F.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>H.</given-names></string-name>, <string-name><surname>Xue</surname><given-names>J.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>H.</given-names></string-name>, <string-name><surname>Zhao</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Yu</surname><given-names>L.</given-names></string-name>, <string-name><surname>Zeng</surname><given-names>S.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>VARIDT 3.0: the phenotypic and regulatory variability of drug transporter</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad818</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B91">
+        <label>91.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zhang</surname>
+<given-names>Y.</given-names>
+</string-name>, <string-name><surname>Liu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Li</surname><given-names>F.</given-names></string-name>, <string-name><surname>Yin</surname><given-names>J.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>H.</given-names></string-name>, <string-name><surname>Li</surname><given-names>X.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Chai</surname><given-names>X.</given-names></string-name>, <string-name><surname>Niu</surname><given-names>T.</given-names></string-name>, <string-name><surname>Zeng</surname><given-names>S.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>INTEDE 2.0: the metabolic roadmap of drugs</article-title>. <source>Nucleic Acids Res.</source><year>2023)</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1013</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B92">
+        <label>92.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Liu</surname>
+<given-names>X.</given-names>
+</string-name>, <string-name><surname>Yi</surname><given-names>J.</given-names></string-name>, <string-name><surname>Li</surname><given-names>T.</given-names></string-name>, <string-name><surname>Wen</surname><given-names>J.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>K.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>J.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>G.</given-names></string-name>, <string-name><surname>Kim</surname><given-names>P.</given-names></string-name>, <string-name><surname>Song</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Zhou</surname><given-names>X.</given-names></string-name></person-group>
+<article-title>DRMref: comprehensive reference map of drug resistance mechanisms in human cancer</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1087</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B93">
+        <label>93.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Schubach</surname>
+<given-names>M.</given-names>
+</string-name>, <string-name><surname>Maass</surname><given-names>T.</given-names></string-name>, <string-name><surname>Nazaretyan</surname><given-names>L.</given-names></string-name>, <string-name><surname>Röner</surname><given-names>S.</given-names></string-name>, <string-name><surname>Kircher</surname><given-names>M.</given-names></string-name></person-group>
+<article-title>CADD v1.7: using protein language models, regulatory CNNs and other nucleotide-level scores to improve genome-wide variant predictions</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad989</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B94">
+        <label>94.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wang</surname>
+<given-names>Z.</given-names>
+</string-name>, <string-name><surname>Zhao</surname><given-names>G.</given-names></string-name>, <string-name><surname>Zhu</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Xiang</surname><given-names>X.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>S.</given-names></string-name>, <string-name><surname>Luo</surname><given-names>T.</given-names></string-name>, <string-name><surname>Zhou</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Qiu</surname><given-names>J.</given-names></string-name>, <string-name><surname>Tang</surname><given-names>B.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>VarCards2: an integrated genetic and clinical database for ACMG-AMP variant-interpretation guidelines in the human whole genome</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1061</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B95">
+        <label>95.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Cui</surname>
+<given-names>C.</given-names>
+</string-name>, <string-name><surname>Zhong</surname><given-names>B.</given-names></string-name>, <string-name><surname>Fan</surname><given-names>R.</given-names></string-name>, <string-name><surname>Cui</surname><given-names>Q.</given-names></string-name></person-group>
+<article-title>HMDD v4.0: a database for experimentally supported human microRNA-disease associations</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad717</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B96">
+        <label>96.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Lin</surname>
+<given-names>X.</given-names>
+</string-name>, <string-name><surname>Lu</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>C.</given-names></string-name>, <string-name><surname>Cui</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Tang</surname><given-names>Y.D.</given-names></string-name>, <string-name><surname>Ji</surname><given-names>X.</given-names></string-name>, <string-name><surname>Cui</surname><given-names>C.</given-names></string-name></person-group>
+<article-title>LncRNADisease v3.0: an updated database of long non-coding RNA-associated diseases</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad828</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B97">
+        <label>97.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Sun</surname>
+<given-names>Z.Y.</given-names>
+</string-name>, <string-name><surname>Yang</surname><given-names>C.L.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>L.J.</given-names></string-name>, <string-name><surname>Mo</surname><given-names>Z.C.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>K.N.</given-names></string-name>, <string-name><surname>Fan</surname><given-names>W.H.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>K.Y.</given-names></string-name>, <string-name><surname>Wu</surname><given-names>F.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>J.G.</given-names></string-name>, <string-name><surname>Meng</surname><given-names>F.L.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>circRNADisease v2.0: an updated resource for high-quality experimentally supported circRNA-disease associations</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad949</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B98">
+        <label>98.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Baron</surname>
+<given-names>J.A.</given-names>
+</string-name>, <string-name><surname>Johnson</surname><given-names>C.S.</given-names></string-name>, <string-name><surname>Schor</surname><given-names>M.A.</given-names></string-name>, <string-name><surname>Olley</surname><given-names>D.</given-names></string-name>, <string-name><surname>Nickel</surname><given-names>L.</given-names></string-name>, <string-name><surname>Felix</surname><given-names>V.</given-names></string-name>, <string-name><surname>Munro</surname><given-names>J.B.</given-names></string-name>, <string-name><surname>Bello</surname><given-names>S.M.</given-names></string-name>, <string-name><surname>Bearer</surname><given-names>C.</given-names></string-name>, <string-name><surname>Lichenstein</surname><given-names>R.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The DO-KB Knowledgebase: a 20-year journey developing the disease open science ecosystem</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1051</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B99">
+        <label>99.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Gargano</surname>
+<given-names>M.A.</given-names>
+</string-name>, <string-name><surname>Matentzoglu</surname><given-names>N.</given-names></string-name>, <string-name><surname>Coleman</surname><given-names>B.</given-names></string-name>, <string-name><surname>Addo-Lartey</surname><given-names>E.B.</given-names></string-name>, <string-name><surname>Anagnostopoulos</surname><given-names>A.V.</given-names></string-name>, <string-name><surname>Anderton</surname><given-names>J.</given-names></string-name>, <string-name><surname>Avillach</surname><given-names>P.</given-names></string-name>, <string-name><surname>Bagley</surname><given-names>A.M.</given-names></string-name>, <string-name><surname>Bakštein</surname><given-names>E.</given-names></string-name>, <string-name><surname>Balhoff</surname><given-names>J.P.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>The Human Phenotype Ontology in 2024: phenotypes around the world</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1005</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B100">
+        <label>100.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Cao</surname>
+<given-names>Y.</given-names>
+</string-name>, <string-name><surname>Tian</surname><given-names>D.</given-names></string-name>, <string-name><surname>Tang</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Hu</surname><given-names>W.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Song</surname><given-names>S.</given-names></string-name></person-group>
+<article-title>OPIA: an open archive of plant images and related phenotypic traits</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad975</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B101">
+        <label>101.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Dong</surname>
+<given-names>X.</given-names>
+</string-name>, <string-name><surname>Zhao</surname><given-names>K.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>Q.</given-names></string-name>, <string-name><surname>Wu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Wu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>T.</given-names></string-name>, <string-name><surname>Dong</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Gao</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>P.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>PlantPAD: a platform for large-scale image phenomics analysis of disease in plant science</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad917</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B102">
+        <label>102.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Yang</surname>
+<given-names>Z.</given-names>
+</string-name>, <string-name><surname>Luo</surname><given-names>C.</given-names></string-name>, <string-name><surname>Pei</surname><given-names>X.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>S.</given-names></string-name>, <string-name><surname>Huang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Li</surname><given-names>J.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>B.</given-names></string-name>, <string-name><surname>Kong</surname><given-names>F.</given-names></string-name>, <string-name><surname>Yang</surname><given-names>Q.Y.</given-names></string-name>, <string-name><surname>Fang</surname><given-names>C.</given-names></string-name></person-group>
+<article-title>SoyMD: a platform combining multi-omics data with various tools for soybean research and breeding</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad786</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B103">
+        <label>103.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Kang</surname>
+<given-names>H.</given-names>
+</string-name>, <string-name><surname>Huang</surname><given-names>T.</given-names></string-name>, <string-name><surname>Duan</surname><given-names>G.</given-names></string-name>, <string-name><surname>Meng</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>X.</given-names></string-name>, <string-name><surname>He</surname><given-names>S.</given-names></string-name>, <string-name><surname>Xia</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Zhou</surname><given-names>X.</given-names></string-name>, <string-name><surname>Chao</surname><given-names>J.</given-names></string-name>, <string-name><surname>Tang</surname><given-names>B.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>TCOD: an integrated resource for tropical crops</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad870</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B104">
+        <label>104.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Chen</surname>
+<given-names>J.</given-names>
+</string-name>, <string-name><surname>Tan</surname><given-names>C.</given-names></string-name>, <string-name><surname>Zhu</surname><given-names>M.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>C.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Ni</surname><given-names>X.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Wei</surname><given-names>T.</given-names></string-name>, <string-name><surname>Wei</surname><given-names>X.</given-names></string-name>, <string-name><surname>Fang</surname><given-names>X.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>CropGS-Hub: a comprehensive database of genotype and phenotype resources for genomic prediction in major crops</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1062</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B105">
+        <label>105.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Yang</surname>
+<given-names>S.</given-names>
+</string-name>, <string-name><surname>Zong</surname><given-names>W.</given-names></string-name>, <string-name><surname>Shi</surname><given-names>L.</given-names></string-name>, <string-name><surname>Li</surname><given-names>R.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>S.</given-names></string-name>, <string-name><surname>Si</surname><given-names>J.</given-names></string-name>, <string-name><surname>Wu</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Zhai</surname><given-names>J.</given-names></string-name>, <string-name><surname>Ma</surname><given-names>Y.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>PPGR: a comprehensive perennial plant genomes and regulation database</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad963</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B106">
+        <label>106.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Shi</surname>
+<given-names>H.</given-names>
+</string-name>, <string-name><surname>Wu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Zhu</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Jiang</surname><given-names>T.</given-names></string-name>, <string-name><surname>Wang</surname><given-names>Z.</given-names></string-name>, <string-name><surname>Li</surname><given-names>X.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>J.</given-names></string-name>, <string-name><surname>Zhang</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>F.</given-names></string-name>, <string-name><surname>Gao</surname><given-names>J.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>RefMetaPlant: a reference metabolome database for plants across five major phyla</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad980</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B107">
+        <label>107.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Tian</surname>
+<given-names>Z.</given-names>
+</string-name>, <string-name><surname>Hu</surname><given-names>X.</given-names></string-name>, <string-name><surname>Xu</surname><given-names>Y.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>M.</given-names></string-name>, <string-name><surname>Liu</surname><given-names>H.</given-names></string-name>, <string-name><surname>Li</surname><given-names>D.</given-names></string-name>, <string-name><surname>Hu</surname><given-names>L.</given-names></string-name>, <string-name><surname>Wei</surname><given-names>G.</given-names></string-name>, <string-name><surname>Chen</surname><given-names>W.</given-names></string-name></person-group>
+<article-title>PMhub 1.0: a comprehensive plant metabolome database</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad811</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B108">
+        <label>108.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Conroy</surname>
+<given-names>M.J.</given-names>
+</string-name>, <string-name><surname>Andrews</surname><given-names>R.M.</given-names></string-name>, <string-name><surname>Andrews</surname><given-names>S.</given-names></string-name>, <string-name><surname>Cockayne</surname><given-names>L.</given-names></string-name>, <string-name><surname>Dennis</surname><given-names>E.A.</given-names></string-name>, <string-name><surname>Fahy</surname><given-names>E.</given-names></string-name>, <string-name><surname>Gaud</surname><given-names>C.</given-names></string-name>, <string-name><surname>Griffiths</surname><given-names>W.J.</given-names></string-name>, <string-name><surname>Jukes</surname><given-names>G.</given-names></string-name>, <string-name><surname>Kolchin</surname><given-names>M.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>LIPID MAPS: update to databases and tools for the lipidomics community</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad896</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B109">
+        <label>109.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Schnider</surname>
+<given-names>B.</given-names>
+</string-name>, <string-name><surname>M’Rad</surname><given-names>Y.</given-names></string-name>, <string-name><surname>El Ahmadie</surname><given-names>J.</given-names></string-name>, <string-name><surname>de Brevern</surname><given-names>A.G.</given-names></string-name>, <string-name><surname>Imberty</surname><given-names>A.</given-names></string-name>, <string-name><surname>Lisacek</surname><given-names>F.</given-names></string-name></person-group>
+<article-title>HumanLectome, an update of UniLectin for the annotation and prediction of human lectins</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad905</pub-id>.</mixed-citation>
+      </ref>
+      <ref id="B110">
+        <label>110.</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Chitti</surname>
+<given-names>S.V.</given-names>
+</string-name>, <string-name><surname>Gummadi</surname><given-names>S.</given-names></string-name>, <string-name><surname>Kang</surname><given-names>T.</given-names></string-name>, <string-name><surname>Shahi</surname><given-names>S.</given-names></string-name>, <string-name><surname>Marzan</surname><given-names>A.L.</given-names></string-name>, <string-name><surname>Nedeva</surname><given-names>C.</given-names></string-name>, <string-name><surname>Sanwlani</surname><given-names>R.</given-names></string-name>, <string-name><surname>Bramich</surname><given-names>K.</given-names></string-name>, <string-name><surname>Stewart</surname><given-names>S.</given-names></string-name>, <string-name><surname>Petrovska</surname><given-names>M.</given-names></string-name><etal>et al</etal>.</person-group>
+<article-title>Vesiclepedia 2024: an extracellular vesicles and extracellular particles repository</article-title>. <source>Nucleic Acids Res.</source><year>2023</year>; <pub-id pub-id-type="doi">10.1093/nar/gkad1007</pub-id>.</mixed-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

@@ -1,0 +1,1340 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:16:54Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:10300000" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:10300000</identifier><datestamp>2023-06-29</datestamp><setSpec>scirep</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" article-type="research-article" dtd-version="1.3">
+  <processing-meta base-tagset="archiving" mathml-version="3.0" table-model="xhtml" tagset-family="jats">
+    <restricted-by>pmc</restricted-by>
+  </processing-meta>
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">Sci Rep</journal-id>
+      <journal-id journal-id-type="iso-abbrev">Sci Rep</journal-id>
+      <journal-title-group>
+        <journal-title>Scientific Reports</journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">2045-2322</issn>
+      <publisher>
+        <publisher-name>Nature Publishing Group UK</publisher-name>
+        <publisher-loc>London</publisher-loc>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC10300000</article-id>
+      <article-id pub-id-type="pmcid">PMC10300000</article-id>
+      <article-id pub-id-type="pmc-uid">10300000</article-id>
+      <article-id pub-id-type="pmid">37369807</article-id>
+      <article-id pub-id-type="pmid">37369807</article-id>
+      <article-id pub-id-type="publisher-id">37641</article-id>
+      <article-id pub-id-type="doi">10.1038/s41598-023-37641-9</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>Article</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Ion mobility mass spectrometry for the study of mycobacterial mycolic acids</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Liu</surname>
+            <given-names>Yi</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Kaffah</surname>
+            <given-names>Nadhira</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Pandor</surname>
+            <given-names>Sufyan</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Sartain</surname>
+            <given-names>Mark J.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author" corresp="yes">
+          <name>
+            <surname>Larrouy-Maumus</surname>
+            <given-names>Gerald</given-names>
+          </name>
+          <address>
+            <email>g.larrouy-maumus@imperial.ac.uk</email>
+          </address>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <aff id="Aff1"><label>1</label><institution-wrap><institution-id institution-id-type="GRID">grid.7445.2</institution-id><institution-id institution-id-type="ISNI">0000 0001 2113 8111</institution-id><institution>Centre for Bacterial Resistance Biology, Department of Life Sciences, Faculty of Natural Sciences, </institution><institution>Imperial College London, </institution></institution-wrap>London, SW7 2AZ UK </aff>
+        <aff id="Aff2"><label>2</label><institution-wrap><institution-id institution-id-type="GRID">grid.422181.c</institution-id><institution-id institution-id-type="ISNI">0000 0004 0597 6969</institution-id><institution>Agilent Technologies, Inc., </institution></institution-wrap>Cheadle, UK </aff>
+        <aff id="Aff3"><label>3</label><institution-wrap><institution-id institution-id-type="GRID">grid.422638.9</institution-id><institution-id institution-id-type="ISNI">0000 0001 2107 5309</institution-id><institution>Agilent Technologies, Inc., </institution></institution-wrap>Santa Clara, CA 95051 USA </aff>
+      </contrib-group>
+      <pub-date pub-type="epub">
+        <day>27</day>
+        <month>6</month>
+        <year>2023</year>
+      </pub-date>
+      <pub-date pub-type="pmc-release">
+        <day>27</day>
+        <month>6</month>
+        <year>2023</year>
+      </pub-date>
+      <pub-date pub-type="collection">
+        <year>2023</year>
+      </pub-date>
+      <volume>13</volume>
+      <elocation-id>10390</elocation-id>
+      <history>
+        <date date-type="received">
+          <day>11</day>
+          <month>3</month>
+          <year>2023</year>
+        </date>
+        <date date-type="accepted">
+          <day>25</day>
+          <month>6</month>
+          <year>2023</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-statement>© The Author(s) 2023</copyright-statement>
+        <license>
+          <ali:license_ref specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref>
+          <license-p><bold>Open Access</bold> This article is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if changes were made. The images or other third party material in this article are included in the article's Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the article's Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder. To view a copy of this licence, visit <ext-link ext-link-type="uri" xlink:href="https://creativecommons.org/licenses/by/4.0/">http://creativecommons.org/licenses/by/4.0/</ext-link>.</license-p>
+        </license>
+      </permissions>
+      <abstract id="Abs1">
+        <p id="Par1">Lipids are highly structurally diverse molecules involved in a wide variety of biological processes. The involvement of lipids is even more pronounced in mycobacteria, including the human pathogen <italic>Mycobacterium tuberculosis</italic>, which produces a highly complex and diverse set of lipids in the cell envelope. These lipids include mycolic acids, which are among the longest fatty acids in nature and can contain up to 90 carbon atoms. Mycolic acids are ubiquitously found in mycobacteria and are alpha branched and beta hydroxylated lipids. Discrete modifications, such as alpha, alpha’, epoxy, methoxy, keto, and carboxy, characterize mycolic acids at the species level. Here, we used high precision ion mobility-mass spectrometry to build a database including 206 mass-resolved collision cross sections (CCSs) of mycolic acids originating from the strict human pathogen <italic>M. tuberculosis</italic>, the opportunistic strains <italic>M. abscessus</italic>, <italic>M. marinum</italic> and <italic>M. avium,</italic> and the nonpathogenic strain <italic>M. smegmatis</italic>. Primary differences between the mycolic acid profiles could be observed between mycobacterial species. Acyl tail length and modifications were the primary structural descriptors determining CCS magnitude. As a resource for researchers, this work provides a detailed catalogue of the mass-resolved collision cross sections for mycolic acids along with a workflow to generate and analyse the dataset generated.</p>
+      </abstract>
+      <kwd-group kwd-group-type="npg-subject">
+        <title>Subject terms</title>
+        <kwd>Mass spectrometry</kwd>
+        <kwd>Lipids</kwd>
+      </kwd-group>
+      <funding-group>
+        <award-group>
+          <funding-source>
+            <institution-wrap>
+              <institution-id institution-id-type="FundRef">http://dx.doi.org/10.13039/501100000265</institution-id>
+              <institution>Medical Research Council</institution>
+            </institution-wrap>
+          </funding-source>
+          <award-id>MR/W018756/1</award-id>
+          <principal-award-recipient>
+            <name>
+              <surname>Larrouy-Maumus</surname>
+              <given-names>Gerald</given-names>
+            </name>
+          </principal-award-recipient>
+        </award-group>
+      </funding-group>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>issue-copyright-statement</meta-name>
+          <meta-value>© Springer Nature Limited 2023</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="Sec1">
+      <title>Introduction</title>
+      <p id="Par2">Mycolic acids are long-chain fatty acids and comprise the inner leaflet of mycobacterial outer membranes in cell envelopes<sup><xref ref-type="bibr" rid="CR1">1</xref>–<xref ref-type="bibr" rid="CR5">5</xref></sup>. They occur mostly in association with sugar moieties and are either covalently linked to arabinogalactan or esterifying trehalose and glycerol; however, they may also exist freely<sup><xref ref-type="bibr" rid="CR3">3</xref>,<xref ref-type="bibr" rid="CR4">4</xref>,<xref ref-type="bibr" rid="CR6">6</xref>,<xref ref-type="bibr" rid="CR7">7</xref></sup>. Mycolic acids are important not only for mycobacterial cell envelope architecture but also for virulence and antibiotic resistance<sup><xref ref-type="bibr" rid="CR2">2</xref>,<xref ref-type="bibr" rid="CR8">8</xref>,<xref ref-type="bibr" rid="CR9">9</xref></sup>. Mycolic acids determine cell envelope fluidity and create a hydrophobic layer in association with sugar moieties and lipids; this layer acts as a barrier for drug penetration, thereby conferring intrinsic resistance to antibiotics<sup><xref ref-type="bibr" rid="CR10">10</xref></sup>. The synthesis of mycolic acids is targeted by the first-line anti-TB drug isoniazid through inhibiting the activities of InhA and KasA. Moreover, mycolic acids manipulate the host immune response<sup><xref ref-type="bibr" rid="CR7">7</xref></sup> and induce foamy macrophage formation characteristic of <italic>Mycobacterium</italic> spp.<sup><xref ref-type="bibr" rid="CR11">11</xref></sup>.</p>
+      <p id="Par3">The role of mycolic acids in virulence is determined by their structure. All mycolic acids share a main acyl chain, called the meromycolic chain, and an alpha branch<sup><xref ref-type="bibr" rid="CR4">4</xref>,<xref ref-type="bibr" rid="CR5">5</xref></sup>. Mycolic acids are divided into different classes according to the functional groups attached to the main meromycolic chain<sup><xref ref-type="bibr" rid="CR4">4</xref>–<xref ref-type="bibr" rid="CR6">6</xref>,<xref ref-type="bibr" rid="CR9">9</xref>,<xref ref-type="bibr" rid="CR12">12</xref></sup>. However, mycolic acid classes are species-specific and not present in all <italic>Mycobacterium</italic> species<sup><xref ref-type="bibr" rid="CR8">8</xref>,<xref ref-type="bibr" rid="CR9">9</xref>,<xref ref-type="bibr" rid="CR13">13</xref></sup>. For example, the nonpathogenic mycobacterium <italic>Mycobacterium smegmatis</italic> mc<sup>2</sup>155 does not possess keto and methoxy groups, as found in the pathogenic mycobacterium strain <italic>Mycobacterium tuberculosis</italic> H37Rv<sup><xref ref-type="bibr" rid="CR9">9</xref>,<xref ref-type="bibr" rid="CR14">14</xref>,<xref ref-type="bibr" rid="CR15">15</xref></sup>. Additionally, although epoxy mycolic acids are found in <italic>M. smegmatis</italic> mc<sup>2</sup>155, they are not present in <italic>M. bovis</italic> BCG, the vaccine strain<sup><xref ref-type="bibr" rid="CR9">9</xref>,<xref ref-type="bibr" rid="CR14">14</xref>,<xref ref-type="bibr" rid="CR16">16</xref></sup>.</p>
+      <p id="Par4">Recent studies have shown that mycolic acid chain length, functional groups and structures can influence the fluidity of the mycobacterial cell envelope, which in turn affects drug susceptibility<sup><xref ref-type="bibr" rid="CR10">10</xref></sup>. Furthermore, the chemical functions on the meromycolic chain determine virulence<sup><xref ref-type="bibr" rid="CR1">1</xref>,<xref ref-type="bibr" rid="CR9">9</xref></sup>. For example, only mycobacteria with oxygenated mycolic acids can induce formation of foamy macrophages, which facilitate mycobacterial persistence within host macrophages<sup><xref ref-type="bibr" rid="CR11">11</xref></sup>. Specifically, keto-mycolic acids are able to interact with the host lipid sensor TR4 and induce this foamy phenotype<sup><xref ref-type="bibr" rid="CR17">17</xref></sup>. Methoxy and keto mycolic acids are also more antigenic than alpha mycolic acids<sup><xref ref-type="bibr" rid="CR18">18</xref></sup>.</p>
+      <p id="Par5">It is important to characterize the mycolic acid profiles of different mycobacterial species at a fine structural level to clarify their roles during infection and antimicrobial resistance between different species. Mycolic acids of the same classification may differ in the position and geometry of their chemical functions, adding to their structural complexity. Numerous studies have reported on the identification of mycolic acid classes in different mycobacterial species<sup><xref ref-type="bibr" rid="CR12">12</xref>,<xref ref-type="bibr" rid="CR15">15</xref>,<xref ref-type="bibr" rid="CR19">19</xref></sup> and investigated the roles of mycolic acid classes in virulence<sup><xref ref-type="bibr" rid="CR11">11</xref>,<xref ref-type="bibr" rid="CR17">17</xref>,<xref ref-type="bibr" rid="CR18">18</xref></sup>. These approaches involve mass spectrometry techniques, such as matrix-assisted laser desorption ionization<sup><xref ref-type="bibr" rid="CR15">15</xref></sup> or electrospray ionization<sup><xref ref-type="bibr" rid="CR20">20</xref>–<xref ref-type="bibr" rid="CR22">22</xref></sup> mass spectrometry.</p>
+      <p id="Par6">However, none of these studies have investigated the use of ion mobility coupled to mass spectrometry to gain deeper insight into mycolic acids. Ion mobility-mass spectrometry (IM-MS) is a technique used to achieve molecular ion separation based on ionic mass, charge, and conformations in the gas phase<sup><xref ref-type="bibr" rid="CR23">23</xref>–<xref ref-type="bibr" rid="CR25">25</xref></sup>. In contrast to conventional mass spectrometry, the additional information on conformation, which is measured in terms of collisional cross section (CCS), improves the accuracy of identification of molecules with similar structures. Indeed, through ion mobility, the rotationally averaged CCS of an ion can be measured. CCS is an important distinguishing characteristic of an ion in the gas phase. It is related to its chemical structure and three-dimensional conformation.</p>
+      <p id="Par7">This method has been previously used to identify lipid isomers, which are lipids that exhibit the same mass but different structures (hence, different CCS values), and classify them according to lipid head group, chain length, and degree of unsaturation<sup><xref ref-type="bibr" rid="CR26">26</xref>–<xref ref-type="bibr" rid="CR29">29</xref></sup>.</p>
+      <p id="Par8">In this study, we focus on the relationship between lipid structure and gas-phase conformation via IM-MS analysis to generate an atlas of mycolic acid methyl ester (MAME) isomers in relevant mycobacterial species.</p>
+    </sec>
+    <sec id="Sec2">
+      <title>Results and discussion</title>
+      <sec id="Sec3">
+        <title>Data processing workflow</title>
+        <p id="Par9">A subset database from online sources (<ext-link ext-link-type="uri" xlink:href="https://www.lipidmaps.org/">https://www.lipidmaps.org/</ext-link>) and the literature was created in comma-separated values (CSV) format<sup><xref ref-type="bibr" rid="CR15">15</xref>,<xref ref-type="bibr" rid="CR30">30</xref>–<xref ref-type="bibr" rid="CR32">32</xref></sup>. Analysis of fragmentation data from the pooled quality control samples performed in Mass Hunter Qualitative Analysis (Agilent Technologies) was used to extract compounds with corresponding spectral information. Data were placed into Sirius 4 (Lehrstuhl Bioinformatik Jena) for molecular formula assignment. Fragment formulas were added to the database<sup><xref ref-type="bibr" rid="CR33">33</xref>,<xref ref-type="bibr" rid="CR34">34</xref></sup>. Finally, all compounds in the database were annotated with CCS using Mass Profiler (Agilent Technologies).</p>
+        <p id="Par10">A screening workflow was set up in Skyline (MacCoss Lab), in which all mycolic acids were extracted from IM-QToF<sup><xref ref-type="bibr" rid="CR35">35</xref></sup>. All Ions MS/MS data were collected with accurate mass, retention time and CCS (Fig. <xref rid="Fig1" ref-type="fig">1</xref>). Data were filtered to exclude matches with an isotope dot product score lower than 0.8 and a mass error of &gt; 10 ppm.<fig id="Fig1"><label>Figure 1</label><caption><p>Data process workflow used to extract and annotate the mycolic acid methyl esters (MAMEs) with formula and CCS.</p></caption><graphic xlink:href="41598_2023_37641_Fig1_HTML" id="MO1"/></fig></p>
+      </sec>
+      <sec id="Sec4">
+        <title>Mycolic acid distribution and ion forms</title>
+        <p id="Par11">MAMEs were identified and assigned primarily based on exact mass measurements and MS/MS profiles. The CCS measurements and corresponding mobility-mass correlations were utilized to provide additional confidence in the lipid assignment in conjunction with the mass measurement accuracy (± 10 ppm observed in this work).</p>
+        <p id="Par12">This work represents 206 CCS values for uniquely identified mycolic acids from 5 mycobacterial species and 6 MAME families analysed in the positive ion mode and obtained on a drift tube instrument operated with nitrogen drift gas (<sup>DT</sup>CCS<sub>N2</sub>). Using the solvents required for chromatography, across all 5 mycobacterial species, ~ 76% and ~ 24% of the total ion abundance of corresponded to mycolic acid methyl ester species with proton [M + H]<sup>+</sup> and sodium [M + Na]<sup>+</sup> adducts, respectively (Fig. <xref rid="Fig2" ref-type="fig">2</xref>A). In previous literature, most MAMEs are reported as sodium or ammonium adducts<sup><xref ref-type="bibr" rid="CR36">36</xref></sup>. In contrast, we observe that the large majority of adducts are [M + H]<sup>+</sup>, which can be explained by the preconditioning of the LC system by phosphoric acid; this was performed to reduce the presence of ions, such as Na<sup>+</sup> and K<sup>+</sup>.<fig id="Fig2"><label>Figure 2</label><caption><p>Mycolic acid methyl ester population observations. (<bold>a</bold>) The distribution of adducts observed resulting in the species of quasimolecular ion detected. (<bold>b</bold>) Mycolic acid methyl ester modification distributions across 5 mycobacterial species, <italic>M. tuberculosis</italic>, <italic>M. abscessus</italic>, <italic>M. avium</italic>, <italic>M. marinum</italic> and <italic>M. smegmatis</italic>.</p></caption><graphic xlink:href="41598_2023_37641_Fig2_HTML" id="MO2"/></fig></p>
+        <p id="Par13">In terms of mycolic acids categories, carboxy; methoxy; keto; epoxy/w1-methoxy; alpha’ and alpha were annotated. More particularly, in Mtb, alpha mycolic acid methyl esters represent 55%, keto mycolic acid methyl esters represent 39% and methoxy mycolic acid methyl esters represent 6% of the total MAME ion abundance measured. In <italic>M. abscessus</italic>, alpha mycolic acid methyl esters represent 55%, alpha’ mycolic acid methyl esters represent 32%, epoxy/w1 methoxy mycolic acid methyl esters represent 9% and carboxy mycolic acid methyl esters represent 5% of the total MAME ion abundance measured. In <italic>M. avium</italic>, alpha mycolic acid methyl esters represent 44%, epoxy/w1 methoxy mycolic acid methyl esters represent 6% and carboxy mycolic acid methyl esters represent 50% of the total MAME ion abundance measured. In <italic>M. marinum</italic>, alpha mycolic acid methyl esters represent 40%, keto mycolic acid methyl esters represent 52%, methoxy mycolic acid methyl esters represent 9% and carboxy mycolic acid methyl esters represent 8% of the total MAME ion abundance measured. In <italic>M. smegmatis</italic>, alpha mycolic acid methyl esters represent 58%, alpha’ mycolic acid methyl esters represent 14%, and epoxy/w1-methoxy mycolic acid methyl esters represent 28% of the total MAME ion abundance measured. These observations are summarized in the histogram in Fig. <xref rid="Fig2" ref-type="fig">2</xref>B and are in agreement with the thin layer chromatography from growing mycobacteria (Figs. <xref rid="MOESM1" ref-type="media">S1</xref> and <xref rid="MOESM1" ref-type="media">S2</xref>). These distributions correlate well with those found in the literature using conventional methods<sup><xref ref-type="bibr" rid="CR14">14</xref>,<xref ref-type="bibr" rid="CR37">37</xref>–<xref ref-type="bibr" rid="CR41">41</xref></sup>.</p>
+      </sec>
+      <sec id="Sec5">
+        <title>IM-MS correlation</title>
+        <p id="Par14">In this work, all MAME classes exhibit a positive mobility-mass correlation in conformational space analyses, as typically observed with lipid classes in other studies. Within the MAME lipid trendline, unique families could be further differentiated by their respective <sup>DT</sup>CCS<sub>N2</sub> information, as each family exhibited an average CCS increase in 0.1–0.2 Å<sup>2</sup> per mass unit within the investigated mass range of 850–1400 <italic>m</italic>/<italic>z</italic> (Fig. <xref rid="Fig3" ref-type="fig">3</xref>, Supplementary Table <xref rid="MOESM2" ref-type="media">1</xref>). A closer examination of the IM-MS data shows a regular increase in size for each of the mycolic acid methyl ester families with a corresponding slope, <sup>DT</sup>CCS<sub>N2</sub> vs. mass, ranging from 0.1–0.2 Å<sup>2</sup> per mass unit.<fig id="Fig3"><label>Figure 3</label><caption><p>Quantitative correlations within the cation data for mycolic acid methyl esters for (<bold>a</bold>) <italic>M. smegmatis</italic>, (<bold>b</bold>) <italic>M. abscessus</italic>, (<bold>c</bold>) <italic>M. avium</italic>, (<bold>d</bold>) <italic>M. marinum,</italic> and (<bold>e</bold>) <italic>M. tuberculosis</italic>. The colours correspond to mycolic acid methyl ester modifications, whereas the shapes correspond to cation type, as specified in the corresponding panel legends.</p></caption><graphic xlink:href="41598_2023_37641_Fig3_HTML" id="MO3"/></fig></p>
+        <p id="Par15">The CCS/mass relationship presented here describes MAMEs differing only in chain length, decorations, or adduct type and can be used to identify lipid features that are ambiguous to characterize by mass alone or conformations.</p>
+        <p id="Par16">For protonated adducts, the same mass <italic>m</italic>/<italic>z</italic> can correlate to more than one CCS. These findings can also be observed for the alpha MAMEs in <italic>M. marinum</italic> at <italic>m</italic>/<italic>z</italic> 1152.202 correlated to CCS at 388.17 Å<sup>2</sup> and 386.96 Å<sup>2</sup>, at <italic>m</italic>/<italic>z</italic> 1166.18 correlated to CCS at 389.36 Å<sup>2</sup> and 392.10 Å<sup>2</sup>, at <italic>m</italic>/<italic>z</italic> 1180.232 correlated to CCS at 395.7 Å<sup>2</sup> and 394.27 Å<sup>2</sup>, and for keto MAMEs at <italic>m</italic>/<italic>z</italic> 1224.257 correlated to CCS at 406.75 Å<sup>2</sup>, 408.12 Å<sup>2</sup>, 405.77 Å<sup>2</sup>, 407.19 Å<sup>2</sup>, 408.17 Å<sup>2</sup>, 405.32 Å<sup>2</sup>. In <italic>M. tuberculosis</italic>, alpha MAMEs at <italic>m</italic>/<italic>z</italic> 1152.201 correlated to CCS at 385.49 Å<sup>2</sup> and 388.17 Å<sup>2</sup>, and <italic>m</italic>/<italic>z</italic> 1180.232 correlated to CCS at 395.7 Å<sup>2</sup> and 394.27 Å<sup>2</sup>.</p>
+        <p id="Par17">As in <italic>M. avium</italic>, these data indicate that for some carboxy MAMEs, a <italic>m/z</italic> can correlate to more than one CCS, such as for <italic>m/z</italic> 1001.987 with CCS at 340.01 Å<sup>2</sup> and CCS at 348.89 Å<sup>2</sup> (Fig. <xref rid="Fig4" ref-type="fig">4</xref>), suggesting that this lipid can adopt a different conformation in the gas phase. This information may indicate that the carboxy position is different in the meromycolic chain. A similar conclusion can be drawn for alpha’ mycolic acids, in which the double bond found in the meromycolic acid chain could be in different positions. As a result, the conformation of the meromycolic chain and therefore the CCS changes; however, the <italic>m/z</italic> remains the same, giving new insights into the complexity of mycolic acids.<fig id="Fig4"><label>Figure 4</label><caption><p>Selected example of a 2D IM-MS spectrum for carboxy mycolic acid methyl esters from <italic>M. avium</italic> showing separation of isobaric lipids. The top spectrum depicts the ion counts versus the mass-to-charge ratio (<italic>m/z</italic>), and the left spectrum depicts the drift spectrum in counts versus drift time (ms).</p></caption><graphic xlink:href="41598_2023_37641_Fig4_HTML" id="MO4"/></fig></p>
+        <p id="Par18">In this study, 206 <sup>DT</sup>CC<sub>N2</sub> measurements are presented for the MAMEs for 5 mycobacterial species representing 6 classes of decorations. This correlation <italic>m/z</italic> to CCS is unique to MAMEs and provides resources for future investigations. In addition, using this approach, we observed that MAMEs can adopt multiple CCS values, which could result from different conformations in the gas phase. The majority of isomeric mycolic acids belong to the alpha, keto and carboxy classes. Compared to the acyl chain length, the degree of unsaturation is four times more impactful on CCS<sup><xref ref-type="bibr" rid="CR26">26</xref>,<xref ref-type="bibr" rid="CR28">28</xref></sup>; thus, some MAMEs are more likely to form isomers, resulting in the same <italic>m/z</italic> but different CCS values. In conclusion, this is the first study reporting on a workflow and the use of IM-MS on MAMEs from 5 different mycobacterial lipids, providing a resource for researchers.</p>
+        <p id="Par19">Overall, this study demonstrates that IM-MS improves separation of mycolic acids, especially between the different isomeric forms that share the same molecular weight. Considering the important roles of mycolic acids in mycobacterial virulence and their differential distribution across mycobacterial species, accurate separation and characterisation of mycolic acids would greatly help the research in this field. As demonstrated in this study, IM-MS could be a powerful tool for this purpose based on its accuracy and specificity compared with conventional mass spectrometry or ion mobility spectrometry alone. Specifically, in LC-IM-MS studies CCS values are being increasingly leveraged as molecular identifiers that provide an orthogonal dimension of information to mass and retention time, and many software workflows such as the screening workflow shown here are being adapted to accommodate filtering on CCS values for increased specificity for both targeted compound detection and unknown compound identification. To enable the mycobacterial research community, this study presents a database of mycolic acids from various mycobacterial species and an example workflow of data analysis for such purposes. We hope to encourage future studies on the species-specific mycolic acid profiles and their functions in mycobacterial species. However, validation of CCS values is restricted to the limited number of lipid standards that are commercially available for mycolic acids, making one of the limitations for this study.</p>
+      </sec>
+    </sec>
+    <sec id="Sec6">
+      <title>Material and methods</title>
+      <sec id="Sec7">
+        <title>Bacterial strains and growth conditions</title>
+        <p id="Par20"><italic>Mycobacterium tuberculosis</italic> reference strain H37Rv, <italic>M. abscessus</italic> subsp. <italic>abscessus</italic> ATCC 19977, <italic>M. avium</italic> subsp<italic>. avium</italic> Chester ATCC 25291, <italic>M. marinum</italic> M and <italic>M. smegmatis</italic> mc<sup>2</sup>155 were grown in Middlebrook 7H9 liquid medium supplemented with 0.2% glycerol (w/v) and 10% enrichments containing BSA (Sigma) 5% (w/v), glucose (Sigma) 2% (w/v) and NaCl (Sigma) 0.85% (w/v) and left at + 37 °C and + 30 °C for <italic>M. marinum</italic> M to reach OD ~ 0.8–1, representing the mid-logarithmic phase of growth. To monitor the growth of the bacteria, control flasks were inoculated at an OD<sub>600</sub> of 0.01 for the <italic>Mycobacterium tuberculosis</italic> reference strain H37Rv and an OD<sub>600</sub> of 0.001 for <italic>M. abscessus</italic> subsp. <italic>abscessus</italic> ATCC 19977, <italic>M. avium</italic> subsp<italic>. avium</italic> Chester ATCC 25291, <italic>M. marinum</italic> M and <italic>M. smegmatis</italic> mc<sup>2</sup>155 and grown in 7H9 liquid medium supplemented with 0.2% glycerol (w/v) and 10% enrichments containing BSA (Sigma) 5% (w/v), glucose (Sigma) 2% (w/v), NaCl (Sigma) 0.85% (w/v) and 0.05% tyloxapol (Sigma).</p>
+      </sec>
+      <sec id="Sec8">
+        <title>Preparation of mycolic acid methyl esters</title>
+        <p id="Par21">Mycolic acid methyl esters (MAMEs) were prepared as described by Bottai et al.<sup><xref ref-type="bibr" rid="CR42">42</xref></sup>. Briefly, heat-killed mycobacteria were first washed 3 times with PBS. The pellets were then delipidated by CHCl<sub>3</sub>/MeOH 1:2 (v/v) extraction for 12 h at room temperature followed by one CHCl<sub>3</sub>/MeOH 1:1 (v/v) extraction and one CHCl<sub>3</sub>/MeOH 2:1 (v/v) extraction for 3 h at room temperature. To analyse the cell wall mycolic acids, the delipidated bacterial pellets were mixed with 2 ml 15% tetrabutyl ammonium hydroxide (TBAH) solution and incubated at 100 °C for 5 h. After cooling to room temperature for 1 h, the samples were incubated with 2 ml of CHCl<sub>3</sub> and 100 μl of iodomethane for 1 h for methylation of the released mycolic acids. The organic lower layer after centrifugation at 2000×<italic>g</italic> at 4 °C for 10 min was collected and dried under a stream of N<sub>2</sub>. Dried methylated mycolic acids were resuspended in 3 ml diethyl ether and mixed thoroughly. All supernatants were collected after centrifugation at 2000×<italic>g</italic> at 4 °C for 10 min, transferred into a new glass tube and dried under a stream of nitrogen. Pellets containing MAMEs were resuspended in 50 μl of CHCl<sub>3</sub> and 5 ml of MeOH and left at 4 °C overnight for precipitation. MAMEs were collected after centrifugation at 2000×<italic>g</italic> at 4 °C for 10 min and dried under a stream of nitrogen. The purified MAMEs were suspended in CHCl<sub>3</sub> at a final concentration of 10 mg/ml and analysed by IM-MS in the positive ion mode.</p>
+      </sec>
+      <sec id="Sec9">
+        <title>Instrumentation</title>
+        <p id="Par22">The instrumentation and experimental procedures are based on the work from Leaptrot et al.<sup><xref ref-type="bibr" rid="CR26">26</xref></sup>. Briefly, a low-field drift-tube-based 6560 Ion Mobility LC/Q-TOF mass spectrometer (Agilent Technologies) was utilized to acquire accurate mass and CCS measurements from MAME samples. The instrument consists of an orthogonal electrospray ionization (ESI) source (Agilent Jet Stream) with a heated sheath gas nebulizer for desolvation and focusing of ions at atmospheric pressure. A single bore, resistively coated, glass capillary was used to transfer ions into the vacuum system. As ions exit the transfer capillary, they are directed by a high-pressure ion funnel into a trapping funnel with two wire grids for ion trapping and gating. Ions accumulate in the trapping funnel and are subsequently pulsed into the uniform field drift tube, which is approximately 78 cm in length. An additional rear ion funnel refocuses ions as they exit the drift tube and pass to a lower pressure region via a hexapole ion guide. Ions passed through a quadrupole mass filter and collision cell before mass measurement was performed in an orthogonal time-of-flight (TOF) mass spectrometer.</p>
+      </sec>
+      <sec id="Sec10">
+        <title>Experimental parameters</title>
+        <p id="Par23">Data were acquired across all samples using UHPLC-IM-QToF. Chromatographic separation was performed using an Agilent 1290 Infinity II system (Agilent Technologies). Reversed-phase chromatography was performed using an InfinityLab RRHD Eclipse Plus C18 column, 2.1 × 50 mm, 1.8 µm (Agilent Technologies). The LC system was first preconditioned with phosphoric acid before sample acquisition. For this procedure, the LC was disconnected from the mass spectrometer, and the LC system and column were washed overnight with 0.5% (v/v) phosphoric acid at 0.1 mL/min in water/acetonitrile 20:80 (v/v), followed by a wash with LC/MS grade water for 4 h until the pH was neutral and finally reconnected to the MS system. The column temperature was set at 65 °C. Mobile phase A consisted of water/acetonitrile 40/60 + 0.1% formic acid + 10 mM ammonium formate, and mobile phase B consisted of isopropanol/acetonitrile 90/10 + 0.1% formic acid + 10 mM ammonium formate. The following gradient was applied at a flow rate of 0.4 ml/min: 0 min, 43% B; 0–0.55 min, 43% B; 0.55–3 min, 54% B; 3–3.2 min, 70% B; 3.2–4.5 min, 100% B; 4.5–10 min, 100% B; 10–10.5 min, 43% B; 10.5–12 min, 43% B. Mass axis calibration was achieved by continuous infusion after the chromatography of a reference mass solution using an isocratic pump connected to an ESI ionization source operated in positive-ion mode.</p>
+        <p id="Par24">For all experiments, source conditions remained constant to ensure that the single field calibration could be used to measure CCS across all acquired data<sup><xref ref-type="bibr" rid="CR43">43</xref></sup>. The following parameters were used: sheath gas temperature, 300 °C; nebulizer pressure, 35 psig; sheath gas flow, 11 l min<sup>−1</sup>; capillary voltage, 3500 V; nozzle voltage, 1000 V; and fragmentor voltage, 400 V. The data were collected in profile 2 GHz (extended dynamic range) mode.</p>
+      </sec>
+      <sec id="Sec11">
+        <title>IM-QToF All Ions MS/MS data acquisition</title>
+        <p id="Par25">With the chromatographic conditions described fragmentation data were acquired using an “All Ions MS/MS” data independent acquisition approach with two alternating experiments. The first experiment was used to acquire full spectrum ion mobility data of precursors using no collision energy. The second experiment was then employed to collect fragmentation information across the same mass range as the previous experiment by applying a collision energy of 42 eV. Ion mobility acquisition settings were as follows: mass range 800–1400 <italic>m/z</italic>, frame rate 2.5 frames per second, maximum drift time 100 ms, trap full time 20,000 ms and trap release time 150 ms.</p>
+      </sec>
+      <sec id="Sec12">
+        <title>QToF iterative MS/MS</title>
+        <p id="Par26">MS/MS was performed only on a pooled sample to acquire data-dependent fragmentation data. Fragmentation was performed in the collision cell following quadrupole isolation of precursor ions with a preference for mycolic acids using a preferred inclusion list. Alternate scans were performed first in TOF-only mode to collect and analyse full-spectrum MS precursor data and for mass axis calibration, a second scan with a collision energy of 20 eV and a third scan with an increased collision energy of 42 eV. Data acquisition speed was optimized for collision-induced dissociation (CID) experiments based on chromatographic peak and number of potential mycolic acid coeluting in the chromatographic space. Thus, 10 spectra/second was used to ensure sufficient MS/MS scans were acquired. In this mode, the pooled sample was injected multiple times, thereby significantly improving the coverage of precursors being selected for fragmentation.</p>
+      </sec>
+    </sec>
+    <sec sec-type="supplementary-material">
+      <title>Supplementary Information</title>
+      <sec id="Sec13">
+        <p>
+<supplementary-material content-type="local-data" id="MOESM1"><media xlink:href="41598_2023_37641_MOESM1_ESM.docx"><caption><p>Supplementary Figures.</p></caption></media></supplementary-material><supplementary-material content-type="local-data" id="MOESM2"><media xlink:href="41598_2023_37641_MOESM2_ESM.xlsx"><caption><p>Supplementary Table 1.</p></caption></media></supplementary-material></p>
+      </sec>
+    </sec>
+  </body>
+  <back>
+    <fn-group>
+      <fn>
+        <p>
+          <bold>Publisher's note</bold>
+        </p>
+        <p>Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.</p>
+      </fn>
+    </fn-group>
+    <sec>
+      <title>Supplementary Information</title>
+      <p>The online version contains supplementary material available at 10.1038/s41598-023-37641-9.</p>
+    </sec>
+    <ack>
+      <title>Acknowledgements</title>
+      <p>G.L-M. received funding from the Medical Research Council MR/W018756/1.</p>
+    </ack>
+    <notes notes-type="author-contribution">
+      <title>Author contributions</title>
+      <p>G.L.M. had full access to all of the data in the study and take responsibility for the integrity of the data and the accuracy of the data analysis. Study concept and design: Y.L., N.K., S.P., G.L.M. Acquisition, analysis, or interpretation of data: All authors. Drafting of the manuscript: Y.L., M.J.S., G.L.M. Critical revision of the manuscript for important intellectual content: All authors.</p>
+    </notes>
+    <notes notes-type="data-availability">
+      <title>Data availability</title>
+      <p>The datasets used and analysed during the current study are available from the corresponding author on reasonable request.</p>
+    </notes>
+    <notes id="FPar1" notes-type="COI-statement">
+      <title>Competing interests</title>
+      <p id="Par27">S.P. and M.J.S. are employees of Agilent technology from which data acquisition was generated. Y.L., N.K. and G.L.-M. do not have conflict of interest to declare.</p>
+    </notes>
+    <ref-list id="Bib1">
+      <title>References</title>
+      <ref id="CR1">
+        <label>1.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Batt</surname>
+              <given-names>SM</given-names>
+            </name>
+            <name>
+              <surname>Minnikin</surname>
+              <given-names>DE</given-names>
+            </name>
+            <name>
+              <surname>Besra</surname>
+              <given-names>GS</given-names>
+            </name>
+          </person-group>
+          <article-title>The thick waxy coat of mycobacteria, a protective layer against antibiotics and the host's immune system</article-title>
+          <source>Biochem. J.</source>
+          <year>2020</year>
+          <volume>477</volume>
+          <fpage>1983</fpage>
+          <lpage>2006</lpage>
+          <pub-id pub-id-type="doi">10.1042/BCJ20200194</pub-id>
+          <?supplied-pmid 32470138?>
+          <pub-id pub-id-type="pmid">32470138</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR2">
+        <label>2.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Abrahams</surname>
+              <given-names>KA</given-names>
+            </name>
+            <name>
+              <surname>Besra</surname>
+              <given-names>GS</given-names>
+            </name>
+          </person-group>
+          <article-title>Mycobacterial cell wall biosynthesis: A multifaceted antibiotic target</article-title>
+          <source>Parasitology</source>
+          <year>2018</year>
+          <volume>145</volume>
+          <fpage>116</fpage>
+          <lpage>133</lpage>
+          <pub-id pub-id-type="doi">10.1017/S0031182016002377</pub-id>
+          <?supplied-pmid 27976597?>
+          <pub-id pub-id-type="pmid">27976597</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR3">
+        <label>3.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Jackson</surname>
+              <given-names>M</given-names>
+            </name>
+          </person-group>
+          <article-title>The mycobacterial cell envelope-lipids</article-title>
+          <source>Cold Spring Harb. Perspect. Med.</source>
+          <year>2014</year>
+          <pub-id pub-id-type="doi">10.1101/cshperspect.a021105</pub-id>
+          <?supplied-pmid 25104772?>
+          <pub-id pub-id-type="pmid">25104772</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR4">
+        <label>4.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Brennan</surname>
+              <given-names>PJ</given-names>
+            </name>
+            <name>
+              <surname>Nikaido</surname>
+              <given-names>H</given-names>
+            </name>
+          </person-group>
+          <article-title>The envelope of mycobacteria</article-title>
+          <source>Annu. Rev. Biochem.</source>
+          <year>1995</year>
+          <volume>64</volume>
+          <fpage>29</fpage>
+          <lpage>63</lpage>
+          <pub-id pub-id-type="doi">10.1146/annurev.bi.64.070195.000333</pub-id>
+          <?supplied-pmid 7574484?>
+          <pub-id pub-id-type="pmid">7574484</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR5">
+        <label>5.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Minnikin</surname>
+              <given-names>DE</given-names>
+            </name>
+            <name>
+              <surname>Minnikin</surname>
+              <given-names>SM</given-names>
+            </name>
+            <name>
+              <surname>Parlett</surname>
+              <given-names>JH</given-names>
+            </name>
+            <name>
+              <surname>Goodfellow</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Magnusson</surname>
+              <given-names>M</given-names>
+            </name>
+          </person-group>
+          <article-title>Mycolic acid patterns of some species of <italic>Mycobacterium</italic></article-title>
+          <source>Arch. Microbiol.</source>
+          <year>1984</year>
+          <volume>139</volume>
+          <fpage>225</fpage>
+          <lpage>231</lpage>
+          <pub-id pub-id-type="doi">10.1007/BF00402005</pub-id>
+          <?supplied-pmid 6517656?>
+          <pub-id pub-id-type="pmid">6517656</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR6">
+        <label>6.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Brennan</surname>
+              <given-names>PJ</given-names>
+            </name>
+          </person-group>
+          <article-title>Structure, function, and biogenesis of the cell wall of <italic>Mycobacterium tuberculosis</italic></article-title>
+          <source>Tuberculosis (Edinb)</source>
+          <year>2003</year>
+          <volume>83</volume>
+          <fpage>91</fpage>
+          <lpage>97</lpage>
+          <pub-id pub-id-type="doi">10.1016/S1472-9792(02)00089-6</pub-id>
+          <?supplied-pmid 12758196?>
+          <pub-id pub-id-type="pmid">12758196</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR7">
+        <label>7.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Verschoor</surname>
+              <given-names>JA</given-names>
+            </name>
+            <name>
+              <surname>Baird</surname>
+              <given-names>MS</given-names>
+            </name>
+            <name>
+              <surname>Grooten</surname>
+              <given-names>J</given-names>
+            </name>
+          </person-group>
+          <article-title>Towards understanding the functional diversity of cell wall mycolic acids of <italic>Mycobacterium tuberculosis</italic></article-title>
+          <source>Prog. Lipid Res.</source>
+          <year>2012</year>
+          <volume>51</volume>
+          <fpage>325</fpage>
+          <lpage>339</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.plipres.2012.05.002</pub-id>
+          <?supplied-pmid 22659327?>
+          <pub-id pub-id-type="pmid">22659327</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR8">
+        <label>8.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Nataraj</surname>
+              <given-names>V</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Mycolic acids: Deciphering and targeting the Achilles' heel of the tubercle bacillus</article-title>
+          <source>Mol. Microbiol.</source>
+          <year>2015</year>
+          <volume>98</volume>
+          <fpage>7</fpage>
+          <lpage>16</lpage>
+          <pub-id pub-id-type="doi">10.1111/mmi.13101</pub-id>
+          <?supplied-pmid 26135034?>
+          <pub-id pub-id-type="pmid">26135034</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR9">
+        <label>9.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Marrakchi</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Laneelle</surname>
+              <given-names>MA</given-names>
+            </name>
+            <name>
+              <surname>Daffe</surname>
+              <given-names>M</given-names>
+            </name>
+          </person-group>
+          <article-title>Mycolic acids: Structures, biosynthesis, and beyond</article-title>
+          <source>Chem Biol</source>
+          <year>2014</year>
+          <volume>21</volume>
+          <fpage>67</fpage>
+          <lpage>85</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.chembiol.2013.11.011</pub-id>
+          <?supplied-pmid 24374164?>
+          <pub-id pub-id-type="pmid">24374164</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR10">
+        <label>10.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Singh</surname>
+              <given-names>R</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Recent updates on drug resistance in <italic>Mycobacterium tuberculosis</italic></article-title>
+          <source>J. Appl. Microbiol.</source>
+          <year>2020</year>
+          <volume>128</volume>
+          <fpage>1547</fpage>
+          <lpage>1567</lpage>
+          <pub-id pub-id-type="doi">10.1111/jam.14478</pub-id>
+          <?supplied-pmid 31595643?>
+          <pub-id pub-id-type="pmid">31595643</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR11">
+        <label>11.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Peyron</surname>
+              <given-names>P</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Foamy macrophages from tuberculous patients' granulomas constitute a nutrient-rich reservoir for <italic>M. tuberculosis</italic> persistence</article-title>
+          <source>PLoS Pathog.</source>
+          <year>2008</year>
+          <volume>4</volume>
+          <fpage>e1000204</fpage>
+          <pub-id pub-id-type="doi">10.1371/journal.ppat.1000204</pub-id>
+          <?supplied-pmid 19002241?>
+          <pub-id pub-id-type="pmid">19002241</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR12">
+        <label>12.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Daffe</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Laneelle</surname>
+              <given-names>MA</given-names>
+            </name>
+            <name>
+              <surname>Lacave</surname>
+              <given-names>C</given-names>
+            </name>
+          </person-group>
+          <article-title>Structure and stereochemistry of mycolic acids of <italic>Mycobacterium marinum</italic> and <italic>Mycobacterium ulcerans</italic></article-title>
+          <source>Res. Microbiol.</source>
+          <year>1991</year>
+          <volume>142</volume>
+          <fpage>397</fpage>
+          <lpage>403</lpage>
+          <pub-id pub-id-type="doi">10.1016/0923-2508(91)90109-n</pub-id>
+          <?supplied-pmid 1871424?>
+          <pub-id pub-id-type="pmid">1871424</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR13">
+        <label>13.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Barry</surname>
+              <given-names>CE</given-names>
+              <suffix>3rd</suffix>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Mycolic acids: Structure, biosynthesis and physiological functions</article-title>
+          <source>Prog. Lipid Res.</source>
+          <year>1998</year>
+          <volume>37</volume>
+          <fpage>143</fpage>
+          <lpage>179</lpage>
+          <pub-id pub-id-type="doi">10.1016/s0163-7827(98)00008-3</pub-id>
+          <?supplied-pmid 9829124?>
+          <pub-id pub-id-type="pmid">9829124</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR14">
+        <label>14.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Daffé</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Quémard</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Marrakchi</surname>
+              <given-names>H</given-names>
+            </name>
+          </person-group>
+          <person-group person-group-type="editor">
+            <name>
+              <surname>Geiger</surname>
+              <given-names>O</given-names>
+            </name>
+          </person-group>
+          <source>Biogenesis of Fatty Acids, Lipids and Membranes</source>
+          <year>2017</year>
+          <publisher-name>Springer International Publishing</publisher-name>
+          <fpage>1</fpage>
+          <lpage>36</lpage>
+        </element-citation>
+      </ref>
+      <ref id="CR15">
+        <label>15.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Laval</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Laneelle</surname>
+              <given-names>MA</given-names>
+            </name>
+            <name>
+              <surname>Deon</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Monsarrat</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Daffe</surname>
+              <given-names>M</given-names>
+            </name>
+          </person-group>
+          <article-title>Accurate molecular mass determination of mycolic acids by MALDI-TOF mass spectrometry</article-title>
+          <source>Anal. Chem.</source>
+          <year>2001</year>
+          <volume>73</volume>
+          <fpage>4537</fpage>
+          <lpage>4544</lpage>
+          <pub-id pub-id-type="doi">10.1021/ac0105181</pub-id>
+          <?supplied-pmid 11575804?>
+          <pub-id pub-id-type="pmid">11575804</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR16">
+        <label>16.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Barkan</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Sacchettini</surname>
+              <given-names>JC</given-names>
+            </name>
+            <name>
+              <surname>Glickman</surname>
+              <given-names>MS</given-names>
+            </name>
+          </person-group>
+          <article-title>Mycolic acid cyclopropanation is essential for viability, drug resistance, and cell wall integrity of <italic>Mycobacterium tuberculosis</italic></article-title>
+          <source>Chem. Biol.</source>
+          <year>2009</year>
+          <volume>16</volume>
+          <fpage>499</fpage>
+          <lpage>509</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.chembiol.2009.04.001</pub-id>
+          <?supplied-pmid 19477414?>
+          <pub-id pub-id-type="pmid">19477414</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR17">
+        <label>17.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Dkhar</surname>
+              <given-names>HK</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title><italic>Mycobacterium tuberculosis</italic> keto-mycolic acid and macrophage nuclear receptor TR4 modulate foamy biogenesis in granulomas: A case of a heterologous and noncanonical ligand–receptor pair</article-title>
+          <source>J. Immunol.</source>
+          <year>2014</year>
+          <volume>193</volume>
+          <fpage>295</fpage>
+          <lpage>305</lpage>
+          <pub-id pub-id-type="doi">10.4049/jimmunol.1400092</pub-id>
+          <?supplied-pmid 24907344?>
+          <pub-id pub-id-type="pmid">24907344</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR18">
+        <label>18.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Beukes</surname>
+              <given-names>M</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Structure-function relationships of the antigenicity of mycolic acids in tuberculosis patients</article-title>
+          <source>Chem. Phys. Lipids</source>
+          <year>2010</year>
+          <volume>163</volume>
+          <fpage>800</fpage>
+          <lpage>808</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.chemphyslip.2010.09.006</pub-id>
+          <?supplied-pmid 20875402?>
+          <pub-id pub-id-type="pmid">20875402</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR19">
+        <label>19.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Song</surname>
+              <given-names>SH</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Electrospray ionization-tandem mass spectrometry analysis of the mycolic acid profiles for the identification of common clinical isolates of mycobacterial species</article-title>
+          <source>J. Microbiol. Methods</source>
+          <year>2009</year>
+          <volume>77</volume>
+          <fpage>165</fpage>
+          <lpage>177</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.mimet.2009.01.023</pub-id>
+          <?supplied-pmid 19318047?>
+          <pub-id pub-id-type="pmid">19318047</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR20">
+        <label>20.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Szewczyk</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Kowalski</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Janiszewska-Drobinska</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Druszczynska</surname>
+              <given-names>M</given-names>
+            </name>
+          </person-group>
+          <article-title>Rapid method for <italic>Mycobacterium tuberculosis</italic> identification using electrospray ionization tandem mass spectrometry analysis of mycolic acids</article-title>
+          <source>Diagn. Microbiol. Infect. Dis.</source>
+          <year>2013</year>
+          <volume>76</volume>
+          <fpage>298</fpage>
+          <lpage>305</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.diagmicrobio.2013.03.025</pub-id>
+          <?supplied-pmid 23669043?>
+          <pub-id pub-id-type="pmid">23669043</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR21">
+        <label>21.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Frankfater</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Fujiwara</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Williams</surname>
+              <given-names>SJ</given-names>
+            </name>
+            <name>
+              <surname>Minnaard</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Hsu</surname>
+              <given-names>FF</given-names>
+            </name>
+          </person-group>
+          <article-title>Characterization of <italic>Mycobacterium tuberculosis</italic> mycolic acids by multiple-stage linear ion-trap mass spectrometry</article-title>
+          <source>J. Am. Soc. Mass Spectrom.</source>
+          <year>2022</year>
+          <volume>33</volume>
+          <fpage>149</fpage>
+          <lpage>159</lpage>
+          <pub-id pub-id-type="doi">10.1021/jasms.1c00310</pub-id>
+          <?supplied-pmid 34842433?>
+          <pub-id pub-id-type="pmid">34842433</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR22">
+        <label>22.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Shui</surname>
+              <given-names>G</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Mycolic acids as diagnostic markers for tuberculosis case detection in humans and drug efficacy in mice</article-title>
+          <source>EMBO Mol. Med.</source>
+          <year>2012</year>
+          <volume>4</volume>
+          <fpage>27</fpage>
+          <lpage>37</lpage>
+          <pub-id pub-id-type="doi">10.1002/emmm.201100185</pub-id>
+          <?supplied-pmid 22147526?>
+          <pub-id pub-id-type="pmid">22147526</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR23">
+        <label>23.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hinz</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Liggi</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Griffin</surname>
+              <given-names>JL</given-names>
+            </name>
+          </person-group>
+          <article-title>The potential of ion mobility mass spectrometry for high-throughput and high-resolution lipidomics</article-title>
+          <source>Curr. Opin. Chem. Biol.</source>
+          <year>2018</year>
+          <volume>42</volume>
+          <fpage>42</fpage>
+          <lpage>50</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.cbpa.2017.10.018</pub-id>
+          <?supplied-pmid 29145156?>
+          <pub-id pub-id-type="pmid">29145156</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR24">
+        <label>24.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Dodds</surname>
+              <given-names>JN</given-names>
+            </name>
+            <name>
+              <surname>Baker</surname>
+              <given-names>ES</given-names>
+            </name>
+          </person-group>
+          <article-title>Ion mobility spectrometry: Fundamental concepts, instrumentation, applications, and the road ahead</article-title>
+          <source>J. Am. Soc. Mass Spectrom.</source>
+          <year>2019</year>
+          <volume>30</volume>
+          <fpage>2185</fpage>
+          <lpage>2195</lpage>
+          <pub-id pub-id-type="doi">10.1007/s13361-019-02288-2</pub-id>
+          <?supplied-pmid 31493234?>
+          <pub-id pub-id-type="pmid">31493234</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR25">
+        <label>25.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kanu</surname>
+              <given-names>AB</given-names>
+            </name>
+            <name>
+              <surname>Dwivedi</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Tam</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Matz</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Hill</surname>
+              <given-names>HH</given-names>
+              <suffix>Jr</suffix>
+            </name>
+          </person-group>
+          <article-title>Ion mobility-mass spectrometry</article-title>
+          <source>J. Mass Spectrom.</source>
+          <year>2008</year>
+          <volume>43</volume>
+          <fpage>1</fpage>
+          <lpage>22</lpage>
+          <pub-id pub-id-type="doi">10.1002/jms.1383</pub-id>
+          <?supplied-pmid 18200615?>
+          <pub-id pub-id-type="pmid">18200615</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR26">
+        <label>26.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Leaptrot</surname>
+              <given-names>KL</given-names>
+            </name>
+            <name>
+              <surname>May</surname>
+              <given-names>JC</given-names>
+            </name>
+            <name>
+              <surname>Dodds</surname>
+              <given-names>JN</given-names>
+            </name>
+            <name>
+              <surname>McLean</surname>
+              <given-names>JA</given-names>
+            </name>
+          </person-group>
+          <article-title>Ion mobility conformational lipid atlas for high confidence lipidomics</article-title>
+          <source>Nat. Commun.</source>
+          <year>2019</year>
+          <volume>10</volume>
+          <fpage>985</fpage>
+          <pub-id pub-id-type="doi">10.1038/s41467-019-08897-5</pub-id>
+          <?supplied-pmid 30816114?>
+          <pub-id pub-id-type="pmid">30816114</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR27">
+        <label>27.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Paglia</surname>
+              <given-names>G</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Ion mobility-derived collision cross section as an additional measure for lipid fingerprinting and identification</article-title>
+          <source>Anal. Chem.</source>
+          <year>2015</year>
+          <volume>87</volume>
+          <fpage>1137</fpage>
+          <lpage>1144</lpage>
+          <pub-id pub-id-type="doi">10.1021/ac503715v</pub-id>
+          <?supplied-pmid 25495617?>
+          <pub-id pub-id-type="pmid">25495617</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR28">
+        <label>28.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Rose</surname>
+              <given-names>BS</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>High confidence shotgun lipidomics using structurally selective ion mobility-mass spectrometry</article-title>
+          <source>Methods Mol. Biol.</source>
+          <year>2021</year>
+          <volume>2306</volume>
+          <fpage>11</fpage>
+          <lpage>37</lpage>
+          <pub-id pub-id-type="doi">10.1007/978-1-0716-1410-5_2</pub-id>
+          <?supplied-pmid 33954937?>
+          <pub-id pub-id-type="pmid">33954937</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR29">
+        <label>29.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Paglia</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Smith</surname>
+              <given-names>AJ</given-names>
+            </name>
+            <name>
+              <surname>Astarita</surname>
+              <given-names>G</given-names>
+            </name>
+          </person-group>
+          <article-title>Ion mobility mass spectrometry in the omics era: Challenges and opportunities for metabolomics and lipidomics</article-title>
+          <source>Mass Spectrom. Rev.</source>
+          <year>2022</year>
+          <volume>41</volume>
+          <fpage>722</fpage>
+          <lpage>765</lpage>
+          <pub-id pub-id-type="doi">10.1002/mas.21686</pub-id>
+          <?supplied-pmid 33522625?>
+          <pub-id pub-id-type="pmid">33522625</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR30">
+        <label>30.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Layre</surname>
+              <given-names>E</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>A comparative lipidomics platform for chemotaxonomic analysis of <italic>Mycobacterium</italic>
+<italic>tuberculosis</italic></article-title>
+          <source>Chem. Biol.</source>
+          <year>2011</year>
+          <volume>18</volume>
+          <fpage>1537</fpage>
+          <lpage>1549</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.chembiol.2011.10.013</pub-id>
+          <?supplied-pmid 22195556?>
+          <pub-id pub-id-type="pmid">22195556</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR31">
+        <label>31.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Sartain</surname>
+              <given-names>MJ</given-names>
+            </name>
+            <name>
+              <surname>Dick</surname>
+              <given-names>DL</given-names>
+            </name>
+            <name>
+              <surname>Rithner</surname>
+              <given-names>CD</given-names>
+            </name>
+            <name>
+              <surname>Crick</surname>
+              <given-names>DC</given-names>
+            </name>
+            <name>
+              <surname>Belisle</surname>
+              <given-names>JT</given-names>
+            </name>
+          </person-group>
+          <article-title>Lipidomic analyses of <italic>Mycobacterium</italic>
+<italic>tuberculosis</italic> based on accurate mass measurements and the novel "Mtb LipidDB"</article-title>
+          <source>J. Lipid Res.</source>
+          <year>2011</year>
+          <volume>52</volume>
+          <fpage>861</fpage>
+          <lpage>872</lpage>
+          <pub-id pub-id-type="doi">10.1194/jlr.M010363</pub-id>
+          <?supplied-pmid 21285232?>
+          <pub-id pub-id-type="pmid">21285232</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR32">
+        <label>32.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Fahy</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Sud</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Cotter</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Subramaniam</surname>
+              <given-names>S</given-names>
+            </name>
+          </person-group>
+          <article-title>LIPID MAPS online tools for lipid research</article-title>
+          <source>Nucleic Acids Res.</source>
+          <year>2007</year>
+          <volume>35</volume>
+          <fpage>W606</fpage>
+          <lpage>612</lpage>
+          <pub-id pub-id-type="doi">10.1093/nar/gkm324</pub-id>
+          <?supplied-pmid 17584797?>
+          <pub-id pub-id-type="pmid">17584797</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR33">
+        <label>33.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ludwig</surname>
+              <given-names>M</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Database-independent molecular formula annotation using Gibbs sampling through ZODIAC</article-title>
+          <source>Nat. Mach. Intell.</source>
+          <year>2020</year>
+          <volume>2</volume>
+          <fpage>629</fpage>
+          <lpage>641</lpage>
+          <pub-id pub-id-type="doi">10.1038/s42256-020-00234-6</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR34">
+        <label>34.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Duhrkop</surname>
+              <given-names>K</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>SIRIUS 4: A rapid tool for turning tandem mass spectra into metabolite structure information</article-title>
+          <source>Nat. Methods</source>
+          <year>2019</year>
+          <volume>16</volume>
+          <fpage>299</fpage>
+          <lpage>302</lpage>
+          <pub-id pub-id-type="doi">10.1038/s41592-019-0344-8</pub-id>
+          <?supplied-pmid 30886413?>
+          <pub-id pub-id-type="pmid">30886413</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR35">
+        <label>35.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>MacLean</surname>
+              <given-names>BX</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Using skyline to analyze data-containing liquid chromatography, ion mobility spectrometry, and mass spectrometry dimensions</article-title>
+          <source>J. Am. Soc. Mass Spectrom.</source>
+          <year>2018</year>
+          <volume>29</volume>
+          <fpage>2182</fpage>
+          <lpage>2188</lpage>
+          <pub-id pub-id-type="doi">10.1007/s13361-018-2028-5</pub-id>
+          <?supplied-pmid 30047074?>
+          <pub-id pub-id-type="pmid">30047074</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR36">
+        <label>36.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hong</surname>
+              <given-names>S</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Ultralong C100 mycolic acids support the assignment of <italic>Segniliparus</italic> as a new bacterial genus</article-title>
+          <source>PLoS One</source>
+          <year>2012</year>
+          <volume>7</volume>
+          <fpage>e39017</fpage>
+          <pub-id pub-id-type="doi">10.1371/journal.pone.0039017</pub-id>
+          <?supplied-pmid 22720018?>
+          <pub-id pub-id-type="pmid">22720018</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR37">
+        <label>37.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Minnikin</surname>
+              <given-names>DE</given-names>
+            </name>
+            <name>
+              <surname>Brennan</surname>
+              <given-names>PJ</given-names>
+            </name>
+          </person-group>
+          <person-group person-group-type="editor">
+            <name>
+              <surname>Goldfine</surname>
+              <given-names>H</given-names>
+            </name>
+          </person-group>
+          <source>Health Consequences of Microbial Interactions with Hydrocarbons, Oils, and Lipids</source>
+          <year>2020</year>
+          <publisher-name>Springer International Publishing</publisher-name>
+          <fpage>1</fpage>
+          <lpage>76</lpage>
+        </element-citation>
+      </ref>
+      <ref id="CR38">
+        <label>38.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Singh</surname>
+              <given-names>A</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Identification of a desaturase involved in mycolic acid biosynthesis in <italic>Mycobacterium</italic>
+<italic>smegmatis</italic></article-title>
+          <source>PLoS One</source>
+          <year>2016</year>
+          <volume>11</volume>
+          <fpage>e0164253</fpage>
+          <pub-id pub-id-type="doi">10.1371/journal.pone.0164253</pub-id>
+          <?supplied-pmid 27741286?>
+          <pub-id pub-id-type="pmid">27741286</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR39">
+        <label>39.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Watanabe</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Aoyagi</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Ridell</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Minnikin</surname>
+              <given-names>DE</given-names>
+            </name>
+          </person-group>
+          <article-title>Separation and characterization of individual mycolic acids in representative mycobacteria</article-title>
+          <source>Microbiology (Reading)</source>
+          <year>2001</year>
+          <volume>147</volume>
+          <fpage>1825</fpage>
+          <lpage>1837</lpage>
+          <pub-id pub-id-type="doi">10.1099/00221287-147-7-1825</pub-id>
+          <?supplied-pmid 11429460?>
+          <pub-id pub-id-type="pmid">11429460</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR40">
+        <label>40.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Watanabe</surname>
+              <given-names>M</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Location of functional groups in mycobacterial meromycolate chains; the recognition of new structural principles in mycolic acids</article-title>
+          <source>Microbiology (Reading)</source>
+          <year>2002</year>
+          <volume>148</volume>
+          <fpage>1881</fpage>
+          <lpage>1902</lpage>
+          <pub-id pub-id-type="doi">10.1099/00221287-148-6-1881</pub-id>
+          <?supplied-pmid 12055308?>
+          <pub-id pub-id-type="pmid">12055308</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR41">
+        <label>41.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Sambandan</surname>
+              <given-names>D</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Keto-mycolic acid-dependent pellicle formation confers tolerance to drug-sensitive <italic>Mycobacterium</italic>
+<italic>tuberculosis</italic></article-title>
+          <source>MBio</source>
+          <year>2013</year>
+          <volume>4</volume>
+          <fpage>e0022200213</fpage>
+          <pub-id pub-id-type="doi">10.1128/mBio.00222-13</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR42">
+        <label>42.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Bottai</surname>
+              <given-names>D</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>TbD1 deletion as a driver of the evolutionary success of modern epidemic <italic>Mycobacterium</italic>
+<italic>tuberculosis</italic> lineages</article-title>
+          <source>Nat. Commun.</source>
+          <year>2020</year>
+          <volume>11</volume>
+          <fpage>684</fpage>
+          <pub-id pub-id-type="doi">10.1038/s41467-020-14508-5</pub-id>
+          <?supplied-pmid 32019932?>
+          <pub-id pub-id-type="pmid">32019932</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR43">
+        <label>43.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Stow</surname>
+              <given-names>SM</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>An interlaboratory evaluation of drift tube ion mobility-mass spectrometry collision cross section measurements</article-title>
+          <source>Anal. Chem.</source>
+          <year>2017</year>
+          <volume>89</volume>
+          <fpage>9048</fpage>
+          <lpage>9055</lpage>
+          <pub-id pub-id-type="doi">10.1021/acs.analchem.7b01729</pub-id>
+          <?supplied-pmid 28763190?>
+          <pub-id pub-id-type="pmid">28763190</pub-id>
+        </element-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

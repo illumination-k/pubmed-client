@@ -1,0 +1,1187 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:09:26Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:6000000" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:6000000</identifier><datestamp>2018-06-14</datestamp><setSpec>emmi</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" article-type="research-article">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">Emerg Microbes Infect</journal-id>
+      <journal-id journal-id-type="iso-abbrev">Emerg Microbes Infect</journal-id>
+      <journal-title-group>
+        <journal-title>Emerging Microbes &amp; Infections</journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">2222-1751</issn>
+      <publisher>
+        <publisher-name>Nature Publishing Group UK</publisher-name>
+        <publisher-loc>London</publisher-loc>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC6000000</article-id>
+      <article-id pub-id-type="pmcid">PMC6000000</article-id>
+      <article-id pub-id-type="pmc-uid">6000000</article-id>
+      <article-id pub-id-type="pmid">29899428</article-id>
+      <article-id pub-id-type="pmid">29899428</article-id>
+      <article-id pub-id-type="publisher-id">113</article-id>
+      <article-id pub-id-type="doi">10.1038/s41426-018-0113-2</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>Article</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Patient-derived avian influenza A (H5N6) virus is highly pathogenic in mice but can be effectively treated by anti-influenza polyclonal antibodies</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author" equal-contrib="yes">
+          <name>
+            <surname>Pan</surname>
+            <given-names>Weiqi</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author" equal-contrib="yes">
+          <name>
+            <surname>Xie</surname>
+            <given-names>Haojun</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Li</surname>
+            <given-names>Xiaobo</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Guan</surname>
+            <given-names>Wenda</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Chen</surname>
+            <given-names>Peihai</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Zhang</surname>
+            <given-names>Beiwu</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Zhang</surname>
+            <given-names>Mincong</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Dong</surname>
+            <given-names>Ji</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Wang</surname>
+            <given-names>Qian</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Li</surname>
+            <given-names>Zhixia</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Li</surname>
+            <given-names>Shufen</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Yang</surname>
+            <given-names>Zifeng</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Li</surname>
+            <given-names>Chufang</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Zhong</surname>
+            <given-names>Nanshan</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author" corresp="yes">
+          <name>
+            <surname>Huang</surname>
+            <given-names>Jicheng</given-names>
+          </name>
+          <address>
+            <email>huangjc@iqtc.cn</email>
+          </address>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author" corresp="yes">
+          <name>
+            <surname>Chen</surname>
+            <given-names>Ling</given-names>
+          </name>
+          <address>
+            <email>chen002@gmail.com</email>
+          </address>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <aff id="Aff1"><label>1</label><institution-wrap><institution-id institution-id-type="GRID">grid.470124.4</institution-id><institution>State Key Laboratory of Respiratory Disease, </institution><institution>The First Affiliated Hospital of Guangzhou Medical University, </institution></institution-wrap>Guangzhou, China </aff>
+        <aff id="Aff2"><label>2</label><institution-wrap><institution-id institution-id-type="GRID">grid.488170.2</institution-id><institution>Health Quarantine Laboratory, </institution><institution>Guangdong Inspection and Quarantine Technology Center, </institution></institution-wrap>Guangzhou, China </aff>
+        <aff id="Aff3"><label>3</label><institution-wrap><institution-id institution-id-type="ISNI">0000000119573309</institution-id><institution-id institution-id-type="GRID">grid.9227.e</institution-id><institution>Guangzhou Institutes of Biomedicine and Health, </institution><institution>Chinese Academy of Sciences, </institution></institution-wrap>Guangzhou, China </aff>
+      </contrib-group>
+      <pub-date pub-type="epub">
+        <day>13</day>
+        <month>6</month>
+        <year>2018</year>
+      </pub-date>
+      <pub-date pub-type="pmc-release">
+        <day>13</day>
+        <month>6</month>
+        <year>2018</year>
+      </pub-date>
+      <pub-date pub-type="collection">
+        <year>2018</year>
+      </pub-date>
+      <volume>7</volume>
+      <elocation-id>107</elocation-id>
+      <history>
+        <date date-type="received">
+          <day>20</day>
+          <month>1</month>
+          <year>2018</year>
+        </date>
+        <date date-type="rev-recd">
+          <day>4</day>
+          <month>5</month>
+          <year>2018</year>
+        </date>
+        <date date-type="accepted">
+          <day>13</day>
+          <month>5</month>
+          <year>2018</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-statement>© The Author(s) 2018</copyright-statement>
+        <license license-type="OpenAccess">
+          <license-p><bold>Open Access</bold> This article is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons license, and indicate if changes were made. The images or other third party material in this article are included in the article’s Creative Commons license, unless indicated otherwise in a credit line to the material. If material is not included in the article’s Creative Commons license and your intended use is not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder. To view a copy of this license, visit <ext-link ext-link-type="uri" xlink:href="http://creativecommons.org/licenses/by/4.0/">http://creativecommons.org/licenses/by/4.0/</ext-link>.</license-p>
+        </license>
+      </permissions>
+      <abstract id="Abs1">
+        <p id="Par1">Highly pathogenic avian influenza A (H5N6) virus has been circulating in poultry since 2013 and causes sporadic infections and fatalities in humans. Due to the re-occurrence and continuous evolution of this virus subtype, there is an urgent need to better understand the pathogenicity of the H5N6 virus and to identify effective preventative and therapeutic strategies. We established a mouse model to evaluate the virulence of H5N6 A/Guangzhou/39715/2014 (H5N6/GZ14), which was isolated from an infected patient. BALB/c mice were inoculated intranasally with H5N6/GZ14 and monitored for morbidity, mortality, cytokine production, lung injury, viral replication, and viral dissemination to other organs. H5N6/GZ14 is highly pathogenic and can kill 50% of mice at a very low infectious dose of 5 plaque-forming units (pfu). Infection with H5N6/GZ14 showed rapid disease progression, viral replication to high titers in the lung, a strongly induced pro-inflammatory cytokine response, and severe lung injury. Moreover, infectious H5N6/GZ14 could be detected in the heart and brain of the infected mice. We also demonstrated that anti-influenza polyclonal antibodies generated by immunizing rhesus macaques could protect mice from lethal infection. Our results provide insights into the pathogenicity of the H5N6 human isolate.</p>
+      </abstract>
+      <funding-group>
+        <award-group>
+          <funding-source>
+            <institution-wrap>
+              <institution-id institution-id-type="FundRef">https://doi.org/10.13039/501100001809</institution-id>
+              <institution>National Natural Science Foundation of China (National Science Foundation of China)</institution>
+            </institution-wrap>
+          </funding-source>
+          <award-id>91442102</award-id>
+          <award-id>81671640</award-id>
+          <award-id>81490530</award-id>
+          <principal-award-recipient>
+            <name>
+              <surname>Pan</surname>
+              <given-names>Weiqi</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>Xiaobo</given-names>
+            </name>
+            <name>
+              <surname>Zhong</surname>
+              <given-names>Nanshan</given-names>
+            </name>
+          </principal-award-recipient>
+        </award-group>
+      </funding-group>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>issue-copyright-statement</meta-name>
+          <meta-value>© The Author(s) 2018</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="Sec1" sec-type="introduction">
+      <title>Introduction</title>
+      <p id="Par2">Since its first isolation in Laos in 2013, H5N6 has been subsequently reported in Vietnam and China and more recently in Korea<sup><xref ref-type="bibr" rid="CR1">1</xref>–<xref ref-type="bibr" rid="CR4">4</xref></sup>. Approximately 155 outbreaks at poultry farms have been reported in 18 provinces across China with sporadic human infections, including 16 cases of human infections with a high fatality rate (9/16 cases, 56.3%) since 2014, a fatality rate that is higher than that reported for H5N1 (52.8%) and H7N9 (39.1%)<sup><xref ref-type="bibr" rid="CR5">5</xref>,<xref ref-type="bibr" rid="CR6">6</xref></sup>. The continued and overwhelming circulation of the H5N6 virus instead of the H5N1 virus in poultry in southern China poses a considerable threat to public health and increases the risks for human infections worldwide through international travel and migratory wild birds<sup><xref ref-type="bibr" rid="CR7">7</xref></sup>. Therefore, it is necessary to better understand the pathogenicity of the H5N6 human isolate in mammals and identify prevention and therapeutic strategies.</p>
+      <p id="Par3">In this study, we investigated the pathogenicity of the human-derived H5N6 isolate A/Guangzhou/39715/2014 (H5N6/GZ14) in BALB/c mice. This virus was isolated from a 59-year-old male patient with a history of visiting poultry markets who survived severe acute respiratory distress syndrome (ARDS) in our hospital (the First Affiliated Hospital of Guangzhou Medical University, Guangzhou, China)<sup><xref ref-type="bibr" rid="CR8">8</xref></sup>. We evaluated viral replication in the lung, viral dissemination in the extrapulmonary organs, pulmonary histopathology, and the level of cytokines and chemokines in the lungs of infected mice. By immunizing rhesus macaques with inactivated recombinant avian influenza A viruses, we generated an anti-influenza immunoglobulin G (IgG) consisting of polyclonal antibodies with neutralizing activity against H5N6/GZ14. We demonstrated that H5N6/GZ14-infected mice could be effectively protected by anti-influenza polyclonal antibodies.</p>
+    </sec>
+    <sec id="Sec2" sec-type="results">
+      <title>Results</title>
+      <sec id="Sec3">
+        <title>The patient-derived H5N6/GZ14 isolate was highly lethal in BALB/c mice</title>
+        <p id="Par4">Because there was no prior information regarding the virulence of human-infected H5N6/GZ14 in mice, we attempted to infect 8-week-old female BALB/c mice intranasally with 1, 10, 100, and 1000 plaque-forming units (pfu) of H5N6/GZ14. The mice were monitored for signs of illness, weight loss, and mortality for up to 14 days. The mice were euthanized when the weight loss exceeded 25% of the original body weight. Mice infected with 1000 pfu started to show signs of illness, including a ruffled coat and decreased activity, at 2 days post infection (dpi). Mice had an average of 17% weight loss at 3 dpi, and none survived at 5 dpi (Fig. <xref rid="Fig1" ref-type="fig">1a, b</xref>). Mice infected with 100 pfu showed signs of illness at 3 dpi. Three out of six mice in this group were euthanized at 5 dpi due to weight loss &gt;25%. The remaining three mice were euthanized at 7 dpi due to weight loss &gt;25% (Fig. <xref rid="Fig1" ref-type="fig">1a, b</xref>). Mice infected with 10 pfu showed signs of illness and weight loss at 5 dpi, which was delayed 2~3 days compared to mice infected with 1000 and 100 pfu. Five mice in this group were euthanized at 9 dpi due to weight loss &gt;25% (Fig. <xref rid="Fig1" ref-type="fig">1a, b</xref>). Mice infected with 1 pfu showed an average weight loss of 10% at 7 dpi, but most mice survived and regained their body weight, and only one mouse had to be euthanized at 9 dpi due to weight loss &gt;25% (Fig. <xref rid="Fig1" ref-type="fig">1a, b</xref>). The calculated 50% mouse lethal dose (MLD<sub>50</sub>) of H5N6/GZ14 is 5 pfu. This result revealed that the patient-derived H5N6/GZ14 isolate, without prior adaptation in mice, has a very high degree of lethality in BALB/c mice.<fig id="Fig1"><label>Fig. 1</label><caption><title>Infection of the patient-derived H5N6/GZ14 isolate in mice.</title><p>Eight-week-old female BALB/c mice (<italic>n</italic> = 6) were anesthetized with isoflurane and infected intranasally with 1, 10, 100, or 1000 pfu of H5N6/GZ14. The mice were monitored for 14 days. <bold>a</bold> The body weights were measured every other day. The results from each group and each time point are expressed as the mean ± standard deviations (SD). <bold>b</bold> Survival of infected mice. Mice were euthanized when body weight loss exceeded 25% of the original weight</p></caption><graphic xlink:href="41426_2018_113_Fig1_HTML" id="d29e380"/></fig></p>
+      </sec>
+      <sec id="Sec4">
+        <title>The patient-derived H5N6/GZ14 isolate replicated efficiently in mouse lung and can disseminate systemically</title>
+        <p id="Par5">To evaluate the viral replication and dissemination of H5N6/GZ14 in mice, we infected mice with H5N6/GZ14 at 10 MLD<sub>50</sub> (50 pfu). Three mice were sacrificed per day at 1, 3, and 5 dpi for evaluation of viral replication in vivo. H5N6/GZ14 appeared to replicate rapidly to a high titer (3.55 × 10<sup>6</sup> pfu (10<sup>6.55±0.88</sup> pfu)/g tissue) in the lungs at 1 dpi, reached a peak (4.90 × 10<sup>7</sup> pfu/g (10<sup>7.69±0.05</sup> pfu/g)) at 3 dpi, and remained at a high level at 5 dpi (Table <xref rid="Tab1" ref-type="table">1</xref>). To further determine whether H5N6/GZ14 has any extrapulmonary dissemination following infection, we investigated the viral titers in the heart, liver, spleen, kidney, brain, and serum by a plaque formation assay. At 1 dpi, no virus could be detected in the organs other than the lung of infected mice. At 3 dpi, two out of three mice had detectable virus in the heart, with an average titer of 1.12 × 10<sup>5</sup> pfu/g (10<sup>5.05</sup> pfu/g). At 5 dpi, all of the mice had detectable virus in the heart, with an average titer of 2.88 × 10<sup>4</sup> pfu/g (10<sup>4.46±0.07</sup> pfu/g). At 3 and 5 dpi, one out of three mice had detectable virus in the brain, with a titer at 2.69 × 10<sup>2</sup> pfu/g (10<sup>2.43</sup> pfu/g) and 5.50 × 10<sup>3</sup> pfu/g (10<sup>3.74</sup> pfu/g), respectively (Table <xref rid="Tab1" ref-type="table">1</xref>). No infectious viruses could be detected in the blood, liver, spleen, and kidney. We also examined the relative amounts of H5N6 virus genome in the serum samples by real-time quantitative PCR (qPCR). Analysis of the serum samples collected at 1, 3, and 5 dpi showed an average of 110 viral genome copies per 100 μl of serum, which indicated the presence of viremia in mice infected with H5N6/GZ14 at 10 MLD<sub>50</sub> (50 pfu).<table-wrap id="Tab1"><label>Table 1</label><caption><p>Replication of influenza H5N6/GZ in mice</p></caption><table frame="hsides" rules="groups"><thead><tr><th>Days</th><th colspan="3">Virus titer in tissue<sup>a</sup> (mean log<sub>10</sub> pfu/g ± SD)</th><th colspan="3">Virus detected in organs<sup>c</sup></th></tr><tr><th/><th>Lung</th><th>Heart</th><th>Brain</th><th>Lung</th><th>Heart</th><th>Brain</th></tr></thead><tbody><tr><td>1</td><td>6.55 ± 0.88</td><td>
+<bold>—</bold>
+<sup>b</sup>
+</td><td>
+<bold>—</bold>
+</td><td>3/3<sup>d</sup></td><td>0/3</td><td>0/3</td></tr><tr><td>3</td><td>7.69 ± 0.05</td><td>5.05</td><td>2.43</td><td>3/3</td><td>2/3</td><td>1/3</td></tr><tr><td>5</td><td>7.04 ± 0.05</td><td>4.46 ± 0.07</td><td>3.74</td><td>3/3</td><td>3/3</td><td>1/3</td></tr></tbody></table><table-wrap-foot><p><sup>a</sup>Mice were infected with 10 MLD<sub>50</sub> (50 pfu)</p><p><sup>b</sup>— represents virus was not detected in samples</p><p><sup>c</sup>There was no detectable virus in liver, spleen, and kidney</p><p><sup>d</sup>Number of mice had detectable virus in tissues per three mice</p></table-wrap-foot></table-wrap></p>
+      </sec>
+      <sec id="Sec5">
+        <title>H5N6/GZ14 infection resulted in severe lung injury and elevation of pro-inflammatory cytokines and chemokines in the lungs of infected mice</title>
+        <p id="Par6">To determine the effect of H5N6/GZ14 infection on the lungs, we performed a histopathological examination of formalin-fixed, paraffin-embedded lung sections stained with hematoxylin and eosin. Histopathologic changes appeared as early as 1 dpi, with inflammatory cells noted around the observed bronchi. Some airways showed small volumes of exudates. The alveolar walls were thickened, and the alveolar lumens were flooded with edema fluid mixed with erythrocytes and inflammatory cells (Fig. <xref rid="Fig2" ref-type="fig">2c, d</xref>). At 3 dpi, H5N6/GZ14-infected mice had severe bronchial inflammation, bronchial epithelial intracellular edema, and necrosis with necrotic epithelium sloughing into the airway spaces (Fig. <xref rid="Fig2" ref-type="fig">2e, f</xref>). Severe pulmonary parenchyma consolidation was observed at 5 dpi. Increased accumulation of inflammatory cells, mainly neutrophils, macrophages, lymphocytes, and necrotic tissue debris, was observed in the lung parenchyma. Alveoli were completely filled with edema and hemorrhages (Fig. <xref rid="Fig2" ref-type="fig">2g, h</xref>). This result revealed that H5N6/GZ14 infection resulted in severe lung injury.<fig id="Fig2"><label>Fig. 2</label><caption><title>Histopathology of the lungs from H5N6/GZ14-infected mice.</title><p><bold>a</bold>, <bold>b</bold> Eight-week-old female BALB/c mice without infection. <bold>c</bold>–<bold>h</bold> Eight-week-old female BALB/c mice infected with 10 MLD<sub>50</sub> (50 pfu) of H5N6/GZ14. Lung tissue sections were stained with hematoxylin-eosin and analyzed under a light microscope. At 1 dpi, inflammatory cells (arrows) could be observed around the bronchi (<bold>c</bold>, <bold>d</bold>). The airways showed small volumes of exudates with edema fluid mixed with erythrocytes and inflammatory cells (asterisks). <bold>e</bold>, <bold>f</bold> At 3f dpi, the lungs had high numbers of inflammatory cells (arrows), bronchial epithelial intracellular edema, and necrosis with necrotic epithelium sloughing into the airway spaces (asterisks). <bold>g</bold>, <bold>h</bold> At 5 dpi, severe pulmonary parenchyma consolidation was observed. Increased accumulation of inflammatory cells and necrotic tissue debris (arrows) was observed in the lung parenchyma. The alveoli were completely filled with edema and hemorrhages (asterisks). Scale bars = 100 μm (<bold>a</bold>, <bold>c</bold>, <bold>e</bold>, <bold>g</bold>) and 25 μm (<bold>b</bold>, <bold>d</bold>, <bold>f</bold>, <bold>h</bold>)</p></caption><graphic xlink:href="41426_2018_113_Fig2_HTML" id="d29e671"/></fig></p>
+        <p id="Par7">To understand the relationship of disease progression and the level of pro-inflammatory cytokines and chemokines in the lungs, we collected lungs from mice infected with 10 MLD<sub>50</sub> of H5N6/GZ14 at 1, 3, and 5 dpi. Enzyme-linked immunosorbent assay (ELISA) was used to measure seven pro-inflammatory cytokines and chemokines and one anti-inflammatory cytokine in the lung homogenates. At 1 dpi, the levels of the pro-inflammatory cytokines monocyte chemotactic protein 1 (MCP-1), macrophage inflammatory protein 1β (MIP-1β), gamma interferon (IFN-γ), granulocyte-macrophage colony-stimulating factor (GM-CSF), and interleukin 1β (IL-1β) significantly increased. These cytokines, interleukin 6 (IL-6) and tumor necrosis factor alpha (TNF-α), were elevated to the highest level at 3 dpi. At 5 dpi, MCP-1, MIP-1β, IL-6, GM-CSF, IL-1β, and TNF-α remained at a high level. In contrast, the level of the anti-inflammatory cytokine interleukin 10 (IL-10) decreased significantly at 3 and 5 dpi (Fig. <xref rid="Fig3" ref-type="fig">3</xref>). This result showed that H5N6/GZ14 infection could elevate pro-inflammatory cytokines and chemokines in the lungs.<fig id="Fig3"><label>Fig. 3</label><caption><title>Pro-inflammatory cytokines and chemokines in the lungs of H5N6/GZ14-infected mice.</title><p>The lung tissues were collected and homogenized from H5N6/GZ14-infected mice at 1, 3, and 5 dpi (<italic>n</italic> = 3). The levels of cytokines and chemokines in the lung homogenates (pg/g of lung tissue) were determined by ELISA. The results from each time point are expressed as the mean ± SD. *A significant difference (*<italic>P</italic> &lt; 0.05)</p></caption><graphic xlink:href="41426_2018_113_Fig3_HTML" id="d29e696"/></fig></p>
+      </sec>
+      <sec id="Sec6">
+        <title>Mice infected with H5N6/GZ14 could be rescued by treatment with anti-influenza polyclonal antibodies generated from immunized rhesus macaques</title>
+        <p id="Par8">Previous studies have shown that treatment of severe H5N1 or H1N1 infections with convalescent plasma containing neutralizing antibodies to these influenza viruses could reduce the respiratory tract viral load, the serum cytokine response, and mortality<sup><xref ref-type="bibr" rid="CR9">9</xref>,<xref ref-type="bibr" rid="CR10">10</xref></sup>. However, there are no available human donors from H5N6 natural infection, and survivors are rare. Therefore, to obtain antibodies that could neutralize H5N6/GZ14, we generated an anti-influenza IgG that consists of polyclonal antibodies from immunized rhesus macaques. Rhesus macaques were immunized with three inactivated recombinant (6 + 2) viruses in the A/Puerto Rico/8/1934 (<italic>PR8</italic>) gene background, including rH5N1/VN04, rH7N9/AH13, and rH5N6/GZ14. Fifty milliliters of hyperimmune sera was collected and pooled for IgG purification. The pooled hyperimmune sera had hemagglutination inhibition (HI) and the neutralizing antibody against three recombinant viruses: rH5N6/GZ14; rH7N9/AH13; and rH5N1/VN04. Protein A-Sepharose affinity chromatography was used to purify the IgG and to remove serum albumin and other proteins (Fig. <xref rid="Fig4" ref-type="fig">4a</xref>). The antibody heavy chain (~50 kDa) and light chain (~25 kDa) of purified anti-influenza IgG could be observed without contamination from other proteins (Fig. <xref rid="Fig4" ref-type="fig">4a</xref>). After purification, a total volume of 27 ml was collected containing 24.3 mg of protein/ml, an HI antibody titer at 1:320, and a neutralizing antibody titer at 1:640 against recombinant rH5N6/GZ14 virus (Fig. <xref rid="Fig4" ref-type="fig">4b</xref>).<fig id="Fig4"><label>Fig. 4</label><caption><title>Coomassie Blue staining after SDS-PAGE and the antibody titer of immunized rhesus macaque sera and purified IgG.</title><p><bold>a</bold> Coomassie Blue staining after SDS-PAGE of macaque serum and purified IgG. M molecular weight markers (kDa). Lane 1: pooled hyperimmune rhesus macaque serum (diluted 500-fold). The filtered start serum mainly contains albumin (arrow). Lane 2: the flow through pool and unbound material (diluted 50-fold). Albumin and other proteins were removed and could be observed in the flow through pool. Lane 3: the effluent and column wash. Lane 4: the eluted and purified IgG (diluted 1000-fold). The IgG heavy chain (~50 kDa) and light chain (~25 kDa) (arrows) could be observed in the pooled elution buffer without albumin and other proteins. <bold>b</bold> HI and the MN neutralizing antibody titer of the pooled hyperimmune sera and the purified polyclonal IgG antibody. Three recombinant viruses, rH5N1/VN04, rH5N6/GZ14, and rH7N9/AH13, were used to immunize the rhesus macaques. HI titers are presented as the reciprocal value of the highest serum dilution that inhibited hemagglutination. MN titers are presented as the reciprocal value of the highest serum dilution that conferred 50% neutralization of 100 TCID<sub>50</sub> of the virus</p></caption><graphic xlink:href="41426_2018_113_Fig4_HTML" id="d29e740"/></fig></p>
+        <p id="Par9">To evaluate whether the highly pathogenic H5N6/GZ14 infection in mice could be treated with anti-influenza polyclonal antibodies, we first infected BALB/c mice intranasally with 2 MLD<sub>50</sub> of H5N6/GZ14. One day after infection, the mice were treated with purified IgG at either 1 or 3 mg/mouse via a single intraperitoneal injection. All of the mice receiving 3 mg of purified IgG survived lethal infection without obvious signs of illness. Mice receiving 1 mg of purified IgG also exhibited 50% survival with less weight loss. All of the mice receiving 3 mg of an unrelated IgG succumbed to infection by 9 dpi (Fig. <xref rid="Fig5" ref-type="fig">5</xref>). Therefore, lethal infection with H5N6/GZ14 in mice could be rescued using anti-influenza polyclonal antibodies generated by immunizing rhesus macaques with related influenza viruses.<fig id="Fig5"><label>Fig. 5</label><caption><title>Efficacy of anti-influenza polyclonal antibodies for treating H5N6/GZ14-infected mice.</title><p>Female 8-week-old BALB/c mice (<italic>n</italic> = 6) were intranasally infected with 2 MLD<sub>50</sub> (10 pfu) of H5N6/GZ14. One day later, the mice were treated with an intraperitoneal injection of either 1 or 3 mg of anti-influenza IgG/mouse. The mock-treated mice received an intraperitoneal injection of 3 mg of purified unrelated IgG. <bold>a</bold> The body weights were measured every other day. The results from each group and each time point are expressed as the mean ± SD. <bold>b</bold> Survival of infected mice. Mice were euthanized when body weight loss exceeded 25% of the original weight</p></caption><graphic xlink:href="41426_2018_113_Fig5_HTML" id="d29e771"/></fig></p>
+      </sec>
+    </sec>
+    <sec id="Sec7" sec-type="discussion">
+      <title>Discussion</title>
+      <p id="Par10">In this study, we reported that H5N6/GZ14 isolated from a hospitalized patient who developed ARDS exhibited high virulence and severe disease phenotypes in BALB/c mice with an MLD<sub>50</sub> value as low as 5 pfu. We also demonstrated that virulent disease progression was effectively inhibited using primate-derived anti-influenza polyclonal antibodies generated by immunizing rhesus macaques with related influenza viruses.</p>
+      <p id="Par11">Over the past several years, highly pathogenic avian influenza H5N6 viruses have been circulating in poultry and have caused severe infections in humans at a high fatality rate comparable to that of H5N1 and H7N9 avian influenza A viruses<sup><xref ref-type="bibr" rid="CR11">11</xref>,<xref ref-type="bibr" rid="CR12">12</xref></sup>. BALB/c mice have been used to study the pathogenesis of and conduct antiviral therapeutic assessments for several influenza A viruses, including H5N1 and H7N9<sup><xref ref-type="bibr" rid="CR13">13</xref>,<xref ref-type="bibr" rid="CR14">14</xref></sup>. So far, there are no reports on the study of H5N6 human isolates in a mouse model. There are several studies in mice on the pathogenicity and transmissibility of the H5N6 virus isolated from birds<sup><xref ref-type="bibr" rid="CR15">15</xref>–<xref ref-type="bibr" rid="CR17">17</xref></sup>. In one study, the pathogenicity of three H5N6 avian isolates was evaluated, and the results varied from mildly pathogenic to highly pathogenic in mice<sup><xref ref-type="bibr" rid="CR15">15</xref></sup>. Sequential passaging in mice using an H5N6 isolate from birds showed that E627K on PB2 played an important role in adaptation of the H5N6 virus to mice, which is similar to that reported for the H5N1, H9N2, and H6N1 influenza viruses<sup><xref ref-type="bibr" rid="CR16">16</xref>–<xref ref-type="bibr" rid="CR19">19</xref></sup>. In our study, the human-infected isolate, H5N6/GZ14, contains multiple basic amino acids at a hemagglutinin (HA) cleavage site and the mammalian adaptation mutation PB2-E627K, suggesting that this H5N6/GZ14 has high pathogenicity in mammals, which was also demonstrated in the infected patient<sup><xref ref-type="bibr" rid="CR20">20</xref></sup>. Therefore, it would be interesting to test if the patient-derived H5N6 could infect mice, and if so, what the degree of virulence would be and whether the infection could be treated.</p>
+      <p id="Par12">We found that the patient-derived isolate H5N6/GZ14, without prior adaptation in mice, is highly virulent in BALB/c mice. Disease progression and the course of infection were very rapid. Most importantly, H5N6/GZ14 spread beyond the respiratory tract to other organs, with infectious virus detected in the brain and heart at 5 dpi. Detection of the viral RNA in the serum samples from H5N6/GZ14-infected mice suggested that the dissemination of H5N6/GZ14 from the respiratory tract to other organs may be related to viremia that occurred early in infection.</p>
+      <p id="Par13">In our study, the MLD<sub>50</sub> of H5N6/GZ14 was only 5 pfu in mice, which is much lower than that of other highly pathogenic avian influenza viruses, including H5N1 and H7N9, as reported by others. The reported MLD<sub>50</sub> values of A/Vietnam/1203/04 (H5N1) and A/Anhui/1/13 (H7N9) are 32 pfu (10<sup>1.5</sup> pfu) and 2512 pfu (10<sup>3.4</sup> pfu), respectively<sup><xref ref-type="bibr" rid="CR14">14</xref>,<xref ref-type="bibr" rid="CR21">21</xref></sup>. However, it is important to note that it is difficult to compare the experimental results based on published papers, as the experimental conditions and procedures can vary among different laboratories. We were not able to compare H5N6/GZ14 with H7N9 or H5N1 virus in parallel due to the limitations in our Biosafety level 3 animal facility. Nevertheless, the dramatically lower MLD<sub>50</sub> of H5N6/GZ14 suggested the extremely high virulence of this patient-derived H5N6 virus in BALB/c mice. The results in a mouse model concurred with the clinical observations in H5N6-infected patients, which also showed rapid disease progression with ARDS<sup><xref ref-type="bibr" rid="CR11">11</xref>,<xref ref-type="bibr" rid="CR12">12</xref></sup>. The high fatality rate of H5N6 influenza infection increases the need to better understand the disease and to evaluate better therapeutics.</p>
+      <p id="Par14">The occurrence of a “cytokine storm” or the upregulation of pro-inflammatory cytokines and chemokines has been associated with aggravated lung injury and pneumonia in H5N1- and H7N9-infected patients<sup><xref ref-type="bibr" rid="CR22">22</xref>–<xref ref-type="bibr" rid="CR25">25</xref></sup>. Exacerbated pro-inflammatory cytokine responses were also detected during severe H5N1 and H7N9 virus infections in mice, which contributed to tissue pathology and fatal outcomes<sup><xref ref-type="bibr" rid="CR26">26</xref>–<xref ref-type="bibr" rid="CR28">28</xref></sup>. In this study, we found that the levels of pro-inflammatory cytokines and chemokines, including MCP-1, MIP-1β, IL-1β, and GM-CSF, increased rapidly at 1 dpi, peaked at 3 dpi, and remained elevated at 5 dpi in the lungs of H5N6/GZ14-infected mice. In contrast, the level of IL-10 significantly decreased at 3 and 5 dpi. IL-10 is known to be an important anti-inflammatory cytokine and serves as a negative regulator of both innate and adaptive immune responses<sup><xref ref-type="bibr" rid="CR29">29</xref>,<xref ref-type="bibr" rid="CR30">30</xref></sup>. Thus, these findings suggest that dysregulation of cytokines and chemokines is associated with lung injury and high fatality in H5N6-infected hosts.</p>
+      <p id="Par15">Although anti-influenza neuraminidase (NA) inhibitors, such as oseltamivir (Tamiflu), have been used for treating influenza viral infection, the drug is only effective in the early stage of infection<sup><xref ref-type="bibr" rid="CR31">31</xref></sup>. The high fatality and rapid disease progression of H5N6 infection in humans indicate a need to improve the treatment regimen. In clinical practice, passive immunotherapy with convalescent plasma from influenza infection survivors has been proven as a viable option for treating H5N1 infection even at a later stage of infection and for treating H1N1 infection<sup><xref ref-type="bibr" rid="CR9">9</xref>,<xref ref-type="bibr" rid="CR10">10</xref></sup>. However, there are very few H5N6 survivors, and they are unlikely to be suitable for the donation of plasma due to age and health conditions. In the absence of adequate human donors of convalescent plasma, immunoglobulins or polyclonal antibodies from immunized animal sera have been considered<sup><xref ref-type="bibr" rid="CR32">32</xref>,<xref ref-type="bibr" rid="CR33">33</xref></sup>. It is reported that prepared F(ab′)<sub>2</sub> fragments from inactivated H5N1-vaccinated horses could provide protection against H5N1 infection in mice<sup><xref ref-type="bibr" rid="CR34">34</xref></sup>. However, there are concerns of severe allergic responses, such as allergic shock, that result from infusion of foreign antigenic proteins. We proposed a concept of immunizing nonhuman primates with the desired antigens to generate antigen-specific IgG, which consists of specific polyclonal antibodies, for use in urgent situations to treat infections with virulent pathogens, such as highly pathogenic AIV infections. Rhesus macaques are genetically more closely related to humans than most other animals. The immunoglobulin genes of rhesus macaques share up to 95% identity with humans<sup><xref ref-type="bibr" rid="CR35">35</xref></sup>. Therefore, rhesus macaques could be a source to provide more human biocompatible IgG for human use in urgent situations. Another solution would be to clone H5N6 neutralizing antibodies or, ideally, broadly neutralizing antibodies to influenza viruses from infected patients and develop monoclonal antibodies as antibody drugs. However, the long timeline and cost for development may make it unfeasible if the number of patients remains small and there is a lack of incentive in the industry.</p>
+      <p id="Par16">In this study, we generated a primate-derived, trivalent anti-influenza IgG containing polyclonal antibodies with neutralizing activities against three avian influenza A viruses: H5N1, H7N9, and H5N6. Although the human isolate H5N6/GZ14 is highly virulent in BALB/c mice, the anti-influenza IgG could rescue the infected mice from lethal infection, demonstrating the effectiveness of polyclonal antibodies for treating H5N6 infection. Although we proposed the exploration of immunized macaque IgG and demonstrated its efficacy in treating H5N6/GZ14 lethal infection in mice, more studies need to be done to assess the practicality of this strategy. The availability of pathogen-free rhesus macaques for immunization and methods for disinfecting possible pathogens in purified IgG should improve the safety and usefulness in the future.</p>
+      <p id="Par17">In summary, we found that a patient-derived H5N6 isolate is highly pathogenic in BALB/c mice but can be treated with anti-influenza polyclonal antibodies. Our results provide insights into understanding the pathogenicity and treatment of H5N6 infection.</p>
+    </sec>
+    <sec id="Sec8" sec-type="materials|methods">
+      <title>Materials and methods</title>
+      <sec id="Sec9">
+        <title>Ethics statement</title>
+        <p id="Par18">All murine experiments were performed in an animal biosafety level 3 facility using HEPA-filtered isolators and under the guidance of the Association for Assessment and Accreditation of Laboratory Animal Care International. The experimental protocol was approved by the Committee on the Ethics of Animal Experiments of Animal Biosafety Level 3 (BSL-3) of Guangdong Inspection and Quarantine Technology Center, Guangdong Entry-Exit Inspection and Quarantine Bureau (SYXK20140086).</p>
+        <p id="Par19">The rhesus macaques’ study protocol was approved by the GIBH Institutional Animal Care and Use Committee (2013007). The rhesus macaques were housed and handled in accordance with the guidelines set by the Association for the Assessment and Accreditation of Laboratory Animal Care. All steps taken to ameliorate the welfare and to avoid the suffering of the rhesus monkeys were in accordance with the recommendations of the “Weatherall report for the use of nonhuman primates”.</p>
+      </sec>
+      <sec id="Sec10">
+        <title>Viruses</title>
+        <p id="Par20">A/Guangzhou/39715/2014 (H5N6) (H5N6/GZ14) (GenBank No. KP765785~KP765792) was initially isolated from a throat swab specimen collected from an adult male patient with known poultry exposure<sup><xref ref-type="bibr" rid="CR8">8</xref></sup>. The virus isolate was obtained by inoculating the allantoic sac and amniotic cavity of approximately 10-day-old specific pathogen-free (SPF) embryonated chicken eggs. All operations involving live H5N6 virus were carried out in a BSL-3 facility at the Guangdong Inspection and Quarantine Technology Center.</p>
+        <p id="Par21">The recombinant influenza virus rH5N6/GZ14 was generated by eight-plasmid-based reverse genetics in the background of A/Puerto Rico/1934 (PR8) containing HA and NA sequences of H5N6/GZ14. The other two “6 + 2” recombinant viruses, A/Vietnam /1194/2004 (H5N1) (rH5N1/VN04) and A/Anhui/1/2013 (H7N9) (rH7N9/AH13), were generated by the same method in our previous studies<sup><xref ref-type="bibr" rid="CR36">36</xref>,<xref ref-type="bibr" rid="CR37">37</xref></sup>. These recombinant viruses were propagated in embryonated chicken eggs and then purified by using a sucrose gradient centrifugation as described previously<sup><xref ref-type="bibr" rid="CR36">36</xref></sup>.</p>
+      </sec>
+      <sec id="Sec11">
+        <title>Immunization of rhesus macaques with inactivated recombinant influenza viruses</title>
+        <p id="Par22">Purified rH5N1/VN04, rH7N9/AH13, and rH5N6/GZ14 were inactivated by treatment with 0.1% formalin at 4 °C for 3 days to prepare the inactivated vaccine antigen. The HA protein content of inactivated vaccine was estimated to make up ~30% of the total protein of inactivated vaccine, which was measured by BCA protein assay kit (Pierce). Six healthy male Chinese rhesus macaques, previously immunized with a H7N9 vaccine<sup><xref ref-type="bibr" rid="CR36">36</xref></sup>, were immunized with a mixture of inactivated recombinant viruses rH5N1/VN04, rH7N9/AH13, and rH5N6/GZ14, containing 15 μg HA of each with aluminum hydroxide via intramuscular injection. Four weeks later, these macaques were immunized again with the same inactivated recombinant viruses. Considering the welfare of animals, approximately 5 ml of blood was collected from each macaque at 2, 6, 10, 14, and 18 weeks after the last immunization. The sera collected at different time points from these macaques were frozen at −80 °C. After the samples from all the time points were collected, the serum samples were then pooled together for purification of IgG. The HI and neutralization titers were determined.</p>
+      </sec>
+      <sec id="Sec12">
+        <title>Purification of anti-influenza IgG</title>
+        <p id="Par23">A total volume of 50 ml of hyperimmune sera pooled from immunized rhesus macaques was purified by Protein A-Sepharose affinity chromatography with ÄKTApurifier 10 according to the manufacturer’s instructions (GE Healthcare). Briefly, the hyperimmune sera were centrifuged at 12 000 × <italic>g</italic> for 15 min to remove particulate matter. The supernatant was diluted with 10 column volumes of physiological saline and then filtered through 0.45 μm filter before loading on the Vantage column (Millipore), which was packed with rProtein A-Sepharose Fast Flow, at a volumetric flow rate of 3.5 ml/min. The loaded serum sample was washed with physiological saline until the ultraviolet absorbance reached at 20 mAU and then eluted with 0.1 M sodium citrate (pH 3.5). The collection samples were neutralized with 1 M Tri-HCl (pH 9.0) to ensure the eluted immunoglobulin was approximately neutral. Total protein content of purified IgG was determined by a BCA protein assay kit (Pierce) according to the manufacturer’s instructions. Samples before and after IgG purification were analyzed using Coomassie blue stained sodium dodecylsulfate polyacrylamide gel electrophoresis (SDS-PAGE) gels. The HI and neutralization titers of purified IgG were determined.</p>
+      </sec>
+      <sec id="Sec13">
+        <title>SDS-PAGE analysis</title>
+        <p id="Par24">Standard one-dimensional SDS-PAGE was carried out as described by Laemmli<sup><xref ref-type="bibr" rid="CR38">38</xref></sup>. A total volume of 10 μl of diluted samples, with 2.5 μl of loading dye with 2% (vol/vol) β-mercaptoethanol as reducing agent, was heated to 95 °C for 5 min and then loaded onto a 10% acrylamide gel. The gel was run at 20 mA for approximately 90 min until the tracking dye just ran out of the gel, followed by Coomassie Blue staining.</p>
+      </sec>
+      <sec id="Sec14">
+        <title>HI assay</title>
+        <p id="Par25">Standard HI assays were performed on post-immune rhesus macaque sera and purified IgG using 1% chicken erythrocytes against recombinant rH5N1/VN04, rH7N9/AH13, and rH5N6/GZ14 according to standard protocols<sup><xref ref-type="bibr" rid="CR39">39</xref></sup>.</p>
+      </sec>
+      <sec id="Sec15">
+        <title>Microneutralization assay</title>
+        <p id="Par26">The neutralizing antibody titer of purified immunoglobulins was determined by microneutralization (MN) assays as previously described with minor modifications<sup><xref ref-type="bibr" rid="CR40">40</xref></sup>. In brief, 50 μl of influenza virus containing 100 TCID<sub>50</sub> was incubated with 50 μl of twofold dilutions of the cholera filtrate-treated serum for 1 h at room temperature. After incubation, the virus-serum mixtures were transferred to 96-well plate containing an Madin-Darby Canine Kidney cell (MDCK) monolayer and then incubated for 2 h at 37 °C and 5% CO<sub>2</sub>. The virus-serum mixtures were removed from the wells and then washed once with phosphate buffered saline (PBS). The cells were incubated at 37 °C for 2 days in Dulbecco’s modified Eagle’s medium (DMEM) supplemented with 0.3% bovine serum albumin (BSA) and 1 μg/ml of TPCK-treated trypsin. The plates were fixed with 4% paraformaldehyde for 10 min. The presence of viral protein was detected by ELISA with a monoclonal antibody (Abcam) to the influenza A nucleoprotein. The MN titer was defined as the highest dilution of serum that resulted in 50% neutralization of 100 TCID<sub>50</sub> of virus in MDCK cell cultures.</p>
+      </sec>
+      <sec id="Sec16">
+        <title>Establishment of the H5N6/GZ14 mouse model</title>
+        <p id="Par27">SPF female BALB/c mice (Vital River Laboratory, Beijing) were used. Eight-week-old female BALB/c mice with six mice for each group were infected intranasally with 1, 10,100, and 1000 pfu of H5N6/GZ14 in 50 μl of PBS. Mice were monitored for signs of illness, weight loss, and mortality for up to 14 days. Mice were euthanized when the loss of original body weight exceeds 25%. To avoid excess disturbance, the mice were weighted every other day. The dose required to kill 50% of the mice (MLD<sub>50</sub>) was calculated by the Reed-Muench Method<sup><xref ref-type="bibr" rid="CR41">41</xref></sup>.</p>
+        <p id="Par28">To determine the extent of viral replication in mice, mice were infected with 10 MLD<sub>50</sub> of H5N6/GZ14. The mice (<italic>n</italic> = 3) were sacrificed at 1, 3 and 5 dpi for virological assays. Blood samples were collected through intracardiac puncture after anesthetization, and then, mice were euthanized for dissection. The blood was allowed to clot, and the serum was separated by centrifugation and stored at −80 °C. The lung, heart, liver, spleen, kidney, and brain were collected. The organs were weighted and homogenized in 1 ml cold PBS, and virus replication titers were determined by plaque formation assays. The limit detection for all tissues was 10 pfu/ml. Parts of lungs of infected mice were fixed for the histopathological analysis.</p>
+      </sec>
+      <sec id="Sec17">
+        <title>Plaque formation assay</title>
+        <p id="Par29">Confluent MDCK cell monolayers in six-well plates were infected with 10-fold dilutions of virus-containing samples (allantoic fluid or tissue homogenate) in a total volume of 1.0 ml DMEM containing 0.3% BSA for 1 h at 37 °C. The wells were aspirated and washed once with PBS to remove residual virus. Each well was then immediately covered with an agar overlay (final concentration: 1% agar; 1× modified Eagle’s medium; 0.3% BSA; and 1 µg/ml TPCK trypsin). The plates were then incubated at 37 °C with 5% CO<sub>2</sub> for 3 days. The overlays were carefully removed, and the cells were stained with crystal violet. The number of pfu was counted and recorded.</p>
+      </sec>
+      <sec id="Sec18">
+        <title>Measurement of influenza viral RNA in the serum sample</title>
+        <p id="Par30">Total RNA from 100 μl of serum sample was extracted using a QIAamp viral RNA mini kit (Qiagen). Complementary DNA was prepared using a Primescript cDNA synthesis kit (TaKaRa) and uni-12 primer (5′-AGCA/GAAAGCAGG-3′), which is based on the consensus 3′-sequence of the vRNA end sequences of influenza A virus. The relative amounts of the H5N6 virus genome were quantified using absolute real-time qPCR assays with a fixed quantity of 20 ng cDNA per reaction. Plasmid standards were developed using a pMD-18 T vector (TaKaRa) containing a HA fragment of H5N6/GZ14. Plasmid copy numbers were determined by calculating the molecular weight of the cloned plasmid. For absolute quantitation of viral copies, standard curves were constructed using an amplification of a 180-base pair fragment of the HA gene and 10-fold serial dilutions of the plasmids.</p>
+        <p id="Par31">The qPCR was carried out in a 25 µl ready-to-use SYBR Green reaction mixture (TaKaRa) with gene-specific primers for HA (5′-ATCAGAGTGCCGGAATGGTC-3′ and 5′- ATGGACATGCTGCGCTCAC-3′) in a CFX96 Touch Real-Time PCR Detector (Bio-Rad). The PCR conditions were 95 °C for 30 s and 40 cycles of 95 °C for 5 s, 55 °C for 30 s, and 72 °C for 10 s. Duplicate reactions were run for each sample. The results of qPCR assays were analyzed using CFX manager software version 3.1 supplied with the CFX96 Touch (Bio-Rad).</p>
+      </sec>
+      <sec id="Sec19">
+        <title>Histopathological analysis of lung tissues</title>
+        <p id="Par32">Lung tissues from infected and mock mice at indicated time points were fixed in 10% neutral buffered formalin and embedded in paraffin. Tissue sections (5 μm) were stained with hematoxylin and eosin and analyzed under light microscopy.</p>
+      </sec>
+      <sec id="Sec20">
+        <title>Detection of cytokines and chemokines</title>
+        <p id="Par33">Expression levels of IFN-α, TNF-α, MIP-1α, MIP-1β, MCP-1, IFN-γ, IL-6, and IP-10 in the lung homogenates from 10 MLD<sub>50</sub> of H5N6/GZ14-infected mice on 1, 3 and 5 dpi were quantitatively determined by use of ELISA kits (eBioscience) according to the manufacturer’s protocol (assay sensitivity, 15.6 pg/ml).</p>
+      </sec>
+      <sec id="Sec21">
+        <title>Treatment of H5N6/GZ14-infected mice with anti-AIV IgG</title>
+        <p id="Par34">Eight-week-old female BALB/c mice, six mice/group, were infected intranasally with 2 MLD<sub>50</sub> of H5N6/GZ14 virus under anesthesia with isoflurane. Twenty-four hours later, mice were intraperitoneally injected with either 1 or and 3 mg/mouse of anti-AIV IgG. The control group received purified IgG from macaques immunized with an uncorrelated antigen. The mice were observed for up to 14 days and weighted every other day.</p>
+      </sec>
+      <sec id="Sec22">
+        <title>Statistical analysis</title>
+        <p id="Par35">Statistical significance was determined using unpaired, two-tailed Student’s <italic>t</italic>-tests with the GraphPad Prism 5 software package (GraphPad Software). <italic>P</italic> values &lt; 0.05 were considered significant.</p>
+      </sec>
+    </sec>
+  </body>
+  <back>
+    <ack>
+      <title>Acknowledgements</title>
+      <p>This work was supported by the National Natural Science Foundation of China (grant numbers 81490530 and 91442102). This work was also partly supported by a grant from the Science and Technology Program of Guangzhou, China (201707020046 and 201510010185) and the Guangzhou Health Care and Cooperative Innovation Major Project (201508020252 and 201803040004).</p>
+    </ack>
+    <notes notes-type="author-contribution">
+      <title>Authors’ contributions</title>
+      <p>L.C., W.P., and H.X. contributed to the design, execution, and analysis of the study. W.P., H.X., X.L., B.Z., and S.L. contributed to in vitro and animal studies in BSL-3 facility. P.C., W.G., M.Z., J.D., Q.W., Z.Y., Z.L., and C.L. contributed to virus preparation, animal immunization, and purification of polyclonal immunoglobulin G. L.C., W.P., H.X., and N.Z. contributed to the preparation of the manuscript. All authors reviewed the manuscript.</p>
+    </notes>
+    <notes notes-type="COI-statement">
+      <title>Conflict of interest</title>
+      <p id="Par36">The authors declare that they have no conflict of interest.</p>
+    </notes>
+    <ref-list id="Bib1">
+      <title>References</title>
+      <ref id="CR1">
+        <label>1.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Wong</surname>
+              <given-names>FY</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Reassortant highly pathogenic influenza A (H5N6) virus in Laos</article-title>
+          <source>Emerg. Infect. Dis.</source>
+          <year>2015</year>
+          <volume>21</volume>
+          <fpage>511</fpage>
+          <lpage>516</lpage>
+          <pub-id pub-id-type="doi">10.3201/eid2103.141488</pub-id>
+          <?supplied-pmid 25695754?>
+          <pub-id pub-id-type="pmid">25695754</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR2">
+        <label>2.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Wu</surname>
+              <given-names>H</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Novel reassortant highly pathogenic H5N6 avian viruses in poultry in China</article-title>
+          <source>Infect. Genet. Evol.</source>
+          <year>2015</year>
+          <volume>31</volume>
+          <fpage>64</fpage>
+          <lpage>67</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.meegid.2015.01.019</pub-id>
+          <?supplied-pmid 25653129?>
+          <pub-id pub-id-type="pmid">25653129</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR3">
+        <label>3.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Nguyen</surname>
+              <given-names>DT</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Shifting clade distribution, reassortment, and emergence of new subtypes of highly pathogenic avian influenza A(H5) viruses collected from Vietnamese poultry from 2012 to 2015</article-title>
+          <source>J. Virol.</source>
+          <year>2017</year>
+          <volume>91</volume>
+          <fpage>e01708</fpage>
+          <lpage>e01716</lpage>
+          <pub-id pub-id-type="doi">10.1128/JVI.01708-16</pub-id>
+          <?supplied-pmid 28003481?>
+          <pub-id pub-id-type="pmid">28003481</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR4">
+        <label>4.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kim</surname>
+              <given-names>HK</given-names>
+            </name>
+            <name>
+              <surname>Jeong</surname>
+              <given-names>DG</given-names>
+            </name>
+            <name>
+              <surname>Yoon</surname>
+              <given-names>SW</given-names>
+            </name>
+          </person-group>
+          <article-title>Recent outbreaks of highly pathogenic avian influenza viruses in South Korea</article-title>
+          <source>Clin. Exp. Vaccin. Res</source>
+          <year>2017</year>
+          <volume>6</volume>
+          <fpage>95</fpage>
+          <lpage>103</lpage>
+          <pub-id pub-id-type="doi">10.7774/cevr.2017.6.2.95</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR5">
+        <label>5.</label>
+        <mixed-citation publication-type="other">World Health Organization. Monthly Risk Assessment Summary; 30 Oct 2017. [accessed 23 Nov 2017]. <ext-link ext-link-type="uri" xlink:href="http://www.who.int/influenza%20/human_animal_interface%20/Influenza_Summary_IRA_HA_interface_10_30_2017.pdf?ua=1">http://www.who.int/influenza /human_animal_interface/Influenza_Summary_IRA_HA_interface_10_30_2017.pdf?ua=1</ext-link></mixed-citation>
+      </ref>
+      <ref id="CR6">
+        <label>6.</label>
+        <mixed-citation publication-type="other">World Health Organization. Influenza at the human-animal interface. Summary and assessment, 30 October to 7 December 2017. <ext-link ext-link-type="uri" xlink:href="http://www.who.int/influenza/human_animal_interface/Influenza_Summary_IRA_HA_interface_12_07_2017.pdf?ua=1">http://www.who.int/influenza/human_animal_interface/Influenza_Summary_IRA_HA_interface_12_07_2017.pdf?ua=1</ext-link></mixed-citation>
+      </ref>
+      <ref id="CR7">
+        <label>7.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Bi</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Genesis, evolution and prevalence of H5N6 avian influenza viruses in China</article-title>
+          <source>Cell Host Microbe</source>
+          <year>2016</year>
+          <volume>20</volume>
+          <fpage>810</fpage>
+          <lpage>820</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.chom.2016.10.022</pub-id>
+          <?supplied-pmid 27916476?>
+          <pub-id pub-id-type="pmid">27916476</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR8">
+        <label>8.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yang</surname>
+              <given-names>ZF</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Human infection with a novel avian influenza A (H5N6) virus</article-title>
+          <source>N. Engl. J. Med.</source>
+          <year>2015</year>
+          <volume>373</volume>
+          <fpage>487</fpage>
+          <lpage>489</lpage>
+          <pub-id pub-id-type="doi">10.1056/NEJMc1502983</pub-id>
+          <?supplied-pmid 26222578?>
+          <pub-id pub-id-type="pmid">26222578</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR9">
+        <label>9.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhou</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Zhong</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Guan</surname>
+              <given-names>Y</given-names>
+            </name>
+          </person-group>
+          <article-title>Treatment with convalescent plasma for influenza A (H5N1) infection</article-title>
+          <source>N. Engl. J. Med.</source>
+          <year>2007</year>
+          <volume>357</volume>
+          <fpage>1450</fpage>
+          <lpage>1451</lpage>
+          <pub-id pub-id-type="doi">10.1056/NEJMc070359</pub-id>
+          <?supplied-pmid 17914053?>
+          <pub-id pub-id-type="pmid">17914053</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR10">
+        <label>10.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hung</surname>
+              <given-names>IF</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Convalescent plasma treatment reduced mortality in patients with severe pandemic influenza A (H1N1) 2009 virus infection</article-title>
+          <source>Clin. Infect. Dis.</source>
+          <year>2011</year>
+          <volume>52</volume>
+          <fpage>447</fpage>
+          <lpage>456</lpage>
+          <pub-id pub-id-type="doi">10.1093/cid/ciq106</pub-id>
+          <?supplied-pmid 21248066?>
+          <pub-id pub-id-type="pmid">21248066</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR11">
+        <label>11.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Pan</surname>
+              <given-names>M</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Human infection with a novel, highly pathogenic avian influenza A (H5N6)virus: virological and clinical findings</article-title>
+          <source>J. Infect.</source>
+          <year>2016</year>
+          <volume>72</volume>
+          <fpage>52</fpage>
+          <lpage>59</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.jinf.2015.06.009</pub-id>
+          <?supplied-pmid 26143617?>
+          <pub-id pub-id-type="pmid">26143617</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR12">
+        <label>12.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Xu</surname>
+              <given-names>W</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>A fatal case of infection with a further reassortant, highly pathogenic avian influenza (HPAI) H5N6 virus in Yunnan, China</article-title>
+          <source>Infect. Genet. Evol.</source>
+          <year>2016</year>
+          <volume>40</volume>
+          <fpage>63</fpage>
+          <lpage>66</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.meegid.2016.02.020</pub-id>
+          <?supplied-pmid 26911643?>
+          <pub-id pub-id-type="pmid">26911643</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR13">
+        <label>13.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lu</surname>
+              <given-names>X</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>A mouse model for the evaluation of pathogenesis and immunity to influenza A (H5N1) viruses isolated from humans</article-title>
+          <source>J. Virol.</source>
+          <year>1999</year>
+          <volume>73</volume>
+          <fpage>5903</fpage>
+          <lpage>5911</lpage>
+          <?supplied-pmid 10364342?>
+          <pub-id pub-id-type="pmid">10364342</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR14">
+        <label>14.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Belser</surname>
+              <given-names>JA</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Pathogenesis and transmission of avian influenza A (H7N9) virus in ferrets and mice</article-title>
+          <source>Nature</source>
+          <year>2013</year>
+          <volume>501</volume>
+          <fpage>556</fpage>
+          <lpage>559</lpage>
+          <pub-id pub-id-type="doi">10.1038/nature12391</pub-id>
+          <?supplied-pmid 23842497?>
+          <pub-id pub-id-type="pmid">23842497</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR15">
+        <label>15.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhao</surname>
+              <given-names>Z</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Avian influenza H5N6 viruses exhibit differing pathogenicities and transmissibilities in mammals</article-title>
+          <source>Sci. Rep.</source>
+          <year>2017</year>
+          <volume>7</volume>
+          <fpage>16280</fpage>
+          <pub-id pub-id-type="doi">10.1038/s41598-017-16139-1</pub-id>
+          <?supplied-pmid 29176564?>
+          <pub-id pub-id-type="pmid">29176564</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR16">
+        <label>16.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Peng</surname>
+              <given-names>X</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Amino acid substitutions occurring during adaptation of an emergent H5N6 avian influenza virus to mammals</article-title>
+          <source>Arch. Virol.</source>
+          <year>2016</year>
+          <volume>161</volume>
+          <fpage>1165</fpage>
+          <lpage>1170</lpage>
+        </element-citation>
+      </ref>
+      <ref id="CR17">
+        <label>17.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhang</surname>
+              <given-names>C</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Amino acid substitutions associated with avian H5N6 influenza A virus adaptation to mice</article-title>
+          <source>Front. Microbiol.</source>
+          <year>2017</year>
+          <volume>8</volume>
+          <fpage>1763</fpage>
+          <pub-id pub-id-type="doi">10.3389/fmicb.2017.01763</pub-id>
+          <?supplied-pmid 28966609?>
+          <pub-id pub-id-type="pmid">28966609</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR18">
+        <label>18.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Sang</surname>
+              <given-names>X</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Rapid emergence of a PB2-E627K substitution confers a virulent phenotype to an H9N2 avian influenza virus during adoption in mice</article-title>
+          <source>Arch. Virol.</source>
+          <year>2015</year>
+          <volume>160</volume>
+          <fpage>1267</fpage>
+          <lpage>1277</lpage>
+          <pub-id pub-id-type="doi">10.1007/s00705-015-2383-5</pub-id>
+          <?supplied-pmid 25782865?>
+          <pub-id pub-id-type="pmid">25782865</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR19">
+        <label>19.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Cheng</surname>
+              <given-names>K</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>PB2-E627K and PA-T97I substitutions enhance polymerase activity and confer a virulent phenotype to an H6N1 avian influenza virus in mice</article-title>
+          <source>Virologoy</source>
+          <year>2014</year>
+          <volume>468-470</volume>
+          <fpage>207</fpage>
+          <lpage>213</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.virol.2014.08.010</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR20">
+        <label>20.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Mok</surname>
+              <given-names>CK</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Genetic characterization of highly pathogenic avian influenza A (H5N6) virus, Guangdong, China</article-title>
+          <source>Emerg. Infect. Dis.</source>
+          <year>2015</year>
+          <volume>21</volume>
+          <fpage>2268</fpage>
+          <lpage>2271</lpage>
+          <pub-id pub-id-type="doi">10.3201/eid2112.150809</pub-id>
+          <?supplied-pmid 26584075?>
+          <pub-id pub-id-type="pmid">26584075</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR21">
+        <label>21.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Belser</surname>
+              <given-names>JA</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Pathogenesis of pandemic influenza A (H1N1) and triple-reassortant swine influenza A (H1) viruses in mice</article-title>
+          <source>J. Virol.</source>
+          <year>2010</year>
+          <volume>84</volume>
+          <fpage>4194</fpage>
+          <lpage>4203</lpage>
+          <pub-id pub-id-type="doi">10.1128/JVI.02742-09</pub-id>
+          <?supplied-pmid 20181710?>
+          <pub-id pub-id-type="pmid">20181710</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR22">
+        <label>22.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>de Jong</surname>
+              <given-names>MD</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Fatal outcome of human influenza A (H5N1) is associated with high viral load and hypercytokinemia</article-title>
+          <source>Nat. Med.</source>
+          <year>2006</year>
+          <volume>12</volume>
+          <fpage>1203</fpage>
+          <lpage>1207</lpage>
+          <pub-id pub-id-type="doi">10.1038/nm1477</pub-id>
+          <?supplied-pmid 16964257?>
+          <pub-id pub-id-type="pmid">16964257</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR23">
+        <label>23.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Peiris</surname>
+              <given-names>JS</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Re-emergence of fatal human influenza A subtype H5N1 disease</article-title>
+          <source>Lancet</source>
+          <year>2004</year>
+          <volume>363</volume>
+          <fpage>617</fpage>
+          <lpage>619</lpage>
+          <pub-id pub-id-type="doi">10.1016/S0140-6736(04)15595-5</pub-id>
+          <?supplied-pmid 14987888?>
+          <pub-id pub-id-type="pmid">14987888</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR24">
+        <label>24.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Chi</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Cytokine and chemokine levels in patients infected with the novel avian influenza A (H7N9) virus in China</article-title>
+          <source>J. Infect. Dis.</source>
+          <year>2013</year>
+          <volume>208</volume>
+          <fpage>1962</fpage>
+          <lpage>1967</lpage>
+          <pub-id pub-id-type="doi">10.1093/infdis/jit440</pub-id>
+          <?supplied-pmid 23990573?>
+          <pub-id pub-id-type="pmid">23990573</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR25">
+        <label>25.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Chen</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Human infections with the emerging avian influenza A H7N9 virus from wet market poultry: clinical analysis and characterisation of viral genome</article-title>
+          <source>Lancet</source>
+          <year>2013</year>
+          <volume>381</volume>
+          <fpage>1916</fpage>
+          <lpage>1925</lpage>
+          <pub-id pub-id-type="doi">10.1016/S0140-6736(13)60903-4</pub-id>
+          <?supplied-pmid 23623390?>
+          <pub-id pub-id-type="pmid">23623390</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR26">
+        <label>26.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Szretter</surname>
+              <given-names>KJ</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Role of host cytokine responses in the pathogenesis of avian H5N1 influenza viruses in mice</article-title>
+          <source>J. Virol.</source>
+          <year>2007</year>
+          <volume>81</volume>
+          <fpage>2736</fpage>
+          <lpage>2744</lpage>
+          <pub-id pub-id-type="doi">10.1128/JVI.02336-06</pub-id>
+          <?supplied-pmid 17182684?>
+          <pub-id pub-id-type="pmid">17182684</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR27">
+        <label>27.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Mok</surname>
+              <given-names>CK</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Pathogenicity of the novel A/H7N9 influenza virus in mice</article-title>
+          <source>MBio</source>
+          <year>2013</year>
+          <volume>4</volume>
+          <fpage>e00362</fpage>
+          <lpage>13</lpage>
+          <pub-id pub-id-type="doi">10.1128/mBio.00362-13</pub-id>
+          <?supplied-pmid 23820393?>
+          <pub-id pub-id-type="pmid">23820393</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR28">
+        <label>28.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhao</surname>
+              <given-names>G</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Differences in the pathogenicity and inflammatory responses induced by avian influenza A/H7N9 virus infection in BALB/c and C57BL/6 mouse models</article-title>
+          <source>PLoS ONE</source>
+          <year>2014</year>
+          <volume>9</volume>
+          <fpage>e92987</fpage>
+          <pub-id pub-id-type="doi">10.1371/journal.pone.0092987</pub-id>
+          <?supplied-pmid 24676272?>
+          <pub-id pub-id-type="pmid">24676272</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR29">
+        <label>29.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Moore</surname>
+              <given-names>KW</given-names>
+            </name>
+            <name>
+              <surname>de Waal Malefyt</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Coffman</surname>
+              <given-names>RL</given-names>
+            </name>
+            <name>
+              <surname>O’Garra</surname>
+              <given-names>A</given-names>
+            </name>
+          </person-group>
+          <article-title>Interleukin-10 and the interleukin-10 receptor</article-title>
+          <source>Annu. Rev. Immunol.</source>
+          <year>2001</year>
+          <volume>19</volume>
+          <fpage>683</fpage>
+          <lpage>765</lpage>
+          <pub-id pub-id-type="doi">10.1146/annurev.immunol.19.1.683</pub-id>
+          <?supplied-pmid 11244051?>
+          <pub-id pub-id-type="pmid">11244051</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR30">
+        <label>30.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Sun</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Effector T cells control lung inflammation during acute influenza virus infection by producing IL-10</article-title>
+          <source>Nat. Med.</source>
+          <year>2009</year>
+          <volume>15</volume>
+          <fpage>277</fpage>
+          <lpage>284</lpage>
+          <pub-id pub-id-type="doi">10.1038/nm.1929</pub-id>
+          <?supplied-pmid 19234462?>
+          <pub-id pub-id-type="pmid">19234462</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR31">
+        <label>31.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Moscona</surname>
+              <given-names>A</given-names>
+            </name>
+          </person-group>
+          <article-title>Neuraminidase inhibitors for influenza</article-title>
+          <source>N. Engl. J. Med.</source>
+          <year>2005</year>
+          <volume>353</volume>
+          <fpage>1363</fpage>
+          <lpage>1373</lpage>
+          <pub-id pub-id-type="doi">10.1056/NEJMra050740</pub-id>
+          <?supplied-pmid 16192481?>
+          <pub-id pub-id-type="pmid">16192481</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR32">
+        <label>32.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Satpathy</surname>
+              <given-names>DM</given-names>
+            </name>
+            <name>
+              <surname>Sahu</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Behera</surname>
+              <given-names>TR</given-names>
+            </name>
+          </person-group>
+          <article-title>Equine rabies immunoglobulin: a study on its clinical safety</article-title>
+          <source>J. Indian Med. Assoc.</source>
+          <year>2005</year>
+          <volume>103</volume>
+          <fpage>238</fpage>
+          <?supplied-pmid 16173435?>
+          <pub-id pub-id-type="pmid">16173435</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR33">
+        <label>33.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lang</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Evaluation of the safety, immunogenicity, and pharmacokinetic profile of a new, highly purified, heat-treated equine rabies immunoglobulin, administered either alone or in association with a purified, vero-cell rabies vaccine</article-title>
+          <source>Acta Trop.</source>
+          <year>1998</year>
+          <volume>70</volume>
+          <fpage>317</fpage>
+          <lpage>333</lpage>
+          <pub-id pub-id-type="doi">10.1016/S0001-706X(98)00038-2</pub-id>
+          <?supplied-pmid 9777717?>
+          <pub-id pub-id-type="pmid">9777717</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR34">
+        <label>34.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lu</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Passive immunotherapy for influenza A H5N1 virus infection with equine hyperimmune globulin F (ab’)<sub>2</sub> in mice</article-title>
+          <source>Respir. Res.</source>
+          <year>2006</year>
+          <volume>7</volume>
+          <fpage>43</fpage>
+          <lpage>50</lpage>
+          <pub-id pub-id-type="doi">10.1186/1465-9921-7-43</pub-id>
+          <?supplied-pmid 16553963?>
+          <pub-id pub-id-type="pmid">16553963</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR35">
+        <label>35.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Meng</surname>
+              <given-names>W</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Rapid generation of human-like neutralizing monoclonal antibodies in urgent preparedness for influenza pandemics and virulent infectious diseases</article-title>
+          <source>PLoS ONE</source>
+          <year>2013</year>
+          <volume>8</volume>
+          <fpage>e66276</fpage>
+          <pub-id pub-id-type="doi">10.1371/journal.pone.0066276</pub-id>
+          <?supplied-pmid 23824680?>
+          <pub-id pub-id-type="pmid">23824680</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR36">
+        <label>36.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Pan</surname>
+              <given-names>W</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Induction of neutralizing antibodies to influenza A virus H7N9 by inactivated whole virus in mice and nonhuman primates</article-title>
+          <source>Antiviral Res.</source>
+          <year>2014</year>
+          <volume>107</volume>
+          <fpage>1</fpage>
+          <lpage>5</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.antiviral.2014.04.003</pub-id>
+          <?supplied-pmid 24746458?>
+          <pub-id pub-id-type="pmid">24746458</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR37">
+        <label>37.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Pan</surname>
+              <given-names>WQ</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Improvement of influenza vaccine strain A/Viernam/1194/2004 (H5N1) growth with the neuraminidase packaging sequence from A/Puerto Rico/8/34</article-title>
+          <source>Hum. Vaccin. Immunother.</source>
+          <year>2012</year>
+          <volume>8</volume>
+          <fpage>1</fpage>
+          <lpage>8</lpage>
+          <pub-id pub-id-type="doi">10.4161/hv.18468</pub-id>
+          <pub-id pub-id-type="pmid">22251991</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR38">
+        <label>38.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <collab>Laemmli UK.</collab>
+          </person-group>
+          <article-title>Cleavage of structural proteins during the assembly pf bacteriophage T4</article-title>
+          <source>Nature</source>
+          <year>1970</year>
+          <volume>227</volume>
+          <fpage>680</fpage>
+          <lpage>685</lpage>
+          <pub-id pub-id-type="doi">10.1038/227680a0</pub-id>
+          <?supplied-pmid 5432063?>
+          <pub-id pub-id-type="pmid">5432063</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR39">
+        <label>39.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <collab>World Health Organization Global Influenza Surveillance Network.</collab>
+          </person-group>
+          <source>Manual for the Laboratory Diagnosis and Virological Surveillance of Influenza</source>
+          <year>2011</year>
+          <publisher-loc>Geneva, Switzerland</publisher-loc>
+          <publisher-name>WHO Press</publisher-name>
+        </element-citation>
+      </ref>
+      <ref id="CR40">
+        <label>40.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Rowe</surname>
+              <given-names>T</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Detection of antibody to avian influenza A (H5N1) virus in human serum by using a combination of serologic assays</article-title>
+          <source>J. Clin. Microbiol.</source>
+          <year>1999</year>
+          <volume>37</volume>
+          <fpage>937</fpage>
+          <lpage>943</lpage>
+          <?supplied-pmid 10074505?>
+          <pub-id pub-id-type="pmid">10074505</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR41">
+        <label>41.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Reed</surname>
+              <given-names>LJ</given-names>
+            </name>
+            <name>
+              <surname>Muench</surname>
+              <given-names>M</given-names>
+            </name>
+          </person-group>
+          <article-title>A simple method for estimating fifty percent endpoints</article-title>
+          <source>Am. J. Hyg.</source>
+          <year>1938</year>
+          <volume>27</volume>
+          <fpage>493</fpage>
+          <lpage>497</lpage>
+        </element-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

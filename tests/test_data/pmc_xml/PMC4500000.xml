@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:17:00Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:4500000" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:4500000</identifier><datestamp>2015-07-15</datestamp><setSpec>jpts</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ali="http://www.niso.org/schemas/ali/1.0" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" article-type="research-article">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">J Phys Ther Sci</journal-id>
+      <journal-id journal-id-type="iso-abbrev">J Phys Ther Sci</journal-id>
+      <journal-id journal-id-type="publisher-id">JPTS</journal-id>
+      <journal-title-group>
+        <journal-title>Journal of Physical Therapy Science</journal-title>
+      </journal-title-group>
+      <issn pub-type="ppub">0915-5287</issn>
+      <issn pub-type="epub">2187-5626</issn>
+      <publisher>
+        <publisher-name>The Society of Physical Therapy Science</publisher-name>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC4500000</article-id>
+      <article-id pub-id-type="pmcid">PMC4500000</article-id>
+      <article-id pub-id-type="pmc-uid">4500000</article-id>
+      <article-id pub-id-type="pmid">26180337</article-id>
+      <article-id pub-id-type="pmid">26180337</article-id>
+      <article-id pub-id-type="publisher-id">jpts-2015-046</article-id>
+      <article-id pub-id-type="doi">10.1589/jpts.27.1865</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>Original Article</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Effects of a multifactorial fall prevention program on balance, gait, and
+fear of falling in post-stroke inpatients</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Jung</surname>
+            <given-names>Younuk</given-names>
+          </name>
+          <degrees>PT, MSc</degrees>
+          <xref ref-type="aff" rid="aff1">
+            <sup>1</sup>
+          </xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Lee</surname>
+            <given-names>Kyeongbong</given-names>
+          </name>
+          <degrees>PT, MSc</degrees>
+          <xref ref-type="aff" rid="aff1">
+            <sup>1</sup>
+          </xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Shin</surname>
+            <given-names>Seonhae</given-names>
+          </name>
+          <degrees>MA</degrees>
+          <xref ref-type="aff" rid="aff2">
+            <sup>2</sup>
+          </xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Lee</surname>
+            <given-names>Wanhee</given-names>
+          </name>
+          <degrees>PT, PhD</degrees>
+          <xref ref-type="aff" rid="aff1">
+            <sup>1</sup>
+          </xref>
+          <xref rid="cor1" ref-type="corresp">
+            <sup>*</sup>
+          </xref>
+        </contrib>
+        <aff id="aff1"><label>1)</label> Graduate School of Physical Therapy, Sahmyook University, Republic of Korea</aff>
+        <aff id="aff2"><label>2)</label> Department of English, Sahmyook University, Republic of
+Korea</aff>
+      </contrib-group>
+      <author-notes>
+        <corresp id="cor1"><label>*</label>Corresponding author. Wanhee Lee, Graduate School of Physical Therapy, Sahmyook University:
+815 Hwarang-ro, Nowon-gu, Seoul 139-742, Republic of Korea. (E-mail: <email xlink:href="whlee@syu.ac.kr">whlee@syu.ac.kr</email>)</corresp>
+      </author-notes>
+      <pub-date pub-type="epub">
+        <day>30</day>
+        <month>6</month>
+        <year>2015</year>
+      </pub-date>
+      <pub-date pub-type="ppub">
+        <month>6</month>
+        <year>2015</year>
+      </pub-date>
+      <volume>27</volume>
+      <issue>6</issue>
+      <fpage>1865</fpage>
+      <lpage>1868</lpage>
+      <history>
+        <date date-type="received">
+          <day>21</day>
+          <month>1</month>
+          <year>2015</year>
+        </date>
+        <date date-type="accepted">
+          <day>07</day>
+          <month>3</month>
+          <year>2015</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-statement>2015©by the Society of Physical Therapy Science. Published by IPEC
+Inc.</copyright-statement>
+        <copyright-year>2015</copyright-year>
+        <license license-type="open-access" xlink:href="http://creativecommons.org/licenses/by-nc-nd/3.0/">
+          <license-p>This is an open-access article distributed under the terms of the Creative
+Commons Attribution Non-Commercial No Derivatives (by-nc-nd) License. </license-p>
+        </license>
+      </permissions>
+      <abstract>
+        <p>[Purpose] This study investigated the effects of a multifactorial fall prevention program
+on balance, gait, and fear of falling in stroke patients. [Subjects] Twenty-five stroke
+patients were divided randomly into multifactorial fall prevention program group (n=15)
+and control treadmill group (n=10). [Methods] All interventions were applied for 30 min,
+five times per week, for five weeks. The fall prevention program included interventions
+based on the “Step Up to Stop Falls” initiative and educational interventions based on the
+Department of Health guidelines. For those in the treadmill group, the speed was increased
+gradually. The Korean falls efficacy scale and Korean activities-specific balance
+confidence scale were used to assess fear of falling. To assess balance and walking
+ability, the Korean performance-oriented mobility assessment scale and the 10-m and
+6-minute walk tests were used. [Results] The fall prevention program interventions were
+found to be very effective at improving gait, balance, and fear of falling compared with
+the treadmill intervention and therefore seem appropriate for stroke patients.
+[Conclusion] A multifactorial fall prevention program is effective at improving balance,
+gait ability, and fear of falling. It is a more specific and broad intervention for
+reducing falls among inpatients in facilities and hospitals.</p>
+      </abstract>
+      <kwd-group>
+        <title>Key words</title>
+        <kwd>Multifactorial fall prevention</kwd>
+        <kwd>Balance</kwd>
+        <kwd>Gait ability</kwd>
+      </kwd-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="intro" id="s1">
+      <title>INTRODUCTION</title>
+      <p>Stroke manifestations vary depending on the lesion site and severity. Development of
+hemiplegia causes difficulties in weight bearing on the affected side and maintaining
+balance, both of which are required for correct posture. An imbalanced posture results in
+instability during standing, muscle weakness, and a limited range of motion. These features
+are predictive of an increased likelihood of falls and decreased gait ability<xref rid="r1" ref-type="bibr">1</xref><sup>)</sup>. The risk of falls may increase after a
+patient has experienced one fall, even in the absence of physical damage, because of an
+increased fear of falling<xref rid="r2" ref-type="bibr">2</xref><sup>)</sup>. Schoenfelder
+et al. suggested that fall prevention education and muscle strengthening can decrease the
+fear of falling and risk of falls<xref rid="r3" ref-type="bibr">3</xref><sup>)</sup>. A fall
+prevention program that includes balance, muscle strengthening, and flexibility training is
+effective for improving gait, balance ability, and perception of the risk of falling<xref rid="r4" ref-type="bibr">4</xref><sup>)</sup>. Because falls have multiple causes,
+multifactorial interventions including patient education and improvement of muscle strength,
+balance, and gait are required for fall prevention. However, most fall prevention programs
+consist of a single item, and because falls are influenced by physical, psychological,
+environmental, and social factors, an effective fall prevention program would include
+exercise and educational interventions<xref rid="r5" ref-type="bibr">5</xref><sup>)</sup>.
+Although many studies have reported ways to prevent falls<xref rid="r6" ref-type="bibr">6</xref>, <xref rid="r7" ref-type="bibr">7</xref><sup>)</sup>, the subjects in these
+investigations were elderly people in the community, and only a single program was applied.
+Fall prevention interventions have to begin in high-risk facilities and hospitals<xref rid="r8" ref-type="bibr">8</xref><sup>)</sup>. Therefore, the purpose of this study was to
+study baseline data and decrease the risk of falls using a multifactorial fall prevention
+program (MFPP) in post-stroke patients.</p>
+    </sec>
+    <sec sec-type="methods" id="s2">
+      <title>SUBJECTS AND METHODS</title>
+      <p>Thirty patients (16 males, 14 females) who had experienced a stroke within the previous
+year at the M hospital in Seoul-Si were included. Based on previous studies, the following
+inclusion criteria were used: age &lt;65 years, able to walk independently, Korean
+mini-mental state examination (MMSE-K) score &gt;24, and able to understand the study
+procedures and communicate<xref rid="r9" ref-type="bibr">9</xref><sup>)</sup>. The exclusion
+criteria were medication use, which can influence gait ability and balance, visual deficits,
+and vestibular impairment. This study used a randomized two-group pretest-posttest design.
+Subjects were randomly allocated to the MFPP group (n=15, MFPG) or treadmill exercise group
+(n=15, TEG). Five patients were excluded from the MFPG. From the TEG, 1 male and 3 female
+patients were excluded due to discharge before completion of the experiment, and 1 female
+patient was excluded for personal reasons. The randomization was generated by a computer
+drawing lots. All study procedures were explained to the subjects prior to participation,
+and written informed consent was obtained from all subjects. This study was approved by the
+Sahmyook University Institutional Review Board.</p>
+      <p>Before the intervention program, the subjects’ gait speed and endurance were assessed using
+the Korean performance-oriented motor assessment (POMA-K) scale<xref rid="r10" ref-type="bibr">10</xref><sup>)</sup>, 10-m walk test, and 6-min walk test. The Korean falls
+efficacy scale<xref rid="r11" ref-type="bibr">11</xref><sup>)</sup> (FES-K) and Korean
+activities-specific balance confidence<xref rid="r12" ref-type="bibr">12</xref><sup>)</sup>
+(ABC-K) scale were used to assess the balance self-assurance of the patients. The
+multifactorial exercise program included education regarding fall prevention,
+neuro-developmental treatment (NDT), and training for muscle strengthening, balance, and
+flexibility. It was carried out for 30 min per day, five times a week, over a 5-week period.
+The treadmill exercise program included NDT and treadmill exercise, with a 0.4 km/h increase
+in speed per week. The details of both exercise programs are described in <xref rid="tbl_001" ref-type="table">Tables 1</xref><table-wrap id="tbl_001" orientation="portrait" position="float"><label>Table 1.</label><caption><title>Multifactorial fall prevention program</title></caption><table frame="hsides" rules="groups"><thead><tr><th align="left" rowspan="1" colspan="1">Exercise type</th><th align="center" rowspan="1" colspan="1"/><th align="center" rowspan="1" colspan="1"/><th align="center" rowspan="1" colspan="1">Time (sets/duration)</th></tr></thead><tbody><tr><td align="left" rowspan="10" colspan="1">Exercise</td><td align="left" rowspan="1" colspan="1">Strengthening intervention</td><td align="left" rowspan="1" colspan="1">Calf stretching</td><td align="left" rowspan="1" colspan="1">30–60 sec 5 repetitions</td></tr><tr><td align="center" rowspan="1" colspan="1"/><td align="left" rowspan="1" colspan="1">Heel/Toe raise</td><td align="left" rowspan="1" colspan="1">5–10 sec</td></tr><tr><td align="center" rowspan="1" colspan="1"/><td align="left" rowspan="1" colspan="1">Marching</td><td align="left" rowspan="1" colspan="1">Floor/Stairs</td></tr><tr><td align="center" rowspan="1" colspan="1"/><td align="left" rowspan="1" colspan="1">SLR: forward, side, backward</td><td align="left" rowspan="1" colspan="1">5–10 sec, 10 repetitions, 3 sets</td></tr><tr><td align="center" rowspan="1" colspan="1"/><td align="left" rowspan="1" colspan="1">Leg curl</td><td align="left" rowspan="1" colspan="1">In sitting on chair</td></tr><tr><td align="left" rowspan="1" colspan="1">Balance intervention</td><td align="left" rowspan="1" colspan="1">Ankle ROM exercise</td><td align="left" rowspan="1" colspan="1">Draw A to Z</td></tr><tr><td align="center" rowspan="1" colspan="1"/><td align="left" rowspan="1" colspan="1">Standing on air cushion</td><td align="left" rowspan="1" colspan="1">Up and down the leg alternately</td></tr><tr><td align="center" rowspan="1" colspan="1"/><td align="left" rowspan="1" colspan="1">Diagonal movement exercise</td><td align="left" rowspan="1" colspan="1">In holding both hands with trunk rotation</td></tr><tr><td align="left" rowspan="1" colspan="1">Flexibility intervention</td><td align="left" rowspan="1" colspan="1">Standing with head movement</td><td align="left" rowspan="1" colspan="1">General standing 30 sec Tandem standing 30 sec</td></tr><tr><td align="center" rowspan="1" colspan="1"/><td align="left" rowspan="1" colspan="1">Standing on balance pad</td><td align="left" rowspan="1" colspan="1">Eye open/close</td></tr><tr><td align="left" rowspan="1" colspan="1">Education</td><td align="left" rowspan="1" colspan="1">Regulation of fall Environmental factor</td><td align="left" rowspan="1" colspan="1">Before starting exercise for 5 minutes</td><td align="center" rowspan="1" colspan="1"/></tr><tr><td align="left" rowspan="1" colspan="1">General physical therapy</td><td align="left" rowspan="1" colspan="1">NDT<break/>PNF</td><td align="left" rowspan="1" colspan="1">General stretching and strengthening<break/>Static and dynamic balance
+training</td><td align="left" rowspan="1" colspan="1">2 times/day, 5 days/week</td></tr></tbody></table><table-wrap-foot><p>ROM: range of motion; SLR: straight leg raise; NDT: neurodevelopmental technique;
+PNF: proprioceptive neuromuscular facilitation</p></table-wrap-foot></table-wrap> and <xref rid="tbl_002" ref-type="table">2</xref><table-wrap id="tbl_002" orientation="portrait" position="float"><label>Table 2.</label><caption><title>Treadmill exercise program</title></caption><table frame="hsides" rules="groups"><thead><tr><th align="center" valign="middle" rowspan="1" colspan="1">Exercise</th><th align="center" valign="middle" rowspan="1" colspan="1">Treadmill</th><th align="center" valign="middle" rowspan="1" colspan="1">Increase the speed by 0.4 km/h per week<break/>f possible independent
+walking</th><th align="center" valign="middle" rowspan="1" colspan="1">Exercise stopped in cases of fatigue,<break/>dyspnea on exertion, or on
+patients’ request</th></tr></thead><tbody><tr><td align="left" rowspan="1" colspan="1">General physical therapy</td><td align="left" rowspan="1" colspan="1">NDT<break/>PNF</td><td align="left" rowspan="1" colspan="1">General stretching and strengthening<break/>Static and dynamic balance
+training</td><td align="left" rowspan="1" colspan="1">2 times/day, 5 days/week</td></tr></tbody></table><table-wrap-foot><p>NDT: neurodevelopmental technique; PNF: proprioceptive neuromuscular facilitation</p></table-wrap-foot></table-wrap>.</p>
+      <p>The SPSS version 19.0 statistical software was used for all analyses. Statistics were used
+to describe patient characteristics after confirming that the data were normally
+distributed. A comparison of the general characteristics was performed using the independent
+t-test or χ<sup>2</sup> test. Pre- and post-data were analyzed using the paired t-test to
+test differences within the groups. Scheffé’s post-hoc test was used to test the
+significance of differences between the groups. A significance level of 0.05 was used for
+all measurements.</p>
+    </sec>
+    <sec sec-type="results" id="s3">
+      <title>RESULTS</title>
+      <p>The general characteristics of the subjects are presented in <xref rid="tbl_003" ref-type="table">Table 3</xref><table-wrap id="tbl_003" orientation="portrait" position="float"><label>Table 3.</label><caption><title>General characteristics</title></caption><table frame="hsides" rules="groups"><thead><tr><th valign="top" align="center" rowspan="1" colspan="1">Parameter</th><th align="center" rowspan="1" colspan="1">MFPG</th><th align="center" rowspan="1" colspan="1">TEG</th></tr></thead><tbody><tr><td align="left" valign="top" rowspan="1" colspan="1">Gender Male/Female (%)</td><td align="center" rowspan="1" colspan="1">10/5 (66.7/33.3)</td><td align="center" rowspan="1" colspan="1">5/5 (50.0/50.0)</td></tr><tr><td align="left" valign="top" rowspan="1" colspan="1">Age, years</td><td align="center" rowspan="1" colspan="1">47.9±10.6</td><td align="center" rowspan="1" colspan="1">53.2±12.3</td></tr><tr><td align="left" valign="top" rowspan="1" colspan="1">Height, cm</td><td align="center" rowspan="1" colspan="1">165.1±7.7</td><td align="center" rowspan="1" colspan="1">164.8±10.8</td></tr><tr><td align="left" valign="top" rowspan="1" colspan="1">Weight, kg</td><td align="center" rowspan="1" colspan="1">64.7±8.4</td><td align="center" rowspan="1" colspan="1">62.3±8.4</td></tr><tr><td align="left" valign="top" rowspan="1" colspan="1">Disease cause Infarction /Hemorrhage</td><td align="center" rowspan="1" colspan="1">8/7 (53.3/46.7)</td><td align="center" rowspan="1" colspan="1">5/5 (50.0/50.0)</td></tr><tr><td align="left" valign="top" rowspan="1" colspan="1">Affected side Right/Left (%)</td><td align="center" rowspan="1" colspan="1">10/5 (66.7/33.3)</td><td align="center" rowspan="1" colspan="1">4/6 (40.0/60.0)</td></tr><tr><td align="left" valign="top" rowspan="1" colspan="1">Disease duration (months)</td><td align="center" rowspan="1" colspan="1">8.02±2.9</td><td align="center" rowspan="1" colspan="1">6.22±2.2</td></tr><tr><td align="left" valign="top" rowspan="1" colspan="1">MMSE-K</td><td align="center" rowspan="1" colspan="1">26.7±2.3</td><td align="center" rowspan="1" colspan="1">26.3±1.8</td></tr></tbody></table><table-wrap-foot><p>Values are expressed as n (%) or mean±SD. MFPG: multifactorial program group; TEG:
+treadmill exercise group; MMSE-K: mini-mental state examination-Korean</p></table-wrap-foot></table-wrap>. No significant differences in general characteristics were observed between
+the MFPG and TEG (age, 49.9 years vs. 53.2 years; height, 168.1 cm vs. 164.8 cm; body
+weight, 64.7 kg vs. 62.3 kg).</p>
+      <p>Differences in pre- and post-test values within and between the groups are summarized in
+<xref rid="tbl_004" ref-type="table">Table 4</xref><table-wrap id="tbl_004" orientation="portrait" position="float"><label>Table 4.</label><caption><title>Comparison of POMA-K, 10-m walk test, 6-minute walk test, FES-K, and ABC
+scale-K</title></caption><table frame="hsides" rules="groups"><thead><tr><th valign="top" align="left" rowspan="3" colspan="1"/><th colspan="2" align="center" rowspan="1">MFPG (n=15)</th><th colspan="2" align="center" rowspan="1">TEG (n=10)</th></tr><tr><th colspan="2" rowspan="1"><hr/></th><th colspan="2" rowspan="1"><hr/></th></tr><tr><th align="center" rowspan="1" colspan="1">Pretest</th><th align="center" rowspan="1" colspan="1">Posttest</th><th align="center" rowspan="1" colspan="1">Pretest</th><th align="center" rowspan="1" colspan="1">Posttest</th></tr></thead><tbody><tr><td align="left" rowspan="1" colspan="1">POMA-K</td><td align="center" rowspan="1" colspan="1">19.67 (6.04)</td><td align="center" rowspan="1" colspan="1">23.80 (5.17)<sup>**</sup></td><td align="center" rowspan="1" colspan="1">17.30 (4.24)</td><td align="center" rowspan="1" colspan="1">17.40 (5.58)</td></tr><tr><td align="left" rowspan="1" colspan="1">10-m walk test (m/s)</td><td align="center" rowspan="1" colspan="1">0.48 (0.23)</td><td align="center" rowspan="1" colspan="1">0.65 (0.28)<sup>**</sup></td><td align="center" rowspan="1" colspan="1">0.43 (0.26)</td><td align="center" rowspan="1" colspan="1">0.55 (0.29)<sup>*</sup></td></tr><tr><td align="left" rowspan="1" colspan="1">6-minute walk test (m/s)</td><td align="center" rowspan="1" colspan="1">0.49 (0.25)</td><td align="center" rowspan="1" colspan="1">0.60 (0.26)<sup>**</sup></td><td align="center" rowspan="1" colspan="1">0.40 (0.23)</td><td align="center" rowspan="1" colspan="1">0.44 (0.27)</td></tr><tr><td align="left" rowspan="1" colspan="1">FES-K</td><td align="center" rowspan="1" colspan="1">59.00 (21.03)</td><td align="center" rowspan="1" colspan="1">72.93 (15.61)<sup>**</sup></td><td align="center" rowspan="1" colspan="1">57.30 (19.32)</td><td align="center" rowspan="1" colspan="1">55.50 (25.67)</td></tr><tr><td align="left" rowspan="1" colspan="1">ABC scale-K</td><td align="center" rowspan="1" colspan="1">47.35 (18.14)</td><td align="center" rowspan="1" colspan="1">62.40 (17.28)<sup>**</sup></td><td align="center" rowspan="1" colspan="1">39.45 (19.78)</td><td align="center" rowspan="1" colspan="1">40.70 (25.50)</td></tr></tbody></table><table-wrap-foot><p>Values are expressed as mean (SD). Within group differences <sup>*</sup>p&lt;0.05,
+<sup>**</sup>p&lt;0.01. MFPG: multifactorial program group; TEG: treadmill exercise
+group; POMA-K: performance-oriented motor assessment-Korean; FES-K: fall efficacy
+scale-Korean; ABC scale-K: activities-specific balance confidence scale-Korean</p></table-wrap-foot></table-wrap>. The POMA-K scores were significantly higher in the MFPG (p&lt;0.01) and
+significantly different between the groups (p&lt;0.05). Both groups showed significant
+improvements in the 10-m walk test (MFPG, p&lt;0.01; TEG, p&lt;0.05) and gait speed, but
+there was no difference between the groups. The MFPG showed a significant improvement in the
+6-min walk test score (p&lt;0.001), and the difference was significantly greater than that
+in the TEG. In addition, the FES-K score significantly improved in the MFPG only
+(p&lt;0.05), with a significant difference between groups (p&lt;0.05). The ABC-K score
+either (p&lt;0.05).</p>
+    </sec>
+    <sec sec-type="discussion" id="s4">
+      <title>DISCUSSION</title>
+      <p>This study aimed to investigate the effects of an MFPP comprised of exercise and
+educational interventions for improving balance, gait, as well as fear of falling, and to
+provide a suitable approach for use of a fall prevention program in stroke inpatients.
+Guidelines for fall prevention in the United States and Britain suggest that a
+multifactorial program, involving exercise and educational interventions, is more effective
+than a single intervention, and that fall prevention programs have to be focused on
+physiological and psychological factors such as fear of falling<xref rid="r5" ref-type="bibr">5</xref><sup>)</sup>. Because exercise interventions alone cannot improve FES
+scores, exercise and educational intervention are needed for individuals at a high risk for
+falls<xref rid="r3" ref-type="bibr">3</xref><sup>)</sup>. Tinetti studied the benefits of
+multifactorial interventions for muscle strengthening and improvement of balance and
+self-confidence in comparison to those of a single intervention. They recommend an MFPP,
+because physical and occupational therapists alone cannot control falls or reduce the fear
+of falling<xref rid="r13" ref-type="bibr">13</xref><sup>)</sup>.</p>
+      <p>In this study, the MFPG showed significant improvements in physical activity and FES-K
+scores, as shown in other studies<xref rid="r4" ref-type="bibr">4</xref>, <xref rid="r13" ref-type="bibr">13</xref>, <xref rid="r14" ref-type="bibr">14</xref><sup>)</sup>. The POMA-K scale score, which is focused on mobility, significantly
+increased in the MFPG (p&lt;0.01), and this result indicates a greater increase than that
+seen in previous studies<xref rid="r15" ref-type="bibr">15</xref><sup>)</sup>. For gait
+ability, the 10-m walk test and 6-min walk test were used in this study. The MFPG had a
+significantly increased 10-m walk test score (p&lt;0.01) and 6-min walk test score
+(p&lt;0.01), but the TEG showed a significant increase only in the 10-m walk test score
+(p&lt;0.05). Because fall prevention exercise interventions increase balance ability and
+strengthen muscles, the risk of falls is decreased by 15–20%<xref rid="r16" ref-type="bibr">16</xref><sup>)</sup>. In particular, the 6-min walk test score, used to assess
+functional capacity in older adults<xref rid="r17" ref-type="bibr">17</xref><sup>)</sup>,
+significantly increased in the MFPG. Therefore, it can be seen that an MFPP positively
+influences walking ability and aerobic capacity.</p>
+      <p>Batchelor et al. suggested that an MFPP improves balance (p&lt;0.01), gait speed
+(p&lt;0.01), and the FES score (p&lt;0.05) in stroke patients returning home after
+rehabilitation<xref rid="r18" ref-type="bibr">18</xref><sup>)</sup>. Their results show
+that exercise and educational interventions have to be used together to reduce the fear of
+falling. Our study demonstrates that an MFPP was effective at improving FES-K scores
+(p&lt;0.05), and the treadmill exercise was not (p&gt;0.05). In addition, the FES-K score
+was significantly different between the groups (p&lt;0.05). The ABC-K scale, a more
+objective evaluation of the fear of falling, showed the same results as the FES-K (MFPG
+p&lt;0.01, TEG p&gt;0.05). In other words, exercise intervention improved balance and gait
+ability, and educational intervention improved the psychological aspect of the fear of
+falling. Cumming et al. reported that home visits can prevent falls among older people who
+are at increased risk of falling. However, this effect may not be the result of improved
+balance and strength alone, but also due to a decreased fear of falling<xref rid="r8" ref-type="bibr">8</xref><sup>)</sup>. The risk of falling within 12 months in those with a
+decreased FES score was half that in patients whose FES score had not decreased<xref rid="r9" ref-type="bibr">9</xref><sup>)</sup>. Therefore, interventions for fall
+prevention need to begin at hospital facilities, and programs must consist of a variety of
+approaches. Using the ABC-K scale with the FES scale is an efficient method of evaluating
+the fear of outdoor activities as well as indoor activities<xref rid="r18" ref-type="bibr">18</xref><sup>)</sup>.</p>
+      <p>While this study demonstrates the effectiveness of an MFPP, it has some limitations. First,
+although balance, gait ability and FES scores significantly improved after the MFPP, it can
+be difficult to prove the frequency of falls using these factors alone; the validity of this
+study is therefore limited. Second, a reduction in fall frequency is the eventual goal, but
+an intervention period of 5 weeks is too short to allow an assessment of this factor. It is
+therefore suggested that further studies include longer intervention and follow-up
+periods.</p>
+    </sec>
+  </body>
+  <back>
+    <ref-list>
+      <title>REFERENCES</title>
+      <ref id="r1">
+        <label>1</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Nyberg</surname><given-names>L</given-names></name><name><surname>Gustafson</surname><given-names>Y</given-names></name></person-group>: <article-title>Patient falls in stroke rehabilitation. A challenge to
+rehabilitation strategies</article-title>. <source>Stroke</source>, <year>1995</year>,
+<volume>26</volume>: <fpage>838</fpage>–<lpage>842</lpage>. <pub-id pub-id-type="pmid">7740577</pub-id></mixed-citation>
+      </ref>
+      <ref id="r2">
+        <label>2</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Sangpring</surname><given-names>P</given-names></name><name><surname>Vongsirinavarat</surname><given-names>M</given-names></name><name><surname>Hiengkaew</surname><given-names>V</given-names></name><etal>et al.</etal></person-group>: <article-title>Development of a geriatric fear of falling questionnaire
+for assessing the fear of falling of Thai elders</article-title>. <source>J Phys Ther
+Sci</source>, <year>2012</year>, <volume>24</volume>:
+<fpage>359</fpage>–<lpage>364</lpage>. </mixed-citation>
+      </ref>
+      <ref id="r3">
+        <label>3</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Schoenfelder</surname><given-names>DP</given-names></name><name><surname>Van Why</surname><given-names>K</given-names></name></person-group>: <article-title>A fall prevention educational program for community
+dwelling seniors</article-title>. <source>Public Health Nurs</source>,
+<year>1997</year>, <volume>14</volume>: <fpage>383</fpage>–<lpage>390</lpage>.
+<pub-id pub-id-type="pmid">9439178</pub-id></mixed-citation>
+      </ref>
+      <ref id="r4">
+        <label>4</label>
+        <mixed-citation publication-type="journal">: <article-title>Guideline
+for the prevention of falls in older persons. American Geriatrics Society, British
+Geriatrics Society, and American Academy of Orthopaedic Surgeons Panel on Falls
+Prevention</article-title>. <source>J Am Geriatr Soc</source>, <year>2001</year>,
+<volume>49</volume>: <fpage>664</fpage>–<lpage>672</lpage>. <pub-id pub-id-type="pmid">11380764</pub-id></mixed-citation>
+      </ref>
+      <ref id="r5">
+        <label>5</label>
+        <mixed-citation publication-type="journal">Panel on Prevention of Falls
+in Older Persons, American Geriatrics Society and British Geriatrics Society:
+<article-title>Summary of the Updated American Geriatrics Society/British Geriatrics
+Society clinical practice guideline for prevention of falls in older
+persons</article-title>. <source>J Am Geriatr Soc</source>, <year>2011</year>,
+<volume>59</volume>: <fpage>148</fpage>–<lpage>157</lpage>. <pub-id pub-id-type="pmid">21226685</pub-id></mixed-citation>
+      </ref>
+      <ref id="r6">
+        <label>6</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Kim</surname><given-names>WJ</given-names></name><name><surname>Chang</surname><given-names>M</given-names></name><name><surname>An</surname><given-names>DH</given-names></name></person-group>: <article-title>Effects of a community-based fall prevention exercise
+program on activity participation</article-title>. <source>J Phys Ther Sci</source>,
+<year>2014</year>, <volume>26</volume>: <fpage>651</fpage>–<lpage>653</lpage>.
+<pub-id pub-id-type="pmid">24926125</pub-id></mixed-citation>
+      </ref>
+      <ref id="r7">
+        <label>7</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Ming Huo</surname><given-names>HM</given-names></name></person-group>: <article-title>The effectiveness of a simple approach to the assessment
+of the risk of fall in the elderly-probe reaction time and dispersion of the time for a
+single step during marking time</article-title>. <source>J Phys Ther Sci</source>,
+<year>2007</year>, <volume>18</volume>:
+<fpage>181</fpage>–<lpage>185</lpage>.</mixed-citation>
+      </ref>
+      <ref id="r8">
+        <label>8</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Cumming</surname><given-names>RG</given-names></name><name><surname>Thomas</surname><given-names>M</given-names></name><name><surname>Szonyi</surname><given-names>G</given-names></name><etal>et al.</etal></person-group>: <article-title>Home visits by an occupational therapist for assessment
+and modification of environmental hazards: a randomized trial of falls
+prevention</article-title>. <source>J Am Geriatr Soc</source>, <year>1999</year>,
+<volume>47</volume>: <fpage>1397</fpage>–<lpage>1402</lpage>. <pub-id pub-id-type="pmid">10591231</pub-id></mixed-citation>
+      </ref>
+      <ref id="r9">
+        <label>9</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Cumming</surname><given-names>RG</given-names></name><name><surname>Salkeld</surname><given-names>G</given-names></name><name><surname>Thomas</surname><given-names>M</given-names></name><etal>et al.</etal></person-group>: <article-title>Prospective study of the impact of fear of falling on
+activities of daily living, SF-36 scores, and nursing home admission</article-title>.
+<source>J Gerontol A Biol Sci Med Sci</source>, <year>2000</year>, <volume>55</volume>:
+<fpage>M299</fpage>–<lpage>M305</lpage>. <pub-id pub-id-type="pmid">10819321</pub-id></mixed-citation>
+      </ref>
+      <ref id="r10">
+        <label>10</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Tinetti</surname><given-names>ME</given-names></name></person-group>: <article-title>Performance-oriented assessment of mobility problems in
+elderly patients</article-title>. <source>J Am Geriatr Soc</source>, <year>1986</year>,
+<volume>34</volume>: <fpage>119</fpage>–<lpage>126</lpage>. <pub-id pub-id-type="pmid">3944402</pub-id></mixed-citation>
+      </ref>
+      <ref id="r11">
+        <label>11</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Tinetti</surname><given-names>ME</given-names></name><name><surname>Richman</surname><given-names>D</given-names></name><name><surname>Powell</surname><given-names>L</given-names></name></person-group>: <article-title>Falls efficacy as a measure of fear of
+falling</article-title>. <source>J Gerontol</source>, <year>1990</year>,
+<volume>45</volume>: <fpage>239</fpage>–<lpage>243</lpage>. </mixed-citation>
+      </ref>
+      <ref id="r12">
+        <label>12</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Powell</surname><given-names>LE</given-names></name><name><surname>Myers</surname><given-names>AM</given-names></name></person-group>: <article-title>The activities-specific balance confidence (ABC)
+scale</article-title>. <source>J Gerontol A Biol Sci Med Sci</source>,
+<year>1995</year>, <volume>50A</volume>: <fpage>M28</fpage>–<lpage>M34</lpage>.
+<pub-id pub-id-type="pmid">7814786</pub-id></mixed-citation>
+      </ref>
+      <ref id="r13">
+        <label>13</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Tinetti</surname><given-names>ME</given-names></name></person-group>: <article-title>Multifactorial fall-prevention strategies: time to retreat
+or advance</article-title>. <source>J Am Geriatr Soc</source>, <year>2008</year>,
+<volume>56</volume>: <fpage>1563</fpage>–<lpage>1565</lpage>. <pub-id pub-id-type="pmid">18808601</pub-id></mixed-citation>
+      </ref>
+      <ref id="r14">
+        <label>14</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Diener</surname><given-names>DD</given-names></name><name><surname>Judith</surname><given-names>M</given-names></name></person-group>: <article-title>Impact of a multifactorial fall prevention program upon
+falls of older frail adults attending an adult health day care center</article-title>.
+<source>Top Geriatr Rehabil</source>, <year>2005</year>, <volume>21</volume>:
+<fpage>247</fpage>–<lpage>257</lpage>. </mixed-citation>
+      </ref>
+      <ref id="r15">
+        <label>15</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Suhrie</surname><given-names>EM</given-names></name><name><surname>Hanlon</surname><given-names>JT</given-names></name><name><surname>Jaffe</surname><given-names>EJ</given-names></name><etal>et al.</etal></person-group>: <article-title>Impact of a geriatric nursing home palliative care service
+on unnecessary medication prescribing</article-title>. <source>Am J Geriatr
+Pharmacother</source>, <year>2009</year>, <volume>7</volume>:
+<fpage>20</fpage>–<lpage>25</lpage>. <pub-id pub-id-type="pmid">19281937</pub-id></mixed-citation>
+      </ref>
+      <ref id="r16">
+        <label>16</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Barnett</surname><given-names>A</given-names></name><name><surname>Smith</surname><given-names>B</given-names></name><name><surname>Lord</surname><given-names>SR</given-names></name><etal>et al.</etal></person-group>: <article-title>Community-based group exercise improves balance and
+reduces falls in at-risk older people: a randomised controlled trial</article-title>.
+<source>Age Ageing</source>, <year>2003</year>, <volume>32</volume>:
+<fpage>407</fpage>–<lpage>414</lpage>. <pub-id pub-id-type="pmid">12851185</pub-id></mixed-citation>
+      </ref>
+      <ref id="r17">
+        <label>17</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Bohannon</surname><given-names>RW</given-names></name></person-group>: <article-title>Six-minute walk test: a meta-analysis of data from
+apparently healthy elders</article-title>. <source>Top Geriatr Rehabil</source>,
+<year>2007</year>, <volume>23</volume>: <fpage>155</fpage>–<lpage>160</lpage>.
+</mixed-citation>
+      </ref>
+      <ref id="r18">
+        <label>18</label>
+        <mixed-citation publication-type="journal"><person-group><name><surname>Batchelor</surname><given-names>FA</given-names></name><name><surname>Hill</surname><given-names>KD</given-names></name><name><surname>Mackintosh</surname><given-names>SF</given-names></name><etal>et al.</etal></person-group>: <article-title>Effects of a multifactorial falls prevention program for
+people with stroke returning home after rehabilitation: a randomized controlled
+trial</article-title>. <source>Arch Phys Med Rehabil</source>, <year>2012</year>,
+<volume>93</volume>: <fpage>1648</fpage>–<lpage>1655</lpage>. <pub-id pub-id-type="pmid">22503739</pub-id></mixed-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>
