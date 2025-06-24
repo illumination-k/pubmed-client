@@ -27,7 +27,3 @@ slow-timeout = "120s"
 filter = "test(markdown)"
 threads-required = 2
 slow-timeout = "60s"
-
-# Set environment variables
-[profile.default.env]
-RUST_LOG = "debug"
