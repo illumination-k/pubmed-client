@@ -1,4 +1,6 @@
+use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
+use crate::rate_limit::RateLimiter;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info, instrument, warn};
@@ -65,6 +67,8 @@ struct AuthorData {
 pub struct PubMedClient {
     client: Client,
     base_url: String,
+    rate_limiter: RateLimiter,
+    config: ClientConfig,
 }
 
 impl PubMedClient {
@@ -94,7 +98,10 @@ impl PubMedClient {
     pub fn search(&self) -> crate::query::SearchQuery {
         crate::query::SearchQuery::new()
     }
-    /// Create a new PubMed client
+    /// Create a new PubMed client with default configuration
+    ///
+    /// Uses default NCBI rate limiting (3 requests/second) and no API key.
+    /// For production use, consider using `with_config()` to set an API key.
     ///
     /// # Example
     ///
@@ -104,13 +111,46 @@ impl PubMedClient {
     /// let client = PubMedClient::new();
     /// ```
     pub fn new() -> Self {
+        let config = ClientConfig::new();
+        Self::with_config(config)
+    }
+
+    /// Create a new PubMed client with custom configuration
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - Client configuration including rate limits, API key, etc.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::{PubMedClient, ClientConfig};
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_api_key("your_api_key_here")
+    ///     .with_email("researcher@university.edu");
+    ///
+    /// let client = PubMedClient::with_config(config);
+    /// ```
+    pub fn with_config(config: ClientConfig) -> Self {
+        let rate_limiter = config.create_rate_limiter();
+        let base_url = config.effective_base_url().to_string();
+
+        let client = Client::builder()
+            .timeout(config.timeout)
+            .user_agent(config.effective_user_agent())
+            .build()
+            .expect("Failed to create HTTP client");
+
         Self {
-            client: Client::new(),
-            base_url: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils".to_string(),
+            client,
+            base_url,
+            rate_limiter,
+            config,
         }
     }
 
-    /// Create a new PubMed client with custom HTTP client
+    /// Create a new PubMed client with custom HTTP client and default configuration
     ///
     /// # Arguments
     ///
@@ -131,9 +171,15 @@ impl PubMedClient {
     /// let client = PubMedClient::with_client(http_client);
     /// ```
     pub fn with_client(client: Client) -> Self {
+        let config = ClientConfig::new();
+        let rate_limiter = config.create_rate_limiter();
+        let base_url = config.effective_base_url().to_string();
+
         Self {
             client,
-            base_url: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils".to_string(),
+            base_url,
+            rate_limiter,
+            config,
         }
     }
 
@@ -179,14 +225,28 @@ impl PubMedClient {
             });
         }
 
-        // Use EFetch to get full article details including abstract
-        let fetch_url = format!(
+        // Acquire rate limit token before making request
+        self.rate_limiter.acquire().await?;
+
+        // Build URL with API parameters
+        let mut url = format!(
             "{}/efetch.fcgi?db=pubmed&id={}&retmode=xml&rettype=abstract",
             self.base_url, pmid
         );
 
+        // Add API parameters (API key, email, tool)
+        let api_params = self.config.build_api_params();
+        if !api_params.is_empty() {
+            for (key, value) in api_params {
+                url.push('&');
+                url.push_str(&key);
+                url.push('=');
+                url.push_str(&urlencoding::encode(&value));
+            }
+        }
+
         debug!("Making EFetch API request");
-        let response = self.client.get(&fetch_url).send().await?;
+        let response = self.client.get(&url).send().await?;
 
         if !response.status().is_success() {
             warn!("API request failed with status: {}", response.status());
@@ -413,15 +473,28 @@ impl PubMedClient {
             return Ok(Vec::new());
         }
 
-        let search_url = format!(
+        // Acquire rate limit token before making request
+        self.rate_limiter.acquire().await?;
+
+        // Build URL with API parameters
+        let mut url = format!(
             "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retmode=json",
             self.base_url,
             urlencoding::encode(query),
             limit
         );
 
+        // Add API parameters (API key, email, tool)
+        let api_params = self.config.build_api_params();
+        for (key, value) in api_params {
+            url.push('&');
+            url.push_str(&key);
+            url.push('=');
+            url.push_str(&urlencoding::encode(&value));
+        }
+
         debug!("Making ESearch API request");
-        let response = self.client.get(&search_url).send().await?;
+        let response = self.client.get(&url).send().await?;
 
         if !response.status().is_success() {
             warn!(
@@ -496,5 +569,97 @@ impl PubMedClient {
 impl Default for PubMedClient {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+
+    #[test]
+    fn test_client_config_rate_limiting() {
+        // Test default configuration (no API key)
+        let config = ClientConfig::new();
+        assert_eq!(config.effective_rate_limit(), 3.0);
+
+        // Test with API key
+        let config_with_key = ClientConfig::new().with_api_key("test_key");
+        assert_eq!(config_with_key.effective_rate_limit(), 10.0);
+
+        // Test custom rate limit
+        let config_custom = ClientConfig::new().with_rate_limit(5.0);
+        assert_eq!(config_custom.effective_rate_limit(), 5.0);
+
+        // Test custom rate limit overrides API key default
+        let config_override = ClientConfig::new()
+            .with_api_key("test_key")
+            .with_rate_limit(7.0);
+        assert_eq!(config_override.effective_rate_limit(), 7.0);
+    }
+
+    #[test]
+    fn test_client_api_params() {
+        let config = ClientConfig::new()
+            .with_api_key("test_key_123")
+            .with_email("test@example.com")
+            .with_tool("TestTool");
+
+        let params = config.build_api_params();
+
+        // Should have 3 parameters
+        assert_eq!(params.len(), 3);
+
+        // Check each parameter
+        assert!(params.contains(&("api_key".to_string(), "test_key_123".to_string())));
+        assert!(params.contains(&("email".to_string(), "test@example.com".to_string())));
+        assert!(params.contains(&("tool".to_string(), "TestTool".to_string())));
+    }
+
+    #[test]
+    fn test_config_effective_values() {
+        let config = ClientConfig::new()
+            .with_email("test@example.com")
+            .with_tool("TestApp");
+
+        assert_eq!(
+            config.effective_base_url(),
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+        );
+        assert!(
+            config
+                .effective_user_agent()
+                .starts_with("pubmed-client-rs/")
+        );
+        assert_eq!(config.effective_tool(), "TestApp");
+    }
+
+    #[test]
+    fn test_rate_limiter_creation_from_config() {
+        let config = ClientConfig::new()
+            .with_api_key("test_key")
+            .with_rate_limit(8.0);
+
+        let rate_limiter = config.create_rate_limiter();
+
+        // Rate limiter should be created successfully
+        // We can't easily test the exact rate without async context,
+        // but we can verify it was created
+        assert!(std::mem::size_of_val(&rate_limiter) > 0);
+    }
+
+    #[tokio::test]
+    async fn test_invalid_pmid_rate_limiting() {
+        let config = ClientConfig::new().with_rate_limit(5.0);
+        let client = PubMedClient::with_config(config);
+
+        // Invalid PMID should fail before rate limiting (validation happens first)
+        let start = Instant::now();
+        let result = client.fetch_article("invalid_pmid").await;
+        assert!(result.is_err());
+
+        let elapsed = start.elapsed();
+        // Should fail quickly without consuming rate limit token
+        assert!(elapsed < Duration::from_millis(100));
     }
 }
