@@ -6,6 +6,7 @@ A Rust client library for accessing PubMed and PMC (PubMed Central) APIs.
 
 - **PubMed API Integration**: Search and fetch article metadata
 - **PMC Full Text**: Retrieve and parse structured full-text articles
+- **MeSH Term Support**: Extract and search using Medical Subject Headings (MeSH) vocabulary
 - **Markdown Export**: Convert PMC articles to well-formatted Markdown
 - **Async Support**: Built on tokio for async/await support
 - **Type Safety**: Strongly typed data structures for all API responses
@@ -97,6 +98,95 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Or save to file
         std::fs::write("article.md", markdown)?;
     }
+
+    Ok(())
+}
+```
+
+### Working with MeSH Terms
+
+Medical Subject Headings (MeSH) terms provide standardized vocabulary for biomedical literature. This library supports extracting and searching with MeSH terms.
+
+#### Searching with MeSH Terms
+
+```rust
+use pubmed_client_rs::{PubMedClient, pubmed::SearchQuery};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = PubMedClient::new();
+
+    // Search using MeSH major topics
+    let diabetes_articles = SearchQuery::new()
+        .mesh_major_topic("Diabetes Mellitus, Type 2")
+        .mesh_subheading("drug therapy")
+        .published_after(2020)
+        .limit(10)
+        .search_and_fetch(&client)
+        .await?;
+
+    // Search with multiple MeSH terms
+    let cancer_research = SearchQuery::new()
+        .mesh_terms(&["Neoplasms", "Antineoplastic Agents"])
+        .clinical_trials_only()
+        .limit(5)
+        .search_and_fetch(&client)
+        .await?;
+
+    Ok(())
+}
+```
+
+#### Extracting MeSH Information
+
+```rust
+use pubmed_client_rs::PubMedClient;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = PubMedClient::new();
+    let article = client.fetch_article("31978945").await?;
+
+    // Get major MeSH terms
+    let major_terms = article.get_major_mesh_terms();
+    println!("Major MeSH topics: {:?}", major_terms);
+
+    // Check for specific MeSH term
+    if article.has_mesh_term("COVID-19") {
+        println!("This article is about COVID-19");
+    }
+
+    // Get all MeSH terms
+    let all_terms = article.get_all_mesh_terms();
+    println!("All MeSH terms: {:?}", all_terms);
+
+    // Get MeSH qualifiers for a specific term
+    let qualifiers = article.get_mesh_qualifiers("COVID-19");
+    println!("COVID-19 qualifiers: {:?}", qualifiers);
+
+    // Get chemical substances
+    let chemicals = article.get_chemical_names();
+    println!("Chemicals mentioned: {:?}", chemicals);
+
+    Ok(())
+}
+```
+
+#### Comparing Articles by MeSH Terms
+
+```rust
+use pubmed_client_rs::PubMedClient;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = PubMedClient::new();
+
+    let article1 = client.fetch_article("31978945").await?;
+    let article2 = client.fetch_article("33515491").await?;
+
+    // Calculate MeSH term similarity (Jaccard similarity)
+    let similarity = article1.mesh_term_similarity(&article2);
+    println!("MeSH similarity: {:.2}%", similarity * 100.0);
 
     Ok(())
 }
