@@ -1,5 +1,5 @@
 use crate::error::{PubMedError, Result};
-use crate::pubmed::models::PubMedArticle;
+use crate::pubmed::models::{ChemicalConcept, MeshHeading, MeshQualifier, MeshTerm, PubMedArticle};
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use std::io::BufReader;
@@ -21,6 +21,9 @@ impl PubMedXmlParser {
         let doi = None;
         let mut abstract_text = None;
         let mut article_types = Vec::new();
+        let mut mesh_headings: Vec<MeshHeading> = Vec::new();
+        let mut keywords: Vec<String> = Vec::new();
+        let mut chemical_list: Vec<ChemicalConcept> = Vec::new();
 
         let mut buf = Vec::new();
         let mut in_article_title = false;
@@ -35,6 +38,31 @@ impl PubMedXmlParser {
         let mut in_publication_type = false;
         let mut current_author_last = String::new();
         let mut current_author_fore = String::new();
+
+        // MeSH parsing state
+        let mut in_mesh_heading_list = false;
+        let mut in_mesh_heading = false;
+        let mut in_descriptor_name = false;
+        let mut in_qualifier_name = false;
+        let mut current_descriptor_name = String::new();
+        let mut current_descriptor_ui = String::new();
+        let mut current_descriptor_major = false;
+        let mut current_qualifiers: Vec<MeshQualifier> = Vec::new();
+        let mut current_qualifier_name = String::new();
+        let mut current_qualifier_ui = String::new();
+        let mut current_qualifier_major = false;
+
+        // Chemical parsing state
+        let mut in_chemical_list = false;
+        let mut in_chemical = false;
+        let mut in_name_of_substance = false;
+        let mut current_chemical_name = String::new();
+        let mut current_registry_number = String::new();
+        let mut current_chemical_ui = String::new();
+
+        // Keyword parsing state
+        let mut in_keyword_list = false;
+        let mut in_keyword = false;
 
         loop {
             match reader.read_event_into(&mut buf) {
@@ -63,6 +91,59 @@ impl PubMedXmlParser {
                                 }
                             }
                         }
+                        // MeSH parsing
+                        b"MeshHeadingList" => in_mesh_heading_list = true,
+                        b"MeshHeading" if in_mesh_heading_list => {
+                            in_mesh_heading = true;
+                            current_qualifiers.clear();
+                        }
+                        b"DescriptorName" if in_mesh_heading => {
+                            in_descriptor_name = true;
+                            // Check for MajorTopicYN attribute
+                            for attr in e.attributes().flatten() {
+                                if attr.key.as_ref() == b"MajorTopicYN" {
+                                    current_descriptor_major = attr.value.as_ref() == b"Y";
+                                }
+                                if attr.key.as_ref() == b"UI" {
+                                    current_descriptor_ui =
+                                        String::from_utf8_lossy(&attr.value).to_string();
+                                }
+                            }
+                        }
+                        b"QualifierName" if in_mesh_heading => {
+                            in_qualifier_name = true;
+                            // Check for MajorTopicYN attribute
+                            for attr in e.attributes().flatten() {
+                                if attr.key.as_ref() == b"MajorTopicYN" {
+                                    current_qualifier_major = attr.value.as_ref() == b"Y";
+                                }
+                                if attr.key.as_ref() == b"UI" {
+                                    current_qualifier_ui =
+                                        String::from_utf8_lossy(&attr.value).to_string();
+                                }
+                            }
+                        }
+                        // Chemical parsing
+                        b"ChemicalList" => in_chemical_list = true,
+                        b"Chemical" if in_chemical_list => {
+                            in_chemical = true;
+                            current_chemical_name.clear();
+                            current_registry_number.clear();
+                            current_chemical_ui.clear();
+                        }
+                        b"NameOfSubstance" if in_chemical => {
+                            in_name_of_substance = true;
+                            // Get UI attribute if available
+                            for attr in e.attributes().flatten() {
+                                if attr.key.as_ref() == b"UI" {
+                                    current_chemical_ui =
+                                        String::from_utf8_lossy(&attr.value).to_string();
+                                }
+                            }
+                        }
+                        // Keyword parsing
+                        b"KeywordList" => in_keyword_list = true,
+                        b"Keyword" if in_keyword_list => in_keyword = true,
                         _ => {}
                     }
                 }
@@ -89,6 +170,67 @@ impl PubMedXmlParser {
                     b"LastName" => in_last_name = false,
                     b"ForeName" => in_fore_name = false,
                     b"PublicationType" => in_publication_type = false,
+                    // MeSH parsing
+                    b"MeshHeadingList" => in_mesh_heading_list = false,
+                    b"MeshHeading" => {
+                        if in_mesh_heading {
+                            // Create MeshTerm and add to headings
+                            if !current_descriptor_name.is_empty() {
+                                let mesh_term = MeshTerm {
+                                    descriptor_name: current_descriptor_name.clone(),
+                                    descriptor_ui: current_descriptor_ui.clone(),
+                                    major_topic: current_descriptor_major,
+                                    qualifiers: current_qualifiers.clone(),
+                                };
+                                mesh_headings.push(MeshHeading {
+                                    mesh_terms: vec![mesh_term],
+                                    supplemental_concepts: Vec::new(), // TODO: Parse supplemental concepts if needed
+                                });
+                            }
+                            current_descriptor_name.clear();
+                            current_descriptor_ui.clear();
+                            current_descriptor_major = false;
+                            in_mesh_heading = false;
+                        }
+                    }
+                    b"DescriptorName" => in_descriptor_name = false,
+                    b"QualifierName" => {
+                        if in_qualifier_name && !current_qualifier_name.is_empty() {
+                            current_qualifiers.push(MeshQualifier {
+                                qualifier_name: current_qualifier_name.clone(),
+                                qualifier_ui: current_qualifier_ui.clone(),
+                                major_topic: current_qualifier_major,
+                            });
+                            current_qualifier_name.clear();
+                            current_qualifier_ui.clear();
+                            current_qualifier_major = false;
+                        }
+                        in_qualifier_name = false;
+                    }
+                    // Chemical parsing
+                    b"ChemicalList" => in_chemical_list = false,
+                    b"Chemical" => {
+                        if in_chemical && !current_chemical_name.is_empty() {
+                            chemical_list.push(ChemicalConcept {
+                                name: current_chemical_name.clone(),
+                                registry_number: if current_registry_number.is_empty() {
+                                    None
+                                } else {
+                                    Some(current_registry_number.clone())
+                                },
+                                ui: if current_chemical_ui.is_empty() {
+                                    None
+                                } else {
+                                    Some(current_chemical_ui.clone())
+                                },
+                            });
+                        }
+                        in_chemical = false;
+                    }
+                    b"NameOfSubstance" => in_name_of_substance = false,
+                    // Keyword parsing
+                    b"KeywordList" => in_keyword_list = false,
+                    b"Keyword" => in_keyword = false,
                     _ => {}
                 },
                 Ok(Event::Text(e)) => {
@@ -118,6 +260,17 @@ impl PubMedXmlParser {
                         current_author_fore = text;
                     } else if in_publication_type {
                         article_types.push(text);
+                    } else if in_descriptor_name && in_mesh_heading {
+                        current_descriptor_name = text;
+                    } else if in_qualifier_name && in_mesh_heading {
+                        current_qualifier_name = text;
+                    } else if in_name_of_substance && in_chemical {
+                        current_chemical_name = text;
+                    } else if in_chemical && text.trim() != current_chemical_name {
+                        // This might be RegistryNumber
+                        current_registry_number = text;
+                    } else if in_keyword && in_keyword_list {
+                        keywords.push(text);
                     }
                 }
                 Ok(Event::Eof) => break,
@@ -143,6 +296,9 @@ impl PubMedXmlParser {
             authors_parsed = authors.len(),
             has_abstract = abstract_text.is_some(),
             journal = %journal,
+            mesh_terms_count = mesh_headings.len(),
+            keywords_count = keywords.len(),
+            chemicals_count = chemical_list.len(),
             "Completed XML parsing"
         );
 
@@ -155,6 +311,21 @@ impl PubMedXmlParser {
             doi,
             abstract_text,
             article_types,
+            mesh_headings: if mesh_headings.is_empty() {
+                None
+            } else {
+                Some(mesh_headings)
+            },
+            keywords: if keywords.is_empty() {
+                None
+            } else {
+                Some(keywords)
+            },
+            chemical_list: if chemical_list.is_empty() {
+                None
+            } else {
+                Some(chemical_list)
+            },
         })
     }
 }

@@ -6,11 +6,14 @@
 pub mod client;
 pub mod models;
 pub mod parser;
+pub mod query;
 pub mod responses;
 
 // Re-export public types
 pub use client::PubMedClient;
 pub use models::{
-    Citations, DatabaseInfo, FieldInfo, LinkInfo, PmcLinks, PubMedArticle, RelatedArticles,
+    ChemicalConcept, Citations, DatabaseInfo, FieldInfo, LinkInfo, MeshHeading, MeshQualifier,
+    MeshTerm, PmcLinks, PubMedArticle, RelatedArticles, SupplementalConcept,
 };
 pub use parser::PubMedXmlParser;
+pub use query::{ArticleType, Language, SearchQuery};
