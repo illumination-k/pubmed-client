@@ -10,6 +10,41 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  lint:
+    name: Lint and Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install dprint
+        uses: taiki-e/install-action@v2
+        with:
+          tool: dprint
+
+      - name: Check formatting with rustfmt
+        run: cargo fmt --all -- --check
+
+      - name: Check formatting with dprint
+        run: dprint check
+
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Check docs
+        run: cargo doc --all-features --no-deps
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+
   test:
     name: Test Suite
     runs-on: ${{ matrix.os }}
@@ -17,8 +52,16 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         rust: [stable, beta]
+        exclude:
+          # Reduce matrix size - only test beta on Ubuntu
+          - os: windows-latest
+            rust: beta
+          - os: macos-latest
+            rust: beta
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -31,24 +74,43 @@ jobs:
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
-      - name: Run tests
-        run: cargo nextest run --all-features --profile ci
+      - name: Run unit tests
+        run: cargo nextest run --lib --all-features
+
+      - name: Run integration tests (excluding real API)
+        run: |
+          cargo nextest run --test comprehensive_pmc_tests --all-features
+          cargo nextest run --test comprehensive_pubmed_tests --all-features
+          cargo nextest run --test markdown_tests --all-features
+          cargo nextest run --test pmc_xml_tests --all-features
+          cargo nextest run --test test_abstract_parsing --all-features
+          cargo nextest run --test test_einfo_integration --all-features
+          cargo nextest run --test test_elink_integration --all-features
+          cargo nextest run --test test_integration_abstract --all-features
+          cargo nextest run --test test_mesh_integration --all-features
+          cargo nextest run --test test_rate_limiting_mocked --all-features
 
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.rust }}
-          path: target/nextest/ci/junit.xml
+          path: target/nextest/*/junit.xml
 
   coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
+    needs: [lint, test]
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
@@ -57,4 +119,6 @@ jobs:
         uses: taiki-e/install-action@nextest
 
       - name: Generate coverage
-        run: cargo llvm-cov nextest --all-features --lcov --output-path lcov.info
+        run: |
+          cargo llvm-cov nextest --all-features --lcov --output-path lcov.info \
+            --ignore-filename-regex="tests/integration/test_real_api_rate_limiting.rs"

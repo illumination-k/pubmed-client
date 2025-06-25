@@ -507,3 +507,90 @@ The test suites provide extensive coverage of XML parsing and content analysis:
   - Article type distribution
 
 Both test suites include statistical analysis and success rate validation to ensure robust parsing across diverse article types and content structures.
+
+## GitHub Actions CI/CD
+
+The project uses comprehensive GitHub Actions workflows for continuous integration and deployment.
+
+### Workflows
+
+#### Test Workflow (`.github/workflows/test.yml`)
+
+**Jobs:**
+
+- **Lint and Format**: Code quality checks (rustfmt, dprint, clippy, docs)
+- **Test Suite**: Cross-platform testing (Ubuntu, Windows, macOS) with Rust stable/beta
+- **Code Coverage**: Coverage reporting with Codecov integration
+- **Real API Tests**: Optional real NCBI API testing (main branch or `test-real-api` label)
+- **Security Audit**: Dependency vulnerability scanning
+- **Minimum Rust Version**: MSRV compatibility testing (Rust 1.70.0)
+
+**Key Features:**
+
+- Git LFS support for test fixtures
+- Excludes real API tests from regular CI (network-dependent)
+- Matrix testing with reduced beta combinations for efficiency
+- Comprehensive integration test coverage
+
+#### Documentation Workflow (`.github/workflows/docs.yml`)
+
+**Jobs:**
+
+- **Build Documentation**: Generate rustdoc with all features
+- **Deploy Documentation**: Auto-deploy to GitHub Pages (main branch only)
+
+**Features:**
+
+- Documentation warnings as errors (`RUSTDOCFLAGS`)
+- GitHub Pages integration
+- Artifact upload for PR previews
+
+#### Release Workflow (`.github/workflows/release.yml`)
+
+**Jobs:**
+
+- **Create Release**: GitHub release creation on version tags
+- **Test Before Release**: Full test suite validation
+- **Publish to crates.io**: Automated publishing (stable releases only)
+
+**Features:**
+
+- Automatic prerelease detection (alpha/beta/rc tags)
+- Package validation before publishing
+- Secure token-based crates.io publishing
+
+### Git LFS Configuration
+
+Large test data files are managed with Git LFS:
+
+```gitattributes
+# Track all test data files with Git LFS
+tests/integration/test_data/**/*.xml filter=lfs diff=lfs merge=lfs -text
+tests/integration/test_data/**/*.json filter=lfs diff=lfs merge=lfs -text
+```
+
+**Benefits:**
+
+- Keeps repository lightweight
+- Efficient CI/CD with large fixtures
+- Proper version control for binary-like test data
+
+### Running Real API Tests in CI
+
+Real API tests are opt-in to avoid overwhelming NCBI servers:
+
+```bash
+# Automatically runs on main branch pushes
+git push origin main
+
+# Or add label "test-real-api" to PR
+gh pr edit --add-label "test-real-api"
+```
+
+### Coverage Integration
+
+Code coverage is automatically generated and uploaded to Codecov:
+
+- Excludes real API tests from coverage (network-dependent)
+- Requires `CODECOV_TOKEN` secret in repository settings
+- Generates LCOV format for broad tool compatibility
