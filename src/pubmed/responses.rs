@@ -104,3 +104,30 @@ pub(crate) struct EInfoLink {
     #[serde(rename = "dbto")]
     pub db_to: String,
 }
+
+// ELink API response structures
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ELinkResponse {
+    #[serde(rename = "linksets")]
+    pub linksets: Vec<ELinkSet>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ELinkSet {
+    #[serde(rename = "dbfrom")]
+    pub db_from: String,
+    #[serde(rename = "ids")]
+    pub ids: Vec<String>,
+    #[serde(rename = "linksetdbs", default)]
+    pub linkset_dbs: Option<Vec<ELinkSetDb>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ELinkSetDb {
+    #[serde(rename = "dbto")]
+    pub db_to: String,
+    #[serde(rename = "linkname")]
+    pub link_name: String,
+    #[serde(rename = "links")]
+    pub links: Vec<String>,
+}

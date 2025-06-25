@@ -111,7 +111,10 @@ pub use pmc::{
     MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter, PmcXmlParser, Reference,
     ReferenceStyle, Table,
 };
-pub use pubmed::{DatabaseInfo, FieldInfo, LinkInfo, PubMedArticle, PubMedClient};
+pub use pubmed::{
+    Citations, DatabaseInfo, FieldInfo, LinkInfo, PmcLinks, PubMedArticle, PubMedClient,
+    RelatedArticles,
+};
 pub use query::{ArticleType, Language, SearchQuery};
 pub use rate_limit::RateLimiter;
 
@@ -298,6 +301,87 @@ impl Client {
     /// ```
     pub async fn get_database_info(&self, database: &str) -> Result<DatabaseInfo> {
         self.pubmed.get_database_info(database).await
+    }
+
+    /// Get related articles for given PMIDs
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - List of PubMed IDs to find related articles for
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<RelatedArticles>` containing related article information
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let related = client.get_related_articles(&[31978945]).await?;
+    ///     println!("Found {} related articles", related.related_pmids.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_related_articles(&self, pmids: &[u32]) -> Result<RelatedArticles> {
+        self.pubmed.get_related_articles(pmids).await
+    }
+
+    /// Get PMC links for given PMIDs (full-text availability)
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - List of PubMed IDs to check for PMC availability
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<PmcLinks>` containing PMC IDs with full text available
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let pmc_links = client.get_pmc_links(&[31978945]).await?;
+    ///     println!("Found {} PMC articles", pmc_links.pmc_ids.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_pmc_links(&self, pmids: &[u32]) -> Result<PmcLinks> {
+        self.pubmed.get_pmc_links(pmids).await
+    }
+
+    /// Get citing articles for given PMIDs
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - List of PubMed IDs to find citing articles for
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Citations>` containing citing article information
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let citations = client.get_citations(&[31978945]).await?;
+    ///     println!("Found {} citing articles", citations.citing_pmids.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_citations(&self, pmids: &[u32]) -> Result<Citations> {
+        self.pubmed.get_citations(pmids).await
     }
 }
 
