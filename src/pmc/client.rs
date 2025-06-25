@@ -1,6 +1,8 @@
+use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pmc::models::PmcFullText;
 use crate::pmc::parser::PmcXmlParser;
+use crate::rate_limit::RateLimiter;
 use reqwest::Client;
 
 /// Client for interacting with PMC (PubMed Central) API
@@ -8,10 +10,15 @@ use reqwest::Client;
 pub struct PmcClient {
     client: Client,
     base_url: String,
+    rate_limiter: RateLimiter,
+    config: ClientConfig,
 }
 
 impl PmcClient {
-    /// Create a new PMC client
+    /// Create a new PMC client with default configuration
+    ///
+    /// Uses default NCBI rate limiting (3 requests/second) and no API key.
+    /// For production use, consider using `with_config()` to set an API key.
     ///
     /// # Example
     ///
@@ -21,13 +28,46 @@ impl PmcClient {
     /// let client = PmcClient::new();
     /// ```
     pub fn new() -> Self {
+        let config = ClientConfig::new();
+        Self::with_config(config)
+    }
+
+    /// Create a new PMC client with custom configuration
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - Client configuration including rate limits, API key, etc.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::{PmcClient, ClientConfig};
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_api_key("your_api_key_here")
+    ///     .with_email("researcher@university.edu");
+    ///
+    /// let client = PmcClient::with_config(config);
+    /// ```
+    pub fn with_config(config: ClientConfig) -> Self {
+        let rate_limiter = config.create_rate_limiter();
+        let base_url = config.effective_base_url().to_string();
+
+        let client = Client::builder()
+            .timeout(config.timeout)
+            .user_agent(config.effective_user_agent())
+            .build()
+            .expect("Failed to create HTTP client");
+
         Self {
-            client: Client::new(),
-            base_url: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils".to_string(),
+            client,
+            base_url,
+            rate_limiter,
+            config,
         }
     }
 
-    /// Create a new PMC client with custom HTTP client
+    /// Create a new PMC client with custom HTTP client and default configuration
     ///
     /// # Arguments
     ///
@@ -48,9 +88,15 @@ impl PmcClient {
     /// let client = PmcClient::with_client(http_client);
     /// ```
     pub fn with_client(client: Client) -> Self {
+        let config = ClientConfig::new();
+        let rate_limiter = config.create_rate_limiter();
+        let base_url = config.effective_base_url().to_string();
+
         Self {
             client,
-            base_url: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils".to_string(),
+            base_url,
+            rate_limiter,
+            config,
         }
     }
 
@@ -118,12 +164,25 @@ impl PmcClient {
             });
         }
 
-        let fetch_url = format!(
+        // Acquire rate limit token before making request
+        self.rate_limiter.acquire().await?;
+
+        // Build URL with API parameters
+        let mut url = format!(
             "{}/efetch.fcgi?db=pmc&id=PMC{}&retmode=xml",
             self.base_url, clean_pmcid
         );
 
-        let response = self.client.get(&fetch_url).send().await?;
+        // Add API parameters (API key, email, tool)
+        let api_params = self.config.build_api_params();
+        for (key, value) in api_params {
+            url.push('&');
+            url.push_str(&key);
+            url.push('=');
+            url.push_str(&urlencoding::encode(&value));
+        }
+
+        let response = self.client.get(&url).send().await?;
 
         if !response.status().is_success() {
             return Err(PubMedError::ApiError {
@@ -186,12 +245,25 @@ impl PmcClient {
             });
         }
 
-        let link_url = format!(
+        // Acquire rate limit token before making request
+        self.rate_limiter.acquire().await?;
+
+        // Build URL with API parameters
+        let mut url = format!(
             "{}/elink.fcgi?dbfrom=pubmed&db=pmc&id={}&retmode=json",
             self.base_url, pmid
         );
 
-        let response = self.client.get(&link_url).send().await?;
+        // Add API parameters (API key, email, tool)
+        let api_params = self.config.build_api_params();
+        for (key, value) in api_params {
+            url.push('&');
+            url.push_str(&key);
+            url.push('=');
+            url.push_str(&urlencoding::encode(&value));
+        }
+
+        let response = self.client.get(&url).send().await?;
 
         if !response.status().is_success() {
             return Err(PubMedError::ApiError {
