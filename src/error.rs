@@ -15,6 +15,10 @@ pub enum PubMedError {
     #[error("XML parsing failed: {0}")]
     XmlError(String),
 
+    /// XML parsing error with detailed message
+    #[error("XML parsing error: {message}")]
+    XmlParseError { message: String },
+
     /// Article not found
     #[error("Article not found: PMID {pmid}")]
     ArticleNotFound { pmid: String },
