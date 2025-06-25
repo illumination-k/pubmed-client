@@ -1,6 +1,7 @@
 [package]
 name = "pubmed-client-rs"
 version = "0.1.0"
+autotests = false
 edition = "2024"
 
 [dependencies]
@@ -22,6 +23,43 @@ tokio-test = "0.4"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-test = "0.2"
 wiremock = "0.6"
+
+# Integration tests configuration
+[[test]]
+name = "comprehensive_pmc_tests"
+path = "tests/integration/comprehensive_pmc_tests.rs"
+
+[[test]]
+name = "markdown_tests"
+path = "tests/integration/markdown_tests.rs"
+
+[[test]]
+name = "pmc_xml_tests"
+path = "tests/integration/pmc_xml_tests.rs"
+
+[[test]]
+name = "test_abstract_parsing"
+path = "tests/integration/test_abstract_parsing.rs"
+
+[[test]]
+name = "test_einfo_integration"
+path = "tests/integration/test_einfo_integration.rs"
+
+[[test]]
+name = "test_elink_integration"
+path = "tests/integration/test_elink_integration.rs"
+
+[[test]]
+name = "test_integration_abstract"
+path = "tests/integration/test_integration_abstract.rs"
+
+[[test]]
+name = "test_mesh_integration"
+path = "tests/integration/test_mesh_integration.rs"
+
+[[test]]
+name = "test_rate_limiting_mocked"
+path = "tests/integration/test_rate_limiting_mocked.rs"
 
 [build-dependencies]
 # XSD parsing tools - will be evaluated
