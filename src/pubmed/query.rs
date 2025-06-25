@@ -1,7 +1,7 @@
 //! Query builder for constructing PubMed search queries with filters
 
+use super::{PubMedArticle, PubMedClient};
 use crate::error::Result;
-use crate::pubmed::{PubMedArticle, PubMedClient};
 
 /// Article types that can be filtered in PubMed searches
 #[derive(Debug, Clone, PartialEq)]
@@ -352,6 +352,104 @@ impl SearchQuery {
         self
     }
 
+    /// Filter by MeSH major topic
+    ///
+    /// # Arguments
+    ///
+    /// * `mesh_term` - MeSH term to filter by as a major topic
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::query::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .mesh_major_topic("Diabetes Mellitus, Type 2");
+    /// ```
+    pub fn mesh_major_topic<S: Into<String>>(mut self, mesh_term: S) -> Self {
+        self.filters
+            .push(format!("{}[MeSH Major Topic]", mesh_term.into()));
+        self
+    }
+
+    /// Filter by MeSH term
+    ///
+    /// # Arguments
+    ///
+    /// * `mesh_term` - MeSH term to filter by
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::query::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .mesh_term("Neoplasms");
+    /// ```
+    pub fn mesh_term<S: Into<String>>(mut self, mesh_term: S) -> Self {
+        self.filters
+            .push(format!("{}[MeSH Terms]", mesh_term.into()));
+        self
+    }
+
+    /// Filter by multiple MeSH terms
+    ///
+    /// # Arguments
+    ///
+    /// * `mesh_terms` - MeSH terms to filter by
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::query::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .mesh_terms(&["Neoplasms", "Antineoplastic Agents"]);
+    /// ```
+    pub fn mesh_terms<S: AsRef<str>>(mut self, mesh_terms: &[S]) -> Self {
+        for term in mesh_terms {
+            self = self.mesh_term(term.as_ref());
+        }
+        self
+    }
+
+    /// Filter by MeSH subheading
+    ///
+    /// # Arguments
+    ///
+    /// * `subheading` - MeSH subheading to filter by
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::query::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .mesh_term("Diabetes Mellitus")
+    ///     .mesh_subheading("drug therapy");
+    /// ```
+    pub fn mesh_subheading<S: Into<String>>(mut self, subheading: S) -> Self {
+        self.filters
+            .push(format!("{}[MeSH Subheading]", subheading.into()));
+        self
+    }
+
+    /// Filter to clinical trials only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::query::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("diabetes treatment")
+    ///     .clinical_trials_only();
+    /// ```
+    pub fn clinical_trials_only(mut self) -> Self {
+        self.filters.push("Clinical Trial[pt]".to_string());
+        self
+    }
+
     /// Build the final query string
     ///
     /// # Returns
@@ -555,5 +653,62 @@ mod tests {
         let query = SearchQuery::new().query("test");
 
         assert_eq!(query.get_limit(), 20);
+    }
+
+    #[test]
+    fn test_mesh_major_topic() {
+        let query = SearchQuery::new()
+            .mesh_major_topic("Diabetes Mellitus")
+            .build();
+
+        assert_eq!(query, "Diabetes Mellitus[MeSH Major Topic]");
+    }
+
+    #[test]
+    fn test_mesh_term() {
+        let query = SearchQuery::new().mesh_term("Hypertension").build();
+
+        assert_eq!(query, "Hypertension[MeSH Terms]");
+    }
+
+    #[test]
+    fn test_mesh_terms_multiple() {
+        let query = SearchQuery::new()
+            .mesh_terms(&["Cancer", "Chemotherapy"])
+            .build();
+
+        assert_eq!(query, "Cancer[MeSH Terms] AND Chemotherapy[MeSH Terms]");
+    }
+
+    #[test]
+    fn test_mesh_subheading() {
+        let query = SearchQuery::new().mesh_subheading("drug therapy").build();
+
+        assert_eq!(query, "drug therapy[MeSH Subheading]");
+    }
+
+    #[test]
+    fn test_clinical_trials_only() {
+        let query = SearchQuery::new()
+            .query("treatment")
+            .clinical_trials_only()
+            .build();
+
+        assert_eq!(query, "treatment AND Clinical Trial[pt]");
+    }
+
+    #[test]
+    fn test_mesh_complex_query() {
+        let query = SearchQuery::new()
+            .mesh_major_topic("COVID-19")
+            .mesh_subheading("prevention & control")
+            .published_after(2022)
+            .free_full_text()
+            .build();
+
+        assert_eq!(
+            query,
+            "COVID-19[MeSH Major Topic] AND prevention & control[MeSH Subheading] AND 2022:3000[pdat] AND free full text[sb]"
+        );
     }
 }

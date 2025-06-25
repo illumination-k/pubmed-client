@@ -100,7 +100,6 @@ pub mod config;
 pub mod error;
 pub mod pmc;
 pub mod pubmed;
-pub mod query;
 pub mod rate_limit;
 
 // Re-export main types for convenience
@@ -112,10 +111,9 @@ pub use pmc::{
     ReferenceStyle, Table,
 };
 pub use pubmed::{
-    Citations, DatabaseInfo, FieldInfo, LinkInfo, PmcLinks, PubMedArticle, PubMedClient,
-    RelatedArticles,
+    ArticleType, Citations, DatabaseInfo, FieldInfo, Language, LinkInfo, PmcLinks, PubMedArticle,
+    PubMedClient, RelatedArticles, SearchQuery,
 };
-pub use query::{ArticleType, Language, SearchQuery};
 pub use rate_limit::RateLimiter;
 
 /// Convenience client that combines both PubMed and PMC functionality
