@@ -1,4 +1,4 @@
-use pubmed_client_rs::PubMedClient;
+use pubmed_client_rs::pubmed::parser::PubMedXmlParser;
 
 const TEST_XML_WITH_ABSTRACT: &str = r#"<?xml version="1.0" ?>
 <!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2025//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_250101.dtd">
@@ -59,8 +59,7 @@ const TEST_XML_WITHOUT_ABSTRACT: &str = r#"<?xml version="1.0" ?>
 
 #[test]
 fn test_parse_article_with_abstract() {
-    let client = PubMedClient::new();
-    let result = client.parse_article_from_xml(TEST_XML_WITH_ABSTRACT, "31978945");
+    let result = PubMedXmlParser::parse_article_from_xml(TEST_XML_WITH_ABSTRACT, "31978945");
 
     assert!(result.is_ok());
     let article = result.unwrap();
@@ -86,8 +85,7 @@ fn test_parse_article_with_abstract() {
 
 #[test]
 fn test_parse_article_without_abstract() {
-    let client = PubMedClient::new();
-    let result = client.parse_article_from_xml(TEST_XML_WITHOUT_ABSTRACT, "33515491");
+    let result = PubMedXmlParser::parse_article_from_xml(TEST_XML_WITHOUT_ABSTRACT, "33515491");
 
     assert!(result.is_ok());
     let article = result.unwrap();
@@ -107,20 +105,18 @@ fn test_parse_article_without_abstract() {
 
 #[test]
 fn test_parse_invalid_xml() {
-    let client = PubMedClient::new();
     let invalid_xml = "<invalid>xml</not_closed>";
-    let result = client.parse_article_from_xml(invalid_xml, "12345");
+    let result = PubMedXmlParser::parse_article_from_xml(invalid_xml, "12345");
 
     assert!(result.is_err());
 }
 
 #[test]
 fn test_parse_empty_xml() {
-    let client = PubMedClient::new();
     let empty_xml = r#"<?xml version="1.0" ?>
     <PubmedArticleSet>
     </PubmedArticleSet>"#;
-    let result = client.parse_article_from_xml(empty_xml, "12345");
+    let result = PubMedXmlParser::parse_article_from_xml(empty_xml, "12345");
 
     assert!(result.is_err());
     match result {
