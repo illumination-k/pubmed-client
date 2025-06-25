@@ -1,5 +1,6 @@
 use pubmed_client_rs::pubmed::SearchQuery;
 use pubmed_client_rs::{ClientConfig, PubMedClient};
+use tracing::info;
 
 #[tokio::test]
 #[ignore] // This is an integration test that requires network access
@@ -22,13 +23,24 @@ async fn test_mesh_search_integration() {
 
     // Verify that fetched articles have MeSH terms
     for article in &articles {
-        println!("Article: {} - {}", article.pmid, article.title);
+        info!(
+            pmid = %article.pmid,
+            title = %article.title,
+            "Found article"
+        );
         if let Some(_mesh_headings) = &article.mesh_headings {
-            println!("  MeSH terms: {}", article.get_all_mesh_terms().join(", "));
+            let mesh_terms = article.get_all_mesh_terms();
+            info!(
+                mesh_terms = %mesh_terms.join(", "),
+                "Article MeSH terms"
+            );
 
             // Check if COVID-19 is a major topic
             let major_terms = article.get_major_mesh_terms();
-            println!("  Major topics: {}", major_terms.join(", "));
+            info!(
+                major_topics = %major_terms.join(", "),
+                "Major topics"
+            );
         }
     }
 }
@@ -52,18 +64,28 @@ async fn test_chemical_search_integration() {
     assert!(!articles.is_empty());
 
     for article in &articles {
-        println!("Article: {} - {}", article.pmid, article.title);
+        info!(
+            pmid = %article.pmid,
+            title = %article.title,
+            "Found article"
+        );
 
         // Check chemicals
         let chemicals = article.get_chemical_names();
         if !chemicals.is_empty() {
-            println!("  Chemicals: {}", chemicals.join(", "));
+            info!(
+                chemicals = %chemicals.join(", "),
+                "Article chemicals"
+            );
         }
 
         // Check MeSH qualifiers for diabetes
         let qualifiers = article.get_mesh_qualifiers("Diabetes Mellitus, Type 2");
         if !qualifiers.is_empty() {
-            println!("  Diabetes qualifiers: {}", qualifiers.join(", "));
+            info!(
+                diabetes_qualifiers = %qualifiers.join(", "),
+                "Diabetes qualifiers"
+            );
         }
     }
 }

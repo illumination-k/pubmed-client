@@ -19,7 +19,7 @@ impl PubMedXmlParser {
         let mut journal = String::new();
         let mut pub_date = String::new();
         let doi = None;
-        let mut abstract_text = None;
+        let mut abstract_text: Option<String> = None;
         let mut article_types = Vec::new();
         let mut mesh_headings: Vec<MeshHeading> = Vec::new();
         let mut keywords: Vec<String> = Vec::new();
@@ -244,7 +244,15 @@ impl PubMedXmlParser {
                     if in_article_title {
                         title = text;
                     } else if in_abstract_text && in_abstract {
-                        abstract_text = Some(text);
+                        // Handle structured abstracts with multiple AbstractText sections
+                        if let Some(existing) = abstract_text.as_mut() {
+                            if !existing.is_empty() {
+                                existing.push(' '); // Add space between sections
+                            }
+                            existing.push_str(&text);
+                        } else {
+                            abstract_text = Some(text);
+                        }
                     } else if in_journal_title && !in_article_title {
                         journal = text;
                     } else if in_pub_date {
@@ -431,6 +439,59 @@ mod tests {
         assert_eq!(keywords.len(), 2);
         assert_eq!(keywords[0], "diabetes treatment");
         assert_eq!(keywords[1], "insulin therapy");
+    }
+
+    #[test]
+    fn test_structured_abstract_parsing() {
+        let xml = r#"
+        <PubmedArticleSet>
+            <PubmedArticle>
+                <MedlineCitation>
+                    <PMID>32887691</PMID>
+                    <Article>
+                        <ArticleTitle>A living WHO guideline on drugs for covid-19.</ArticleTitle>
+                        <Abstract>
+                            <AbstractText Label="UPDATES">This is the fourteenth version (thirteenth update) of the living guideline, replacing earlier versions.</AbstractText>
+                            <AbstractText Label="CLINICAL QUESTION">What is the role of drugs in the treatment of patients with covid-19?</AbstractText>
+                            <AbstractText Label="CONTEXT">The evidence base for therapeutics for covid-19 is evolving with numerous randomised controlled trials.</AbstractText>
+                        </Abstract>
+                        <Journal>
+                            <Title>BMJ (Clinical research ed.)</Title>
+                        </Journal>
+                        <PubDate>
+                            <Year>2020</Year>
+                            <Month>Sep</Month>
+                        </PubDate>
+                    </Article>
+                </MedlineCitation>
+            </PubmedArticle>
+        </PubmedArticleSet>"#;
+
+        let result = PubMedXmlParser::parse_article_from_xml(xml, "32887691");
+        assert!(result.is_ok());
+
+        let article = result.unwrap();
+        assert_eq!(article.pmid, "32887691");
+        assert_eq!(
+            article.title,
+            "A living WHO guideline on drugs for covid-19."
+        );
+
+        // Verify that all three abstract sections are concatenated
+        let abstract_text = article.abstract_text.unwrap();
+        assert!(abstract_text.contains("This is the fourteenth version"));
+        assert!(abstract_text.contains("What is the role of drugs"));
+        assert!(abstract_text.contains("The evidence base for therapeutics"));
+
+        // Verify they are properly concatenated with spaces
+        assert!(abstract_text.contains("earlier versions. What is the role"));
+        assert!(abstract_text.contains("covid-19? The evidence base"));
+
+        debug!(
+            abstract_length = abstract_text.len(),
+            "Parsed abstract successfully"
+        );
+        debug!(abstract = %abstract_text, "Abstract content parsed");
     }
 
     #[test]

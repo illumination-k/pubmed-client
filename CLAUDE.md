@@ -10,19 +10,14 @@ This is a Rust client library for accessing PubMed and PMC (PubMed Central) APIs
 
 ### Build & Development
 
+Using `mise` instead of `cargo` for common tasks:
+
 ```bash
 # Build the project
-cargo build
 mise r build
 
 # Run tests with nextest (preferred test runner)
 mise r test
-
-# Run tests with cargo (fallback)
-cargo test
-
-# Run a specific test
-cargo nextest run test_name
 
 # Run tests in watch mode
 mise r test:watch
@@ -31,11 +26,9 @@ mise r test:watch
 mise r test:verbose
 
 # Generate and open documentation
-cargo doc --open
 mise r doc
 
 # Check code without building
-cargo check
 mise r check
 ```
 
@@ -47,9 +40,6 @@ mise r lint
 
 # Format code (dprint + cargo fmt)
 mise r fmt
-
-# Run clippy only
-cargo clippy --all-targets --all-features -- -D warnings
 ```
 
 ### Code Coverage
@@ -183,6 +173,38 @@ Log levels and structured fields:
 - `DEBUG`: Detailed operations (API requests, XML parsing steps)
 - `WARN`: Error conditions and fallbacks
 - Structured fields: `pmid`, `title`, `authors_count`, `has_abstract`, `abstract_length`
+
+#### Logging Guidelines
+
+**DO NOT use `println!` or `eprintln!` in production code.** This project uses structured logging with the `tracing` crate for better observability and debugging.
+
+**Allowed uses of `println!`:**
+
+- Documentation examples in doc comments (`///` or `//!`)
+- Code examples in README files
+- Demo applications or example code
+
+**Instead of print statements, use appropriate tracing macros:**
+
+```rust
+// ❌ AVOID - Don't use println! in library code
+println!("Processing article {}", pmid);
+println!("Found {} results", count);
+eprintln!("Error: {}", error);
+
+// ✅ PREFER - Use structured tracing
+info!(pmid = %pmid, "Processing article");
+info!(result_count = count, "Search completed");
+warn!(error = %error, "Operation failed");
+```
+
+**Structured logging benefits:**
+
+- Machine-readable logs for monitoring and analysis
+- Consistent format across the entire codebase
+- Better integration with observability tools
+- Filterable and searchable log fields
+- Performance benefits over string formatting
 
 ## Rate Limiting & NCBI API Compliance
 
@@ -373,3 +395,52 @@ cargo test test_get_related_articles_integration
 cargo test test_get_pmc_links_integration
 cargo test test_get_citations_integration
 ```
+
+## Test Fixtures and Data
+
+### Downloading Test Data
+
+The project includes scripts to download real XML responses for comprehensive integration testing:
+
+```bash
+# Download PMC XML test fixtures (already included)
+./scripts/download_all_verified_xml.sh
+
+# Download PubMed XML test fixtures
+./scripts/download_pubmed_xml.sh
+```
+
+### Test Data Structure
+
+```
+tests/integration/test_data/
+├── pmc_xml/         # PMC full-text XML files (18 files)
+│   ├── PMC10000000.xml
+│   ├── PMC10618641.xml
+│   └── ...
+└── pubmed_xml/      # PubMed article XML files (15 files)
+    ├── 25760099.xml  # CRISPR-Cas9 research
+    ├── 31978945.xml  # COVID-19 research
+    ├── 33515491.xml  # Cancer treatment
+    └── ...
+```
+
+### Comprehensive Integration Tests
+
+The test suites provide extensive coverage of XML parsing and content analysis:
+
+- **PMC Tests**: `cargo test --test comprehensive_pmc_tests`
+  - XML parsing validation
+  - Content structure analysis
+  - Author and metadata extraction
+  - Figures and tables processing
+
+- **PubMed Tests**: `cargo test --test comprehensive_pubmed_tests`
+  - Article metadata validation
+  - MeSH term extraction and analysis
+  - Abstract content analysis
+  - Author details and affiliations
+  - Chemical substances parsing
+  - Article type distribution
+
+Both test suites include statistical analysis and success rate validation to ensure robust parsing across diverse article types and content structures.
