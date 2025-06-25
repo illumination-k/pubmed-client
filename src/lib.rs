@@ -96,12 +96,15 @@
 //! }
 //! ```
 
+pub mod config;
 pub mod error;
 pub mod pmc;
 pub mod pubmed;
 pub mod query;
+pub mod rate_limit;
 
 // Re-export main types for convenience
+pub use config::ClientConfig;
 pub use error::{PubMedError, Result};
 pub use pmc::{
     Affiliation, ArticleSection, Author, Figure, FundingInfo, HeadingStyle, JournalInfo,
@@ -110,6 +113,7 @@ pub use pmc::{
 };
 pub use pubmed::{PubMedArticle, PubMedClient};
 pub use query::{ArticleType, Language, SearchQuery};
+pub use rate_limit::RateLimiter;
 
 /// Convenience client that combines both PubMed and PMC functionality
 #[derive(Clone)]
@@ -121,7 +125,10 @@ pub struct Client {
 }
 
 impl Client {
-    /// Create a new combined client
+    /// Create a new combined client with default configuration
+    ///
+    /// Uses default NCBI rate limiting (3 requests/second) and no API key.
+    /// For production use, consider using `with_config()` to set an API key.
     ///
     /// # Example
     ///
@@ -131,9 +138,34 @@ impl Client {
     /// let client = Client::new();
     /// ```
     pub fn new() -> Self {
+        let config = ClientConfig::new();
+        Self::with_config(config)
+    }
+
+    /// Create a new combined client with custom configuration
+    ///
+    /// Both PubMed and PMC clients will use the same configuration
+    /// for consistent rate limiting and API key usage.
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - Client configuration including rate limits, API key, etc.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::{Client, ClientConfig};
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_api_key("your_api_key_here")
+    ///     .with_email("researcher@university.edu");
+    ///
+    /// let client = Client::with_config(config);
+    /// ```
+    pub fn with_config(config: ClientConfig) -> Self {
         Self {
-            pubmed: PubMedClient::new(),
-            pmc: PmcClient::new(),
+            pubmed: PubMedClient::with_config(config.clone()),
+            pmc: PmcClient::with_config(config),
         }
     }
 
