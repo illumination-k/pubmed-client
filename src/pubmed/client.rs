@@ -42,8 +42,8 @@ impl PubMedClient {
     ///     Ok(())
     /// }
     /// ```
-    pub fn search(&self) -> crate::query::SearchQuery {
-        crate::query::SearchQuery::new()
+    pub fn search(&self) -> super::query::SearchQuery {
+        super::query::SearchQuery::new()
     }
 
     /// Create a new PubMed client with default configuration
