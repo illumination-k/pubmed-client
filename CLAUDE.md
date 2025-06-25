@@ -13,6 +13,7 @@ This is a Rust client library for accessing PubMed and PMC (PubMed Central) APIs
 ```bash
 # Build the project
 cargo build
+mise r build
 
 # Run tests with nextest (preferred test runner)
 mise r test
@@ -26,11 +27,16 @@ cargo nextest run test_name
 # Run tests in watch mode
 mise r test:watch
 
+# Run tests with verbose output
+mise r test:verbose
+
 # Generate and open documentation
 cargo doc --open
+mise r doc
 
 # Check code without building
 cargo check
+mise r check
 ```
 
 ### Code Quality
@@ -43,7 +49,7 @@ mise r lint
 mise r fmt
 
 # Run clippy only
-cargo clippy -- -D warnings
+cargo clippy --all-targets --all-features -- -D warnings
 ```
 
 ### Code Coverage
@@ -57,6 +63,9 @@ mise r coverage
 
 # Generate LCOV format for CI
 mise r coverage:lcov
+
+# Generate JSON format for tooling
+mise r coverage:json
 ```
 
 ### Debugging & Logging
@@ -78,8 +87,13 @@ RUST_LOG=trace cargo test       # All tracing output
 
 ### Module Structure
 
-- `src/lib.rs` - Main library entry point, re-exports public API
-- `src/pubmed.rs` - PubMed API client for article metadata search and retrieval
+- `src/lib.rs` - Main library entry point, re-exports public API and unified `Client`
+- `src/pubmed/` - PubMed module directory
+  - `client.rs` - PubMed API client for article metadata search and ELink API
+  - `parser.rs` - XML parsing logic for PubMed article metadata
+  - `models.rs` - Data structures for PubMed articles, ELink results
+  - `responses.rs` - Internal API response structures for JSON/XML parsing
+  - `mod.rs` - Module exports and public API
 - `src/pmc/` - PMC module directory
   - `client.rs` - PMC client for full-text article access
   - `parser.rs` - XML parsing logic for PMC content
@@ -93,20 +107,24 @@ RUST_LOG=trace cargo test       # All tracing output
 ### Key Types
 
 - `Client` - Combined client that provides both PubMed and PMC functionality
-- `PubMedClient` - Handles article metadata searches via PubMed E-utilities
+- `PubMedClient` - Handles article metadata searches and ELink API via PubMed E-utilities
 - `PmcClient` - Fetches structured full-text from PubMed Central
 - `SearchQuery` - Builder pattern for constructing complex search queries with filters
-- `PmcArticle` - Structured representation of PMC full-text articles
+- `PubMedArticle` - Article metadata from PubMed (title, authors, abstract, etc.)
+- `PmcFullText` - Structured representation of PMC full-text articles
+- `RelatedArticles`, `PmcLinks`, `Citations` - ELink API result types for discovering article relationships
 - `ClientConfig` - Configuration for API keys, rate limiting, and client behavior
 - `RateLimiter` - Token bucket rate limiter for NCBI API compliance
 
 ### API Design Patterns
 
 - Async/await using tokio runtime
-- Builder pattern for search queries
+- Builder pattern for search queries (`SearchQuery`)
 - Result<T> type alias for error handling
 - Separation of metadata (PubMed) and full-text (PMC) concerns
+- ELink API integration for discovering article relationships (related articles, citations, PMC links)
 - Support for custom HTTP clients via reqwest
+- Internal response types separate from public API models
 - Data-driven testing with real PMC XML samples in `tests/test_data/`
 - Structured logging with tracing for debugging and monitoring
 - Rate limiting with token bucket algorithm for NCBI API compliance
@@ -119,6 +137,8 @@ RUST_LOG=trace cargo test       # All tracing output
 - Test data: Real PMC XML files in `tests/test_data/pmc_xml/`
 - Common test utilities in `tests/common/mod.rs`
 - Integration tests with tracing support using `#[traced_test]`
+- Mocked rate limiting tests for deterministic behavior
+- ELink API integration tests covering all relationship types
 
 ### Dependencies
 
@@ -318,4 +338,38 @@ tracing_subscriber::fmt::init();
 // Rate limiting events will be logged
 let client = PubMedClient::new();
 // Logs: "Need to wait for token", "Token acquired", etc.
+```
+
+## ELink API for Article Relationships
+
+The library implements NCBI's ELink API for discovering relationships between articles. This provides three main types of article discovery:
+
+### ELink Methods Available
+
+1. **Related Articles** (`get_related_articles`) - Find articles related by subject/content
+2. **PMC Links** (`get_pmc_links`) - Check PMC full-text availability
+3. **Citations** (`get_citations`) - Find articles that cite the given articles
+
+### Implementation Details
+
+- **Rate Limited**: All ELink methods respect the same rate limiting as other API calls
+- **Deduplication**: Results automatically remove duplicates and filter out source PMIDs
+- **Error Handling**: Comprehensive error handling with tracing integration
+- **Empty Input**: Graceful handling of empty PMID lists
+- **Batch Processing**: Support for multiple PMIDs in a single request
+
+### ELink Response Processing
+
+The implementation uses internal response types (`ELinkResponse`, `ELinkSet`, `ELinkSetDb`) for JSON parsing, then converts to clean public API types (`RelatedArticles`, `PmcLinks`, `Citations`). This separation ensures API stability while handling NCBI's complex response format.
+
+### Testing ELink Functionality
+
+```bash
+# Run ELink-specific integration tests
+cargo test --test test_elink_integration
+
+# Test individual ELink methods
+cargo test test_get_related_articles_integration
+cargo test test_get_pmc_links_integration
+cargo test test_get_citations_integration
 ```
