@@ -10,5 +10,7 @@ pub mod responses;
 
 // Re-export public types
 pub use client::PubMedClient;
-pub use models::{DatabaseInfo, FieldInfo, LinkInfo, PubMedArticle};
+pub use models::{
+    Citations, DatabaseInfo, FieldInfo, LinkInfo, PmcLinks, PubMedArticle, RelatedArticles,
+};
 pub use parser::PubMedXmlParser;

@@ -77,3 +77,34 @@ pub struct LinkInfo {
     /// Target database
     pub target_db: String,
 }
+
+/// Results from ELink API for related article discovery
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct RelatedArticles {
+    /// Source PMIDs that were queried
+    pub source_pmids: Vec<u32>,
+    /// Related article PMIDs found
+    pub related_pmids: Vec<u32>,
+    /// Link type (e.g., "pubmed_pubmed", "pubmed_pubmed_reviews")
+    pub link_type: String,
+}
+
+/// PMC links discovered through ELink API
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PmcLinks {
+    /// Source PMIDs that were queried
+    pub source_pmids: Vec<u32>,
+    /// PMC IDs that have full text available
+    pub pmc_ids: Vec<String>,
+}
+
+/// Citation information from ELink API
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Citations {
+    /// Source PMIDs that were queried
+    pub source_pmids: Vec<u32>,
+    /// PMIDs of articles that cite the source articles
+    pub citing_pmids: Vec<u32>,
+    /// Link type (e.g., "pubmed_pubmed_citedin")
+    pub link_type: String,
+}
