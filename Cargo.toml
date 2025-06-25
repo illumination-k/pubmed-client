@@ -65,6 +65,10 @@ path = "tests/integration/test_rate_limiting_mocked.rs"
 name = "comprehensive_pubmed_tests"
 path = "tests/integration/comprehensive_pubmed_tests.rs"
 
+[[test]]
+name = "test_real_api_rate_limiting"
+path = "tests/integration/test_real_api_rate_limiting.rs"
+
 [build-dependencies]
 # XSD parsing tools - will be evaluated
 # xsd-parser-rs = "1.0"  # Not available on crates.io

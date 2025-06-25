@@ -10,7 +10,7 @@ This is a Rust client library for accessing PubMed and PMC (PubMed Central) APIs
 
 ### Build & Development
 
-Using `mise` instead of `cargo` for common tasks:
+Using `mise` for task management (configured in `.mise.toml`):
 
 ```bash
 # Build the project
@@ -30,6 +30,14 @@ mise r doc
 
 # Check code without building
 mise r check
+
+# Run specific integration test suite
+cargo test --test comprehensive_pmc_tests
+cargo test --test comprehensive_pubmed_tests
+cargo test --test test_elink_integration
+
+# Run single unit test
+cargo test --lib pubmed::parser::tests::test_mesh_term_parsing
 ```
 
 ### Code Quality
@@ -124,11 +132,22 @@ RUST_LOG=trace cargo test       # All tracing output
 
 - Test runner: `cargo-nextest` for better output and parallelization
 - Parameterized tests using `rstest`
-- Test data: Real PMC XML files in `tests/test_data/pmc_xml/`
-- Common test utilities in `tests/common/mod.rs`
+- Test data: Real XML files in `tests/integration/test_data/`
+- Common test utilities in `tests/integration/common/mod.rs`
 - Integration tests with tracing support using `#[traced_test]`
 - Mocked rate limiting tests for deterministic behavior
 - ELink API integration tests covering all relationship types
+
+#### Test Organization
+
+- **Unit tests**: Located alongside source code in `src/` modules
+- **Integration tests**: Located in `tests/integration/` directory
+  - `comprehensive_pmc_tests.rs` - PMC XML parsing validation
+  - `comprehensive_pubmed_tests.rs` - PubMed XML parsing validation
+  - `test_elink_integration.rs` - ELink API functionality
+  - `test_einfo_integration.rs` - EInfo API functionality
+  - `markdown_tests.rs` - Markdown conversion testing
+- **Test utilities**: Shared code in `tests/integration/common/mod.rs`
 
 ### Dependencies
 
@@ -339,13 +358,52 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Testing Rate Limiting
 
+#### Mock Rate Limiting Tests (Default)
+
 ```bash
-# Run rate limiting tests
+# Run mocked rate limiting tests (default, no network calls)
 cargo test test_rate_limiting -- --nocapture
 
 # Test with custom rate limits
 RUST_LOG=debug cargo test test_rate_limiter_basic_functionality -- --nocapture
+
+# Run all mocked rate limiting tests
+cargo test --test test_rate_limiting_mocked -- --nocapture
 ```
+
+#### Real API Rate Limiting Tests (Optional)
+
+⚠️ **Warning**: These tests make actual network calls to NCBI APIs and are NOT run by default.
+
+```bash
+# Enable real API tests (requires internet connection)
+export PUBMED_REAL_API_TESTS=1
+
+# Run real API rate limiting tests
+cargo test --test test_real_api_rate_limiting -- --nocapture
+
+# Run with debug logging to see rate limiting behavior
+RUST_LOG=debug cargo test --test test_real_api_rate_limiting -- --nocapture
+
+# Test with API key (optional, set your NCBI API key)
+export NCBI_API_KEY="your_api_key_here"
+RUST_LOG=debug cargo test test_real_api_with_api_key -- --nocapture
+```
+
+**Real API Test Features:**
+
+- Tests actual rate limiting with NCBI E-utilities
+- Verifies 3 req/sec limit without API key, 10 req/sec with API key
+- Tests concurrent request handling
+- Validates end-to-end search and fetch workflows
+- Tests server-side rate limit responses (429 errors)
+
+**Real API Test Safety:**
+
+- Conservative rate limits to avoid overwhelming NCBI servers
+- Proper email and tool identification in requests
+- Graceful handling of network errors and timeouts
+- Respectful delays between requests
 
 ### Monitoring Rate Limits
 
@@ -362,15 +420,20 @@ let client = PubMedClient::new();
 // Logs: "Need to wait for token", "Token acquired", etc.
 ```
 
-## ELink API for Article Relationships
+## NCBI E-utilities API Support
 
-The library implements NCBI's ELink API for discovering relationships between articles. This provides three main types of article discovery:
+The library implements multiple NCBI E-utilities APIs for comprehensive biomedical data access:
 
-### ELink Methods Available
+### ELink API for Article Relationships
 
 1. **Related Articles** (`get_related_articles`) - Find articles related by subject/content
 2. **PMC Links** (`get_pmc_links`) - Check PMC full-text availability
 3. **Citations** (`get_citations`) - Find articles that cite the given articles
+
+### EInfo API for Database Information
+
+1. **Database List** (`get_database_list`) - Get all available NCBI databases
+2. **Database Details** (`get_database_info`) - Get detailed information about specific databases including searchable fields and links
 
 ### Implementation Details
 
