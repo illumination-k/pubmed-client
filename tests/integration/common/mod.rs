@@ -36,6 +36,7 @@ impl PmcXmlTestCase {
     }
 
     /// Read the XML content or panic with a descriptive message
+    #[allow(dead_code)]
     pub fn read_xml_content_or_panic(&self) -> String {
         self.read_xml_content()
             .unwrap_or_else(|_| panic!("Failed to read XML file: {:?}", self.file_path))
@@ -44,7 +45,7 @@ impl PmcXmlTestCase {
 
 /// Get all PMC XML test files from the test data directory
 pub fn get_pmc_xml_test_cases() -> Vec<PmcXmlTestCase> {
-    let xml_dir = Path::new("tests/test_data/pmc_xml");
+    let xml_dir = Path::new("tests/integration/test_data/pmc_xml");
 
     if !xml_dir.exists() {
         return Vec::new();
@@ -69,7 +70,7 @@ pub fn get_pmc_xml_test_cases() -> Vec<PmcXmlTestCase> {
 
 /// Get a specific PMC XML test case by filename
 pub fn get_pmc_xml_test_case(filename: &str) -> Option<PmcXmlTestCase> {
-    let xml_path = Path::new("tests/test_data/pmc_xml").join(filename);
+    let xml_path = Path::new("tests/integration/test_data/pmc_xml").join(filename);
 
     if xml_path.exists() {
         Some(PmcXmlTestCase::new(xml_path))
@@ -117,6 +118,7 @@ impl PubMedXmlTestCase {
     }
 
     /// Read the XML content or panic with a descriptive message
+    #[allow(dead_code)]
     pub fn read_xml_content_or_panic(&self) -> String {
         self.read_xml_content()
             .unwrap_or_else(|_| panic!("Failed to read XML file: {:?}", self.file_path))
