@@ -69,6 +69,14 @@ path = "tests/integration/comprehensive_pubmed_tests.rs"
 name = "test_real_api_rate_limiting"
 path = "tests/integration/test_real_api_rate_limiting.rs"
 
+[[test]]
+name = "comprehensive_einfo_tests"
+path = "tests/integration/comprehensive_einfo_tests.rs"
+
+[[test]]
+name = "comprehensive_elink_tests"
+path = "tests/integration/comprehensive_elink_tests.rs"
+
 [build-dependencies]
 # XSD parsing tools - will be evaluated
 # xsd-parser-rs = "1.0"  # Not available on crates.io

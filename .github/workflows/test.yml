@@ -81,6 +81,8 @@ jobs:
         run: |
           cargo nextest run --test comprehensive_pmc_tests --all-features
           cargo nextest run --test comprehensive_pubmed_tests --all-features
+          cargo nextest run --test comprehensive_einfo_tests --all-features
+          cargo nextest run --test comprehensive_elink_tests --all-features
           cargo nextest run --test markdown_tests --all-features
           cargo nextest run --test pmc_xml_tests --all-features
           cargo nextest run --test test_abstract_parsing --all-features

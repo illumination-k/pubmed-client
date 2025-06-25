@@ -521,9 +521,6 @@ The project uses comprehensive GitHub Actions workflows for continuous integrati
 - **Lint and Format**: Code quality checks (rustfmt, dprint, clippy, docs)
 - **Test Suite**: Cross-platform testing (Ubuntu, Windows, macOS) with Rust stable/beta
 - **Code Coverage**: Coverage reporting with Codecov integration
-- **Real API Tests**: Optional real NCBI API testing (main branch or `test-real-api` label)
-- **Security Audit**: Dependency vulnerability scanning
-- **Minimum Rust Version**: MSRV compatibility testing (Rust 1.70.0)
 
 **Key Features:**
 
