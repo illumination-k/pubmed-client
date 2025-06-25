@@ -329,3 +329,147 @@ impl PubMedXmlParser {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_mesh_term_parsing() {
+        let xml = r#"<?xml version="1.0" ?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2023//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_230101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Status="PubMed-not-MEDLINE" Owner="NLM">
+        <PMID Version="1">12345678</PMID>
+        <Article>
+            <ArticleTitle>Test Article with MeSH Terms</ArticleTitle>
+            <Abstract>
+                <AbstractText>This is a test abstract.</AbstractText>
+            </Abstract>
+            <AuthorList>
+                <Author>
+                    <LastName>Doe</LastName>
+                    <ForeName>John</ForeName>
+                </Author>
+            </AuthorList>
+            <Journal>
+                <Title>Test Journal</Title>
+            </Journal>
+        </Article>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D003920" MajorTopicYN="Y">Diabetes Mellitus</DescriptorName>
+                <QualifierName UI="Q000188" MajorTopicYN="N">drug therapy</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D007333" MajorTopicYN="N">Insulin</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>11061-68-0</RegistryNumber>
+                <NameOfSubstance UI="D007328">Insulin</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <KeywordList>
+            <Keyword>diabetes treatment</Keyword>
+            <Keyword>insulin therapy</Keyword>
+        </KeywordList>
+        <MedlineJournalInfo>
+            <MedlineTA>Test J</MedlineTA>
+        </MedlineJournalInfo>
+        <PubmedData>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">12345678</ArticleId>
+            </ArticleIdList>
+            <PublicationStatus>ppublish</PublicationStatus>
+        </PubmedData>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = PubMedXmlParser::parse_article_from_xml(xml, "12345678").unwrap();
+
+        // Test MeSH headings
+        assert!(article.mesh_headings.is_some());
+        let mesh_headings = article.mesh_headings.as_ref().unwrap();
+        assert_eq!(mesh_headings.len(), 2);
+
+        // Test first MeSH heading (major topic with qualifier)
+        let first_heading = &mesh_headings[0];
+        assert_eq!(first_heading.mesh_terms.len(), 1);
+        let diabetes_term = &first_heading.mesh_terms[0];
+        assert_eq!(diabetes_term.descriptor_name, "Diabetes Mellitus");
+        assert_eq!(diabetes_term.descriptor_ui, "D003920");
+        assert!(diabetes_term.major_topic);
+        assert_eq!(diabetes_term.qualifiers.len(), 1);
+        assert_eq!(diabetes_term.qualifiers[0].qualifier_name, "drug therapy");
+        assert_eq!(diabetes_term.qualifiers[0].qualifier_ui, "Q000188");
+        assert!(!diabetes_term.qualifiers[0].major_topic);
+
+        // Test second MeSH heading (non-major topic)
+        let second_heading = &mesh_headings[1];
+        assert_eq!(second_heading.mesh_terms.len(), 1);
+        let insulin_term = &second_heading.mesh_terms[0];
+        assert_eq!(insulin_term.descriptor_name, "Insulin");
+        assert_eq!(insulin_term.descriptor_ui, "D007333");
+        assert!(!insulin_term.major_topic);
+        assert_eq!(insulin_term.qualifiers.len(), 0);
+
+        // Test chemicals
+        assert!(article.chemical_list.is_some());
+        let chemicals = article.chemical_list.as_ref().unwrap();
+        assert_eq!(chemicals.len(), 1);
+        assert_eq!(chemicals[0].name, "Insulin");
+        assert_eq!(chemicals[0].registry_number, Some("11061-68-0".to_string()));
+        assert_eq!(chemicals[0].ui, Some("D007328".to_string()));
+
+        // Test keywords
+        assert!(article.keywords.is_some());
+        let keywords = article.keywords.as_ref().unwrap();
+        assert_eq!(keywords.len(), 2);
+        assert_eq!(keywords[0], "diabetes treatment");
+        assert_eq!(keywords[1], "insulin therapy");
+    }
+
+    #[test]
+    fn test_article_without_mesh_terms() {
+        let xml = r#"<?xml version="1.0" ?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2023//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_230101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Status="PubMed-not-MEDLINE" Owner="NLM">
+        <PMID Version="1">87654321</PMID>
+        <Article>
+            <ArticleTitle>Article Without MeSH Terms</ArticleTitle>
+            <AuthorList>
+                <Author>
+                    <LastName>Smith</LastName>
+                    <ForeName>Jane</ForeName>
+                </Author>
+            </AuthorList>
+            <Journal>
+                <Title>Another Journal</Title>
+            </Journal>
+        </Article>
+        <MedlineJournalInfo>
+            <MedlineTA>Another J</MedlineTA>
+        </MedlineJournalInfo>
+        <PubmedData>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">87654321</ArticleId>
+            </ArticleIdList>
+            <PublicationStatus>ppublish</PublicationStatus>
+        </PubmedData>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = PubMedXmlParser::parse_article_from_xml(xml, "87654321").unwrap();
+
+        assert!(article.mesh_headings.is_none());
+        assert!(article.chemical_list.is_none());
+        assert!(article.keywords.is_none());
+    }
+}
