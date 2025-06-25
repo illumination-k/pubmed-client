@@ -111,7 +111,7 @@ pub use pmc::{
     MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter, PmcXmlParser, Reference,
     ReferenceStyle, Table,
 };
-pub use pubmed::{PubMedArticle, PubMedClient};
+pub use pubmed::{DatabaseInfo, FieldInfo, LinkInfo, PubMedArticle, PubMedClient};
 pub use query::{ArticleType, Language, SearchQuery};
 pub use rate_limit::RateLimiter;
 
@@ -246,6 +246,58 @@ impl Client {
         }
 
         Ok(results)
+    }
+
+    /// Get list of all available NCBI databases
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<String>>` containing names of all available databases
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let databases = client.get_database_list().await?;
+    ///     println!("Available databases: {:?}", databases);
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_database_list(&self) -> Result<Vec<String>> {
+        self.pubmed.get_database_list().await
+    }
+
+    /// Get detailed information about a specific database
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - Name of the database (e.g., "pubmed", "pmc", "books")
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<DatabaseInfo>` containing detailed database information
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let db_info = client.get_database_info("pubmed").await?;
+    ///     println!("Database: {}", db_info.name);
+    ///     println!("Description: {}", db_info.description);
+    ///     println!("Fields: {}", db_info.fields.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_database_info(&self, database: &str) -> Result<DatabaseInfo> {
+        self.pubmed.get_database_info(database).await
     }
 }
 
