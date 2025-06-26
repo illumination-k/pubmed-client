@@ -17,4 +17,4 @@ pub use models::{
     SupplementalConcept,
 };
 pub use parser::PubMedXmlParser;
-pub use query::{ArticleType, Language, SearchQuery};
+pub use query::{ArticleType, Language, PubDate, SearchQuery};

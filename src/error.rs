@@ -36,6 +36,10 @@ pub enum PubMedError {
     #[error("Invalid PMID format: {pmid}")]
     InvalidPmid { pmid: String },
 
+    /// Invalid query structure or parameters
+    #[error("Invalid query: {0}")]
+    InvalidQuery(String),
+
     /// API rate limit exceeded
     #[error("API rate limit exceeded")]
     RateLimitExceeded,
@@ -88,7 +92,8 @@ impl RetryableError for PubMedError {
             | PubMedError::ArticleNotFound { .. }
             | PubMedError::PmcNotAvailable { .. }
             | PubMedError::PmcNotAvailableById { .. }
-            | PubMedError::InvalidPmid { .. } => false,
+            | PubMedError::InvalidPmid { .. }
+            | PubMedError::InvalidQuery(_) => false,
         }
     }
 
@@ -117,6 +122,7 @@ impl RetryableError for PubMedError {
                     "Content not available"
                 }
                 PubMedError::InvalidPmid { .. } => "Invalid input",
+                PubMedError::InvalidQuery(_) => "Invalid query",
                 _ => "Non-transient error",
             }
         }
