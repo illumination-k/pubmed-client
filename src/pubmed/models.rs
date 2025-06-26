@@ -383,3 +383,182 @@ impl PubMedArticle {
             .unwrap_or_default()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn create_test_article_with_mesh() -> PubMedArticle {
+        PubMedArticle {
+            pmid: "12345".to_string(),
+            title: "Test Article".to_string(),
+            authors: vec!["John Doe".to_string()],
+            journal: "Test Journal".to_string(),
+            pub_date: "2023".to_string(),
+            doi: None,
+            abstract_text: None,
+            article_types: vec![],
+            mesh_headings: Some(vec![
+                MeshHeading {
+                    mesh_terms: vec![MeshTerm {
+                        descriptor_name: "Diabetes Mellitus, Type 2".to_string(),
+                        descriptor_ui: "D003924".to_string(),
+                        major_topic: true,
+                        qualifiers: vec![
+                            MeshQualifier {
+                                qualifier_name: "drug therapy".to_string(),
+                                qualifier_ui: "Q000188".to_string(),
+                                major_topic: false,
+                            },
+                            MeshQualifier {
+                                qualifier_name: "genetics".to_string(),
+                                qualifier_ui: "Q000235".to_string(),
+                                major_topic: true,
+                            },
+                        ],
+                    }],
+                    supplemental_concepts: vec![],
+                },
+                MeshHeading {
+                    mesh_terms: vec![MeshTerm {
+                        descriptor_name: "Hypertension".to_string(),
+                        descriptor_ui: "D006973".to_string(),
+                        major_topic: false,
+                        qualifiers: vec![],
+                    }],
+                    supplemental_concepts: vec![],
+                },
+            ]),
+            keywords: Some(vec!["diabetes".to_string(), "treatment".to_string()]),
+            chemical_list: Some(vec![ChemicalConcept {
+                name: "Metformin".to_string(),
+                registry_number: Some("657-24-9".to_string()),
+                ui: Some("D008687".to_string()),
+            }]),
+        }
+    }
+
+    #[test]
+    fn test_get_major_mesh_terms() {
+        let article = create_test_article_with_mesh();
+        let major_terms = article.get_major_mesh_terms();
+
+        assert_eq!(major_terms.len(), 1);
+        assert_eq!(major_terms[0], "Diabetes Mellitus, Type 2");
+    }
+
+    #[test]
+    fn test_has_mesh_term() {
+        let article = create_test_article_with_mesh();
+
+        assert!(article.has_mesh_term("Diabetes Mellitus, Type 2"));
+        assert!(article.has_mesh_term("DIABETES MELLITUS, TYPE 2")); // Case insensitive
+        assert!(article.has_mesh_term("Hypertension"));
+        assert!(!article.has_mesh_term("Cancer"));
+    }
+
+    #[test]
+    fn test_get_all_mesh_terms() {
+        let article = create_test_article_with_mesh();
+        let all_terms = article.get_all_mesh_terms();
+
+        assert_eq!(all_terms.len(), 2);
+        assert!(all_terms.contains(&"Diabetes Mellitus, Type 2".to_string()));
+        assert!(all_terms.contains(&"Hypertension".to_string()));
+    }
+
+    #[test]
+    fn test_mesh_term_similarity() {
+        let article1 = create_test_article_with_mesh();
+        let mut article2 = create_test_article_with_mesh();
+
+        // Same article should have similarity of 1.0
+        let similarity = article1.mesh_term_similarity(&article2);
+        assert_eq!(similarity, 1.0);
+
+        // Different MeSH terms
+        article2.mesh_headings = Some(vec![MeshHeading {
+            mesh_terms: vec![
+                MeshTerm {
+                    descriptor_name: "Diabetes Mellitus, Type 2".to_string(),
+                    descriptor_ui: "D003924".to_string(),
+                    major_topic: true,
+                    qualifiers: vec![],
+                },
+                MeshTerm {
+                    descriptor_name: "Obesity".to_string(),
+                    descriptor_ui: "D009765".to_string(),
+                    major_topic: false,
+                    qualifiers: vec![],
+                },
+            ],
+            supplemental_concepts: vec![],
+        }]);
+
+        let similarity = article1.mesh_term_similarity(&article2);
+        // Should have partial similarity (1 common term out of 3 unique terms)
+        assert!(similarity > 0.0 && similarity < 1.0);
+        assert_eq!(similarity, 1.0 / 3.0); // Jaccard similarity
+
+        // No MeSH terms
+        let article3 = PubMedArticle {
+            pmid: "54321".to_string(),
+            title: "Test".to_string(),
+            authors: vec![],
+            journal: "Test".to_string(),
+            pub_date: "2023".to_string(),
+            doi: None,
+            abstract_text: None,
+            article_types: vec![],
+            mesh_headings: None,
+            keywords: None,
+            chemical_list: None,
+        };
+
+        assert_eq!(article1.mesh_term_similarity(&article3), 0.0);
+    }
+
+    #[test]
+    fn test_get_mesh_qualifiers() {
+        let article = create_test_article_with_mesh();
+
+        let qualifiers = article.get_mesh_qualifiers("Diabetes Mellitus, Type 2");
+        assert_eq!(qualifiers.len(), 2);
+        assert!(qualifiers.contains(&"drug therapy".to_string()));
+        assert!(qualifiers.contains(&"genetics".to_string()));
+
+        let qualifiers = article.get_mesh_qualifiers("Hypertension");
+        assert_eq!(qualifiers.len(), 0);
+
+        let qualifiers = article.get_mesh_qualifiers("Nonexistent Term");
+        assert_eq!(qualifiers.len(), 0);
+    }
+
+    #[test]
+    fn test_has_mesh_terms() {
+        let article = create_test_article_with_mesh();
+        assert!(article.has_mesh_terms());
+
+        let mut article_no_mesh = article.clone();
+        article_no_mesh.mesh_headings = None;
+        assert!(!article_no_mesh.has_mesh_terms());
+
+        let mut article_empty_mesh = article.clone();
+        article_empty_mesh.mesh_headings = Some(vec![]);
+        assert!(!article_empty_mesh.has_mesh_terms());
+    }
+
+    #[test]
+    fn test_get_chemical_names() {
+        let article = create_test_article_with_mesh();
+        let chemicals = article.get_chemical_names();
+
+        assert_eq!(chemicals.len(), 1);
+        assert_eq!(chemicals[0], "Metformin");
+
+        let mut article_no_chemicals = article.clone();
+        article_no_chemicals.chemical_list = None;
+        let chemicals = article_no_chemicals.get_chemical_names();
+        assert_eq!(chemicals.len(), 0);
+    }
+}

@@ -19,7 +19,7 @@ impl PubMedXmlParser {
         let mut journal = String::new();
         let mut pub_date = String::new();
         let doi = None;
-        let mut abstract_text = None;
+        let mut abstract_text: Option<String> = None;
         let mut article_types = Vec::new();
         let mut mesh_headings: Vec<MeshHeading> = Vec::new();
         let mut keywords: Vec<String> = Vec::new();
@@ -244,7 +244,15 @@ impl PubMedXmlParser {
                     if in_article_title {
                         title = text;
                     } else if in_abstract_text && in_abstract {
-                        abstract_text = Some(text);
+                        // Handle structured abstracts with multiple AbstractText sections
+                        if let Some(existing) = abstract_text.as_mut() {
+                            if !existing.is_empty() {
+                                existing.push(' '); // Add space between sections
+                            }
+                            existing.push_str(&text);
+                        } else {
+                            abstract_text = Some(text);
+                        }
                     } else if in_journal_title && !in_article_title {
                         journal = text;
                     } else if in_pub_date {
@@ -327,5 +335,202 @@ impl PubMedXmlParser {
                 Some(chemical_list)
             },
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_mesh_term_parsing() {
+        let xml = r#"<?xml version="1.0" ?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2023//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_230101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Status="PubMed-not-MEDLINE" Owner="NLM">
+        <PMID Version="1">12345678</PMID>
+        <Article>
+            <ArticleTitle>Test Article with MeSH Terms</ArticleTitle>
+            <Abstract>
+                <AbstractText>This is a test abstract.</AbstractText>
+            </Abstract>
+            <AuthorList>
+                <Author>
+                    <LastName>Doe</LastName>
+                    <ForeName>John</ForeName>
+                </Author>
+            </AuthorList>
+            <Journal>
+                <Title>Test Journal</Title>
+            </Journal>
+        </Article>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D003920" MajorTopicYN="Y">Diabetes Mellitus</DescriptorName>
+                <QualifierName UI="Q000188" MajorTopicYN="N">drug therapy</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D007333" MajorTopicYN="N">Insulin</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>11061-68-0</RegistryNumber>
+                <NameOfSubstance UI="D007328">Insulin</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <KeywordList>
+            <Keyword>diabetes treatment</Keyword>
+            <Keyword>insulin therapy</Keyword>
+        </KeywordList>
+        <MedlineJournalInfo>
+            <MedlineTA>Test J</MedlineTA>
+        </MedlineJournalInfo>
+        <PubmedData>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">12345678</ArticleId>
+            </ArticleIdList>
+            <PublicationStatus>ppublish</PublicationStatus>
+        </PubmedData>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = PubMedXmlParser::parse_article_from_xml(xml, "12345678").unwrap();
+
+        // Test MeSH headings
+        assert!(article.mesh_headings.is_some());
+        let mesh_headings = article.mesh_headings.as_ref().unwrap();
+        assert_eq!(mesh_headings.len(), 2);
+
+        // Test first MeSH heading (major topic with qualifier)
+        let first_heading = &mesh_headings[0];
+        assert_eq!(first_heading.mesh_terms.len(), 1);
+        let diabetes_term = &first_heading.mesh_terms[0];
+        assert_eq!(diabetes_term.descriptor_name, "Diabetes Mellitus");
+        assert_eq!(diabetes_term.descriptor_ui, "D003920");
+        assert!(diabetes_term.major_topic);
+        assert_eq!(diabetes_term.qualifiers.len(), 1);
+        assert_eq!(diabetes_term.qualifiers[0].qualifier_name, "drug therapy");
+        assert_eq!(diabetes_term.qualifiers[0].qualifier_ui, "Q000188");
+        assert!(!diabetes_term.qualifiers[0].major_topic);
+
+        // Test second MeSH heading (non-major topic)
+        let second_heading = &mesh_headings[1];
+        assert_eq!(second_heading.mesh_terms.len(), 1);
+        let insulin_term = &second_heading.mesh_terms[0];
+        assert_eq!(insulin_term.descriptor_name, "Insulin");
+        assert_eq!(insulin_term.descriptor_ui, "D007333");
+        assert!(!insulin_term.major_topic);
+        assert_eq!(insulin_term.qualifiers.len(), 0);
+
+        // Test chemicals
+        assert!(article.chemical_list.is_some());
+        let chemicals = article.chemical_list.as_ref().unwrap();
+        assert_eq!(chemicals.len(), 1);
+        assert_eq!(chemicals[0].name, "Insulin");
+        assert_eq!(chemicals[0].registry_number, Some("11061-68-0".to_string()));
+        assert_eq!(chemicals[0].ui, Some("D007328".to_string()));
+
+        // Test keywords
+        assert!(article.keywords.is_some());
+        let keywords = article.keywords.as_ref().unwrap();
+        assert_eq!(keywords.len(), 2);
+        assert_eq!(keywords[0], "diabetes treatment");
+        assert_eq!(keywords[1], "insulin therapy");
+    }
+
+    #[test]
+    fn test_structured_abstract_parsing() {
+        let xml = r#"
+        <PubmedArticleSet>
+            <PubmedArticle>
+                <MedlineCitation>
+                    <PMID>32887691</PMID>
+                    <Article>
+                        <ArticleTitle>A living WHO guideline on drugs for covid-19.</ArticleTitle>
+                        <Abstract>
+                            <AbstractText Label="UPDATES">This is the fourteenth version (thirteenth update) of the living guideline, replacing earlier versions.</AbstractText>
+                            <AbstractText Label="CLINICAL QUESTION">What is the role of drugs in the treatment of patients with covid-19?</AbstractText>
+                            <AbstractText Label="CONTEXT">The evidence base for therapeutics for covid-19 is evolving with numerous randomised controlled trials.</AbstractText>
+                        </Abstract>
+                        <Journal>
+                            <Title>BMJ (Clinical research ed.)</Title>
+                        </Journal>
+                        <PubDate>
+                            <Year>2020</Year>
+                            <Month>Sep</Month>
+                        </PubDate>
+                    </Article>
+                </MedlineCitation>
+            </PubmedArticle>
+        </PubmedArticleSet>"#;
+
+        let result = PubMedXmlParser::parse_article_from_xml(xml, "32887691");
+        assert!(result.is_ok());
+
+        let article = result.unwrap();
+        assert_eq!(article.pmid, "32887691");
+        assert_eq!(
+            article.title,
+            "A living WHO guideline on drugs for covid-19."
+        );
+
+        // Verify that all three abstract sections are concatenated
+        let abstract_text = article.abstract_text.unwrap();
+        assert!(abstract_text.contains("This is the fourteenth version"));
+        assert!(abstract_text.contains("What is the role of drugs"));
+        assert!(abstract_text.contains("The evidence base for therapeutics"));
+
+        // Verify they are properly concatenated with spaces
+        assert!(abstract_text.contains("earlier versions. What is the role"));
+        assert!(abstract_text.contains("covid-19? The evidence base"));
+
+        debug!(
+            abstract_length = abstract_text.len(),
+            "Parsed abstract successfully"
+        );
+        debug!(abstract = %abstract_text, "Abstract content parsed");
+    }
+
+    #[test]
+    fn test_article_without_mesh_terms() {
+        let xml = r#"<?xml version="1.0" ?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2023//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_230101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Status="PubMed-not-MEDLINE" Owner="NLM">
+        <PMID Version="1">87654321</PMID>
+        <Article>
+            <ArticleTitle>Article Without MeSH Terms</ArticleTitle>
+            <AuthorList>
+                <Author>
+                    <LastName>Smith</LastName>
+                    <ForeName>Jane</ForeName>
+                </Author>
+            </AuthorList>
+            <Journal>
+                <Title>Another Journal</Title>
+            </Journal>
+        </Article>
+        <MedlineJournalInfo>
+            <MedlineTA>Another J</MedlineTA>
+        </MedlineJournalInfo>
+        <PubmedData>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">87654321</ArticleId>
+            </ArticleIdList>
+            <PublicationStatus>ppublish</PublicationStatus>
+        </PubmedData>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = PubMedXmlParser::parse_article_from_xml(xml, "87654321").unwrap();
+
+        assert!(article.mesh_headings.is_none());
+        assert!(article.chemical_list.is_none());
+        assert!(article.keywords.is_none());
     }
 }

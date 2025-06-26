@@ -1,4 +1,5 @@
 use rstest::*;
+use tracing::{debug, info, warn};
 
 use pubmed_client_rs::pmc::{
     HeadingStyle, MarkdownConfig, PmcMarkdownConverter, PmcXmlParser, ReferenceStyle,
@@ -20,7 +21,10 @@ fn test_markdown_conversion_basic(#[from(markdown_test_cases)] test_cases: Vec<P
     let xml_tag_regex = regex::Regex::new(r"<[^>]*>").unwrap();
 
     for test_case in &test_cases {
-        println!("Testing markdown conversion for: {}", test_case.filename());
+        info!(
+            filename = test_case.filename(),
+            "Testing markdown conversion"
+        );
 
         let xml_content = test_case.read_xml_content_or_panic();
 
@@ -83,9 +87,9 @@ fn test_markdown_conversion_basic(#[from(markdown_test_cases)] test_cases: Vec<P
             test_case.filename()
         );
 
-        println!(
-            "✓ {}: Basic markdown conversion passed",
-            test_case.filename()
+        info!(
+            filename = test_case.filename(),
+            "Basic markdown conversion passed"
         );
     }
 }
@@ -123,9 +127,9 @@ fn test_markdown_conversion_with_different_configs(
 
     // Test with the first few files to avoid excessive output
     for test_case in test_cases.iter().take(3) {
-        println!(
-            "Testing different configurations for: {}",
-            test_case.filename()
+        info!(
+            filename = test_case.filename(),
+            "Testing different configurations"
         );
 
         let xml_content = test_case.read_xml_content_or_panic();
@@ -141,13 +145,9 @@ fn test_markdown_conversion_with_different_configs(
         for (config_name, converter) in &configs {
             let markdown = converter.convert(&article);
             if markdown.is_empty() {
-                println!(
-                    "Empty markdown for {} with config {}. Article has {} sections",
-                    test_case.filename(),
-                    config_name,
-                    article.sections.len()
-                );
-                println!("Article title: {}", article.title);
+                warn!(filename = test_case.filename(), config_name = config_name,
+                      section_count = article.sections.len(), title = %article.title,
+                      "Empty markdown generated");
             }
             assert!(
                 !markdown.is_empty(),
@@ -207,10 +207,10 @@ fn test_markdown_conversion_with_different_configs(
                 _ => {}
             }
 
-            println!("  ✓ Config '{}' passed", config_name);
+            debug!(config_name = config_name, "Config test passed");
         }
 
-        println!("✓ {}: All configurations tested", test_case.filename());
+        info!(filename = test_case.filename(), "All configurations tested");
     }
 }
 
@@ -225,7 +225,10 @@ fn test_markdown_metadata_extraction(#[from(markdown_test_cases)] test_cases: Ve
     let mut articles_with_funding = 0;
 
     for test_case in test_cases.iter().take(5) {
-        println!("Testing metadata extraction for: {}", test_case.filename());
+        info!(
+            filename = test_case.filename(),
+            "Testing metadata extraction"
+        );
 
         let xml_content = test_case.read_xml_content_or_panic();
 
@@ -243,13 +246,13 @@ fn test_markdown_metadata_extraction(#[from(markdown_test_cases)] test_cases: Ve
         // Check DOI links
         if article.doi.is_some() && markdown.contains("](https://doi.org/") {
             articles_with_doi_links += 1;
-            println!("  DOI link found");
+            debug!("DOI link found");
         }
 
         // Check PMID links
         if article.pmid.is_some() && markdown.contains("](https://pubmed.ncbi.nlm.nih.gov/") {
             articles_with_pmid_links += 1;
-            println!("  PMID link found");
+            debug!("PMID link found");
         }
 
         // Check keywords
@@ -266,7 +269,7 @@ fn test_markdown_metadata_extraction(#[from(markdown_test_cases)] test_cases: Ve
                     keyword
                 );
             }
-            println!("  Keywords: {}", article.keywords.len());
+            debug!(keyword_count = article.keywords.len(), "Keywords found");
         }
 
         // Check funding
@@ -276,35 +279,41 @@ fn test_markdown_metadata_extraction(#[from(markdown_test_cases)] test_cases: Ve
                 markdown.contains("# Funding") || markdown.contains("## Funding"),
                 "Should contain funding section"
             );
-            println!("  Funding sources: {}", article.funding.len());
+            debug!(
+                funding_count = article.funding.len(),
+                "Funding sources found"
+            );
         }
 
-        println!("✓ {}: Metadata extraction tested", test_case.filename());
+        info!(
+            filename = test_case.filename(),
+            "Metadata extraction tested"
+        );
     }
 
     // 統計サマリー
-    println!("\n=== Markdown Metadata Extraction Summary ===");
-    println!("Total files tested: {}", total_tested);
+    info!("Markdown Metadata Extraction Summary");
+    info!(total_tested = total_tested, "Files tested");
     if total_tested > 0 {
-        println!(
-            "Articles with DOI links: {} ({:.1}%)",
-            articles_with_doi_links,
-            (articles_with_doi_links as f64 / total_tested as f64) * 100.0
+        info!(
+            doi_links = articles_with_doi_links,
+            doi_percentage = (articles_with_doi_links as f64 / total_tested as f64) * 100.0,
+            "Articles with DOI links"
         );
-        println!(
-            "Articles with PMID links: {} ({:.1}%)",
-            articles_with_pmid_links,
-            (articles_with_pmid_links as f64 / total_tested as f64) * 100.0
+        info!(
+            pmid_links = articles_with_pmid_links,
+            pmid_percentage = (articles_with_pmid_links as f64 / total_tested as f64) * 100.0,
+            "Articles with PMID links"
         );
-        println!(
-            "Articles with keywords: {} ({:.1}%)",
-            articles_with_keywords,
-            (articles_with_keywords as f64 / total_tested as f64) * 100.0
+        info!(
+            keywords = articles_with_keywords,
+            keywords_percentage = (articles_with_keywords as f64 / total_tested as f64) * 100.0,
+            "Articles with keywords"
         );
-        println!(
-            "Articles with funding: {} ({:.1}%)",
-            articles_with_funding,
-            (articles_with_funding as f64 / total_tested as f64) * 100.0
+        info!(
+            funding = articles_with_funding,
+            funding_percentage = (articles_with_funding as f64 / total_tested as f64) * 100.0,
+            "Articles with funding"
         );
     }
 }
@@ -314,7 +323,7 @@ fn test_markdown_content_structure(#[from(markdown_test_cases)] test_cases: Vec<
     let converter = PmcMarkdownConverter::new();
 
     for test_case in test_cases.iter().take(3) {
-        println!("Testing content structure for: {}", test_case.filename());
+        info!(filename = test_case.filename(), "Testing content structure");
 
         let xml_content = test_case.read_xml_content_or_panic();
 
@@ -336,7 +345,7 @@ fn test_markdown_content_structure(#[from(markdown_test_cases)] test_cases: Vec<
         for line in &lines {
             if line.starts_with('#') {
                 heading_count += 1;
-                println!("  Found heading: {}", line);
+                debug!(heading = %line, "Found heading");
             } else if !line.trim().is_empty() && !line.starts_with("**") {
                 content_lines += 1;
             }
@@ -347,9 +356,10 @@ fn test_markdown_content_structure(#[from(markdown_test_cases)] test_cases: Vec<
             "Should have at least one heading for {}",
             test_case.filename()
         );
-        println!(
-            "  Headings: {}, Content lines: {}",
-            heading_count, content_lines
+        debug!(
+            heading_count = heading_count,
+            content_lines = content_lines,
+            "Content statistics"
         );
 
         // Check for figures and tables in markdown if they exist in the original
@@ -358,21 +368,17 @@ fn test_markdown_content_structure(#[from(markdown_test_cases)] test_cases: Vec<
 
         if has_figures {
             if markdown.contains("**Figure") {
-                println!("  Contains figure references");
+                debug!("Contains figure references");
             } else {
-                println!(
-                    "  Note: Article has figures but they may not be properly formatted in markdown"
-                );
+                debug!("Article has figures but they may not be properly formatted in markdown");
             }
         }
 
         if has_tables {
             if markdown.contains("**Table") {
-                println!("  Contains table references");
+                debug!("Contains table references");
             } else {
-                println!(
-                    "  Note: Article has tables but they may not be properly formatted in markdown"
-                );
+                debug!("Article has tables but they may not be properly formatted in markdown");
             }
         }
 
@@ -383,10 +389,13 @@ fn test_markdown_content_structure(#[from(markdown_test_cases)] test_cases: Vec<
                 "Should contain references section for {}",
                 test_case.filename()
             );
-            println!("  References section found");
+            debug!("References section found");
         }
 
-        println!("✓ {}: Content structure validated", test_case.filename());
+        info!(
+            filename = test_case.filename(),
+            "Content structure validated"
+        );
     }
 }
 
@@ -397,7 +406,7 @@ fn test_specific_markdown_conversion(#[case] filename: &str) {
     let test_case = match common::get_pmc_xml_test_case(filename) {
         Some(case) => case,
         None => {
-            println!("Skipping test for {}: file not found", filename);
+            warn!(filename = filename, "Skipping test: file not found");
             return;
         }
     };
@@ -435,15 +444,19 @@ fn test_specific_markdown_conversion(#[case] filename: &str) {
     for (style_name, converter) in converters {
         let markdown = converter.convert(&article);
 
-        println!("=== {} Style Markdown for {} ===", style_name, filename);
-        println!("Length: {} characters", markdown.len());
-        println!("Lines: {}", markdown.lines().count());
+        info!(
+            style = style_name,
+            filename = filename,
+            length = markdown.len(),
+            line_count = markdown.lines().count(),
+            "Generated markdown"
+        );
 
         // Show first few lines as example
         for (i, line) in markdown.lines().take(10).enumerate() {
-            println!("{:2}: {}", i + 1, line);
+            debug!(line_number = i + 1, content = %line, "Markdown line");
         }
-        println!("...");
+        debug!("...");
 
         // Validation
         assert!(!markdown.is_empty(), "Markdown should not be empty");
@@ -469,7 +482,7 @@ fn test_specific_markdown_conversion(#[case] filename: &str) {
             _ => {}
         }
 
-        println!("✓ {} style conversion completed\n", style_name);
+        info!(style = style_name, "Style conversion completed");
     }
 }
 
@@ -588,7 +601,7 @@ fn test_markdown_edge_cases() {
     };
 
     let markdown = converter.convert(&special_article);
-    println!("Generated markdown:\n{}", markdown);
+    debug!(markdown = %markdown, "Generated markdown for special characters test");
     assert!(
         markdown.contains("Article with"),
         "Should contain cleaned title text"

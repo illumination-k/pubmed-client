@@ -1,4 +1,5 @@
 use pubmed_client_rs::{Client, PubMedClient};
+use tracing::{info, warn};
 
 #[tokio::test]
 async fn test_get_related_articles_integration() {
@@ -11,10 +12,10 @@ async fn test_get_related_articles_integration() {
         Ok(related) => {
             assert_eq!(related.source_pmids, test_pmids);
             assert_eq!(related.link_type, "pubmed_pubmed");
-            println!(
-                "Found {} related articles for PMID {}",
-                related.related_pmids.len(),
-                test_pmids[0]
+            info!(
+                related_count = related.related_pmids.len(),
+                pmid = test_pmids[0],
+                "Found related articles"
             );
 
             // Related PMIDs should not contain the original PMID
@@ -26,7 +27,7 @@ async fn test_get_related_articles_integration() {
             }
         }
         Err(e) => {
-            eprintln!("Warning: Could not fetch related articles: {}", e);
+            warn!(error = %e, "Could not fetch related articles");
         }
     }
 }
@@ -41,22 +42,22 @@ async fn test_get_pmc_links_integration() {
     match client.get_pmc_links(&test_pmids).await {
         Ok(pmc_links) => {
             assert_eq!(pmc_links.source_pmids, test_pmids);
-            println!(
-                "Found {} PMC articles for {} PMIDs",
-                pmc_links.pmc_ids.len(),
-                test_pmids.len()
+            info!(
+                pmc_count = pmc_links.pmc_ids.len(),
+                pmid_count = test_pmids.len(),
+                "Found PMC articles"
             );
 
             // Print PMC IDs if found
             if !pmc_links.pmc_ids.is_empty() {
-                println!(
-                    "PMC IDs: {:?}",
-                    &pmc_links.pmc_ids[..5.min(pmc_links.pmc_ids.len())]
+                info!(
+                    pmc_ids = ?&pmc_links.pmc_ids[..5.min(pmc_links.pmc_ids.len())],
+                    "Found PMC IDs"
                 );
             }
         }
         Err(e) => {
-            eprintln!("Warning: Could not fetch PMC links: {}", e);
+            warn!(error = %e, "Could not fetch PMC links");
         }
     }
 }
@@ -72,14 +73,14 @@ async fn test_get_citations_integration() {
         Ok(citations) => {
             assert_eq!(citations.source_pmids, test_pmids);
             assert_eq!(citations.link_type, "pubmed_pubmed_citedin");
-            println!(
-                "Found {} citing articles for PMID {}",
-                citations.citing_pmids.len(),
-                test_pmids[0]
+            info!(
+                citing_count = citations.citing_pmids.len(),
+                pmid = test_pmids[0],
+                "Found citing articles"
             );
         }
         Err(e) => {
-            eprintln!("Warning: Could not fetch citations: {}", e);
+            warn!(error = %e, "Could not fetch citations");
         }
     }
 }
@@ -115,39 +116,39 @@ async fn test_elink_methods_through_combined_client() {
     // Test related articles through combined client
     match client.get_related_articles(&test_pmids).await {
         Ok(related) => {
-            println!(
-                "Combined client: Found {} related articles",
-                related.related_pmids.len()
+            info!(
+                related_count = related.related_pmids.len(),
+                "Combined client found related articles"
             );
         }
         Err(e) => {
-            eprintln!("Warning: Combined client related articles failed: {}", e);
+            warn!(error = %e, "Combined client related articles failed");
         }
     }
 
     // Test PMC links through combined client
     match client.get_pmc_links(&test_pmids).await {
         Ok(pmc_links) => {
-            println!(
-                "Combined client: Found {} PMC links",
-                pmc_links.pmc_ids.len()
+            info!(
+                pmc_count = pmc_links.pmc_ids.len(),
+                "Combined client found PMC links"
             );
         }
         Err(e) => {
-            eprintln!("Warning: Combined client PMC links failed: {}", e);
+            warn!(error = %e, "Combined client PMC links failed");
         }
     }
 
     // Test citations through combined client
     match client.get_citations(&test_pmids).await {
         Ok(citations) => {
-            println!(
-                "Combined client: Found {} citations",
-                citations.citing_pmids.len()
+            info!(
+                citing_count = citations.citing_pmids.len(),
+                "Combined client found citations"
             );
         }
         Err(e) => {
-            eprintln!("Warning: Combined client citations failed: {}", e);
+            warn!(error = %e, "Combined client citations failed");
         }
     }
 }
@@ -162,10 +163,10 @@ async fn test_multiple_pmids_handling() {
     match client.get_related_articles(&multiple_pmids).await {
         Ok(related) => {
             assert_eq!(related.source_pmids, multiple_pmids);
-            println!(
-                "Multiple PMIDs: Found {} related articles for {} source PMIDs",
-                related.related_pmids.len(),
-                multiple_pmids.len()
+            info!(
+                related_count = related.related_pmids.len(),
+                source_count = multiple_pmids.len(),
+                "Multiple PMIDs: Found related articles"
             );
 
             // Ensure no source PMIDs are in the related results
@@ -177,7 +178,7 @@ async fn test_multiple_pmids_handling() {
             }
         }
         Err(e) => {
-            eprintln!("Warning: Multiple PMIDs related articles failed: {}", e);
+            warn!(error = %e, "Multiple PMIDs related articles failed");
         }
     }
 }
@@ -206,7 +207,7 @@ async fn test_elink_deduplication() {
             );
         }
         Err(e) => {
-            eprintln!("Warning: Duplicate PMIDs test failed: {}", e);
+            warn!(error = %e, "Duplicate PMIDs test failed");
         }
     }
 }
