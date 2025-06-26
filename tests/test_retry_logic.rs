@@ -91,10 +91,6 @@ async fn test_retry_on_server_error() {
     let result = client.fetch_article("12345678").await;
     let elapsed = start.elapsed();
 
-    // Should succeed after retries
-    if let Err(e) = &result {
-        eprintln!("Error: {:?}", e);
-    }
     assert!(result.is_ok(), "Expected success after retries");
     let article = result.unwrap();
     assert_eq!(article.pmid, "12345678");
