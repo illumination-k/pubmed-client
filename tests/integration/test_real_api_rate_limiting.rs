@@ -108,7 +108,7 @@ async fn test_real_api_basic_rate_limiting() {
                     PubMedError::RateLimitExceeded => {
                         info!("Rate limit properly enforced by client");
                     }
-                    PubMedError::ApiError { message } if message.contains("429") => {
+                    PubMedError::ApiError { status: _, message } if message.contains("429") => {
                         info!("Rate limit enforced by NCBI server (429 response)");
                     }
                     _ => {
@@ -224,7 +224,7 @@ async fn test_real_api_concurrent_rate_limiting() {
                 rate_limited_tasks += 1;
                 debug!(task_id = i, "Task was rate limited (expected)");
             }
-            Ok(Err(PubMedError::ApiError { message })) if message.contains("429") => {
+            Ok(Err(PubMedError::ApiError { status: _, message })) if message.contains("429") => {
                 rate_limited_tasks += 1;
                 debug!(task_id = i, "Task got 429 from server (expected)");
             }
@@ -546,7 +546,7 @@ async fn test_real_api_server_rate_limit_handling() {
                 rate_limit_errors += 1;
                 debug!(request_number = i + 1, "Client-side rate limit triggered");
             }
-            Err(PubMedError::ApiError { message }) if message.contains("429") => {
+            Err(PubMedError::ApiError { status: _, message }) if message.contains("429") => {
                 rate_limit_errors += 1;
                 debug!(request_number = i + 1, "Server returned 429 (expected)");
             }
