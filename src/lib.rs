@@ -112,8 +112,9 @@ pub use pmc::{
     ReferenceStyle, Table,
 };
 pub use pubmed::{
-    ArticleType, Citations, DatabaseInfo, FieldInfo, Language, LinkInfo, PmcLinks, PubMedArticle,
-    PubMedClient, RelatedArticles, SearchQuery,
+    Affiliation as PubMedAffiliation, ArticleType, Author as PubMedAuthor, Citations, DatabaseInfo,
+    FieldInfo, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient, RelatedArticles,
+    SearchQuery,
 };
 pub use rate_limit::RateLimiter;
 
