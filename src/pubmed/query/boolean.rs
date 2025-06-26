@@ -154,3 +154,121 @@ impl SearchQuery {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_and_operation() {
+        let query1 = SearchQuery::new().query("covid-19");
+        let query2 = SearchQuery::new().query("vaccine");
+        let combined = query1.and(query2);
+        assert_eq!(combined.build(), "(covid-19) AND (vaccine)");
+    }
+
+    #[test]
+    fn test_or_operation() {
+        let query1 = SearchQuery::new().query("diabetes");
+        let query2 = SearchQuery::new().query("hypertension");
+        let combined = query1.or(query2);
+        assert_eq!(combined.build(), "(diabetes) OR (hypertension)");
+    }
+
+    #[test]
+    fn test_negate_operation() {
+        let query = SearchQuery::new().query("cancer").negate();
+        assert_eq!(query.build(), "NOT (cancer)");
+    }
+
+    #[test]
+    fn test_exclude_operation() {
+        let base_query = SearchQuery::new().query("cancer treatment");
+        let exclude_query = SearchQuery::new().query("animal studies");
+        let filtered = base_query.exclude(exclude_query);
+        assert_eq!(filtered.build(), "(cancer treatment) NOT (animal studies)");
+    }
+
+    #[test]
+    fn test_group_operation() {
+        let query = SearchQuery::new().query("cancer").group();
+        assert_eq!(query.build(), "(cancer)");
+    }
+
+    #[test]
+    fn test_complex_boolean_chain() {
+        let ai_query = SearchQuery::new().query("machine learning");
+        let medicine_query = SearchQuery::new().query("medicine");
+        let exclude_query = SearchQuery::new().query("veterinary");
+
+        let final_query = ai_query.and(medicine_query).exclude(exclude_query).group();
+
+        assert_eq!(
+            final_query.build(),
+            "(((machine learning) AND (medicine)) NOT (veterinary))"
+        );
+    }
+
+    #[test]
+    fn test_and_with_empty_queries() {
+        let query1 = SearchQuery::new();
+        let query2 = SearchQuery::new().query("test");
+        let combined = query1.and(query2);
+        assert_eq!(combined.build(), "test");
+    }
+
+    #[test]
+    fn test_or_with_empty_queries() {
+        let query1 = SearchQuery::new().query("test");
+        let query2 = SearchQuery::new();
+        let combined = query1.or(query2);
+        assert_eq!(combined.build(), "test");
+    }
+
+    #[test]
+    fn test_limit_preservation_in_boolean_ops() {
+        let query1 = SearchQuery::new().query("covid").limit(10);
+        let query2 = SearchQuery::new().query("vaccine").limit(50);
+        let combined = query1.and(query2);
+        assert_eq!(combined.get_limit(), 50); // Should use higher limit
+    }
+
+    #[test]
+    fn test_negate_empty_query() {
+        let query = SearchQuery::new().negate();
+        assert_eq!(query.build(), "");
+    }
+
+    #[test]
+    fn test_exclude_empty_base() {
+        let base_query = SearchQuery::new();
+        let exclude_query = SearchQuery::new().query("test");
+        let filtered = base_query.exclude(exclude_query);
+        assert_eq!(filtered.build(), "");
+    }
+
+    #[test]
+    fn test_exclude_empty_excluded() {
+        let base_query = SearchQuery::new().query("test");
+        let exclude_query = SearchQuery::new();
+        let filtered = base_query.exclude(exclude_query);
+        assert_eq!(filtered.build(), "test");
+    }
+
+    #[test]
+    fn test_deep_boolean_nesting() {
+        let q1 = SearchQuery::new().query("a");
+        let q2 = SearchQuery::new().query("b");
+        let q3 = SearchQuery::new().query("c");
+        let q4 = SearchQuery::new().query("d");
+
+        let nested = q1.and(q2).or(q3.and(q4));
+        assert_eq!(nested.build(), "((a) AND (b)) OR ((c) AND (d))");
+    }
+
+    #[test]
+    fn test_group_empty_query() {
+        let query = SearchQuery::new().group();
+        assert_eq!(query.build(), "");
+    }
+}

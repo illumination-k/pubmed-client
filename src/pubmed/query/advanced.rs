@@ -260,3 +260,148 @@ impl SearchQuery {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_mesh_term() {
+        let query = SearchQuery::new().mesh_term("Neoplasms");
+        assert_eq!(query.build(), "Neoplasms[MeSH Terms]");
+    }
+
+    #[test]
+    fn test_mesh_major_topic() {
+        let query = SearchQuery::new().mesh_major_topic("Diabetes Mellitus, Type 2");
+        assert_eq!(query.build(), "Diabetes Mellitus, Type 2[MeSH Major Topic]");
+    }
+
+    #[test]
+    fn test_multiple_mesh_terms() {
+        let mesh_terms = ["Neoplasms", "Antineoplastic Agents"];
+        let query = SearchQuery::new().mesh_terms(&mesh_terms);
+        assert_eq!(
+            query.build(),
+            "Neoplasms[MeSH Terms] AND Antineoplastic Agents[MeSH Terms]"
+        );
+    }
+
+    #[test]
+    fn test_mesh_subheading() {
+        let query = SearchQuery::new()
+            .mesh_term("Diabetes Mellitus")
+            .mesh_subheading("drug therapy");
+        assert_eq!(
+            query.build(),
+            "Diabetes Mellitus[MeSH Terms] AND drug therapy[MeSH Subheading]"
+        );
+    }
+
+    #[test]
+    fn test_first_author() {
+        let query = SearchQuery::new().first_author("Smith J");
+        assert_eq!(query.build(), "Smith J[First Author]");
+    }
+
+    #[test]
+    fn test_last_author() {
+        let query = SearchQuery::new().last_author("Johnson M");
+        assert_eq!(query.build(), "Johnson M[Last Author]");
+    }
+
+    #[test]
+    fn test_any_author() {
+        let query = SearchQuery::new().author("Williams K");
+        assert_eq!(query.build(), "Williams K[Author]");
+    }
+
+    #[test]
+    fn test_affiliation() {
+        let query = SearchQuery::new().affiliation("Harvard Medical School");
+        assert_eq!(query.build(), "Harvard Medical School[Affiliation]");
+    }
+
+    #[test]
+    fn test_orcid() {
+        let query = SearchQuery::new().orcid("0000-0001-2345-6789");
+        assert_eq!(query.build(), "0000-0001-2345-6789[Author - Identifier]");
+    }
+
+    #[test]
+    fn test_human_studies_only() {
+        let query = SearchQuery::new().human_studies_only();
+        assert_eq!(query.build(), "humans[mh]");
+    }
+
+    #[test]
+    fn test_animal_studies_only() {
+        let query = SearchQuery::new().animal_studies_only();
+        assert_eq!(query.build(), "animals[mh]");
+    }
+
+    #[test]
+    fn test_age_group() {
+        let query = SearchQuery::new().age_group("Child");
+        assert_eq!(query.build(), "Child[mh]");
+    }
+
+    #[test]
+    fn test_custom_filter() {
+        let query = SearchQuery::new().custom_filter("custom[field]");
+        assert_eq!(query.build(), "custom[field]");
+    }
+
+    #[test]
+    fn test_combined_advanced_filters() {
+        let query = SearchQuery::new()
+            .query("cancer treatment")
+            .mesh_term("Neoplasms")
+            .author("Smith J")
+            .human_studies_only()
+            .affiliation("Harvard");
+
+        let expected = "cancer treatment AND Neoplasms[MeSH Terms] AND Smith J[Author] AND humans[mh] AND Harvard[Affiliation]";
+        assert_eq!(query.build(), expected);
+    }
+
+    #[test]
+    fn test_empty_mesh_terms_array() {
+        let mesh_terms: &[&str] = &[];
+        let query = SearchQuery::new().mesh_terms(mesh_terms);
+        assert_eq!(query.build(), "");
+    }
+
+    #[test]
+    fn test_single_mesh_term_via_array() {
+        let mesh_terms = ["Neoplasms"];
+        let query = SearchQuery::new().mesh_terms(&mesh_terms);
+        assert_eq!(query.build(), "Neoplasms[MeSH Terms]");
+    }
+
+    #[test]
+    fn test_mesh_term_with_spaces() {
+        let query = SearchQuery::new().mesh_term("Diabetes Mellitus, Type 2");
+        assert_eq!(query.build(), "Diabetes Mellitus, Type 2[MeSH Terms]");
+    }
+
+    #[test]
+    fn test_author_with_special_characters() {
+        let query = SearchQuery::new().author("O'Connor J");
+        assert_eq!(query.build(), "O'Connor J[Author]");
+    }
+
+    #[test]
+    fn test_affiliation_with_special_characters() {
+        let query = SearchQuery::new().affiliation("Johns Hopkins & MIT");
+        assert_eq!(query.build(), "Johns Hopkins & MIT[Affiliation]");
+    }
+
+    #[test]
+    fn test_custom_filter_preservation() {
+        let query = SearchQuery::new()
+            .custom_filter("first[custom]")
+            .custom_filter("second[custom]");
+        assert_eq!(query.build(), "first[custom] AND second[custom]");
+    }
+}

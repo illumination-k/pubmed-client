@@ -299,3 +299,188 @@ impl SearchQuery {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_title_contains() {
+        let query = SearchQuery::new().title_contains("machine learning");
+        assert_eq!(query.build(), "machine learning[Title]");
+    }
+
+    #[test]
+    fn test_abstract_contains() {
+        let query = SearchQuery::new().abstract_contains("deep learning neural networks");
+        assert_eq!(query.build(), "deep learning neural networks[Abstract]");
+    }
+
+    #[test]
+    fn test_title_or_abstract() {
+        let query = SearchQuery::new().title_or_abstract("CRISPR gene editing");
+        assert_eq!(query.build(), "CRISPR gene editing[Title/Abstract]");
+    }
+
+    #[test]
+    fn test_journal() {
+        let query = SearchQuery::new().journal("Nature");
+        assert_eq!(query.build(), "Nature[Journal]");
+    }
+
+    #[test]
+    fn test_journal_abbreviation() {
+        let query = SearchQuery::new().journal_abbreviation("Nat Med");
+        assert_eq!(query.build(), "Nat Med[Journal Title Abbreviation]");
+    }
+
+    #[test]
+    fn test_grant_number() {
+        let query = SearchQuery::new().grant_number("R01AI123456");
+        assert_eq!(query.build(), "R01AI123456[Grant Number]");
+    }
+
+    #[test]
+    fn test_isbn() {
+        let query = SearchQuery::new().isbn("978-0123456789");
+        assert_eq!(query.build(), "978-0123456789[ISBN]");
+    }
+
+    #[test]
+    fn test_issn() {
+        let query = SearchQuery::new().issn("1234-5678");
+        assert_eq!(query.build(), "1234-5678[ISSN]");
+    }
+
+    #[test]
+    fn test_open_access_only() {
+        let query = SearchQuery::new().open_access_only();
+        assert_eq!(query.build(), "free full text[sb]");
+    }
+
+    #[test]
+    fn test_free_full_text() {
+        let query = SearchQuery::new().free_full_text();
+        assert_eq!(query.build(), "free full text[sb]");
+    }
+
+    #[test]
+    fn test_has_full_text() {
+        let query = SearchQuery::new().has_full_text();
+        assert_eq!(query.build(), "full text[sb]");
+    }
+
+    #[test]
+    fn test_has_abstract() {
+        let query = SearchQuery::new().has_abstract();
+        assert_eq!(query.build(), "hasabstract");
+    }
+
+    #[test]
+    fn test_single_article_type() {
+        let query = SearchQuery::new().article_type(ArticleType::ClinicalTrial);
+        assert_eq!(query.build(), "Clinical Trial[pt]");
+    }
+
+    #[test]
+    fn test_multiple_article_types() {
+        let types = [ArticleType::ClinicalTrial, ArticleType::Review];
+        let query = SearchQuery::new().article_types(&types);
+        assert_eq!(query.build(), "(Clinical Trial[pt] OR Review[pt])");
+    }
+
+    #[test]
+    fn test_empty_article_types() {
+        let types: &[ArticleType] = &[];
+        let query = SearchQuery::new().article_types(types);
+        assert_eq!(query.build(), "");
+    }
+
+    #[test]
+    fn test_single_article_type_via_array() {
+        let types = [ArticleType::Review];
+        let query = SearchQuery::new().article_types(&types);
+        assert_eq!(query.build(), "Review[pt]");
+    }
+
+    #[test]
+    fn test_language() {
+        let query = SearchQuery::new().language(Language::English);
+        assert_eq!(query.build(), "English[lang]");
+    }
+
+    #[test]
+    fn test_language_other() {
+        let query = SearchQuery::new().language(Language::Other("Esperanto".to_string()));
+        assert_eq!(query.build(), "Esperanto[lang]");
+    }
+
+    #[test]
+    fn test_combined_search_filters() {
+        let query = SearchQuery::new()
+            .query("cancer treatment")
+            .title_contains("immunotherapy")
+            .journal("Nature")
+            .free_full_text()
+            .article_type(ArticleType::ClinicalTrial)
+            .language(Language::English);
+
+        let expected = "cancer treatment AND immunotherapy[Title] AND Nature[Journal] AND free full text[sb] AND Clinical Trial[pt] AND English[lang]";
+        assert_eq!(query.build(), expected);
+    }
+
+    #[test]
+    fn test_multiple_journal_filters() {
+        let query = SearchQuery::new().journal("Nature").journal("Science");
+        assert_eq!(query.build(), "Nature[Journal] AND Science[Journal]");
+    }
+
+    #[test]
+    fn test_title_and_abstract_separate() {
+        let query = SearchQuery::new()
+            .title_contains("machine learning")
+            .abstract_contains("neural networks");
+        assert_eq!(
+            query.build(),
+            "machine learning[Title] AND neural networks[Abstract]"
+        );
+    }
+
+    #[test]
+    fn test_all_text_availability_filters() {
+        let query = SearchQuery::new()
+            .query("research")
+            .has_abstract()
+            .has_full_text()
+            .free_full_text();
+        assert_eq!(
+            query.build(),
+            "research AND hasabstract AND full text[sb] AND free full text[sb]"
+        );
+    }
+
+    #[test]
+    fn test_many_article_types() {
+        let types = [
+            ArticleType::ClinicalTrial,
+            ArticleType::Review,
+            ArticleType::MetaAnalysis,
+            ArticleType::SystematicReview,
+        ];
+        let query = SearchQuery::new().article_types(&types);
+        let expected =
+            "(Clinical Trial[pt] OR Review[pt] OR Meta-Analysis[pt] OR Systematic Review[pt])";
+        assert_eq!(query.build(), expected);
+    }
+
+    #[test]
+    fn test_identifier_fields() {
+        let query = SearchQuery::new()
+            .grant_number("R01CA123456")
+            .isbn("978-0123456789")
+            .issn("0028-0836");
+
+        let expected = "R01CA123456[Grant Number] AND 978-0123456789[ISBN] AND 0028-0836[ISSN]";
+        assert_eq!(query.build(), expected);
+    }
+}

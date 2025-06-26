@@ -203,3 +203,111 @@ impl Default for SearchQuery {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_query() {
+        let query = SearchQuery::new();
+        assert_eq!(query.build(), "");
+        assert_eq!(query.get_limit(), 20);
+    }
+
+    #[test]
+    fn test_default_query() {
+        let query = SearchQuery::default();
+        assert_eq!(query.build(), "");
+        assert_eq!(query.get_limit(), 20);
+    }
+
+    #[test]
+    fn test_single_query_term() {
+        let query = SearchQuery::new().query("covid-19");
+        assert_eq!(query.build(), "covid-19");
+    }
+
+    #[test]
+    fn test_multiple_query_calls() {
+        let query = SearchQuery::new().query("covid-19").query("treatment");
+        assert_eq!(query.build(), "covid-19 treatment");
+    }
+
+    #[test]
+    fn test_terms_method() {
+        let terms = ["covid-19", "vaccine", "efficacy"];
+        let query = SearchQuery::new().terms(&terms);
+        assert_eq!(query.build(), "covid-19 vaccine efficacy");
+    }
+
+    #[test]
+    fn test_empty_terms_array() {
+        let terms: &[&str] = &[];
+        let query = SearchQuery::new().terms(terms);
+        assert_eq!(query.build(), "");
+    }
+
+    #[test]
+    fn test_limit_setting() {
+        let query = SearchQuery::new().limit(100);
+        assert_eq!(query.get_limit(), 100);
+    }
+
+    #[test]
+    fn test_limit_with_query() {
+        let query = SearchQuery::new().query("cancer").limit(50);
+        assert_eq!(query.build(), "cancer");
+        assert_eq!(query.get_limit(), 50);
+    }
+
+    #[test]
+    fn test_string_and_str_inputs() {
+        let query1 = SearchQuery::new().query("test");
+        let query2 = SearchQuery::new().query("test".to_string());
+        assert_eq!(query1.build(), query2.build());
+    }
+
+    #[test]
+    fn test_empty_query_build() {
+        let query = SearchQuery::new();
+        assert_eq!(query.build(), "");
+    }
+
+    #[test]
+    fn test_terms_and_filters_combined() {
+        let mut query = SearchQuery::new();
+        query.terms.push("cancer".to_string());
+        query.filters.push("test[filter]".to_string());
+        assert_eq!(query.build(), "cancer AND test[filter]");
+    }
+
+    #[test]
+    fn test_only_filters_no_terms() {
+        let mut query = SearchQuery::new();
+        query.filters.push("test1[filter]".to_string());
+        query.filters.push("test2[filter]".to_string());
+        assert_eq!(query.build(), "test1[filter] AND test2[filter]");
+    }
+
+    #[test]
+    fn test_limit_edge_values() {
+        let query = SearchQuery::new().limit(0);
+        assert_eq!(query.get_limit(), 0);
+
+        let query = SearchQuery::new().limit(usize::MAX);
+        assert_eq!(query.get_limit(), usize::MAX);
+    }
+
+    #[test]
+    fn test_chaining_methods() {
+        let query = SearchQuery::new()
+            .query("test")
+            .limit(10)
+            .query("more")
+            .limit(20); // Should override previous limit
+
+        assert_eq!(query.get_limit(), 20);
+        assert_eq!(query.build(), "test more");
+    }
+}
