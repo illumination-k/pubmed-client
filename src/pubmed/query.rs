@@ -861,117 +861,23 @@ impl SearchQuery {
         self
     }
 
-    /// Filter to clinical trials only
+    /// Filter by a single article type (convenience method)
+    ///
+    /// # Arguments
+    ///
+    /// * `article_type` - The article type to filter by
     ///
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client_rs::pubmed::{SearchQuery, ArticleType};
     ///
     /// let query = SearchQuery::new()
     ///     .query("diabetes treatment")
-    ///     .clinical_trials_only();
+    ///     .article_type(ArticleType::ClinicalTrial);
     /// ```
-    pub fn clinical_trials_only(mut self) -> Self {
-        self.filters.push("Clinical Trial[pt]".to_string());
-        self
-    }
-
-    /// Filter to review articles only
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
-    ///
-    /// let query = SearchQuery::new()
-    ///     .query("cancer immunotherapy")
-    ///     .review_articles_only();
-    /// ```
-    pub fn review_articles_only(mut self) -> Self {
-        self.filters.push("Review[pt]".to_string());
-        self
-    }
-
-    /// Filter to systematic reviews only
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
-    ///
-    /// let query = SearchQuery::new()
-    ///     .query("covid treatment effectiveness")
-    ///     .systematic_reviews_only();
-    /// ```
-    pub fn systematic_reviews_only(mut self) -> Self {
-        self.filters.push("Systematic Review[pt]".to_string());
-        self
-    }
-
-    /// Filter to meta-analyses only
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
-    ///
-    /// let query = SearchQuery::new()
-    ///     .query("drug efficacy")
-    ///     .meta_analyses_only();
-    /// ```
-    pub fn meta_analyses_only(mut self) -> Self {
-        self.filters.push("Meta-Analysis[pt]".to_string());
-        self
-    }
-
-    /// Filter to case reports only
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
-    ///
-    /// let query = SearchQuery::new()
-    ///     .query("rare disease")
-    ///     .case_reports_only();
-    /// ```
-    pub fn case_reports_only(mut self) -> Self {
-        self.filters.push("Case Reports[pt]".to_string());
-        self
-    }
-
-    /// Filter to randomized controlled trials only
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
-    ///
-    /// let query = SearchQuery::new()
-    ///     .query("new drug treatment")
-    ///     .randomized_controlled_trials_only();
-    /// ```
-    pub fn randomized_controlled_trials_only(mut self) -> Self {
-        self.filters
-            .push("Randomized Controlled Trial[pt]".to_string());
-        self
-    }
-
-    /// Filter to observational studies only
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
-    ///
-    /// let query = SearchQuery::new()
-    ///     .query("population health")
-    ///     .observational_studies_only();
-    /// ```
-    pub fn observational_studies_only(mut self) -> Self {
-        self.filters.push("Observational Study[pt]".to_string());
-        self
+    pub fn article_type(self, article_type: ArticleType) -> Self {
+        self.article_types(&[article_type])
     }
 
     /// Filter by first author
@@ -1642,7 +1548,7 @@ mod tests {
     fn test_clinical_trials_only() {
         let query = SearchQuery::new()
             .query("treatment")
-            .clinical_trials_only()
+            .article_type(ArticleType::ClinicalTrial)
             .build();
 
         assert_eq!(query, "treatment AND Clinical Trial[pt]");
@@ -1821,7 +1727,7 @@ mod tests {
     fn test_review_articles_only() {
         let query = SearchQuery::new()
             .query("cancer")
-            .review_articles_only()
+            .article_type(ArticleType::Review)
             .build();
 
         assert_eq!(query, "cancer AND Review[pt]");
@@ -1831,7 +1737,7 @@ mod tests {
     fn test_systematic_reviews_only() {
         let query = SearchQuery::new()
             .query("treatment")
-            .systematic_reviews_only()
+            .article_type(ArticleType::SystematicReview)
             .build();
 
         assert_eq!(query, "treatment AND Systematic Review[pt]");
@@ -1841,7 +1747,7 @@ mod tests {
     fn test_meta_analyses_only() {
         let query = SearchQuery::new()
             .query("efficacy")
-            .meta_analyses_only()
+            .article_type(ArticleType::MetaAnalysis)
             .build();
 
         assert_eq!(query, "efficacy AND Meta-Analysis[pt]");
@@ -1851,7 +1757,7 @@ mod tests {
     fn test_case_reports_only() {
         let query = SearchQuery::new()
             .query("rare disease")
-            .case_reports_only()
+            .article_type(ArticleType::CaseReport)
             .build();
 
         assert_eq!(query, "rare disease AND Case Reports[pt]");
@@ -1861,7 +1767,7 @@ mod tests {
     fn test_randomized_controlled_trials_only() {
         let query = SearchQuery::new()
             .query("new drug")
-            .randomized_controlled_trials_only()
+            .article_type(ArticleType::RandomizedControlledTrial)
             .build();
 
         assert_eq!(query, "new drug AND Randomized Controlled Trial[pt]");
@@ -1871,7 +1777,7 @@ mod tests {
     fn test_observational_studies_only() {
         let query = SearchQuery::new()
             .query("population health")
-            .observational_studies_only()
+            .article_type(ArticleType::ObservationalStudy)
             .build();
 
         assert_eq!(query, "population health AND Observational Study[pt]");
@@ -2209,7 +2115,7 @@ mod tests {
         let final_query = ai_query
             .and(medical_query)
             .published_after(2020)
-            .review_articles_only()
+            .article_type(ArticleType::Review)
             .human_studies_only()
             .free_full_text()
             .language(Language::English)
