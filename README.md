@@ -10,6 +10,8 @@ A Rust client library for accessing PubMed and PMC (PubMed Central) APIs.
 - **Markdown Export**: Convert PMC articles to well-formatted Markdown
 - **Async Support**: Built on tokio for async/await support
 - **Type Safety**: Strongly typed data structures for all API responses
+- **Automatic Retry**: Built-in retry logic with exponential backoff for handling transient failures
+- **Rate Limiting**: Automatic compliance with NCBI API rate limits
 
 ## Installation
 
@@ -187,6 +189,65 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Calculate MeSH term similarity (Jaccard similarity)
     let similarity = article1.mesh_term_similarity(&article2);
     println!("MeSH similarity: {:.2}%", similarity * 100.0);
+
+    Ok(())
+}
+```
+
+## Configuration
+
+### Rate Limiting and API Keys
+
+The client automatically handles rate limiting according to NCBI guidelines:
+
+```rust
+use pubmed_client_rs::{PubMedClient, ClientConfig};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Default: 3 requests per second without API key
+    let client = PubMedClient::new();
+
+    // With API key: 10 requests per second
+    let config = ClientConfig::new()
+        .with_api_key("your_ncbi_api_key")
+        .with_email("your@email.com")
+        .with_tool("YourAppName");
+
+    let client = PubMedClient::with_config(config);
+
+    Ok(())
+}
+```
+
+### Retry Configuration
+
+The client includes automatic retry logic with exponential backoff for handling transient failures:
+
+```rust
+use pubmed_client_rs::{PubMedClient, ClientConfig, retry::RetryConfig};
+use std::time::Duration;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Custom retry configuration
+    let retry_config = RetryConfig::new()
+        .with_max_retries(5)                            // Maximum 5 retry attempts
+        .with_initial_delay(Duration::from_secs(2))     // Start with 2 second delay
+        .with_max_delay(Duration::from_secs(60))        // Cap at 60 seconds
+        .without_jitter();                              // Disable jitter for predictable delays
+
+    let config = ClientConfig::new()
+        .with_api_key("your_api_key")
+        .with_retry_config(retry_config);
+
+    let client = PubMedClient::with_config(config);
+
+    // The client will automatically retry on:
+    // - Network timeouts
+    // - HTTP 5xx server errors
+    // - HTTP 429 rate limit responses
+    // - Connection failures
 
     Ok(())
 }

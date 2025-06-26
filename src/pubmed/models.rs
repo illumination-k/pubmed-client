@@ -1,5 +1,47 @@
 use serde::{Deserialize, Serialize};
 
+/// Represents an author's institutional affiliation
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Affiliation {
+    /// Institution name (e.g., "Harvard Medical School")
+    pub institution: Option<String>,
+    /// Department or division (e.g., "Department of Medicine")
+    pub department: Option<String>,
+    /// Full address including street, city, state/province
+    pub address: Option<String>,
+    /// Country
+    pub country: Option<String>,
+    /// Email address associated with this affiliation
+    pub email: Option<String>,
+}
+
+/// Represents a detailed author with enhanced metadata
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Author {
+    /// Author's last name/surname
+    pub last_name: Option<String>,
+    /// Author's fore name (given name)
+    pub fore_name: Option<String>,
+    /// Author's first name (may be different from fore_name)
+    pub first_name: Option<String>,
+    /// Author's middle name
+    pub middle_name: Option<String>,
+    /// Author's initials
+    pub initials: Option<String>,
+    /// Name suffix (e.g., "Jr", "Sr", "III")
+    pub suffix: Option<String>,
+    /// Full formatted name
+    pub full_name: String,
+    /// List of institutional affiliations
+    pub affiliations: Vec<Affiliation>,
+    /// ORCID identifier (e.g., "0000-0000-0000-0000")
+    pub orcid: Option<String>,
+    /// Whether this author is a corresponding author
+    pub is_corresponding: bool,
+    /// Author's roles/contributions (e.g., ["Conceptualization", "Writing - original draft"])
+    pub author_roles: Vec<String>,
+}
+
 /// Represents a PubMed article with metadata
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PubMedArticle {
@@ -7,8 +49,10 @@ pub struct PubMedArticle {
     pub pmid: String,
     /// Article title
     pub title: String,
-    /// List of authors
-    pub authors: Vec<String>,
+    /// List of authors with detailed metadata
+    pub authors: Vec<Author>,
+    /// Number of authors (computed from authors list)
+    pub author_count: u32,
     /// Journal name
     pub journal: String,
     /// Publication date
@@ -273,6 +317,83 @@ impl PubMedArticle {
         terms
     }
 
+    /// Get corresponding authors from the article
+    ///
+    /// # Returns
+    ///
+    /// A vector of references to authors marked as corresponding
+    pub fn get_corresponding_authors(&self) -> Vec<&Author> {
+        self.authors
+            .iter()
+            .filter(|author| author.is_corresponding)
+            .collect()
+    }
+
+    /// Get authors affiliated with a specific institution
+    ///
+    /// # Arguments
+    ///
+    /// * `institution` - Institution name to search for (case-insensitive substring match)
+    ///
+    /// # Returns
+    ///
+    /// A vector of references to authors with matching affiliations
+    pub fn get_authors_by_institution(&self, institution: &str) -> Vec<&Author> {
+        let institution_lower = institution.to_lowercase();
+        self.authors
+            .iter()
+            .filter(|author| {
+                author.affiliations.iter().any(|affil| {
+                    affil
+                        .institution
+                        .as_ref()
+                        .is_some_and(|inst| inst.to_lowercase().contains(&institution_lower))
+                })
+            })
+            .collect()
+    }
+
+    /// Get all unique countries from author affiliations
+    ///
+    /// # Returns
+    ///
+    /// A vector of unique country names
+    pub fn get_author_countries(&self) -> Vec<String> {
+        use std::collections::HashSet;
+        let mut countries: HashSet<String> = HashSet::new();
+
+        for author in &self.authors {
+            for affiliation in &author.affiliations {
+                if let Some(country) = &affiliation.country {
+                    countries.insert(country.clone());
+                }
+            }
+        }
+
+        countries.into_iter().collect()
+    }
+
+    /// Get authors with ORCID identifiers
+    ///
+    /// # Returns
+    ///
+    /// A vector of references to authors who have ORCID IDs
+    pub fn get_authors_with_orcid(&self) -> Vec<&Author> {
+        self.authors
+            .iter()
+            .filter(|author| author.orcid.is_some())
+            .collect()
+    }
+
+    /// Check if the article has international collaboration
+    ///
+    /// # Returns
+    ///
+    /// `true` if authors are from multiple countries
+    pub fn has_international_collaboration(&self) -> bool {
+        self.get_author_countries().len() > 1
+    }
+
     /// Calculate MeSH term similarity between two articles
     ///
     /// # Arguments
@@ -291,6 +412,7 @@ impl PubMedArticle {
     /// #     pmid: "123".to_string(),
     /// #     title: "Test".to_string(),
     /// #     authors: vec![],
+    /// #     author_count: 0,
     /// #     journal: "Test Journal".to_string(),
     /// #     pub_date: "2023".to_string(),
     /// #     doi: None,
@@ -384,15 +506,172 @@ impl PubMedArticle {
     }
 }
 
+impl PartialEq<str> for Author {
+    fn eq(&self, other: &str) -> bool {
+        self.full_name == other
+    }
+}
+
+impl PartialEq<&str> for Author {
+    fn eq(&self, other: &&str) -> bool {
+        self.full_name == *other
+    }
+}
+
+impl std::fmt::Display for Author {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.full_name)
+    }
+}
+
+impl Author {
+    /// Create a new Author with basic information
+    pub fn new(last_name: Option<String>, fore_name: Option<String>) -> Self {
+        let full_name = format_author_name(&last_name, &fore_name, &None);
+        Author {
+            last_name,
+            fore_name,
+            first_name: None,
+            middle_name: None,
+            initials: None,
+            suffix: None,
+            full_name,
+            affiliations: Vec::new(),
+            orcid: None,
+            is_corresponding: false,
+            author_roles: Vec::new(),
+        }
+    }
+
+    /// Check if the author is affiliated with a specific institution
+    ///
+    /// # Arguments
+    ///
+    /// * `institution` - Institution name to check (case-insensitive)
+    ///
+    /// # Returns
+    ///
+    /// `true` if the author has an affiliation matching the institution
+    pub fn is_affiliated_with(&self, institution: &str) -> bool {
+        let institution_lower = institution.to_lowercase();
+        self.affiliations.iter().any(|affil| {
+            affil
+                .institution
+                .as_ref()
+                .is_some_and(|inst| inst.to_lowercase().contains(&institution_lower))
+        })
+    }
+
+    /// Get the author's primary affiliation (first in the list)
+    ///
+    /// # Returns
+    ///
+    /// A reference to the primary affiliation, if any
+    pub fn primary_affiliation(&self) -> Option<&Affiliation> {
+        self.affiliations.first()
+    }
+
+    /// Check if the author has an ORCID identifier
+    ///
+    /// # Returns
+    ///
+    /// `true` if the author has an ORCID ID
+    pub fn has_orcid(&self) -> bool {
+        self.orcid.is_some()
+    }
+
+    /// Check if the author name is empty
+    ///
+    /// # Returns
+    ///
+    /// `true` if the full name is empty or just whitespace
+    pub fn is_empty(&self) -> bool {
+        self.full_name.trim().is_empty()
+    }
+
+    /// Get the length of the author's full name
+    ///
+    /// # Returns
+    ///
+    /// Length of the full name string
+    pub fn len(&self) -> usize {
+        self.full_name.len()
+    }
+
+    /// Get an iterator over the characters in the author's full name
+    ///
+    /// # Returns
+    ///
+    /// Iterator over characters
+    pub fn chars(&self) -> std::str::Chars {
+        self.full_name.chars()
+    }
+}
+
+/// Format an author name from components
+fn format_author_name(
+    last_name: &Option<String>,
+    fore_name: &Option<String>,
+    initials: &Option<String>,
+) -> String {
+    match (fore_name, last_name) {
+        (Some(fore), Some(last)) => format!("{} {}", fore, last),
+        (None, Some(last)) => {
+            if let Some(init) = initials {
+                format!("{} {}", init, last)
+            } else {
+                last.clone()
+            }
+        }
+        (Some(fore), None) => fore.clone(),
+        (None, None) => "Unknown Author".to_string(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn create_test_author() -> Author {
+        Author {
+            last_name: Some("Doe".to_string()),
+            fore_name: Some("John".to_string()),
+            first_name: None,
+            middle_name: Some("A".to_string()),
+            initials: Some("JA".to_string()),
+            suffix: None,
+            full_name: "John Doe".to_string(),
+            affiliations: vec![
+                Affiliation {
+                    institution: Some("Harvard Medical School".to_string()),
+                    department: Some("Department of Medicine".to_string()),
+                    address: Some("Boston, MA".to_string()),
+                    country: Some("USA".to_string()),
+                    email: Some("john.doe@hms.harvard.edu".to_string()),
+                },
+                Affiliation {
+                    institution: Some("Massachusetts General Hospital".to_string()),
+                    department: None,
+                    address: Some("Boston, MA".to_string()),
+                    country: Some("USA".to_string()),
+                    email: None,
+                },
+            ],
+            orcid: Some("0000-0001-2345-6789".to_string()),
+            is_corresponding: true,
+            author_roles: vec![
+                "Conceptualization".to_string(),
+                "Writing - original draft".to_string(),
+            ],
+        }
+    }
 
     fn create_test_article_with_mesh() -> PubMedArticle {
         PubMedArticle {
             pmid: "12345".to_string(),
             title: "Test Article".to_string(),
-            authors: vec!["John Doe".to_string()],
+            authors: vec![create_test_author()],
+            author_count: 1,
             journal: "Test Journal".to_string(),
             pub_date: "2023".to_string(),
             doi: None,
@@ -505,6 +784,7 @@ mod tests {
             pmid: "54321".to_string(),
             title: "Test".to_string(),
             authors: vec![],
+            author_count: 0,
             journal: "Test".to_string(),
             pub_date: "2023".to_string(),
             doi: None,
@@ -560,5 +840,114 @@ mod tests {
         article_no_chemicals.chemical_list = None;
         let chemicals = article_no_chemicals.get_chemical_names();
         assert_eq!(chemicals.len(), 0);
+    }
+
+    #[test]
+    fn test_author_creation() {
+        let author = Author::new(Some("Smith".to_string()), Some("Jane".to_string()));
+        assert_eq!(author.last_name, Some("Smith".to_string()));
+        assert_eq!(author.fore_name, Some("Jane".to_string()));
+        assert_eq!(author.full_name, "Jane Smith");
+        assert!(!author.has_orcid());
+        assert!(!author.is_corresponding);
+    }
+
+    #[test]
+    fn test_author_affiliations() {
+        let author = create_test_author();
+
+        assert!(author.is_affiliated_with("Harvard"));
+        assert!(author.is_affiliated_with("Massachusetts General"));
+        assert!(!author.is_affiliated_with("Stanford"));
+
+        let primary = author.primary_affiliation().unwrap();
+        assert_eq!(
+            primary.institution,
+            Some("Harvard Medical School".to_string())
+        );
+
+        assert!(author.has_orcid());
+        assert!(author.is_corresponding);
+    }
+
+    #[test]
+    fn test_get_corresponding_authors() {
+        let article = create_test_article_with_mesh();
+        let corresponding = article.get_corresponding_authors();
+
+        assert_eq!(corresponding.len(), 1);
+        assert_eq!(corresponding[0].full_name, "John Doe");
+    }
+
+    #[test]
+    fn test_get_authors_by_institution() {
+        let article = create_test_article_with_mesh();
+
+        let harvard_authors = article.get_authors_by_institution("Harvard");
+        assert_eq!(harvard_authors.len(), 1);
+
+        let stanford_authors = article.get_authors_by_institution("Stanford");
+        assert_eq!(stanford_authors.len(), 0);
+    }
+
+    #[test]
+    fn test_get_author_countries() {
+        let article = create_test_article_with_mesh();
+        let countries = article.get_author_countries();
+
+        assert_eq!(countries.len(), 1);
+        assert!(countries.contains(&"USA".to_string()));
+    }
+
+    #[test]
+    fn test_international_collaboration() {
+        let article = create_test_article_with_mesh();
+        assert!(!article.has_international_collaboration());
+
+        // Create article with international authors
+        let mut international_article = article.clone();
+        let mut uk_author = create_test_author();
+        uk_author.affiliations[0].country = Some("UK".to_string());
+        international_article.authors.push(uk_author);
+        international_article.author_count = 2;
+
+        assert!(international_article.has_international_collaboration());
+    }
+
+    #[test]
+    fn test_get_authors_with_orcid() {
+        let article = create_test_article_with_mesh();
+        let authors_with_orcid = article.get_authors_with_orcid();
+
+        assert_eq!(authors_with_orcid.len(), 1);
+        assert_eq!(
+            authors_with_orcid[0].orcid,
+            Some("0000-0001-2345-6789".to_string())
+        );
+    }
+
+    #[test]
+    fn test_format_author_name() {
+        assert_eq!(
+            format_author_name(&Some("Smith".to_string()), &Some("John".to_string()), &None),
+            "John Smith"
+        );
+
+        assert_eq!(
+            format_author_name(&Some("Doe".to_string()), &None, &Some("J".to_string())),
+            "J Doe"
+        );
+
+        assert_eq!(
+            format_author_name(&Some("Johnson".to_string()), &None, &None),
+            "Johnson"
+        );
+
+        assert_eq!(
+            format_author_name(&None, &Some("Jane".to_string()), &None),
+            "Jane"
+        );
+
+        assert_eq!(format_author_name(&None, &None, &None), "Unknown Author");
     }
 }
