@@ -101,6 +101,7 @@ pub mod error;
 pub mod pmc;
 pub mod pubmed;
 pub mod rate_limit;
+pub mod retry;
 
 // Re-export main types for convenience
 pub use config::ClientConfig;
