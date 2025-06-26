@@ -39,7 +39,7 @@ pub struct ClientConfig {
 
     /// Base URL for NCBI E-utilities
     ///
-    /// Default: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+    /// Default: <https://eutils.ncbi.nlm.nih.gov/entrez/eutils>
     /// This should rarely need to be changed unless using a proxy or test environment.
     pub base_url: Option<String>,
 
