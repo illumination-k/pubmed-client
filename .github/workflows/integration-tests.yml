@@ -1,0 +1,215 @@
+name: Integration Tests
+
+# Run integration tests on schedule and manual trigger
+# These tests make real API calls to NCBI, so they run separately from regular CI
+on:
+  # Run daily at 06:00 UTC to catch API changes
+  schedule:
+    - cron: "0 6 * * *"
+
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: "Type of integration tests to run"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - pubmed
+          - pmc
+          - error-handling
+
+      use_api_key:
+        description: "Use NCBI API key for higher rate limits"
+        required: false
+        default: true
+        type: boolean
+
+  # Run on PRs with specific label
+  pull_request:
+    types: [labeled]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Check if integration tests should run
+  check-trigger:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      test_type: ${{ steps.check.outputs.test_type }}
+      use_api_key: ${{ steps.check.outputs.use_api_key }}
+    steps:
+      - name: Check if integration tests should run
+        id: check
+        run: |
+          # Always run on schedule or manual dispatch
+          if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            echo "test_type=${{ github.event.inputs.test_type || 'all' }}" >> $GITHUB_OUTPUT
+            echo "use_api_key=${{ github.event.inputs.use_api_key || 'true' }}" >> $GITHUB_OUTPUT
+          # Run on PRs with integration-tests label
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ contains(github.event.pull_request.labels.*.name, 'test-integration') }}" == "true" ]]; then
+              echo "should_run=true" >> $GITHUB_OUTPUT
+              echo "test_type=all" >> $GITHUB_OUTPUT
+              echo "use_api_key=true" >> $GITHUB_OUTPUT
+            else
+              echo "should_run=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Integration tests job
+  integration-tests:
+    needs: check-trigger
+    if: needs.check-trigger.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30 # Integration tests can take longer due to rate limiting
+
+    strategy:
+      fail-fast: false
+      matrix:
+        rust-version: [stable]
+        # Only run on Ubuntu for integration tests to limit API usage
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.rust-version }}
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-integration-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-integration-
+            ${{ runner.os }}-cargo-
+
+      - name: Install test dependencies
+        run: |
+          # Install cargo-nextest for better test output
+          cargo install cargo-nextest --locked
+
+      - name: Setup integration test environment
+        run: |
+          # Set required environment variables
+          echo "PUBMED_REAL_API_TESTS=1" >> $GITHUB_ENV
+          echo "RUST_LOG=info" >> $GITHUB_ENV
+
+          # Set API key if available and requested
+          if [[ "${{ needs.check-trigger.outputs.use_api_key }}" == "true" && -n "${{ secrets.NCBI_API_KEY }}" ]]; then
+            echo "NCBI_API_KEY=${{ secrets.NCBI_API_KEY }}" >> $GITHUB_ENV
+            echo "Using NCBI API key for higher rate limits"
+          else
+            echo "Running without API key (standard rate limits)"
+          fi
+
+      - name: Build with integration-tests feature
+        run: |
+          cargo build --features integration-tests --tests
+          echo "Build completed successfully"
+
+      - name: Run PubMed integration tests
+        if: needs.check-trigger.outputs.test_type == 'all' || needs.check-trigger.outputs.test_type == 'pubmed'
+        run: |
+          echo "Running PubMed API integration tests..."
+          cargo nextest run --features integration-tests --test pubmed_api_tests \
+            --test-threads 1 \
+            --no-capture \
+            --verbose
+        continue-on-error: true # Don't fail the workflow if some tests fail due to API issues
+
+      - name: Run PMC integration tests
+        if: needs.check-trigger.outputs.test_type == 'all' || needs.check-trigger.outputs.test_type == 'pmc'
+        run: |
+          echo "Running PMC API integration tests..."
+          cargo nextest run --features integration-tests --test pmc_api_tests \
+            --test-threads 1 \
+            --no-capture \
+            --verbose
+        continue-on-error: true
+
+      - name: Run error handling integration tests
+        if: needs.check-trigger.outputs.test_type == 'all' || needs.check-trigger.outputs.test_type == 'error-handling'
+        run: |
+          echo "Running error handling integration tests..."
+          cargo nextest run --features integration-tests --test error_handling_tests \
+            --test-threads 1 \
+            --no-capture \
+            --verbose
+        continue-on-error: true
+
+      - name: Run existing real API tests for comparison
+        if: needs.check-trigger.outputs.test_type == 'all'
+        run: |
+          echo "Running existing real API tests for comparison..."
+          cargo nextest run --test test_real_api_rate_limiting \
+            --test-threads 1 \
+            --no-capture \
+            --verbose
+        continue-on-error: true
+
+      - name: Generate integration test summary
+        if: always()
+        run: |
+          echo "## Integration Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Configuration:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Test Type: ${{ needs.check-trigger.outputs.test_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- API Key Used: ${{ needs.check-trigger.outputs.use_api_key }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Rust Version: ${{ matrix.rust-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Add timing information
+          echo "**Test Execution:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Started: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "- Trigger: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "- Type: Scheduled daily run" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "- Type: Manual trigger" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "- Type: PR with integration-tests label" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Notes:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Tests may fail due to network issues or API changes" >> $GITHUB_STEP_SUMMARY
+          echo "- Rate limiting is enforced to be respectful to NCBI servers" >> $GITHUB_STEP_SUMMARY
+          echo "- Individual test failures don't fail the workflow" >> $GITHUB_STEP_SUMMARY
+
+  # Notification job for scheduled runs
+  notify-results:
+    needs: [check-trigger, integration-tests]
+    if: always() && needs.check-trigger.outputs.should_run == 'true' && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report scheduled test results
+        run: |
+          if [[ "${{ needs.integration-tests.result }}" == "success" ]]; then
+            echo "✅ Scheduled integration tests completed successfully"
+          else
+            echo "⚠️ Scheduled integration tests encountered issues"
+            echo "This may indicate API changes or network issues"
+            echo "Please review the test results and update if necessary"
+          fi
+
+          echo "Integration test workflow completed for scheduled run"
+          echo "Next scheduled run: Tomorrow at 06:00 UTC"

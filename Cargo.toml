@@ -19,6 +19,10 @@ tokio-util = "0.7"
 tracing = "0.1"
 urlencoding = "2.1"
 
+[features]
+default = []
+integration-tests = []
+
 [dev-dependencies]
 rstest = "0.18"
 tokio-test = "0.4"
@@ -78,6 +82,19 @@ path = "tests/integration/comprehensive_einfo_tests.rs"
 [[test]]
 name = "comprehensive_elink_tests"
 path = "tests/integration/comprehensive_elink_tests.rs"
+
+# New integration tests with real API calls
+[[test]]
+name = "pubmed_api_tests"
+path = "tests/integration/pubmed_api_tests.rs"
+
+[[test]]
+name = "pmc_api_tests"
+path = "tests/integration/pmc_api_tests.rs"
+
+[[test]]
+name = "error_handling_tests"
+path = "tests/integration/error_handling_tests.rs"
 
 [build-dependencies]
 # XSD parsing tools - will be evaluated
