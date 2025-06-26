@@ -46,6 +46,21 @@ pub enum Language {
     Spanish,
     Italian,
     Chinese,
+    Russian,
+    Portuguese,
+    Arabic,
+    Dutch,
+    Korean,
+    Polish,
+    Swedish,
+    Danish,
+    Norwegian,
+    Finnish,
+    Turkish,
+    Hebrew,
+    Czech,
+    Hungarian,
+    Greek,
     Other(String),
 }
 
@@ -59,6 +74,21 @@ impl Language {
             Language::Spanish => "Spanish[lang]".to_string(),
             Language::Italian => "Italian[lang]".to_string(),
             Language::Chinese => "Chinese[lang]".to_string(),
+            Language::Russian => "Russian[lang]".to_string(),
+            Language::Portuguese => "Portuguese[lang]".to_string(),
+            Language::Arabic => "Arabic[lang]".to_string(),
+            Language::Dutch => "Dutch[lang]".to_string(),
+            Language::Korean => "Korean[lang]".to_string(),
+            Language::Polish => "Polish[lang]".to_string(),
+            Language::Swedish => "Swedish[lang]".to_string(),
+            Language::Danish => "Danish[lang]".to_string(),
+            Language::Norwegian => "Norwegian[lang]".to_string(),
+            Language::Finnish => "Finnish[lang]".to_string(),
+            Language::Turkish => "Turkish[lang]".to_string(),
+            Language::Hebrew => "Hebrew[lang]".to_string(),
+            Language::Czech => "Czech[lang]".to_string(),
+            Language::Hungarian => "Hungarian[lang]".to_string(),
+            Language::Greek => "Greek[lang]".to_string(),
             Language::Other(lang) => format!("{}[lang]", lang),
         }
     }
@@ -106,6 +136,166 @@ impl SearchQuery {
     /// ```
     pub fn query<S: Into<String>>(mut self, terms: S) -> Self {
         self.terms.push(terms.into());
+        self
+    }
+
+    /// Search in article titles only
+    ///
+    /// # Arguments
+    ///
+    /// * `title` - Title text to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .title_contains("machine learning");
+    /// ```
+    pub fn title_contains<S: Into<String>>(mut self, title: S) -> Self {
+        self.filters.push(format!("{}[Title]", title.into()));
+        self
+    }
+
+    /// Search in article abstracts only
+    ///
+    /// # Arguments
+    ///
+    /// * `abstract_text` - Abstract text to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .abstract_contains("deep learning neural networks");
+    /// ```
+    pub fn abstract_contains<S: Into<String>>(mut self, abstract_text: S) -> Self {
+        self.filters
+            .push(format!("{}[Abstract]", abstract_text.into()));
+        self
+    }
+
+    /// Search in both title and abstract
+    ///
+    /// # Arguments
+    ///
+    /// * `text` - Text to search for in title or abstract
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .title_or_abstract("CRISPR gene editing");
+    /// ```
+    pub fn title_or_abstract<S: Into<String>>(mut self, text: S) -> Self {
+        self.filters
+            .push(format!("{}[Title/Abstract]", text.into()));
+        self
+    }
+
+    /// Filter by journal name
+    ///
+    /// # Arguments
+    ///
+    /// * `journal` - Journal name to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("cancer treatment")
+    ///     .journal("Nature");
+    /// ```
+    pub fn journal<S: Into<String>>(mut self, journal: S) -> Self {
+        self.filters.push(format!("{}[Journal]", journal.into()));
+        self
+    }
+
+    /// Filter by journal title abbreviation
+    ///
+    /// # Arguments
+    ///
+    /// * `abbreviation` - Journal abbreviation to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("stem cells")
+    ///     .journal_abbreviation("Nat Med");
+    /// ```
+    pub fn journal_abbreviation<S: Into<String>>(mut self, abbreviation: S) -> Self {
+        self.filters.push(format!(
+            "{}[Journal Title Abbreviation]",
+            abbreviation.into()
+        ));
+        self
+    }
+
+    /// Filter by grant number
+    ///
+    /// # Arguments
+    ///
+    /// * `grant_number` - Grant number to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .grant_number("R01AI123456");
+    /// ```
+    pub fn grant_number<S: Into<String>>(mut self, grant_number: S) -> Self {
+        self.filters
+            .push(format!("{}[Grant Number]", grant_number.into()));
+        self
+    }
+
+    /// Filter by ISBN
+    ///
+    /// # Arguments
+    ///
+    /// * `isbn` - ISBN to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .isbn("978-0123456789");
+    /// ```
+    pub fn isbn<S: Into<String>>(mut self, isbn: S) -> Self {
+        self.filters.push(format!("{}[ISBN]", isbn.into()));
+        self
+    }
+
+    /// Filter by ISSN
+    ///
+    /// # Arguments
+    ///
+    /// * `issn` - ISSN to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .issn("1234-5678");
+    /// ```
+    pub fn issn<S: Into<String>>(mut self, issn: S) -> Self {
+        self.filters.push(format!("{}[ISSN]", issn.into()));
         self
     }
 
@@ -267,6 +457,170 @@ impl SearchQuery {
         let date_filter = match end_year {
             Some(end) => format!("{}:{}[pdat]", start_year, end),
             None => format!("{}:3000[pdat]", start_year), // Far future date
+        };
+        self.filters.push(date_filter);
+        self
+    }
+
+    /// Filter by publication date range with month precision
+    ///
+    /// # Arguments
+    ///
+    /// * `start_year` - Start year
+    /// * `start_month` - Start month (1-12)
+    /// * `end_year` - End year (optional)
+    /// * `end_month` - End month (1-12, optional)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("covid vaccines")
+    ///     .date_range_with_month(2020, 3, Some(2021), Some(12));
+    /// ```
+    pub fn date_range_with_month(
+        mut self,
+        start_year: u32,
+        start_month: u32,
+        end_year: Option<u32>,
+        end_month: Option<u32>,
+    ) -> Self {
+        let date_filter = match (end_year, end_month) {
+            (Some(end_y), Some(end_m)) => format!(
+                "{}/{:02}:{}/{:02}[pdat]",
+                start_year, start_month, end_y, end_m
+            ),
+            (Some(end_y), None) => format!("{}/{:02}:{}[pdat]", start_year, start_month, end_y),
+            _ => format!("{}/{:02}:3000[pdat]", start_year, start_month),
+        };
+        self.filters.push(date_filter);
+        self
+    }
+
+    /// Filter by publication date range with full date precision
+    ///
+    /// # Arguments
+    ///
+    /// * `start_year` - Start year
+    /// * `start_month` - Start month (1-12)
+    /// * `start_day` - Start day (1-31)
+    /// * `end_year` - End year (optional)
+    /// * `end_month` - End month (1-12, optional)
+    /// * `end_day` - End day (1-31, optional)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("pandemic response")
+    ///     .date_range_precise(2020, 3, 15, Some(2020), Some(12), Some(31));
+    /// ```
+    pub fn date_range_precise(
+        mut self,
+        start_year: u32,
+        start_month: u32,
+        start_day: u32,
+        end_year: Option<u32>,
+        end_month: Option<u32>,
+        end_day: Option<u32>,
+    ) -> Self {
+        let date_filter = match (end_year, end_month, end_day) {
+            (Some(end_y), Some(end_m), Some(end_d)) => {
+                format!(
+                    "{}/{:02}/{:02}:{}/{:02}/{:02}[pdat]",
+                    start_year, start_month, start_day, end_y, end_m, end_d
+                )
+            }
+            (Some(end_y), Some(end_m), None) => {
+                format!(
+                    "{}/{:02}/{:02}:{}/{:02}[pdat]",
+                    start_year, start_month, start_day, end_y, end_m
+                )
+            }
+            (Some(end_y), None, None) => {
+                format!(
+                    "{}/{:02}/{:02}:{}[pdat]",
+                    start_year, start_month, start_day, end_y
+                )
+            }
+            _ => format!(
+                "{}/{:02}/{:02}:3000[pdat]",
+                start_year, start_month, start_day
+            ),
+        };
+        self.filters.push(date_filter);
+        self
+    }
+
+    /// Filter to articles published in a specific year
+    ///
+    /// # Arguments
+    ///
+    /// * `year` - Year to filter by
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("artificial intelligence")
+    ///     .published_in_year(2023);
+    /// ```
+    pub fn published_in_year(mut self, year: u32) -> Self {
+        self.filters.push(format!("{}[pdat]", year));
+        self
+    }
+
+    /// Filter by entry date (when added to PubMed database)
+    ///
+    /// # Arguments
+    ///
+    /// * `start_year` - Start year
+    /// * `end_year` - End year (optional)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("recent discoveries")
+    ///     .entry_date_range(2023, Some(2024));
+    /// ```
+    pub fn entry_date_range(mut self, start_year: u32, end_year: Option<u32>) -> Self {
+        let date_filter = match end_year {
+            Some(end) => format!("{}:{}[edat]", start_year, end),
+            None => format!("{}:3000[edat]", start_year),
+        };
+        self.filters.push(date_filter);
+        self
+    }
+
+    /// Filter by modification date (when last updated in PubMed database)
+    ///
+    /// # Arguments
+    ///
+    /// * `start_year` - Start year
+    /// * `end_year` - End year (optional)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("updated articles")
+    ///     .modification_date_range(2023, None);
+    /// ```
+    pub fn modification_date_range(mut self, start_year: u32, end_year: Option<u32>) -> Self {
+        let date_filter = match end_year {
+            Some(end) => format!("{}:{}[mdat]", start_year, end),
+            None => format!("{}:3000[mdat]", start_year),
         };
         self.filters.push(date_filter);
         self
@@ -450,6 +804,103 @@ impl SearchQuery {
         self
     }
 
+    /// Filter to review articles only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("cancer immunotherapy")
+    ///     .review_articles_only();
+    /// ```
+    pub fn review_articles_only(mut self) -> Self {
+        self.filters.push("Review[pt]".to_string());
+        self
+    }
+
+    /// Filter to systematic reviews only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("covid treatment effectiveness")
+    ///     .systematic_reviews_only();
+    /// ```
+    pub fn systematic_reviews_only(mut self) -> Self {
+        self.filters.push("Systematic Review[pt]".to_string());
+        self
+    }
+
+    /// Filter to meta-analyses only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("drug efficacy")
+    ///     .meta_analyses_only();
+    /// ```
+    pub fn meta_analyses_only(mut self) -> Self {
+        self.filters.push("Meta-Analysis[pt]".to_string());
+        self
+    }
+
+    /// Filter to case reports only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("rare disease")
+    ///     .case_reports_only();
+    /// ```
+    pub fn case_reports_only(mut self) -> Self {
+        self.filters.push("Case Reports[pt]".to_string());
+        self
+    }
+
+    /// Filter to randomized controlled trials only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("new drug treatment")
+    ///     .randomized_controlled_trials_only();
+    /// ```
+    pub fn randomized_controlled_trials_only(mut self) -> Self {
+        self.filters
+            .push("Randomized Controlled Trial[pt]".to_string());
+        self
+    }
+
+    /// Filter to observational studies only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("population health")
+    ///     .observational_studies_only();
+    /// ```
+    pub fn observational_studies_only(mut self) -> Self {
+        self.filters.push("Observational Study[pt]".to_string());
+        self
+    }
+
     /// Filter by first author
     ///
     /// # Arguments
@@ -551,6 +1002,330 @@ impl SearchQuery {
         self.filters
             .push(format!("{}[Author - Identifier]", orcid_id.into()));
         self
+    }
+
+    /// Combine this query with another using AND logic
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - Another SearchQuery to combine with
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query1 = SearchQuery::new().query("covid-19");
+    /// let query2 = SearchQuery::new().query("vaccine");
+    /// let combined = query1.and(query2);
+    /// ```
+    pub fn and(mut self, other: SearchQuery) -> Self {
+        // Combine the queries by wrapping each in parentheses
+        let self_query = self.build();
+        let other_query = other.build();
+
+        if !self_query.is_empty() && !other_query.is_empty() {
+            // Create a new query with the combined result
+            let combined_query = format!("({}) AND ({})", self_query, other_query);
+            self.terms = vec![combined_query];
+            self.filters = Vec::new();
+        } else if !other_query.is_empty() {
+            self.terms = vec![other_query];
+            self.filters = Vec::new();
+        }
+
+        // Use the higher limit if set
+        if other.limit.is_some() && (self.limit.is_none() || other.limit > self.limit) {
+            self.limit = other.limit;
+        }
+
+        self
+    }
+
+    /// Combine this query with another using OR logic
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - Another SearchQuery to combine with
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query1 = SearchQuery::new().query("diabetes");
+    /// let query2 = SearchQuery::new().query("hypertension");
+    /// let combined = query1.or(query2);
+    /// ```
+    pub fn or(mut self, other: SearchQuery) -> Self {
+        // Combine the queries by wrapping each in parentheses
+        let self_query = self.build();
+        let other_query = other.build();
+
+        if !self_query.is_empty() && !other_query.is_empty() {
+            // Create a new query with the combined result
+            let combined_query = format!("({}) OR ({})", self_query, other_query);
+            self.terms = vec![combined_query];
+            self.filters = Vec::new();
+        } else if !other_query.is_empty() {
+            self.terms = vec![other_query];
+            self.filters = Vec::new();
+        }
+
+        // Use the higher limit if set
+        if other.limit.is_some() && (self.limit.is_none() || other.limit > self.limit) {
+            self.limit = other.limit;
+        }
+
+        self
+    }
+
+    /// Negate this query using NOT logic
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("cancer")
+    ///     .negate();
+    /// ```
+    pub fn negate(mut self) -> Self {
+        let self_query = self.build();
+
+        if !self_query.is_empty() {
+            let negated_query = format!("NOT ({})", self_query);
+            self.terms = vec![negated_query];
+            self.filters = Vec::new();
+        }
+
+        self
+    }
+
+    /// Exclude articles matching the given query
+    ///
+    /// # Arguments
+    ///
+    /// * `excluded` - SearchQuery representing articles to exclude
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let base_query = SearchQuery::new().query("cancer treatment");
+    /// let exclude_query = SearchQuery::new().query("animal studies");
+    /// let filtered = base_query.exclude(exclude_query);
+    /// ```
+    pub fn exclude(mut self, excluded: SearchQuery) -> Self {
+        let self_query = self.build();
+        let excluded_query = excluded.build();
+
+        if !self_query.is_empty() && !excluded_query.is_empty() {
+            let combined_query = format!("({}) NOT ({})", self_query, excluded_query);
+            self.terms = vec![combined_query];
+            self.filters = Vec::new();
+        }
+
+        self
+    }
+
+    /// Add parentheses around the current query for grouping
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("cancer")
+    ///     .or(SearchQuery::new().query("tumor"))
+    ///     .group();
+    /// ```
+    pub fn group(mut self) -> Self {
+        let self_query = self.build();
+
+        if !self_query.is_empty() {
+            let grouped_query = format!("({})", self_query);
+            self.terms = vec![grouped_query];
+            self.filters = Vec::new();
+        }
+
+        self
+    }
+
+    /// Filter to human studies only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("drug treatment")
+    ///     .human_studies_only();
+    /// ```
+    pub fn human_studies_only(mut self) -> Self {
+        self.filters.push("humans[mh]".to_string());
+        self
+    }
+
+    /// Filter to animal studies only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("preclinical research")
+    ///     .animal_studies_only();
+    /// ```
+    pub fn animal_studies_only(mut self) -> Self {
+        self.filters.push("animals[mh]".to_string());
+        self
+    }
+
+    /// Filter by age group
+    ///
+    /// # Arguments
+    ///
+    /// * `age_group` - Age group to filter by (e.g., "Child", "Adult", "Aged")
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("pediatric medicine")
+    ///     .age_group("Child");
+    /// ```
+    pub fn age_group<S: Into<String>>(mut self, age_group: S) -> Self {
+        self.filters.push(format!("{}[mh]", age_group.into()));
+        self
+    }
+
+    /// Validate the query structure and parameters
+    ///
+    /// # Returns
+    ///
+    /// Returns an error if the query is invalid, Ok(()) otherwise
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new().query("covid-19");
+    /// assert!(query.validate().is_ok());
+    /// ```
+    pub fn validate(&self) -> crate::error::Result<()> {
+        // Check if query is completely empty
+        if self.terms.is_empty() && self.filters.is_empty() {
+            return Err(crate::error::PubMedError::InvalidQuery(
+                "Query cannot be empty".to_string(),
+            ));
+        }
+
+        // Validate limit is reasonable
+        if let Some(limit) = self.limit {
+            if limit == 0 {
+                return Err(crate::error::PubMedError::InvalidQuery(
+                    "Limit must be greater than 0".to_string(),
+                ));
+            }
+            if limit > 10000 {
+                return Err(crate::error::PubMedError::InvalidQuery(
+                    "Limit should not exceed 10,000 for performance reasons".to_string(),
+                ));
+            }
+        }
+
+        // Check for potentially problematic patterns
+        let query_string = self.build();
+        if query_string.len() > 4000 {
+            return Err(crate::error::PubMedError::InvalidQuery(
+                "Query string is too long (>4000 characters)".to_string(),
+            ));
+        }
+
+        // Check for unbalanced parentheses
+        let open_parens = query_string.matches('(').count();
+        let close_parens = query_string.matches(')').count();
+        if open_parens != close_parens {
+            return Err(crate::error::PubMedError::InvalidQuery(
+                "Unbalanced parentheses in query".to_string(),
+            ));
+        }
+
+        Ok(())
+    }
+
+    /// Optimize the query for better performance
+    ///
+    /// # Returns
+    ///
+    /// Returns an optimized version of the query
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let optimized = SearchQuery::new()
+    ///     .query("covid-19")
+    ///     .published_after(2020)
+    ///     .optimize();
+    /// ```
+    pub fn optimize(mut self) -> Self {
+        // Remove duplicate filters
+        self.filters.sort();
+        self.filters.dedup();
+
+        // Remove duplicate terms
+        self.terms.sort();
+        self.terms.dedup();
+
+        // Remove empty terms and filters
+        self.terms.retain(|term| !term.trim().is_empty());
+        self.filters.retain(|filter| !filter.trim().is_empty());
+
+        self
+    }
+
+    /// Get query statistics and information
+    ///
+    /// # Returns
+    ///
+    /// Returns a tuple of (term_count, filter_count, estimated_complexity)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("machine learning")
+    ///     .published_after(2020)
+    ///     .free_full_text();
+    ///
+    /// let (terms, filters, complexity) = query.get_stats();
+    /// ```
+    pub fn get_stats(&self) -> (usize, usize, usize) {
+        let term_count = self.terms.len();
+        let filter_count = self.filters.len();
+
+        // Estimate complexity based on query structure
+        let query_string = self.build();
+        let complexity = query_string.matches(" AND ").count()
+            + query_string.matches(" OR ").count() * 2
+            + query_string.matches(" NOT ").count() * 2
+            + query_string.matches('(').count()
+            + 1; // Base complexity
+
+        (term_count, filter_count, complexity)
     }
 
     /// Build the final query string
@@ -885,5 +1660,383 @@ mod tests {
             query,
             "diabetes treatment AND Smith J[First Author] AND Harvard Medical School[Affiliation] AND 2020:3000[pdat] AND free full text[sb]"
         );
+    }
+
+    // New tests for field-specific searches
+    #[test]
+    fn test_title_contains() {
+        let query = SearchQuery::new()
+            .title_contains("machine learning")
+            .build();
+
+        assert_eq!(query, "machine learning[Title]");
+    }
+
+    #[test]
+    fn test_abstract_contains() {
+        let query = SearchQuery::new()
+            .abstract_contains("neural networks")
+            .build();
+
+        assert_eq!(query, "neural networks[Abstract]");
+    }
+
+    #[test]
+    fn test_title_or_abstract() {
+        let query = SearchQuery::new().title_or_abstract("CRISPR").build();
+
+        assert_eq!(query, "CRISPR[Title/Abstract]");
+    }
+
+    #[test]
+    fn test_journal_filter() {
+        let query = SearchQuery::new().query("cancer").journal("Nature").build();
+
+        assert_eq!(query, "cancer AND Nature[Journal]");
+    }
+
+    #[test]
+    fn test_journal_abbreviation() {
+        let query = SearchQuery::new().journal_abbreviation("Nat Med").build();
+
+        assert_eq!(query, "Nat Med[Journal Title Abbreviation]");
+    }
+
+    #[test]
+    fn test_grant_number() {
+        let query = SearchQuery::new().grant_number("R01AI123456").build();
+
+        assert_eq!(query, "R01AI123456[Grant Number]");
+    }
+
+    #[test]
+    fn test_isbn_issn() {
+        let query = SearchQuery::new()
+            .isbn("978-0123456789")
+            .issn("1234-5678")
+            .build();
+
+        assert_eq!(query, "978-0123456789[ISBN] AND 1234-5678[ISSN]");
+    }
+
+    // Tests for publication type convenience methods
+    #[test]
+    fn test_review_articles_only() {
+        let query = SearchQuery::new()
+            .query("cancer")
+            .review_articles_only()
+            .build();
+
+        assert_eq!(query, "cancer AND Review[pt]");
+    }
+
+    #[test]
+    fn test_systematic_reviews_only() {
+        let query = SearchQuery::new()
+            .query("treatment")
+            .systematic_reviews_only()
+            .build();
+
+        assert_eq!(query, "treatment AND Systematic Review[pt]");
+    }
+
+    #[test]
+    fn test_meta_analyses_only() {
+        let query = SearchQuery::new()
+            .query("efficacy")
+            .meta_analyses_only()
+            .build();
+
+        assert_eq!(query, "efficacy AND Meta-Analysis[pt]");
+    }
+
+    #[test]
+    fn test_case_reports_only() {
+        let query = SearchQuery::new()
+            .query("rare disease")
+            .case_reports_only()
+            .build();
+
+        assert_eq!(query, "rare disease AND Case Reports[pt]");
+    }
+
+    #[test]
+    fn test_randomized_controlled_trials_only() {
+        let query = SearchQuery::new()
+            .query("new drug")
+            .randomized_controlled_trials_only()
+            .build();
+
+        assert_eq!(query, "new drug AND Randomized Controlled Trial[pt]");
+    }
+
+    #[test]
+    fn test_observational_studies_only() {
+        let query = SearchQuery::new()
+            .query("population health")
+            .observational_studies_only()
+            .build();
+
+        assert_eq!(query, "population health AND Observational Study[pt]");
+    }
+
+    // Tests for advanced date filtering
+    #[test]
+    fn test_published_in_year() {
+        let query = SearchQuery::new()
+            .query("AI")
+            .published_in_year(2023)
+            .build();
+
+        assert_eq!(query, "AI AND 2023[pdat]");
+    }
+
+    #[test]
+    fn test_date_range_with_month() {
+        let query = SearchQuery::new()
+            .query("covid")
+            .date_range_with_month(2020, 3, Some(2021), Some(12))
+            .build();
+
+        assert_eq!(query, "covid AND 2020/03:2021/12[pdat]");
+    }
+
+    #[test]
+    fn test_date_range_precise() {
+        let query = SearchQuery::new()
+            .query("pandemic")
+            .date_range_precise(2020, 3, 15, Some(2020), Some(12), Some(31))
+            .build();
+
+        assert_eq!(query, "pandemic AND 2020/03/15:2020/12/31[pdat]");
+    }
+
+    #[test]
+    fn test_entry_date_range() {
+        let query = SearchQuery::new()
+            .query("recent")
+            .entry_date_range(2023, Some(2024))
+            .build();
+
+        assert_eq!(query, "recent AND 2023:2024[edat]");
+    }
+
+    #[test]
+    fn test_modification_date_range() {
+        let query = SearchQuery::new()
+            .query("updated")
+            .modification_date_range(2023, None)
+            .build();
+
+        assert_eq!(query, "updated AND 2023:3000[mdat]");
+    }
+
+    // Tests for boolean query combinations
+    #[test]
+    fn test_and_combination() {
+        let query1 = SearchQuery::new().query("covid-19");
+        let query2 = SearchQuery::new().query("vaccine");
+        let combined = query1.and(query2).build();
+
+        assert_eq!(combined, "(covid-19) AND (vaccine)");
+    }
+
+    #[test]
+    fn test_or_combination() {
+        let query1 = SearchQuery::new().query("diabetes");
+        let query2 = SearchQuery::new().query("hypertension");
+        let combined = query1.or(query2).build();
+
+        assert_eq!(combined, "(diabetes) OR (hypertension)");
+    }
+
+    #[test]
+    fn test_not_query() {
+        let query = SearchQuery::new().query("cancer").negate().build();
+
+        assert_eq!(query, "NOT (cancer)");
+    }
+
+    #[test]
+    fn test_exclude_query() {
+        let base_query = SearchQuery::new().query("cancer treatment");
+        let exclude_query = SearchQuery::new().query("animal studies");
+        let filtered = base_query.exclude(exclude_query).build();
+
+        assert_eq!(filtered, "(cancer treatment) NOT (animal studies)");
+    }
+
+    #[test]
+    fn test_group_query() {
+        let query = SearchQuery::new().query("cancer").group().build();
+
+        assert_eq!(query, "(cancer)");
+    }
+
+    #[test]
+    fn test_complex_boolean_query() {
+        let query1 = SearchQuery::new().title_contains("machine learning");
+        let query2 = SearchQuery::new().mesh_term("Artificial Intelligence");
+        let query3 = SearchQuery::new().mesh_term("Deep Learning");
+
+        let combined = query1
+            .and(query2.or(query3).group())
+            .published_after(2020)
+            .build();
+
+        assert!(combined.contains("machine learning[Title]"));
+        assert!(combined.contains("Artificial Intelligence[MeSH Terms]"));
+        assert!(combined.contains("Deep Learning[MeSH Terms]"));
+        assert!(combined.contains("2020:3000[pdat]"));
+    }
+
+    // Tests for species and age filtering
+    #[test]
+    fn test_human_studies_only() {
+        let query = SearchQuery::new()
+            .query("drug treatment")
+            .human_studies_only()
+            .build();
+
+        assert_eq!(query, "drug treatment AND humans[mh]");
+    }
+
+    #[test]
+    fn test_animal_studies_only() {
+        let query = SearchQuery::new()
+            .query("preclinical")
+            .animal_studies_only()
+            .build();
+
+        assert_eq!(query, "preclinical AND animals[mh]");
+    }
+
+    #[test]
+    fn test_age_group() {
+        let query = SearchQuery::new()
+            .query("pediatric")
+            .age_group("Child")
+            .build();
+
+        assert_eq!(query, "pediatric AND Child[mh]");
+    }
+
+    // Tests for expanded language support
+    #[test]
+    fn test_additional_languages() {
+        let languages = vec![
+            (Language::Russian, "Russian[lang]"),
+            (Language::Portuguese, "Portuguese[lang]"),
+            (Language::Arabic, "Arabic[lang]"),
+            (Language::Korean, "Korean[lang]"),
+            (Language::Turkish, "Turkish[lang]"),
+        ];
+
+        for (lang, expected) in languages {
+            let query = SearchQuery::new().query("test").language(lang).build();
+            assert_eq!(query, format!("test AND {}", expected));
+        }
+    }
+
+    // Tests for validation
+    #[test]
+    fn test_validate_empty_query() {
+        let query = SearchQuery::new();
+        assert!(query.validate().is_err());
+    }
+
+    #[test]
+    fn test_validate_valid_query() {
+        let query = SearchQuery::new().query("covid-19");
+        assert!(query.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_zero_limit() {
+        let query = SearchQuery::new().query("test").limit(0);
+        assert!(query.validate().is_err());
+    }
+
+    #[test]
+    fn test_validate_excessive_limit() {
+        let query = SearchQuery::new().query("test").limit(20000);
+        assert!(query.validate().is_err());
+    }
+
+    // Tests for optimization
+    #[test]
+    fn test_optimize_removes_duplicates() {
+        let mut query = SearchQuery::new();
+        query.terms = vec!["cancer".to_string(), "cancer".to_string()];
+        query.filters = vec!["Review[pt]".to_string(), "Review[pt]".to_string()];
+
+        let optimized = query.optimize();
+        assert_eq!(optimized.terms.len(), 1);
+        assert_eq!(optimized.filters.len(), 1);
+    }
+
+    #[test]
+    fn test_optimize_removes_empty() {
+        let mut query = SearchQuery::new();
+        query.terms = vec!["cancer".to_string(), "".to_string(), "   ".to_string()];
+        query.filters = vec!["Review[pt]".to_string(), "".to_string()];
+
+        let optimized = query.optimize();
+        assert_eq!(optimized.terms.len(), 1);
+        assert_eq!(optimized.filters.len(), 1);
+    }
+
+    // Tests for query statistics
+    #[test]
+    fn test_get_stats() {
+        let query = SearchQuery::new()
+            .query("machine learning")
+            .published_after(2020)
+            .free_full_text();
+
+        let (terms, filters, complexity) = query.get_stats();
+        assert_eq!(terms, 1);
+        assert_eq!(filters, 2);
+        assert!(complexity > 0);
+    }
+
+    // Integration test for complex real-world query
+    #[test]
+    fn test_comprehensive_real_world_query() {
+        let ai_query = SearchQuery::new()
+            .title_contains("machine learning")
+            .or(SearchQuery::new().mesh_term("Artificial Intelligence"));
+
+        let medical_query = SearchQuery::new()
+            .mesh_term("Medicine")
+            .or(SearchQuery::new().mesh_term("Healthcare"));
+
+        let final_query = ai_query
+            .and(medical_query)
+            .published_after(2020)
+            .review_articles_only()
+            .human_studies_only()
+            .free_full_text()
+            .language(Language::English)
+            .limit(50);
+
+        let query_string = final_query.build();
+
+        // Verify key components are present
+        assert!(query_string.contains("machine learning[Title]"));
+        assert!(query_string.contains("Artificial Intelligence[MeSH Terms]"));
+        assert!(query_string.contains("Medicine[MeSH Terms]"));
+        assert!(query_string.contains("Review[pt]"));
+        assert!(query_string.contains("humans[mh]"));
+        assert!(query_string.contains("free full text[sb]"));
+        assert!(query_string.contains("English[lang]"));
+        assert!(query_string.contains("2020:3000[pdat]"));
+
+        // Verify boolean logic structure
+        assert!(query_string.contains(" AND "));
+        assert!(query_string.contains(" OR "));
+
+        assert!(final_query.validate().is_ok());
+        assert_eq!(final_query.get_limit(), 50);
     }
 }
