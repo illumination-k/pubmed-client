@@ -3,6 +3,70 @@
 use super::{PubMedArticle, PubMedClient};
 use crate::error::Result;
 
+/// Represents a date for PubMed searches with varying precision
+#[derive(Debug, Clone, PartialEq)]
+pub struct PubDate {
+    year: u32,
+    month: Option<u32>,
+    day: Option<u32>,
+}
+
+impl PubDate {
+    /// Create a new PubDate with year only
+    pub fn new(year: u32) -> Self {
+        Self {
+            year,
+            month: None,
+            day: None,
+        }
+    }
+
+    /// Create a new PubDate with year and month
+    pub fn with_month(year: u32, month: u32) -> Self {
+        Self {
+            year,
+            month: Some(month),
+            day: None,
+        }
+    }
+
+    /// Create a new PubDate with year, month, and day
+    pub fn with_day(year: u32, month: u32, day: u32) -> Self {
+        Self {
+            year,
+            month: Some(month),
+            day: Some(day),
+        }
+    }
+
+    /// Format as PubMed date string
+    pub fn to_pubmed_string(&self) -> String {
+        match (self.month, self.day) {
+            (Some(month), Some(day)) => format!("{}/{:02}/{:02}", self.year, month, day),
+            (Some(month), None) => format!("{}/{:02}", self.year, month),
+            _ => self.year.to_string(),
+        }
+    }
+}
+
+impl From<u32> for PubDate {
+    fn from(year: u32) -> Self {
+        Self::new(year)
+    }
+}
+
+impl From<(u32, u32)> for PubDate {
+    fn from((year, month): (u32, u32)) -> Self {
+        Self::with_month(year, month)
+    }
+}
+
+impl From<(u32, u32, u32)> for PubDate {
+    fn from((year, month, day): (u32, u32, u32)) -> Self {
+        Self::with_day(year, month, day)
+    }
+}
+
 /// Article types that can be filtered in PubMed searches
 #[derive(Debug, Clone, PartialEq)]
 pub enum ArticleType {
@@ -462,95 +526,54 @@ impl SearchQuery {
         self
     }
 
-    /// Filter by publication date range with month precision
+    /// Filter by publication date range with flexible precision
     ///
     /// # Arguments
     ///
-    /// * `start_year` - Start year
-    /// * `start_month` - Start month (1-12)
-    /// * `end_year` - End year (optional)
-    /// * `end_month` - End month (1-12, optional)
+    /// * `start` - Start date (can be year, (year, month), or (year, month, day))
+    /// * `end` - End date (optional, same format as start)
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```
     /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
+    /// // Year range
     /// let query = SearchQuery::new()
     ///     .query("covid vaccines")
-    ///     .date_range_with_month(2020, 3, Some(2021), Some(12));
-    /// ```
-    pub fn date_range_with_month(
-        mut self,
-        start_year: u32,
-        start_month: u32,
-        end_year: Option<u32>,
-        end_month: Option<u32>,
-    ) -> Self {
-        let date_filter = match (end_year, end_month) {
-            (Some(end_y), Some(end_m)) => format!(
-                "{}/{:02}:{}/{:02}[pdat]",
-                start_year, start_month, end_y, end_m
-            ),
-            (Some(end_y), None) => format!("{}/{:02}:{}[pdat]", start_year, start_month, end_y),
-            _ => format!("{}/{:02}:3000[pdat]", start_year, start_month),
-        };
-        self.filters.push(date_filter);
-        self
-    }
-
-    /// Filter by publication date range with full date precision
+    ///     .published_between(2020, Some(2023));
     ///
-    /// # Arguments
-    ///
-    /// * `start_year` - Start year
-    /// * `start_month` - Start month (1-12)
-    /// * `start_day` - Start day (1-31)
-    /// * `end_year` - End year (optional)
-    /// * `end_month` - End month (1-12, optional)
-    /// * `end_day` - End day (1-31, optional)
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
-    ///
+    /// // Month precision
     /// let query = SearchQuery::new()
     ///     .query("pandemic response")
-    ///     .date_range_precise(2020, 3, 15, Some(2020), Some(12), Some(31));
+    ///     .published_between((2020, 3), Some((2021, 12)));
+    ///
+    /// // Day precision
+    /// let query = SearchQuery::new()
+    ///     .query("outbreak analysis")
+    ///     .published_between((2020, 3, 15), Some((2020, 12, 31)));
+    ///
+    /// // Open-ended (from date onwards)
+    /// let query = SearchQuery::new()
+    ///     .query("recent research")
+    ///     .published_between(2023, None);
     /// ```
-    pub fn date_range_precise(
-        mut self,
-        start_year: u32,
-        start_month: u32,
-        start_day: u32,
-        end_year: Option<u32>,
-        end_month: Option<u32>,
-        end_day: Option<u32>,
-    ) -> Self {
-        let date_filter = match (end_year, end_month, end_day) {
-            (Some(end_y), Some(end_m), Some(end_d)) => {
+    pub fn published_between<S, E>(mut self, start: S, end: Option<E>) -> Self
+    where
+        S: Into<PubDate>,
+        E: Into<PubDate>,
+    {
+        let start_date = start.into();
+        let date_filter = match end {
+            Some(end_date) => {
+                let end_date = end_date.into();
                 format!(
-                    "{}/{:02}/{:02}:{}/{:02}/{:02}[pdat]",
-                    start_year, start_month, start_day, end_y, end_m, end_d
+                    "{}:{}[pdat]",
+                    start_date.to_pubmed_string(),
+                    end_date.to_pubmed_string()
                 )
             }
-            (Some(end_y), Some(end_m), None) => {
-                format!(
-                    "{}/{:02}/{:02}:{}/{:02}[pdat]",
-                    start_year, start_month, start_day, end_y, end_m
-                )
-            }
-            (Some(end_y), None, None) => {
-                format!(
-                    "{}/{:02}/{:02}:{}[pdat]",
-                    start_year, start_month, start_day, end_y
-                )
-            }
-            _ => format!(
-                "{}/{:02}/{:02}:3000[pdat]",
-                start_year, start_month, start_day
-            ),
+            None => format!("{}:3000[pdat]", start_date.to_pubmed_string()),
         };
         self.filters.push(date_filter);
         self
@@ -580,8 +603,8 @@ impl SearchQuery {
     ///
     /// # Arguments
     ///
-    /// * `start_year` - Start year
-    /// * `end_year` - End year (optional)
+    /// * `start` - Start date (can be year, (year, month), or (year, month, day))
+    /// * `end` - End date (optional, same format as start)
     ///
     /// # Example
     ///
@@ -590,12 +613,24 @@ impl SearchQuery {
     ///
     /// let query = SearchQuery::new()
     ///     .query("recent discoveries")
-    ///     .entry_date_range(2023, Some(2024));
+    ///     .entry_date_between(2023, Some(2024));
     /// ```
-    pub fn entry_date_range(mut self, start_year: u32, end_year: Option<u32>) -> Self {
-        let date_filter = match end_year {
-            Some(end) => format!("{}:{}[edat]", start_year, end),
-            None => format!("{}:3000[edat]", start_year),
+    pub fn entry_date_between<S, E>(mut self, start: S, end: Option<E>) -> Self
+    where
+        S: Into<PubDate>,
+        E: Into<PubDate>,
+    {
+        let start_date = start.into();
+        let date_filter = match end {
+            Some(end_date) => {
+                let end_date = end_date.into();
+                format!(
+                    "{}:{}[edat]",
+                    start_date.to_pubmed_string(),
+                    end_date.to_pubmed_string()
+                )
+            }
+            None => format!("{}:3000[edat]", start_date.to_pubmed_string()),
         };
         self.filters.push(date_filter);
         self
@@ -605,8 +640,8 @@ impl SearchQuery {
     ///
     /// # Arguments
     ///
-    /// * `start_year` - Start year
-    /// * `end_year` - End year (optional)
+    /// * `start` - Start date (can be year, (year, month), or (year, month, day))
+    /// * `end` - End date (optional, same format as start)
     ///
     /// # Example
     ///
@@ -615,55 +650,93 @@ impl SearchQuery {
     ///
     /// let query = SearchQuery::new()
     ///     .query("updated articles")
-    ///     .modification_date_range(2023, None);
+    ///     .modification_date_between(2023, None);
     /// ```
-    pub fn modification_date_range(mut self, start_year: u32, end_year: Option<u32>) -> Self {
-        let date_filter = match end_year {
-            Some(end) => format!("{}:{}[mdat]", start_year, end),
-            None => format!("{}:3000[mdat]", start_year),
+    pub fn modification_date_between<S, E>(mut self, start: S, end: Option<E>) -> Self
+    where
+        S: Into<PubDate>,
+        E: Into<PubDate>,
+    {
+        let start_date = start.into();
+        let date_filter = match end {
+            Some(end_date) => {
+                let end_date = end_date.into();
+                format!(
+                    "{}:{}[mdat]",
+                    start_date.to_pubmed_string(),
+                    end_date.to_pubmed_string()
+                )
+            }
+            None => format!("{}:3000[mdat]", start_date.to_pubmed_string()),
         };
         self.filters.push(date_filter);
         self
     }
 
-    /// Filter to articles published after a specific year
+    /// Filter to articles published after a specific date
     ///
     /// # Arguments
     ///
-    /// * `year` - Year after which articles were published
+    /// * `date` - Date after which articles were published (can be year, (year, month), or (year, month, day))
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```
     /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
+    /// // After a specific year
     /// let query = SearchQuery::new()
     ///     .query("crispr")
     ///     .published_after(2020);
+    ///
+    /// // After a specific month
+    /// let query = SearchQuery::new()
+    ///     .query("covid treatment")
+    ///     .published_after((2020, 3));
+    ///
+    /// // After a specific date
+    /// let query = SearchQuery::new()
+    ///     .query("pandemic response")
+    ///     .published_after((2020, 3, 15));
     /// ```
-    pub fn published_after(self, year: u32) -> Self {
-        self.date_range(year, None)
+    pub fn published_after<D>(self, date: D) -> Self
+    where
+        D: Into<PubDate>,
+    {
+        self.published_between(date, None::<u32>)
     }
 
-    /// Filter to articles published before a specific year
+    /// Filter to articles published before a specific date
     ///
     /// # Arguments
     ///
-    /// * `year` - Year before which articles were published
+    /// * `date` - Date before which articles were published (can be year, (year, month), or (year, month, day))
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```
     /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
+    /// // Before a specific year
     /// let query = SearchQuery::new()
     ///     .query("genome sequencing")
     ///     .published_before(2020);
+    ///
+    /// // Before a specific month
+    /// let query = SearchQuery::new()
+    ///     .query("early research")
+    ///     .published_before((2020, 3));
+    ///
+    /// // Before a specific date
+    /// let query = SearchQuery::new()
+    ///     .query("pre-pandemic studies")
+    ///     .published_before((2020, 3, 15));
     /// ```
-    pub fn published_before(mut self, year: u32) -> Self {
-        let date_filter = format!("1900:{}[pdat]", year);
-        self.filters.push(date_filter);
-        self
+    pub fn published_before<D>(self, date: D) -> Self
+    where
+        D: Into<PubDate>,
+    {
+        self.published_between(1900, Some(date))
     }
 
     /// Set maximum number of results
@@ -1662,6 +1735,30 @@ mod tests {
         );
     }
 
+    // Tests for PubDate type
+    #[test]
+    fn test_pubdate_creation() {
+        let year_only = PubDate::from(2023);
+        assert_eq!(year_only.to_pubmed_string(), "2023");
+
+        let year_month = PubDate::from((2023, 6));
+        assert_eq!(year_month.to_pubmed_string(), "2023/06");
+
+        let year_month_day = PubDate::from((2023, 6, 15));
+        assert_eq!(year_month_day.to_pubmed_string(), "2023/06/15");
+    }
+
+    #[test]
+    fn test_pubdate_constructors() {
+        let date1 = PubDate::new(2023);
+        let date2 = PubDate::with_month(2023, 6);
+        let date3 = PubDate::with_day(2023, 6, 15);
+
+        assert_eq!(date1.to_pubmed_string(), "2023");
+        assert_eq!(date2.to_pubmed_string(), "2023/06");
+        assert_eq!(date3.to_pubmed_string(), "2023/06/15");
+    }
+
     // New tests for field-specific searches
     #[test]
     fn test_title_contains() {
@@ -1791,44 +1888,142 @@ mod tests {
         assert_eq!(query, "AI AND 2023[pdat]");
     }
 
+    // Tests for new simplified date API
     #[test]
-    fn test_date_range_with_month() {
+    fn test_published_between_years() {
         let query = SearchQuery::new()
             .query("covid")
-            .date_range_with_month(2020, 3, Some(2021), Some(12))
+            .published_between(2020, Some(2023))
             .build();
 
-        assert_eq!(query, "covid AND 2020/03:2021/12[pdat]");
+        assert_eq!(query, "covid AND 2020:2023[pdat]");
     }
 
     #[test]
-    fn test_date_range_precise() {
+    fn test_published_between_months() {
         let query = SearchQuery::new()
             .query("pandemic")
-            .date_range_precise(2020, 3, 15, Some(2020), Some(12), Some(31))
+            .published_between((2020, 3), Some((2021, 12)))
             .build();
 
-        assert_eq!(query, "pandemic AND 2020/03/15:2020/12/31[pdat]");
+        assert_eq!(query, "pandemic AND 2020/03:2021/12[pdat]");
     }
 
     #[test]
-    fn test_entry_date_range() {
+    fn test_published_between_days() {
+        let query = SearchQuery::new()
+            .query("outbreak")
+            .published_between((2020, 3, 15), Some((2020, 12, 31)))
+            .build();
+
+        assert_eq!(query, "outbreak AND 2020/03/15:2020/12/31[pdat]");
+    }
+
+    #[test]
+    fn test_published_between_open_ended() {
         let query = SearchQuery::new()
             .query("recent")
-            .entry_date_range(2023, Some(2024))
+            .published_between(2023, None::<u32>)
+            .build();
+
+        assert_eq!(query, "recent AND 2023:3000[pdat]");
+    }
+
+    #[test]
+    fn test_published_after_year() {
+        let query = SearchQuery::new().query("ai").published_after(2020).build();
+
+        assert_eq!(query, "ai AND 2020:3000[pdat]");
+    }
+
+    #[test]
+    fn test_published_after_month() {
+        let query = SearchQuery::new()
+            .query("covid")
+            .published_after((2020, 3))
+            .build();
+
+        assert_eq!(query, "covid AND 2020/03:3000[pdat]");
+    }
+
+    #[test]
+    fn test_published_after_day() {
+        let query = SearchQuery::new()
+            .query("pandemic")
+            .published_after((2020, 3, 15))
+            .build();
+
+        assert_eq!(query, "pandemic AND 2020/03/15:3000[pdat]");
+    }
+
+    #[test]
+    fn test_published_before_year() {
+        let query = SearchQuery::new()
+            .query("historical")
+            .published_before(2020)
+            .build();
+
+        assert_eq!(query, "historical AND 1900:2020[pdat]");
+    }
+
+    #[test]
+    fn test_published_before_month() {
+        let query = SearchQuery::new()
+            .query("early")
+            .published_before((2020, 3))
+            .build();
+
+        assert_eq!(query, "early AND 1900:2020/03[pdat]");
+    }
+
+    #[test]
+    fn test_published_before_day() {
+        let query = SearchQuery::new()
+            .query("pre-pandemic")
+            .published_before((2020, 3, 15))
+            .build();
+
+        assert_eq!(query, "pre-pandemic AND 1900:2020/03/15[pdat]");
+    }
+
+    #[test]
+    fn test_entry_date_between() {
+        let query = SearchQuery::new()
+            .query("recent")
+            .entry_date_between(2023, Some(2024))
             .build();
 
         assert_eq!(query, "recent AND 2023:2024[edat]");
     }
 
     #[test]
-    fn test_modification_date_range() {
+    fn test_entry_date_between_with_precision() {
+        let query = SearchQuery::new()
+            .query("new entries")
+            .entry_date_between((2023, 6), None::<u32>)
+            .build();
+
+        assert_eq!(query, "new entries AND 2023/06:3000[edat]");
+    }
+
+    #[test]
+    fn test_modification_date_between() {
         let query = SearchQuery::new()
             .query("updated")
-            .modification_date_range(2023, None)
+            .modification_date_between(2023, None::<u32>)
             .build();
 
         assert_eq!(query, "updated AND 2023:3000[mdat]");
+    }
+
+    #[test]
+    fn test_modification_date_between_with_precision() {
+        let query = SearchQuery::new()
+            .query("recently modified")
+            .modification_date_between((2023, 1, 1), Some((2023, 12, 31)))
+            .build();
+
+        assert_eq!(query, "recently modified AND 2023/01/01:2023/12/31[mdat]");
     }
 
     // Tests for boolean query combinations
