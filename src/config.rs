@@ -1,4 +1,5 @@
 use crate::rate_limit::RateLimiter;
+use crate::retry::RetryConfig;
 use std::time::Duration;
 
 /// Configuration options for PubMed and PMC clients
@@ -54,6 +55,11 @@ pub struct ClientConfig {
     /// NCBI recommends including a tool name in requests.
     /// Default: "pubmed-client-rs"
     pub tool: Option<String>,
+
+    /// Retry configuration for handling transient failures
+    ///
+    /// Default: 3 retries with exponential backoff starting at 1 second
+    pub retry_config: RetryConfig,
 }
 
 impl ClientConfig {
@@ -75,6 +81,7 @@ impl ClientConfig {
             base_url: None,
             email: None,
             tool: None,
+            retry_config: RetryConfig::default(),
         }
     }
 
@@ -212,6 +219,31 @@ impl ClientConfig {
     /// ```
     pub fn with_tool<S: Into<String>>(mut self, tool: S) -> Self {
         self.tool = Some(tool.into());
+        self
+    }
+
+    /// Set retry configuration for handling transient failures
+    ///
+    /// # Arguments
+    ///
+    /// * `retry_config` - Custom retry configuration
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client_rs::retry::RetryConfig;
+    /// use std::time::Duration;
+    ///
+    /// let retry_config = RetryConfig::new()
+    ///     .with_max_retries(5)
+    ///     .with_initial_delay(Duration::from_secs(2));
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_retry_config(retry_config);
+    /// ```
+    pub fn with_retry_config(mut self, retry_config: RetryConfig) -> Self {
+        self.retry_config = retry_config;
         self
     }
 

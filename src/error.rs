@@ -1,3 +1,4 @@
+use crate::retry::RetryableError;
 use thiserror::Error;
 
 /// Error types for PubMed client operations
@@ -45,3 +46,76 @@ pub enum PubMedError {
 }
 
 pub type Result<T> = std::result::Result<T, PubMedError>;
+
+impl RetryableError for PubMedError {
+    fn is_retryable(&self) -> bool {
+        match self {
+            // Network errors are typically transient
+            PubMedError::RequestError(err) => {
+                // Check if it's a network-related error
+                if err.is_timeout() || err.is_connect() {
+                    return true;
+                }
+
+                // Check for server errors (5xx)
+                if let Some(status) = err.status() {
+                    return status.is_server_error() || status.as_u16() == 429;
+                }
+
+                // DNS and other network errors
+                !err.is_builder() && !err.is_redirect() && !err.is_decode()
+            }
+
+            // Rate limiting should be retried after delay
+            PubMedError::RateLimitExceeded => true,
+
+            // API errors might be retryable if they indicate server issues
+            PubMedError::ApiError { message } => {
+                let lower_msg = message.to_lowercase();
+                lower_msg.contains("temporarily unavailable")
+                    || lower_msg.contains("server error")
+                    || lower_msg.contains("timeout")
+                    || lower_msg.contains("500")
+                    || lower_msg.contains("502")
+                    || lower_msg.contains("503")
+                    || lower_msg.contains("504")
+                    || lower_msg.contains("429")
+            }
+
+            // All other errors are not retryable
+            PubMedError::JsonError(_)
+            | PubMedError::XmlError(_)
+            | PubMedError::XmlParseError { .. }
+            | PubMedError::ArticleNotFound { .. }
+            | PubMedError::PmcNotAvailable { .. }
+            | PubMedError::PmcNotAvailableById { .. }
+            | PubMedError::InvalidPmid { .. } => false,
+        }
+    }
+
+    fn retry_reason(&self) -> &str {
+        if self.is_retryable() {
+            match self {
+                PubMedError::RequestError(err) if err.is_timeout() => "Request timeout",
+                PubMedError::RequestError(err) if err.is_connect() => "Connection error",
+                PubMedError::RequestError(_) => "Network error",
+                PubMedError::RateLimitExceeded => "Rate limit exceeded",
+                PubMedError::ApiError { .. } => "Temporary API error",
+                _ => "Transient error",
+            }
+        } else {
+            match self {
+                PubMedError::JsonError(_) => "Invalid JSON response",
+                PubMedError::XmlError(_) | PubMedError::XmlParseError { .. } => {
+                    "Invalid XML response"
+                }
+                PubMedError::ArticleNotFound { .. } => "Article does not exist",
+                PubMedError::PmcNotAvailable { .. } | PubMedError::PmcNotAvailableById { .. } => {
+                    "Content not available"
+                }
+                PubMedError::InvalidPmid { .. } => "Invalid input",
+                _ => "Non-transient error",
+            }
+        }
+    }
+}

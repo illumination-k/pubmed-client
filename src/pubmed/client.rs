@@ -6,7 +6,8 @@ use crate::pubmed::models::{
 use crate::pubmed::parser::PubMedXmlParser;
 use crate::pubmed::responses::{EInfoResponse, ELinkResponse, ESearchResult};
 use crate::rate_limit::RateLimiter;
-use reqwest::Client;
+use crate::retry::with_retry;
+use reqwest::{Client, Response};
 use tracing::{debug, info, instrument, warn};
 
 /// Client for interacting with PubMed API
@@ -173,9 +174,6 @@ impl PubMedClient {
             });
         }
 
-        // Acquire rate limit token before making request
-        self.rate_limiter.acquire().await?;
-
         // Build URL with API parameters
         let mut url = format!(
             "{}/efetch.fcgi?db=pubmed&id={}&retmode=xml&rettype=abstract",
@@ -194,7 +192,7 @@ impl PubMedClient {
         }
 
         debug!("Making EFetch API request");
-        let response = self.client.get(&url).send().await?;
+        let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
             warn!("API request failed with status: {}", response.status());
@@ -267,9 +265,6 @@ impl PubMedClient {
             return Ok(Vec::new());
         }
 
-        // Acquire rate limit token before making request
-        self.rate_limiter.acquire().await?;
-
         // Build URL with API parameters
         let mut url = format!(
             "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retmode=json",
@@ -288,7 +283,7 @@ impl PubMedClient {
         }
 
         debug!("Making ESearch API request");
-        let response = self.client.get(&url).send().await?;
+        let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
             warn!(
@@ -385,9 +380,6 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self))]
     pub async fn get_database_list(&self) -> Result<Vec<String>> {
-        // Acquire rate limit token before making request
-        self.rate_limiter.acquire().await?;
-
         // Build URL with API parameters
         let mut url = format!("{}/einfo.fcgi?retmode=json", self.base_url);
 
@@ -401,7 +393,7 @@ impl PubMedClient {
         }
 
         debug!("Making EInfo API request for database list");
-        let response = self.client.get(&url).send().await?;
+        let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
             warn!(
@@ -471,9 +463,6 @@ impl PubMedClient {
             });
         }
 
-        // Acquire rate limit token before making request
-        self.rate_limiter.acquire().await?;
-
         // Build URL with API parameters
         let mut url = format!(
             "{}/einfo.fcgi?db={}&retmode=json",
@@ -491,7 +480,7 @@ impl PubMedClient {
         }
 
         debug!("Making EInfo API request for database details");
-        let response = self.client.get(&url).send().await?;
+        let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
             warn!(
@@ -781,6 +770,41 @@ impl PubMedClient {
         })
     }
 
+    /// Internal helper method for making HTTP requests with retry logic
+    async fn make_request(&self, url: &str) -> Result<Response> {
+        with_retry(
+            || async {
+                self.rate_limiter.acquire().await?;
+                debug!("Making API request to: {}", url);
+                let response = self
+                    .client
+                    .get(url)
+                    .send()
+                    .await
+                    .map_err(PubMedError::from)?;
+
+                // Check if response has server error status and convert to retryable error
+                if response.status().is_server_error() || response.status().as_u16() == 429 {
+                    return Err(PubMedError::ApiError {
+                        message: format!(
+                            "HTTP {}: {}",
+                            response.status(),
+                            response
+                                .status()
+                                .canonical_reason()
+                                .unwrap_or("Unknown error")
+                        ),
+                    });
+                }
+
+                Ok(response)
+            },
+            &self.config.retry_config,
+            "NCBI API request",
+        )
+        .await
+    }
+
     /// Internal helper method for ELink API requests
     async fn elink_request(
         &self,
@@ -791,9 +815,6 @@ impl PubMedClient {
         // Convert PMIDs to strings and join with commas
         let id_list: Vec<String> = pmids.iter().map(|id| id.to_string()).collect();
         let ids = id_list.join(",");
-
-        // Acquire rate limit token before making request
-        self.rate_limiter.acquire().await?;
 
         // Build URL with API parameters
         let mut url = format!(
@@ -814,7 +835,7 @@ impl PubMedClient {
         }
 
         debug!("Making ELink API request");
-        let response = self.client.get(&url).send().await?;
+        let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
             warn!(

@@ -3,7 +3,9 @@ use crate::error::{PubMedError, Result};
 use crate::pmc::models::PmcFullText;
 use crate::pmc::parser::PmcXmlParser;
 use crate::rate_limit::RateLimiter;
-use reqwest::Client;
+use crate::retry::with_retry;
+use reqwest::{Client, Response};
+use tracing::debug;
 
 /// Client for interacting with PMC (PubMed Central) API
 #[derive(Clone)]
@@ -164,9 +166,6 @@ impl PmcClient {
             });
         }
 
-        // Acquire rate limit token before making request
-        self.rate_limiter.acquire().await?;
-
         // Build URL with API parameters
         let mut url = format!(
             "{}/efetch.fcgi?db=pmc&id=PMC{}&retmode=xml",
@@ -182,7 +181,7 @@ impl PmcClient {
             url.push_str(&urlencoding::encode(&value));
         }
 
-        let response = self.client.get(&url).send().await?;
+        let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
             return Err(PubMedError::ApiError {
@@ -245,9 +244,6 @@ impl PmcClient {
             });
         }
 
-        // Acquire rate limit token before making request
-        self.rate_limiter.acquire().await?;
-
         // Build URL with API parameters
         let mut url = format!(
             "{}/elink.fcgi?dbfrom=pubmed&db=pmc&id={}&retmode=json",
@@ -263,7 +259,7 @@ impl PmcClient {
             url.push_str(&urlencoding::encode(&value));
         }
 
-        let response = self.client.get(&url).send().await?;
+        let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
             return Err(PubMedError::ApiError {
@@ -352,6 +348,41 @@ impl PmcClient {
         } else {
             format!("PMC{}", pmcid)
         }
+    }
+
+    /// Internal helper method for making HTTP requests with retry logic
+    async fn make_request(&self, url: &str) -> Result<Response> {
+        with_retry(
+            || async {
+                self.rate_limiter.acquire().await?;
+                debug!("Making API request to: {}", url);
+                let response = self
+                    .client
+                    .get(url)
+                    .send()
+                    .await
+                    .map_err(PubMedError::from)?;
+
+                // Check if response has server error status and convert to retryable error
+                if response.status().is_server_error() || response.status().as_u16() == 429 {
+                    return Err(PubMedError::ApiError {
+                        message: format!(
+                            "HTTP {}: {}",
+                            response.status(),
+                            response
+                                .status()
+                                .canonical_reason()
+                                .unwrap_or("Unknown error")
+                        ),
+                    });
+                }
+
+                Ok(response)
+            },
+            &self.config.retry_config,
+            "NCBI API request",
+        )
+        .await
     }
 }
 
