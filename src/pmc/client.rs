@@ -185,14 +185,12 @@ impl PmcClient {
 
         if !response.status().is_success() {
             return Err(PubMedError::ApiError {
-                message: format!(
-                    "HTTP {}: {}",
-                    response.status(),
-                    response
-                        .status()
-                        .canonical_reason()
-                        .unwrap_or("Unknown error")
-                ),
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
             });
         }
 
@@ -263,14 +261,12 @@ impl PmcClient {
 
         if !response.status().is_success() {
             return Err(PubMedError::ApiError {
-                message: format!(
-                    "HTTP {}: {}",
-                    response.status(),
-                    response
-                        .status()
-                        .canonical_reason()
-                        .unwrap_or("Unknown error")
-                ),
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
             });
         }
 
@@ -366,14 +362,12 @@ impl PmcClient {
                 // Check if response has server error status and convert to retryable error
                 if response.status().is_server_error() || response.status().as_u16() == 429 {
                     return Err(PubMedError::ApiError {
-                        message: format!(
-                            "HTTP {}: {}",
-                            response.status(),
-                            response
-                                .status()
-                                .canonical_reason()
-                                .unwrap_or("Unknown error")
-                        ),
+                        status: response.status().as_u16(),
+                        message: response
+                            .status()
+                            .canonical_reason()
+                            .unwrap_or("Unknown error")
+                            .to_string(),
                     });
                 }
 

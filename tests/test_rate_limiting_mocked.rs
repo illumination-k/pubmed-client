@@ -346,8 +346,8 @@ async fn test_rate_limiting_with_429_responses() {
     assert!(result.is_err());
 
     match result.unwrap_err() {
-        PubMedError::ApiError { message } => {
-            assert!(message.contains("429"));
+        PubMedError::ApiError { status, message } => {
+            assert_eq!(status, 429);
             assert!(message.contains("Too Many Requests"));
         }
         other => panic!("Expected ApiError, got: {:?}", other),
@@ -369,8 +369,8 @@ async fn test_realistic_429_rate_limit_response() {
     assert!(result.is_err());
 
     match result.unwrap_err() {
-        PubMedError::ApiError { message } => {
-            assert!(message.contains("429"));
+        PubMedError::ApiError { status, message } => {
+            assert_eq!(status, 429);
             assert!(message.contains("Too Many Requests"));
         }
         other => panic!("Expected ApiError for 429, got: {:?}", other),
@@ -391,8 +391,9 @@ async fn test_server_rate_limit_simulation() {
     let result = client.search_articles("test", 1).await;
     assert!(result.is_err());
 
-    if let Err(PubMedError::ApiError { message }) = result {
-        assert!(message.contains("429"));
+    if let Err(PubMedError::ApiError { status, message }) = result {
+        assert_eq!(status, 429);
+        assert!(message.contains("Too Many Requests"));
     } else {
         panic!("Expected ApiError with 429 status");
     }

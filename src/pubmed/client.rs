@@ -197,14 +197,12 @@ impl PubMedClient {
         if !response.status().is_success() {
             warn!("API request failed with status: {}", response.status());
             return Err(PubMedError::ApiError {
-                message: format!(
-                    "HTTP {}: {}",
-                    response.status(),
-                    response
-                        .status()
-                        .canonical_reason()
-                        .unwrap_or("Unknown error")
-                ),
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
             });
         }
 
@@ -291,14 +289,12 @@ impl PubMedClient {
                 response.status()
             );
             return Err(PubMedError::ApiError {
-                message: format!(
-                    "HTTP {}: {}",
-                    response.status(),
-                    response
-                        .status()
-                        .canonical_reason()
-                        .unwrap_or("Unknown error")
-                ),
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
             });
         }
 
@@ -401,14 +397,12 @@ impl PubMedClient {
                 response.status()
             );
             return Err(PubMedError::ApiError {
-                message: format!(
-                    "HTTP {}: {}",
-                    response.status(),
-                    response
-                        .status()
-                        .canonical_reason()
-                        .unwrap_or("Unknown error")
-                ),
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
             });
         }
 
@@ -459,6 +453,7 @@ impl PubMedClient {
     pub async fn get_database_info(&self, database: &str) -> Result<DatabaseInfo> {
         if database.trim().is_empty() {
             return Err(PubMedError::ApiError {
+                status: 400,
                 message: "Database name cannot be empty".to_string(),
             });
         }
@@ -488,14 +483,12 @@ impl PubMedClient {
                 response.status()
             );
             return Err(PubMedError::ApiError {
-                message: format!(
-                    "HTTP {}: {}",
-                    response.status(),
-                    response
-                        .status()
-                        .canonical_reason()
-                        .unwrap_or("Unknown error")
-                ),
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
             });
         }
 
@@ -506,6 +499,7 @@ impl PubMedClient {
                 .einfo_result
                 .db_info
                 .ok_or_else(|| PubMedError::ApiError {
+                    status: 404,
                     message: format!(
                         "Database '{}' not found or no information available",
                         database
@@ -516,6 +510,7 @@ impl PubMedClient {
             .into_iter()
             .next()
             .ok_or_else(|| PubMedError::ApiError {
+                status: 404,
                 message: format!("Database '{}' information not found", database),
             })?;
 
@@ -786,14 +781,12 @@ impl PubMedClient {
                 // Check if response has server error status and convert to retryable error
                 if response.status().is_server_error() || response.status().as_u16() == 429 {
                     return Err(PubMedError::ApiError {
-                        message: format!(
-                            "HTTP {}: {}",
-                            response.status(),
-                            response
-                                .status()
-                                .canonical_reason()
-                                .unwrap_or("Unknown error")
-                        ),
+                        status: response.status().as_u16(),
+                        message: response
+                            .status()
+                            .canonical_reason()
+                            .unwrap_or("Unknown error")
+                            .to_string(),
                     });
                 }
 
@@ -843,14 +836,12 @@ impl PubMedClient {
                 response.status()
             );
             return Err(PubMedError::ApiError {
-                message: format!(
-                    "HTTP {}: {}",
-                    response.status(),
-                    response
-                        .status()
-                        .canonical_reason()
-                        .unwrap_or("Unknown error")
-                ),
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
             });
         }
 

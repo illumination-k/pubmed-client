@@ -204,12 +204,8 @@ async fn test_max_retries_exceeded() {
     // Should fail after exhausting retries
     assert!(result.is_err());
     match result {
-        Err(PubMedError::ApiError { message }) => {
-            assert!(
-                message.contains("503"),
-                "Expected 503 error in message: {}",
-                message
-            );
+        Err(PubMedError::ApiError { status, message: _ }) => {
+            assert_eq!(status, 503, "Expected 503 status code");
         }
         Err(e) => {
             panic!("Expected ApiError, got: {:?}", e);

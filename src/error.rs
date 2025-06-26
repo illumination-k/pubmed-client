@@ -40,9 +40,9 @@ pub enum PubMedError {
     #[error("API rate limit exceeded")]
     RateLimitExceeded,
 
-    /// Generic API error
-    #[error("API error: {message}")]
-    ApiError { message: String },
+    /// Generic API error with HTTP status code
+    #[error("API error {status}: {message}")]
+    ApiError { status: u16, message: String },
 }
 
 pub type Result<T> = std::result::Result<T, PubMedError>;
@@ -70,16 +70,15 @@ impl RetryableError for PubMedError {
             PubMedError::RateLimitExceeded => true,
 
             // API errors might be retryable if they indicate server issues
-            PubMedError::ApiError { message } => {
-                let lower_msg = message.to_lowercase();
-                lower_msg.contains("temporarily unavailable")
-                    || lower_msg.contains("server error")
-                    || lower_msg.contains("timeout")
-                    || lower_msg.contains("500")
-                    || lower_msg.contains("502")
-                    || lower_msg.contains("503")
-                    || lower_msg.contains("504")
-                    || lower_msg.contains("429")
+            PubMedError::ApiError { status, message } => {
+                // Server errors (5xx) and rate limiting (429) are retryable
+                (*status >= 500 && *status < 600) || *status == 429 || {
+                    // Also check message for specific error conditions
+                    let lower_msg = message.to_lowercase();
+                    lower_msg.contains("temporarily unavailable")
+                        || lower_msg.contains("timeout")
+                        || lower_msg.contains("connection")
+                }
             }
 
             // All other errors are not retryable
@@ -100,7 +99,11 @@ impl RetryableError for PubMedError {
                 PubMedError::RequestError(err) if err.is_connect() => "Connection error",
                 PubMedError::RequestError(_) => "Network error",
                 PubMedError::RateLimitExceeded => "Rate limit exceeded",
-                PubMedError::ApiError { .. } => "Temporary API error",
+                PubMedError::ApiError { status, .. } => match status {
+                    429 => "Rate limit exceeded",
+                    500..=599 => "Server error",
+                    _ => "Temporary API error",
+                },
                 _ => "Transient error",
             }
         } else {
