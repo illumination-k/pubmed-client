@@ -78,7 +78,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new();
     /// ```
@@ -99,7 +99,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("covid-19 treatment");
@@ -118,7 +118,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .terms(&["covid-19", "treatment", "vaccine"]);
@@ -135,7 +135,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer")
@@ -151,7 +151,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("diabetes")
@@ -167,7 +167,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("machine learning")
@@ -183,7 +183,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("genetics")
@@ -203,7 +203,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::{SearchQuery, ArticleType};
+    /// use pubmed_client_rs::pubmed::{SearchQuery, ArticleType};
     ///
     /// let query = SearchQuery::new()
     ///     .query("hypertension")
@@ -236,7 +236,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::{SearchQuery, Language};
+    /// use pubmed_client_rs::pubmed::{SearchQuery, Language};
     ///
     /// let query = SearchQuery::new()
     ///     .query("stem cells")
@@ -257,7 +257,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("immunotherapy")
@@ -281,7 +281,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("crispr")
@@ -300,7 +300,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("genome sequencing")
@@ -321,7 +321,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("alzheimer")
@@ -341,7 +341,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer")
@@ -361,7 +361,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .mesh_major_topic("Diabetes Mellitus, Type 2");
@@ -381,7 +381,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .mesh_term("Neoplasms");
@@ -401,7 +401,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .mesh_terms(&["Neoplasms", "Antineoplastic Agents"]);
@@ -422,7 +422,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .mesh_term("Diabetes Mellitus")
@@ -439,7 +439,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("diabetes treatment")
@@ -459,7 +459,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::query::SearchQuery;
+    /// use pubmed_client_rs::pubmed::SearchQuery;
     ///
     /// let query_string = SearchQuery::new()
     ///     .query("covid-19")
@@ -502,7 +502,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, query::SearchQuery};
+    /// use pubmed_client_rs::{PubMedClient, pubmed::SearchQuery};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -538,7 +538,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, query::SearchQuery};
+    /// use pubmed_client_rs::{PubMedClient, pubmed::SearchQuery};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
