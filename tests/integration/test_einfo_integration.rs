@@ -1,4 +1,5 @@
 use pubmed_client_rs::{Client, PubMedClient};
+use tracing::{info, warn};
 
 #[tokio::test]
 async fn test_get_database_list_integration() {
@@ -18,15 +19,15 @@ async fn test_get_database_list_integration() {
                 "Should contain pmc database"
             );
 
-            println!("Found {} databases", databases.len());
-            println!(
-                "First 10 databases: {:?}",
-                &databases[..10.min(databases.len())]
+            info!(
+                database_count = databases.len(),
+                first_databases = ?&databases[..10.min(databases.len())],
+                "Found databases"
             );
         }
         Err(e) => {
             // If we're offline or have rate limiting issues, just warn
-            eprintln!("Warning: Could not fetch database list: {}", e);
+            warn!(error = %e, "Could not fetch database list");
         }
     }
 }
@@ -46,25 +47,31 @@ async fn test_get_pubmed_database_info_integration() {
 
             // Check for common PubMed fields
             let field_names: Vec<&str> = db_info.fields.iter().map(|f| f.name.as_str()).collect();
-            println!(
-                "Available fields: {:?}",
-                &field_names[..10.min(field_names.len())]
+            info!(
+                available_fields = ?&field_names[..10.min(field_names.len())],
+                "Available fields found"
             );
             assert!(field_names.contains(&"TITL"), "Should have title field");
             assert!(field_names.contains(&"FULL"), "Should have author field");
 
-            println!("PubMed database:");
-            println!("  Description: {}", db_info.description);
-            println!("  Fields: {}", db_info.fields.len());
-            println!("  Links: {}", db_info.links.len());
+            info!(
+                description = %db_info.description,
+                field_count = db_info.fields.len(),
+                link_count = db_info.links.len(),
+                "PubMed database information"
+            );
 
-            // Print first few fields
+            // Log first few fields
             for field in db_info.fields.iter().take(5) {
-                println!("  Field: {} - {}", field.name, field.full_name);
+                info!(
+                    field_name = %field.name,
+                    field_full_name = %field.full_name,
+                    "PubMed field"
+                );
             }
         }
         Err(e) => {
-            eprintln!("Warning: Could not fetch PubMed database info: {}", e);
+            warn!(error = %e, "Could not fetch PubMed database info");
         }
     }
 }
@@ -81,13 +88,15 @@ async fn test_get_pmc_database_info_integration() {
                 "Description should not be empty"
             );
 
-            println!("PMC database:");
-            println!("  Description: {}", db_info.description);
-            println!("  Fields: {}", db_info.fields.len());
-            println!("  Links: {}", db_info.links.len());
+            info!(
+                description = %db_info.description,
+                field_count = db_info.fields.len(),
+                link_count = db_info.links.len(),
+                "PMC database information"
+            );
         }
         Err(e) => {
-            eprintln!("Warning: Could not fetch PMC database info: {}", e);
+            warn!(error = %e, "Could not fetch PMC database info");
         }
     }
 }
@@ -119,10 +128,13 @@ async fn test_combined_client_einfo() {
     match client.get_database_list().await {
         Ok(databases) => {
             assert!(!databases.is_empty(), "Database list should not be empty");
-            println!("Combined client found {} databases", databases.len());
+            info!(
+                database_count = databases.len(),
+                "Combined client found databases"
+            );
         }
         Err(e) => {
-            eprintln!("Warning: Combined client database list failed: {}", e);
+            warn!(error = %e, "Combined client database list failed");
         }
     }
 
@@ -130,13 +142,13 @@ async fn test_combined_client_einfo() {
     match client.get_database_info("pubmed").await {
         Ok(db_info) => {
             assert_eq!(db_info.name, "pubmed");
-            println!(
-                "Combined client got PubMed info with {} fields",
-                db_info.fields.len()
+            info!(
+                field_count = db_info.fields.len(),
+                "Combined client got PubMed info"
             );
         }
         Err(e) => {
-            eprintln!("Warning: Combined client database info failed: {}", e);
+            warn!(error = %e, "Combined client database info failed");
         }
     }
 }

@@ -38,7 +38,7 @@ pub enum HeadingStyle {
 /// Reference formatting style
 #[derive(Debug, Clone, PartialEq)]
 pub enum ReferenceStyle {
-    /// Numbered references [1], [2], etc.
+    /// Numbered references \[1\], \[2\], etc.
     Numbered,
     /// Author-year style (Smith, 2023)
     AuthorYear,
