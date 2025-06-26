@@ -29,7 +29,9 @@ mod integration_tests {
     use pubmed_client_rs::pmc::markdown::PmcMarkdownConverter;
 
     // Import test utilities
-    use crate::common::{TEST_PMCIDS, create_test_pmc_client, should_run_real_api_tests};
+    use crate::common::integration_test_utils::{
+        TEST_PMCIDS, create_test_pmc_client, create_test_pubmed_client, should_run_real_api_tests,
+    };
 
     /// Test fetching PMC full-text articles
     #[tokio::test]
@@ -182,7 +184,7 @@ mod integration_tests {
                             first_author.surname.as_deref().unwrap_or("")
                         );
                         assert!(
-                            markdown.contains(&author_name.trim())
+                            markdown.contains(author_name.trim())
                                 || markdown.contains(first_author.surname.as_deref().unwrap_or(""))
                                 || markdown.contains(&first_author.full_name),
                             "Markdown should contain author information"
@@ -511,7 +513,7 @@ mod integration_tests {
         info!("Testing PMC combined workflow integration");
 
         // Create both PubMed and PMC clients for the workflow
-        let pubmed_client = crate::common::create_test_pubmed_client();
+        let pubmed_client = create_test_pubmed_client();
         let pmc_client = create_test_pmc_client();
 
         // Step 1: Search for articles that might have PMC full text
@@ -629,7 +631,7 @@ mod integration_tests {
 
         // The workflow is successful if we can execute all steps without errors
         // Even if no full text is available, the API integration is working
-        assert!(pmids.len() > 0, "Should find some articles in search");
+        assert!(!pmids.is_empty(), "Should find some articles in search");
     }
 }
 

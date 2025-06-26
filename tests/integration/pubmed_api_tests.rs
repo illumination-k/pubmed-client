@@ -29,7 +29,7 @@ mod integration_tests {
     use pubmed_client_rs::{PubMedError, SearchQuery};
 
     // Import test utilities
-    use crate::common::{
+    use crate::common::integration_test_utils::{
         TEST_PMIDS, TEST_PMIDS_STR, TEST_SEARCH_QUERIES, create_test_pubmed_client,
         should_run_real_api_tests,
     };

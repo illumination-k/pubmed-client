@@ -24,7 +24,7 @@ mod integration_tests {
     use pubmed_client_rs::{ClientConfig, PubMedClient, PubMedError};
 
     // Import test utilities
-    use crate::common::{
+    use crate::common::integration_test_utils::{
         create_test_pmc_client, create_test_pubmed_client, should_run_real_api_tests,
     };
 
@@ -295,7 +295,7 @@ mod integration_tests {
 
         let mut tasks = Vec::new();
 
-        for (_i, (label, query)) in queries.iter().enumerate() {
+        for (label, query) in queries.iter() {
             let client = client.clone();
             let label = label.to_string();
             let query = query.to_string();
