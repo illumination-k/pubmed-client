@@ -7,6 +7,7 @@ repos:
       - id: check-yaml
       - id: check-toml
       - id: check-json
+        exclude: "^tests/integration/test_data/"
       - id: check-merge-conflict
       - id: check-added-large-files
         args: ["--maxkb=1000"]
@@ -26,4 +27,5 @@ repos:
         entry: dprint fmt
         language: system
         files: '\.(json|toml|md|yaml|yml)$'
+        exclude: "^tests/integration/test_data/"
         pass_filenames: false

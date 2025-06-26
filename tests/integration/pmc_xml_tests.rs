@@ -1,5 +1,6 @@
 mod common;
 use common::get_pmc_xml_test_cases;
+use tracing::{info, warn};
 
 #[cfg(test)]
 mod tests {
@@ -10,12 +11,12 @@ mod tests {
         let test_cases = get_pmc_xml_test_cases();
 
         if test_cases.is_empty() {
-            println!("No XML test files found in tests/test_data/pmc_xml");
+            warn!("No XML test files found in tests/test_data/pmc_xml");
             return;
         }
 
         for test_case in test_cases {
-            println!("Testing file: {}", test_case.filename());
+            info!(filename = test_case.filename(), "Testing file");
 
             let xml_content = test_case.read_xml_content_or_panic();
 
@@ -27,7 +28,7 @@ mod tests {
             );
             assert!(xml_content.contains("PMC"), "Should contain PMC reference");
 
-            println!("✓ {}: Basic validation passed", test_case.filename());
+            info!(filename = test_case.filename(), "Basic validation passed");
         }
     }
 
@@ -48,7 +49,7 @@ mod tests {
             let content_panic = first_case.read_xml_content_or_panic();
             assert!(!content_panic.is_empty());
 
-            println!("✓ PmcXmlTestCase functionality validated");
+            info!("PmcXmlTestCase functionality validated");
         }
     }
 
@@ -67,7 +68,7 @@ mod tests {
             assert_eq!(specific_case.filename(), filename);
             assert_eq!(specific_case.pmcid, first_case.pmcid);
 
-            println!("✓ Specific XML file access validated");
+            info!("Specific XML file access validated");
         }
     }
 
@@ -78,6 +79,6 @@ mod tests {
         let nonexistent = get_pmc_xml_test_case("nonexistent_file.xml");
         assert!(nonexistent.is_none());
 
-        println!("✓ Nonexistent file handling validated");
+        info!("Nonexistent file handling validated");
     }
 }

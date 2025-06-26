@@ -8,7 +8,8 @@
   "yaml": {
   },
   "excludes": [
-    "**/*-lock.json"
+    "**/*-lock.json",
+    "tests/integration/test_data/**"
   ],
   "plugins": [
     "https://plugins.dprint.dev/json-0.20.0.wasm",

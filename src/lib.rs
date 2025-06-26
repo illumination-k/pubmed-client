@@ -207,7 +207,7 @@ impl Client {
     ///
     /// # Returns
     ///
-    /// Returns a vector of tuples containing (PubMedArticle, Option<PmcFullText>)
+    /// Returns a vector of tuples containing (`PubMedArticle`, `Option<PmcFullText>`)
     ///
     /// # Example
     ///

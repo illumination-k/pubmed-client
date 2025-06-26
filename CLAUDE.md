@@ -10,19 +10,14 @@ This is a Rust client library for accessing PubMed and PMC (PubMed Central) APIs
 
 ### Build & Development
 
+Using `mise` for task management (configured in `.mise.toml`):
+
 ```bash
 # Build the project
-cargo build
 mise r build
 
 # Run tests with nextest (preferred test runner)
 mise r test
-
-# Run tests with cargo (fallback)
-cargo test
-
-# Run a specific test
-cargo nextest run test_name
 
 # Run tests in watch mode
 mise r test:watch
@@ -31,12 +26,18 @@ mise r test:watch
 mise r test:verbose
 
 # Generate and open documentation
-cargo doc --open
 mise r doc
 
 # Check code without building
-cargo check
 mise r check
+
+# Run specific integration test suite
+cargo test --test comprehensive_pmc_tests
+cargo test --test comprehensive_pubmed_tests
+cargo test --test test_elink_integration
+
+# Run single unit test
+cargo test --lib pubmed::parser::tests::test_mesh_term_parsing
 ```
 
 ### Code Quality
@@ -47,9 +48,6 @@ mise r lint
 
 # Format code (dprint + cargo fmt)
 mise r fmt
-
-# Run clippy only
-cargo clippy --all-targets --all-features -- -D warnings
 ```
 
 ### Code Coverage
@@ -134,11 +132,22 @@ RUST_LOG=trace cargo test       # All tracing output
 
 - Test runner: `cargo-nextest` for better output and parallelization
 - Parameterized tests using `rstest`
-- Test data: Real PMC XML files in `tests/test_data/pmc_xml/`
-- Common test utilities in `tests/common/mod.rs`
+- Test data: Real XML files in `tests/integration/test_data/`
+- Common test utilities in `tests/integration/common/mod.rs`
 - Integration tests with tracing support using `#[traced_test]`
 - Mocked rate limiting tests for deterministic behavior
 - ELink API integration tests covering all relationship types
+
+#### Test Organization
+
+- **Unit tests**: Located alongside source code in `src/` modules
+- **Integration tests**: Located in `tests/integration/` directory
+  - `comprehensive_pmc_tests.rs` - PMC XML parsing validation
+  - `comprehensive_pubmed_tests.rs` - PubMed XML parsing validation
+  - `test_elink_integration.rs` - ELink API functionality
+  - `test_einfo_integration.rs` - EInfo API functionality
+  - `markdown_tests.rs` - Markdown conversion testing
+- **Test utilities**: Shared code in `tests/integration/common/mod.rs`
 
 ### Dependencies
 
@@ -183,6 +192,38 @@ Log levels and structured fields:
 - `DEBUG`: Detailed operations (API requests, XML parsing steps)
 - `WARN`: Error conditions and fallbacks
 - Structured fields: `pmid`, `title`, `authors_count`, `has_abstract`, `abstract_length`
+
+#### Logging Guidelines
+
+**DO NOT use `println!` or `eprintln!` in production code.** This project uses structured logging with the `tracing` crate for better observability and debugging.
+
+**Allowed uses of `println!`:**
+
+- Documentation examples in doc comments (`///` or `//!`)
+- Code examples in README files
+- Demo applications or example code
+
+**Instead of print statements, use appropriate tracing macros:**
+
+```rust
+// ❌ AVOID - Don't use println! in library code
+println!("Processing article {}", pmid);
+println!("Found {} results", count);
+eprintln!("Error: {}", error);
+
+// ✅ PREFER - Use structured tracing
+info!(pmid = %pmid, "Processing article");
+info!(result_count = count, "Search completed");
+warn!(error = %error, "Operation failed");
+```
+
+**Structured logging benefits:**
+
+- Machine-readable logs for monitoring and analysis
+- Consistent format across the entire codebase
+- Better integration with observability tools
+- Filterable and searchable log fields
+- Performance benefits over string formatting
 
 ## Rate Limiting & NCBI API Compliance
 
@@ -317,13 +358,52 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Testing Rate Limiting
 
+#### Mock Rate Limiting Tests (Default)
+
 ```bash
-# Run rate limiting tests
+# Run mocked rate limiting tests (default, no network calls)
 cargo test test_rate_limiting -- --nocapture
 
 # Test with custom rate limits
 RUST_LOG=debug cargo test test_rate_limiter_basic_functionality -- --nocapture
+
+# Run all mocked rate limiting tests
+cargo test --test test_rate_limiting_mocked -- --nocapture
 ```
+
+#### Real API Rate Limiting Tests (Optional)
+
+⚠️ **Warning**: These tests make actual network calls to NCBI APIs and are NOT run by default.
+
+```bash
+# Enable real API tests (requires internet connection)
+export PUBMED_REAL_API_TESTS=1
+
+# Run real API rate limiting tests
+cargo test --test test_real_api_rate_limiting -- --nocapture
+
+# Run with debug logging to see rate limiting behavior
+RUST_LOG=debug cargo test --test test_real_api_rate_limiting -- --nocapture
+
+# Test with API key (optional, set your NCBI API key)
+export NCBI_API_KEY="your_api_key_here"
+RUST_LOG=debug cargo test test_real_api_with_api_key -- --nocapture
+```
+
+**Real API Test Features:**
+
+- Tests actual rate limiting with NCBI E-utilities
+- Verifies 3 req/sec limit without API key, 10 req/sec with API key
+- Tests concurrent request handling
+- Validates end-to-end search and fetch workflows
+- Tests server-side rate limit responses (429 errors)
+
+**Real API Test Safety:**
+
+- Conservative rate limits to avoid overwhelming NCBI servers
+- Proper email and tool identification in requests
+- Graceful handling of network errors and timeouts
+- Respectful delays between requests
 
 ### Monitoring Rate Limits
 
@@ -340,15 +420,20 @@ let client = PubMedClient::new();
 // Logs: "Need to wait for token", "Token acquired", etc.
 ```
 
-## ELink API for Article Relationships
+## NCBI E-utilities API Support
 
-The library implements NCBI's ELink API for discovering relationships between articles. This provides three main types of article discovery:
+The library implements multiple NCBI E-utilities APIs for comprehensive biomedical data access:
 
-### ELink Methods Available
+### ELink API for Article Relationships
 
 1. **Related Articles** (`get_related_articles`) - Find articles related by subject/content
 2. **PMC Links** (`get_pmc_links`) - Check PMC full-text availability
 3. **Citations** (`get_citations`) - Find articles that cite the given articles
+
+### EInfo API for Database Information
+
+1. **Database List** (`get_database_list`) - Get all available NCBI databases
+2. **Database Details** (`get_database_info`) - Get detailed information about specific databases including searchable fields and links
 
 ### Implementation Details
 
@@ -373,3 +458,136 @@ cargo test test_get_related_articles_integration
 cargo test test_get_pmc_links_integration
 cargo test test_get_citations_integration
 ```
+
+## Test Fixtures and Data
+
+### Downloading Test Data
+
+The project includes scripts to download real XML responses for comprehensive integration testing:
+
+```bash
+# Download PMC XML test fixtures (already included)
+./scripts/download_all_verified_xml.sh
+
+# Download PubMed XML test fixtures
+./scripts/download_pubmed_xml.sh
+```
+
+### Test Data Structure
+
+```
+tests/integration/test_data/
+├── pmc_xml/         # PMC full-text XML files (18 files)
+│   ├── PMC10000000.xml
+│   ├── PMC10618641.xml
+│   └── ...
+└── pubmed_xml/      # PubMed article XML files (15 files)
+    ├── 25760099.xml  # CRISPR-Cas9 research
+    ├── 31978945.xml  # COVID-19 research
+    ├── 33515491.xml  # Cancer treatment
+    └── ...
+```
+
+### Comprehensive Integration Tests
+
+The test suites provide extensive coverage of XML parsing and content analysis:
+
+- **PMC Tests**: `cargo test --test comprehensive_pmc_tests`
+  - XML parsing validation
+  - Content structure analysis
+  - Author and metadata extraction
+  - Figures and tables processing
+
+- **PubMed Tests**: `cargo test --test comprehensive_pubmed_tests`
+  - Article metadata validation
+  - MeSH term extraction and analysis
+  - Abstract content analysis
+  - Author details and affiliations
+  - Chemical substances parsing
+  - Article type distribution
+
+Both test suites include statistical analysis and success rate validation to ensure robust parsing across diverse article types and content structures.
+
+## GitHub Actions CI/CD
+
+The project uses comprehensive GitHub Actions workflows for continuous integration and deployment.
+
+### Workflows
+
+#### Test Workflow (`.github/workflows/test.yml`)
+
+**Jobs:**
+
+- **Lint and Format**: Code quality checks (rustfmt, dprint, clippy, docs)
+- **Test Suite**: Cross-platform testing (Ubuntu, Windows, macOS) with Rust stable/beta
+- **Code Coverage**: Coverage reporting with Codecov integration
+
+**Key Features:**
+
+- Git LFS support for test fixtures
+- Excludes real API tests from regular CI (network-dependent)
+- Matrix testing with reduced beta combinations for efficiency
+- Comprehensive integration test coverage
+
+#### Documentation Workflow (`.github/workflows/docs.yml`)
+
+**Jobs:**
+
+- **Build Documentation**: Generate rustdoc with all features
+- **Deploy Documentation**: Auto-deploy to GitHub Pages (main branch only)
+
+**Features:**
+
+- Documentation warnings as errors (`RUSTDOCFLAGS`)
+- GitHub Pages integration
+- Artifact upload for PR previews
+
+#### Release Workflow (`.github/workflows/release.yml`)
+
+**Jobs:**
+
+- **Create Release**: GitHub release creation on version tags
+- **Test Before Release**: Full test suite validation
+- **Publish to crates.io**: Automated publishing (stable releases only)
+
+**Features:**
+
+- Automatic prerelease detection (alpha/beta/rc tags)
+- Package validation before publishing
+- Secure token-based crates.io publishing
+
+### Git LFS Configuration
+
+Large test data files are managed with Git LFS:
+
+```gitattributes
+# Track all test data files with Git LFS
+tests/integration/test_data/**/*.xml filter=lfs diff=lfs merge=lfs -text
+tests/integration/test_data/**/*.json filter=lfs diff=lfs merge=lfs -text
+```
+
+**Benefits:**
+
+- Keeps repository lightweight
+- Efficient CI/CD with large fixtures
+- Proper version control for binary-like test data
+
+### Running Real API Tests in CI
+
+Real API tests are opt-in to avoid overwhelming NCBI servers:
+
+```bash
+# Automatically runs on main branch pushes
+git push origin main
+
+# Or add label "test-real-api" to PR
+gh pr edit --add-label "test-real-api"
+```
+
+### Coverage Integration
+
+Code coverage is automatically generated and uploaded to Codecov:
+
+- Excludes real API tests from coverage (network-dependent)
+- Requires `CODECOV_TOKEN` secret in repository settings
+- Generates LCOV format for broad tool compatibility
