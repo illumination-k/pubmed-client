@@ -450,6 +450,109 @@ impl SearchQuery {
         self
     }
 
+    /// Filter by first author
+    ///
+    /// # Arguments
+    ///
+    /// * `author` - First author name to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("cancer treatment")
+    ///     .first_author("Smith J");
+    /// ```
+    pub fn first_author<S: Into<String>>(mut self, author: S) -> Self {
+        self.filters
+            .push(format!("{}[First Author]", author.into()));
+        self
+    }
+
+    /// Filter by last author
+    ///
+    /// # Arguments
+    ///
+    /// * `author` - Last author name to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("genomics")
+    ///     .last_author("Johnson M");
+    /// ```
+    pub fn last_author<S: Into<String>>(mut self, author: S) -> Self {
+        self.filters.push(format!("{}[Last Author]", author.into()));
+        self
+    }
+
+    /// Filter by any author
+    ///
+    /// # Arguments
+    ///
+    /// * `author` - Author name to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("machine learning")
+    ///     .author("Williams K");
+    /// ```
+    pub fn author<S: Into<String>>(mut self, author: S) -> Self {
+        self.filters.push(format!("{}[Author]", author.into()));
+        self
+    }
+
+    /// Filter by institution/affiliation
+    ///
+    /// # Arguments
+    ///
+    /// * `institution` - Institution name to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("cardiology research")
+    ///     .affiliation("Harvard Medical School");
+    /// ```
+    pub fn affiliation<S: Into<String>>(mut self, institution: S) -> Self {
+        self.filters
+            .push(format!("{}[Affiliation]", institution.into()));
+        self
+    }
+
+    /// Filter by ORCID identifier
+    ///
+    /// # Arguments
+    ///
+    /// * `orcid_id` - ORCID identifier to search for
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("computational biology")
+    ///     .orcid("0000-0001-2345-6789");
+    /// ```
+    pub fn orcid<S: Into<String>>(mut self, orcid_id: S) -> Self {
+        self.filters
+            .push(format!("{}[Author - Identifier]", orcid_id.into()));
+        self
+    }
+
     /// Build the final query string
     ///
     /// # Returns
@@ -709,6 +812,78 @@ mod tests {
         assert_eq!(
             query,
             "COVID-19[MeSH Major Topic] AND prevention & control[MeSH Subheading] AND 2022:3000[pdat] AND free full text[sb]"
+        );
+    }
+
+    #[test]
+    fn test_first_author_filter() {
+        let query = SearchQuery::new()
+            .query("cancer treatment")
+            .first_author("Smith J")
+            .build();
+
+        assert_eq!(query, "cancer treatment AND Smith J[First Author]");
+    }
+
+    #[test]
+    fn test_last_author_filter() {
+        let query = SearchQuery::new()
+            .query("genomics")
+            .last_author("Johnson M")
+            .build();
+
+        assert_eq!(query, "genomics AND Johnson M[Last Author]");
+    }
+
+    #[test]
+    fn test_author_filter() {
+        let query = SearchQuery::new()
+            .query("machine learning")
+            .author("Williams K")
+            .build();
+
+        assert_eq!(query, "machine learning AND Williams K[Author]");
+    }
+
+    #[test]
+    fn test_affiliation_filter() {
+        let query = SearchQuery::new()
+            .query("cardiology research")
+            .affiliation("Harvard Medical School")
+            .build();
+
+        assert_eq!(
+            query,
+            "cardiology research AND Harvard Medical School[Affiliation]"
+        );
+    }
+
+    #[test]
+    fn test_orcid_filter() {
+        let query = SearchQuery::new()
+            .query("computational biology")
+            .orcid("0000-0001-2345-6789")
+            .build();
+
+        assert_eq!(
+            query,
+            "computational biology AND 0000-0001-2345-6789[Author - Identifier]"
+        );
+    }
+
+    #[test]
+    fn test_author_complex_query() {
+        let query = SearchQuery::new()
+            .query("diabetes treatment")
+            .first_author("Smith J")
+            .affiliation("Harvard Medical School")
+            .published_after(2020)
+            .free_full_text()
+            .build();
+
+        assert_eq!(
+            query,
+            "diabetes treatment AND Smith J[First Author] AND Harvard Medical School[Affiliation] AND 2020:3000[pdat] AND free full text[sb]"
         );
     }
 }

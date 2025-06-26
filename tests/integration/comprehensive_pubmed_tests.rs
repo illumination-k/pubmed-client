@@ -521,7 +521,7 @@ fn test_pubmed_author_details(#[from(xml_test_cases)] test_cases: Vec<PubMedXmlT
 
                     if i < 3 {
                         // Log first few authors
-                        debug!(author_index = i + 1, author_name = author, "Author details");
+                        debug!(author_index = i + 1, author_name = %author.full_name, "Author details");
                     }
                 }
 

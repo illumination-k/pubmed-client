@@ -1,5 +1,7 @@
 use crate::error::{PubMedError, Result};
-use crate::pubmed::models::{ChemicalConcept, MeshHeading, MeshQualifier, MeshTerm, PubMedArticle};
+use crate::pubmed::models::{
+    Affiliation, Author, ChemicalConcept, MeshHeading, MeshQualifier, MeshTerm, PubMedArticle,
+};
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use std::io::BufReader;
@@ -15,7 +17,7 @@ impl PubMedXmlParser {
         reader.config_mut().trim_text(true);
 
         let mut title = String::new();
-        let mut authors = Vec::new();
+        let mut authors: Vec<Author> = Vec::new();
         let mut journal = String::new();
         let mut pub_date = String::new();
         let doi = None;
@@ -35,9 +37,20 @@ impl PubMedXmlParser {
         let mut in_author = false;
         let mut in_last_name = false;
         let mut in_fore_name = false;
+        let mut in_initials = false;
+        let mut in_suffix = false;
         let mut in_publication_type = false;
+        let mut in_affiliation_info = false;
+        let mut in_affiliation = false;
+        let mut in_identifier = false;
         let mut current_author_last = String::new();
         let mut current_author_fore = String::new();
+        let mut current_author_initials = String::new();
+        let mut current_author_suffix = String::new();
+        let mut current_author_affiliations: Vec<Affiliation> = Vec::new();
+        let mut current_affiliation_text = String::new();
+        let mut current_orcid = Option::<String>::None;
+        let mut current_identifier_source = String::new();
 
         // MeSH parsing state
         let mut in_mesh_heading_list = false;
@@ -78,9 +91,31 @@ impl PubMedXmlParser {
                             in_author = true;
                             current_author_last.clear();
                             current_author_fore.clear();
+                            current_author_initials.clear();
+                            current_author_suffix.clear();
+                            current_author_affiliations.clear();
+                            current_orcid = None;
                         }
                         b"LastName" if in_author => in_last_name = true,
                         b"ForeName" if in_author => in_fore_name = true,
+                        b"Initials" if in_author => in_initials = true,
+                        b"Suffix" if in_author => in_suffix = true,
+                        b"AffiliationInfo" if in_author => {
+                            in_affiliation_info = true;
+                            current_affiliation_text.clear();
+                        }
+                        b"Affiliation" if in_affiliation_info => in_affiliation = true,
+                        b"Identifier" if in_author => {
+                            in_identifier = true;
+                            current_identifier_source.clear();
+                            // Check for Source attribute
+                            for attr in e.attributes().flatten() {
+                                if attr.key.as_ref() == b"Source" {
+                                    current_identifier_source =
+                                        String::from_utf8_lossy(&attr.value).to_string();
+                                }
+                            }
+                        }
                         b"PublicationType" => in_publication_type = true,
                         b"ELocationID" => {
                             // Check if this is a DOI
@@ -156,19 +191,75 @@ impl PubMedXmlParser {
                     b"AuthorList" => in_author_list = false,
                     b"Author" => {
                         if in_author {
-                            let full_name = if !current_author_fore.is_empty() {
-                                format!("{} {}", current_author_fore, current_author_last)
-                            } else {
-                                current_author_last.clone()
-                            };
-                            if !full_name.trim().is_empty() {
-                                authors.push(full_name);
+                            let full_name = format_author_name(
+                                &if current_author_last.is_empty() {
+                                    None
+                                } else {
+                                    Some(current_author_last.clone())
+                                },
+                                &if current_author_fore.is_empty() {
+                                    None
+                                } else {
+                                    Some(current_author_fore.clone())
+                                },
+                                &if current_author_initials.is_empty() {
+                                    None
+                                } else {
+                                    Some(current_author_initials.clone())
+                                },
+                            );
+
+                            if !full_name.trim().is_empty() && full_name != "Unknown Author" {
+                                let author = Author {
+                                    last_name: if current_author_last.is_empty() {
+                                        None
+                                    } else {
+                                        Some(current_author_last.clone())
+                                    },
+                                    fore_name: if current_author_fore.is_empty() {
+                                        None
+                                    } else {
+                                        Some(current_author_fore.clone())
+                                    },
+                                    first_name: None, // Could be extracted from fore_name if needed
+                                    middle_name: None, // Could be extracted from fore_name if needed
+                                    initials: if current_author_initials.is_empty() {
+                                        None
+                                    } else {
+                                        Some(current_author_initials.clone())
+                                    },
+                                    suffix: if current_author_suffix.is_empty() {
+                                        None
+                                    } else {
+                                        Some(current_author_suffix.clone())
+                                    },
+                                    full_name,
+                                    affiliations: current_author_affiliations.clone(),
+                                    orcid: current_orcid.clone(),
+                                    is_corresponding: false, // TODO: Detect corresponding authors from XML
+                                    author_roles: Vec::new(), // TODO: Parse author contributions if available
+                                };
+                                authors.push(author);
                             }
                             in_author = false;
                         }
                     }
                     b"LastName" => in_last_name = false,
                     b"ForeName" => in_fore_name = false,
+                    b"Initials" => in_initials = false,
+                    b"Suffix" => in_suffix = false,
+                    b"AffiliationInfo" => {
+                        if in_affiliation_info && !current_affiliation_text.is_empty() {
+                            let affiliation = parse_affiliation_text(&current_affiliation_text);
+                            current_author_affiliations.push(affiliation);
+                        }
+                        in_affiliation_info = false;
+                    }
+                    b"Affiliation" => in_affiliation = false,
+                    b"Identifier" => {
+                        in_identifier = false;
+                        current_identifier_source.clear();
+                    }
                     b"PublicationType" => in_publication_type = false,
                     // MeSH parsing
                     b"MeshHeadingList" => in_mesh_heading_list = false,
@@ -266,6 +357,16 @@ impl PubMedXmlParser {
                         current_author_last = text;
                     } else if in_fore_name && in_author {
                         current_author_fore = text;
+                    } else if in_initials && in_author {
+                        current_author_initials = text;
+                    } else if in_suffix && in_author {
+                        current_author_suffix = text;
+                    } else if in_affiliation && in_affiliation_info {
+                        current_affiliation_text = text;
+                    } else if in_identifier && in_author {
+                        if current_identifier_source == "ORCID" {
+                            current_orcid = Some(text);
+                        }
                     } else if in_publication_type {
                         article_types.push(text);
                     } else if in_descriptor_name && in_mesh_heading {
@@ -310,10 +411,13 @@ impl PubMedXmlParser {
             "Completed XML parsing"
         );
 
+        let author_count = authors.len() as u32;
+
         Ok(PubMedArticle {
             pmid: pmid.to_string(),
             title,
             authors,
+            author_count,
             journal,
             pub_date,
             doi,
@@ -338,6 +442,123 @@ impl PubMedXmlParser {
     }
 }
 
+/// Parse affiliation text into structured components
+fn parse_affiliation_text(text: &str) -> Affiliation {
+    // This is a simplified parser for affiliation text
+    // In practice, this would be more sophisticated
+    let text = text.trim();
+
+    // Extract email if present
+    let email = extract_email_from_text(text);
+
+    // Extract country (usually at the end)
+    let country = extract_country_from_text(text);
+
+    // For now, treat the whole text as institution
+    // More sophisticated parsing could identify departments, addresses, etc.
+    Affiliation {
+        institution: if text.is_empty() {
+            None
+        } else {
+            Some(text.to_string())
+        },
+        department: None, // TODO: Parse department from affiliation text
+        address: None,    // TODO: Parse address from affiliation text
+        country,
+        email,
+    }
+}
+
+/// Extract email address from affiliation text
+fn extract_email_from_text(text: &str) -> Option<String> {
+    // Simple regex-like pattern matching for email
+    let parts: Vec<&str> = text.split_whitespace().collect();
+    for part in parts {
+        if part.contains('@') && part.contains('.') {
+            // Remove punctuation that might be at the end
+            let cleaned = part.trim_end_matches(&['.', ',', ';', ')'][..]);
+            if cleaned.len() > 5 {
+                // Basic validation
+                return Some(cleaned.to_string());
+            }
+        }
+    }
+    None
+}
+
+/// Extract country from affiliation text (basic implementation)
+fn extract_country_from_text(text: &str) -> Option<String> {
+    // Common country patterns that might appear at the end of affiliations
+    let common_countries = [
+        "USA",
+        "United States",
+        "US",
+        "UK",
+        "United Kingdom",
+        "England",
+        "Scotland",
+        "Wales",
+        "Canada",
+        "Australia",
+        "Germany",
+        "France",
+        "Italy",
+        "Spain",
+        "Japan",
+        "China",
+        "India",
+        "Brazil",
+        "Netherlands",
+        "Sweden",
+        "Switzerland",
+        "Denmark",
+        "Norway",
+        "Finland",
+        "Belgium",
+        "Austria",
+        "Portugal",
+        "Ireland",
+        "Israel",
+        "South Korea",
+        "Singapore",
+        "Hong Kong",
+        "Taiwan",
+        "New Zealand",
+        "Mexico",
+    ];
+
+    let text_lower = text.to_lowercase();
+    for country in &common_countries {
+        if text_lower.ends_with(&country.to_lowercase())
+            || text_lower.contains(&format!(", {}", country.to_lowercase()))
+        {
+            return Some(country.to_string());
+        }
+    }
+
+    None
+}
+
+/// Format an author name from components
+fn format_author_name(
+    last_name: &Option<String>,
+    fore_name: &Option<String>,
+    initials: &Option<String>,
+) -> String {
+    match (fore_name, last_name) {
+        (Some(fore), Some(last)) => format!("{} {}", fore, last),
+        (None, Some(last)) => {
+            if let Some(init) = initials {
+                format!("{} {}", init, last)
+            } else {
+                last.clone()
+            }
+        }
+        (Some(fore), None) => fore.clone(),
+        (None, None) => "Unknown Author".to_string(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -359,6 +580,11 @@ mod tests {
                 <Author>
                     <LastName>Doe</LastName>
                     <ForeName>John</ForeName>
+                    <Initials>JA</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Department of Medicine, Harvard Medical School, Boston, MA, USA. john.doe@hms.harvard.edu</Affiliation>
+                    </AffiliationInfo>
+                    <Identifier Source="ORCID">0000-0001-2345-6789</Identifier>
                 </Author>
             </AuthorList>
             <Journal>
@@ -432,6 +658,24 @@ mod tests {
         assert_eq!(chemicals[0].name, "Insulin");
         assert_eq!(chemicals[0].registry_number, Some("11061-68-0".to_string()));
         assert_eq!(chemicals[0].ui, Some("D007328".to_string()));
+
+        // Test author parsing
+        assert_eq!(article.authors.len(), 1);
+        assert_eq!(article.author_count, 1);
+        let author = &article.authors[0];
+        assert_eq!(author.last_name, Some("Doe".to_string()));
+        assert_eq!(author.fore_name, Some("John".to_string()));
+        assert_eq!(author.initials, Some("JA".to_string()));
+        assert_eq!(author.full_name, "John Doe");
+        assert_eq!(author.orcid, Some("0000-0001-2345-6789".to_string()));
+        assert_eq!(author.affiliations.len(), 1);
+        assert!(
+            author.affiliations[0]
+                .institution
+                .as_ref()
+                .unwrap()
+                .contains("Harvard Medical School")
+        );
 
         // Test keywords
         assert!(article.keywords.is_some());
@@ -529,8 +773,79 @@ mod tests {
 
         let article = PubMedXmlParser::parse_article_from_xml(xml, "87654321").unwrap();
 
+        assert_eq!(article.authors.len(), 1);
+        assert_eq!(article.author_count, 1);
+        assert_eq!(article.authors[0].full_name, "Jane Smith");
         assert!(article.mesh_headings.is_none());
         assert!(article.chemical_list.is_none());
         assert!(article.keywords.is_none());
+    }
+
+    #[test]
+    fn test_parse_affiliation_text() {
+        let affiliation_text = "Department of Medicine, Harvard Medical School, Boston, MA, USA. john.doe@hms.harvard.edu";
+        let affiliation = parse_affiliation_text(affiliation_text);
+
+        assert!(affiliation.institution.is_some());
+        assert!(
+            affiliation
+                .institution
+                .as_ref()
+                .unwrap()
+                .contains("Harvard Medical School")
+        );
+        assert_eq!(
+            affiliation.email,
+            Some("john.doe@hms.harvard.edu".to_string())
+        );
+        assert_eq!(affiliation.country, Some("USA".to_string()));
+    }
+
+    #[test]
+    fn test_extract_email_from_text() {
+        assert_eq!(
+            extract_email_from_text("Contact john.doe@example.com for details"),
+            Some("john.doe@example.com".to_string())
+        );
+
+        assert_eq!(
+            extract_email_from_text("Email: jane.smith@university.edu."),
+            Some("jane.smith@university.edu".to_string())
+        );
+
+        assert_eq!(extract_email_from_text("No email here"), None);
+    }
+
+    #[test]
+    fn test_extract_country_from_text() {
+        assert_eq!(
+            extract_country_from_text("Harvard Medical School, Boston, MA, USA"),
+            Some("USA".to_string())
+        );
+
+        assert_eq!(
+            extract_country_from_text("University of Oxford, Oxford, UK"),
+            Some("UK".to_string())
+        );
+
+        assert_eq!(extract_country_from_text("Local Institution"), None);
+    }
+
+    #[test]
+    fn test_format_author_name() {
+        assert_eq!(
+            format_author_name(&Some("Smith".to_string()), &Some("John".to_string()), &None),
+            "John Smith"
+        );
+
+        assert_eq!(
+            format_author_name(&Some("Doe".to_string()), &None, &Some("J".to_string())),
+            "J Doe"
+        );
+
+        assert_eq!(
+            format_author_name(&Some("Johnson".to_string()), &None, &None),
+            "Johnson"
+        );
     }
 }
