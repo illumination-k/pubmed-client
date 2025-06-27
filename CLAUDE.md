@@ -36,6 +36,11 @@ cargo test --test comprehensive_pmc_tests
 cargo test --test comprehensive_pubmed_tests
 cargo test --test test_elink_integration
 
+# Run new real API integration tests (requires network and env var)
+PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pubmed_api_tests
+PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pmc_api_tests
+PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test error_handling_tests
+
 # Run single unit test
 cargo test --lib pubmed::parser::tests::test_mesh_term_parsing
 ```
@@ -97,10 +102,17 @@ RUST_LOG=trace cargo test       # All tracing output
   - `parser.rs` - XML parsing logic for PMC content
   - `models.rs` - Data structures for PMC articles
   - `markdown.rs` - Converter from PMC XML to Markdown format
-- `src/query.rs` - Query builder for constructing filtered searches
+- `src/pubmed/query/` - Advanced query builder system with filters, date ranges, boolean logic
+  - `builder.rs` - Main SearchQuery builder implementation
+  - `filters.rs` - Field-specific search filters (title, author, journal, etc.)
+  - `dates.rs` - Date range and publication date filtering
+  - `boolean.rs` - Boolean logic operations (AND, OR, NOT)
+  - `advanced.rs` - Advanced search features (MeSH terms, article types)
+  - `validation.rs` - Query validation and error handling
 - `src/error.rs` - Error types and result aliases
 - `src/config.rs` - Client configuration options for API keys and rate limiting
 - `src/rate_limit.rs` - Rate limiting implementation using token bucket algorithm
+- `src/retry.rs` - Retry logic with exponential backoff for network failures
 
 ### Key Types
 
