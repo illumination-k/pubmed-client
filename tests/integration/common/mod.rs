@@ -3,6 +3,9 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+#[cfg(feature = "integration-tests")]
+pub mod integration_test_utils;
+
 /// Test case structure for PMC XML files
 #[derive(Debug, Clone)]
 pub struct PmcXmlTestCase {
