@@ -57,8 +57,18 @@ impl RetryableError for PubMedError {
             // Network errors are typically transient
             PubMedError::RequestError(err) => {
                 // Check if it's a network-related error
-                if err.is_timeout() || err.is_connect() {
-                    return true;
+                #[cfg(not(target_arch = "wasm32"))]
+                {
+                    if err.is_timeout() || err.is_connect() {
+                        return true;
+                    }
+                }
+
+                #[cfg(target_arch = "wasm32")]
+                {
+                    if err.is_timeout() {
+                        return true;
+                    }
                 }
 
                 // Check for server errors (5xx)
@@ -101,6 +111,7 @@ impl RetryableError for PubMedError {
         if self.is_retryable() {
             match self {
                 PubMedError::RequestError(err) if err.is_timeout() => "Request timeout",
+                #[cfg(not(target_arch = "wasm32"))]
                 PubMedError::RequestError(err) if err.is_connect() => "Connection error",
                 PubMedError::RequestError(_) => "Network error",
                 PubMedError::RateLimitExceeded => "Rate limit exceeded",

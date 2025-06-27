@@ -1,0 +1,38 @@
+{
+  "name": "pubmed-client-wasm",
+  "version": "0.1.0",
+  "description": "WebAssembly bindings for the PubMed client library",
+  "main": "pkg/pubmed_client_rs.js",
+  "types": "pkg/pubmed_client_rs.d.ts",
+  "files": [
+    "pkg/"
+  ],
+  "scripts": {
+    "build": "wasm-pack build --target nodejs --features wasm",
+    "build:web": "wasm-pack build --target web --features wasm",
+    "build:bundler": "wasm-pack build --target bundler --features wasm",
+    "build:all": "npm run build && npm run build:web && npm run build:bundler",
+    "test": "wasm-pack test --node --features wasm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/illumination-k/pubmed-client-rs.git"
+  },
+  "keywords": [
+    "pubmed",
+    "biomedical",
+    "research",
+    "api",
+    "wasm",
+    "webassembly",
+    "rust"
+  ],
+  "author": "Your Name",
+  "license": "MIT OR Apache-2.0",
+  "devDependencies": {
+    "wasm-pack": "^0.12.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

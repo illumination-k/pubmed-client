@@ -1,6 +1,6 @@
 use crate::rate_limit::RateLimiter;
 use crate::retry::RetryConfig;
-use std::time::Duration;
+use crate::time::Duration;
 
 /// Configuration options for PubMed and PMC clients
 ///
@@ -136,13 +136,32 @@ impl ClientConfig {
     ///
     /// ```
     /// use pubmed_client_rs::config::ClientConfig;
-    /// use std::time::Duration;
+    /// use pubmed_client_rs::time::Duration;
     ///
     /// let config = ClientConfig::new()
     ///     .with_timeout(Duration::from_secs(60));
     /// ```
     pub fn with_timeout(mut self, timeout: Duration) -> Self {
         self.timeout = timeout;
+        self
+    }
+
+    /// Set the HTTP request timeout in seconds (convenience method)
+    ///
+    /// # Arguments
+    ///
+    /// * `timeout_seconds` - Maximum time to wait for HTTP responses in seconds
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::config::ClientConfig;
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_timeout_seconds(60);
+    /// ```
+    pub fn with_timeout_seconds(mut self, timeout_seconds: u64) -> Self {
+        self.timeout = Duration::from_secs(timeout_seconds);
         self
     }
 

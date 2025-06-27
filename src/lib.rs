@@ -102,6 +102,10 @@ pub mod pmc;
 pub mod pubmed;
 pub mod rate_limit;
 pub mod retry;
+pub mod time;
+
+#[cfg(feature = "wasm")]
+pub mod wasm;
 
 // Re-export main types for convenience
 pub use config::ClientConfig;
@@ -117,6 +121,10 @@ pub use pubmed::{
     SearchQuery,
 };
 pub use rate_limit::RateLimiter;
+pub use time::{Duration, Instant, sleep};
+
+#[cfg(feature = "wasm")]
+pub use wasm::{WasmClientConfig, WasmPubMedClient};
 
 /// Convenience client that combines both PubMed and PMC functionality
 #[derive(Clone)]

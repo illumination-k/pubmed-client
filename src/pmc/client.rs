@@ -55,11 +55,24 @@ impl PmcClient {
         let rate_limiter = config.create_rate_limiter();
         let base_url = config.effective_base_url().to_string();
 
-        let client = Client::builder()
-            .timeout(config.timeout)
-            .user_agent(config.effective_user_agent())
-            .build()
-            .expect("Failed to create HTTP client");
+        let client = {
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                Client::builder()
+                    .user_agent(config.effective_user_agent())
+                    .timeout(config.timeout)
+                    .build()
+                    .expect("Failed to create HTTP client")
+            }
+
+            #[cfg(target_arch = "wasm32")]
+            {
+                Client::builder()
+                    .user_agent(config.effective_user_agent())
+                    .build()
+                    .expect("Failed to create HTTP client")
+            }
+        };
 
         Self {
             client,
