@@ -29,8 +29,7 @@ tokio-util = "0.7"
 reqwest = { version = "0.11", features = ["json"], default-features = false }
 tokio = { version = "1.0", features = ["macros", "rt", "time"], default-features = false }
 getrandom = { version = "0.2", features = ["js"] }
-
-# WASM-specific optional dependencies
+# WASM bindings - controlled by 'wasm' feature
 wasm-bindgen = { version = "0.2", optional = true }
 wasm-bindgen-futures = { version = "0.4", optional = true }
 js-sys = { version = "0.3", optional = true }

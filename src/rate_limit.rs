@@ -112,7 +112,7 @@ impl RateLimiter {
 
         if should_wait {
             // Calculate wait time based on rate
-            let wait_duration = Duration::from_secs(1).as_secs_f64() / self.get_rate_sync();
+            let wait_duration = Duration::from_secs(1).as_secs_f64() / self.rate();
             let wait_duration = Duration::from_millis((wait_duration * 1000.0) as u64);
 
             debug!(
@@ -138,95 +138,35 @@ impl RateLimiter {
     ///
     /// Returns `true` if a token is available and can be acquired immediately.
     /// This method does not consume a token.
-    pub async fn check_available(&self) -> bool {
+    pub fn check_available(&self) -> bool {
         let mut bucket = self.bucket.lock().unwrap();
         self.refill_bucket(&mut bucket);
         bucket.tokens >= 1.0
     }
 
     /// Get current token count (for testing and monitoring)
-    pub async fn token_count(&self) -> f64 {
+    pub fn token_count(&self) -> f64 {
         let mut bucket = self.bucket.lock().unwrap();
         self.refill_bucket(&mut bucket);
         bucket.tokens
     }
 
     /// Get the configured rate limit (requests per second)
-    pub async fn rate(&self) -> f64 {
+    pub fn rate(&self) -> f64 {
         let bucket = self.bucket.lock().unwrap();
         bucket.refill_rate
     }
 
-    /// Get rate synchronously (internal helper)
-    fn get_rate_sync(&self) -> f64 {
-        let bucket = self.bucket.lock().unwrap();
-        bucket.refill_rate
-    }
-
-    /// Refill the token bucket based on elapsed time (internal helper)
+    /// Refill the token bucket based on elapsed time
     fn refill_bucket(&self, bucket: &mut TokenBucket) {
         let now = Instant::now();
-        let _elapsed = now.duration_since(bucket.last_refill);
+        let elapsed = now.duration_since(bucket.last_refill);
 
-        // In simplified time implementation, elapsed is always 0
-        // So we use a simplified refill strategy
-        if bucket.tokens < bucket.capacity {
-            // For simplicity, refill to capacity when tokens are low
-            bucket.tokens = bucket.capacity;
-        }
+        // Calculate tokens to add based on elapsed time
+        let tokens_to_add = elapsed.as_secs_f64() * bucket.refill_rate;
+        bucket.tokens = (bucket.tokens + tokens_to_add).min(bucket.capacity);
 
         bucket.last_refill = now;
-    }
-}
-
-/// Common interface for rate limiters (for backwards compatibility)
-#[allow(async_fn_in_trait)]
-pub trait RateLimiterTrait: Sized {
-    /// Create a new rate limiter with the specified rate (requests per second)
-    fn new(rate: f64) -> Self;
-
-    /// Create rate limiter for NCBI API without API key (3 requests/second)
-    fn ncbi_default() -> Self {
-        Self::new(3.0)
-    }
-
-    /// Create rate limiter for NCBI API with API key (10 requests/second)
-    fn ncbi_with_key() -> Self {
-        Self::new(10.0)
-    }
-
-    /// Acquire a token, blocking if necessary to respect rate limits
-    async fn acquire(&self) -> crate::Result<()>;
-
-    /// Check if a token is available without blocking
-    async fn check_available(&self) -> bool;
-
-    /// Get current token count (for testing and monitoring)
-    async fn token_count(&self) -> f64;
-
-    /// Get the configured rate limit (requests per second)
-    async fn rate(&self) -> f64;
-}
-
-impl RateLimiterTrait for RateLimiter {
-    fn new(rate: f64) -> Self {
-        RateLimiter::new(rate)
-    }
-
-    async fn acquire(&self) -> crate::Result<()> {
-        self.acquire().await
-    }
-
-    async fn check_available(&self) -> bool {
-        self.check_available().await
-    }
-
-    async fn token_count(&self) -> f64 {
-        self.token_count().await
-    }
-
-    async fn rate(&self) -> f64 {
-        self.rate().await
     }
 }
 
@@ -242,7 +182,7 @@ mod tests {
         limiter.acquire().await.unwrap();
 
         // Check rate
-        let rate = limiter.rate().await;
+        let rate = limiter.rate();
         assert!((rate - 5.0).abs() < 0.1);
     }
 
@@ -251,7 +191,7 @@ mod tests {
         let limiter = RateLimiter::new(2.0);
 
         // Should have tokens available initially
-        assert!(limiter.check_available().await);
+        assert!(limiter.check_available());
     }
 
     #[tokio::test]
@@ -259,8 +199,8 @@ mod tests {
         let default_limiter = RateLimiter::ncbi_default();
         let with_key_limiter = RateLimiter::ncbi_with_key();
 
-        assert!((default_limiter.rate().await - 3.0).abs() < 0.1);
-        assert!((with_key_limiter.rate().await - 10.0).abs() < 0.1);
+        assert!((default_limiter.rate() - 3.0).abs() < 0.1);
+        assert!((with_key_limiter.rate() - 10.0).abs() < 0.1);
     }
 
     #[tokio::test]
@@ -272,7 +212,7 @@ mod tests {
         limiter.acquire().await.unwrap(); // This should involve a wait
 
         // Rate limiter should still work
-        let tokens = limiter.token_count().await;
+        let tokens = limiter.token_count();
         assert!(tokens >= 0.0);
     }
 }
