@@ -70,15 +70,14 @@ mod integration_tests {
                     for pmid in pmids.iter().take(3) {
                         assert!(
                             pmid.parse::<u32>().is_ok(),
-                            "PMID should be numeric: {}",
-                            pmid
+                            "PMID should be numeric: {pmid}"
                         );
                         debug!(pmid = pmid, "Retrieved PMID");
                     }
                 }
                 Err(e) => {
                     warn!(query = query, error = %e, "Search failed");
-                    panic!("Search should succeed for query: {}", query);
+                    panic!("Search should succeed for query: {query}");
                 }
             }
 
@@ -132,7 +131,8 @@ mod integration_tests {
 
                     // Log title preview for verification
                     let title_preview = if article.title.len() > 100 {
-                        format!("{}...", &article.title[..100])
+                        let preview = &article.title[..100];
+                        format!("{preview}...")
                     } else {
                         article.title.clone()
                     };
@@ -140,7 +140,7 @@ mod integration_tests {
                 }
                 Err(e) => {
                     warn!(pmid = pmid, error = %e, "Article fetch failed");
-                    panic!("Fetch should succeed for PMID: {}", pmid);
+                    panic!("Fetch should succeed for PMID: {pmid}");
                 }
             }
 
@@ -258,7 +258,7 @@ mod integration_tests {
 
                 // Verify PMIDs are valid
                 for pmid in related.related_pmids.iter().take(5) {
-                    assert!(*pmid > 0, "Related PMID should be positive: {}", pmid);
+                    assert!(*pmid > 0, "Related PMID should be positive: {pmid}");
                 }
 
                 debug!(
@@ -302,8 +302,7 @@ mod integration_tests {
                     for pmc_id in pmc_links.pmc_ids.iter().take(3) {
                         assert!(
                             pmc_id.starts_with("PMC"),
-                            "PMC ID should start with PMC: {}",
-                            pmc_id
+                            "PMC ID should start with PMC: {pmc_id}"
                         );
                     }
 
@@ -349,7 +348,7 @@ mod integration_tests {
                 // Citations might be empty for newer articles
                 if !citations.citing_pmids.is_empty() {
                     for pmid in citations.citing_pmids.iter().take(5) {
-                        assert!(*pmid > 0, "Citation PMID should be positive: {}", pmid);
+                        assert!(*pmid > 0, "Citation PMID should be positive: {pmid}");
                     }
 
                     debug!(
@@ -461,7 +460,7 @@ mod integration_tests {
         let mut rate_limited_requests = 0;
 
         for i in 0..8 {
-            let query = format!("test query {}", i);
+            let query = format!("test query {i}");
 
             match client.search_articles(&query, 3).await {
                 Ok(pmids) => {

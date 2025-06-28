@@ -137,7 +137,7 @@ mod wasm_impl {
                             .collect::<Vec<_>>();
                         Ok(serde_wasm_bindgen::to_value(&js_articles)?)
                     }
-                    Err(e) => Err(JsValue::from_str(&format!("Search failed: {}", e))),
+                    Err(e) => Err(JsValue::from_str(&format!("Search failed: {e}"))),
                 }
             })
         }
@@ -152,7 +152,7 @@ mod wasm_impl {
                         let js_article = JsArticle::from(article);
                         Ok(serde_wasm_bindgen::to_value(&js_article)?)
                     }
-                    Err(e) => Err(JsValue::from_str(&format!("Fetch failed: {}", e))),
+                    Err(e) => Err(JsValue::from_str(&format!("Fetch failed: {e}"))),
                 }
             })
         }
@@ -167,7 +167,7 @@ mod wasm_impl {
                         let js_full_text = JsFullText::from(full_text);
                         Ok(serde_wasm_bindgen::to_value(&js_full_text)?)
                     }
-                    Err(e) => Err(JsValue::from_str(&format!("Full text fetch failed: {}", e))),
+                    Err(e) => Err(JsValue::from_str(&format!("Full text fetch failed: {e}"))),
                 }
             })
         }
@@ -179,7 +179,7 @@ mod wasm_impl {
             future_to_promise(async move {
                 match client.pmc.check_pmc_availability(&pmid).await {
                     Ok(pmcid_opt) => Ok(serde_wasm_bindgen::to_value(&pmcid_opt)?),
-                    Err(e) => Err(JsValue::from_str(&format!("PMC check failed: {}", e))),
+                    Err(e) => Err(JsValue::from_str(&format!("PMC check failed: {e}"))),
                 }
             })
         }
@@ -192,8 +192,7 @@ mod wasm_impl {
                 match client.get_related_articles(&pmids).await {
                     Ok(related) => Ok(serde_wasm_bindgen::to_value(&related)?),
                     Err(e) => Err(JsValue::from_str(&format!(
-                        "Related articles fetch failed: {}",
-                        e
+                        "Related articles fetch failed: {e}"
                     ))),
                 }
             })
@@ -203,7 +202,7 @@ mod wasm_impl {
         #[wasm_bindgen]
         pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
             let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)
-                .map_err(|e| JsValue::from_str(&format!("Invalid full text data: {}", e)))?;
+                .map_err(|e| JsValue::from_str(&format!("Invalid full text data: {e}")))?;
 
             let full_text: PmcFullText = js_full_text.into();
             let converter = crate::pmc::PmcMarkdownConverter::new();
@@ -500,7 +499,6 @@ mod wasm_impl {
     }
 
     // Re-export types at module level for easier access
-    pub use self::{WasmClientConfig, WasmPubMedClient};
 }
 
 // Re-export the WASM types only when the feature and target are available

@@ -317,9 +317,10 @@ impl ClientConfig {
     ///
     /// Returns the configured User-Agent or a default based on the crate name and version.
     pub fn effective_user_agent(&self) -> String {
-        self.user_agent
-            .clone()
-            .unwrap_or_else(|| format!("pubmed-client-rs/{}", env!("CARGO_PKG_VERSION")))
+        self.user_agent.clone().unwrap_or_else(|| {
+            let version = env!("CARGO_PKG_VERSION");
+            format!("pubmed-client-rs/{version}")
+        })
     }
 
     /// Get the tool name for NCBI identification

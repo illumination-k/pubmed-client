@@ -86,7 +86,7 @@ impl Language {
             Language::Czech => "Czech[lang]".to_string(),
             Language::Hungarian => "Hungarian[lang]".to_string(),
             Language::Greek => "Greek[lang]".to_string(),
-            Language::Other(lang) => format!("{}[lang]", lang),
+            Language::Other(lang) => format!("{lang}[lang]"),
         }
     }
 }

@@ -513,10 +513,7 @@ impl PubMedClient {
                 .db_info
                 .ok_or_else(|| PubMedError::ApiError {
                     status: 404,
-                    message: format!(
-                        "Database '{}' not found or no information available",
-                        database
-                    ),
+                    message: format!("Database '{database}' not found or no information available"),
                 })?;
 
         let db_info = db_info_list
@@ -524,7 +521,7 @@ impl PubMedClient {
             .next()
             .ok_or_else(|| PubMedError::ApiError {
                 status: 404,
-                message: format!("Database '{}' information not found", database),
+                message: format!("Database '{database}' information not found"),
             })?;
 
         // Convert internal response to public model

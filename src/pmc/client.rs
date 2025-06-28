@@ -181,8 +181,8 @@ impl PmcClient {
 
         // Build URL with API parameters
         let mut url = format!(
-            "{}/efetch.fcgi?db=pmc&id=PMC{}&retmode=xml",
-            self.base_url, clean_pmcid
+            "{}/efetch.fcgi?db=pmc&id=PMC{clean_pmcid}&retmode=xml",
+            self.base_url
         );
 
         // Add API parameters (API key, email, tool)
@@ -257,8 +257,8 @@ impl PmcClient {
 
         // Build URL with API parameters
         let mut url = format!(
-            "{}/elink.fcgi?dbfrom=pubmed&db=pmc&id={}&retmode=json",
-            self.base_url, pmid
+            "{}/elink.fcgi?dbfrom=pubmed&db=pmc&id={pmid}&retmode=json",
+            self.base_url
         );
 
         // Add API parameters (API key, email, tool)
@@ -293,7 +293,7 @@ impl PmcClient {
                         if linksetdb["dbto"] == "pmc" {
                             if let Some(links) = linksetdb["links"].as_array() {
                                 if let Some(pmcid) = links.first() {
-                                    return Ok(Some(format!("PMC{}", pmcid)));
+                                    return Ok(Some(format!("PMC{pmcid}")));
                                 }
                             }
                         }
@@ -355,7 +355,7 @@ impl PmcClient {
         if pmcid.starts_with("PMC") {
             pmcid.to_string()
         } else {
-            format!("PMC{}", pmcid)
+            format!("PMC{pmcid}")
         }
     }
 
@@ -364,7 +364,7 @@ impl PmcClient {
         with_retry(
             || async {
                 self.rate_limiter.acquire().await?;
-                debug!("Making API request to: {}", url);
+                debug!("Making API request to: {url}");
                 let response = self
                     .client
                     .get(url)
