@@ -10,7 +10,7 @@
 /// `std::time::Duration` which is not available in WASM environments.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Duration {
-    secs: u64,
+    millis: u64,
 }
 
 impl Duration {
@@ -29,7 +29,9 @@ impl Duration {
     /// assert_eq!(duration.as_secs(), 30);
     /// ```
     pub fn from_secs(secs: u64) -> Self {
-        Self { secs }
+        Self {
+            millis: secs * 1000,
+        }
     }
 
     /// Create a new Duration from milliseconds
@@ -48,9 +50,7 @@ impl Duration {
     /// assert_eq!(duration.as_millis(), 1500);
     /// ```
     pub fn from_millis(millis: u64) -> Self {
-        Self {
-            secs: millis / 1000,
-        }
+        Self { millis }
     }
 
     /// Get duration as seconds
@@ -59,7 +59,7 @@ impl Duration {
     ///
     /// Duration in seconds as u64
     pub fn as_secs(&self) -> u64 {
-        self.secs
+        self.millis / 1000
     }
 
     /// Get duration as milliseconds
@@ -68,7 +68,7 @@ impl Duration {
     ///
     /// Duration in milliseconds as u64
     pub fn as_millis(&self) -> u64 {
-        self.secs * 1000
+        self.millis
     }
 
     /// Get duration as seconds f64 (useful for rate calculations)
@@ -77,12 +77,12 @@ impl Duration {
     ///
     /// Duration in seconds as f64
     pub fn as_secs_f64(&self) -> f64 {
-        self.secs as f64
+        self.millis as f64 / 1000.0
     }
 
     /// Check if duration is zero
     pub fn is_zero(&self) -> bool {
-        self.secs == 0
+        self.millis == 0
     }
 }
 
