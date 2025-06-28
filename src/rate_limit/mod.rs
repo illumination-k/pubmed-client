@@ -12,7 +12,7 @@ use tracing::{debug, instrument};
 /// - 3 requests per second without API key
 /// - 10 requests per second with API key
 /// - Violations can result in IP blocking
-
+///
 /// Token bucket rate limiter for NCBI API compliance
 #[derive(Clone)]
 pub struct RateLimiter {
@@ -180,6 +180,7 @@ impl RateLimiter {
 }
 
 /// Common interface for rate limiters (for backwards compatibility)
+#[allow(async_fn_in_trait)]
 pub trait RateLimiterTrait: Sized {
     /// Create a new rate limiter with the specified rate (requests per second)
     fn new(rate: f64) -> Self;

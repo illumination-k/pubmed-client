@@ -16,8 +16,7 @@ mod common;
 
 #[cfg(feature = "integration-tests")]
 mod integration_tests {
-    use std::time::Duration;
-    use tokio::time::sleep;
+    use pubmed_client_rs::time::{Duration, sleep};
     use tracing::{debug, info, warn};
     use tracing_test::traced_test;
 

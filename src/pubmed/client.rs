@@ -90,7 +90,7 @@ impl PubMedClient {
             {
                 Client::builder()
                     .user_agent(config.effective_user_agent())
-                    .timeout(config.timeout)
+                    .timeout(std::time::Duration::from_secs(config.timeout.as_secs()))
                     .build()
                     .expect("Failed to create HTTP client")
             }
