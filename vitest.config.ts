@@ -1,5 +1,5 @@
+import { resolve } from 'node:path'
 import { defineConfig } from 'vitest/config'
-import { resolve } from 'path'
 
 export default defineConfig({
   test: {
@@ -14,12 +14,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['pkg/**/*.js'],
-      exclude: [
-        'pkg/**/*.d.ts',
-        'pkg/**/*.wasm',
-        'node_modules/',
-        'tests/',
-      ],
+      exclude: ['pkg/**/*.d.ts', 'pkg/**/*.wasm', 'node_modules/', 'tests/'],
     },
     pool: 'threads',
     poolOptions: {

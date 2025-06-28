@@ -30,16 +30,6 @@
     "types": ["node", "vitest/globals"],
     "lib": ["ES2022", "DOM"]
   },
-  "include": [
-    "tests/**/*",
-    "pkg/*.d.ts",
-    "wasm-types.d.ts",
-    "vitest.config.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "target",
-    "pkg/*.js"
-  ]
+  "include": ["tests/**/*", "pkg/*.d.ts", "wasm-types.d.ts", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist", "target", "pkg/*.js"]
 }

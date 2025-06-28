@@ -47,12 +47,32 @@ cargo test --lib pubmed::parser::tests::test_mesh_term_parsing
 
 ### Code Quality
 
+#### Rust Code Quality
+
 ```bash
 # Full linting (dprint + cargo fmt + clippy)
 mise r lint
 
 # Format code (dprint + cargo fmt)
 mise r fmt
+```
+
+#### WASM/TypeScript Code Quality
+
+The project uses Biome for TypeScript/JavaScript linting and formatting:
+
+```bash
+# Format TypeScript and JavaScript files
+pnpm run format
+
+# Run linting
+pnpm run lint
+
+# Format and lint (recommended)
+pnpm run check
+
+# CI mode (fails on issues, no auto-fix)
+pnpm run ci
 ```
 
 ### Code Coverage
@@ -470,6 +490,57 @@ cargo test test_get_related_articles_integration
 cargo test test_get_pmc_links_integration
 cargo test test_get_citations_integration
 ```
+
+## WASM TypeScript Testing
+
+The project includes comprehensive TypeScript tests for the WASM bindings using Vitest:
+
+### WASM Test Commands
+
+```bash
+# Build WASM package
+pnpm run build
+
+# Run TypeScript tests
+pnpm run test
+
+# Run tests in watch mode
+pnpm run test:watch
+
+# Run tests with coverage
+pnpm run test:coverage
+
+# Type checking
+pnpm run typecheck
+
+# Full quality check (lint + format + test)
+pnpm run check && pnpm run test
+```
+
+### WASM Test Architecture
+
+- **Test Framework**: Vitest with TypeScript support
+- **Test Location**: `tests/wasm/simple.test.ts`
+- **Test Coverage**: All WASM exported functions with success/failure scenarios
+- **Setup**: Automatic WASM module loading via `tests/wasm/setup.ts`
+
+### WASM Functions Tested
+
+1. **Client Configuration**: `WasmClientConfig` creation and property setting
+2. **Client Creation**: Default and custom configuration clients
+3. **Article Search**: `search_articles()` with various queries and limits
+4. **Article Fetching**: `fetch_article()` by PMID with validation
+5. **PMC Availability**: `check_pmc_availability()` for full-text access
+6. **Full Text Retrieval**: `fetch_full_text()` from PMC with structure validation
+7. **Markdown Conversion**: `convert_to_markdown()` with content validation
+8. **Related Articles**: `get_related_articles()` with PMID arrays
+
+### Test Data and Fixtures
+
+- **Live API Tests**: Uses real PMIDs like `31978945` (COVID-19 research)
+- **PMC Test Data**: `PMC7092803` for full-text validation
+- **Error Testing**: Invalid PMIDs and malformed inputs
+- **Network Resilience**: Graceful handling of API failures
 
 ## Test Fixtures and Data
 

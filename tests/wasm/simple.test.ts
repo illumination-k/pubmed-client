@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { WasmPubMedClient, WasmClientConfig } from '../../pkg/pubmed_client_rs.js'
+import { describe, expect, it } from 'vitest'
+import { WasmClientConfig, WasmPubMedClient } from '../../pkg/pubmed_client_rs.js'
 
 describe('WASM Client Basic Tests', () => {
   describe('WasmClientConfig', () => {

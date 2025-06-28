@@ -3,7 +3,7 @@
  * This file is executed before each test file
  */
 
-import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest'
 
 // Global test configuration
 beforeAll(async () => {
@@ -152,7 +152,7 @@ export const MOCK_ARTICLE = {
   pub_date: '2020 Feb 20',
   doi: '10.1056/NEJMoa2001017',
   article_types: ['Journal Article'],
-  abstract_text: 'In December 2019, a cluster of patients with pneumonia...'
+  abstract_text: 'In December 2019, a cluster of patients with pneumonia...',
 }
 
 export const MOCK_FULL_TEXT = {
@@ -165,13 +165,13 @@ export const MOCK_FULL_TEXT = {
       surname: 'Zhu',
       full_name: 'Na Zhu',
       affiliations: ['State Key Laboratory of Virology'],
-      is_corresponding: false
-    }
+      is_corresponding: false,
+    },
   ],
   journal: {
     title: 'New England Journal of Medicine',
     abbreviation: 'N Engl J Med',
-    issn_print: '0028-4793'
+    issn_print: '0028-4793',
   },
   pub_date: '2020 Feb 20',
   doi: '10.1056/NEJMoa2001017',
@@ -179,9 +179,9 @@ export const MOCK_FULL_TEXT = {
     {
       section_type: 'abstract',
       title: 'Abstract',
-      content: 'In December 2019, a cluster of patients with pneumonia...'
-    }
+      content: 'In December 2019, a cluster of patients with pneumonia...',
+    },
   ],
   references: [],
-  keywords: ['coronavirus', 'pneumonia', 'outbreak']
+  keywords: ['coronavirus', 'pneumonia', 'outbreak'],
 }
