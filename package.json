@@ -11,8 +11,12 @@
     "build": "wasm-pack build --target nodejs --features wasm",
     "build:web": "wasm-pack build --target web --features wasm",
     "build:bundler": "wasm-pack build --target bundler --features wasm",
-    "build:all": "npm run build && npm run build:web && npm run build:bundler",
-    "test": "wasm-pack test --node --features wasm"
+    "build:all": "pnpm run build && pnpm run build:web && pnpm run build:bundler",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:wasm": "wasm-pack test --node --features wasm",
+    "typecheck": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -30,9 +34,14 @@
   "author": "Your Name",
   "license": "MIT OR Apache-2.0",
   "devDependencies": {
-    "wasm-pack": "^0.12.1"
+    "wasm-pack": "^0.12.1",
+    "vitest": "^1.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "happy-dom": "^12.0.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=20.0.0"
   }
 }

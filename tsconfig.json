@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./tests/*"],
+      "@/wasm/*": ["./tests/wasm/*"],
+      "@/pkg/*": ["./pkg/*"]
+    },
+    "types": ["node", "vitest/globals"],
+    "lib": ["ES2022", "DOM"]
+  },
+  "include": [
+    "tests/**/*",
+    "pkg/*.d.ts",
+    "wasm-types.d.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "target",
+    "pkg/*.js"
+  ]
+}

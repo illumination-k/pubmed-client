@@ -9,8 +9,8 @@ async function main() {
 
         // Create configuration
         const config = new WasmClientConfig();
-        config.set_email("researcher@university.edu");
-        config.set_tool("PubMed WASM Example");
+        config.email = "researcher@university.edu";
+        config.tool = "PubMed WASM Example";
 
         // Create client
         const client = WasmPubMedClient.with_config(config);

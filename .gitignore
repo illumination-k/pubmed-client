@@ -12,3 +12,5 @@ coverage/
 *.profraw
 
 .cache/
+
+node_modules/

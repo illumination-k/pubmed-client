@@ -73,3 +73,41 @@ jobs:
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.rust }}
           path: target/nextest/*/junit.xml
+
+  wasm-tests:
+    name: WASM TypeScript Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - uses: jdx/mise-action@v2
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Build WASM package
+        run: pnpm run build
+
+      - name: Install TypeScript dependencies
+        run: pnpm install
+
+      - name: Run TypeScript tests
+        run: pnpm run test
