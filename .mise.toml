@@ -47,3 +47,19 @@ run = [
 
 [tasks."coverage:open"]
 run = ["cargo llvm-cov nextest --all-features --html --open"]
+
+[tasks."wasm:build"]
+run = [
+  "wasm-pack build --target web --out-dir pkg --features wasm,tsify",
+]
+
+[tasks."wasm:build:node"]
+run = [
+  "wasm-pack build --target nodejs --out-dir pkg --features wasm,tsify",
+]
+
+[tasks."wasm:test"]
+run = [
+  "mise r wasm:build:node",
+  "pnpm run test",
+]

@@ -9,10 +9,11 @@ import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest'
 beforeAll(async () => {
   console.log('🧬 Setting up WASM test environment...')
 
-  // Ensure WASM module is available
+  // Ensure WASM module is available and initialized
   try {
-    // Try to import the WASM module to verify it's built
+    // Import the WASM module (Node.js target auto-initializes)
     const wasmModule = await import('../../pkg/pubmed_client_rs.js')
+
     if (!wasmModule.WasmPubMedClient || !wasmModule.WasmClientConfig) {
       throw new Error('WASM module not properly exported')
     }

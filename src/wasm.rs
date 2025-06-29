@@ -9,10 +9,34 @@
 #[cfg(all(feature = "wasm", target_arch = "wasm32"))]
 mod wasm_impl {
     use crate::{Client, config::ClientConfig, pmc::PmcFullText, pubmed::PubMedArticle};
-    use js_sys::Promise;
     use serde::{Deserialize, Serialize};
+    #[cfg(feature = "tsify")]
+    use tsify::Tsify;
     use wasm_bindgen::prelude::*;
     use wasm_bindgen_futures::future_to_promise;
+
+    #[wasm_bindgen]
+    extern "C" {
+        /// Promise<JsArticle[]>
+        #[wasm_bindgen(typescript_type = "Promise<JsArticle[]>")]
+        pub type JsPromiseArticles;
+
+        /// Promise<JsArticle>
+        #[wasm_bindgen(typescript_type = "Promise<JsArticle>")]
+        pub type JsPromiseArticle;
+
+        /// Promise<JsFullText>
+        #[wasm_bindgen(typescript_type = "Promise<JsFullText>")]
+        pub type JsPromiseFullText;
+
+        /// Promise<string | null>
+        #[wasm_bindgen(typescript_type = "Promise<string | null>")]
+        pub type JsPromiseOptString;
+
+        /// Promise<string[]>
+        #[wasm_bindgen(typescript_type = "Promise<string[]>")]
+        pub type JsPromiseStringArray;
+    }
 
     // Set up panic handler and allocator for better WASM experience
     #[wasm_bindgen(start)]
@@ -125,26 +149,25 @@ mod wasm_impl {
         }
 
         /// Search for articles and return a Promise
-        #[wasm_bindgen]
-        pub fn search_articles(&self, query: String, limit: usize) -> Promise {
+        #[wasm_bindgen(typescript_type = "Promise<JsArticle[]>")]
+        pub fn search_articles(&self, query: String, limit: usize) -> JsPromiseArticles {
             let client = self.client.clone();
             future_to_promise(async move {
                 match client.pubmed.search_and_fetch(&query, limit).await {
                     Ok(articles) => {
-                        let js_articles = articles
-                            .into_iter()
-                            .map(JsArticle::from)
-                            .collect::<Vec<_>>();
+                        let js_articles: Vec<JsArticle> =
+                            articles.into_iter().map(JsArticle::from).collect();
                         Ok(serde_wasm_bindgen::to_value(&js_articles)?)
                     }
                     Err(e) => Err(JsValue::from_str(&format!("Search failed: {e}"))),
                 }
             })
+            .unchecked_into()
         }
 
         /// Fetch a single article by PMID
-        #[wasm_bindgen]
-        pub fn fetch_article(&self, pmid: String) -> Promise {
+        #[wasm_bindgen(typescript_type = "Promise<JsArticle>")]
+        pub fn fetch_article(&self, pmid: String) -> JsPromiseArticle {
             let client = self.client.clone();
             future_to_promise(async move {
                 match client.pubmed.fetch_article(&pmid).await {
@@ -155,11 +178,12 @@ mod wasm_impl {
                     Err(e) => Err(JsValue::from_str(&format!("Fetch failed: {e}"))),
                 }
             })
+            .unchecked_into()
         }
 
         /// Fetch full text from PMC
-        #[wasm_bindgen]
-        pub fn fetch_full_text(&self, pmcid: String) -> Promise {
+        #[wasm_bindgen(typescript_type = "Promise<JsFullText>")]
+        pub fn fetch_full_text(&self, pmcid: String) -> JsPromiseFullText {
             let client = self.client.clone();
             future_to_promise(async move {
                 match client.pmc.fetch_full_text(&pmcid).await {
@@ -170,11 +194,12 @@ mod wasm_impl {
                     Err(e) => Err(JsValue::from_str(&format!("Full text fetch failed: {e}"))),
                 }
             })
+            .unchecked_into()
         }
 
         /// Check if PMC full text is available for a PMID
-        #[wasm_bindgen]
-        pub fn check_pmc_availability(&self, pmid: String) -> Promise {
+        #[wasm_bindgen(typescript_type = "Promise<string | null>")]
+        pub fn check_pmc_availability(&self, pmid: String) -> JsPromiseOptString {
             let client = self.client.clone();
             future_to_promise(async move {
                 match client.pmc.check_pmc_availability(&pmid).await {
@@ -182,11 +207,12 @@ mod wasm_impl {
                     Err(e) => Err(JsValue::from_str(&format!("PMC check failed: {e}"))),
                 }
             })
+            .unchecked_into()
         }
 
         /// Get related articles for given PMIDs
-        #[wasm_bindgen]
-        pub fn get_related_articles(&self, pmids: Vec<u32>) -> Promise {
+        #[wasm_bindgen(typescript_type = "Promise<string[]>")]
+        pub fn get_related_articles(&self, pmids: Vec<u32>) -> JsPromiseStringArray {
             let client = self.client.clone();
             future_to_promise(async move {
                 match client.get_related_articles(&pmids).await {
@@ -196,10 +222,11 @@ mod wasm_impl {
                     ))),
                 }
             })
+            .unchecked_into()
         }
 
         /// Convert PMC full text to markdown
-        #[wasm_bindgen]
+        #[wasm_bindgen(typescript_type = "(full_text_js: JsFullText) => string")]
         pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
             let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)
                 .map_err(|e| JsValue::from_str(&format!("Invalid full text data: {e}")))?;
@@ -212,6 +239,8 @@ mod wasm_impl {
 
     /// JavaScript-friendly article representation
     #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "tsify", derive(Tsify))]
+    #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
     pub struct JsArticle {
         pub pmid: String,
         pub title: String,
@@ -247,6 +276,8 @@ mod wasm_impl {
 
     /// JavaScript-friendly full text representation
     #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "tsify", derive(Tsify))]
+    #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
     pub struct JsFullText {
         pub pmcid: String,
         pub pmid: Option<String>,
@@ -262,6 +293,8 @@ mod wasm_impl {
     }
 
     #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "tsify", derive(Tsify))]
+    #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
     pub struct JsAuthor {
         pub given_names: Option<String>,
         pub surname: Option<String>,
@@ -272,6 +305,8 @@ mod wasm_impl {
     }
 
     #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "tsify", derive(Tsify))]
+    #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
     pub struct JsJournal {
         pub title: String,
         pub abbreviation: Option<String>,
@@ -281,6 +316,8 @@ mod wasm_impl {
     }
 
     #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "tsify", derive(Tsify))]
+    #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
     pub struct JsSection {
         pub section_type: String,
         pub title: Option<String>,
@@ -288,6 +325,8 @@ mod wasm_impl {
     }
 
     #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[cfg_attr(feature = "tsify", derive(Tsify))]
+    #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
     pub struct JsReference {
         pub id: String,
         pub title: Option<String>,

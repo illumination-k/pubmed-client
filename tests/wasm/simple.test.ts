@@ -51,9 +51,9 @@ describe('WASM Client Basic Tests', () => {
       expect(articles.length).toBeLessThanOrEqual(2)
 
       const article = articles[0]
-      expect(typeof article.pmid).toBe('string')
-      expect(typeof article.title).toBe('string')
-      expect(Array.isArray(article.authors)).toBe(true)
+      expect(typeof article?.pmid).toBe('string')
+      expect(typeof article?.title).toBe('string')
+      expect(Array.isArray(article?.authors)).toBe(true)
 
       client.free()
     })
