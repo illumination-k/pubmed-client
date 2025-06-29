@@ -177,7 +177,7 @@ async fn test_real_api_concurrent_rate_limiting() {
         .map(|i| {
             let client = client.clone();
             tokio::spawn(async move {
-                let query = format!("test query {}", i);
+                let query = format!("test query {i}");
                 let task_start = Instant::now();
 
                 debug!(task_id = i, query = %query, "Starting concurrent task");
@@ -529,9 +529,7 @@ async fn test_real_api_server_rate_limit_handling() {
     for i in 0..10 {
         requests_made += 1;
 
-        let result = client
-            .search_articles(&format!("test query {}", i), 1)
-            .await;
+        let result = client.search_articles(&format!("test query {i}"), 1).await;
 
         match result {
             Ok(pmids) => {

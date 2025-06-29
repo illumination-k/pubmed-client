@@ -353,22 +353,22 @@ impl Reference {
                 let mut journal_part = journal.clone();
                 if let Some(year) = &self.year {
                     if !year.trim().is_empty() && year != "n.d." {
-                        journal_part.push_str(&format!(" ({})", year));
+                        journal_part.push_str(&format!(" ({year})"));
                     }
                 }
                 if let Some(volume) = &self.volume {
                     if !volume.trim().is_empty() {
-                        journal_part.push_str(&format!(" {}", volume));
+                        journal_part.push_str(&format!(" {volume}"));
                         if let Some(issue) = &self.issue {
                             if !issue.trim().is_empty() {
-                                journal_part.push_str(&format!("({})", issue));
+                                journal_part.push_str(&format!("({issue})"));
                             }
                         }
                     }
                 }
                 if let Some(pages) = &self.pages {
                     if !pages.trim().is_empty() {
-                        journal_part.push_str(&format!(": {}", pages));
+                        journal_part.push_str(&format!(": {pages}"));
                     }
                 }
                 parts.push(journal_part);
@@ -378,7 +378,8 @@ impl Reference {
         // If no meaningful parts found, use the reference ID as fallback
         let result = parts.join(". ");
         if result.trim().is_empty() {
-            format!("Reference {}", self.id)
+            let id = &self.id;
+            format!("Reference {id}")
         } else {
             result
         }
@@ -403,7 +404,7 @@ impl Author {
     /// Create an author with separated names
     pub fn with_names(given_names: Option<String>, surname: Option<String>) -> Self {
         let full_name = match (&given_names, &surname) {
-            (Some(given), Some(sur)) => format!("{} {}", given, sur),
+            (Some(given), Some(sur)) => format!("{given} {sur}"),
             (Some(given), None) => given.clone(),
             (None, Some(sur)) => sur.clone(),
             (None, None) => "Unknown Author".to_string(),

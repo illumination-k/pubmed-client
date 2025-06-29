@@ -297,7 +297,7 @@ async fn test_high_concurrency_rate_limiting() {
     for i in 0..5 {
         let client = client.clone();
         let task =
-            tokio::spawn(async move { client.search_articles(&format!("query {}", i), 1).await });
+            tokio::spawn(async move { client.search_articles(&format!("query {i}"), 1).await });
         tasks.push(task);
     }
 
