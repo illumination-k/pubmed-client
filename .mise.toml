@@ -1,36 +1,27 @@
 [tools]
 pre-commit = "latest"
 dprint = "latest"
+
 "cargo:cargo-nextest" = "latest"
 "cargo:cargo-llvm-cov" = "latest"
 
+pnpm = "10"
+node = "20"
+
 [tasks.fmt]
-run = [
-  "dprint fmt",
-  "cargo fmt --all",
-]
+run = ["dprint fmt", "cargo fmt --all"]
 
 [tasks.lint]
 run = [
   "dprint check",
   "cargo fmt --all -- --check",
-  "cargo clippy --all-targets --all-features -- -D warnings",
+  "cargo clippy --all-targets -- -D warnings",
+  "cargo clippy --all-targets --features integration-tests -- -D warnings",
+  "cargo clippy --all-targets --features wasm -- -D warnings",
 ]
 
 [tasks.test]
-run = [
-  "cargo nextest run --all-features",
-]
-
-[tasks."test:watch"]
-run = [
-  "cargo watch -x 'nextest run --all-features'",
-]
-
-[tasks."test:verbose"]
-run = [
-  "cargo nextest run --all-features --nocapture",
-]
+run = ["cargo nextest run --all-features"]
 
 [tasks.build]
 run = ["cargo build"]
@@ -42,9 +33,7 @@ run = ["cargo check"]
 run = ["cargo doc --open"]
 
 [tasks.coverage]
-run = [
-  "cargo llvm-cov nextest --all-features --html",
-]
+run = ["cargo llvm-cov nextest --all-features --html"]
 
 [tasks."coverage:lcov"]
 run = [
@@ -57,6 +46,20 @@ run = [
 ]
 
 [tasks."coverage:open"]
+run = ["cargo llvm-cov nextest --all-features --html --open"]
+
+[tasks."wasm:build"]
 run = [
-  "cargo llvm-cov nextest --all-features --html --open",
+  "wasm-pack build --target web --out-dir pkg --features wasm,tsify",
+]
+
+[tasks."wasm:build:node"]
+run = [
+  "wasm-pack build --target nodejs --out-dir pkg --features wasm,tsify",
+]
+
+[tasks."wasm:test"]
+run = [
+  "mise r wasm:build:node",
+  "pnpm run test",
 ]

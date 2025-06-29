@@ -385,7 +385,7 @@ impl PubMedXmlParser {
                 Ok(Event::Eof) => break,
                 Err(e) => {
                     return Err(PubMedError::XmlParseError {
-                        message: format!("XML parsing error: {}", e),
+                        message: format!("XML parsing error: {e}"),
                     });
                 }
                 _ => {}
@@ -529,9 +529,10 @@ fn extract_country_from_text(text: &str) -> Option<String> {
 
     let text_lower = text.to_lowercase();
     for country in &common_countries {
-        if text_lower.ends_with(&country.to_lowercase())
-            || text_lower.contains(&format!(", {}", country.to_lowercase()))
-        {
+        if text_lower.ends_with(&country.to_lowercase()) || {
+            let country_lower = country.to_lowercase();
+            text_lower.contains(&format!(", {country_lower}"))
+        } {
             return Some(country.to_string());
         }
     }
@@ -546,10 +547,10 @@ fn format_author_name(
     initials: &Option<String>,
 ) -> String {
     match (fore_name, last_name) {
-        (Some(fore), Some(last)) => format!("{} {}", fore, last),
+        (Some(fore), Some(last)) => format!("{fore} {last}"),
         (None, Some(last)) => {
             if let Some(init) = initials {
-                format!("{} {}", init, last)
+                format!("{init} {last}")
             } else {
                 last.clone()
             }

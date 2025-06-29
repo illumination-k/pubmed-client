@@ -171,45 +171,48 @@ impl PmcMarkdownConverter {
         }
 
         // Journal information
-        metadata.push_str(&format!("\n**Journal:** {}", article.journal.title));
+        let journal_title = &article.journal.title;
+        metadata.push_str(&format!("\n**Journal:** {journal_title}"));
         if let Some(abbrev) = &article.journal.abbreviation {
-            metadata.push_str(&format!(" ({})", abbrev));
+            metadata.push_str(&format!(" ({abbrev})"));
         }
         metadata.push('\n');
 
         // Publication date
         if !article.pub_date.is_empty() && article.pub_date != "Unknown Date" {
-            metadata.push_str(&format!("**Published:** {}\n", article.pub_date));
+            let pub_date = &article.pub_date;
+            metadata.push_str(&format!("**Published:** {pub_date}\n"));
         }
 
         // Identifiers
         let mut identifiers = Vec::new();
         if let Some(doi) = &article.doi {
             if self.config.include_identifier_links {
-                identifiers.push(format!("[DOI: {}](https://doi.org/{})", doi, doi));
+                identifiers.push(format!("[DOI: {doi}](https://doi.org/{doi})"));
             } else {
-                identifiers.push(format!("DOI: {}", doi));
+                identifiers.push(format!("DOI: {doi}"));
             }
         }
         if let Some(pmid) = &article.pmid {
             if self.config.include_identifier_links {
                 identifiers.push(format!(
-                    "[PMID: {}](https://pubmed.ncbi.nlm.nih.gov/{})",
-                    pmid, pmid
+                    "[PMID: {pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid})"
                 ));
             } else {
-                identifiers.push(format!("PMID: {}", pmid));
+                identifiers.push(format!("PMID: {pmid}"));
             }
         }
-        identifiers.push(format!("PMC: {}", article.pmcid));
+        let pmcid = &article.pmcid;
+        identifiers.push(format!("PMC: {pmcid}"));
 
         if !identifiers.is_empty() {
-            metadata.push_str(&format!("**Identifiers:** {}\n", identifiers.join(" | ")));
+            let identifiers_str = identifiers.join(" | ");
+            metadata.push_str(&format!("**Identifiers:** {identifiers_str}\n"));
         }
 
         // Article type
         if let Some(article_type) = &article.article_type {
-            metadata.push_str(&format!("**Article Type:** {}\n", article_type));
+            metadata.push_str(&format!("**Article Type:** {article_type}\n"));
         }
 
         // Keywords
@@ -219,19 +222,20 @@ impl PmcMarkdownConverter {
                 .iter()
                 .map(|k| self.clean_content(k))
                 .collect();
-            metadata.push_str(&format!("**Keywords:** {}\n", clean_keywords.join(", ")));
+            let keywords_str = clean_keywords.join(", ");
+            metadata.push_str(&format!("**Keywords:** {keywords_str}\n"));
         }
 
         // Journal details
         let mut journal_details = Vec::new();
         if let Some(volume) = &article.journal.volume {
-            journal_details.push(format!("Volume {}", volume));
+            journal_details.push(format!("Volume {volume}"));
         }
         if let Some(issue) = &article.journal.issue {
-            journal_details.push(format!("Issue {}", issue));
+            journal_details.push(format!("Issue {issue}"));
         }
         if let Some(publisher) = &article.journal.publisher {
-            journal_details.push(format!("Publisher: {}", publisher));
+            journal_details.push(format!("Publisher: {publisher}"));
         }
         if !journal_details.is_empty() {
             metadata.push_str(&format!(
@@ -253,19 +257,18 @@ impl PmcMarkdownConverter {
             let default_title = "Untitled".to_string();
             let title = section.title.as_ref().unwrap_or(&default_title);
             let anchor = self.create_anchor(title);
-            toc.push_str(&format!("{}. [{}](#{})\n", i + 1, title, anchor));
+            let index = i + 1;
+            toc.push_str(&format!("{index}. [{title}](#{anchor})\n"));
 
             // Add subsections
             for (j, subsection) in section.subsections.iter().enumerate() {
                 let default_sub_title = "Untitled".to_string();
                 let sub_title = subsection.title.as_ref().unwrap_or(&default_sub_title);
                 let sub_anchor = self.create_anchor(sub_title);
+                let main_index = i + 1;
+                let sub_index = j + 1;
                 toc.push_str(&format!(
-                    "   {}.{}. [{}](#{})\n",
-                    i + 1,
-                    j + 1,
-                    sub_title,
-                    sub_anchor
+                    "   {main_index}.{sub_index}. [{sub_title}](#{sub_anchor})\n"
                 ));
             }
         }
@@ -334,7 +337,8 @@ impl PmcMarkdownConverter {
             }
             ReferenceStyle::AuthorYear | ReferenceStyle::FullCitation => {
                 for reference in references {
-                    content.push_str(&format!("- {}\n", self.format_reference(reference)));
+                    let formatted_ref = self.format_reference(reference);
+                    content.push_str(&format!("- {formatted_ref}\n"));
                 }
             }
         }
@@ -391,16 +395,20 @@ impl PmcMarkdownConverter {
 
         match self.config.heading_style {
             HeadingStyle::ATX => {
-                format!("{} {}", "#".repeat(level as usize), text)
+                let hashes = "#".repeat(level as usize);
+                format!("{hashes} {text}")
             }
             HeadingStyle::Setext => {
                 if level == 1 {
-                    format!("{}\n{}", text, "=".repeat(text.len()))
+                    let underline = "=".repeat(text.len());
+                    format!("{text}\n{underline}")
                 } else if level == 2 {
-                    format!("{}\n{}", text, "-".repeat(text.len()))
+                    let underline = "-".repeat(text.len());
+                    format!("{text}\n{underline}")
                 } else {
                     // Fall back to ATX for levels 3+
-                    format!("{} {}", "#".repeat(level as usize), text)
+                    let hashes = "#".repeat(level as usize);
+                    format!("{hashes} {text}")
                 }
             }
         }
@@ -419,10 +427,7 @@ impl PmcMarkdownConverter {
                         let clean_orcid = orcid.trim_start_matches("https://orcid.org/");
                         if clean_orcid.len() > 10 {
                             // Basic ORCID format check
-                            name.push_str(&format!(
-                                " ([ORCID](https://orcid.org/{}))",
-                                clean_orcid
-                            ));
+                            name.push_str(&format!(" ([ORCID](https://orcid.org/{clean_orcid}))"));
                         }
                     }
                 }
@@ -450,15 +455,13 @@ impl PmcMarkdownConverter {
 
                     // Add DOI link
                     if let Some(doi) = &reference.doi {
-                        formatted.push_str(&format!(" [DOI](https://doi.org/{})", doi));
+                        formatted.push_str(&format!(" [DOI](https://doi.org/{doi})"));
                     }
 
                     // Add PMID link
                     if let Some(pmid) = &reference.pmid {
-                        formatted.push_str(&format!(
-                            " [PMID](https://pubmed.ncbi.nlm.nih.gov/{})",
-                            pmid
-                        ));
+                        formatted
+                            .push_str(&format!(" [PMID](https://pubmed.ncbi.nlm.nih.gov/{pmid})"));
                     }
 
                     formatted
@@ -482,14 +485,16 @@ impl PmcMarkdownConverter {
 
     /// Format funding information
     fn format_funding(&self, funding: &FundingInfo) -> String {
-        let mut text = format!("- **{}**", funding.source);
+        let source = &funding.source;
+        let mut text = format!("- **{source}**");
 
         if let Some(award_id) = &funding.award_id {
-            text.push_str(&format!(" (Award ID: {})", award_id));
+            text.push_str(&format!(" (Award ID: {award_id})"));
         }
 
         if let Some(statement) = &funding.statement {
-            text.push_str(&format!(": {}", self.clean_content(statement)));
+            let content = self.clean_content(statement);
+            text.push_str(&format!(": {content}"));
         }
 
         text
@@ -500,15 +505,18 @@ impl PmcMarkdownConverter {
         let mut content = String::new();
 
         if let Some(label) = &figure.label {
-            content.push_str(&format!("**{}**", label));
+            content.push_str(&format!("**{label}**"));
         } else {
-            content.push_str(&format!("**Figure {}**", figure.id));
+            let figure_id = &figure.id;
+            content.push_str(&format!("**Figure {figure_id}**"));
         }
 
-        content.push_str(&format!(": {}", self.clean_content(&figure.caption)));
+        let caption = self.clean_content(&figure.caption);
+        content.push_str(&format!(": {caption}"));
 
         if let Some(alt_text) = &figure.alt_text {
-            content.push_str(&format!("\n\n*Alt text: {}*", self.clean_content(alt_text)));
+            let alt_content = self.clean_content(alt_text);
+            content.push_str(&format!("\n\n*Alt text: {alt_content}*"));
         }
 
         content
@@ -519,17 +527,21 @@ impl PmcMarkdownConverter {
         let mut content = String::new();
 
         if let Some(label) = &table.label {
-            content.push_str(&format!("**{}**", label));
+            content.push_str(&format!("**{label}**"));
         } else {
-            content.push_str(&format!("**Table {}**", table.id));
+            let table_id = &table.id;
+            content.push_str(&format!("**Table {table_id}**"));
         }
 
-        content.push_str(&format!(": {}", self.clean_content(&table.caption)));
+        let caption = self.clean_content(&table.caption);
+        content.push_str(&format!(": {caption}"));
 
         if !table.footnotes.is_empty() {
             content.push_str("\n\n*Footnotes:*\n");
             for (i, footnote) in table.footnotes.iter().enumerate() {
-                content.push_str(&format!("{}. {}\n", i + 1, self.clean_content(footnote)));
+                let index = i + 1;
+                let footnote_content = self.clean_content(footnote);
+                content.push_str(&format!("{index}. {footnote_content}\n"));
             }
         }
 

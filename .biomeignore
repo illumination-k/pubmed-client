@@ -1,0 +1,14 @@
+# Generated files
+pkg/
+target/
+node_modules/
+
+# WASM files
+*.wasm
+
+# Lock files
+pnpm-lock.yaml
+Cargo.lock
+
+# Rust source files (handled by rustfmt)
+src/

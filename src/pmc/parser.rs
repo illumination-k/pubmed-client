@@ -110,7 +110,7 @@ impl PmcXmlParser {
                                     let given_end = given_content_start + given_end;
                                     let given_names =
                                         &contrib_section[given_content_start..given_end];
-                                    authors.push(format!("{} {}", given_names, surname));
+                                    authors.push(format!("{given_names} {surname}"));
                                     pos = given_end;
                                     continue;
                                 }
@@ -729,7 +729,10 @@ impl PmcXmlParser {
 
                 let id = self
                     .extract_attribute_value(fig_content, "id")
-                    .unwrap_or_else(|| format!("fig_{}", figures.len() + 1));
+                    .unwrap_or_else(|| {
+                        let fig_num = figures.len() + 1;
+                        format!("fig_{fig_num}")
+                    });
 
                 let label = self.extract_text_between(fig_content, "<label>", "</label>");
                 let caption = self
@@ -768,7 +771,10 @@ impl PmcXmlParser {
 
                 let id = self
                     .extract_attribute_value(table_content, "id")
-                    .unwrap_or_else(|| format!("table_{}", tables.len() + 1));
+                    .unwrap_or_else(|| {
+                        let table_num = tables.len() + 1;
+                        format!("table_{table_num}")
+                    });
 
                 let label = self.extract_text_between(table_content, "<label>", "</label>");
                 let caption = self
@@ -864,7 +870,7 @@ impl PmcXmlParser {
         // Extract pages
         if let Some(fpage) = self.extract_text_between(ref_content, "<fpage>", "</fpage>") {
             if let Some(lpage) = self.extract_text_between(ref_content, "<lpage>", "</lpage>") {
-                reference.pages = Some(format!("{}-{}", fpage, lpage));
+                reference.pages = Some(format!("{fpage}-{lpage}"));
             } else {
                 reference.pages = Some(fpage);
             }
@@ -918,7 +924,7 @@ impl PmcXmlParser {
 
     /// Extract attribute value from XML tag
     fn extract_attribute_value(&self, content: &str, attribute: &str) -> Option<String> {
-        let pattern = format!("{}=\"", attribute);
+        let pattern = format!("{attribute}=\"");
         if let Some(attr_start) = content.find(&pattern) {
             let value_start = attr_start + pattern.len();
             if let Some(value_end) = content[value_start..].find('"') {
