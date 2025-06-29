@@ -10,3 +10,7 @@ coverage.lcov
 coverage.json
 coverage/
 *.profraw
+
+.cache/
+
+node_modules/

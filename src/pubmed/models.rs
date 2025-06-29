@@ -615,10 +615,10 @@ fn format_author_name(
     initials: &Option<String>,
 ) -> String {
     match (fore_name, last_name) {
-        (Some(fore), Some(last)) => format!("{} {}", fore, last),
+        (Some(fore), Some(last)) => format!("{fore} {last}"),
         (None, Some(last)) => {
             if let Some(init) = initials {
-                format!("{} {}", init, last)
+                format!("{init} {last}")
             } else {
                 last.clone()
             }

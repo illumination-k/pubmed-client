@@ -25,7 +25,7 @@ impl SearchQuery {
 
         if !self_query.is_empty() && !other_query.is_empty() {
             // Create a new query with the combined result
-            let combined_query = format!("({}) AND ({})", self_query, other_query);
+            let combined_query = format!("({self_query}) AND ({other_query})");
             self.terms = vec![combined_query];
             self.filters = Vec::new();
         } else if !other_query.is_empty() {
@@ -63,7 +63,7 @@ impl SearchQuery {
 
         if !self_query.is_empty() && !other_query.is_empty() {
             // Create a new query with the combined result
-            let combined_query = format!("({}) OR ({})", self_query, other_query);
+            let combined_query = format!("({self_query}) OR ({other_query})");
             self.terms = vec![combined_query];
             self.filters = Vec::new();
         } else if !other_query.is_empty() {
@@ -94,7 +94,7 @@ impl SearchQuery {
         let self_query = self.build();
 
         if !self_query.is_empty() {
-            let negated_query = format!("NOT ({})", self_query);
+            let negated_query = format!("NOT ({self_query})");
             self.terms = vec![negated_query];
             self.filters = Vec::new();
         }
@@ -122,7 +122,7 @@ impl SearchQuery {
         let excluded_query = excluded.build();
 
         if !self_query.is_empty() && !excluded_query.is_empty() {
-            let combined_query = format!("({}) NOT ({})", self_query, excluded_query);
+            let combined_query = format!("({self_query}) NOT ({excluded_query})");
             self.terms = vec![combined_query];
             self.filters = Vec::new();
         }
@@ -146,7 +146,7 @@ impl SearchQuery {
         let self_query = self.build();
 
         if !self_query.is_empty() {
-            let grouped_query = format!("({})", self_query);
+            let grouped_query = format!("({self_query})");
             self.terms = vec![grouped_query];
             self.filters = Vec::new();
         }

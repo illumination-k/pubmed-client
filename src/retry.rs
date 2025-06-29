@@ -3,10 +3,9 @@
 //! This module provides a configurable retry mechanism with exponential backoff
 //! and jitter to handle temporary network issues when communicating with NCBI APIs.
 
+use crate::time::{Duration, sleep};
 use rand::Rng;
 use std::future::Future;
-use std::time::Duration;
-use tokio::time::sleep;
 use tracing::{debug, warn};
 
 /// Configuration for retry behavior

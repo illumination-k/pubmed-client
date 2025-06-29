@@ -85,11 +85,24 @@ impl PubMedClient {
         let rate_limiter = config.create_rate_limiter();
         let base_url = config.effective_base_url().to_string();
 
-        let client = Client::builder()
-            .timeout(config.timeout)
-            .user_agent(config.effective_user_agent())
-            .build()
-            .expect("Failed to create HTTP client");
+        let client = {
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                Client::builder()
+                    .user_agent(config.effective_user_agent())
+                    .timeout(std::time::Duration::from_secs(config.timeout.as_secs()))
+                    .build()
+                    .expect("Failed to create HTTP client")
+            }
+
+            #[cfg(target_arch = "wasm32")]
+            {
+                Client::builder()
+                    .user_agent(config.effective_user_agent())
+                    .build()
+                    .expect("Failed to create HTTP client")
+            }
+        };
 
         Self {
             client,
@@ -500,10 +513,7 @@ impl PubMedClient {
                 .db_info
                 .ok_or_else(|| PubMedError::ApiError {
                     status: 404,
-                    message: format!(
-                        "Database '{}' not found or no information available",
-                        database
-                    ),
+                    message: format!("Database '{database}' not found or no information available"),
                 })?;
 
         let db_info = db_info_list
@@ -511,7 +521,7 @@ impl PubMedClient {
             .next()
             .ok_or_else(|| PubMedError::ApiError {
                 status: 404,
-                message: format!("Database '{}' information not found", database),
+                message: format!("Database '{database}' information not found"),
             })?;
 
         // Convert internal response to public model

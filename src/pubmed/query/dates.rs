@@ -21,8 +21,8 @@ impl SearchQuery {
     /// ```
     pub fn date_range(mut self, start_year: u32, end_year: Option<u32>) -> Self {
         let date_filter = match end_year {
-            Some(end) => format!("{}:{}[pdat]", start_year, end),
-            None => format!("{}:3000[pdat]", start_year), // Far future date
+            Some(end) => format!("{start_year}:{end}[pdat]"),
+            None => format!("{start_year}:3000[pdat]"), // Far future date
         };
         self.filters.push(date_filter);
         self
@@ -97,7 +97,7 @@ impl SearchQuery {
     ///     .published_in_year(2023);
     /// ```
     pub fn published_in_year(mut self, year: u32) -> Self {
-        self.filters.push(format!("{}[pdat]", year));
+        self.filters.push(format!("{year}[pdat]"));
         self
     }
 

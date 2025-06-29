@@ -111,7 +111,8 @@ mod integration_tests {
 
                     // Log title preview for verification
                     let title_preview = if fulltext.title.len() > 100 {
-                        format!("{}...", &fulltext.title[..100])
+                        let preview = &fulltext.title[..100];
+                        format!("{preview}...")
                     } else {
                         fulltext.title.clone()
                     };
