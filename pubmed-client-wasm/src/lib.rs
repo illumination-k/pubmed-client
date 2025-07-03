@@ -9,19 +9,19 @@ use wasm_bindgen_futures::future_to_promise;
 
 #[wasm_bindgen]
 extern "C" {
-    /// Promise<JsArticle[]>
+    /// `Promise<JsArticle[]>`
     pub type JsPromiseArticles;
 
-    /// Promise<JsArticle>
+    /// `Promise<JsArticle>`
     pub type JsPromiseArticle;
 
-    /// Promise<JsFullText>
+    /// `Promise<JsFullText>`
     pub type JsPromiseFullText;
 
-    /// Promise<string | null>
+    /// `Promise<string | null>`
     pub type JsPromiseOptString;
 
-    /// Promise<string[]>
+    /// `Promise<string[]>`
     pub type JsPromiseStringArray;
 }
 
