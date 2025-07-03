@@ -10,23 +10,18 @@ use wasm_bindgen_futures::future_to_promise;
 #[wasm_bindgen]
 extern "C" {
     /// Promise<JsArticle[]>
-    #[wasm_bindgen(typescript_type = "Promise<JsArticle[]>")]
     pub type JsPromiseArticles;
 
     /// Promise<JsArticle>
-    #[wasm_bindgen(typescript_type = "Promise<JsArticle>")]
     pub type JsPromiseArticle;
 
     /// Promise<JsFullText>
-    #[wasm_bindgen(typescript_type = "Promise<JsFullText>")]
     pub type JsPromiseFullText;
 
     /// Promise<string | null>
-    #[wasm_bindgen(typescript_type = "Promise<string | null>")]
     pub type JsPromiseOptString;
 
     /// Promise<string[]>
-    #[wasm_bindgen(typescript_type = "Promise<string[]>")]
     pub type JsPromiseStringArray;
 }
 
@@ -117,6 +112,12 @@ pub struct WasmPubMedClient {
     client: Client,
 }
 
+impl Default for WasmPubMedClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[wasm_bindgen]
 impl WasmPubMedClient {
     /// Create a new client with default configuration
@@ -137,7 +138,6 @@ impl WasmPubMedClient {
     }
 
     /// Search for articles and return a Promise
-    #[wasm_bindgen(typescript_type = "Promise<JsArticle[]>")]
     pub fn search_articles(&self, query: String, limit: usize) -> JsPromiseArticles {
         let client = self.client.clone();
         future_to_promise(async move {
@@ -154,7 +154,6 @@ impl WasmPubMedClient {
     }
 
     /// Fetch a single article by PMID
-    #[wasm_bindgen(typescript_type = "Promise<JsArticle>")]
     pub fn fetch_article(&self, pmid: String) -> JsPromiseArticle {
         let client = self.client.clone();
         future_to_promise(async move {
@@ -170,7 +169,6 @@ impl WasmPubMedClient {
     }
 
     /// Fetch full text from PMC
-    #[wasm_bindgen(typescript_type = "Promise<JsFullText>")]
     pub fn fetch_full_text(&self, pmcid: String) -> JsPromiseFullText {
         let client = self.client.clone();
         future_to_promise(async move {
@@ -186,7 +184,6 @@ impl WasmPubMedClient {
     }
 
     /// Check if PMC full text is available for a PMID
-    #[wasm_bindgen(typescript_type = "Promise<string | null>")]
     pub fn check_pmc_availability(&self, pmid: String) -> JsPromiseOptString {
         let client = self.client.clone();
         future_to_promise(async move {
@@ -199,7 +196,6 @@ impl WasmPubMedClient {
     }
 
     /// Get related articles for given PMIDs
-    #[wasm_bindgen(typescript_type = "Promise<string[]>")]
     pub fn get_related_articles(&self, pmids: Vec<u32>) -> JsPromiseStringArray {
         let client = self.client.clone();
         future_to_promise(async move {
@@ -214,7 +210,6 @@ impl WasmPubMedClient {
     }
 
     /// Convert PMC full text to markdown
-    #[wasm_bindgen(typescript_type = "(full_text_js: JsFullText) => string")]
     pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
         let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)
             .map_err(|e| JsValue::from_str(&format!("Invalid full text data: {e}")))?;

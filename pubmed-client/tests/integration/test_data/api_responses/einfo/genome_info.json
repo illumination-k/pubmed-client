@@ -1,0 +1,398 @@
+{
+  "header": { "type": "einfo", "version": "0.3" },
+  "einforesult": {
+    "dbinfo": [
+      {
+        "dbname": "genome",
+        "menuname": "Genome",
+        "description": "Genomic sequences, contigs, and maps",
+        "dbbuild": "Build241118-1225.1",
+        "count": "88333",
+        "lastupdate": "2024/11/18 13:03",
+        "fieldlist": [
+          {
+            "name": "ALL",
+            "fullname": "All Fields",
+            "description": "All terms from all searchable fields",
+            "termcount": "20894580",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UID",
+            "fullname": "UID",
+            "description": "Unique number assigned to genome",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "FILT",
+            "fullname": "Filter",
+            "description": "Limits the records",
+            "termcount": "17",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ORGN",
+            "fullname": "Organism",
+            "description": "Organism",
+            "termcount": "719854",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "PID",
+            "fullname": "ProjectID",
+            "description": "Project ID",
+            "termcount": "137111",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PRJA",
+            "fullname": "Project Accession",
+            "description": "Project Accession",
+            "termcount": "137061",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PRJT",
+            "fullname": "Project Type",
+            "description": "Project Type",
+            "termcount": "21",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DFLN",
+            "fullname": "Title",
+            "description": "Genome short description",
+            "termcount": "37950",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DSCR",
+            "fullname": "Genome description",
+            "description": "Genome full description",
+            "termcount": "22937",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "STAT",
+            "fullname": "Status",
+            "description": "Bioproject status",
+            "termcount": "4",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "AID",
+            "fullname": "AssemblyID",
+            "description": "Release ID of full assembly",
+            "termcount": "857320",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "AACC",
+            "fullname": "Assembly Accession",
+            "description": "Accession of full assembly",
+            "termcount": "857302",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ANAM",
+            "fullname": "Assembly Name",
+            "description": "Name of full assembly",
+            "termcount": "2355267",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GI",
+            "fullname": "Replicon GI",
+            "description": "Replicon GI",
+            "termcount": "1094474",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ACCN",
+            "fullname": "Replicon accession",
+            "description": "Replicon Accession",
+            "termcount": "3101173",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RNAM",
+            "fullname": "Replicon name",
+            "description": "Replicon Name",
+            "termcount": "41727",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PACC",
+            "fullname": "Protein Accession",
+            "description": "Protein Accession",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PROT",
+            "fullname": "Protein Name",
+            "description": "Protein Name",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PGI",
+            "fullname": "Protein GI",
+            "description": "protein GI",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GNID",
+            "fullname": "GeneID",
+            "description": "GeneID",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GENE",
+            "fullname": "Gene Name",
+            "description": "Gene Name",
+            "termcount": "10593108",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LTAG",
+            "fullname": "Locus Tag",
+            "description": "Locus Tag",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "WGSP",
+            "fullname": "WGS prefix",
+            "description": "WGS Prefix",
+            "termcount": "957302",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PMID",
+            "fullname": "PubMed ID",
+            "description": "Unique identifier from PubMed",
+            "termcount": "24689",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "BIOP",
+            "fullname": "biological properties",
+            "description": "Biological Properties",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PCID",
+            "fullname": "ProtClust ID",
+            "description": "Protein Clusters ID",
+            "termcount": "43",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PROP",
+            "fullname": "Properties",
+            "description": "Project/Organism Properties",
+            "termcount": "8",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CDT",
+            "fullname": "Create Date",
+            "description": "Create Date",
+            "termcount": "7477",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "STRN",
+            "fullname": "Strain",
+            "description": "Organism Strain",
+            "termcount": "709435",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "HOST",
+            "fullname": "Host",
+            "description": "Organism Host",
+            "termcount": "33",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          }
+        ],
+        "linklist": [
+          {
+            "name": "genome_assembly",
+            "menu": "Assembly",
+            "description": "Related Assembly records",
+            "dbto": "assembly"
+          },
+          {
+            "name": "genome_bioproject",
+            "menu": "BioProject Links",
+            "description": "Related BioProjects",
+            "dbto": "bioproject"
+          },
+          { "name": "genome_gene", "menu": "Gene Links", "description": "Related Gene", "dbto": "gene" },
+          {
+            "name": "genome_nuccore",
+            "menu": "Components",
+            "description": "Constituent nucleotide sequence",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "genome_nuccore_samespecies",
+            "menu": "Other genomes for species",
+            "description": "Other (nearly) complete genomes or particular genomic segments for the species from DDBJ/EMBL/GenBank",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "genome_protein",
+            "menu": "Protein Links",
+            "description": "Constituent protein sequence",
+            "dbto": "protein"
+          },
+          {
+            "name": "genome_proteinclusters",
+            "menu": "Protein Cluster Links",
+            "description": "Related Protein Clusters",
+            "dbto": "proteinclusters"
+          },
+          {
+            "name": "genome_pubmed",
+            "menu": "PubMed Links",
+            "description": "PubMed articles cited by genome record",
+            "dbto": "pubmed"
+          },
+          {
+            "name": "genome_taxonomy",
+            "menu": "Taxonomy Links",
+            "description": "Taxonomy sequences associated with genome record",
+            "dbto": "taxonomy"
+          }
+        ]
+      }
+    ]
+  }
+}

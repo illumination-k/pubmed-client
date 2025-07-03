@@ -15,51 +15,69 @@ run = ["dprint fmt", "cargo fmt --all"]
 run = [
   "dprint check",
   "cargo fmt --all -- --check",
-  "cargo clippy --all-targets -- -D warnings",
-  "cargo clippy --all-targets --features integration-tests -- -D warnings",
-  "cargo clippy --all-targets --features wasm -- -D warnings",
+  "cargo clippy --workspace --all-targets -- -D warnings",
+  "cargo clippy -p pubmed-client-rs --all-targets --features integration-tests -- -D warnings",
 ]
 
 [tasks.test]
-run = ["cargo nextest run --all-features"]
+run = ["cargo nextest run --workspace"]
+
+[tasks."test:watch"]
+run = ["cargo watch -x 'nextest run --workspace'"]
+
+[tasks."test:verbose"]
+run = ["cargo nextest run --workspace --no-capture"]
 
 [tasks.build]
-run = ["cargo build"]
+run = ["cargo build --workspace"]
 
 [tasks.check]
-run = ["cargo check"]
+run = ["cargo check --workspace"]
 
 [tasks.doc]
-run = ["cargo doc --open"]
+run = ["cargo doc --workspace --open"]
 
 [tasks.coverage]
-run = ["cargo llvm-cov nextest --all-features --html"]
+run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html"]
 
 [tasks."coverage:lcov"]
 run = [
-  "cargo llvm-cov nextest --all-features --lcov --output-path coverage.lcov",
+  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --lcov --output-path coverage.lcov",
 ]
 
 [tasks."coverage:json"]
 run = [
-  "cargo llvm-cov nextest --all-features --json --output-path coverage.json",
+  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --json --output-path coverage.json",
 ]
 
 [tasks."coverage:open"]
-run = ["cargo llvm-cov nextest --all-features --html --open"]
+run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html --open"]
 
 [tasks."wasm:build"]
 run = [
-  "wasm-pack build --target web --out-dir pkg --features wasm,tsify",
+  "cd pubmed-client-wasm && wasm-pack build --target web",
 ]
 
 [tasks."wasm:build:node"]
 run = [
-  "wasm-pack build --target nodejs --out-dir pkg --features wasm,tsify",
+  "cd pubmed-client-wasm && wasm-pack build --target nodejs",
 ]
 
 [tasks."wasm:test"]
 run = [
-  "mise r wasm:build:node",
-  "pnpm run test",
+  "cd pubmed-client-wasm && pnpm run build && pnpm run test",
 ]
+
+[tasks."wasm:publish"]
+run = [
+  "cd pubmed-client-wasm && pnpm run publish",
+]
+
+[tasks."core:test"]
+run = ["cargo test -p pubmed-client-rs"]
+
+[tasks."core:test:integration"]
+run = ["cd pubmed-client && cargo test --test"]
+
+[tasks."core:publish"]
+run = ["cd pubmed-client && cargo publish"]

@@ -1,0 +1,10 @@
+{
+  "header": { "type": "elink", "version": "0.3" },
+  "linksets": [
+    {
+      "dbfrom": "pubmed",
+      "ids": ["29540945"],
+      "linksetdbs": [{ "dbto": "pubmed", "linkname": "pubmed_pubmed_citedin", "links": ["39625661", "36010029"] }]
+    }
+  ]
+}

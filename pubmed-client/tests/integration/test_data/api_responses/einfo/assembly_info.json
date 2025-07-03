@@ -1,0 +1,610 @@
+{
+  "header": { "type": "einfo", "version": "0.3" },
+  "einforesult": {
+    "dbinfo": [
+      {
+        "dbname": "assembly",
+        "menuname": "Assembly",
+        "description": "Genome Assembly Database",
+        "dbbuild": "Build250624-0925.1",
+        "count": "3129896",
+        "lastupdate": "2025/06/24 11:11",
+        "fieldlist": [
+          {
+            "name": "ALL",
+            "fullname": "All Fields",
+            "description": "All terms from all searchable fields",
+            "termcount": "60799174",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UID",
+            "fullname": "UID",
+            "description": "Unique number assigned to publication",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "FILT",
+            "fullname": "Filter",
+            "description": "Limits the records",
+            "termcount": "103",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ACCN",
+            "fullname": "Accession",
+            "description": "Chromosome accessions",
+            "termcount": "3789302",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ASAC",
+            "fullname": "Assembly Accession",
+            "description": "Space delimited assembly accessions w/ & w/o versions",
+            "termcount": "14590100",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ASLV",
+            "fullname": "Assembly Level",
+            "description": "How assembled is this assembly. 'Contig' to 'Chromosome'",
+            "termcount": "4",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TXID",
+            "fullname": "Taxonomy ID",
+            "description": "Taxonomy ID",
+            "termcount": "234635",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ORGN",
+            "fullname": "Organism",
+            "description": "Exploded organism names",
+            "termcount": "930313",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "RUID",
+            "fullname": "RefSeq ID",
+            "description": "Id of RefSeq Assembly.",
+            "termcount": "553966",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GUID",
+            "fullname": "GenBank ID",
+            "description": "Id of GenBank synonym of this Assembly.",
+            "termcount": "3129485",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UIDS",
+            "fullname": "All Uids",
+            "description": "Pair-id, GB-id, and RS-id of this Assembly.",
+            "termcount": "6552221",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PROJ",
+            "fullname": "BioProject IDs and Accessions",
+            "description": "Uid and accessions of this assembly's projects",
+            "termcount": "292244",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SAMP",
+            "fullname": "BioSample",
+            "description": "BioSample Accession and Id",
+            "termcount": "5685796",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "NAME",
+            "fullname": "Assembly Name",
+            "description": "Assembly name",
+            "termcount": "3145502",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ALLN",
+            "fullname": "All Names",
+            "description": "All names, space separated",
+            "termcount": "37397906",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DESC",
+            "fullname": "Description",
+            "description": "Assembly description",
+            "termcount": "3015621",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "COV",
+            "fullname": "Coverage",
+            "description": "Sequencing coverage",
+            "termcount": "8701",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TYPE",
+            "fullname": "Assembly Type",
+            "description": "Type of the assembly",
+            "termcount": "5",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SRDT",
+            "fullname": "Date - Sequences Release",
+            "description": "Date the most recent sequence went live in ID",
+            "termcount": "7460",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UPDT",
+            "fullname": "Date - Assembly Update",
+            "description": "Date the assembly was last updated",
+            "termcount": "4346",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LEN",
+            "fullname": "Total Sequence Length in Mbp",
+            "description": "Total length of chromosome/genome including bases and gaps divided by 1,000,000.",
+            "termcount": "4136",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "REPL",
+            "fullname": "Chromosome Count",
+            "description": "Number of chromosomes in assembly",
+            "termcount": "230",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PLAC",
+            "fullname": "Placed Scaffolds Count",
+            "description": "Number of placed scaffolds",
+            "termcount": "454",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UNLO",
+            "fullname": "Unlocalized Scaffolds Count",
+            "description": "Number of unordered(unlocalized) scaffolds belonging to chromosomes",
+            "termcount": "626",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UNPL",
+            "fullname": "Unplaced Scaffolds Count",
+            "description": "Number of unplaced scaffolds which do not belong to any chromosome, ie ChrUn",
+            "termcount": "24881",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CN50",
+            "fullname": "Contig N50",
+            "description": "Contig length at which 50% of total bases in assembly are in contigs of that length or greater",
+            "termcount": "610484",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SN50",
+            "fullname": "Scaffold N50",
+            "description": "Scaffold length at which 50% of total bases in assembly are in contigs of that length or greater",
+            "termcount": "636302",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CL50",
+            "fullname": "Contig L50",
+            "description": "Number of contigs that are greater than or equal to the N50 length.",
+            "termcount": "16231",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SL50",
+            "fullname": "Scaffold L50",
+            "description": "Number of scaffolds that are greater than or equal to the N50 length.",
+            "termcount": "13132",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CNTG",
+            "fullname": "Contig Count",
+            "description": "Number of contigs",
+            "termcount": "28821",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UNGL",
+            "fullname": "Ungapped Length in Mbp",
+            "description": "Total length excluding gaps in chromosome/genome divided by 1,000,000",
+            "termcount": "4050",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PROP",
+            "fullname": "Properties",
+            "description": "Properties",
+            "termcount": "48",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SUBO",
+            "fullname": "Submitter Organization",
+            "description": "Organization that submitted this assembly",
+            "termcount": "24346",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "INFR",
+            "fullname": "Infraspecific Name",
+            "description": "Infraspecific Name: breed, cultivar, strain, ecotype",
+            "termcount": "2114129",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ISOL",
+            "fullname": "Isolate",
+            "description": "Isolate name",
+            "termcount": "918046",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SEX",
+            "fullname": "Sex",
+            "description": "Sex",
+            "termcount": "13",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ASMM",
+            "fullname": "Assembly Method",
+            "description": "Assembly Method",
+            "termcount": "21126",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GCOV",
+            "fullname": "Genome Coverage",
+            "description": "Genome Coverage",
+            "termcount": "198774",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "TECH",
+            "fullname": "Sequencing Technology",
+            "description": "Sequencing Technology",
+            "termcount": "2917",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "EXFV",
+            "fullname": "Expected Final Version",
+            "description": "Expected Final Version",
+            "termcount": "2",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RGAS",
+            "fullname": "Reference Guided Assembly",
+            "description": "Reference Guided Assembly",
+            "termcount": "2578",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SCAM",
+            "fullname": "Single Cell Amplification",
+            "description": "Single Cell Amplification",
+            "termcount": "8",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RCAT",
+            "fullname": "RefSeq Category",
+            "description": "RefSeq Category",
+            "termcount": "2",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "FTYP",
+            "fullname": "From Type Material",
+            "description": "From Type Material",
+            "termcount": "9",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "NFRS",
+            "fullname": "Excluded from RefSeq",
+            "description": "Reasons assembly was excluded from RefSeq",
+            "termcount": "35",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GRLS",
+            "fullname": "Date - GenBank Assembly Release",
+            "description": "Date the GenBankassembly was first released",
+            "termcount": "4915",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RRLS",
+            "fullname": "Date - RefSeq Assembly Release",
+            "description": "Date the RefSeq assembly was first released",
+            "termcount": "4210",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RTYP",
+            "fullname": "Release Type",
+            "description": "Release Type",
+            "termcount": "3",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RLEN",
+            "fullname": "Total Sequence Length",
+            "description": "Total length of chromosome/genome including bases and gaps",
+            "termcount": "2078508",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LINK",
+            "fullname": "Linked Assembly",
+            "description": "Linked Assembly accession",
+            "termcount": "7916",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TCS",
+            "fullname": "Taxonomy Check Status",
+            "description": "Taxonomy Check Status (ANI)",
+            "termcount": "3",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          }
+        ],
+        "linklist": [
+          {
+            "name": "assembly_assembly_diploid",
+            "menu": "Linked assembly from diploid",
+            "description": "Genome assembly that is the other (pseudo)haplotype from the same diploid individual as the current genome assembly.",
+            "dbto": "assembly"
+          },
+          { "name": "assembly_bioproject", "menu": "BioProject", "description": "BioProject", "dbto": "bioproject" },
+          { "name": "assembly_biosample", "menu": "BioSample", "description": "BioSample", "dbto": "biosample" },
+          { "name": "assembly_genome", "menu": "Genome", "description": "Related Genome records", "dbto": "genome" },
+          {
+            "name": "assembly_nuccore_insdc",
+            "menu": "Nucleotide INSDC",
+            "description": "Nucleotide INSDC (GenBank)",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "assembly_nuccore_refseq",
+            "menu": "Nucleotide RefSeq",
+            "description": "Nucleotide RefSeq",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "assembly_nuccore_wgsmaster",
+            "menu": "WGS Master",
+            "description": "WGS Master",
+            "dbto": "nuccore"
+          },
+          { "name": "assembly_pubmed", "menu": "PubMed", "description": "PubMed", "dbto": "pubmed" },
+          { "name": "assembly_sra", "menu": "Sra Links", "description": "Links to sra", "dbto": "sra" },
+          { "name": "assembly_taxonomy", "menu": "Taxonomy", "description": "Taxonomy", "dbto": "taxonomy" }
+        ]
+      }
+    ]
+  }
+}

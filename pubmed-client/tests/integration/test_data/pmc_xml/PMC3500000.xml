@@ -1,0 +1,1082 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:17:04Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:3500000" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:3500000</identifier><datestamp>2012-11-20</datestamp><setSpec>mjhid</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" article-type="research-article">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">Mediterr J Hematol Infect Dis</journal-id>
+      <journal-id journal-id-type="iso-abbrev">Mediterr J Hematol Infect Dis</journal-id>
+      <journal-id journal-id-type="publisher-id">Mediterranean Journal of Hematology and Infectious Diseases</journal-id>
+      <journal-title-group>
+        <journal-title>Mediterranean Journal of Hematology and Infectious Diseases</journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">2035-3006</issn>
+      <publisher>
+        <publisher-name>Università Cattolica del Sacro Cuore</publisher-name>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC3500000</article-id>
+      <article-id pub-id-type="pmcid">PMC3500000</article-id>
+      <article-id pub-id-type="pmc-uid">3500000</article-id>
+      <article-id pub-id-type="pmid">23170191</article-id>
+      <article-id pub-id-type="pmid">23170191</article-id>
+      <article-id pub-id-type="doi">10.4084/MJHID.2012.062</article-id>
+      <article-id pub-id-type="publisher-id">mjhid-4-1-062</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>Original Articles</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Chemotherapy-Induced Neutropenia in HIV Positive Patients with Lymphoma: Comparison of Pegfilgrastim with Daily Filgrastim Administration</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Teofili</surname>
+            <given-names>Luciana</given-names>
+          </name>
+          <xref ref-type="aff" rid="af1-mjhid-4-1-062">1</xref>
+          <xref ref-type="corresp" rid="c1-mjhid-4-1-062"/>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Izzi</surname>
+            <given-names>Immacolata</given-names>
+          </name>
+          <xref ref-type="aff" rid="af2-mjhid-4-1-062">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Nuzzolo</surname>
+            <given-names>Eugenia Rosa</given-names>
+          </name>
+          <xref ref-type="aff" rid="af1-mjhid-4-1-062">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Scoppettuolo</surname>
+            <given-names>Giancarlo</given-names>
+          </name>
+          <xref ref-type="aff" rid="af2-mjhid-4-1-062">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Torti</surname>
+            <given-names>Lorenza</given-names>
+          </name>
+          <xref ref-type="aff" rid="af1-mjhid-4-1-062">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Rossi</surname>
+            <given-names>Marianna</given-names>
+          </name>
+          <xref ref-type="aff" rid="af2-mjhid-4-1-062">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>de Gaetano Donati</surname>
+            <given-names>Katleen</given-names>
+          </name>
+          <xref ref-type="aff" rid="af2-mjhid-4-1-062">2</xref>
+        </contrib>
+      </contrib-group>
+      <aff id="af1-mjhid-4-1-062">
+<label>1</label>Department of Hematology, Catholic University of Rome, Italy</aff>
+      <aff id="af2-mjhid-4-1-062">
+<label>2</label>Department of Infectious Diseases, Catholic University of Rome, Italy</aff>
+      <author-notes>
+        <corresp id="c1-mjhid-4-1-062">Correspondence to: Dr. Luciana Teofili, Hematology Department, Catholic University of Rome, Largo Gemelli 8 00168, Rome, Italy. Tel: +39-06-3015-4180, Fax: +39-06-3055153. Email: mailto:<email>lteofili@rm.unicatt.it</email></corresp>
+      </author-notes>
+      <pub-date pub-type="collection">
+        <year>2012</year>
+      </pub-date>
+      <pub-date pub-type="epub">
+        <day>03</day>
+        <month>10</month>
+        <year>2012</year>
+      </pub-date>
+      <volume>4</volume>
+      <issue>1</issue>
+      <elocation-id>e2012062</elocation-id>
+      <history>
+        <date date-type="received">
+          <day>28</day>
+          <month>8</month>
+          <year>2012</year>
+        </date>
+        <date date-type="accepted">
+          <day>20</day>
+          <month>9</month>
+          <year>2012</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-year>2012</copyright-year>
+        <license license-type="open-access">
+          <license-p>This is an Open Access article distributed under the terms of the Creative Commons Attribution License (<ext-link ext-link-type="uri" xlink:href="http://creativecommons.org/licenses/by/2.0">http://creativecommons.org/licenses/by/2.0</ext-link>), which permits unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.</license-p>
+        </license>
+      </permissions>
+      <abstract>
+        <p>We retrospectively compared the incidence of neutropenia in two groups of HIV patients with lymphoma, who underwent chemotherapy supported by once-per-cycle administration of pegfilgrastim or by daily subcutaneous injection of filgrastim, respectively. Our findings indicate that pegfilgrastim and filgastrim produce similar results in preventing both neutropenia and febrile neutropenia.</p>
+      </abstract>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="intro">
+      <title>Introduction</title>
+      <p>HIV infection leads to an increased risk of non-Hodgkin’s lymphoma (NHL) and, to a minor extent, of Hodgkin’s lymphoma (HL). The concomitant administration of highly active antiretroviral therapy (ART) to chemotherapy (CT) has greatly improved the outcome of these diseases.<xref rid="b1-mjhid-4-1-062" ref-type="bibr">1</xref> Furthermore, the management of CT induced neutropenia with recombinant human granulocyte-colony stimulating factors (G-CSFs, i.e. filgrastim and lenograstim) rendered feasible intensive CT regimens, including dose-dense CT or high dose CT, also in HIV positive patients.<xref rid="b2-mjhid-4-1-062" ref-type="bibr">2</xref>,<xref rid="b3-mjhid-4-1-062" ref-type="bibr">3</xref> A pegylated form of filgrastim is today available: actually, the addition of the polyethylene glycol molecule increases the serum half-life of filgrastim, resulting in its prolonged activity.<xref rid="b3-mjhid-4-1-062" ref-type="bibr">3</xref> Therefore, pegfilgrastim shows the advantage of a single injection per CT course as compared to repeated daily administration of filgrastim or lenograstim. The safety and efficacy of primary prophylaxis with all currently available G-CSFs in preventing febrile neutropenia (FN) and in supporting dose-dense therapy has been demonstrated in various malignancies and it is strongly recommended.<xref rid="b4-mjhid-4-1-062" ref-type="bibr">4</xref> However, a recent meta-analysis demonstrated that all currently available G-CSFs significantly reduces the incidence of FN in comparison with patients not receiving growth factors, whereas pegfilgrastim in particular appeared the most effective one.<xref rid="b4-mjhid-4-1-062" ref-type="bibr">4</xref> If so, the superiority of pegfilgrastim should be even more evident in the setting of AIDS associated tumors, since these patients have a particular high infectious risk. Nevertheless, to our knowledge, the efficacy of pegylated and non pegylated G-CSFs in HIV positive patients has never been investigated. In this retrospective study we compared the efficacy of pegfilgrastim and filgastrim in preventing neutropenia and fever in a series of HIV patients treated at our institution.</p>
+    </sec>
+    <sec sec-type="methods|subjects">
+      <title>Patients and Methods</title>
+      <p>The study population consisted of a series of 8 HIV positive patients with diagnosis of HL (n = 4) and NHL (n = 4), consecutively observed at the department of Infectious Diseases of the Catholic University of Rome between October 2005 and July 2006. These patients received CT regimens supported by once-per-cycle administration of pegfilgrastim. As a control group, 13 HIV positive patients (5 with HL and 8 with NHL) matched for age, diagnosis and CT, who had been previously followed at the same institution, were evaluated. All patients in the control group received CT supported by daily subcutaneous injection of filgrastim. Chemotherapy for HL consisted of ABVD<xref rid="b7-mjhid-4-1-062" ref-type="bibr">7</xref> in 3 patients with early stage HL, and of standard dose-BEACOPP<xref rid="b8-mjhid-4-1-062" ref-type="bibr">8</xref> or EBVP<xref rid="b7-mjhid-4-1-062" ref-type="bibr">7</xref> regimens in 6 patients with advanced stage-HL. Chemotherapy for NHL consisted of CHOP<xref rid="b7-mjhid-4-1-062" ref-type="bibr">7</xref> in 9 patients with diffuse large B-cell lymphoma and of Magrath protocol<xref rid="b9-mjhid-4-1-062" ref-type="bibr">9</xref> in 3 patients with Burkitt’s lymphoma. Considering that all patients were treated before 2006, none of them received Rituximab in association with CT. Both pegfilgrastim and filgrastim were administered 1 day after the completion of CT. In total, 23 courses of CT were evaluated in the pegfilgrastim group and 75 courses in the filgrastim group. The efficacy of pegfilgrastim and of filgrastim was assessed by evaluating the incidence of severe neutropenia (defined as neutrophil count less than 0.5 × 10<sup>9</sup>/L), the number of FN episodes and the number of positive blood cultures occurred among all recorded CT courses. Statistical comparison of continuous variables was performed by the Mann-Whitney U-test. Comparison of categorical variables was performed by chi-square statistic, using the Fisher’s exact test. P values &lt;0.05 were considered statistically significant.</p>
+    </sec>
+    <sec sec-type="results">
+      <title>Results</title>
+      <p>Clinical and laboratory findings of patients are shown in <xref rid="t1-mjhid-4-1-062" ref-type="table">Table 1</xref>. No differences were found between pegfilgrastim or filgastrim groups of patients for sex and age distribution, stage of disease, Type of CT, and hematological parameters (<xref rid="t1-mjhid-4-1-062" ref-type="table">Table 1</xref>). Moreover, the number of CD4+ cell count at diagnosis (evaluated as continuous variable) and the percentage of patients showing CD4+ cell count less than 200/μL were similar in both groups (<xref rid="t1-mjhid-4-1-062" ref-type="table">Table 1</xref>). A similar proportion of patients in pegfilgrastim and filgrastim groups received ART in combination with CT (<xref rid="t1-mjhid-4-1-062" ref-type="table">Table 1</xref>). <xref rid="t2-mjhid-4-1-062" ref-type="table">Table 2</xref> shows the efficacy end points observed in pegfilgrastim- as compared to filgrastim-supported CT courses. Severe neutropenia was observed in 8 out of the 23 CT courses analyzed in the pegfilgrastim group, and in 32 out of the 75 CT courses analyzed in the filgrastim group (p=0.63, <xref rid="t2-mjhid-4-1-062" ref-type="table">Table 2</xref>). The median duration of neutropenia was 5 days in both groups (p=0.80, <xref rid="t2-mjhid-4-1-062" ref-type="table">Table 2</xref>). FN was recorded in 5 cases in pegfilgrastim group and in 27 cases in filgrastim group (p=0.14, <xref rid="t2-mjhid-4-1-062" ref-type="table">Table 2</xref>). Accordingly, no differences were found between pegfilgrastim and filgrastim-supported-CT in the incidence of positive blood cultures (p=1.00, <xref rid="t2-mjhid-4-1-062" ref-type="table">Table 2</xref>).</p>
+    </sec>
+    <sec sec-type="discussion">
+      <title>Discussion</title>
+      <p>To compare the efficay of pegylated and non-pegylated G-CSFs in the setting of HIV associated malignancies is an interesting issue to address. According to evidence-based clinical practice, primary prophylaxis with G-CSFs is recommended for CT regimens exceeding the 20% threshold of FN risk<xref rid="b4-mjhid-4-1-062" ref-type="bibr">4</xref>,<xref rid="b10-mjhid-4-1-062" ref-type="bibr">10</xref> and in dose-dense CT schedules.<xref rid="b11-mjhid-4-1-062" ref-type="bibr">11</xref>,<xref rid="b12-mjhid-4-1-062" ref-type="bibr">12</xref> The existence of concomitant conditions predisposing to prolonged neutropenia, such as other myelotoxic therapies or bone marrow involvement by lymphoma cells, may help to identify which patients are most likely to benefit from prophylactic G-CSFs.<xref rid="b4-mjhid-4-1-062" ref-type="bibr">4</xref>,<xref rid="b10-mjhid-4-1-062" ref-type="bibr">10</xref> In this respect, HIV positive persons undergoing CT for lymphoma represent a patients population at high risk for infection and FN. Actually, the diagnosis of lymphoma and HIV infection frequently occurs simultaneously<xref rid="b1-mjhid-4-1-062" ref-type="bibr">1</xref> and lymphoid tumors often arise in most immunocompromised HIV patients.<xref rid="b13-mjhid-4-1-062" ref-type="bibr">13</xref> In addition, the majority of HIV infected patients receives antiretroviral drugs and CT in combination: importantly, not only ART can have a direct hematologic toxicity<xref rid="b14-mjhid-4-1-062" ref-type="bibr">14</xref> but, in some instances, it can affect the metabolism of antiproliferative drugs so enhancing their bone marrow toxicity.<xref rid="b15-mjhid-4-1-062" ref-type="bibr">15</xref> Finally, lymphomas occurring in HIV positive patients, involve bone marrow more frequently than in general people.<xref rid="b16-mjhid-4-1-062" ref-type="bibr">16</xref> Our study shows that pegfilgrastim and filgrastim exhibit similar efficacy in controlling both CT-induced neutropenia and FN episodes in HIV positive patients with HL and NHL. Notwithstanding the worth of our findings is limited by the retrospective design of the study, they can suggest some considerations. While filgrastim and lenogratim are administered by a course of daily injections, pegfilgrastim posses the important advantage of once-per-cycle administration. This is an important aspect considering that several data from low level studies derived from audit data and clinical practice suggests that some patients receive suboptimal daily G-CSFs<xref rid="b4-mjhid-4-1-062" ref-type="bibr">4</xref> and the use of pegfilgrastim prevents this problem. Likewise, however, it is important to consider the cost of care is rising progressively, and that it is partly due to unnecessary use of health care resources. To this purpose, the American Society of Clinical Oncology has recently stated, among other opportunities to improve care and reduce costs, that G-CSFs should be used only when the risk of FN, secondary to a recommended chemotherapy regimen is approximately 20% and equally effective treatment programs that do not require white cell stimulating factors are unavailable.<xref rid="b17-mjhid-4-1-062" ref-type="bibr">17</xref> In line with these recommendation, pegfilgrastim support should be mainly tailored to a cost-effective care provision.<xref rid="b11-mjhid-4-1-062" ref-type="bibr">11</xref>,<xref rid="b12-mjhid-4-1-062" ref-type="bibr">12</xref> Nevertheless, in HIV positive patients, the simplified one-per cycle injection could result also in the reduced risk of infection by health care operators. This important topic should be considered an additional point to be clarified in studies performed on HIV infected patients.</p>
+    </sec>
+  </body>
+  <back>
+    <fn-group>
+      <fn id="fn1-mjhid-4-1-062">
+        <p><bold>Competing interests:</bold> The authors have declared that no competing interests exist.</p>
+      </fn>
+    </fn-group>
+    <ref-list>
+      <title>References</title>
+      <ref id="b1-mjhid-4-1-062">
+        <label>1</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Vaccher</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Spina</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Talamini</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Zanetti</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>di Gennaro</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Nasti</surname>
+              <given-names>G</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Improvement of systemic human immunodeficiency virus-related non-Hodgkin lymphoma outcome in the era of highly active antiretroviral therapy</article-title>
+          <year>2003</year>
+          <source>Clin Infect Dis</source>
+          <volume>37</volume>
+          <fpage>1556</fpage>
+          <lpage>64</lpage>
+          <pub-id pub-id-type="doi">10.1086/379517</pub-id>
+          <?supplied-pmid 14614680?>
+          <pub-id pub-id-type="pmid">14614680</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b2-mjhid-4-1-062">
+        <label>2</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Dunleavy</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Wilson</surname>
+              <given-names>WH</given-names>
+            </name>
+          </person-group>
+          <article-title>How I treat HIV-associated lymphoma</article-title>
+          <source>Blood</source>
+          <year>2012</year>
+          <volume>119</volume>
+          <fpage>3245</fpage>
+          <lpage>55</lpage>
+          <pub-id pub-id-type="doi">10.1182/blood-2011-08-373738</pub-id>
+          <?supplied-pmid 22337719?>
+          <pub-id pub-id-type="pmid">22337719</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b3-mjhid-4-1-062">
+        <label>3</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Michieli</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Mazzucato</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Tirelli</surname>
+              <given-names>U</given-names>
+            </name>
+            <name>
+              <surname>De Paoli</surname>
+              <given-names>P</given-names>
+            </name>
+          </person-group>
+          <article-title>Stem cell transplantation for lymphoma patients with HIV infection</article-title>
+          <source>Cell Transplant</source>
+          <year>2011</year>
+          <volume>20</volume>
+          <fpage>351</fpage>
+          <lpage>70</lpage>
+          <pub-id pub-id-type="doi">10.3727/096368910X528076</pub-id>
+          <?supplied-pmid 20875226?>
+          <pub-id pub-id-type="pmid">20875226</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b4-mjhid-4-1-062">
+        <label>4</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lyman</surname>
+              <given-names>GH</given-names>
+            </name>
+          </person-group>
+          <article-title>Pegfilgrastim: a granulocyte colony-stimulating factor with sustained duration of action</article-title>
+          <year>2005</year>
+          <source>Expert Opin Biol Ther</source>
+          <volume>5</volume>
+          <fpage>1635</fpage>
+          <lpage>46</lpage>
+          <comment>Review. </comment>
+          <pub-id pub-id-type="doi">10.1517/14712598.5.12.1635</pub-id>
+          <?supplied-pmid 16318427?>
+          <pub-id pub-id-type="pmid">16318427</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b5-mjhid-4-1-062">
+        <label>5</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Aapro</surname>
+              <given-names>MS</given-names>
+            </name>
+            <name>
+              <surname>Bohlius</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Cameron</surname>
+              <given-names>DA</given-names>
+            </name>
+            <name>
+              <surname>Dal Lago</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Donnelly</surname>
+              <given-names>JP</given-names>
+            </name>
+            <name>
+              <surname>Kearney</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Lyman</surname>
+              <given-names>GH</given-names>
+            </name>
+            <name>
+              <surname>Pettengell</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Tjan-Heijnen</surname>
+              <given-names>VC</given-names>
+            </name>
+            <name>
+              <surname>Walewski</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Weber</surname>
+              <given-names>DC</given-names>
+            </name>
+            <name>
+              <surname>Zielinski</surname>
+              <given-names>C</given-names>
+            </name>
+          </person-group>
+          <collab>European Organisation for Research and Treatment of Cancer</collab>
+          <article-title>2010 update of EORTC guidelines for the use of granulocyte-colony stimulating factor to reduce the incidence of chemotherapy-induced febrile neutropenia in adult patients with lymphoproliferative disorders and solid tumours</article-title>
+          <source>Eur J Cancer</source>
+          <year>2011</year>
+          <volume>47</volume>
+          <fpage>8</fpage>
+          <lpage>32</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.ejca.2010.10.013</pub-id>
+          <?supplied-pmid 21095116?>
+          <pub-id pub-id-type="pmid">21095116</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b6-mjhid-4-1-062">
+        <label>6</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author"><name><surname>Cooper</surname><given-names>KL</given-names></name><name><surname>Madan</surname><given-names>J</given-names></name><name><surname>Whyte</surname><given-names>S</given-names></name><name><surname>Stevenson</surname><given-names>MD</given-names></name><name><surname>Akehurst</surname><given-names>RL</given-names></name></person-group><article-title>Granulocyte colony-stimulating factors for febrile neutropenia prophylaxis following chemotherapy: systematic review and meta-analysis</article-title><source>BMC Cancer</source><year>2011</year><volume>11</volume><fpage>404</fpage><pub-id pub-id-type="doi">10.1186/1471-2407-11-404</pub-id>
+<!--<pub-id pub-id-type="pmcid">3203098</pub-id>--><?supplied-pmid 21943360?><pub-id pub-id-type="pmid">21943360</pub-id></element-citation>
+      </ref>
+      <ref id="b7-mjhid-4-1-062">
+        <label>7</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Berretta</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Cinelli</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Martellotta</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Spina</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Vaccher</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Tirelli</surname>
+              <given-names>U</given-names>
+            </name>
+          </person-group>
+          <year>2003</year>
+          <article-title>Therapeutic approaches to AIDS-related malignancies</article-title>
+          <source>Oncogene</source>
+          <volume>22</volume>
+          <fpage>6646</fpage>
+          <lpage>59</lpage>
+          <pub-id pub-id-type="doi">10.1038/sj.onc.1206771</pub-id>
+          <?supplied-pmid 14528290?>
+          <pub-id pub-id-type="pmid">14528290</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b8-mjhid-4-1-062">
+        <label>8</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hartmann</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Rehwald</surname>
+              <given-names>U</given-names>
+            </name>
+            <name>
+              <surname>Salzberger</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Franzen</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Sieber</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Wohrmann</surname>
+              <given-names>A</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>BEACOPP therapeutic regimen for patients with Hodgkin’s disease and HIV infection</article-title>
+          <source>Ann Oncol</source>
+          <year>2003</year>
+          <volume>14</volume>
+          <fpage>1562</fpage>
+          <lpage>9</lpage>
+          <pub-id pub-id-type="doi">10.1093/annonc/mdg408</pub-id>
+          <?supplied-pmid 14504059?>
+          <pub-id pub-id-type="pmid">14504059</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b9-mjhid-4-1-062">
+        <label>9</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Mead</surname>
+              <given-names>GM</given-names>
+            </name>
+            <name>
+              <surname>Sydes</surname>
+              <given-names>MR</given-names>
+            </name>
+            <name>
+              <surname>Walewski</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Grigg</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Hatton</surname>
+              <given-names>CS</given-names>
+            </name>
+            <name>
+              <surname>Pescosta</surname>
+              <given-names>N</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>An international evaluation of CODOX-M and CODOX-M alternating with IVAC in adult Burkitt’s lymphoma: results of United Kingdom Lymphoma Group LY06 study</article-title>
+          <source>Ann Oncol</source>
+          <year>2002</year>
+          <volume>13</volume>
+          <fpage>1264</fpage>
+          <lpage>74</lpage>
+          <pub-id pub-id-type="doi">10.1093/annonc/mdf253</pub-id>
+          <?supplied-pmid 12181251?>
+          <pub-id pub-id-type="pmid">12181251</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b10-mjhid-4-1-062">
+        <label>10</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Smith</surname>
+              <given-names>TJ</given-names>
+            </name>
+            <name>
+              <surname>Khatcheressian</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Lyman</surname>
+              <given-names>GH</given-names>
+            </name>
+            <name>
+              <surname>Ozer</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Armitage</surname>
+              <given-names>JO</given-names>
+            </name>
+            <name>
+              <surname>Balducci</surname>
+              <given-names>L</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>2006 update of recommendations for the use of white blood cell growth factors: an evidence-based clinical practice guideline</article-title>
+          <source>J Clin Oncol</source>
+          <year>2006</year>
+          <volume>24</volume>
+          <fpage>3187</fpage>
+          <lpage>205</lpage>
+          <pub-id pub-id-type="doi">10.1200/JCO.2006.06.4451</pub-id>
+          <?supplied-pmid 16682719?>
+          <pub-id pub-id-type="pmid">16682719</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b11-mjhid-4-1-062">
+        <label>11</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Anderlini</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Champlin</surname>
+              <given-names>R</given-names>
+            </name>
+          </person-group>
+          <article-title>Use of filgrastim for stem cell mobilisation and transplantation in high-dose cancer chemotherapy</article-title>
+          <source>Drugs</source>
+          <year>2002</year>
+          <volume>62</volume>
+          <issue>Suppl 1</issue>
+          <fpage>79</fpage>
+          <lpage>88</lpage>
+          <pub-id pub-id-type="doi">10.2165/00003495-200262001-00006</pub-id>
+          <?supplied-pmid 12479596?>
+          <pub-id pub-id-type="pmid">12479596</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b12-mjhid-4-1-062">
+        <label>12</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kobbe</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Bruns</surname>
+              <given-names>I</given-names>
+            </name>
+            <name>
+              <surname>Fenk</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Czibere</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Haas</surname>
+              <given-names>R</given-names>
+            </name>
+          </person-group>
+          <article-title>Pegfilgrastim for PBSC mobilization and autologous haematopoietic SCT</article-title>
+          <source>Bone Marrow Transplant</source>
+          <year>2009</year>
+          <volume>43</volume>
+          <fpage>669</fpage>
+          <lpage>77</lpage>
+          <pub-id pub-id-type="doi">10.1038/bmt.2009.59</pub-id>
+          <?supplied-pmid 19308043?>
+          <pub-id pub-id-type="pmid">19308043</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b13-mjhid-4-1-062">
+        <label>13</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Grulich</surname>
+              <given-names>AE</given-names>
+            </name>
+            <name>
+              <surname>Wan</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Law</surname>
+              <given-names>MG</given-names>
+            </name>
+            <name>
+              <surname>Milliken</surname>
+              <given-names>ST</given-names>
+            </name>
+            <name>
+              <surname>Lewis</surname>
+              <given-names>CR</given-names>
+            </name>
+            <name>
+              <surname>Garsia</surname>
+              <given-names>RJ</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>B-cell stimulation and prolonged immune deficiency are risk factors for non-Hodgkin’s lymphoma in people with AIDS</article-title>
+          <source>AIDS</source>
+          <year>2000</year>
+          <volume>14</volume>
+          <fpage>133</fpage>
+          <lpage>40</lpage>
+          <pub-id pub-id-type="doi">10.1097/00002030-200001280-00008</pub-id>
+          <?supplied-pmid 10708283?>
+          <pub-id pub-id-type="pmid">10708283</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b14-mjhid-4-1-062">
+        <label>14</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Pluda</surname>
+              <given-names>JM</given-names>
+            </name>
+            <name>
+              <surname>Mitsuya</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Yarchoan</surname>
+              <given-names>R</given-names>
+            </name>
+          </person-group>
+          <article-title>Hematologic effects of AIDS therapies</article-title>
+          <source>Hematol Oncol Clin North Am</source>
+          <year>1991</year>
+          <volume>5</volume>
+          <fpage>229</fpage>
+          <lpage>48</lpage>
+          <?supplied-pmid 1708759?>
+          <pub-id pub-id-type="pmid">1708759</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b15-mjhid-4-1-062">
+        <label>15</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Cingolani</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Torti</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Pinnetti</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>de Gaetano Donati</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Murri</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Tacconelli</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Larocca</surname>
+              <given-names>LM</given-names>
+            </name>
+            <name>
+              <surname>Teofili</surname>
+              <given-names>L</given-names>
+            </name>
+          </person-group>
+          <article-title>Detrimental clinical interaction between ritonavir-boosted protease inhibitors and vinblastine in HIV-infected patients with Hodgkin’s lymphoma</article-title>
+          <source>AIDS</source>
+          <year>2010</year>
+          <volume>24</volume>
+          <fpage>2408</fpage>
+          <lpage>12</lpage>
+          <?supplied-pmid 20671541?>
+          <pub-id pub-id-type="pmid">20671541</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b16-mjhid-4-1-062">
+        <label>16</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Diamond</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Taylor</surname>
+              <given-names>TH</given-names>
+            </name>
+            <name>
+              <surname>Im</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Anton-Culver</surname>
+              <given-names>H</given-names>
+            </name>
+          </person-group>
+          <article-title>Presentation and outcomes of systemic non-Hodgkin’s lymphoma: a comparison between patients with acquired immunodeficiency syndrome (AIDS) treated with highly active antiretroviral therapy and patients without AIDS</article-title>
+          <source>Leuk Lymphoma</source>
+          <year>2006</year>
+          <volume>47</volume>
+          <fpage>1822</fpage>
+          <lpage>9</lpage>
+          <pub-id pub-id-type="doi">10.1080/10428190600658688</pub-id>
+          <pub-id pub-id-type="pmid">17064995</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="b17-mjhid-4-1-062">
+        <label>17</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Schnipper</surname>
+              <given-names>LE</given-names>
+            </name>
+            <name>
+              <surname>Smith</surname>
+              <given-names>TJ</given-names>
+            </name>
+            <name>
+              <surname>Raghavan</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Blayney</surname>
+              <given-names>DW</given-names>
+            </name>
+            <name>
+              <surname>Ganz</surname>
+              <given-names>PA</given-names>
+            </name>
+            <name>
+              <surname>Mulvey</surname>
+              <given-names>TM</given-names>
+            </name>
+            <name>
+              <surname>Wollins</surname>
+              <given-names>DS</given-names>
+            </name>
+          </person-group>
+          <article-title>American Society of Clinical Oncology identifies five key opportunities to improve care and reduce costs: the top five list for oncology</article-title>
+          <source>J Clin Oncol</source>
+          <year>2012</year>
+          <volume>30</volume>
+          <fpage>1715</fpage>
+          <lpage>24</lpage>
+          <pub-id pub-id-type="doi">10.1200/JCO.2012.42.8375</pub-id>
+          <?supplied-pmid 22493340?>
+          <pub-id pub-id-type="pmid">22493340</pub-id>
+        </element-citation>
+      </ref>
+    </ref-list>
+  </back>
+  <floats-group>
+    <table-wrap id="t1-mjhid-4-1-062" position="float">
+      <label>Table 1</label>
+      <caption>
+        <p>Clinical and laboratory findings of HIV positive patients with Hodgkin lymphoma (HL) and non Hodgkin lymphoma (NHL), receiving pegfilgrastim or filgrastim, respectively.</p>
+      </caption>
+      <table frame="hsides" rules="groups">
+        <thead>
+          <tr>
+            <th align="left" valign="bottom" rowspan="1" colspan="1"/>
+            <th align="center" valign="bottom" rowspan="1" colspan="1">Pegfilgrastim</th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1">Filgrastim</th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <th align="left" valign="bottom" rowspan="1" colspan="1"/>
+            <th colspan="2" align="left" valign="bottom" rowspan="1">
+<hr/></th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <th align="left" valign="bottom" rowspan="1" colspan="1">Patient n°</th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1">8</th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1">13</th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1">
+              <italic>p</italic>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>NHL/HL</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">4/4</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">8/5</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.67</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Males/Females</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">7/1</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">8/5</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.33</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Age(years): Mean</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">45,2</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">41,8</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.66</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Median (Range)</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">45,5 (28–62)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">44 (28–51)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>WBC × 10</bold>
+              <bold>
+                <sup>9</sup>
+              </bold>
+              <bold>/L : Mean</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">4.4</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">4.7</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.84</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Median (Range)</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">4.5 (3.6–5.1)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">4.3 (0.8–8.7)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Hb g/dl: Mean</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">11</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">11,5</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.68</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Median (Range)</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">11,3 (9–13,9)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">11,1 (9,3–13,3)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>PLT × 10</bold>
+              <bold>
+                <sup>9</sup>
+              </bold>
+              <bold>/L: Mean</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">226</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">147</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.48</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Median (Range)</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">257 (110–297)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">107 (19–296)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Stage</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.11</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>I/II</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">1</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">2</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>III/IV</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">7</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">11</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>B symptoms (%)</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">6 (75 )</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">10 (77)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>1</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Chemotherapy</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.45</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>CHOP</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">3</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">6</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>Magrath</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">1</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">2</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>ABVD</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">1</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">2</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>BEACOPP</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">3</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">1</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>EBVP</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">-</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">2</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>HAART (%)</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">7 (87%)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">12 (92 %)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>1</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"><bold>CD4+ cells &lt; 200/</bold>μ<bold>L (%)</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">4 (50)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">8 (62)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.67</italic>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </table-wrap>
+    <table-wrap id="t2-mjhid-4-1-062" position="float">
+      <label>Table 2</label>
+      <caption>
+        <p>Incidence of severe neutropenia (neutrophils &lt; 0,5 × 10<sup>9</sup>/L), febrile neutropenia and positive blood cultures in 23 chemotherapy courses supported by pegfilgrastim and in 75 chemotherapy courses supported by filgrastim.</p>
+      </caption>
+      <table frame="hsides" rules="none">
+        <thead>
+          <tr>
+            <th align="left" valign="bottom" rowspan="1" colspan="1"/>
+            <th colspan="2" align="center" valign="bottom" rowspan="1">Pegfilgrastim</th>
+            <th colspan="2" align="center" valign="bottom" rowspan="1">Filgrastim</th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <th align="left" valign="bottom" rowspan="1" colspan="1"/>
+            <th colspan="4" align="left" valign="bottom" rowspan="1">
+<hr/></th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1"/>
+          </tr>
+          <tr>
+            <th align="left" valign="bottom" rowspan="1" colspan="1">Total courses</th>
+            <th colspan="2" align="center" valign="bottom" rowspan="1">23</th>
+            <th colspan="2" align="center" valign="bottom" rowspan="1">75</th>
+            <th align="center" valign="bottom" rowspan="1" colspan="1">
+              <italic>p</italic>
+            </th>
+          </tr>
+          <tr>
+            <th colspan="6" align="left" valign="bottom" rowspan="1">
+<hr/></th>
+          </tr>
+          <tr>
+            <th align="left" valign="top" rowspan="1" colspan="1"/>
+            <th align="center" valign="top" rowspan="1" colspan="1">
+              <italic>n°</italic>
+            </th>
+            <th align="center" valign="top" rowspan="1" colspan="1">
+              <italic>%</italic>
+            </th>
+            <th align="center" valign="top" rowspan="1" colspan="1">
+              <italic>n°</italic>
+            </th>
+            <th align="center" valign="top" rowspan="1" colspan="1">
+              <italic>%</italic>
+            </th>
+            <th align="center" valign="top" rowspan="1" colspan="1"/>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="6" align="left" valign="top" rowspan="1">
+              <bold>Grade IV neutropenia</bold>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>n. of episodes</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">8</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">35</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">32</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">43</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.63</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1"> <bold>days: median (range)</bold></td>
+            <td align="center" valign="top" rowspan="1" colspan="1">5 (2–7)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+            <td align="center" valign="top" rowspan="1" colspan="1">5 (1–20)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1"/>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.80</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Febrile neutropenia</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">5</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">22</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">27</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">36</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>0.32</italic>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" rowspan="1" colspan="1">
+              <bold>Positive blood cultures</bold>
+            </td>
+            <td align="center" valign="top" rowspan="1" colspan="1">3</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">(13)</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">9</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">12</td>
+            <td align="center" valign="top" rowspan="1" colspan="1">
+              <italic>1</italic>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </table-wrap>
+  </floats-group>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

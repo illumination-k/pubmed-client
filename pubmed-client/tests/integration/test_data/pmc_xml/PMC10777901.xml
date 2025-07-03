@@ -1,0 +1,1126 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:16:32Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:10777901" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:10777901</identifier><datestamp>2024-01-11</datestamp><setSpec>cancers</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" dtd-version="1.3" xml:lang="en" article-type="research-article">
+  <processing-meta base-tagset="archiving" mathml-version="3.0" table-model="xhtml" tagset-family="jats">
+    <restricted-by>pmc</restricted-by>
+  </processing-meta>
+  <front><journal-meta><journal-id journal-id-type="nlm-ta">Cancers (Basel)</journal-id><journal-id journal-id-type="iso-abbrev">Cancers (Basel)</journal-id><journal-id journal-id-type="publisher-id">cancers</journal-id><journal-title-group><journal-title>Cancers</journal-title></journal-title-group><issn pub-type="epub">2072-6694</issn><publisher><publisher-name>MDPI</publisher-name></publisher></journal-meta>
+<article-meta><article-id pub-id-type="accession">PMC10777901</article-id><article-id pub-id-type="pmcid">PMC10777901</article-id><article-id pub-id-type="pmc-uid">10777901</article-id><article-id pub-id-type="pmid">38201660</article-id><article-id pub-id-type="doi">10.3390/cancers16010233</article-id><article-id pub-id-type="publisher-id">cancers-16-00233</article-id><article-categories><subj-group subj-group-type="heading"><subject>Article</subject></subj-group></article-categories><title-group><article-title>Preoperative <sup>18</sup>F-FDG PET/CT in Patients with Presumed Localized Colon Cancer: A Prospective Study with Long-Term Follow-Up</article-title></title-group><contrib-group><contrib contrib-type="author"><name><surname>Aymard</surname><given-names>Samuel</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Conceptualization" vocab-term-identifier="https://credit.niso.org/contributor-roles/conceptualization/">Conceptualization</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Validation" vocab-term-identifier="https://credit.niso.org/contributor-roles/validation/">Validation</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Formal analysis" vocab-term-identifier="https://credit.niso.org/contributor-roles/formal-analysis/">Formal analysis</role><xref rid="af1-cancers-16-00233" ref-type="aff">1</xref></contrib><contrib contrib-type="author"><name><surname>Rust</surname><given-names>Edmond</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Methodology" vocab-term-identifier="https://credit.niso.org/contributor-roles/methodology/">Methodology</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Formal analysis" vocab-term-identifier="https://credit.niso.org/contributor-roles/formal-analysis/">Formal analysis</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – original draft" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-original-draft/">Writing – original draft</role><xref rid="af2-cancers-16-00233" ref-type="aff">2</xref></contrib><contrib contrib-type="author"><name><surname>Kaseb</surname><given-names>Ashjan</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review &amp; editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review &amp; editing</role><xref rid="af1-cancers-16-00233" ref-type="aff">1</xref><xref rid="af3-cancers-16-00233" ref-type="aff">3</xref></contrib><contrib contrib-type="author"><name><surname>Liu</surname><given-names>David</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review &amp; editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review &amp; editing</role><xref rid="af4-cancers-16-00233" ref-type="aff">4</xref></contrib><contrib contrib-type="author"><name><surname>Hubele</surname><given-names>Fabrice</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Formal analysis" vocab-term-identifier="https://credit.niso.org/contributor-roles/formal-analysis/">Formal analysis</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review &amp; editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review &amp; editing</role><xref rid="af1-cancers-16-00233" ref-type="aff">1</xref><xref rid="af5-cancers-16-00233" ref-type="aff">5</xref></contrib><contrib contrib-type="author"><name><surname>Romain</surname><given-names>Benoit</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review &amp; editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review &amp; editing</role><xref rid="af4-cancers-16-00233" ref-type="aff">4</xref></contrib><contrib contrib-type="author"><name><surname>Averous</surname><given-names>Gerlinde</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review &amp; editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review &amp; editing</role><xref rid="af6-cancers-16-00233" ref-type="aff">6</xref></contrib><contrib contrib-type="author"><name><surname>Brigand</surname><given-names>Cecile</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Conceptualization" vocab-term-identifier="https://credit.niso.org/contributor-roles/conceptualization/">Conceptualization</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Formal analysis" vocab-term-identifier="https://credit.niso.org/contributor-roles/formal-analysis/">Formal analysis</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review &amp; editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review &amp; editing</role><xref rid="af4-cancers-16-00233" ref-type="aff">4</xref><xref rid="af5-cancers-16-00233" ref-type="aff">5</xref></contrib><contrib contrib-type="author"><name><surname>Imperiale</surname><given-names>Alessio</given-names></name><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Conceptualization" vocab-term-identifier="https://credit.niso.org/contributor-roles/conceptualization/">Conceptualization</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Methodology" vocab-term-identifier="https://credit.niso.org/contributor-roles/methodology/">Methodology</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Formal analysis" vocab-term-identifier="https://credit.niso.org/contributor-roles/formal-analysis/">Formal analysis</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – original draft" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-original-draft/">Writing – original draft</role><role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review &amp; editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review &amp; editing</role><xref rid="af1-cancers-16-00233" ref-type="aff">1</xref><xref rid="af5-cancers-16-00233" ref-type="aff">5</xref><xref rid="af7-cancers-16-00233" ref-type="aff">7</xref><xref rid="c1-cancers-16-00233" ref-type="corresp">*</xref></contrib></contrib-group><contrib-group><contrib contrib-type="editor"><name><surname>Shariftabrizi</surname><given-names>Ahmad</given-names></name><role>Academic Editor</role></contrib></contrib-group><aff id="af1-cancers-16-00233"><label>1</label>Nuclear Medicine and Molecular Imaging, Institut de Cancérologie Strasbourg Europe (ICANS), University Hospitals of Strasbourg, 67033 Strasbourg, France; <email>s.aymard@icans.eu</email> (S.A.); or <email>ahkaseb@uj.edu.sa</email> (A.K.); <email>f.hubele@icans.eu</email> (F.H.)</aff><aff id="af2-cancers-16-00233"><label>2</label>Nuclear Medicine, Fondation de la Maison du Diaconat, 68200 Mulhouse, France; <email>edmondrust@yahoo.fr</email></aff><aff id="af3-cancers-16-00233"><label>3</label>Radiology, College of Medicine, University of Jeddah, Jeddah 23890, Saudi Arabia</aff><aff id="af4-cancers-16-00233"><label>4</label>Digestive and General Surgery, University Hospitals of Strasbourg, 67098 Strasbourg, France; <email>david.liu@chru-strasbourg.fr</email> (D.L.); <email>benoit.romain@chru-strasbourg.fr</email> (B.R.); <email>cecile.brigand@chru-strasbourg.fr</email> (C.B.)</aff><aff id="af5-cancers-16-00233"><label>5</label>University of Strasbourg, 67000 Strasbourg, France</aff><aff id="af6-cancers-16-00233"><label>6</label>Pathology, Strasbourg University Hospitals, 67098 Strasbourg, France; <email>gerlinde.averous@chru-strasbourg.fr</email></aff><aff id="af7-cancers-16-00233"><label>7</label>Molecular Imaging and Radiobiology, Institut Pluridisciplinaire Hubert Curien (IPHC), UMR 7178, CNRS/Unistra, 67037 Strasbourg, France</aff><author-notes><corresp id="c1-cancers-16-00233"><label>*</label>Correspondence: <email>a.imperiale@icans.eu</email>; Tel.: +33-3-68-76-74-48</corresp></author-notes><pub-date pub-type="epub"><day>04</day><month>1</month><year>2024</year></pub-date><pub-date pub-type="collection"><month>1</month><year>2024</year></pub-date><volume>16</volume><issue>1</issue><elocation-id>233</elocation-id><history><date date-type="received"><day>17</day><month>11</month><year>2023</year></date><date date-type="rev-recd"><day>28</day><month>12</month><year>2023</year></date><date date-type="accepted"><day>29</day><month>12</month><year>2023</year></date></history><permissions><copyright-statement>© 2024 by the authors.</copyright-statement><copyright-year>2024</copyright-year><license><ali:license_ref specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>Licensee MDPI, Basel, Switzerland. This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution (CC BY) license (<ext-link ext-link-type="uri" xlink:href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</ext-link>).</license-p></license></permissions><abstract><sec><title>Simple Summary</title><p>Preoperative <sup>18</sup>F-FDG PET/CT is valuable in detecting colon lesions not visualized by conventional workup, especially in patients with incomplete colonoscopy. <sup>18</sup>F-FDG PET/CT highlights distant metastases but exhibits limitations for N staging. The quantitative analysis of <sup>18</sup>F-FDG uptake in the primary tumor did not reveal any association with recurrence or disease-free survival, adding no prognostic information.</p></sec><sec><title>Abstract</title><p>We analyzed whether preoperative <sup>18</sup>F-FDG PET/CT adds to conventional primary staging in patients with presumed non-metastatic colonic cancer (CC). The prognostic role of <sup>18</sup>F-FDG uptake in the primary tumor was evaluated after a mean follow-up of 15 years. Patients with a new diagnosis of presumed localized CC were prospectively enrolled and underwent presurgical <sup>18</sup>F-FDG PET/CT. For each colon lesion, SUVmax, SUVpeak, TLG, and MTV were assessed and tested as prognostic factors. Forty-eight patients were included. Post-surgery pathology identified a total of 103 colon lesions, including 58 invasive adenocarcinomas, 4 in situ adenocarcinomas, 3 adenomas with high-grade dysplasia, and 38 adenomas with low-grade dysplasia. Per lesion sensitivity, specificity, positive (PPVs) and negative predictive values (NPVs) for colonic primary tumor detection were 78%, 97%, 98%, and 73% for conventional workup, and 94%, 87%, 92%, and 89% for <sup>18</sup>F-FDG PET/CT. Only sensitivity was significantly different between <sup>18</sup>F-FDG PET/CT and conventional workup. PET detected an additional ten pathological colonic lesions in seven patients. SUVmax, SUVpeak, and TLG showed significant differences between invasive adenocarcinomas, in situ adenocarcinomas, and high-grade dysplasia compared to low-grade dysplasia. There was a statistically significant difference between pT1-pT2 and pT3-pT4 adenocarcinomas. On patient-based analysis, sensitivity, specificity, PPV, and NPV for nodal staging were 22%, 84%, 44%, and 65% for CECT, and 33%, 90%, 67%, and 70% for <sup>18</sup>F-FDG PET/CT, without a statistically significant difference. PET/CT also identified unknown metastatic spread and one synchronous lung cancer in four patients. Overall, <sup>18</sup>F-FDG PETCT had an additional diagnostic value in 11 out of 48 patients (23%). <sup>18</sup>F-FDG uptake of the primary tumor did not predict nodal or distant metastases. The difference in disease-free survival categorized by median SUVmax, SUVpeak, TLG, and MTV was not significant. Finally, preoperative <sup>18</sup>F-FDG PET/CT is valuable in detecting potential colon lesions not visualized by conventional workups, especially in cases of incomplete colonoscopy. It effectively highlights distant metastases but exhibits limitations for N staging. Mainly due to the relatively small sample size, the quantitative analysis of <sup>18</sup>F-FDG uptake in the primary tumor did not reveal any association with recurrence or disease-free survival, adding no significant prognostic information.</p></sec></abstract><kwd-group><kwd>colon</kwd><kwd>carcinoma</kwd><kwd>presurgical</kwd><kwd>surgery</kwd><kwd>staging</kwd><kwd><sup>18</sup>F-FDG</kwd><kwd>PET/CT</kwd></kwd-group><funding-group><funding-statement>This research received no external funding.</funding-statement></funding-group></article-meta></front>
+  <body>
+    <sec sec-type="intro" id="sec1-cancers-16-00233">
+      <title>1. Introduction</title>
+      <p>Colorectal cancer (CRC) is a significant global health concern as it accounts for 10% of all tumor types worldwide. It stands as the fourth most prevalent cause of cancer-related mortality, contributing to an estimated 600,000 deaths annually [<xref rid="B1-cancers-16-00233" ref-type="bibr">1</xref>,<xref rid="B2-cancers-16-00233" ref-type="bibr">2</xref>].</p>
+      <p>Early-stage CRC (Stage I or II) is typically localized and has a better prognosis [<xref rid="B3-cancers-16-00233" ref-type="bibr">3</xref>,<xref rid="B4-cancers-16-00233" ref-type="bibr">4</xref>]. Treatment for localized CRC involves the surgical resection of the tumor. The specific surgical approach and extent of surgery depend on tumor location and size [<xref rid="B5-cancers-16-00233" ref-type="bibr">5</xref>]. In certain situations [<xref rid="B6-cancers-16-00233" ref-type="bibr">6</xref>], adjuvant chemotherapy may be recommended to reduce the risk of cancer recurrence. The prognosis for patients with localized CRC is generally favorable and primarily relies on the initial cancer stage [<xref rid="B7-cancers-16-00233" ref-type="bibr">7</xref>,<xref rid="B8-cancers-16-00233" ref-type="bibr">8</xref>]. At a localized stage, the five-year survival rate is as high as 90%. However, it decreases to 70.4% for patients with regional involvement and further drops to 12.5% for patients with metastasis [<xref rid="B8-cancers-16-00233" ref-type="bibr">8</xref>,<xref rid="B9-cancers-16-00233" ref-type="bibr">9</xref>].</p>
+      <p>Primary staging holds crucial significance as it helps determine the appropriate treatment plan and furnishes essential prognostic information. In current clinical practices, staging is achieved through a combination of clinical evaluation, conventional imaging studies such as computed tomography (CT) and magnetic resonance imaging (MRI), endoscopic assessment including colonoscopy and endoscopic ultrasound, and the pathological examination of biopsy samples obtained during colonoscopy or surgery [<xref rid="B3-cancers-16-00233" ref-type="bibr">3</xref>,<xref rid="B4-cancers-16-00233" ref-type="bibr">4</xref>].</p>
+      <p>Although <sup>18</sup>F-fluorodeoxyglucose (<sup>18</sup>F-FDG) positron emission tomography/computed tomography (PET/CT) has demonstrated high sensitivity in detecting both the primary tumor and distant metastases, its initial use seems to have moderate influence on patient management [<xref rid="B10-cancers-16-00233" ref-type="bibr">10</xref>,<xref rid="B11-cancers-16-00233" ref-type="bibr">11</xref>,<xref rid="B12-cancers-16-00233" ref-type="bibr">12</xref>,<xref rid="B13-cancers-16-00233" ref-type="bibr">13</xref>,<xref rid="B14-cancers-16-00233" ref-type="bibr">14</xref>], and presently, it is not included in the international guidelines for the initial preoperative staging of CRC [<xref rid="B3-cancers-16-00233" ref-type="bibr">3</xref>]. <sup>18</sup>F-FDG PET/CT showed low sensitivity in detecting locoregional lymph node metastases, often due to the proximity of metastatic lymph nodes to the primary tumor, making it difficult to distinguish them from the colonic lesion [<xref rid="B10-cancers-16-00233" ref-type="bibr">10</xref>,<xref rid="B15-cancers-16-00233" ref-type="bibr">15</xref>,<xref rid="B16-cancers-16-00233" ref-type="bibr">16</xref>]. Conversely, <sup>18</sup>F-FDG PET/CT primarily identifies distant metastases when conventional imaging techniques have yielded inconclusive or negative results. <sup>18</sup>F-FDG PET/CT demonstrates enhanced accuracy in identifying extrahepatic locations such as periportal lymph nodes, para-aortic lymph nodes, and peritoneal carcinomatosis [<xref rid="B13-cancers-16-00233" ref-type="bibr">13</xref>,<xref rid="B17-cancers-16-00233" ref-type="bibr">17</xref>]. Additionally, <sup>18</sup>F-FDG PET/CT can detect synchronous colonic lesions in cases of incomplete colonoscopy [<xref rid="B10-cancers-16-00233" ref-type="bibr">10</xref>].</p>
+      <p>Several metabolic parameters derived from <sup>18</sup>F-FDG PET/CT, such as maximum standardized uptake value (SUVmax), metabolic tumor volume (MTV), or total lesion glycolysis (TLG), have been proposed as potential prognostic biomarkers. Tumors with high SUVmax at the time of initial diagnosis are often associated with a poor prognosis. In various malignancies, patients with tumors displaying high SUVmax values at diagnosis tend to have shorter overall survival rates compared to those with lower SUVmax [<xref rid="B18-cancers-16-00233" ref-type="bibr">18</xref>,<xref rid="B19-cancers-16-00233" ref-type="bibr">19</xref>,<xref rid="B20-cancers-16-00233" ref-type="bibr">20</xref>,<xref rid="B21-cancers-16-00233" ref-type="bibr">21</xref>,<xref rid="B22-cancers-16-00233" ref-type="bibr">22</xref>]. To date, few clinical investigations have specifically focused on the interest of the quantitative assessment of <sup>18</sup>F-FDG uptake intensity as a prognostic factor for survival in CRC patients, with discordant conclusions [<xref rid="B23-cancers-16-00233" ref-type="bibr">23</xref>,<xref rid="B24-cancers-16-00233" ref-type="bibr">24</xref>,<xref rid="B25-cancers-16-00233" ref-type="bibr">25</xref>].</p>
+      <p>With the aim of introducing new facets to the discussion, the present study prospectively analyzed whether and to what extent preoperative <sup>18</sup>F-FDG PET/CT contributes additional insights compared to conventional primary staging in patients with presumed non-metastatic colon cancer (CC) undergoing oncological surgery. The prognostic significance of <sup>18</sup>F-FDG uptake intensity evaluated in the primary colonic tumor was also evaluated by assessing patient outcomes after long-term follow-up.</p>
+    </sec>
+    <sec id="sec2-cancers-16-00233">
+      <title>2. Materials and Methods</title>
+      <sec id="sec2dot1-cancers-16-00233">
+        <title>2.1. Patient Population</title>
+        <p>This is an ancillary study as a part of a monocentric prospective investigation evaluating prognosis in patients with sentinel lymph node micrometastases from CC. Inclusions were performed according to the following criteria: (i) initial staging of CC; (ii) preoperative conventional radiologic imaging including contrast-enhanced (CE) thoraco-abdomino-pelvic CT, showing a local disease without any equivocal distant lesion; and (iii) surgical laparoscopy. Among the included patients, only those who underwent presurgical <sup>18</sup>F-FDG PET/CT were considered in the present investigation. Excluded from the study were pregnant women, patients requiring emergency surgery for colon cancer (occlusion or perforation), those with visceral metastases discovered preoperatively by conventional morphological imaging, or individuals with a previous history of cancer and a disease-free interval up to CC diagnosis of less than 5 years.</p>
+        <p>Familial history of cancer was examined for all patients. Carcinoembryonic antigen (CEA) serum was measured before surgery. The replication error phenotype (RER) was also assessed. In cases of incomplete initial colonoscopy, a complete endoscopy was performed within 6 months after surgery.</p>
+        <p>In our study, the surgeon was informed of <sup>18</sup>F-FDG PET/CT results before the intervention, and the surgical strategy was defined based on the results of both conventional workup and <sup>18</sup>F-FDG PET/CT. No surgical procedure was established before <sup>18</sup>F-FDG PET/CT, thus the impact of <sup>18</sup>F-FDG PET/CT on the potential modification of surgical approach is not evaluable. Abdominal sites of extra-colonic <sup>18</sup>F-FDG uptake were explored during surgery through careful palpation, hepatic ultrasonography, peritoneal biopsy, and peritoneal fluid analysis if relevant. Primary tumors were analyzed by an expert pathologist and classified according to the seventh TNM classification of the UICC.</p>
+        <p>In compliance with local institutional guidelines, all included patients provided free and written informed consent for the use of anonymous personal medical data extracted from their files for scientific or epidemiological purposes. The Institutional Review Board and Ethical Research Committee approved this prospective study (CPP Est IV, PRI 2006—HUS N°3737).</p>
+      </sec>
+      <sec id="sec2dot2-cancers-16-00233">
+        <title>2.2. <sup>18</sup>F-FDG PET/CT</title>
+        <p>Preoperative <sup>18</sup>F-FDG PET was conducted in all cases using a combined PET/CT device (Discovery ST, General Electric, Milwaukee, WI, USA). To achieve a serum glucose level less than 6.6 mmol/L, patients fasted for 6 h before the intravenous injection of 4.5 MBq/kg of <sup>18</sup>F-FDG. Five milligrams of diazepam and 80 mg of phloroglucinol were previously administered to patient. Whole-body (WB) PET/CT acquisitions commenced 60 min after the tracer injection, including a head-to-midthighs non-enhanced (oral and intra-venous) CT scan (140 kV, 80 mA s, 0.8 s/rotation) during normal breathing, followed by a two-dimensional PET scan (7 fields of view, 15 cm/field, 4 min/field, 3.27 mm slice thickness). Subject to patient consent and technical availability, a delayed PET/CT acquisition was performed at about 120 min after <sup>18</sup>F-FDG administration, covering the abdomen and pelvis (one to three bed positions) to include every focal colonic uptake observed on the standard PET/CT acquisition. PET data were reconstructed with and without CT-based attenuation correction using a common iterative algorithm (ordered subset expectation maximization (OSEM), two iterations, 30 subsets, 128 × 128 matrix).</p>
+        <p>CT, PET (corrected), and combined PET/CT images were displayed on the Xeleris workstation (GE Medical System, Milwaukee, WI, USA) and visually interpreted independently by two nuclear medicine physicians who were aware of the clinical oncologic context. However, they were not aware of the topography of the colonic tumor. PET findings were interpreted as either positive or negative. A positive PET result was defined as the detection of a focal pathologically increased uptake relative to surrounding tissue and physiologic biodistribution. Any focal intestinal <sup>18</sup>F-FDG uptake visualized on standard PET/CT acquisitions and no longer detected on late PET/CT images was not considered as pathologic for tumor localization. In cases of conflicting results between the two reviewers, a consensus was reached. Corresponding morphologic abnormalities, such as parietal thickening and satellite mesenteric fat infiltration, were searched on the coupled CT scan.</p>
+        <p>For each lesion considered positive upon PET/CT examination, SUVmax, SUVpeak, TLG, and MTV were defined on both standard whole-body PET/CT and in delayed PET/CT images within a spherical volume of interest (VOI) centered on the focal uptake and including it completely. MTV was estimated using a fixed-SUV threshold method for lesion segmentation (40% of SUVmax).</p>
+        <p>The mean delay between <sup>18</sup>F-FDG PET/CT and surgery was 5 days, and the conventional workup was realized less than two months before surgery.</p>
+      </sec>
+      <sec id="sec2dot3-cancers-16-00233">
+        <title>2.3. Gold Standard</title>
+        <p>Postoperative histopathology served as the diagnostic standard. Conventional imaging, whether available or performed during post-surgical follow-up, was considered for the evaluation of extra-abdominal PET abnormalities, especially if pathological confirmation was not possible.</p>
+      </sec>
+      <sec id="sec2dot4-cancers-16-00233">
+        <title>2.4. Statistical Analysis</title>
+        <p>Continuous variables are presented as mean ± SD. The nonparametric two-tailed Mann–Whitney U test was employed for intergroup comparisons. Correlations between quantitative data were assessed using the Spearman test. Receiver operating characteristic (ROC) curves were utilized to establish a diagnostic threshold for SUVmax, discriminating between patients with favorable evolution and those who died during follow-up. The role of SUVmax, SUVpeak, TLG, and MTV as prognostic factors was explored through univariate analysis. Kaplan–Meier curves and the log-rank test were employed for survival analysis. A <italic toggle="yes">p</italic>-value less than 0.05 was considered statistically significant. Statistical analysis was conducted using GraphPad Prism version 6.0 (GraphPad Software, Boston, MA 02110, USA).</p>
+      </sec>
+    </sec>
+    <sec sec-type="results" id="sec3-cancers-16-00233">
+      <title>3. Results</title>
+      <sec id="sec3dot1-cancers-16-00233">
+        <title>3.1. Patient Population</title>
+        <p>Forty-eight patients (23 women, 25 men) underwent presurgical <sup>18</sup>F-FDG PET/CT were prospectively included in the analysis (<xref rid="cancers-16-00233-t001" ref-type="table">Table 1</xref>).</p>
+        <p>The mean age was 66 ± 13 years (range, 29–88 years). Three patients had a familial history of CRC, including one case of familial polyposis. The circumstances of CC diagnosis were anemia (n = 12), rectorrhagia (n = 12), positive CC screening (n = 8), abdominal pain (n = 6), occlusive symptoms (n = 4), diarrhea (n = 2), fever (n = 1), systematic colonoscopy (n = 1), enterococcus faecalis bacteremia (n = 1), and etiologic investigation of deep venous thrombosis (n = 1). Pathological analysis after surgery revealed a total of 103 colon lesions, of which 58 were invasive adenocarcinomas (including 5 mucinous), 4 in situ adenocarcinomas, 3 adenomas with high-grade dysplasia, and 38 adenomas with low-grade dysplasia (<xref rid="cancers-16-00233-t002" ref-type="table">Table 2</xref>).</p>
+        <p>In subsequent analyses, adenomas with low-grade dysplasia were considered as benign lesions, contrarily to high-grade dysplasia (a pre-cancerous lesion), which were grouped with invasive and in situ adenocarcinomas.</p>
+      </sec>
+      <sec id="sec3dot2-cancers-16-00233">
+        <title>3.2. Primary Tumor Assessment</title>
+        <p>All 48 included patients underwent CECT of the thorax, abdomen, and pelvis. Colonoscopy was performed in all but one patient (patient refusal) and was complete in 42 out of 47 cases. Endoscopic exploration was blocked by tumoral stenosis situated beyond or before the colonic tumor in three and two patients, respectively (<xref rid="cancers-16-00233-t003" ref-type="table">Table 3</xref>).</p>
+        <p>In these two cases and in the patient without colonoscopy, the diagnosis of colon cancer relied on CT-based virtual colonoscopy. Overall, the conventional workup (combining colonoscopy and CECT) identified 49 out of 58 invasive adenocarcinomas, 2 out of 4 in situ adenocarcinomas, and no high-grade dysplasia. According to post-surgical pathology (103 colon lesions), sensitivity (Se), specificity (Sp), positive predictive value (PPV) and negative predictive value (NPV) to detect colonic lesions were 78%, 97%, 98%, and 73%.</p>
+        <p>The mean delay between <sup>18</sup>F-FDG PET/CT and CI was 29.8 ± 12.9 days (range, 7–53 days), and between <sup>18</sup>F-FDG PET/CT and surgery was 5 ± 4 days (range, 1–23 days). Thirty-six out of forty-eight included patients who underwent dual-time-point PET/CT images (standard whole-body followed by delayed abdominal and pelvic scans). PET/CT analysis of the large bowel was not feasible in two diabetic patients due to diffuse intestinal <sup>18</sup>F-FDG uptake related to undergoing metformin treatment. In those two cases, <sup>18</sup>F-FDG PET/CT failed to detect two T1 carcinomas. According to post-surgical pathological reference, <sup>18</sup>F-FDG PET/CT correctly identified 54 invasive carcinomas (including all 5 mucinous adenocarcinomas), 4 in situ carcinomas, and 3 adenomas with high grade dysplasia. All colonic tumors previously detected with colonoscopy were characterized by pathologic <sup>18</sup>F-FDG uptake (<xref rid="cancers-16-00233-f001" ref-type="fig">Figure 1</xref>).</p>
+        <p>On the other hand, <sup>18</sup>F-FDG PET/CT was false-positive in 5 out of 38 cases of adenomas with low-grade dysplasia, and false-negative in 4 pT1 adenocarcinomas. Six patients presented with focal transient <sup>18</sup>F-FDG colonic focal uptake on standard PET/CT imaging, almost reversible on delayed acquisitions, and without corresponding abnormalities at perioperative palpation in all cases, and follow-up colonoscopy in the remaining five patients, supporting the hypothesis of benign etiology (TN results). Thus, the Se, Sp, PPV, and NPV of <sup>18</sup>F-FDG PET/CT to detect colonic lesions were 94%, 87%, 92%, and 89%, respectively. Sensitivity was significantly higher for PET than conventional workup (<italic toggle="yes">p</italic> = 0.02). No statistically significant difference was revealed for Sp, PPV and NPV (<italic toggle="yes">p</italic> = 0.2; <italic toggle="yes">p</italic> = 0.22; <italic toggle="yes">p</italic> = 0.07, respectively). Overall, PET/CT identified 10 additional pathological lesions in 7 patients (3 adenomas with high-grade dysplasia, 2 in situ carcinomas, and 5 carcinomas) compared with the conventional assessment. The incremental value of <sup>18</sup>F-FDG PET/CT in patients with discordant results between standard workup and <sup>18</sup>F-FDG PET/CT is detailed in <xref rid="cancers-16-00233-t004" ref-type="table">Table 4</xref>.</p>
+        <p>The details of SUVmax, SUVpeak, TLG, and MTV for all detected invasive carcinomas, in situ carcinomas, and adenomas with both low- and high-grade dysplasia are detailed in <xref rid="cancers-16-00233-t005" ref-type="table">Table 5</xref>. SUVmax, SUVpeak, and TLG were significantly different between invasive adenocarcinomas, in situ adenocarcinomas, and high-grade dysplasia vs. low-grade dysplasia (<italic toggle="yes">p</italic> = 0.002, <italic toggle="yes">p</italic> = 0.003, <italic toggle="yes">p</italic> = 0.006, respectively). A statistically significant difference was also found between pT1-pT2 and pT3-pT4 adenocarcinomas (<italic toggle="yes">p</italic> = 0.009, <italic toggle="yes">p</italic> = 0.004, <italic toggle="yes">p</italic> &lt; 0.005 and <italic toggle="yes">p</italic> &lt; 0.005), respectively. However, no PET parameters allowed for differentiation between low-grade and high-grade adenomas. There were no statistically significant differences observed in terms of SUVmax, SUVpeak, TLG, and MTV based on several tumor histologic parameters (pT, angioinvasion, tumoral differentiation, mucinous type), nodal and metastatic patient status, and RER phenotype. A moderate but significant correlation (<italic toggle="yes">p</italic> = 0.005) was found between tumor diameter and SUVmax (R: 0.54), SUVpeak (R: 0.54), TLG (R: 0.66), and MTV (R: 0.59).</p>
+      </sec>
+      <sec id="sec3dot3-cancers-16-00233">
+        <title>3.3. Nodal Involvement and Distant Metastases Assessment</title>
+        <p>Regional lymph node metastases were pathologically confirmed in 18 patients (38%). On patient-based analysis, the sensitivities of CECT and <sup>18</sup>F-FDG PET/CT for nodal metastases assessment were 22% and 33% (<italic toggle="yes">p</italic> = 0.2), the specificities were 84% and 90% (<italic toggle="yes">p</italic> = 0.7), the positive predictive values were 44% and 67% (<italic toggle="yes">p</italic> = 0.08), and the negative predictive values were 65% and 70% (<italic toggle="yes">p</italic> = 0.7), respectively. PET-positive pericolic lymph node metastases were visualized on both standard and delayed PET/CT acquisitions. In one patient, one peritumoral nodal metastasis of 9 mm was detected only by delayed images. Considering only 11 regional lymph nodes exceeding 10 mm in size, <sup>18</sup>F-FDG PET/CT was true positive in 2, true negative in 5, false-positive in 3, and false-negative in 1 case, with an NPV of 83%. Two of the three false-positive results of <sup>18</sup>F-FDG PET/CT were related to inflammatory adenitis secondary to tumoral intestinal fistula. <sup>18</sup>F-FDG PET/CT revealed an ovarian metastasis in one patient and a peritoneal, hepatic, and pulmonary lesion in another patient; in both cases, the secondary origin was histologically confirmed at the time of surgery. In another patient, <sup>18</sup>F-FDG PET/CT allowed for the diagnosis of unknown lung cancer. Finally, in one patient, one hepatic metastasis suggested by <sup>18</sup>F-FDG PET/CT was confirmed by conventional imaging six months after surgery. On the other hand, <sup>18</sup>F-FDG PET/CT failed to reveal one solitary hepatic metastasis of a few millimeters discovered perioperatively in one patient, and millimetric peritoneal metastases in two additional patients. According to inclusion criteria, presurgical CECT was negative for metastatic spread. <sup>18</sup>F-FDG primary tumor uptake was not predictive of nodal or systemic metastases, and no statistically significant differences were found for SUVmax, SUVpeak, TLG, and MTV between patients with or without pathologic lymph nodes or visceral metastases.</p>
+      </sec>
+      <sec id="sec3dot4-cancers-16-00233">
+        <title>3.4. Survival Analysis</title>
+        <p>During a mean post-surgical follow-up of 183 months (range: 164–195 months), one patient died from postoperative complications and was not considered in the survival analysis. Fourteen patients died from causes unrelated to colon cancer, and five patients died because of CC progression. No relation was found between SUVmax uptake at diagnosis and patient death. Six patients experienced tumoral relapse after a mean time of 19 months after surgery (range, 4–48 months), including hepatic metastases in five patients and peritoneal carcinomatosis in one more patient. The predictive value of SUVmax for tumor recurrence was determined by the analysis of the area under the ROC curve. As a statistically significant value was not found, SUVmax, SUVpeak, TLG, and MTV were dichotomized at their median values of 14.2, 11.2, 117.5, and 13.1, respectively. No metabolic parameters obtained by the analysis of tumoral <sup>18</sup>F-FDG uptake were predictive of disease evolution. The difference in disease-free survival of patients categorized by median SUVmax, SUVpeak, TLG, and MTV was not statistically significant. There was no significant difference in terms of SUVmax, SUVpeak, TLG, and MTV between patients who died and survivors. These results are probably influenced by the extremely small number of patients with progressive disease. Only the N stage was identified as a prognostic predictor for disease-free survival. The presence of lymphatic metastases was associated with a poorer prognosis. In this case, Kaplan–Meier analysis showed a 97% progression-free survival in patients without lymph node metastases versus 67% progression-free survival in patients with lymph node metastases (<italic toggle="yes">p</italic> = 0.0023).</p>
+      </sec>
+    </sec>
+    <sec sec-type="discussion" id="sec4-cancers-16-00233">
+      <title>4. Discussion</title>
+      <p>This prospective study delves into the diagnostic and prognostic role of preoperative <sup>18</sup>F-FDG PET/CT in patients with resectable CC. Our results affirm the value of <sup>18</sup>F-FDG PET/CT in detecting synchronous primary intestinal lesions and distant metastases not visualized on conventional workup. However, PET/CT fell short in accurately detecting nodal extension and providing patient prognostic information from the quantitative analysis of <sup>18</sup>F-FDG uptake in the primary tumor.</p>
+      <p>Consistent with previously reported studies [<xref rid="B26-cancers-16-00233" ref-type="bibr">26</xref>,<xref rid="B27-cancers-16-00233" ref-type="bibr">27</xref>], <sup>18</sup>F-FDG PET/CT demonstrated incremental value over standard presurgical workup for colonic lesion detection (Se: 94% vs. 78%). <sup>18</sup>F-FDG PET/CT allowed for the preoperative identification of additional synchronous colon cancer in 7 out of 48 (14.6%) patients, including 2 cases with incomplete or not feasible colonoscopy; 2 out of 4 synchronous in situ carcinomas; and 3 out of 3 adenomas with high-grade dysplasia. Nevertheless, the real clinical impact of this observation is a subject of debate and needs to be defined. In fact, in patients with incomplete endoscopic exploration, peri- or postoperative colonoscopy is recommended with the aim of identifying undetected lesions due to cancerous colic obstruction. In those cases, <sup>18</sup>F-FDG PET/CT would have the advantages of the earlier detection and effective treatment of synchronous colonic lesions during a single surgical procedure, with obvious clinical benefits. These findings are potentially useful, especially for patients scheduled for laparoscopic treatment, as in these cases manual palpation and the inspection of the colon are not feasible. In addition, it should be noted that CT colonoscopy is currently the first alternative examination if the colonoscopy is incomplete [<xref rid="B3-cancers-16-00233" ref-type="bibr">3</xref>]. Studies comparing the benefits of CT colonoscopy and <sup>18</sup>F-FDG PET/CT would be interesting to determine whether <sup>18</sup>F-FDG PET/CT would be of additional benefit.</p>
+      <p>The preoperative Imaging diagnosis of lymphatic metastases remains challenging. As shown in previous works and a large meta-analysis [<xref rid="B20-cancers-16-00233" ref-type="bibr">20</xref>,<xref rid="B28-cancers-16-00233" ref-type="bibr">28</xref>,<xref rid="B29-cancers-16-00233" ref-type="bibr">29</xref>], <sup>18</sup>F-FDG PET/CT performs well for T and M staging but lacks sensitivity for metastatic lymph node detection, mainly due to the proximity of the intensely hypermetabolic primary lesion that potentially masks lymph node <sup>18</sup>F-FDG uptake in the narrow tumor periphery. In addition, a physiologic intestinal and bladder accumulation of <sup>18</sup>F-FDG could complicate the analysis of pelvic and peritumoral lymphatic drainage territories [<xref rid="B16-cancers-16-00233" ref-type="bibr">16</xref>]. Finally, the use of an older generation of PET/CT (no TOF nor analog PET technology) contributes to explaining the low detection rate of nodal metastases in our study. It is worth noting that <sup>18</sup>F-FDG PET/CT had a good NPV, allowing for the reclassification of patients with doubtful results of CECT. Considering only 11 regional lymph nodes exceeding 10 mm in size and considered equivocal according to CECT interpretation criteria, <sup>18</sup>F-FDG PET/CT has an NPV of 83%. Two of the three FP <sup>18</sup>F-FDG PET/CT results were related to inflammation secondary to the presence of an intestinal fistula.</p>
+      <p>Despite not being performed systematically in all patients (mainly due to refusal), dual-time-point imaging appeared useful for the distinction between physiologic and tumoral colon uptake in 6/36 patients (17%), improving the NPV <sup>18</sup>F-FDG PET/CT. The use of dual-time-point imaging in daily practice could be presented as a way to increase the specificity of PET/CT in the evaluation of colonic lesions, especially in cases of focal uptake without identifying the corresponding tumor. Further invasive investigations would then be proposed only in patients with persistent metabolic anomalies, to reduce the rate of unwarranted endoscopic explorations.</p>
+      <p><sup>18</sup>F-FDG PET/CT revealed occult ovarian, peritoneal, and hepatic metastases and one lung carcinoma in four patients. Moreover, in line with previous studies [<xref rid="B30-cancers-16-00233" ref-type="bibr">30</xref>], a one-millimeter liver metastasis was detectable only on the delayed PET/CT acquisition. On the other hand, <sup>18</sup>F-FDG PET/CT (and CECT) failed to reveal peritoneal metastases of a few millimeters in two patients, pointing out the limited sensitivity of actual imaging techniques for the detection of small peritoneal involvements. Delayed PET/CT images did not have any incremental diagnostic value for peritoneal carcinosis detection.</p>
+      <p>To date, only a limited number of studies have delved into the potential prognostic significance of quantitative <sup>18</sup>F-FDG uptake in colon tumor lesions. Shi et al. [<xref rid="B23-cancers-16-00233" ref-type="bibr">23</xref>] conducted research that proposed a role for SUVmax in predicting survival among 107 patients with colon cancer who were scheduled for surgery and followed for a period of 5 years. Their study implicated a larger sample size, which included 30 cases of mortality, allowing them to establish a significant SUVmax threshold of 11.85. On the contrary, Lee et al. [<xref rid="B24-cancers-16-00233" ref-type="bibr">24</xref>] did not find any prognostic value for SUVmax in terms of recurrences and progression-free survival (PFS) in their retrospective study involving 163 patients, with a follow-up period of 4 years. This study also included 25 cases of recurrences, adding to the ongoing debate regarding whether quantitative metabolic parameters can indeed serve as prognostic indicators or not. More recently, the additional value of preoperative <sup>18</sup>F-FDG PET/CT and the relationship between metabolic parameters, pericolic fat stranding finding, postoperative histopathology, and overall survival in CRC have been retrospectively reported in 91 patients [<xref rid="B25-cancers-16-00233" ref-type="bibr">25</xref>]. In multivariate analysis, differentiation degree, MTV, TLG, and lymphovascular invasion were independent factors affecting overall survival. Moreover, preoperative PET/CT contributes to CC management by detecting additional metastases and differentiating between T3 and T4 tumors. Our study, although conducted with a mean follow-up of 15 years, did not allow us to predict disease progression. This result is mainly justified by the examined population, which was smaller than previous reports (48 patients). In fact, most of these resectable tumors were surgically treated definitively, and recurrence was rare. Thus, the PFS study was inconclusive, and a much larger number of patients would be needed to analyze it. Unlike previous studies on other malignancies [<xref rid="B18-cancers-16-00233" ref-type="bibr">18</xref>,<xref rid="B19-cancers-16-00233" ref-type="bibr">19</xref>,<xref rid="B20-cancers-16-00233" ref-type="bibr">20</xref>,<xref rid="B23-cancers-16-00233" ref-type="bibr">23</xref>], in this study, we found no prognostic interest in any parameter measured by <sup>18</sup>F-FDG PET/CT, neither for survival nor for lymph node and metastatic involvement. Once more, these results can be attributed in part to the limited sample size and the relatively low proportion of patients who experience metastasis and succumb to cancer when it is identified at this localized stage. The mean follow-up of 15 years after oncologic surgery did not compensate for the low number of deceases because, as well-described in a meta-analysis, most relapses occur within 2 years of the surgery [<xref rid="B31-cancers-16-00233" ref-type="bibr">31</xref>]. Conversely, in our investigation, a notably higher number of metastases were detected among the group of patients who did not survive compared to those who did. This suggests that while PET/CT may not possess inherent prognostic value, it can uncover hidden metastases that are known to influence the prognosis. Furthermore, a recent study has unveiled the prognostic significance of <sup>18</sup>F-FDG uptake in the bone marrow and spleen, showcasing them as imaging-derived biomarkers for systemic inflammation [<xref rid="B32-cancers-16-00233" ref-type="bibr">32</xref>]. Recently introduced in specialized medical facilities, <sup>18</sup>F-FDG PET/MRI has demonstrated a generally strong diagnostic capability in detecting lesions and metastases associated with colon cancer, as evidenced in a recent comprehensive meta-analysis [<xref rid="B33-cancers-16-00233" ref-type="bibr">33</xref>]. Furthermore, emerging PET tracers such as <sup>68</sup>Ga-DOTA-FAPI-04 hold promise for delivering enhanced diagnostic accuracy, particularly in terms of specificity, in the identification of primary and metastatic lesions across various cancer types. These tracers are particularly notable for their effectiveness in pinpointing liver metastases, peritoneal carcinomatosis, and brain tumors [<xref rid="B34-cancers-16-00233" ref-type="bibr">34</xref>].</p>
+      <p>An important limitation of our study is inherent in the fact that the data were collected about 15 years ago with a first-generation PET/CT scanner, thus affecting the diagnostic performance of PETCT. In addition, treatment options for patients with CC have improved, potentially impacting the clinical management and outcome of patients. Probably, updated data using up-to-date technology should be further explored. Moreover, the mean delay between <sup>18</sup>F-FDG PET/CT and CI of about 30 days (range, 7–53 days) could be also considered as a potential limit of the present study.</p>
+    </sec>
+    <sec sec-type="conclusions" id="sec5-cancers-16-00233">
+      <title>5. Conclusions</title>
+      <p>In patients with presumed non-metastatic CC, preoperative <sup>18</sup>F-FDG PET/CT can identify synchronous colon lesions that may not be visible during conventional diagnostic evaluations. It also effectively identifies distant metastases; however, its precision in determining N staging is limited. Mainly due to the small sample size in our study, the quantitative analysis of <sup>18</sup>F-FDG uptake in the primary tumor did not demonstrate any association with recurrence or disease-free survival among our group of patients, thus failing to provide patient prognostic information.</p>
+    </sec>
+  </body>
+  <back>
+    <fn-group>
+      <fn>
+        <p><bold>Disclaimer/Publisher’s Note:</bold> The statements, opinions and data contained in all publications are solely those of the individual author(s) and contributor(s) and not of MDPI and/or the editor(s). MDPI and/or the editor(s) disclaim responsibility for any injury to people or property resulting from any ideas, methods, instructions or products referred to in the content.</p>
+      </fn>
+    </fn-group>
+    <notes>
+      <title>Author Contributions</title>
+      <p>Conceptualization, S.A., C.B. and A.I.; methodology, S.A., C.B. and A.I.; validation, S.A., E.R., A.K., D.L., F.H., B.R., G.A., C.B. and A.I.; formal analysis, S.A., E.R., A.K., D.L., F.H., B.R., G.A., C.B. and A.I.; investigation, S.A., E.R., A.K., D.L., F.H., B.R., G.A., C.B. and A.I.; writing—original draft preparation, S.A. and A.I.; writing—review and editing, S.A., C.B. and A.I.; supervision, A.I. All authors have read and agreed to the published version of the manuscript.</p>
+    </notes>
+    <notes>
+      <title>Institutional Review Board Statement</title>
+      <p>The study was conducted in accordance with the Declaration of Helsinki and approved in March 2007 by the Institutional Review Board and Ethical Research Committee (CPP Est IV, PRI 2006—HUS N°3737).</p>
+    </notes>
+    <notes>
+      <title>Informed Consent Statement</title>
+      <p>Informed consent was obtained from all subjects involved in the study.</p>
+    </notes>
+    <notes notes-type="data-availability">
+      <title>Data Availability Statement</title>
+      <p>The data presented in this study are available on request from the corresponding author.</p>
+    </notes>
+    <notes notes-type="COI-statement">
+      <title>Conflicts of Interest</title>
+      <p>The authors declare no conflicts of interest.</p>
+    </notes>
+    <ref-list>
+      <title>References</title>
+      <ref id="B1-cancers-16-00233">
+        <label>1.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Allemani</surname><given-names>C.</given-names></name>
+<name><surname>Weir</surname><given-names>H.K.</given-names></name>
+<name><surname>Carreira</surname><given-names>H.</given-names></name>
+<name><surname>Harewood</surname><given-names>R.</given-names></name>
+<name><surname>Spika</surname><given-names>D.</given-names></name>
+<name><surname>Wang</surname><given-names>X.S.</given-names></name>
+<name><surname>Bannon</surname><given-names>F.</given-names></name>
+<name><surname>Ahn</surname><given-names>J.V.</given-names></name>
+<name><surname>Johnson</surname><given-names>C.J.</given-names></name>
+<name><surname>Bonaventure</surname><given-names>A.</given-names></name>
+<etal/>
+</person-group><article-title>Global surveillance of cancer survival 1995–2009: Analysis of individual data for 25,676,887 patients from 279 population-based registries in 67 countries (CONCORD-2)</article-title><source>Lancet Lond. Engl.</source><year>2015</year><volume>385</volume><fpage>977</fpage><lpage>1010</lpage><pub-id pub-id-type="doi">10.1016/S0140-6736(14)62038-9</pub-id><?supplied-pmid 25467588?><pub-id pub-id-type="pmid">25467588</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B2-cancers-16-00233">
+        <label>2.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Arnold</surname><given-names>M.</given-names></name>
+<name><surname>Sierra</surname><given-names>M.S.</given-names></name>
+<name><surname>Laversanne</surname><given-names>M.</given-names></name>
+<name><surname>Soerjomataram</surname><given-names>I.</given-names></name>
+<name><surname>Jemal</surname><given-names>A.</given-names></name>
+<name><surname>Bray</surname><given-names>F.</given-names></name>
+</person-group><article-title>Global patterns and trends in colorectal cancer incidence and mortality</article-title><source>Gut</source><year>2017</year><volume>66</volume><fpage>683</fpage><lpage>691</lpage><pub-id pub-id-type="doi">10.1136/gutjnl-2015-310912</pub-id><?supplied-pmid 26818619?><pub-id pub-id-type="pmid">26818619</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B3-cancers-16-00233">
+        <label>3.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Argilés</surname><given-names>G.</given-names></name>
+<name><surname>Tabernero</surname><given-names>J.</given-names></name>
+<name><surname>Labianca</surname><given-names>R.</given-names></name>
+<name><surname>Hochhauser</surname><given-names>D.</given-names></name>
+<name><surname>Salazar</surname><given-names>R.</given-names></name>
+<name><surname>Iveson</surname><given-names>T.</given-names></name>
+<name><surname>Laurent-Puig</surname><given-names>P.</given-names></name>
+<name><surname>Quirke</surname><given-names>P.</given-names></name>
+<name><surname>Yoshino</surname><given-names>T.</given-names></name>
+<name><surname>Taieb</surname><given-names>J.</given-names></name>
+<etal/>
+</person-group><article-title>Localised colon cancer: ESMO Clinical Practice Guidelines for diagnosis, treatment and follow-up</article-title><source>Ann. Oncol.</source><year>2020</year><volume>31</volume><fpage>1291</fpage><lpage>1305</lpage><pub-id pub-id-type="doi">10.1016/j.annonc.2020.06.022</pub-id><?supplied-pmid 32702383?><pub-id pub-id-type="pmid">32702383</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B4-cancers-16-00233">
+        <label>4.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Gómez-España</surname><given-names>M.A.</given-names></name>
+<name><surname>Gallego</surname><given-names>J.</given-names></name>
+<name><surname>González-Flores</surname><given-names>E.</given-names></name>
+<name><surname>Maurel</surname><given-names>J.</given-names></name>
+<name><surname>Páez</surname><given-names>D.</given-names></name>
+<name><surname>Sastre</surname><given-names>J.</given-names></name>
+<name><surname>Aparicio</surname><given-names>J.</given-names></name>
+<name><surname>Benavides</surname><given-names>M.</given-names></name>
+<name><surname>Feliu</surname><given-names>J.</given-names></name>
+<name><surname>Vera</surname><given-names>R.</given-names></name>
+</person-group><article-title>SEOM clinical guidelines for diagnosis and treatment of metastatic colorectal cancer</article-title><source>Clin. Transl. Oncol.</source><year>2019</year><volume>21</volume><fpage>46</fpage><lpage>54</lpage><pub-id pub-id-type="doi">10.1007/s12094-018-02002-w</pub-id><?supplied-pmid 30565083?><pub-id pub-id-type="pmid">30565083</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B5-cancers-16-00233">
+        <label>5.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Gómez-España</surname><given-names>M.A.</given-names></name>
+<name><surname>Gallego</surname><given-names>J.</given-names></name>
+<name><surname>González-Flores</surname><given-names>E.</given-names></name>
+<name><surname>Maurel</surname><given-names>J.</given-names></name>
+<name><surname>Páez</surname><given-names>D.</given-names></name>
+<name><surname>Sastre</surname><given-names>J.</given-names></name>
+<name><surname>Aparicio</surname><given-names>J.</given-names></name>
+<name><surname>Benavides</surname><given-names>M.</given-names></name>
+<name><surname>Feliu</surname><given-names>J.</given-names></name>
+<name><surname>Vera</surname><given-names>R.</given-names></name>
+</person-group><article-title>ESMO consensus guidelines for the management of patients with metastatic colorectal cancer</article-title><source>Ann. Oncol.</source><year>2016</year><volume>27</volume><fpage>1386</fpage><lpage>1422</lpage><pub-id pub-id-type="pmid">27380959</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B6-cancers-16-00233">
+        <label>6.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Glynne-Jones</surname><given-names>R.</given-names></name>
+<name><surname>Wyrwicz</surname><given-names>L.</given-names></name>
+<name><surname>Tiret</surname><given-names>E.</given-names></name>
+<name><surname>Brown</surname><given-names>G.</given-names></name>
+<name><surname>Rödel</surname><given-names>C.</given-names></name>
+<name><surname>Cervantes</surname><given-names>A.</given-names></name>
+<name><surname>Arnold</surname><given-names>D.</given-names></name>
+</person-group><article-title>Rectal cancer: ESMO Clinical Practice Guidelines for diagnosis, treatment and follow-up</article-title><source>Ann. Oncol.</source><year>2018</year><volume>29</volume><issue>(Suppl. S4)</issue><fpage>iv263</fpage><pub-id pub-id-type="doi">10.1093/annonc/mdy161</pub-id><pub-id pub-id-type="pmid">29741565</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B7-cancers-16-00233">
+        <label>7.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Boyle</surname><given-names>P.</given-names></name>
+<name><surname>Leon</surname><given-names>M.E.</given-names></name>
+</person-group><article-title>Epidemiology of colorectal cancer</article-title><source>Br. Med. Bull.</source><year>2002</year><volume>64</volume><fpage>1</fpage><lpage>25</lpage><pub-id pub-id-type="doi">10.1093/bmb/64.1.1</pub-id><?supplied-pmid 12421722?><pub-id pub-id-type="pmid">12421722</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B8-cancers-16-00233">
+        <label>8.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Favoriti</surname><given-names>P.</given-names></name>
+<name><surname>Carbone</surname><given-names>G.</given-names></name>
+<name><surname>Greco</surname><given-names>M.</given-names></name>
+<name><surname>Pirozzi</surname><given-names>F.</given-names></name>
+<name><surname>Pirozzi</surname><given-names>R.E.M.</given-names></name>
+<name><surname>Corcione</surname><given-names>F.</given-names></name>
+</person-group>
+          <article-title>Worldwide burden of colorectal cancer: A review</article-title>
+          <source>Updat. Surg. Mars</source>
+          <year>2016</year>
+          <volume>68</volume>
+          <fpage>7</fpage>
+          <lpage>11</lpage>
+          <pub-id pub-id-type="doi">10.1007/s13304-016-0359-y</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B9-cancers-16-00233">
+        <label>9.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Torre</surname><given-names>L.A.</given-names></name>
+<name><surname>Bray</surname><given-names>F.</given-names></name>
+<name><surname>Siegel</surname><given-names>R.L.</given-names></name>
+<name><surname>Ferlay</surname><given-names>J.</given-names></name>
+<name><surname>Lortet-Tieulent</surname><given-names>J.</given-names></name>
+<name><surname>Jemal</surname><given-names>A.</given-names></name>
+</person-group><article-title>Global cancer statistics, 2012</article-title><source>CA Cancer J. Clin.</source><year>2015</year><volume>65</volume><fpage>87</fpage><lpage>108</lpage><pub-id pub-id-type="doi">10.3322/caac.21262</pub-id><pub-id pub-id-type="pmid">25651787</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B10-cancers-16-00233">
+        <label>10.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Llamas-Elvira</surname><given-names>J.M.</given-names></name>
+<name><surname>Rodríguez-Fernández</surname><given-names>A.</given-names></name>
+<name><surname>Gutiérrez-Sáinz</surname><given-names>J.</given-names></name>
+<name><surname>Gomez-Rio</surname><given-names>M.</given-names></name>
+<name><surname>Bellon-Guardia</surname><given-names>M.</given-names></name>
+<name><surname>Ramos-Font</surname><given-names>C.</given-names></name>
+<name><surname>Rebollo-Aguirre</surname><given-names>A.C.</given-names></name>
+<name><surname>Cabello-García</surname><given-names>D.</given-names></name>
+<name><surname>Ferrón-Orihuela</surname><given-names>A.</given-names></name>
+</person-group><article-title>Fluorine-18 fluorodeoxyglucose PET in the preoperative staging of colorectal cancer</article-title><source>Eur. J. Nucl. Med. Mol. Imaging</source><year>2007</year><volume>34</volume><fpage>859</fpage><lpage>867</lpage><pub-id pub-id-type="doi">10.1007/s00259-006-0274-4</pub-id><pub-id pub-id-type="pmid">17195075</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B11-cancers-16-00233">
+        <label>11.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Shin</surname><given-names>S.S.</given-names></name>
+<name><surname>Jeong</surname><given-names>Y.Y.</given-names></name>
+<name><surname>Min</surname><given-names>J.J.</given-names></name>
+<name><surname>Kim</surname><given-names>H.R.</given-names></name>
+<name><surname>Chung</surname><given-names>T.W.</given-names></name>
+<name><surname>Kang</surname><given-names>H.K.</given-names></name>
+</person-group><article-title>Preoperative staging of colorectal cancer: CT vs. integrated FDG PET/CT</article-title><source>Abdom. Imaging</source><year>2008</year><volume>33</volume><fpage>270</fpage><lpage>277</lpage><pub-id pub-id-type="doi">10.1007/s00261-007-9262-9</pub-id><?supplied-pmid 17610107?><pub-id pub-id-type="pmid">17610107</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B12-cancers-16-00233">
+        <label>12.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Inoue</surname><given-names>K.</given-names></name>
+<name><surname>Sato</surname><given-names>T.</given-names></name>
+<name><surname>Kitamura</surname><given-names>H.</given-names></name>
+<name><surname>Ito</surname><given-names>M.</given-names></name>
+<name><surname>Tsunoda</surname><given-names>Y.</given-names></name>
+<name><surname>Hirayama</surname><given-names>A.</given-names></name>
+<name><surname>Kurosawa</surname><given-names>H.</given-names></name>
+<name><surname>Tanaka</surname><given-names>T.</given-names></name>
+<name><surname>Fukushi</surname><given-names>M.</given-names></name>
+<name><surname>Moriyama</surname><given-names>N.</given-names></name>
+</person-group><article-title>Diagnosis supporting algorithm for lymph node metastases from colorectal carcinoma on 18F-FDG PET/CT</article-title><source>Ann. Nucl. Med.</source><year>2008</year><volume>22</volume><fpage>41</fpage><lpage>48</lpage><pub-id pub-id-type="doi">10.1007/s12149-007-0073-4</pub-id><?supplied-pmid 18250986?><pub-id pub-id-type="pmid">18250986</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B13-cancers-16-00233">
+        <label>13.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Park</surname><given-names>I.J.</given-names></name>
+<name><surname>Kim</surname><given-names>H.C.</given-names></name>
+<name><surname>Yu</surname><given-names>C.S.</given-names></name>
+<name><surname>Ryu</surname><given-names>M.H.</given-names></name>
+<name><surname>Chang</surname><given-names>H.M.</given-names></name>
+<name><surname>Kim</surname><given-names>J.H.</given-names></name>
+<name><surname>Ryu</surname><given-names>J.S.</given-names></name>
+<name><surname>Yeo</surname><given-names>J.S.</given-names></name>
+<name><surname>Kim</surname><given-names>J.C.</given-names></name>
+</person-group><article-title>Efficacy of PET/CT in the accurate evaluation of primary colorectal carcinoma</article-title><source>Eur. J. Surg. Oncol.</source><year>2006</year><volume>32</volume><fpage>941</fpage><lpage>947</lpage><pub-id pub-id-type="doi">10.1016/j.ejso.2006.05.019</pub-id><?supplied-pmid 16843635?><pub-id pub-id-type="pmid">16843635</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B14-cancers-16-00233">
+        <label>14.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Furukawa</surname><given-names>H.</given-names></name>
+<name><surname>Ikuma</surname><given-names>H.</given-names></name>
+<name><surname>Seki</surname><given-names>A.</given-names></name>
+<name><surname>Yokoe</surname><given-names>K.</given-names></name>
+<name><surname>Yuen</surname><given-names>S.</given-names></name>
+<name><surname>Aramaki</surname><given-names>T.</given-names></name>
+<name><surname>Yamagushi</surname><given-names>S.</given-names></name>
+</person-group><article-title>Positron emission tomography scanning is not superior to whole body multidetector helical computed tomography in the preoperative staging of colorectal cancer</article-title><source>Gut</source><year>2006</year><volume>55</volume><fpage>1007</fpage><lpage>1011</lpage><pub-id pub-id-type="doi">10.1136/gut.2005.076273</pub-id><?supplied-pmid 16361308?><pub-id pub-id-type="pmid">16361308</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B15-cancers-16-00233">
+        <label>15.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Abdel-Nabi</surname><given-names>H.</given-names></name>
+<name><surname>Doerr</surname><given-names>R.J.</given-names></name>
+<name><surname>Lamonica</surname><given-names>D.M.</given-names></name>
+<name><surname>Cronin</surname><given-names>V.R.</given-names></name>
+<name><surname>Galantowicz</surname><given-names>P.J.</given-names></name>
+<name><surname>Carbone</surname><given-names>G.M.</given-names></name>
+<name><surname>Spaulding</surname><given-names>M.B.</given-names></name>
+</person-group><article-title>Staging of primary colorectal carcinomas with fluorine-18 fluorodeoxyglucose whole-body PET: Correlation with histopathologic and CT findings</article-title><source>Radiology</source><year>1998</year><volume>206</volume><fpage>755</fpage><lpage>760</lpage><pub-id pub-id-type="doi">10.1148/radiology.206.3.9494497</pub-id><?supplied-pmid 9494497?><pub-id pub-id-type="pmid">9494497</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B16-cancers-16-00233">
+        <label>16.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Kantorová</surname><given-names>I.</given-names></name>
+<name><surname>Lipská</surname><given-names>L.</given-names></name>
+<name><surname>Bêlohlávek</surname><given-names>O.</given-names></name>
+<name><surname>Visokai</surname><given-names>V.</given-names></name>
+<name><surname>Trubaĉ</surname><given-names>M.</given-names></name>
+<name><surname>Schneiderová</surname><given-names>M.</given-names></name>
+</person-group><article-title>Routine (18)F-FDG PET preoperative staging of colorectal cancer: Comparison with conventional staging and its impact on treatment decision making</article-title><source>J. Nucl. Med.</source><year>2003</year><volume>44</volume><fpage>1784</fpage><lpage>1788</lpage><?supplied-pmid 14602860?><pub-id pub-id-type="pmid">14602860</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B17-cancers-16-00233">
+        <label>17.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Selzner</surname><given-names>M.</given-names></name>
+<name><surname>Hany</surname><given-names>T.F.</given-names></name>
+<name><surname>Wildbrett</surname><given-names>P.</given-names></name>
+<name><surname>McCormack</surname><given-names>L.</given-names></name>
+<name><surname>Kadry</surname><given-names>Z.</given-names></name>
+<name><surname>Clavien</surname><given-names>P.A.</given-names></name>
+</person-group><article-title>Does the Novel PET/CT Imaging Modality Impact on the Treatment of Patients with Metastatic Colorectal Cancer of the Liver?</article-title><source>Ann. Surg.</source><year>2004</year><volume>240</volume><fpage>1027</fpage><lpage>1036</lpage><pub-id pub-id-type="doi">10.1097/01.sla.0000146145.69835.c5</pub-id><pub-id pub-id-type="pmid">15570208</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B18-cancers-16-00233">
+        <label>18.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Doi</surname><given-names>H.</given-names></name>
+<name><surname>Kitajima</surname><given-names>K.</given-names></name>
+<name><surname>Fukushima</surname><given-names>K.</given-names></name>
+<name><surname>Kawanaka</surname><given-names>Y.</given-names></name>
+<name><surname>Mouri</surname><given-names>M.</given-names></name>
+<name><surname>Yamamoto</surname><given-names>S.</given-names></name>
+<name><surname>Ishikura</surname><given-names>R.</given-names></name>
+<name><surname>Terada</surname><given-names>T.</given-names></name>
+<name><surname>Noguchi</surname><given-names>K.</given-names></name>
+<name><surname>Hirota</surname><given-names>S.</given-names></name>
+</person-group><article-title>SUVmax on FDG-PET is a predictor of prognosis in patients with maxillary sinus cancer</article-title><source>Jpn. J. Radiol.</source><year>2016</year><volume>34</volume><fpage>349</fpage><lpage>355</lpage><pub-id pub-id-type="doi">10.1007/s11604-016-0531-9</pub-id><pub-id pub-id-type="pmid">26920841</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B19-cancers-16-00233">
+        <label>19.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Nakamura</surname><given-names>K.</given-names></name>
+<name><surname>Hongo</surname><given-names>A.</given-names></name>
+<name><surname>Kodama</surname><given-names>J.</given-names></name>
+<name><surname>Hiramatsu</surname><given-names>Y.</given-names></name>
+</person-group><article-title>The measurement of SUVmax of the primary tumor is predictive of prognosis for patients with endometrial cancer</article-title><source>Gynecol. Oncol.</source><year>2011</year><volume>123</volume><fpage>82</fpage><lpage>87</lpage><pub-id pub-id-type="doi">10.1016/j.ygyno.2011.06.026</pub-id><pub-id pub-id-type="pmid">21764107</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B20-cancers-16-00233">
+        <label>20.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Xia</surname><given-names>X.</given-names></name>
+<name><surname>Wang</surname><given-names>Y.</given-names></name>
+<name><surname>Yuan</surname><given-names>J.</given-names></name>
+<name><surname>Sun</surname><given-names>W.</given-names></name>
+<name><surname>Jiang</surname><given-names>J.</given-names></name>
+<name><surname>Liu</surname><given-names>C.</given-names></name>
+<name><surname>Zhang</surname><given-names>Q.</given-names></name>
+<name><surname>Ma</surname><given-names>X.</given-names></name>
+</person-group><article-title>Baseline SUVmax of 18F-FDG PET-CT indicates prognosis of extranodal natural killer/T-cell lymphoma</article-title><source>Medicine</source><year>2020</year><volume>99</volume><fpage>e22143</fpage><pub-id pub-id-type="doi">10.1097/MD.0000000000022143</pub-id><pub-id pub-id-type="pmid">32925768</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B21-cancers-16-00233">
+        <label>21.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Kato</surname><given-names>H.</given-names></name>
+<name><surname>Nakajima</surname><given-names>M.</given-names></name>
+<name><surname>Sohda</surname><given-names>M.</given-names></name>
+<name><surname>Tanaka</surname><given-names>N.</given-names></name>
+<name><surname>Inose</surname><given-names>T.</given-names></name>
+<name><surname>Miyazaki</surname><given-names>T.</given-names></name>
+<name><surname>Fukuchi</surname><given-names>M.</given-names></name>
+<name><surname>Oriuchi</surname><given-names>N.</given-names></name>
+<name><surname>Endo</surname><given-names>K.</given-names></name>
+<name><surname>Kuwano</surname><given-names>H.</given-names></name>
+</person-group><article-title>The clinical application of (18)F-fluorodeoxyglucose positron emission tomography to predict survival in patients with operable esophageal cancer</article-title><source>Cancer</source><year>2009</year><volume>115</volume><fpage>3196</fpage><lpage>3203</lpage><pub-id pub-id-type="doi">10.1002/cncr.24399</pub-id><?supplied-pmid 19472406?><pub-id pub-id-type="pmid">19472406</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B22-cancers-16-00233">
+        <label>22.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Chung</surname><given-names>H.W.</given-names></name>
+<name><surname>Lee</surname><given-names>E.J.</given-names></name>
+<name><surname>Cho</surname><given-names>Y.H.</given-names></name>
+<name><surname>Yoon</surname><given-names>S.Y.</given-names></name>
+<name><surname>So</surname><given-names>Y.</given-names></name>
+<name><surname>Kim</surname><given-names>S.Y.</given-names></name>
+<name><surname>Lee</surname><given-names>M.H.</given-names></name>
+<name><surname>Kim</surname><given-names>J.H.</given-names></name>
+<name><surname>Lee</surname><given-names>S.Y.</given-names></name>
+<name><surname>Sung</surname><given-names>I.K.</given-names></name>
+<etal/>
+</person-group><article-title>High FDG uptake in PET/CT predicts worse prognosis in patients with metastatic gastric adenocarcinoma</article-title><source>J Cancer Res. Clin. Oncol.</source><year>2010</year><volume>136</volume><fpage>1929</fpage><lpage>1935</lpage><pub-id pub-id-type="doi">10.1007/s00432-010-0852-5</pub-id><?supplied-pmid 20306088?><pub-id pub-id-type="pmid">20306088</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B23-cancers-16-00233">
+        <label>23.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Shi</surname><given-names>D.</given-names></name>
+<name><surname>Cai</surname><given-names>G.</given-names></name>
+<name><surname>Peng</surname><given-names>J.</given-names></name>
+<name><surname>Li</surname><given-names>D.</given-names></name>
+<name><surname>Li</surname><given-names>X.</given-names></name>
+<name><surname>Xu</surname><given-names>Y.</given-names></name>
+<name><surname>Cai</surname><given-names>S.</given-names></name>
+</person-group><article-title>The preoperative SUVmax for 18F-FDG uptake predicts survival in patients with colorectal cancer</article-title><source>BMC Cancer</source><year>2015</year><volume>15</volume><elocation-id>991</elocation-id><pub-id pub-id-type="doi">10.1186/s12885-015-1991-5</pub-id><?supplied-pmid 26689966?><pub-id pub-id-type="pmid">26689966</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B24-cancers-16-00233">
+        <label>24.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Lee</surname><given-names>J.E.</given-names></name>
+<name><surname>Kim</surname><given-names>S.W.</given-names></name>
+<name><surname>Kim</surname><given-names>J.S.</given-names></name>
+<name><surname>Choi</surname><given-names>K.Y.</given-names></name>
+<name><surname>Kang</surname><given-names>W.K.</given-names></name>
+<name><surname>Oh</surname><given-names>S.T.</given-names></name>
+<name><surname>Yoo</surname><given-names>I.e.R.</given-names></name>
+<name><surname>Kim</surname><given-names>S.H.</given-names></name>
+</person-group><article-title>Prognostic value of 18-fluorodeoxyglucose positron emission tomography-computed tomography in resectable colorectal cancer</article-title><source>World J. Gastroenterol.</source><year>2012</year><volume>18</volume><fpage>5072</fpage><lpage>5077</lpage><pub-id pub-id-type="doi">10.3748/wjg.v18.i36.5072</pub-id><?supplied-pmid 23049216?><pub-id pub-id-type="pmid">23049216</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B25-cancers-16-00233">
+        <label>25.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Soyluoglu</surname><given-names>S.</given-names></name>
+<name><surname>Gunay</surname><given-names>B.O.</given-names></name>
+</person-group><article-title>Contribution of Metabolic Parameters and Pericolic Fat Stranding on Preoperative 18F-FDG PET/CT in Predicting Post-operative Histopathology and Outcome in Colorectal Cancer</article-title><source>Nucl. Med. Mol. Imaging</source><year>2023</year><volume>57</volume><fpage>223</fpage><lpage>234</lpage><pub-id pub-id-type="doi">10.1007/s13139-023-00808-3</pub-id><?supplied-pmid 37720878?><pub-id pub-id-type="pmid">37720878</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B26-cancers-16-00233">
+        <label>26.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Thoeni</surname><given-names>R.F.</given-names></name>
+</person-group>
+          <article-title>Colorectal cancer. Radiologic staging</article-title>
+          <source>Radiol. Clin. N. Am. Mars</source>
+          <year>1997</year>
+          <volume>35</volume>
+          <fpage>457</fpage>
+          <lpage>485</lpage>
+          <pub-id pub-id-type="doi">10.1016/S0033-8389(22)00718-7</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B27-cancers-16-00233">
+        <label>27.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Maeda</surname><given-names>C.</given-names></name>
+<name><surname>Endo</surname><given-names>S.</given-names></name>
+<name><surname>Mori</surname><given-names>Y.</given-names></name>
+<name><surname>Mukai</surname><given-names>S.</given-names></name>
+<name><surname>Hidaka</surname><given-names>E.</given-names></name>
+<name><surname>Ishida</surname><given-names>F.</given-names></name>
+<name><surname>Kudo</surname><given-names>S.E.</given-names></name>
+</person-group><article-title>The ability of positron emission tomography/computed tomography to detect synchronous colonic cancers in patients with obstructive colorectal cancer</article-title><source>Mol. Clin. Oncol.</source><year>2019</year><volume>10</volume><fpage>425</fpage><lpage>429</lpage><pub-id pub-id-type="doi">10.3892/mco.2019.1815</pub-id><pub-id pub-id-type="pmid">30931111</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B28-cancers-16-00233">
+        <label>28.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Dahmarde</surname><given-names>H.</given-names></name>
+<name><surname>Parooie</surname><given-names>F.</given-names></name>
+<name><surname>Salarzaei</surname><given-names>M.</given-names></name>
+</person-group><article-title>Is 18F-FDG PET/CT an Accurate Way to Detect Lymph Node Metastasis in Colorectal Cancer: A Systematic Review and Meta-Analysis</article-title><source>Contrast Media Mol. Imaging</source><year>2020</year><volume>2020</volume><fpage>5439378</fpage><pub-id pub-id-type="doi">10.1155/2020/5439378</pub-id><pub-id pub-id-type="pmid">32733174</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B29-cancers-16-00233">
+        <label>29.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Lu</surname><given-names>Y.Y.</given-names></name>
+<name><surname>Chen</surname><given-names>J.H.</given-names></name>
+<name><surname>Ding</surname><given-names>H.J.</given-names></name>
+<name><surname>Chien</surname><given-names>C.R.</given-names></name>
+<name><surname>Lin</surname><given-names>W.Y.</given-names></name>
+<name><surname>Kao</surname><given-names>C.H.</given-names></name>
+</person-group><article-title>A systematic review and meta-analysis of pretherapeutic lymph node staging of colorectal cancer by 18F-FDG PET or PET/CT</article-title><source>Nucl. Med. Commun.</source><year>2012</year><volume>33</volume><fpage>1127</fpage><lpage>1133</lpage><pub-id pub-id-type="doi">10.1097/MNM.0b013e328357b2d9</pub-id><pub-id pub-id-type="pmid">23000829</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B30-cancers-16-00233">
+        <label>30.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Arena</surname><given-names>V.</given-names></name>
+<name><surname>Skanjeti</surname><given-names>A.</given-names></name>
+<name><surname>Casoni</surname><given-names>R.</given-names></name>
+<name><surname>Douroukas</surname><given-names>A.</given-names></name>
+<name><surname>Pelosi</surname><given-names>E.</given-names></name>
+</person-group><article-title>Dual-phase FDG-PET: Delayed acquisition improves hepatic detectability of pathological uptake</article-title><source>Radiol. Med.</source><year>2008</year><volume>113</volume><fpage>875</fpage><lpage>886</lpage><pub-id pub-id-type="doi">10.1007/s11547-008-0287-0</pub-id><pub-id pub-id-type="pmid">18618076</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B31-cancers-16-00233">
+        <label>31.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Sargent</surname><given-names>D.</given-names></name>
+<name><surname>Sobrero</surname><given-names>A.</given-names></name>
+<name><surname>Grothey</surname><given-names>A.</given-names></name>
+<name><surname>O’Connell</surname><given-names>M.J.</given-names></name>
+<name><surname>Buyse</surname><given-names>M.</given-names></name>
+<name><surname>Andre</surname><given-names>T.</given-names></name>
+<name><surname>Zheng</surname><given-names>Y.</given-names></name>
+<name><surname>Green</surname><given-names>E.</given-names></name>
+<name><surname>Labianca</surname><given-names>R.</given-names></name>
+<name><surname>O’Callaghan</surname><given-names>C.</given-names></name>
+<etal/>
+</person-group><article-title>Evidence for Cure by Adjuvant Therapy in Colon Cancer: Observations Based on Individual Patient Data From 20,898 Patients on 18 Randomized Trials</article-title><source>J. Clin. Oncol.</source><year>2009</year><volume>27</volume><fpage>872</fpage><lpage>877</lpage><pub-id pub-id-type="doi">10.1200/JCO.2008.19.5362</pub-id><?supplied-pmid 19124803?><pub-id pub-id-type="pmid">19124803</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B32-cancers-16-00233">
+        <label>32.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Lee</surname><given-names>J.H.</given-names></name>
+<name><surname>Lee</surname><given-names>H.S.</given-names></name>
+<name><surname>Kim</surname><given-names>S.</given-names></name>
+<name><surname>Park</surname><given-names>E.J.</given-names></name>
+<name><surname>Baik</surname><given-names>S.H.</given-names></name>
+<name><surname>Jeon</surname><given-names>T.J.</given-names></name>
+<name><surname>Lee</surname><given-names>K.Y.</given-names></name>
+<name><surname>Ryu</surname><given-names>Y.H.</given-names></name>
+<name><surname>Kang</surname><given-names>J.</given-names></name>
+</person-group><article-title>Prognostic significance of bone marrow and spleen 18F-FDG uptake in patients with colorectal cancer</article-title><source>Sci Rep.</source><year>2021</year><volume>11</volume><fpage>12137</fpage><pub-id pub-id-type="doi">10.1038/s41598-021-91608-2</pub-id><?supplied-pmid 34108552?><pub-id pub-id-type="pmid">34108552</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B33-cancers-16-00233">
+        <label>33.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Mirshahvalad</surname><given-names>S.A.</given-names></name>
+<name><surname>Hinzpeter</surname><given-names>R.</given-names></name>
+<name><surname>Kohan</surname><given-names>A.</given-names></name>
+<name><surname>Anconina</surname><given-names>R.</given-names></name>
+<name><surname>Kulanthaivelu</surname><given-names>R.</given-names></name>
+<name><surname>Ortega</surname><given-names>C.</given-names></name>
+<name><surname>Metser</surname><given-names>U.</given-names></name>
+<name><surname>Veit-Haibach</surname><given-names>P.</given-names></name>
+</person-group><article-title>Diagnostic performance of [18F]-FDG PET/MR in evaluating colorectal cancer: A systematic review and meta-analysis</article-title><source>Eur. J. Nucl. Med. Mol. Imaging</source><year>2022</year><volume>49</volume><fpage>4205</fpage><lpage>4217</lpage><pub-id pub-id-type="doi">10.1007/s00259-022-05871-0</pub-id><?supplied-pmid 35705874?><pub-id pub-id-type="pmid">35705874</pub-id>
+</element-citation>
+      </ref>
+      <ref id="B34-cancers-16-00233">
+        <label>34.</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Kömek</surname><given-names>H.</given-names></name>
+<name><surname>Can</surname><given-names>C.</given-names></name>
+<name><surname>Kaplan</surname><given-names>İ.</given-names></name>
+<name><surname>Gündoğan</surname><given-names>C.</given-names></name>
+<name><surname>Kepenek</surname><given-names>F.</given-names></name>
+<name><surname>Karaoglan</surname><given-names>H.</given-names></name>
+<name><surname>Demirkıran</surname><given-names>A.</given-names></name>
+<name><surname>Ebinç</surname><given-names>S.</given-names></name>
+<name><surname>Güzel</surname><given-names>Y.</given-names></name>
+<name><surname>Gündeş</surname><given-names>E.</given-names></name>
+</person-group><article-title>Comparison of [<sup>68</sup>Ga]Ga-DOTA-FAPI-04 PET/CT and [<sup>18</sup>F]FDG PET/CT in colorectal cancer</article-title><source>Eur. J. Nucl. Med. Mol. Imaging</source><year>2022</year><volume>49</volume><fpage>3898</fpage><lpage>3909</lpage><pub-id pub-id-type="doi">10.1007/s00259-022-05839-0</pub-id><pub-id pub-id-type="pmid">35578038</pub-id>
+</element-citation>
+      </ref>
+    </ref-list>
+  </back>
+  <floats-group>
+    <fig position="float" id="cancers-16-00233-f001">
+      <label>Figure 1</label>
+      <caption>
+        <p>Presurgical 18F-FDG PET/CT results of 3 patients with presumed localized CC (arrows) showing additional colon lesion or visceral metastasis not visualized at conventional staging (dotted arrows). 57-old year man with (pT3) sigmoid primary (<bold>A</bold>) and synchronous invasive carcinoma (T2) of left colon (<bold>B</bold>). 74-old year man with 11 cm (pT3) tumor of the caecum (<bold>C</bold>), and adenoma with high grade dysplasia of the right colon (<bold>D</bold>). 46-old year woman with incomplete colonoscopy due to a sigmoid tumoral stenosis (pT3) (<bold>E</bold>), and right ovary metastasis (<bold>F</bold>).</p>
+      </caption>
+      <graphic xlink:href="cancers-16-00233-g001" position="float"/>
+    </fig>
+    <table-wrap position="float" id="cancers-16-00233-t001">
+      <object-id pub-id-type="pii">cancers-16-00233-t001_Table 1</object-id>
+      <label>Table 1</label>
+      <caption>
+        <p>Characteristics of examined population.</p>
+      </caption>
+      <table frame="hsides" rules="groups">
+        <tbody>
+          <tr>
+            <td align="center" valign="middle" style="border-top:solid thin" rowspan="1" colspan="1">Number of patients</td>
+            <td align="center" valign="middle" style="border-top:solid thin" rowspan="1" colspan="1">48</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">Sex</td>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">25 men (52%)<break/>23 women (48%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Age</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">67 ± 16</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">Diabetes</td>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">7/48 (14.6%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Colonoscopy</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Complete colonoscopy: 42/48 (88%)<break/>Incomplete colonoscopy: 5/48 (10%)<break/>Not feasible: 1/48 (2%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">CECT</td>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">48/48 (100%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1"><sup>18</sup>F-PET/CT</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Whole-body standard imaging: 48/48 (100%)<break/>Additional delayed imaging: 36/48 (75%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">Pathological findings (103 lesions)</td>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">Low-grade dysplasia: 38 (37%)<break/>High-grade dysplasia: 3 (2.9%)<break/>pTis: 4 (3.9%)<break/>pT1: 10 (9.7%)<break/>pT2: 5 (4.9%)<break/>pT3: 40 (38.8%)<break/>pT4: 3 (2.9%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Localization of pre-malignant and malignant lesions</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Caecum: 14 (21.5%)<break/>Right colon: 17 (26.2%)<break/>Transverse colon: 5 (7.7%)<break/>Left colon: 8 (12.3%)<break/>Sigmoid: 21 (32.3%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">T grade (62 lesions)</td>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">PTis: 4 (6.5%)<break/>PT1: 10 (16.1%)<break/>PT2: 5 (8%)<break/>PT3: 40 (64.5%)<break/>PT4: 3 (4.8%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Main size (cm) (65 lesions)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">4.77 ± 2.02 (range: 1–11)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">Tumor histology</td>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">Adenocarcinoma: 48/48 (100%)<break/>Mucinous subtype: 5/48 (10.4%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Adenocarcinoma differentiation</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Well differentiated: 40 (83.3%)<break/>Moderately differentiated: 2 (4.2%)<break/>Poorly differentiated: 6 (12.5%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">Microsatellite instability (patients)</td>
+            <td align="center" valign="middle" style="background:#F2F2F2" rowspan="1" colspan="1">8/48 (16.7%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Angioinvasion (patients)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">6/48 (12.5%)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="border-bottom:solid thin;background:#F2F2F2" rowspan="1" colspan="1">N+ (patients)</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin;background:#F2F2F2" rowspan="1" colspan="1">18/48 (37.5%)</td>
+          </tr>
+        </tbody>
+      </table>
+    </table-wrap>
+    <table-wrap position="float" id="cancers-16-00233-t002">
+      <object-id pub-id-type="pii">cancers-16-00233-t002_Table 2</object-id>
+      <label>Table 2</label>
+      <caption>
+        <p>Per-lesion results of presurgical conventional workup and <sup>18</sup>F-FDG/PET CT compared with pathological findings after surgery, in 48 patients. *: Adenomas with low-grade dysplasia are not included.</p>
+      </caption>
+      <table frame="hsides" rules="groups">
+        <thead>
+          <tr>
+            <th colspan="2" align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1">
+</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Pathology after Surgical Resection</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Conventional Workup<break/>(Colonoscopy and CECT)</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1"><sup>18</sup>F-FDG PET/CT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="2" align="center" valign="middle" style="background:#E7E6E6" rowspan="1">Adenoma with low-grade dysplasia</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">38</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">1</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">5</td>
+          </tr>
+          <tr>
+            <td colspan="2" align="center" valign="middle" rowspan="1">Adenoma with high-grade dysplasia</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">3</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">0</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">3</td>
+          </tr>
+          <tr>
+            <td colspan="2" align="center" valign="middle" style="background:#E7E6E6" rowspan="1">In situ carcinoma</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">4</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">2</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">4</td>
+          </tr>
+          <tr>
+            <td colspan="2" align="center" valign="middle" rowspan="1">Invasive carcinoma (total)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">58</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">49</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">54</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">
+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">T1</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">10</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">6</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">6</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">
+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">T2</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">5</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">3</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">5</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">
+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">T3</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">40</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">37</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">40</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">
+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">T4</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">3</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">3</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">3</td>
+          </tr>
+          <tr>
+            <td colspan="2" align="center" valign="middle" style="border-bottom:solid thin" rowspan="1">Tumoral and precancerous lesions *</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">65</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">51</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">61</td>
+          </tr>
+        </tbody>
+      </table>
+    </table-wrap>
+    <table-wrap position="float" id="cancers-16-00233-t003">
+      <object-id pub-id-type="pii">cancers-16-00233-t003_Table 3</object-id>
+      <label>Table 3</label>
+      <caption>
+        <p>Results of presurgical standard workup and <sup>18</sup>F-FDG/PET/CT in 5 patients with incomplete colonoscopy, and 1 without endoscopic exploration.</p>
+      </caption>
+      <table frame="hsides" rules="groups">
+        <thead>
+          <tr>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Blockage at Endoscopy</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Cause of Blockage</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Tumor Topography<break/>(T Stage)</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Endoscopic Exploration of Colon Segment with CC (+/−)</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Standard Workup (+/−)</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1"><sup>18</sup>F-FDG PET/CT (+/−)</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">PET/CT<break/>Incremental Value (y/n)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">LC</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">Looping</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (T3)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">no</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">S</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">Looping</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">C (T3)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">−</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">no</td>
+          </tr>
+          <tr>
+            <td rowspan="3" align="center" valign="middle" style="background:#E7E6E6" colspan="1">S</td>
+            <td rowspan="3" align="center" valign="middle" style="background:#E7E6E6" colspan="1">Tumor</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (T3)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">no</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">LC (T2)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">−</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">−</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">yes</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">C (T2)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">−</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">−</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">yes</td>
+          </tr>
+          <tr>
+            <td rowspan="2" align="center" valign="middle" colspan="1">LC</td>
+            <td rowspan="2" align="center" valign="middle" colspan="1">Tumor</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">S (T3)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">no</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">LC (T3)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">no</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">Tumor</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (T4)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">no</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">Endoscopy not performed</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">Patient refusal</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">LC (T1)</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">/</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">−</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">+</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">yes</td>
+          </tr>
+        </tbody>
+      </table>
+      <table-wrap-foot>
+        <fn>
+          <p>S: sigmoid, LC: left colon, C: caecum, CC: colorectal cancer.</p>
+        </fn>
+      </table-wrap-foot>
+    </table-wrap>
+    <table-wrap position="float" id="cancers-16-00233-t004">
+      <object-id pub-id-type="pii">cancers-16-00233-t004_Table 4</object-id>
+      <label>Table 4</label>
+      <caption>
+        <p>Discordant results between standard workup and <sup>18</sup>F-FDG PET/CT for colonic lesion assessment in 12 patients with 12 lesions. The incremental value of <sup>18</sup>F-FDG PET/CT is reported.</p>
+      </caption>
+      <table frame="hsides" rules="groups">
+        <thead>
+          <tr>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Tumor Site</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Tumor Size (mm)</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Standard Workup</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">PET/CT</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">Incremental Value of PET/CT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">T (T1)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">40</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td rowspan="3" align="center" valign="middle" style="background:#E7E6E6" colspan="1">Detection of two additional adenomas with high-grade dysplasia</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">RC (HG)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">25</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">-</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">RC (HG)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">30</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">-</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">S (T1)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">50</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td rowspan="2" align="center" valign="middle" colspan="1">Detection of one additional adenoma with high grade dysplasia</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">T (HG)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">12</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">-</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (is)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">10</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td rowspan="2" align="center" valign="middle" style="background:#E7E6E6" colspan="1">Detection of one synchronous in situ adenocarcinomas not reported at colonoscopy</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">C (T3)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">60</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">S (T3)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">30</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td rowspan="2" align="center" valign="middle" colspan="1">Detection of one synchronous invasive adenocarcinoma and one additional in situ carcinoma</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">CG (is)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">15</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (T3)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">55</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td rowspan="3" align="center" valign="middle" style="background:#E7E6E6" colspan="1">Detection of two additional synchronous invasive adenocarcinomas beyond a sigmoid tumoral stenosis</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">LC (T2)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">25</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">C (T2)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">30</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">S (T3)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">70</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td rowspan="2" align="center" valign="middle" colspan="1">Detection of one synchronous invasive adenocarcinoma not reported at colonoscopy</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">CG (is)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">60</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (T3)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">45</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td rowspan="4" align="center" valign="middle" style="background:#E7E6E6" colspan="1">Detection of one synchronous invasive adenocarcinoma not reported at colonoscopy</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (T3)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">25</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (is)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">15</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">CG (is)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">15</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">S (LG)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">35</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td rowspan="3" align="center" valign="middle" colspan="1">None (perioperative detection of a caecal in situ adenocarcinoma)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">C (is)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">25</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">FN</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">C (T3)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">55</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">S (T1)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">10</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">FN</td>
+            <td rowspan="2" align="center" valign="middle" style="background:#E7E6E6" colspan="1">None (perioperative detection of a sigmoid invasive adenocarcinoma)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">C (T2)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">50</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">T (T3)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">45</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">n/a</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">None (diffuse intestinal uptake related to metformin)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">C (T3)</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">30</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">n/a</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">None (diffuse intestinal uptake related to metformin)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">LC (T3)</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">70</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">TP</td>
+            <td rowspan="2" align="center" valign="middle" style="border-bottom:solid thin" colspan="1">None (false-positive results)</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">-</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">-</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">-</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin" rowspan="1" colspan="1">FP</td>
+          </tr>
+        </tbody>
+      </table>
+      <table-wrap-foot>
+        <fn>
+          <p>S: sigmoid, LC: left colon, T: transverse colon, RC: right colon, C: caecum, is: in situ, HG: high-grade dysplasia.</p>
+        </fn>
+      </table-wrap-foot>
+    </table-wrap>
+    <table-wrap position="float" id="cancers-16-00233-t005">
+      <object-id pub-id-type="pii">cancers-16-00233-t005_Table 5</object-id>
+      <label>Table 5</label>
+      <caption>
+        <p>SUVmax, SUVpeak, TLG, and MTV mean values according to histopathology.</p>
+      </caption>
+      <table frame="hsides" rules="groups">
+        <thead>
+          <tr>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">
+</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">SUVmax</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">SUVpeak</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">TLG</th>
+            <th align="center" valign="middle" style="border-top:solid thin;border-bottom:solid thin" rowspan="1" colspan="1">MTV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">LG dysplasia </td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">6.02 ± 0.66</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">4.48 ± 0.71</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">25.93 ± 12.48</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">7.42 ± 3.89</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">HG dysplasia</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">6.41 ± 0.94</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">4.13 ± 0.39</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">13.25 ± 9.57</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">3.85 ± 3.53</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">In situ carcinoma</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">5.64 ± 1.5</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">4.2 ± 1.4</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">47.2 ± 53.1</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">15.47 ± 19.49</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">T1 carcinoma</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">10.99 ± 1.84</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">8.46 ± 2.56</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">66.97 ± 65.37</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">9.19 ± 8.38</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">T2 carcinoma</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">14.52 ± 10.27</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">10.55 ± 7.34</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">62.1 ± 52.93</td>
+            <td align="center" valign="middle" style="background:#E7E6E6" rowspan="1" colspan="1">6.77 ± 3.75</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" rowspan="1" colspan="1">T3 carcinoma</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">19.41 ± 10.03</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">15.34 ± 7.32</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">269.08 ± 245.22</td>
+            <td align="center" valign="middle" rowspan="1" colspan="1">22.86 ± 17.58</td>
+          </tr>
+          <tr>
+            <td align="center" valign="middle" style="border-bottom:solid thin;background:#E7E6E6" rowspan="1" colspan="1">T4 carcinoma</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin;background:#E7E6E6" rowspan="1" colspan="1">13.19 ± 0.98</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin;background:#E7E6E6" rowspan="1" colspan="1">10.82 ± 0.5</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin;background:#E7E6E6" rowspan="1" colspan="1">189.3 ± 68</td>
+            <td align="center" valign="middle" style="border-bottom:solid thin;background:#E7E6E6" rowspan="1" colspan="1">24.36 ± 7.82</td>
+          </tr>
+        </tbody>
+      </table>
+      <table-wrap-foot>
+        <fn>
+          <p>LG: low-grade, HG: high-grade.</p>
+        </fn>
+      </table-wrap-foot>
+    </table-wrap>
+  </floats-group>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

@@ -40,15 +40,15 @@ cargo test
 # Check all workspace members
 cargo check
 
-# Run specific integration test suite
-cargo test --test comprehensive_pmc_tests
-cargo test --test comprehensive_pubmed_tests
-cargo test --test test_elink_integration
+# Run specific integration test suite (from pubmed-client/ directory)
+cd pubmed-client && cargo test --test comprehensive_pmc_tests
+cd pubmed-client && cargo test --test comprehensive_pubmed_tests
+cd pubmed-client && cargo test --test test_elink_integration
 
-# Run new real API integration tests (requires network and env var)
-PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pubmed_api_tests
-PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pmc_api_tests
-PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test error_handling_tests
+# Run new real API integration tests (requires network and env var, from pubmed-client/)
+cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pubmed_api_tests
+cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pmc_api_tests
+cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test error_handling_tests
 
 # Run single unit test in core library
 cargo test --lib -p pubmed-client-rs pubmed::parser::tests::test_mesh_term_parsing
@@ -87,15 +87,15 @@ pnpm run test:coverage  # With coverage
 pnpm run publish        # wasm-pack publish --access public
 ```
 
-#### Legacy mise Commands (if available)
+#### mise Commands (if available)
 
 Using `mise` for task management (configured in `.mise.toml`):
 
 ```bash
-# Build the project
+# Build all workspace members
 mise r build
 
-# Run tests with nextest (preferred test runner)
+# Run all workspace tests with nextest (preferred test runner)
 mise r test
 
 # Run tests in watch mode
@@ -109,6 +109,17 @@ mise r doc
 
 # Check code without building
 mise r check
+
+# Core library specific
+mise r core:test              # Run core library tests
+mise r core:test:integration  # Run integration tests
+mise r core:publish           # Publish to crates.io
+
+# WASM package specific
+mise r wasm:build            # Build for web target
+mise r wasm:build:node       # Build for Node.js target
+mise r wasm:test             # Build and run TypeScript tests
+mise r wasm:publish          # Publish to npm
 ```
 
 ### Code Quality
@@ -116,10 +127,10 @@ mise r check
 #### Rust Code Quality
 
 ```bash
-# Full linting (dprint + cargo fmt + clippy)
+# Full linting (dprint + cargo fmt + clippy) for entire workspace
 mise r lint
 
-# Format code (dprint + cargo fmt)
+# Format code (dprint + cargo fmt) for entire workspace
 mise r fmt
 ```
 
@@ -247,22 +258,22 @@ The WASM package provides JavaScript/TypeScript bindings for the core Rust libra
 
 - Test runner: `cargo-nextest` for better output and parallelization
 - Parameterized tests using `rstest`
-- Test data: Real XML files in `tests/integration/test_data/`
-- Common test utilities in `tests/integration/common/mod.rs`
+- Test data: Real XML files in `pubmed-client/tests/integration/test_data/`
+- Common test utilities in `pubmed-client/tests/integration/common/mod.rs`
 - Integration tests with tracing support using `#[traced_test]`
 - Mocked rate limiting tests for deterministic behavior
 - ELink API integration tests covering all relationship types
 
 #### Test Organization
 
-- **Unit tests**: Located alongside source code in `src/` modules
-- **Integration tests**: Located in `tests/integration/` directory
+- **Unit tests**: Located alongside source code in `pubmed-client/src/` modules
+- **Integration tests**: Located in `pubmed-client/tests/integration/` directory
   - `comprehensive_pmc_tests.rs` - PMC XML parsing validation
   - `comprehensive_pubmed_tests.rs` - PubMed XML parsing validation
   - `test_elink_integration.rs` - ELink API functionality
   - `test_einfo_integration.rs` - EInfo API functionality
   - `markdown_tests.rs` - Markdown conversion testing
-- **Test utilities**: Shared code in `tests/integration/common/mod.rs`
+- **Test utilities**: Shared code in `pubmed-client/tests/integration/common/mod.rs`
 
 ### Dependencies
 
@@ -565,13 +576,13 @@ The implementation uses internal response types (`ELinkResponse`, `ELinkSet`, `E
 ### Testing ELink Functionality
 
 ```bash
-# Run ELink-specific integration tests
-cargo test --test test_elink_integration
+# Run ELink-specific integration tests (from pubmed-client/ directory)
+cd pubmed-client && cargo test --test test_elink_integration
 
-# Test individual ELink methods
-cargo test test_get_related_articles_integration
-cargo test test_get_pmc_links_integration
-cargo test test_get_citations_integration
+# Test individual ELink methods (from pubmed-client/ directory)
+cd pubmed-client && cargo test test_get_related_articles_integration
+cd pubmed-client && cargo test test_get_pmc_links_integration
+cd pubmed-client && cargo test test_get_citations_integration
 ```
 
 ## WASM Development and Publishing

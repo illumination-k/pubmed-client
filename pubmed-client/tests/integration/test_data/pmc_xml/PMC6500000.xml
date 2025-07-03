@@ -1,0 +1,1751 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:09:23Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:6500000" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:6500000</identifier><datestamp>2019-05-09</datestamp><setSpec>jimmthercanc</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" article-type="research-article">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">J Immunother Cancer</journal-id>
+      <journal-id journal-id-type="iso-abbrev">J Immunother Cancer</journal-id>
+      <journal-title-group>
+        <journal-title>Journal for Immunotherapy of Cancer</journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">2051-1426</issn>
+      <publisher>
+        <publisher-name>BioMed Central</publisher-name>
+        <publisher-loc>London</publisher-loc>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC6500000</article-id>
+      <article-id pub-id-type="pmcid">PMC6500000</article-id>
+      <article-id pub-id-type="pmc-uid">6500000</article-id>
+      <article-id pub-id-type="pmid">31053174</article-id>
+      <article-id pub-id-type="publisher-id">603</article-id>
+      <article-id pub-id-type="doi">10.1186/s40425-019-0603-3</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>Research Article</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Safety and clinical activity of PD-L1 blockade in patients with aggressive recurrent respiratory papillomatosis</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author" corresp="yes">
+          <name>
+            <surname>Allen</surname>
+            <given-names>Clint T.</given-names>
+          </name>
+          <address>
+            <phone>301-827-5620</phone>
+            <email>clint.allen@nih.gov</email>
+          </address>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Lee</surname>
+            <given-names>Sunmin</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Norberg</surname>
+            <given-names>Scott M.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Kovalovsky</surname>
+            <given-names>Damian</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Ye</surname>
+            <given-names>Hong</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Clavijo</surname>
+            <given-names>Paul E.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Hu-Lieskovan</surname>
+            <given-names>Siwen</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff4">4</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Schlegel</surname>
+            <given-names>Richard</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff5">5</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Schlom</surname>
+            <given-names>Jeffrey</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff6">6</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Strauss</surname>
+            <given-names>Julius</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff6">6</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Gulley</surname>
+            <given-names>James L.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff7">7</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Trepel</surname>
+            <given-names>Jane</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Hinrichs</surname>
+            <given-names>Christian S.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <aff id="Aff1"><label>1</label><institution-wrap><institution-id institution-id-type="ISNI">0000 0001 2297 5165</institution-id><institution-id institution-id-type="GRID">grid.94365.3d</institution-id><institution>Translational Tumor Immunology Program, National Institute of Deafness and Other Communication Disorders, </institution><institution>National Institutes of Health, </institution></institution-wrap>10 Center Drive, Room 7N240C, Bethesda, MD 20892 USA </aff>
+        <aff id="Aff2"><label>2</label><institution-wrap><institution-id institution-id-type="ISNI">0000 0004 1936 8075</institution-id><institution-id institution-id-type="GRID">grid.48336.3a</institution-id><institution>Developmental Therapeutics Branch, </institution><institution>National Cancer Institute, National Institutes of Health, </institution></institution-wrap>Bethesda, USA </aff>
+        <aff id="Aff3"><label>3</label><institution-wrap><institution-id institution-id-type="ISNI">0000 0004 1936 8075</institution-id><institution-id institution-id-type="GRID">grid.48336.3a</institution-id><institution>Experimental Transplantation and Immunology Branch, </institution><institution>National Cancer Institute, National Institutes of Health, </institution></institution-wrap>Bethesda, USA </aff>
+        <aff id="Aff4"><label>4</label><institution-wrap><institution-id institution-id-type="ISNI">0000 0000 9632 6718</institution-id><institution-id institution-id-type="GRID">grid.19006.3e</institution-id><institution>University of California Los Angeles School of Medicine, </institution></institution-wrap>Los Angeles, USA </aff>
+        <aff id="Aff5"><label>5</label><institution-wrap><institution-id institution-id-type="ISNI">0000 0001 2186 0438</institution-id><institution-id institution-id-type="GRID">grid.411667.3</institution-id><institution>Georgetown University Medical Center, </institution></institution-wrap>Washington, USA </aff>
+        <aff id="Aff6"><label>6</label><institution-wrap><institution-id institution-id-type="ISNI">0000 0004 1936 8075</institution-id><institution-id institution-id-type="GRID">grid.48336.3a</institution-id><institution>Laboratory of Tumor Immunology and Biology, </institution><institution>National Cancer Institute, National Institutes of Health, </institution></institution-wrap>Bethesda, USA </aff>
+        <aff id="Aff7"><label>7</label><institution-wrap><institution-id institution-id-type="ISNI">0000 0004 1936 8075</institution-id><institution-id institution-id-type="GRID">grid.48336.3a</institution-id><institution>Genitourinary Malignancies Branch, </institution><institution>National Cancer Institute, National Institutes of Health, </institution></institution-wrap>Bethesda, USA </aff>
+      </contrib-group>
+      <pub-date pub-type="epub">
+        <day>3</day>
+        <month>5</month>
+        <year>2019</year>
+      </pub-date>
+      <pub-date pub-type="pmc-release">
+        <day>3</day>
+        <month>5</month>
+        <year>2019</year>
+      </pub-date>
+      <pub-date pub-type="collection">
+        <year>2019</year>
+      </pub-date>
+      <volume>7</volume>
+      <elocation-id>119</elocation-id>
+      <history>
+        <date date-type="received">
+          <day>21</day>
+          <month>2</month>
+          <year>2019</year>
+        </date>
+        <date date-type="accepted">
+          <day>23</day>
+          <month>4</month>
+          <year>2019</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-statement>© The Author(s). 2019</copyright-statement>
+        <license license-type="OpenAccess">
+          <license-p><bold>Open Access</bold>This article is distributed under the terms of the Creative Commons Attribution 4.0 International License (<ext-link ext-link-type="uri" xlink:href="http://creativecommons.org/licenses/by/4.0/">http://creativecommons.org/licenses/by/4.0/</ext-link>), which permits unrestricted use, distribution, and reproduction in any medium, provided you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons license, and indicate if changes were made. The Creative Commons Public Domain Dedication waiver (<ext-link ext-link-type="uri" xlink:href="http://creativecommons.org/publicdomain/zero/1.0/">http://creativecommons.org/publicdomain/zero/1.0/</ext-link>) applies to the data made available in this article, unless otherwise stated.</license-p>
+        </license>
+      </permissions>
+      <abstract id="Abs1">
+        <sec>
+          <title>Background</title>
+          <p id="Par1">Recurrent respiratory papillomatosis (RRP) is a human papillomavirus (HPV)-driven disorder that causes substantial morbidity and can lead to fatal distal airway obstruction and post-obstructive pneumonias. Patients require frequent surgical debridement of disease, and no approved systemic adjuvant therapies exist.</p>
+        </sec>
+        <sec>
+          <title>Methods</title>
+          <p id="Par2">A phase II study was conducted to investigate the clinical activity and safety of programmed death-ligand 1 (PD-L1) blockade with avelumab in patients with RRP.</p>
+        </sec>
+        <sec>
+          <title>Results</title>
+          <p id="Par3">Twelve patients were treated. All patients with laryngeal RRP displayed improvement in disease burden, and 5 of 9 (56%) displayed partial responses. None of 4 patients with pulmonary RRP displayed a response. Using each patient’s surgical history as their own control, patients required fewer surgical interventions after avelumab treatment (<italic>p</italic> = 0.008). A subset of partial responders developed HPV-specific reactivity in papilloma-infiltrating T-cells that correlated with reduced HPV viral load and an increased Tissue Inflammation Signature.</p>
+        </sec>
+        <sec>
+          <title>Conclusions</title>
+          <p id="Par4">Avelumab demonstrated safety and clinical activity in patients with laryngeal RRP. Further study of immune checkpoint blockade for RRP, possibly with longer treatment duration or in combination with other immunotherapies aimed at activating antiviral immunity, is warranted.</p>
+        </sec>
+        <sec>
+          <title>Trial registration</title>
+          <p id="Par5">NCT, number <ext-link ext-link-type="uri" xlink:href="https://clinicaltrials.gov/ct2/show/NCT02859454?term=hinrichs&amp;rank=6">NCT02859454</ext-link>, registered August 9, 2016.</p>
+        </sec>
+        <sec>
+          <title>Electronic supplementary material</title>
+          <p>The online version of this article (10.1186/s40425-019-0603-3) contains supplementary material, which is available to authorized users.</p>
+        </sec>
+      </abstract>
+      <kwd-group xml:lang="en">
+        <title>Keywords</title>
+        <kwd>Immune checkpoint inhibition</kwd>
+        <kwd>Avelumab</kwd>
+        <kwd>Human papillomavirus</kwd>
+        <kwd>Recurrent respiratory papillomatosis</kwd>
+      </kwd-group>
+      <funding-group>
+        <award-group>
+          <funding-source>
+            <institution-wrap>
+              <institution-id institution-id-type="FundRef">http://dx.doi.org/10.13039/100000055</institution-id>
+              <institution>National Institute on Deafness and Other Communication Disorders</institution>
+            </institution-wrap>
+          </funding-source>
+          <award-id>ZIA-DC000087</award-id>
+          <principal-award-recipient>
+            <name>
+              <surname>Allen</surname>
+              <given-names>Clint T.</given-names>
+            </name>
+          </principal-award-recipient>
+        </award-group>
+      </funding-group>
+      <funding-group>
+        <award-group>
+          <funding-source>
+            <institution-wrap>
+              <institution-id institution-id-type="FundRef">http://dx.doi.org/10.13039/100000054</institution-id>
+              <institution>National Cancer Institute</institution>
+            </institution-wrap>
+          </funding-source>
+          <award-id>Intramural Funding</award-id>
+          <principal-award-recipient>
+            <name>
+              <surname>Hinrichs</surname>
+              <given-names>Christian S.</given-names>
+            </name>
+          </principal-award-recipient>
+        </award-group>
+      </funding-group>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>issue-copyright-statement</meta-name>
+          <meta-value>© The Author(s) 2019</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="Sec1">
+      <title>Background</title>
+      <p id="Par18">Recurrent respiratory papillomatosis (RRP) is a clinical disorder characterized by aerodigestive tract papillomas that cause severe voice disturbance, airway obstruction, and potentially fatal distal small-airway obstruction leading to post-obstructive pneumonias [<xref ref-type="bibr" rid="CR1">1</xref>, <xref ref-type="bibr" rid="CR2">2</xref>]. The incidence of RRP is approximately 2 per 100,000 in adults [<xref ref-type="bibr" rid="CR3">3</xref>]. It is caused by chronic infection with low-risk human papillomavirus (HPV) types 6 or 11 [<xref ref-type="bibr" rid="CR2">2</xref>, <xref ref-type="bibr" rid="CR4">4</xref>]. Surgical debridement of papillomas is the standard of care treatment approach, and patients with aggressive RRP can undergo hundreds of lifetime surgeries to control their disease. Advancements in laser surgical technologies have enhanced the ability to precisely remove RRP lesions, but lesion recurrence and the morbidity associated with both the disease itself and repeat surgical interventions remain problematic [<xref ref-type="bibr" rid="CR5">5</xref>]. To date, no systemic adjuvant therapies are widely utilized for this difficult-to-treat disorder [<xref ref-type="bibr" rid="CR6">6</xref>]. The clinical efficacy of systemic type I interferon in the treatment of RRP was previously studied [<xref ref-type="bibr" rid="CR7">7</xref>], but widespread use of this treatment has been limited given lack of durable RRP lesion control and a high rate of adverse events (AEs).</p>
+      <p id="Par19">Immune checkpoint inhibition (ICI) of the programmed death (PD)-axis has clinical activity in certain HPV-associated malignancies [<xref ref-type="bibr" rid="CR8">8</xref>–<xref ref-type="bibr" rid="CR10">10</xref>]. Programmed death-ligand 1 (PD-L1) blockade in RRP has not been reported [<xref ref-type="bibr" rid="CR11">11</xref>]. Treatment of RRP with PD-L1 blockade is an attractive strategy given the presence of HPV DNA in the lesions and the likelihood that this DNA harbors one or more T cell antigens. RRP biopsy specimens display expression of PD-L1 by both papillomas and infiltrating immune cells [<xref ref-type="bibr" rid="CR12">12</xref>], suggesting that the PD-signaling axis may play a role in suppression of effective immune responses. Here, we report clinical and immune correlative findings from a phase II clinical trial for the treatment of patients with aggressive RRP with avelumab, an FDA-approved anti-PD-L1 monoclonal antibody (mAb) [<xref ref-type="bibr" rid="CR13">13</xref>, <xref ref-type="bibr" rid="CR14">14</xref>].</p>
+    </sec>
+    <sec id="Sec2">
+      <title>Methods</title>
+      <sec id="Sec3">
+        <title>Patients</title>
+        <p id="Par20">Patients age 18 years or older with a pathologically confirmed diagnosis of squamous papilloma were eligible for the trial. For laryngeal disease, eligibility required an anatomic Derkay score [<xref ref-type="bibr" rid="CR15">15</xref>] of 10 or greater, and two or more surgical interventions to control papillomas in the prior 12 months. For pulmonary disease, eligibility required measurable lung lesions by RECIST1.1. Inclusion criteria included adequate organ function as assessed by standard laboratory tests and Eastern Cooperative Oncology Group performance status of 0 or 1. Exclusion criteria included infection with HIV, hepatitis B, or hepatitis C; a history of solid organ transplant or autoimmune disease; immunosuppression; and prior treatment with an immune checkpoint inhibitor.</p>
+      </sec>
+      <sec id="Sec4">
+        <title>Study design</title>
+        <p id="Par21">This study was designed as a phase II clinical trial. The protocol was approved by the National Cancer Institute (NCI) Institution Review Board and the National Institutes of Health Clinical Center, and informed consent was obtained from all patients. Treatment consisted of avelumab (10 mg/kg) iv every 2 weeks for three doses (one course). Patients who demonstrated a partial response (PR) after the first course were treated with a second course. Hence, patients could receive a total of up to six doses of avelumab over 12 weeks. Patients who did not demonstrate a PR after one course did not receive a second course. Following completion of treatment, all patients underwent surgical debridement of papillomas with standard-of-care techniques, and they returned to their referring otolaryngologist to resume standard-of-care treatment for their RRP. Avelumab was provided by EMD Serono through a Cooperative Research and Development Agreement with the NCI.</p>
+      </sec>
+      <sec id="Sec5">
+        <title>Assessments</title>
+        <p id="Par22">Clinical assessments including office-based endoscopy via flexible laryngoscopy and completion of the Voice Handicap Index-10 (VHI-10) questionnaire [<xref ref-type="bibr" rid="CR16">16</xref>] were performed at the time of screening and prior to each dose of the study drug. Chest computed tomography (CT) evaluation was obtained on patients with known or suspected lung disease. Complete response was defined as complete resolution of all laryngeal papillomas visible on office-based endoscopy and all pulmonary papillomas evident by CT scan. PR for laryngeal disease was defined as a decrease in anatomic Derkay score of ≥50%. After four patients were treated, the definition was changed to ≥30% to lower the threshold for a second course of treatment as the treatment was well tolerated and appeared to have activity. Responses are reported based on the protocol criteria at the time of treatment. For pulmonary disease, response was defined using RECIST 1.1 criteria. All patients were examined under anesthesia prior to the first and second doses of avelumab to verify patency of the airway and to obtain biopsies. During the baseline and 2-week exams under anesthesia, &lt; 1 mm biopsies were obtained under direct visualization from locations that would not change the Derkay score, such as tracheal or large supraglottic lesions. Normal mucosa was sampled from the posterior arytenoid or post-cricoid regions in all patients at all time points. Clinical laboratory tests were obtained weekly on patients throughout the duration of treatment. Determination of response was based upon changes in anatomic Derkay score obtained via office-based endoscopy and/or chest CT (when indicated) at 6 or 12 weeks.</p>
+      </sec>
+      <sec id="Sec6">
+        <title>Outcomes</title>
+        <p id="Par23">The primary outcome measure was rate of complete response. Secondary outcome measures included the rate of PR, change in inter-surgery interval, change in VHI-10, rate of adverse events, and change in immune correlatives.</p>
+      </sec>
+      <sec id="Sec7">
+        <title>Immune correlative assays</title>
+        <p id="Par24">T cell cultures were initiated from papillomas and adjacent but normal appearing laryngeal mucosa fragments using interleukin-2 containing media [<xref ref-type="bibr" rid="CR17">17</xref>]. Expanded T-cells from papilloma and normal mucosa were tested for reactivity against autologous feeder cells (dendritic cells or B cells) transfected with mRNA from individual HPV genes. T-cell reactivity against these products or PMA/Ionomycin (positive control) was assessed via a standard ELISPOT assay. HPV 6 or 11 copy number per cell was determined using real-time quantitative PCR primers specific for HPV L1 (type specific) and Ribonuclease P. For immunohistochemistry, sectioned FFPE tissue samples were stained with haematoxylin and eosin, anti-CD8, and anti-PD-L1 at the UCLA Anatomic Pathology Immunohistochemistry and Histology Laboratory. Antibodies used included CD8 clone C8/144B (Dako, 1:100, low pH retrieval) and PD-L1 (Spring Biosciences, Sp142, 1:200, high pH retrieval). IHC was performed on a Leica Bond III autostainer. Percentage cellularity (% positive cells/all nucleated cells) was calculated using the Halo platform (Indica Labs). For gene expression analysis, RNA was extracted from frozen tissues and NanoString PanCancer IO 360 Gene Expression Panel™ analysis (NanoString Technologies, Seattle, WA) was performed per the manufacturer’s recommendations. Expression of individual HPV genes was determined by Droplet Digital™ PCR (ddPCR™) analysis (Bio-Rad, Hercules, CA) using HPV type and gene specific primers. Bioinformatic analysis was performed by NanoString.</p>
+      </sec>
+      <sec id="Sec8">
+        <title>Statistical analysis</title>
+        <p id="Par25">The Wilcoxon matched-pairs test was used to test for a significant difference in the surgery-free interval. A <italic>p</italic> value of &lt; 0.05 was considered statistically significant.</p>
+      </sec>
+    </sec>
+    <sec id="Sec9">
+      <title>Results</title>
+      <sec id="Sec10">
+        <title>Patient characteristics</title>
+        <p id="Par26">Twelve patients were treated (Table <xref rid="Tab1" ref-type="table">1</xref>). The median age was 51 years (range 21 to 67 years). Four patients had juvenile onset RRP, and eight had adult onset RRP. The median number of years since diagnosis of RRP was 18 (range 2 to 45 years). Eligibility was based on laryngeal disease for eight patients, pulmonary disease for three patients, and both laryngeal and pulmonary disease for one patient. The median Derkay score of patients who qualified for the study based on laryngeal disease was 13 (range 10 to 26). Ten patients had required at least 20 surgeries to control their RRP lesions since initial diagnosis, and three patients had required greater than 100 surgeries. Most patients had received adjuvant local or systemic treatment with agents such as cidofovir or bevacizumab prior to enrollment. RRP was associated with HPV 11 in six patients and HPV 6 in six patients. There was a trend toward greater likelihood of experiencing a partial response to avelumab in patients with RRP associated with HPV 6 compared to HPV 11, although this failed to reach statistical significance in this small cohort (Additional file <xref rid="MOESM1" ref-type="media">1</xref>: Figure S1). There was no correlation between HPV subtype and the presence of pulmonary disease (Additional file <xref rid="MOESM1" ref-type="media">1</xref>: Figure S2).<table-wrap id="Tab1"><label>Table 1</label><caption><p>Characterization of Patient and Prior Treatments</p></caption><table frame="hsides" rules="groups"><thead><tr><th>Patient</th><th>Age (Years)</th><th>Sex</th><th>HPV type</th><th>Age at diagnosis (Years)</th><th>Number of RRP surgeries lifetime</th><th>Prior local treatments</th><th>Prior systemic treatments</th><th>Pulmonary RRP lesions</th></tr></thead><tbody><tr><td>1</td><td>32</td><td>F</td><td>11</td><td>19</td><td>&gt; 40</td><td>Cidofovir</td><td>I-3-C</td><td>No</td></tr><tr><td>2</td><td>36</td><td>M</td><td>6</td><td>28</td><td>35</td><td>Cidovofir, bevacizumab</td><td>I-3-C</td><td>No</td></tr><tr><td>3</td><td>50</td><td>F</td><td>11</td><td>5</td><td>&gt; 250</td><td>Mitomycin</td><td>Diindolylmethane</td><td>Yes</td></tr><tr><td>4</td><td>63</td><td>M</td><td>11</td><td>19</td><td>&gt; 50</td><td>Cidofovir, Cryotherapy</td><td>None</td><td>No</td></tr><tr><td>5</td><td>27</td><td>F</td><td>6</td><td>6</td><td>&gt; 50</td><td>None</td><td>None</td><td>No</td></tr><tr><td>6</td><td>53</td><td>F</td><td>11</td><td>38</td><td>&gt; 20</td><td>Cidofovir</td><td>None</td><td>Yes</td></tr><tr><td>7</td><td>55</td><td>M</td><td>6</td><td>53</td><td>11</td><td>Cidovofir, bevacizumab</td><td>None</td><td>No</td></tr><tr><td>8</td><td>55</td><td>F</td><td>6</td><td>51</td><td>16</td><td>None</td><td>None</td><td>No</td></tr><tr><td>9</td><td>56</td><td>M</td><td>11</td><td>54</td><td>&gt; 20</td><td>Cidofovir</td><td>None</td><td>No</td></tr><tr><td>10</td><td>21</td><td>M</td><td>6</td><td>1</td><td>&gt; 100</td><td>Cidovofir, bevacizumab</td><td>Interferon, Methotrexate</td><td>Yes</td></tr><tr><td>11</td><td>67</td><td>M</td><td>6</td><td>28</td><td>&gt; 40</td><td>bevacizumab, PDT</td><td>I-3-C</td><td>Yes</td></tr><tr><td>12</td><td>26</td><td>M</td><td>11</td><td>2</td><td>&gt; 100</td><td>Cidofovir, bevacizumab</td><td>Interferon, I-3-C</td><td>No</td></tr></tbody></table><table-wrap-foot><p>Abbreviations: <italic>HPV</italic> human papillomavirus, <italic>RRP</italic> recurrent respiratory papillomatosis, <italic>PDT</italic> photodynamic therapy, <italic>I-3-C</italic> indole-3-carbinol</p></table-wrap-foot></table-wrap></p>
+      </sec>
+      <sec id="Sec11">
+        <title>Clinical activity</title>
+        <p id="Par27">Treatment with avelumab was associated with a decrease in Derkay score in all patients (Fig. <xref rid="Fig1" ref-type="fig">1</xref>a&amp;b). Six of nine patients with qualifying (i.e. Derkay score ≥ 10) laryngeal disease experienced a partial response. Patient 2 received only one dose of avelumab due to laboratory abnormalities but demonstrated a 46% reduction in Derkay score. Another patient demonstrated a 33% reduction in Derkay score but received systemic steroids after completion of course one for an issue unrelated to the protocol, making him ineligible for further treatment. Pulmonary disease did not respond to treatment in any of the four patients with pulmonary disease (Fig. <xref rid="Fig1" ref-type="fig">1</xref>c&amp;d). One patient with both laryngeal and pulmonary disease demonstrated a PR in the larynx but no response in the lung. No patients achieved a complete response. Three of twelve patients had received polyvalent HPV vaccine after their RRP diagnosis but prior to enrollment in this protocol. There was no correlation between patients who received the HPV vaccine and patients who experienced a partial response to avelumab (Additional file <xref rid="MOESM1" ref-type="media">1</xref>: Figure S3).<fig id="Fig1"><label>Fig. 1</label><caption><p>Clinical response following initiation of avelumab in patients with recurrent respiratory papillomatosis. <bold>a</bold>, A spider plot of change in laryngeal disease burden for each patient, as measured by anatomic Derkay score, is shown. The dotted line shows the time that avelumab was initiated. The negative time points reflect screening assessments prior to starting treatment. Patients 5, 7, 8, 9 and 11 received 6 doses of avelumab over 12 weeks. Patients 1, 2, 3, 4, 6, 10 and 12 received three doses over 6 weeks. <bold>b</bold>, Representative endoscopic images of RRP lesions for patients 5, 6 and 9 at the timepoints indicated are displayed. <bold>c</bold>, A spider plot of the change in pulmonary disease burden for each patient, as measured by CT scan imaging per RECIST1.1 guidelines, is shown. <bold>d</bold>, Representative images from CT scans from patients 6, 10 and 11 are displayed. Red arrows point to index lesions</p></caption><graphic xlink:href="40425_2019_603_Fig1_HTML" id="MO1"/></fig></p>
+        <p id="Par28">The degree of papilloma present on the true vocal folds would be expected to determine vocal handicap. For patients with disease located on the true vocal folds, 9 of 11 patients reported decreased VHI-10 scores, indicating improved vocal function, while receiving avelumab treatment (Fig. <xref rid="Fig2" ref-type="fig">2</xref>a). Two patients who experienced worsening vocal function while on treatment demonstrated reduction in the overall Derkay score but not in true vocal fold disease burden with treatment. The number of clinically indicated surgical interventions after avelumab treatment was compared to each patient’s historical rate of interventions before treatment to assess for changes in surgery-free interval (Fig. <xref rid="Fig2" ref-type="fig">2</xref>b). This allowed each patient to serve as their own control and provides an individual measure of duration of response to avelumab. Among patients who had 12 months or more of follow-up data after completion of the trial at the time of analysis (<italic>n</italic> = 9, median 13.5 months), there were significantly fewer interventions per 12 patient-months required after avelumab treatment compared to before treatment (Fig. <xref rid="Fig2" ref-type="fig">2</xref>c, <italic>p</italic> = 0.008, Wilcoxon matched-pairs analysis). In the post-protocol follow-up period, one patient (patient 2) received a course of treatment with different PD-axis immune checkpoint inhibitor, and two patients (patients 3 and 4) received systemic bevacizumab. These data suggest that some patients experienced clinical benefit with improved vocal function and the need for fewer surgical interventions after avelumab treatment.<fig id="Fig2"><label>Fig. 2</label><caption><p>Changes in vocal function and surgery-free interval in patients with recurrent respiratory papillomatosis. <bold>a</bold>, A spider plot of change in VHI-10 scores is shown. <bold>b</bold>, A swimmer’s plot that demonstrates the frequency of surgical interventions before and after treatment with avelumab is shown. Each patient received a protocol indicated surgical intervention that occurred 6 or 12 weeks after initiation of avelumab at time zero. Yellow regions indicate the administration of a systemic therapy (anti-PD-1 mAb for patient 2, systemic bevacizumab for patients 3 and 4) for some patients after completing the protocol. <bold>c</bold>, The change in the number of clinically indicated surgical interventions per 12 patient-months before and after completion of the study. <italic>P</italic> = 0.008 by Wilcoxon matched-pairs analysis</p></caption><graphic xlink:href="40425_2019_603_Fig2_HTML" id="MO2"/></fig></p>
+      </sec>
+      <sec id="Sec12">
+        <title>Adverse events</title>
+        <p id="Par29">There were no grade 3 or 4 AEs (Table <xref rid="Tab2" ref-type="table">2</xref>). The most common AE was grade 1 or grade 2 dry mouth, which developed in 5 of 12 patients. All patients reported ≥50% subjective recovery of dry mouth within 9 months of cessation of avelumab treatment, without systemic steroid administration. One patient experienced a flare of facial eczema/dry skin (pre-existing diagnosis) following her second dose of avelumab that was controlled with topical steroids and lasted for approximately 3 months after completion of treatment. One patient experienced a grade 2 infusion reaction that interrupted the first infusion. He was able to complete the infusion and did not experience infusion reactions with subsequent avelumab treatments. Patient 2 demonstrated asymptomatic grade 2 leukopenia and neutropenia on clinical laboratory assessment after one dose of avelumab, and the decision was made to discontinue treatment. Leukocyte and neutrophil counts normalized within weeks without the use of systemic steroids.<table-wrap id="Tab2"><label>Table 2</label><caption><p>Summary of Adverse Events</p></caption><table frame="hsides" rules="groups"><thead><tr><th rowspan="3"/><th colspan="4">Grade</th></tr><tr><th colspan="4">No. of patients (%)</th></tr><tr><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody><tr><td>Fatigue</td><td>4 (33)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Malaise</td><td>1 (8)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Fever</td><td>2 (17)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Chills</td><td>1 (8)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Tachycardia</td><td>1 (8)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Headache</td><td>3 (25)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Anemia</td><td>2 (17)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Leukopenia</td><td>1 (8)</td><td>1 (8)</td><td>0</td><td>0</td></tr><tr><td>Neutropenia</td><td>0</td><td>1 (8)</td><td>0</td><td>0</td></tr><tr><td>Nausea</td><td>2 (17)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Constipation</td><td>1 (8)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Dysgeusia</td><td>1 (8)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Hyperthyroid</td><td>2 (17)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Hyperbilirubinemia</td><td>1 (8)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Increase in amlyase</td><td>1 (8)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Increase in lipase</td><td>2 (17)</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Dry skin</td><td>0</td><td>1 (8)</td><td>0</td><td>0</td></tr><tr><td>Infusion reaction</td><td>0</td><td>1 (8)</td><td>0</td><td>0</td></tr><tr><td>Dry mouth</td><td>3 (25)</td><td>2 (17)</td><td>0</td><td>0</td></tr><tr><td>Maculopapular rash</td><td>1 (8)</td><td>0</td><td>0</td><td>0</td></tr></tbody></table></table-wrap></p>
+      </sec>
+      <sec id="Sec13">
+        <title>Immune correlates</title>
+        <p id="Par30">To study if PD-L1 immune checkpoint blockade induced anti-viral T cell responses in patients with clinical responses, four patients (patients 5, 7, 8 and 9) were selected (based on PR and tissue availability) for immune correlative analysis of tissues. Patient 5 demonstrated HPV6 E2-specific responses at the 12-week time point in T-cell cultures from papilloma but not normal mucosa (Fig. <xref rid="Fig3" ref-type="fig">3</xref>a). This correlated with a reduction in papilloma HPV6 viral load. Patient 9 demonstrated HPV11 L1-specific responses at the 2-week time point in papilloma but not normal mucosa, but this response was not detected at 12 weeks. This also correlated with a reduction in HPV11 viral load. Patients 7 and 8 did not demonstrate HPV-specific T-cell responses or a reduction in viral load in papilloma tissues. HPV gene expression within papillomas revealed consistently high expression of early genes E2, E4 and E5γ, with inconsistent E6 and E7 expression and low expression of late genes L1 and L2 (Additional file <xref rid="MOESM1" ref-type="media">1</xref>: Figure S4). HPV gene expression was not detected in the normal mucosa of any sample (Fig. <xref rid="Fig3" ref-type="fig">3</xref>b).<fig id="Fig3"><label>Fig. 3</label><caption><p>HPV-specific T-cell responses and viral burden in patients treated with avelumab. <bold>a</bold>, HPV-specific responses in papilloma-infiltrating T-cells from patients 5 and 9 were measured by interferon gamma enzyme-linked immunospot assays. Antigen presenting cells were loaded with RNA encoding individual transcripts of HPV 6 (patient 5) or HPV 11 (Patient 9) genes. Patients 7 and 8 did not demonstrate HPV-specific responses in papilloma-infiltrating T-cells. <bold>b</bold>, HPV viral load for HPV 6 (patient 5) or HPV 11 (Patient 9) in papilloma and normal mucosa was determined by quantitative-polymerase chain reaction. <bold>c</bold>, The Tissue Inflammation Signature was calculated from NanoString IO 360 analysis for patients 5, 7, 8, and 9</p></caption><graphic xlink:href="40425_2019_603_Fig3_HTML" id="MO3"/></fig></p>
+        <p id="Par31">Immunohistochemistry was used to determine percentage of cells positive for CD8 or PD-L1 in papillomas from eleven of twelve patients with evaluable samples. There was a trend toward greater likelihood of experiencing a partial response in patients with higher percentage of CD8 and PD-L1 positive cells at baseline (Additional file <xref rid="MOESM1" ref-type="media">1</xref>: Figure S5). This failed to reach statistical significance in this small cohort. NanoString IO 360 analysis was used to investigate papilloma and normal samples for gene expression profiles related to tumor microenvironment, innate immune signaling and adaptive immunity (Additional file <xref rid="MOESM1" ref-type="media">1</xref>: Figure S6). Unsupervised clustering demonstrated segregation of papilloma from normal mucosa, with enrichment of papilloma gene expression indicative of increased proliferation, glycolytic metabolism and hypoxia. The tissue inflammation signature (TIS) [<xref ref-type="bibr" rid="CR18">18</xref>], composed of an 18-gene expression panel validated for assessment of effector immune and interferon responses and predictive of a response to PD-based immune checkpoint blockade, was calculated from the NanoString IO 360 analysis. While the baseline TIS score did not predict response to avelumab, TIS was elevated in the post-treatment papilloma biopsies compared to baseline in the two patients who demonstrated HPV-specific T-cell responses (Fig. <xref rid="Fig3" ref-type="fig">3</xref>c). Although clear patterns of avelumab treatment-related changes within the papilloma samples were absent, papilloma samples generally displayed gene expression indicative of low dendritic cell and CD8 T-cell infiltration but increased myeloid cell inflammation and transforming growth factor-β (TGFβ) expression, compared to normal mucosa. Cumulatively, these data suggest that treatment with avelumab may induce HPV6- or HPV11-specific T-cell responses in a subset of patients with RRP.</p>
+      </sec>
+    </sec>
+    <sec id="Sec14">
+      <title>Discussion</title>
+      <p id="Par32">Patients with RRP can require dozens to hundreds of lifetime surgeries to maintain a serviceable voice and patent airway, and pulmonary spread can lead to life-threatening distal airway obstruction and post-obstructive pneumonia [<xref ref-type="bibr" rid="CR2">2</xref>]. There is presently no generally accepted systemic therapy. In the present study, avelumab showed safety and clinical activity in patients with RRP. Patients also showed improved vocal function (as measured by VHI-10 scores) and increased surgery-free interval after avelumab treatment, suggesting that this treatment may be of clinical benefit to some patients. This work also suggests that ICI should be investigated as a potential treatment strategy for other disorders caused by chronic HPV infection that are recalcitrant to anti-viral therapy [<xref ref-type="bibr" rid="CR19">19</xref>] such as chondylomata and genitourinary tract intraepithelial neoplasias.</p>
+      <p id="Par33">Immunotherapy with systemic type I interferon administration for patients with RRP was previously reported [<xref ref-type="bibr" rid="CR7">7</xref>]. This intensive treatment regimen combining systemic IFNα and surgical debulking produced an initial decrease in RRP lesion recurrence, but the effect was not durable as RRP lesion recurrence in the treatment group rebounded to levels similar to control within 6 months of completing treatment. Further, significant toxicity was observed in patients treated with IFNα, limiting widespread application of this treatment approach for patients with severe RRP.</p>
+      <p id="Par34">Avelumab showed good tolerability with few grade 1/2 AEs and no grade 3/4 AEs. Reported rates of grade 3/4 AEs in patients with recurrent/metastatic cancer range from 2 to 13% [<xref ref-type="bibr" rid="CR13">13</xref>, <xref ref-type="bibr" rid="CR14">14</xref>, <xref ref-type="bibr" rid="CR20">20</xref>]. Avelumab treatment was also limited to 6 weeks in non-responders and 12 weeks in responders, which is a relatively short duration of treatment compared to the treatment of patients with recurrent/metastatic cancer [<xref ref-type="bibr" rid="CR21">21</xref>]. The median time to onset of AEs following initiation of ICI treatment for patients with recurrent malignancy ranges from 5 to 15 weeks [<xref ref-type="bibr" rid="CR22">22</xref>], which is not significantly dissimilar to duration of treatment reported here. Several patients appeared to have ongoing regression of RRP disease at the time of avelumab discontinuation. Whether longer duration of treatment would increase the rate of grade 3/4 AEs or could eventually induce complete resolution of RRP lesions is unknown.</p>
+      <p id="Par35">RRP is caused by HPV type 6 or 11 infection [<xref ref-type="bibr" rid="CR23">23</xref>]. We report consistently high expression of HPV E2 and lower, less consistent expression of E6 and E7 within papillomas, suggesting that HPV remained episomal and did not integrate into the host genome [<xref ref-type="bibr" rid="CR4">4</xref>, <xref ref-type="bibr" rid="CR24">24</xref>]. This is consistent with previous reports demonstrating a low integration rate for low-risk HPV subtypes [<xref ref-type="bibr" rid="CR25">25</xref>, <xref ref-type="bibr" rid="CR26">26</xref>]. This gene expression profile is different than that observed with HPV 16 which commonly integrates, leading to very high expression of E6 and E7 due to loss of E2 [<xref ref-type="bibr" rid="CR4">4</xref>, <xref ref-type="bibr" rid="CR27">27</xref>]. Here, we demonstrated induction of HPV 6 E2 or HPV 11 L1-specific T-cell responses in two partial responders following avelumab treatment that were absent at baseline. These same patients also had an increased TIS [<xref ref-type="bibr" rid="CR18">18</xref>], indicative of more global immune activation within their RRP lesions, and decreased HPV viral load. We did not demonstrate HPV-specific T-cell responses or decreased HPV viral load in two other partial responders. Although HPV viral load present within papillomas over time after completion of avelumab treatment could provide valuable insight into the duration of response, biopsies beyond the post-treatment biopsy were not obtained. The possibility exists that avelumab induced non-HPV but papilloma-specific T-cell responses in these two patients [<xref ref-type="bibr" rid="CR28">28</xref>]. While not possible here due to challenges with establishing T-cell cultures from papilloma biopsies, comparing HPV-specific T-cell responses in responders and non-responders could provide further insight. Whether development of HPV-specific T-cell responses in HPV-driven lesions are required for durable responses to ICI or other forms of immunotherapy requires further study.</p>
+      <p id="Par36">Prior work demonstrated CD8+ T-cell infiltration and PD-L1 expression within the majority of archived RRP specimens, providing a rationale for PD-based ICI [<xref ref-type="bibr" rid="CR12">12</xref>]. We demonstrated a trend toward greater likelihood of response to avelumab with higher baseline CD8+ cell infiltration and PD-L1 positivity. It is possible this would reach statistical significance with a larger cohort. Blockade of the PD signaling axis reverses adaptive immune resistance but may not reverse other mediators of local immunosuppression within neoplasms [<xref ref-type="bibr" rid="CR29">29</xref>]. RRP lesions harbor an immunosuppressive cytokine profile [<xref ref-type="bibr" rid="CR30">30</xref>, <xref ref-type="bibr" rid="CR31">31</xref>], dysfunctional interferon signaling and major histocompatibility class I expression [<xref ref-type="bibr" rid="CR32">32</xref>] and regulatory T-cells [<xref ref-type="bibr" rid="CR33">33</xref>], all of which could suppress local effector immunity independent of PD immune checkpoint signaling. The results of our study demonstrated low dendritic cell, macrophage and CD8+ T-cell gene expression within RRP lesions compared to normal mucosa, suggesting that complex defects in both innate and adaptive immunity may be limiting anti-HPV responses. A subset of RRP lesions demonstrated gene expression indicative of increased neutrophil and inflammatory myeloid cell infiltration and TGFβ expression. Given the immunosuppressive role of these features in solid malignancies [<xref ref-type="bibr" rid="CR34">34</xref>–<xref ref-type="bibr" rid="CR36">36</xref>], combination immunotherapy targeting immunosuppressive myeloid cells or TGFβ along with PD-based ICI could enhance responses in patients with RRP.</p>
+      <p id="Par37">While all patients with laryngeal RRP showed some degree of disease regression with avelumab treatment, no patients with pulmonary RRP showed disease regression. One patient with both laryngeal and pulmonary RRP had regression of laryngeal RRP but not pulmonary RRP. Mechanisms of this possible differential response between laryngeal and pulmonary RRP are unclear, and it is difficult to acquire tissue from pulmonary lesions for study given their deep location and cystic nature. If this lack of pulmonary response to ICI is verified in future trials, gaining insight into why these lesions do not respond will be a critical focus of research since the majority of RRP-related mortality is associated with complications of pulmonary RRP [<xref ref-type="bibr" rid="CR2">2</xref>].</p>
+      <p id="Par38">Several study limitations exist. The drug was administered for a defined, short course, which decreased drug exposure and the risk of adverse events but may have limited efficacy. In addition, all patients with laryngeal disease demonstrated some level of disease improvement, which prevents the study of factors that contribute to disease response versus disease resistance. Finally, while clinical activity was demonstrated, the small sample size and short duration of follow-up limits conclusions about clinical benefit.</p>
+      <p id="Par39">Future clinical development of ICI in RRP could include a longer treatment course, or combination treatment with an agent possessing a complementary mechanism of action such as TGFβ blockade or induction of type I interferon responses. Duration of treatment with ICI in patients who respond will be a balance between clinical benefit and risk of developing one or more clinically significant immune-related adverse events. A clearer understanding of whether RRP lesions harbor genomic alterations similar to malignancies that could render populations of cells resistant to T cell recognition may inform future immunotherapy strategies.</p>
+    </sec>
+    <sec id="Sec15">
+      <title>Conclusions</title>
+      <p id="Par40">In conclusion, this work establishes the safety profile and indicates a level of clinical activity for avelumab in patients with RRP. Future investigation of systemic treatment of RRP with PD-L1 blockade is warranted.</p>
+    </sec>
+    <sec sec-type="supplementary-material">
+      <title>Additional file</title>
+      <sec id="Sec16">
+        <p>
+<supplementary-material content-type="local-data" id="MOESM1"><media xlink:href="40425_2019_603_MOESM1_ESM.docx"><label>Additional file 1:</label><caption><p><bold>Figure S1.</bold> Contingency plot of HPV subtype and development of a partial response to avelumab. Assessed for statistical significance with the Fisher’s exact test. <bold>Figure S2.</bold> Contingency plot of HPV subtype and the presence of pulmonary disease. Assessed for statistical significance with the Fisher’s exact test. <bold>Figure S3.</bold> Contingency plot of patients who received polyvalent HPV vaccine prior to enrollment and patients who experienced a partial response to avelumab. Assessed for statistical significance with the Fisher’s exact test. <bold>Figure S4.</bold> Expression of individual HPV 6 or 11 genes. Expression of individual HPV 6 (patients 5, 7, and 8) or HPV 11 (patient 9) genes in papilloma and normal mucosa was measured by droplet digital polymerase chain reaction. <bold>Figure S5.</bold> Baseline representative immunohistochemistry photomicrographs and quantification of percentage of papilloma infiltrating CD8+ cells and total PD-L1+ cells. Percentage of positive cells inset within photomicrographs. Quantification of staining in eleven of twelve patients with evaluable biopsies represent percentage of total cells in the entire section. Assessed for statistical significance with the Mann-Whitney test. <bold>Figure S6.</bold> Gene expression profiling of papillomas and normal tissue. A heatmap demonstrating unsupervised hierarchical clustering of expression of individual genes or gene signatures is shown. Gene expression was measured by NanoString IO 360 analysis in pre-treatment (pre), on-treatment (2wk) and post-treatment (off) papilloma and normal mucosa biopsies. Each horizontal row represents a separate biopsy. Each unit increase of expression on the heatmap scale is a doubling of the biologic process it represents. The red box highlights differences in TGFβ gene expression between papilloma and normal mucosa biopsies. (DOCX 3090 kb)</p></caption></media></supplementary-material>
+</p>
+      </sec>
+    </sec>
+  </body>
+  <back>
+    <glossary>
+      <title>Abbreviations</title>
+      <def-list>
+        <def-item>
+          <term>AE</term>
+          <def>
+            <p id="Par6">Adverse event</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>CT</term>
+          <def>
+            <p id="Par7">Computed tomography</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>ddPCR</term>
+          <def>
+            <p id="Par8">Droplet Digital™ PCR</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>HPV</term>
+          <def>
+            <p id="Par9">Human papillomavirus</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>ICI</term>
+          <def>
+            <p id="Par10">Immune checkpoint inhibition</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>NCI</term>
+          <def>
+            <p id="Par11">National Cancer Institute</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>PD</term>
+          <def>
+            <p id="Par12">Programmed death</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>PD-L1</term>
+          <def>
+            <p id="Par13">Programmed death-ligand 1</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>PR</term>
+          <def>
+            <p id="Par14">Partial response</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>RRP</term>
+          <def>
+            <p id="Par15">Recurrent respiratory papillomatosis</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>TGFβ</term>
+          <def>
+            <p id="Par16">Transforming growth factor-β</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>VHI-10</term>
+          <def>
+            <p id="Par17">Voice handicap index-10</p>
+          </def>
+        </def-item>
+      </def-list>
+    </glossary>
+    <ack>
+      <title>Acknowledgements</title>
+      <p>The authors thank Drs. Nicole Schmitt and Wojciech Mydlarz for their critical review of this work.</p>
+      <sec id="FPar1">
+        <title>Funding</title>
+        <p id="Par41">This work was supported by the Center for Cancer Research, National Cancer Institute, National Institute on Deafness and Other Communication Disorders and the Intramural Research Program of the National Institutes of Health.</p>
+      </sec>
+      <sec id="FPar2" sec-type="data-availability">
+        <title>Availability of data and materials</title>
+        <p id="Par42">The datasets generated and analyzed during this study are not publicly available to protect patient privacy but are available from the corresponding author on reasonable request.</p>
+      </sec>
+    </ack>
+    <notes notes-type="author-contribution">
+      <title>Authors’ contributions</title>
+      <p>Study conception and design: CA and CH. Acquisition of data: CA, SL, SN, DK, HY, PEC, SH, RS, JT, CH. Analysis and interpretation of data: CA, SL, SN, DK, HY, PEC, SH, RS, JS, JS, JG, JT, CH. Drafting of manuscript: CA, SN, CH. Critical revision: CA, SL, SN, DK, HY, PEC, SH, RS, JS, JS, JG, JT, CH. All authors read and approved the final manuscript.</p>
+    </notes>
+    <notes notes-type="COI-statement">
+      <sec id="FPar3">
+        <title>Ethics approval and consent to participate</title>
+        <p>This study was approved by the National Cancer Institute (NCI) Institution Review Board and the National Institutes of Health Clinical Center (NCT02859454), and informed consent was obtained from all patients.</p>
+      </sec>
+      <sec id="FPar4">
+        <title>Consent for publication</title>
+        <p>Full consent for the publication of patient demographics and endoscopic images was obtained.</p>
+      </sec>
+      <sec id="FPar5">
+        <title>Competing interests</title>
+        <p>The authors declare that they have no competing interests.</p>
+      </sec>
+      <sec id="FPar6">
+        <title>Publisher’s Note</title>
+        <p>Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.</p>
+      </sec>
+    </notes>
+    <ref-list id="Bib1">
+      <title>References</title>
+      <ref id="CR1">
+        <label>1.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Egawa</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Doorbar</surname>
+              <given-names>J</given-names>
+            </name>
+          </person-group>
+          <article-title>The low-risk papillomaviruses</article-title>
+          <source>Virus Res</source>
+          <year>2017</year>
+          <volume>231</volume>
+          <fpage>119</fpage>
+          <lpage>127</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.virusres.2016.12.017</pub-id>
+          <?supplied-pmid 28040475?>
+          <pub-id pub-id-type="pmid">28040475</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR2">
+        <label>2.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Derkay</surname>
+              <given-names>CS</given-names>
+            </name>
+          </person-group>
+          <article-title>Recurrent respiratory papillomatosis</article-title>
+          <source>Laryngoscope.</source>
+          <year>2001</year>
+          <volume>111</volume>
+          <issue>1</issue>
+          <fpage>57</fpage>
+          <lpage>69</lpage>
+          <pub-id pub-id-type="doi">10.1097/00005537-200101000-00011</pub-id>
+          <?supplied-pmid 11192901?>
+          <pub-id pub-id-type="pmid">11192901</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR3">
+        <label>3.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Fortes</surname>
+              <given-names>HR</given-names>
+            </name>
+            <name>
+              <surname>von Ranke</surname>
+              <given-names>FM</given-names>
+            </name>
+            <name>
+              <surname>Escuissato</surname>
+              <given-names>DL</given-names>
+            </name>
+            <name>
+              <surname>Araujo Neto</surname>
+              <given-names>CA</given-names>
+            </name>
+            <name>
+              <surname>Zanetti</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Hochhegger</surname>
+              <given-names>B</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Recurrent respiratory papillomatosis: a state-of-the-art review</article-title>
+          <source>Respir Med</source>
+          <year>2017</year>
+          <volume>126</volume>
+          <fpage>116</fpage>
+          <lpage>121</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.rmed.2017.03.030</pub-id>
+          <?supplied-pmid 28427542?>
+          <pub-id pub-id-type="pmid">28427542</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR4">
+        <label>4.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Moody</surname>
+              <given-names>CA</given-names>
+            </name>
+            <name>
+              <surname>Laimins</surname>
+              <given-names>LA</given-names>
+            </name>
+          </person-group>
+          <article-title>Human papillomavirus oncoproteins: pathways to transformation</article-title>
+          <source>Nat Rev Cancer</source>
+          <year>2010</year>
+          <volume>10</volume>
+          <issue>8</issue>
+          <fpage>550</fpage>
+          <lpage>560</lpage>
+          <pub-id pub-id-type="doi">10.1038/nrc2886</pub-id>
+          <?supplied-pmid 20592731?>
+          <pub-id pub-id-type="pmid">20592731</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR5">
+        <label>5.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Tatar</surname>
+              <given-names>EC</given-names>
+            </name>
+            <name>
+              <surname>Kupfer</surname>
+              <given-names>RA</given-names>
+            </name>
+            <name>
+              <surname>Barry</surname>
+              <given-names>JY</given-names>
+            </name>
+            <name>
+              <surname>Allen</surname>
+              <given-names>CT</given-names>
+            </name>
+            <name>
+              <surname>Merati</surname>
+              <given-names>AL</given-names>
+            </name>
+          </person-group>
+          <article-title>Office-based vs traditional operating room Management of Recurrent Respiratory Papillomatosis: impact of patient characteristics and disease severity</article-title>
+          <source>JAMA Otolaryngol Head Neck Surg</source>
+          <year>2017</year>
+          <volume>143</volume>
+          <issue>1</issue>
+          <fpage>55</fpage>
+          <lpage>59</lpage>
+          <pub-id pub-id-type="doi">10.1001/jamaoto.2016.2724</pub-id>
+          <?supplied-pmid 27658005?>
+          <pub-id pub-id-type="pmid">27658005</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR6">
+        <label>6.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Derkay</surname>
+              <given-names>CS</given-names>
+            </name>
+            <name>
+              <surname>Wiatrak</surname>
+              <given-names>B</given-names>
+            </name>
+          </person-group>
+          <article-title>Recurrent respiratory papillomatosis: a review</article-title>
+          <source>Laryngoscope</source>
+          <year>2008</year>
+          <volume>118</volume>
+          <issue>7</issue>
+          <fpage>1236</fpage>
+          <lpage>1247</lpage>
+          <pub-id pub-id-type="doi">10.1097/MLG.0b013e31816a7135</pub-id>
+          <?supplied-pmid 18496162?>
+          <pub-id pub-id-type="pmid">18496162</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR7">
+        <label>7.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Healy</surname>
+              <given-names>GB</given-names>
+            </name>
+            <name>
+              <surname>Gelber</surname>
+              <given-names>RD</given-names>
+            </name>
+            <name>
+              <surname>Trowbridge</surname>
+              <given-names>AL</given-names>
+            </name>
+            <name>
+              <surname>Grundfast</surname>
+              <given-names>KM</given-names>
+            </name>
+            <name>
+              <surname>Ruben</surname>
+              <given-names>RJ</given-names>
+            </name>
+            <name>
+              <surname>Price</surname>
+              <given-names>KN</given-names>
+            </name>
+          </person-group>
+          <article-title>Treatment of recurrent respiratory papillomatosis with human leukocyte interferon. Results of a multicenter randomized clinical trial</article-title>
+          <source>N Engl J Med</source>
+          <year>1988</year>
+          <volume>319</volume>
+          <issue>7</issue>
+          <fpage>401</fpage>
+          <lpage>407</lpage>
+          <pub-id pub-id-type="doi">10.1056/NEJM198808183190704</pub-id>
+          <?supplied-pmid 3398891?>
+          <pub-id pub-id-type="pmid">3398891</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR8">
+        <label>8.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Morris</surname>
+              <given-names>VK</given-names>
+            </name>
+            <name>
+              <surname>Salem</surname>
+              <given-names>ME</given-names>
+            </name>
+            <name>
+              <surname>Nimeiri</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Iqbal</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Singh</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Ciombor</surname>
+              <given-names>K</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Nivolumab for previously treated unresectable metastatic anal cancer (NCI9673): a multicentre, single-arm, phase 2 study</article-title>
+          <source>Lancet Oncol</source>
+          <year>2017</year>
+          <volume>18</volume>
+          <issue>4</issue>
+          <fpage>446</fpage>
+          <lpage>453</lpage>
+          <pub-id pub-id-type="doi">10.1016/S1470-2045(17)30104-3</pub-id>
+          <?supplied-pmid 28223062?>
+          <pub-id pub-id-type="pmid">28223062</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR9">
+        <label>9.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>De Felice</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Marchetti</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Palaia</surname>
+              <given-names>I</given-names>
+            </name>
+            <name>
+              <surname>Ostuni</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Muzii</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Tombolini</surname>
+              <given-names>V</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Immune check-point in cervical cancer</article-title>
+          <source>Crit Rev Oncol Hematol</source>
+          <year>2018</year>
+          <volume>129</volume>
+          <fpage>40</fpage>
+          <lpage>43</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.critrevonc.2018.06.006</pub-id>
+          <?supplied-pmid 30097236?>
+          <pub-id pub-id-type="pmid">30097236</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR10">
+        <label>10.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ferris</surname>
+              <given-names>RL</given-names>
+            </name>
+            <name>
+              <surname>Blumenschein</surname>
+              <given-names>G</given-names>
+              <suffix>Jr</suffix>
+            </name>
+            <name>
+              <surname>Fayette</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Guigay</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Colevas</surname>
+              <given-names>AD</given-names>
+            </name>
+            <name>
+              <surname>Licitra</surname>
+              <given-names>L</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Nivolumab for recurrent squamous-cell carcinoma of the head and neck</article-title>
+          <source>N Engl J Med</source>
+          <year>2016</year>
+          <volume>375</volume>
+          <issue>19</issue>
+          <fpage>1856</fpage>
+          <lpage>1867</lpage>
+          <pub-id pub-id-type="doi">10.1056/NEJMoa1602252</pub-id>
+          <?supplied-pmid 27718784?>
+          <pub-id pub-id-type="pmid">27718784</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR11">
+        <label>11.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Rao</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Valentini</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Dodoo</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Zumla</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Maeurer</surname>
+              <given-names>M</given-names>
+            </name>
+          </person-group>
+          <article-title>Anti-PD-1/PD-L1 therapy for infectious diseases: learning from the cancer paradigm</article-title>
+          <source>Int J Infect Dis</source>
+          <year>2017</year>
+          <volume>56</volume>
+          <fpage>221</fpage>
+          <lpage>228</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.ijid.2017.01.028</pub-id>
+          <?supplied-pmid 28163164?>
+          <pub-id pub-id-type="pmid">28163164</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR12">
+        <label>12.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ahn</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Bishop</surname>
+              <given-names>JA</given-names>
+            </name>
+            <name>
+              <surname>Roden</surname>
+              <given-names>RBS</given-names>
+            </name>
+            <name>
+              <surname>Allen</surname>
+              <given-names>CT</given-names>
+            </name>
+            <name>
+              <surname>Best</surname>
+              <given-names>SRA</given-names>
+            </name>
+          </person-group>
+          <article-title>The PD-1 and PD-L1 pathway in recurrent respiratory papillomatosis</article-title>
+          <source>Laryngoscope.</source>
+          <year>2018</year>
+          <volume>128</volume>
+          <issue>1</issue>
+          <fpage>E27</fpage>
+          <lpage>E32</lpage>
+          <pub-id pub-id-type="doi">10.1002/lary.26847</pub-id>
+          <?supplied-pmid 28940446?>
+          <pub-id pub-id-type="pmid">28940446</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR13">
+        <label>13.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kaufman</surname>
+              <given-names>HL</given-names>
+            </name>
+            <name>
+              <surname>Russell</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Hamid</surname>
+              <given-names>O</given-names>
+            </name>
+            <name>
+              <surname>Bhatia</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Terheyden</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>D'Angelo</surname>
+              <given-names>SP</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Avelumab in patients with chemotherapy-refractory metastatic Merkel cell carcinoma: a multicentre, single-group, open-label, phase 2 trial</article-title>
+          <source>Lancet Oncol</source>
+          <year>2016</year>
+          <volume>17</volume>
+          <issue>10</issue>
+          <fpage>1374</fpage>
+          <lpage>1385</lpage>
+          <pub-id pub-id-type="doi">10.1016/S1470-2045(16)30364-3</pub-id>
+          <?supplied-pmid 27592805?>
+          <pub-id pub-id-type="pmid">27592805</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR14">
+        <label>14.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Patel</surname>
+              <given-names>MR</given-names>
+            </name>
+            <name>
+              <surname>Ellerton</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Infante</surname>
+              <given-names>JR</given-names>
+            </name>
+            <name>
+              <surname>Agrawal</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Gordon</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Aljumaily</surname>
+              <given-names>R</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Avelumab in metastatic urothelial carcinoma after platinum failure (JAVELIN solid tumor): pooled results from two expansion cohorts of an open-label, phase 1 trial</article-title>
+          <source>Lancet Oncol</source>
+          <year>2018</year>
+          <volume>19</volume>
+          <issue>1</issue>
+          <fpage>51</fpage>
+          <lpage>64</lpage>
+          <pub-id pub-id-type="doi">10.1016/S1470-2045(17)30900-2</pub-id>
+          <?supplied-pmid 29217288?>
+          <pub-id pub-id-type="pmid">29217288</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR15">
+        <label>15.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Derkay</surname>
+              <given-names>CS</given-names>
+            </name>
+            <name>
+              <surname>Malis</surname>
+              <given-names>DJ</given-names>
+            </name>
+            <name>
+              <surname>Zalzal</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Wiatrak</surname>
+              <given-names>BJ</given-names>
+            </name>
+            <name>
+              <surname>Kashima</surname>
+              <given-names>HK</given-names>
+            </name>
+            <name>
+              <surname>Coltrera</surname>
+              <given-names>MD</given-names>
+            </name>
+          </person-group>
+          <article-title>A staging system for assessing severity of disease and response to therapy in recurrent respiratory papillomatosis</article-title>
+          <source>Laryngoscope.</source>
+          <year>1998</year>
+          <volume>108</volume>
+          <issue>6</issue>
+          <fpage>935</fpage>
+          <lpage>937</lpage>
+          <pub-id pub-id-type="doi">10.1097/00005537-199806000-00026</pub-id>
+          <?supplied-pmid 9628513?>
+          <pub-id pub-id-type="pmid">9628513</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR16">
+        <label>16.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Rosen</surname>
+              <given-names>CA</given-names>
+            </name>
+            <name>
+              <surname>Lee</surname>
+              <given-names>AS</given-names>
+            </name>
+            <name>
+              <surname>Osborne</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Zullo</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Murry</surname>
+              <given-names>T</given-names>
+            </name>
+          </person-group>
+          <article-title>Development and validation of the voice handicap index-10</article-title>
+          <source>Laryngoscope.</source>
+          <year>2004</year>
+          <volume>114</volume>
+          <issue>9</issue>
+          <fpage>1549</fpage>
+          <lpage>1556</lpage>
+          <pub-id pub-id-type="doi">10.1097/00005537-200409000-00009</pub-id>
+          <?supplied-pmid 15475780?>
+          <pub-id pub-id-type="pmid">15475780</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR17">
+        <label>17.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Dudley</surname>
+              <given-names>ME</given-names>
+            </name>
+            <name>
+              <surname>Wunderlich</surname>
+              <given-names>JR</given-names>
+            </name>
+            <name>
+              <surname>Shelton</surname>
+              <given-names>TE</given-names>
+            </name>
+            <name>
+              <surname>Even</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Rosenberg</surname>
+              <given-names>SA</given-names>
+            </name>
+          </person-group>
+          <article-title>Generation of tumor-infiltrating lymphocyte cultures for use in adoptive transfer therapy for melanoma patients</article-title>
+          <source>J Immunother</source>
+          <year>2003</year>
+          <volume>26</volume>
+          <issue>4</issue>
+          <fpage>332</fpage>
+          <lpage>342</lpage>
+          <pub-id pub-id-type="doi">10.1097/00002371-200307000-00005</pub-id>
+          <?supplied-pmid 12843795?>
+          <pub-id pub-id-type="pmid">12843795</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR18">
+        <label>18.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ayers</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Lunceford</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Nebozhyn</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Murphy</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Loboda</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Kaufman</surname>
+              <given-names>DR</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>IFN-gamma-related mRNA profile predicts clinical response to PD-1 blockade</article-title>
+          <source>J Clin Invest</source>
+          <year>2017</year>
+          <volume>127</volume>
+          <issue>8</issue>
+          <fpage>2930</fpage>
+          <lpage>2940</lpage>
+          <pub-id pub-id-type="doi">10.1172/JCI91190</pub-id>
+          <?supplied-pmid 28650338?>
+          <pub-id pub-id-type="pmid">28650338</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR19">
+        <label>19.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>McMurray</surname>
+              <given-names>JS</given-names>
+            </name>
+            <name>
+              <surname>Connor</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Ford</surname>
+              <given-names>CN</given-names>
+            </name>
+          </person-group>
+          <article-title>Cidofovir efficacy in recurrent respiratory papillomatosis: a randomized, double-blind, placebo-controlled study</article-title>
+          <source>Ann Otol Rhinol Laryngol</source>
+          <year>2008</year>
+          <volume>117</volume>
+          <issue>7</issue>
+          <fpage>477</fpage>
+          <lpage>483</lpage>
+          <pub-id pub-id-type="doi">10.1177/000348940811700702</pub-id>
+          <?supplied-pmid 18700421?>
+          <pub-id pub-id-type="pmid">18700421</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR20">
+        <label>20.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Gulley</surname>
+              <given-names>JL</given-names>
+            </name>
+            <name>
+              <surname>Rajan</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Spigel</surname>
+              <given-names>DR</given-names>
+            </name>
+            <name>
+              <surname>Iannotti</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Chandler</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Wong</surname>
+              <given-names>DJL</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Avelumab for patients with previously treated metastatic or recurrent non-small-cell lung cancer (JAVELIN solid tumor): dose-expansion cohort of a multicentre, open-label, phase 1b trial</article-title>
+          <source>Lancet Oncol.</source>
+          <year>2017</year>
+          <volume>18</volume>
+          <issue>5</issue>
+          <fpage>599</fpage>
+          <lpage>610</lpage>
+          <pub-id pub-id-type="doi">10.1016/S1470-2045(17)30240-1</pub-id>
+          <?supplied-pmid 28373005?>
+          <pub-id pub-id-type="pmid">28373005</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR21">
+        <label>21.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Topalian</surname>
+              <given-names>SL</given-names>
+            </name>
+            <name>
+              <surname>Sznol</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>McDermott</surname>
+              <given-names>DF</given-names>
+            </name>
+            <name>
+              <surname>Kluger</surname>
+              <given-names>HM</given-names>
+            </name>
+            <name>
+              <surname>Carvajal</surname>
+              <given-names>RD</given-names>
+            </name>
+            <name>
+              <surname>Sharfman</surname>
+              <given-names>WH</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Survival, durable tumor remission, and long-term safety in patients with advanced melanoma receiving nivolumab</article-title>
+          <source>J Clin Oncol</source>
+          <year>2014</year>
+          <volume>32</volume>
+          <issue>10</issue>
+          <fpage>1020</fpage>
+          <lpage>1030</lpage>
+          <pub-id pub-id-type="doi">10.1200/JCO.2013.53.0105</pub-id>
+          <?supplied-pmid 24590637?>
+          <pub-id pub-id-type="pmid">24590637</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR22">
+        <label>22.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Weber</surname>
+              <given-names>JS</given-names>
+            </name>
+            <name>
+              <surname>Hodi</surname>
+              <given-names>FS</given-names>
+            </name>
+            <name>
+              <surname>Wolchok</surname>
+              <given-names>JD</given-names>
+            </name>
+            <name>
+              <surname>Topalian</surname>
+              <given-names>SL</given-names>
+            </name>
+            <name>
+              <surname>Schadendorf</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Larkin</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Safety profile of Nivolumab monotherapy: a pooled analysis of patients with advanced melanoma</article-title>
+          <source>J Clin Oncol</source>
+          <year>2017</year>
+          <volume>35</volume>
+          <issue>7</issue>
+          <fpage>785</fpage>
+          <lpage>792</lpage>
+          <pub-id pub-id-type="doi">10.1200/JCO.2015.66.1389</pub-id>
+          <?supplied-pmid 28068177?>
+          <pub-id pub-id-type="pmid">28068177</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR23">
+        <label>23.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Wiatrak</surname>
+              <given-names>BJ</given-names>
+            </name>
+            <name>
+              <surname>Wiatrak</surname>
+              <given-names>DW</given-names>
+            </name>
+            <name>
+              <surname>Broker</surname>
+              <given-names>TR</given-names>
+            </name>
+            <name>
+              <surname>Lewis</surname>
+              <given-names>L</given-names>
+            </name>
+          </person-group>
+          <article-title>Recurrent respiratory papillomatosis: a longitudinal study comparing severity associated with human papilloma viral types 6 and 11 and other risk factors in a large pediatric population</article-title>
+          <source>Laryngoscope.</source>
+          <year>2004</year>
+          <volume>114</volume>
+          <issue>11 Pt 2 Suppl 104</issue>
+          <fpage>1</fpage>
+          <lpage>23</lpage>
+          <pub-id pub-id-type="doi">10.1097/01.mlg.000148224.83491.0f</pub-id>
+          <?supplied-pmid 15514560?>
+          <pub-id pub-id-type="pmid">15514560</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR24">
+        <label>24.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>De Marco</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Gillio-Tos</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Bonello</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Ghisetti</surname>
+              <given-names>V</given-names>
+            </name>
+            <name>
+              <surname>Ronco</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Merletti</surname>
+              <given-names>F</given-names>
+            </name>
+          </person-group>
+          <article-title>Detection of human papillomavirus type 16 integration in pre-neoplastic cervical lesions and confirmation by DIPS-PCR and sequencing</article-title>
+          <source>J Clin Virol</source>
+          <year>2007</year>
+          <volume>38</volume>
+          <issue>1</issue>
+          <fpage>7</fpage>
+          <lpage>13</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.jcv.2006.09.008</pub-id>
+          <?supplied-pmid 17070101?>
+          <pub-id pub-id-type="pmid">17070101</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR25">
+        <label>25.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Reidy</surname>
+              <given-names>PM</given-names>
+            </name>
+            <name>
+              <surname>Dedo</surname>
+              <given-names>HH</given-names>
+            </name>
+            <name>
+              <surname>Rabah</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Field</surname>
+              <given-names>JB</given-names>
+            </name>
+            <name>
+              <surname>Mathog</surname>
+              <given-names>RH</given-names>
+            </name>
+            <name>
+              <surname>Gregoire</surname>
+              <given-names>L</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Integration of human papillomavirus type 11 in recurrent respiratory papilloma-associated cancer</article-title>
+          <source>Laryngoscope</source>
+          <year>2004</year>
+          <volume>114</volume>
+          <issue>11</issue>
+          <fpage>1906</fpage>
+          <lpage>1909</lpage>
+          <pub-id pub-id-type="doi">10.1097/01.mlg.0000147918.81733.49</pub-id>
+          <?supplied-pmid 15510012?>
+          <pub-id pub-id-type="pmid">15510012</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR26">
+        <label>26.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Huebbers</surname>
+              <given-names>CU</given-names>
+            </name>
+            <name>
+              <surname>Preuss</surname>
+              <given-names>SF</given-names>
+            </name>
+            <name>
+              <surname>Kolligs</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Vent</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Stenner</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Wieland</surname>
+              <given-names>U</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Integration of HPV6 and downregulation of AKR1C3 expression mark malignant transformation in a patient with juvenile-onset laryngeal papillomatosis</article-title>
+          <source>PLoS One</source>
+          <year>2013</year>
+          <volume>8</volume>
+          <issue>2</issue>
+          <fpage>e57207</fpage>
+          <pub-id pub-id-type="doi">10.1371/journal.pone.0057207</pub-id>
+          <?supplied-pmid 23437342?>
+          <pub-id pub-id-type="pmid">23437342</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR27">
+        <label>27.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hinrichs</surname>
+              <given-names>CS</given-names>
+            </name>
+            <name>
+              <surname>Rosenberg</surname>
+              <given-names>SA</given-names>
+            </name>
+          </person-group>
+          <article-title>Exploiting the curative potential of adoptive T-cell therapy for cancer</article-title>
+          <source>Immunol Rev</source>
+          <year>2014</year>
+          <volume>257</volume>
+          <issue>1</issue>
+          <fpage>56</fpage>
+          <lpage>71</lpage>
+          <pub-id pub-id-type="doi">10.1111/imr.12132</pub-id>
+          <?supplied-pmid 24329789?>
+          <pub-id pub-id-type="pmid">24329789</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR28">
+        <label>28.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Stevanovic</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Pasetto</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Helman</surname>
+              <given-names>SR</given-names>
+            </name>
+            <name>
+              <surname>Gartner</surname>
+              <given-names>JJ</given-names>
+            </name>
+            <name>
+              <surname>Prickett</surname>
+              <given-names>TD</given-names>
+            </name>
+            <name>
+              <surname>Howie</surname>
+              <given-names>B</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Landscape of immunogenic tumor antigens in successful immunotherapy of virally induced epithelial cancer</article-title>
+          <source>Science.</source>
+          <year>2017</year>
+          <volume>356</volume>
+          <issue>6334</issue>
+          <fpage>200</fpage>
+          <lpage>205</lpage>
+          <pub-id pub-id-type="doi">10.1126/science.aak9510</pub-id>
+          <?supplied-pmid 28408606?>
+          <pub-id pub-id-type="pmid">28408606</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR29">
+        <label>29.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Tumeh</surname>
+              <given-names>PC</given-names>
+            </name>
+            <name>
+              <surname>Harview</surname>
+              <given-names>CL</given-names>
+            </name>
+            <name>
+              <surname>Yearley</surname>
+              <given-names>JH</given-names>
+            </name>
+            <name>
+              <surname>Shintaku</surname>
+              <given-names>IP</given-names>
+            </name>
+            <name>
+              <surname>Taylor</surname>
+              <given-names>EJ</given-names>
+            </name>
+            <name>
+              <surname>Robert</surname>
+              <given-names>L</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>PD-1 blockade induces responses by inhibiting adaptive immune resistance</article-title>
+          <source>Nature.</source>
+          <year>2014</year>
+          <volume>515</volume>
+          <issue>7528</issue>
+          <fpage>568</fpage>
+          <lpage>571</lpage>
+          <pub-id pub-id-type="doi">10.1038/nature13954</pub-id>
+          <?supplied-pmid 25428505?>
+          <pub-id pub-id-type="pmid">25428505</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR30">
+        <label>30.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Bonagura</surname>
+              <given-names>VR</given-names>
+            </name>
+            <name>
+              <surname>Hatam</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>DeVoti</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Zeng</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Steinberg</surname>
+              <given-names>BM</given-names>
+            </name>
+          </person-group>
+          <article-title>Recurrent respiratory papillomatosis: altered CD8(+) T-cell subsets and T(H)1/T(H)2 cytokine imbalance</article-title>
+          <source>Clin Immunol</source>
+          <year>1999</year>
+          <volume>93</volume>
+          <issue>3</issue>
+          <fpage>302</fpage>
+          <lpage>311</lpage>
+          <pub-id pub-id-type="doi">10.1006/clim.1999.4784</pub-id>
+          <?supplied-pmid 10600342?>
+          <pub-id pub-id-type="pmid">10600342</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR31">
+        <label>31.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Bonagura</surname>
+              <given-names>VR</given-names>
+            </name>
+            <name>
+              <surname>Hatam</surname>
+              <given-names>LJ</given-names>
+            </name>
+            <name>
+              <surname>Rosenthal</surname>
+              <given-names>DW</given-names>
+            </name>
+            <name>
+              <surname>de Voti</surname>
+              <given-names>JA</given-names>
+            </name>
+            <name>
+              <surname>Lam</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Steinberg</surname>
+              <given-names>BM</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Recurrent respiratory papillomatosis: a complex defect in immune responsiveness to human papillomavirus-6 and -11</article-title>
+          <source>APMIS.</source>
+          <year>2010</year>
+          <volume>118</volume>
+          <issue>6–7</issue>
+          <fpage>455</fpage>
+          <lpage>470</lpage>
+          <pub-id pub-id-type="doi">10.1111/j.1600-0463.2010.02617.x</pub-id>
+          <?supplied-pmid 20553528?>
+          <pub-id pub-id-type="pmid">20553528</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR32">
+        <label>32.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Vambutas</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Bonagura</surname>
+              <given-names>VR</given-names>
+            </name>
+            <name>
+              <surname>Steinberg</surname>
+              <given-names>BM</given-names>
+            </name>
+          </person-group>
+          <article-title>Altered expression of TAP-1 and major histocompatibility complex class I in laryngeal papillomatosis: correlation of TAP-1 with disease</article-title>
+          <source>Clin Diagn Lab Immunol</source>
+          <year>2000</year>
+          <volume>7</volume>
+          <issue>1</issue>
+          <fpage>79</fpage>
+          <lpage>85</lpage>
+          <?supplied-pmid 10618282?>
+          <pub-id pub-id-type="pmid">10618282</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR33">
+        <label>33.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hatam</surname>
+              <given-names>LJ</given-names>
+            </name>
+            <name>
+              <surname>Devoti</surname>
+              <given-names>JA</given-names>
+            </name>
+            <name>
+              <surname>Rosenthal</surname>
+              <given-names>DW</given-names>
+            </name>
+            <name>
+              <surname>Lam</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Abramson</surname>
+              <given-names>AL</given-names>
+            </name>
+            <name>
+              <surname>Steinberg</surname>
+              <given-names>BM</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Immune suppression in premalignant respiratory papillomas: enriched functional CD4+Foxp3+ regulatory T cells and PD-1/PD-L1/L2 expression</article-title>
+          <source>Clin Cancer Res</source>
+          <year>2012</year>
+          <volume>18</volume>
+          <issue>7</issue>
+          <fpage>1925</fpage>
+          <lpage>1935</lpage>
+          <pub-id pub-id-type="doi">10.1158/1078-0432.CCR-11-2941</pub-id>
+          <?supplied-pmid 22322668?>
+          <pub-id pub-id-type="pmid">22322668</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR34">
+        <label>34.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Levovitz</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Ivansson</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Gyllensten</surname>
+              <given-names>U</given-names>
+            </name>
+            <name>
+              <surname>Finnigan</surname>
+              <given-names>JP</given-names>
+            </name>
+            <name>
+              <surname>Alshawish</surname>
+              <given-names>S</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>TGFbeta receptor 1: an immune susceptibility gene in HPV-associated cancer</article-title>
+          <source>Cancer Res</source>
+          <year>2014</year>
+          <volume>74</volume>
+          <issue>23</issue>
+          <fpage>6833</fpage>
+          <lpage>6844</lpage>
+          <pub-id pub-id-type="doi">10.1158/0008-5472.CAN-14-0602-T</pub-id>
+          <?supplied-pmid 25273091?>
+          <pub-id pub-id-type="pmid">25273091</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR35">
+        <label>35.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Massague</surname>
+              <given-names>J</given-names>
+            </name>
+          </person-group>
+          <article-title>TGFbeta in cancer</article-title>
+          <source>Cell.</source>
+          <year>2008</year>
+          <volume>134</volume>
+          <issue>2</issue>
+          <fpage>215</fpage>
+          <lpage>230</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.cell.2008.07.001</pub-id>
+          <?supplied-pmid 18662538?>
+          <pub-id pub-id-type="pmid">18662538</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR36">
+        <label>36.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Gabrilovich</surname>
+              <given-names>DI</given-names>
+            </name>
+            <name>
+              <surname>Nagaraj</surname>
+              <given-names>S</given-names>
+            </name>
+          </person-group>
+          <article-title>Myeloid-derived suppressor cells as regulators of the immune system</article-title>
+          <source>Nat Rev Immunol</source>
+          <year>2009</year>
+          <volume>9</volume>
+          <issue>3</issue>
+          <fpage>162</fpage>
+          <lpage>174</lpage>
+          <pub-id pub-id-type="doi">10.1038/nri2506</pub-id>
+          <?supplied-pmid 2828349?>
+          <pub-id pub-id-type="pmid">19197294</pub-id>
+        </element-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

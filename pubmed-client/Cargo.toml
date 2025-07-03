@@ -51,66 +51,66 @@ wiremock = "0.6"
 # Comprehensive test suites
 [[test]]
 name = "comprehensive_pmc_tests"
-path = "../tests/integration/comprehensive_pmc_tests.rs"
+path = "tests/integration/comprehensive_pmc_tests.rs"
 
 [[test]]
 name = "comprehensive_pubmed_tests"
-path = "../tests/integration/comprehensive_pubmed_tests.rs"
+path = "tests/integration/comprehensive_pubmed_tests.rs"
 
 [[test]]
 name = "comprehensive_einfo_tests"
-path = "../tests/integration/comprehensive_einfo_tests.rs"
+path = "tests/integration/comprehensive_einfo_tests.rs"
 
 [[test]]
 name = "comprehensive_elink_tests"
-path = "../tests/integration/comprehensive_elink_tests.rs"
+path = "tests/integration/comprehensive_elink_tests.rs"
 
 # Feature-specific tests
 [[test]]
 name = "markdown_tests"
-path = "../tests/integration/markdown_tests.rs"
+path = "tests/integration/markdown_tests.rs"
 
 [[test]]
 name = "pmc_xml_tests"
-path = "../tests/integration/pmc_xml_tests.rs"
+path = "tests/integration/pmc_xml_tests.rs"
 
 [[test]]
 name = "test_abstract_parsing"
-path = "../tests/integration/test_abstract_parsing.rs"
+path = "tests/integration/test_abstract_parsing.rs"
 
 [[test]]
 name = "test_einfo_integration"
-path = "../tests/integration/test_einfo_integration.rs"
+path = "tests/integration/test_einfo_integration.rs"
 
 [[test]]
 name = "test_elink_integration"
-path = "../tests/integration/test_elink_integration.rs"
+path = "tests/integration/test_elink_integration.rs"
 
 [[test]]
 name = "test_integration_abstract"
-path = "../tests/integration/test_integration_abstract.rs"
+path = "tests/integration/test_integration_abstract.rs"
 
 [[test]]
 name = "test_mesh_integration"
-path = "../tests/integration/test_mesh_integration.rs"
+path = "tests/integration/test_mesh_integration.rs"
 
 [[test]]
 name = "test_rate_limiting_mocked"
-path = "../tests/integration/test_rate_limiting_mocked.rs"
+path = "tests/integration/test_rate_limiting_mocked.rs"
 
 # Real API tests (opt-in)
 [[test]]
 name = "test_real_api_rate_limiting"
-path = "../tests/integration/test_real_api_rate_limiting.rs"
+path = "tests/integration/test_real_api_rate_limiting.rs"
 
 [[test]]
 name = "pubmed_api_tests"
-path = "../tests/integration/pubmed_api_tests.rs"
+path = "tests/integration/pubmed_api_tests.rs"
 
 [[test]]
 name = "pmc_api_tests"
-path = "../tests/integration/pmc_api_tests.rs"
+path = "tests/integration/pmc_api_tests.rs"
 
 [[test]]
 name = "error_handling_tests"
-path = "../tests/integration/error_handling_tests.rs"
+path = "tests/integration/error_handling_tests.rs"

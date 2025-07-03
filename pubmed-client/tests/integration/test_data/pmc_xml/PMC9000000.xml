@@ -1,0 +1,1393 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:09:14Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:9000000" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:9000000</identifier><datestamp>2022-04-12</datestamp><setSpec>phenaturepg</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" article-type="research-article" dtd-version="1.3">
+  <processing-meta base-tagset="archiving" mathml-version="3.0" table-model="xhtml" tagset-family="jats">
+    <restricted-by>pmc</restricted-by>
+  </processing-meta>
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">Multimed Tools Appl</journal-id>
+      <journal-id journal-id-type="iso-abbrev">Multimed Tools Appl</journal-id>
+      <journal-title-group>
+        <journal-title>Multimedia Tools and Applications</journal-title>
+      </journal-title-group>
+      <issn pub-type="ppub">1380-7501</issn>
+      <issn pub-type="epub">1573-7721</issn>
+      <publisher>
+        <publisher-name>Springer US</publisher-name>
+        <publisher-loc>New York</publisher-loc>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC9000000</article-id>
+      <article-id pub-id-type="pmcid">PMC9000000</article-id>
+      <article-id pub-id-type="pmc-uid">9000000</article-id>
+      <article-id pub-id-type="pmid">35431608</article-id>
+      <article-id pub-id-type="pmid">35431608</article-id>
+      <article-id pub-id-type="publisher-id">12315</article-id>
+      <article-id pub-id-type="doi">10.1007/s11042-022-12315-2</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>1215: Multimodal Interaction and IoT Applications</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>A novel multi-modal depression detection approach based on mobile crowd sensing and task-based mechanisms</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author" corresp="yes">
+          <contrib-id contrib-id-type="orcid">http://orcid.org/0000-0002-8366-5491</contrib-id>
+          <name>
+            <surname>Thati</surname>
+            <given-names>Ravi Prasad</given-names>
+          </name>
+          <address>
+            <email>thati.raviprasad@gmail.com</email>
+          </address>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Dhadwal</surname>
+            <given-names>Abhishek Singh</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Kumar</surname>
+            <given-names>Praveen</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>P</surname>
+            <given-names>Sainaba</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <aff id="Aff1"><label>1</label><institution-wrap><institution-id institution-id-type="GRID">grid.433837.8</institution-id><institution-id institution-id-type="ISNI">0000 0001 2301 2002</institution-id><institution>Department of Computer Science and Engineering, </institution><institution>Visvesvaraya National Institute of Technology, </institution></institution-wrap>South Ambazari Road, Nagpur, 440010 Maharashtra India </aff>
+        <aff id="Aff2"><label>2</label><institution-wrap><institution-id institution-id-type="GRID">grid.448768.1</institution-id><institution-id institution-id-type="ISNI">0000 0004 1772 7660</institution-id><institution>Department of Applied Psychology, </institution><institution>Central University of Tamil Nadu, </institution></institution-wrap>Tamilnadu, India </aff>
+      </contrib-group>
+      <pub-date pub-type="epub">
+        <day>11</day>
+        <month>4</month>
+        <year>2022</year>
+      </pub-date>
+      <pub-date pub-type="ppub">
+        <year>2023</year>
+      </pub-date>
+      <volume>82</volume>
+      <issue>4</issue>
+      <fpage>4787</fpage>
+      <lpage>4820</lpage>
+      <history>
+        <date date-type="received">
+          <day>31</day>
+          <month>3</month>
+          <year>2021</year>
+        </date>
+        <date date-type="rev-recd">
+          <day>20</day>
+          <month>9</month>
+          <year>2021</year>
+        </date>
+        <date date-type="accepted">
+          <day>17</day>
+          <month>1</month>
+          <year>2022</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-statement>© The Author(s), under exclusive licence to Springer Science+Business Media, LLC, part of Springer Nature 2022</copyright-statement>
+        <license>
+          <license-p>This article is made available via the PMC Open Access Subset for unrestricted research re-use and secondary analysis in any form or by any means with acknowledgement of the original source. These permissions are granted for the duration of the World Health Organization (WHO) declaration of COVID-19 as a global pandemic.</license-p>
+        </license>
+      </permissions>
+      <abstract id="Abs1">
+        <p id="Par1">Depression has become a global concern, and COVID-19 also has caused a big surge in its incidence. Broadly, there are two primary methods of detecting depression: Task-based and Mobile Crowd Sensing (MCS) based methods. These two approaches, when integrated, can complement each other. This paper proposes a novel approach for depression detection that combines real-time MCS and task-based mechanisms. We aim to design an end-to-end machine learning pipeline, which involves multimodal data collection, feature extraction, feature selection, fusion, and classification to distinguish between depressed and non-depressed subjects. For this purpose, we created a real-world dataset of depressed and non-depressed subjects. We experimented with: various features from multi-modalities, feature selection techniques, fused features, and machine learning classifiers such as Logistic Regression, Support Vector Machines (SVM), etc. for classification. Our findings suggest that combining features from multiple modalities perform better than any single data modality, and the best classification accuracy is achieved when features from all three data modalities are fused. Feature selection method based on Pearson’s correlation coefficients improved the accuracy in comparison with other methods. Also, SVM yielded the best accuracy of 86%. Our proposed approach was also applied on benchmarking dataset, and results demonstrated that the multimodal approach is advantageous in performance with state-of-the-art depression recognition techniques.</p>
+      </abstract>
+      <kwd-group xml:lang="en">
+        <title>Keywords</title>
+        <kwd>Depression detection</kwd>
+        <kwd>Multi-modal</kwd>
+        <kwd>Mobile crowd sensing</kwd>
+        <kwd>Emotion elicitation</kwd>
+        <kwd>Speech elicitation</kwd>
+        <kwd>Machine learning</kwd>
+      </kwd-group>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>issue-copyright-statement</meta-name>
+          <meta-value>© Springer Science+Business Media, LLC, part of Springer Nature 2023</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="Sec1">
+      <title>Introduction</title>
+      <p id="Par2">Depression has been a worldwide concern for a long time and continues to plague the global health agenda. According to the World Health Organization (WHO), more than 350 million individuals are estimated to suffer from depression. It is equivalent to 4.4% of the world’s population. Depression is forecasted to become the world’s leading health concern by the year 2030 [<xref ref-type="bibr" rid="CR43">43</xref>]. COVID-19 has forced people throughout the world to stay indoors and minimize social interactions, Thus exacerbating the depression situation [<xref ref-type="bibr" rid="CR32">32</xref>]. During the pandemic, the prevalence of depression in the general population is estimated to be 33%. COVID-19 not only impacts physical health concerns but also results in several mental illnesses. However, early diagnosis followed by appropriate treatment has proven to be successful in reducing its impact. Therefore, methods and tools for monitoring mental health are an immediate requirement [<xref ref-type="bibr" rid="CR53">53</xref>].</p>
+      <p id="Par3">Traditional methodologies rely on self-report or clinician consultation for spotting mental illness of an individual. Self-report has known limitations like inadvertence while filling up questionnaires and may be deemed unreliable. Clinician consultation depends on the physician’s expertise, patient’s budget, doctor’s availability, and various other parameters. Hence, auxiliary methodologies for detection of psychological ailments are essential and have drawn the attention of researchers to assist in early diagnosis of depression [<xref ref-type="bibr" rid="CR26">26</xref>].</p>
+      <p id="Par4">Several non-traditional strategies exist for depression detection. Ideally, all the indicators that a clinician utilizes could be modelled into machine learning(ML) algorithms to diagnose depression [<xref ref-type="bibr" rid="CR38">38</xref>]. The majority of the approaches rely on various characteristics like visual manifestations, acoustic and linguistic communication, smartphone usage activities, social media content, physiological cues, etc. [<xref ref-type="bibr" rid="CR14">14</xref>, <xref ref-type="bibr" rid="CR21">21</xref>, <xref ref-type="bibr" rid="CR24">24</xref>, <xref ref-type="bibr" rid="CR34">34</xref>, <xref ref-type="bibr" rid="CR45">45</xref>, <xref ref-type="bibr" rid="CR47">47</xref>, <xref ref-type="bibr" rid="CR48">48</xref>, <xref ref-type="bibr" rid="CR56">56</xref>]. Few approaches combine different modalities like visual with speech [<xref ref-type="bibr" rid="CR38">38</xref>, <xref ref-type="bibr" rid="CR42">42</xref>].</p>
+      <p id="Par5">Combining different modalities is not trivial as each modality behaves differently. For example, each modality source is in a different form (images in visual domain, and text in social media content). From the available literature in the field, it is evident that integrating the modalities provides promising results [<xref ref-type="bibr" rid="CR4">4</xref>, <xref ref-type="bibr" rid="CR42">42</xref>, <xref ref-type="bibr" rid="CR46">46</xref>].</p>
+      <p id="Par6">Collaborative efforts of researchers across various fields are involved in depression detection. Each subfield has different data sources with slightly different goals. Broadly, the majority of the data collection is based on Task/interview-based and mobile crowd sensing-based procedures. Many Task/interview-based depression detection methods consider only in-situ representations such as facial cues, pitch of the voice, etc. Several mobile crowd sensing based depression detection methods take into real-time (days/nights) markers from smartphones like location information, accelerometer, etc. These approaches are inadequate to address the problem completely as Task-based approaches lack historical context. In contrast, mobile crowd sensing-based approaches ignore non-verbal and verbal indicators that clinician primarily rely on. Thus, a methodology that addresses these limitations by combining these approaches is the need of the hour.</p>
+      <p id="Par7">With the advent of technology, smart phone has truly become an essential service for an individual in today’s world. Mobile Crowd Sensing(MCS) refers to a wide range of methods using mobile devices capable of sensing and computing, in which people share data and derive information to quantify and record behaviours of mutual interest. MCS is a key building block for evolving Internet of Things (IoT) applications [<xref ref-type="bibr" rid="CR36">36</xref>]. The main advantage of MCS is that data can be collected without much user intervention. In the present study, MCS focuses on quantifying the history of the exhibition of symptoms (such as decreased levels of physical activity, lesser social interactions, reduced mobility, etc.) over a period of time. We rely on the smart phone usage records collected for a specific duration of two weeks to analyse individuals’ behavioural patterns.</p>
+      <p id="Par8">This work presents experiments by integrating smart phone usage patterns with task-based experimental modalities. Smart phone usage patterns were utilized to present historical information of symptom exhibition. Task-based experiments called emotion elicitation (triggering emotions to activate visual manifestations by showing pictures/video clips) and speech elicitation (triggering auditory responses by reading a predefined paragraph/open form of speech) were conducted to observe and study the momentary representations. The following are the main highlights/contributions of this work:
+<list list-type="bullet"><list-item><p id="Par9">To the best of our knowledge, this could be the first approach to integrate real-time smartphone usage patterns with the task-based modality for diagnosing depression.</p></list-item><list-item><p id="Par10">Creation of a novel tri-modality dataset with two weeks of smartphone usage data, visual and auditory cues of the participants.</p></list-item><list-item><p id="Par11">Designing an end-to-end machine learning pipeline, which involves multimodal data collection, feature extraction, feature selection, fusion, and classification to distinguish between depressed and non-depressed subjects.</p></list-item><list-item><p id="Par12">Extensive experimentation done using: various individual feature vectors from multi-modalities, features selection techniques, fused features, and machine learning classifiers such as Logistic Regression, Decision Tree(DT), Naive Bayes(NB), Random Forest(RF), Support Vector Machines (SVM), etc., for classification.</p></list-item><list-item><p id="Par13">Our findings demonstrate that the combination of statistical feature vectors from multimodal cues gave promising results compared to unimodal feature vectors, not only on our dataset but also on a benchmark open-source dataset.</p></list-item></list></p>
+      <p id="Par14">The rest of the paper is organized as follows. Section II contains the details of related work, covering the existing works on various depression detection techniques. Section III presents the proposed approach. Section IV presents our findings and results in the results section. Section V presents the conclusion. Finally, Section VI presents limitations of the proposed approach and future works in the same field.</p>
+    </sec>
+    <sec id="Sec2">
+      <title>Related work</title>
+      <p id="Par15">According to American Psychiatric Association, which has released the Diagnostic and Statistical Manual of Mental disorders-V (DSM-V), depression is a common mental disorder that involves a continuous sense of sorrow and/or distinct lack of interest. In addition to these, four or more following symptoms are present: weight loss or gain, sleep difficulties, i.e., insomnia or hypersomnia, psychomotor retardation, fatigue or loss of energy, diminished ability to think or concentrate, feelings of worthlessness or excessive guilt, and suicidal thoughts. Depression results in clinically notable changes in cognition, emotion regulation, or behavior that reflect the individual’s psychological, biological, or developmental process, resulting in socially deviant behaviour. This condition persist for a minimum duration of two weeks [<xref ref-type="bibr" rid="CR5">5</xref>].</p>
+      <p id="Par16">Assessments are done through clinical consultations and questionnaire-based standard self-reports. Clinical consultations are conducted by psychiatrists, psychologists, experienced counsellors, etc. Table <xref rid="Tab1" ref-type="table">1</xref> gives details about a few standard self-reports. It usually takes 10 to 20 minutes to complete the questionnaire. Self-reports contain questions that are to be rated by an individual for the severity of their symptoms over a specific period of time. Each question records the response with 0 (not at all), 1(several days), 2(more than half the days), and 3(nearly every day). A score is formed by summing up all the responses. This score is used to diagnose depression and classifying the severity of the depression into different categories: mild, severe, etc.
+<table-wrap id="Tab1"><label>Table 1</label><caption><p>Few standard self-reports</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">Self-Report</th><th align="left">No. of</th><th align="left">Sample contents</th><th align="left">Categories of depression</th></tr><tr><th align="left">Questionnaire</th><th align="left">questions</th><th align="left">of the Questionnaires</th><th align="left"/></tr></thead><tbody><tr><td align="left">Patient Health</td><td align="left">9</td><td align="left">Sleep difficulties, excessive</td><td align="left">Mild, moderate, moderately</td></tr><tr><td align="left">Questionnaire(PHQ-9) [<xref ref-type="bibr" rid="CR30">30</xref>]</td><td align="left"/><td align="left">guilt, fatigue, suicidal ideation</td><td align="left">severe, and severe</td></tr><tr><td align="left">Beck Depression</td><td align="left">21</td><td align="left">Mood, self-hate, social</td><td align="left">minimal, mild, moderate, and</td></tr><tr><td align="left">Inventory(BDI-II) [<xref ref-type="bibr" rid="CR8">8</xref>]</td><td align="left"/><td align="left">withdrawal, fatigability</td><td align="left">severe depression</td></tr><tr><td align="left">Hamilton Rating Scale</td><td align="left">17</td><td align="left">Loss of interest, agitation,</td><td align="left">Normal, mild, moderate, and</td></tr><tr><td align="left">for Depression(HRS-D) [<xref ref-type="bibr" rid="CR10">10</xref>]</td><td align="left"/><td align="left">mood, loss of weight</td><td align="left">severe depression</td></tr><tr><td align="left">Quick Inventory of Depressive</td><td align="left">16</td><td align="left">oncentration, suicidal ideation,</td><td align="left">Normal, mild, moderate, and</td></tr><tr><td align="left">Symptomatology (QIDS) [<xref ref-type="bibr" rid="CR51">51</xref>]</td><td align="left"/><td align="left">sleep disturbance, self-criticism</td><td align="left">severe depression</td></tr></tbody></table></table-wrap></p>
+      <p id="Par17">The following sub-sections briefly give an overview of the different works found in the field of depression diagnosis through facial, verbal, smart phone usage metadata, and multimodal cues. In every approach, the goals and various aspects such as the data collection process, data sources are different. Irrespective of these differences, each approach aims to explore innovative solutions that can assist in depression detection.</p>
+      <sec id="Sec3">
+        <title>Depression detection through smart phone usage indicators</title>
+        <p id="Par18">Some works on mobile crowd sensing have attempted to provide depression detection methods for the following reasons: First, most smartphones are equipped with multiple sensors that can continuously gather information about the users. This data can be monitored to understand behavioural patterns in real-time. Second, smartphones are unobtrusive, prevalent, and capable of data transmission to remote servers without requiring direct user interaction. Third, passive sensing applications that can run in the phone background to capture usage information and store it locally/server can be designed. Few are readily available, like SensusMobile [<xref ref-type="bibr" rid="CR61">61</xref>], Funf journal application <xref ref-type="fn" rid="Fn1">1</xref>, etc. Fourth, smartphone-captured behavioral variations can be used as discriminative features for depression assessment. For e.g., people with depression are more likely to sleep lesser time than non-depressed people. This behavior pattern can be collected via brightness/light sensors present in the smartphone [<xref ref-type="bibr" rid="CR41">41</xref>].</p>
+        <p id="Par20">During a longitudinal study carried out by Masud et al. [<xref ref-type="bibr" rid="CR37">37</xref>] in daily real-life scenarios, Inbuilt phone sensors such as the acceleration and Global Positioning System (GPS) sensor were used to classify physical activities and location movement patterns, respectively. Using a wrapper feature selection method, a subset of features were selected. Depression score was estimated using a linear regression model. SVM classifier was used to distinguish individual depression severity levels (absence, mild, extreme), with an accuracy of 87.2%.</p>
+        <p id="Par21">Fukazawa et al. [<xref ref-type="bibr" rid="CR20">20</xref>] collected raw sensor data from mobile phone, such as brightness, acceleration, rotation/orientation, and application usage. The author used them to form higher-level feature vectors. The fusions of these feature vectors were able to predict the stress levels among the participants. The results demonstrate that the combined features extracted from smartphone log data can be used to predict stress levels.</p>
+        <p id="Par22">De Vos et al. [<xref ref-type="bibr" rid="CR15">15</xref>] passively recorded geographical location data among healthy and depressed groups. From their results, it is evident that a strong correlation exists between geographical movements and depressed people.</p>
+      </sec>
+      <sec id="Sec4">
+        <title>Depression detection through facial indicators</title>
+        <p id="Par23">Facial markers are extensively considered in depression diagnosis due to the following reasons: First, depressed individuals tend to have anomalous facial manifestations for e.g., fewer smiles, more frequent lip presses, prolonged activity on the corrugator muscle, sad/negative/neutral expression occurrence, fast/slow eye blinks, etc. Second, capturing visuals by web cameras has become effortless. Third, Several tools are now available to extract visual features, e.g., The Computer Expression Recognition Toolbox [<xref ref-type="bibr" rid="CR35">35</xref>], OPENFACE [<xref ref-type="bibr" rid="CR6">6</xref>], imotions<xref ref-type="fn" rid="Fn2">2</xref> etc.</p>
+        <p id="Par25">Wang et al. [<xref ref-type="bibr" rid="CR58">58</xref>] have examined the facial cue changes between depressed and normal subjects in the same situation (while displaying positive, neutral, and negative pictures). To measure the facial cue changes on the face, they used person-specific active appearance model [<xref ref-type="bibr" rid="CR11">11</xref>] to detect 68 point landmarks. Statistical features are extracted from distances between feature points of eyes, eyebrows, corners of the mouth to feed the SVM classifier. The classifier achieved 78% test accuracy.</p>
+        <p id="Par26">Girard et al. [<xref ref-type="bibr" rid="CR22">22</xref>] have studied the relationship between facial manifestations and how the severity of depression symptoms changes over time. During a clinical interview of a longitudinal study, they measured Action Unit’s (AU) by Facial Action Coding System(FACS) [<xref ref-type="bibr" rid="CR17">17</xref>, <xref ref-type="bibr" rid="CR18">18</xref>] between Low/High Symptom states. FACS has become the standard for muscle movements in the face. Each subtle muscle movement exhibited on the face is represented as AU. They found that AU 12 (Lip Corner Puller) is lower while AU 14 (Dimpler) is higher in a severe depressive state.</p>
+        <p id="Par27">Alghowinem et al. [<xref ref-type="bibr" rid="CR2">2</xref>] have observed that the eyelids’ average distance (when opened) and duration of blinks vary between depressed and normal subjects. The findings conclude that depressed subjects tend to have a smaller average distance of the eyelids and duration of blink is higher than normal subjects. Alghowinem et al. [<xref ref-type="bibr" rid="CR3">3</xref>] have also observed that head pose and movements significantly differ from depressed to normal people. They drew few conclusions: longer gaze time towards the right and down, slower head movements, and few head posture changes in depressed subjects.</p>
+      </sec>
+      <sec id="Sec5">
+        <title>Depression detection through verbal indicators</title>
+        <p id="Par28">Acoustic features of speech play a vital role in diagnosis of depression for the following reasons: First, linguistic features (what subject speaks), paralinguistic features (how subject speaks), etc., are generally affected by the subject’s mental state. Second, the clinician uses verbal indicators. Several studies have found distinguishable prosodic features such as pitch, loudness, energy, formants, jitter, shimmer, etc., between depressed and non-depressed individuals. Third, the ease of recording and availability of tools to extract the features such as openSMILE [<xref ref-type="bibr" rid="CR19">19</xref>], PRAAT,<xref ref-type="fn" rid="Fn3">3</xref> COVEREP [<xref ref-type="bibr" rid="CR16">16</xref>], etc.</p>
+        <p id="Par30">Cummins et al. [<xref ref-type="bibr" rid="CR12">12</xref>] have investigated good discriminative acoustic features that distinguish normal and depressed speakers. Features like Spectral centroid frequencies and amplitudes were computed using Mel-frequency Cepstral Coefficients (MFCC) then normalized. Multidimensional feature sets, i.e., combinations of those features have performed better when compared to single-dimensional features. They employed Gaussian mixture models to predict depressed and normal speakers. Further, Cummins et al. [<xref ref-type="bibr" rid="CR13">13</xref>] analysed the effects of depression manifesting as a reduction in the spread of phonetic events in acoustic space. In their work, three acoustic variability measures: Average Weighted Variance (AWV), Acoustic Movement (AM), and Acoustic Volume, were used to model the trajectory of depressed speech in the acoustic space. They found that depressed groups often tend to have reduced vowel space when compared with healthy people.</p>
+        <p id="Par31">Scherer et al. [<xref ref-type="bibr" rid="CR54">54</xref>] have investigated reduced vowel space’s association with the speech of individuals who exhibit depressive symptoms. They worked on a publicly available Distress Analysis Interview Corpus(DAIC) dataset [<xref ref-type="bibr" rid="CR23">23</xref>]. They employed a voicing detection algorithm to detect voiced parts of the speech. COVERAP toolbox was utilized to track the first two formants (F1 and F2) in the voiced speech. Further, F1 and F2 were used to compute vowel space while uttering three kinds of vowel sounds i.e., /i/, /a/, and /u/. An unsupervised learning algorithm called K-means clustering(with k = 12 and c = 3) showed the association between vowel space and the depressed group.</p>
+      </sec>
+      <sec id="Sec6">
+        <title>Depression detection through multi-modal indicators</title>
+        <p id="Par32">Recently some researchers have also tried to combine different modalities due to the following reasons: First, an individual modality’s contribution can be better understood when the convergence of modalities is carried out. Second, each modality has its own advantages. Hence a combination can yield better outcome. Third, compatible characteristics of the features exist.</p>
+        <p id="Par33">Williamson et al. [<xref ref-type="bibr" rid="CR59">59</xref>] utilized feature sets derived from facial movements and acoustic verbal cues to detect psychomotor retardation. They employed Principal component analysis for dimensionality reduction and then applied the Gaussian mixture model to classify the combination of principal feature vectors.</p>
+        <p id="Par34">Alghowinem et al. [<xref ref-type="bibr" rid="CR4">4</xref>] showed that the fusion of different modalities gives an improvement when compared to the individual modalities at hand. Their aim was to develop a classification-oriented approach, where features were selected from head pose, eye gaze, and verbal indicators of the depressed and healthy groups. Classification of these feature sets achieved the best results through the use of the SVM classifier.</p>
+        <p id="Par35">Williamson et al. [<xref ref-type="bibr" rid="CR50">50</xref>] combined text, audio, and facial features to form hybrid fusion on a publicly available DAIC dataset [<xref ref-type="bibr" rid="CR23">23</xref>]. Authors used deep learning for classification in thier study.</p>
+        <p id="Par36">Most of the studies discussed in current section employ ML based methods (Support Vector Machines, Gaussian Mixture Models, Random Forest, etc.,) but not deep learning methods. For this insufficient training data availability could be the reason. ML based methods can be trained on lesser data, i.e., when compared with ML, deep learning needs larger training data [<xref ref-type="bibr" rid="CR44">44</xref>]. Another reason could be supervised ML is more powerful when a known relationship exists between the inputs and labels. i.e., numerous features can be extracted and then evaluated to improve model accuracy.</p>
+      </sec>
+    </sec>
+    <sec id="Sec7">
+      <title>Method and proposed approach</title>
+      <sec id="Sec8">
+        <title>Overview</title>
+        <p id="Par37">Figure <xref rid="Fig1" ref-type="fig">1</xref> illustrates the overall architecture of the proposed approach. Our proposed approach has three stages; Stage 1: Data Collection, Stage 2: Feature Extraction, and Stage 3: Model Training and Testing.
+<fig id="Fig1"><label>Fig. 1</label><caption><p>The overall architecture of the proposed approach</p></caption><graphic xlink:href="11042_2022_12315_Fig1_HTML" id="MO1"/></fig></p>
+        <p id="Par38">First of all, multi modal data collection was done by performing a participatory mobile crowd sensing experiment (where real-time smart phone usage data was collected over a period of 2 weeks) and a task-based experiment (where 15 minutes of visual and auditory responses were recorded). Post data collection, standard self reports were used to collect the ground truth. The acquired multimodal data was then used in the feature extraction stage as follows - After data pre-processing, low-level features were extracted from multimodal data modalities(smart phone, audio-visual modalities). High-level features were formed using low-level features. The statistical feature vectors were extracted from the high-level features.The statistical feature vectors and ground truth labels were used in the model-building stage. In the model training, the feature vectors from individual and combination of data modalities were used as inputs for feature selection techniques in order to train ML classifiers such as Logistic Regression(LR), Decision Tree(DT), Naive Bayes(NB), Random Forest(RF), Support Vector Machine(SVM)). These classifiers were trained for classifying depressed and non-depressed classes of participants. The model training is done as one time process. For testing, the trained models were then used on the new test data to predict the participant’s status.</p>
+      </sec>
+      <sec id="Sec9">
+        <title>Data collection</title>
+        <p id="Par39">For mobile-sensor data collection, participants were volunteered through social networks, mailing lists, flyers, posters, and personal contacts. Among 143 responses received, 102 participants (56% female, mean age of 18-19 years) met the experiment’s eligibility criteria. Participants were eligible if they had smartphones, with access to the internet, could speak and read English, were over 18 years old, and lived in India.</p>
+        <p id="Par40">To improve data quality, several incentives were provided to the participants to participate with seriousness. The data was collected for over a period of two weeks.</p>
+        <p id="Par41">Two days before the start of the study, The research team assisted with the download, installation, and configuration of the SensusMobile application (refer to the About SensusMobile sub-section below). All the participants were instructed to: keep their phones with them charged throughout the day and enable the GPS and Bluetooth sensors for the duration of the study. Before taking informed written consent from the participants, the purpose of data collection and explanation of data was provided.The research team periodically checked the data at the server and contacted the participants in case of any discrepancies.</p>
+        <p id="Par42">At the end of the mobile-data collection phase, task-based data collection was performed in online mode to adhere Covid 19 guidelines and to accommodate participants across various regions. Participants were given appointments for Face to Face (30 minutes) Zoom sessions with members of the research team. The participants were instructed to turn their camera ON and be present in optimal lighting conditions with their headset before joining the session, preferably on a Desktop and if not on mobile. During the session, the researchers conducted tasks involving emotion [<xref ref-type="bibr" rid="CR57">57</xref>] and speech elicitation [<xref ref-type="bibr" rid="CR7">7</xref>] to record each subject’s facial and acoustic responses. Table <xref rid="Tab2" ref-type="table">2</xref> lists the experimental procedure with time duration involved to conduct emotion and speech elicitation.
+<table-wrap id="Tab2"><label>Table 2</label><caption><p>Experimental procedure with time duration to conduct emotion and speech elicitation</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">Experimental tasks</th><th align="left">Procedure</th><th align="left">Description(source)</th><th align="left">Duration</th></tr></thead><tbody><tr><td align="left"/><td align="left">Blank screen</td><td align="left">NA</td><td align="left">1 minute</td></tr><tr><td align="left"/><td align="left">Positive video</td><td align="left">The Circus(1928) / Charlie Chaplin, a known comedian, performs hilarious acts when he enters a lion cage.</td><td align="left">3:32 minutes</td></tr><tr><td align="left">Emotion Elicitation</td><td align="left">Blank screen</td><td align="left">NA</td><td align="left">1 minute</td></tr><tr><td align="left"/><td align="left">Neutral video</td><td align="left">Abstract Shapes/colour bars</td><td align="left">3 minutes</td></tr><tr><td align="left"/><td align="left">Blank screen</td><td align="left">NA</td><td align="left">1 minute</td></tr><tr><td align="left"/><td align="left">Negative video</td><td align="left">The Champ(1979) / Little boy crying when his father is on the death bed.</td><td align="left">3 minutes</td></tr><tr><td align="left">Break</td><td align="left">Blank screen</td><td align="left">NA</td><td align="left">10 minutes</td></tr><tr><td align="left">Speech Elicitation</td><td align="left">Passage reading</td><td align="left">Short tale called “The North and the South Wind”</td><td align="left">1 minute</td></tr><tr><td align="left"/><td align="left">Free form speech</td><td align="left">Participant’s choice from a list appears on the monitor</td><td align="left">2 minutes</td></tr></tbody></table></table-wrap></p>
+        <p id="Par43">During online task-based experimental data collection, research assistants shared their screen/audio to perform emotion elicitation. In this task, various kinds (positive/neutral/sad) of multimedia clips selected from famous film clips in psychology [<xref ref-type="bibr" rid="CR57">57</xref>] were shown to evoke the participant’s emotions. Prior to each clip, the experimenter stated that the screen would be blank for one minute (when participants were asked to clear their minds of all feelings, memories, and thoughts). After all the clips were presented, the participants were provided a break of approximately 10 minutes, then speech elicitation was performed. The participants were asked to provide their speech in two different conditions. In the first scenario, they were asked to read out tale (a phonetically balanced paragraph called “The North and the South Wind”) from the screen. Secondly, they were asked to provide an impromptu report on a topic of their choice from a list that appeared on the screen (e.g., memorable incident in life, their goals, etc.). The session was recorded for data pre-processing.</p>
+        <sec id="Sec10">
+          <title>Ground truth labelling</title>
+          <p id="Par44">The SensusMobile app was programmed to deliver instances of the PHQ-4(a subset of PHQ-9) survey (to be filled by participants) on a daily basis and a Patient Health Questionnaire(PHQ-9) Online Survey at the end of the mobile-data collection period (two weeks). PHQ-9/4 were selected in our study due to their high levels of consistency and statistical reliability/validity. Kroenke et al. [<xref ref-type="bibr" rid="CR30">30</xref>] conducted a study to examine the validity of PHQ-9 for depression assessment. Their findings suggest that PHQ-9 is reliable/valid, and it is a helpful research tool for depression diagnosis. The participants also provided physical copies of completed PHQ-9 responses during the video-data collection phase. This questionnaire was collected in order to obtain a more “current” representation of the participants’ psychological state (compared to the mobile data collection phase). Based on the PHQ-9 Scores, each participant’s mental status was categorized into binary labels(Non-depressed= 0; those who show depressive symptoms = 1).</p>
+          <p id="Par45">To take care of outliers or inappropriate filling on the PHQ-9 report by the participants, a team of psychology research scholars from the Central University of Tamil Nadu were provided with scanned copies of the PHQ-9 questionnaires and the recordings of the participants(attained during task-based experimental data collection). The scholars reviewed these items and provided binary classifications using an amalgamation of both resources provided as well as another interview with the participant if needed. This additional step verification was performed in order to strengthen the validity of the ground truth labels leading to a more coherent dataset. Overall data set has been labelled with 54 non-depressed and 48 depressed subjects.</p>
+        </sec>
+        <sec id="Sec11">
+          <title>About sensusmobile</title>
+          <p id="Par46">SensusMobile [<xref ref-type="bibr" rid="CR61">61</xref>] is an open-source mobile crowd data collection application that runs in the background to access readings from device hardware sensors (i.e., accelerometer, GPS, gyroscope, etc.). The accessible sensor information can be stored locally on the device or transmitted to a remote server. Our project utilized Amazon Simple Storage Service Web Services for data collection to ensure that participant data gets stored periodically without user intervention. Prior to the actual study, several beta tests were performed with SensusMobile to calibrate settings to minimize battery consumption and reduce data redundancy.</p>
+          <p id="Par47">SensusMobile supports two methods of data sensing: 1) Listening (continuous data collection) and 2) polling (periodical triggering of probes to collect readings). Table <xref rid="Tab3" ref-type="table">3</xref> lists a subset of the data items collected from the participant’s smartphone for the study conducted.
+<table-wrap id="Tab3"><label>Table 3</label><caption><p>A subset of the data items collected from the participant’s smartphone for the study conducted</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">Data Collected</th><th align="left">Probe Used</th><th align="left">Listening/polling</th><th align="left">Intervals</th></tr></thead><tbody><tr><td align="left">Acceleration</td><td align="left">Accelerometer</td><td align="left">Listening</td><td align="left">1 reading / second</td></tr><tr><td align="left">Application Usage</td><td align="left">ApplicationUsageStats</td><td align="left">Polling</td><td align="left">1 reading / 15 min</td></tr><tr><td align="left">Statistics</td><td align="left"/><td align="left"/><td align="left"/></tr><tr><td align="left">Brightness</td><td align="left">LightDatum</td><td align="left">Listening</td><td align="left">1 reading / second</td></tr><tr><td align="left">Bluetooth encounters</td><td align="left">BluetoothDeviceProximityDatum</td><td align="left">Polling</td><td align="left">scans and reads performed for 10 seconds each, between 30-second intervals</td></tr><tr><td align="left">Gyroscope values</td><td align="left">GyroscopeDatum</td><td align="left">Listening</td><td align="left">1 reading / second</td></tr><tr><td align="left">GPS/ location</td><td align="left">LocationDatum</td><td align="left">Polling</td><td align="left">1 reading / 15 min</td></tr><tr><td align="left">Screen unlocks</td><td align="left">ScreenDatum</td><td align="left">Polling</td><td align="left">1 reading / 30 seconds</td></tr></tbody></table></table-wrap></p>
+        </sec>
+      </sec>
+      <sec id="Sec12">
+        <title>Data pre-processing</title>
+        <p id="Par48">The goal of the data pre-processing stage was to facilitate the extraction of features from various sources, i.e., Smartphone usage data(.json) files along with visual and speech recordings.</p>
+        <p id="Par49">The research team extracted visual cues (.mp4) from participants via recorded visuals as marked in Fig. <xref rid="Fig2" ref-type="fig">2</xref>(a), and the marked red box was cropped for further use. Video portions where the participant is not visible or people other than the participant appeared in the recording were manually deleted. Openface [<xref ref-type="bibr" rid="CR6">6</xref>] was used to extract low-level features from cropped versions of the recording. It is a state-of-the-art framework for extraction of low-level features like facial landmark location detection, eye gaze estimation, head pose estimation, and facial action unit recognition. In the proposed approach, higher-level statistical feature vectors were formed from these low-level features.
+<fig id="Fig2"><label>Fig. 2</label><caption><p>Samples during elicitation methods (a) Emotion Elicitation: participant’s facial clues are recorded while watching the neutral video (b) Speech Elicitation: participant’s speech is recorded while reading the phonetically balanced paragraph</p></caption><graphic xlink:href="11042_2022_12315_Fig2_HTML" id="MO2"/></fig></p>
+        <p id="Par50">From the recorded meeting of the speech elicitation phase, as shown in Fig. <xref rid="Fig2" ref-type="fig">2</xref>(b) speech cues (.mp3) of the participants were extracted. The SOX tool<xref ref-type="fn" rid="Fn4">4</xref> was used for noise removal from the extracted speech content. Then, the Praat software tool<xref ref-type="fn" rid="Fn5">5</xref> was used for low-level acoustic feature extraction (pitch, intensity, formants, etc.).</p>
+      </sec>
+      <sec id="Sec13">
+        <title>Feature extraction</title>
+        <p id="Par53">Those features extracted in the proposed approach were considered clinically significant [<xref ref-type="bibr" rid="CR5">5</xref>] and supported by related work. It is believed that features computed from entire raw data obtained during the data collection of each modality give insightful information than on samples of information. For example, smart phone usage feature extraction with 14 days of smart phone usage data is more insightful than 3/7/10 days of data. In the following sub-sections, feature extraction is explained in detail.</p>
+        <sec id="Sec14">
+          <title>Smart phone usage feature extraction</title>
+          <p id="Par54">The following features were computed from collected smart phone usage data. Although clinically, those features extracted in the proposed work have no direct relation to depression, they can help quantify the individuals’ physical, cognitive, and environmental levels [<xref ref-type="bibr" rid="CR55">55</xref>]. Features are as follows:
+<list list-type="bullet"><list-item><p id="Par55"><bold>Accelerometer probe features</bold></p></list-item></list></p>
+          <p id="Par56">The accelerometer records dynamic or static forces the sensor is experiencing in x,y, and z directions. The acceleration probe reading consists of x, y, and z axes, which specify the axes’ acceleration. In this study, tri-axis readings were considered for feature extraction. From the raw three-axis accelerometer data, which was taken at 1800 samples per hour, the accelerometer magnitude was computed using (<xref rid="Equ1" ref-type="disp-formula">1</xref>). Further arithmetic mean of accelerometer magnitude was also computed from the accelerometer readings [<xref ref-type="bibr" rid="CR27">27</xref>, <xref ref-type="bibr" rid="CR28">28</xref>].
+<disp-formula id="Equ1"><label>1</label><alternatives><tex-math id="M1">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\text{Magnitude} = \sqrt{{x^{2}_{i}} + {y_{i}^{2}}+{z_{i}^{2}}} $$\end{document}</tex-math><mml:math id="M2"><mml:mtext>Magnitude</mml:mtext><mml:mo>=</mml:mo><mml:msqrt><mml:mrow><mml:msubsup><mml:mrow><mml:mi>x</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup><mml:mo>+</mml:mo><mml:msubsup><mml:mrow><mml:mi>y</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup><mml:mo>+</mml:mo><mml:msubsup><mml:mrow><mml:mi>z</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup></mml:mrow></mml:msqrt></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ1.gif" position="anchor"/></alternatives></disp-formula>Where <italic>x</italic><sub><italic>i</italic></sub>, <italic>y</italic><sub><italic>i</italic></sub>, <italic>z</italic><sub><italic>i</italic></sub> are the accelerometer readings at a given time instant <italic>i</italic>.
+<list list-type="bullet"><list-item><p id="Par57"><bold>Gyroscope probe features</bold></p></list-item></list>The Gyroscope sensor aids in determining the orientation of a device using the earth’s gravity. It tracks the rotations of the device in x,y and z directions. The gyroscope probe reading consists of x, y, and z axes, which specify the axe’s rotations. From the raw individual axis gyroscope data taken at 1800 samples per hour, the Variance of the individual axis was computed.
+<list list-type="bullet"><list-item><p id="Par58"><bold>Application usage probe features</bold></p></list-item></list>Smartphone applications were clustered into various categories from their google play store website entries. For Example- WhatsApp is part of the “communication” category</p>
+          <p id="Par59">The average amount of hours spent on each category per day was computed (using the TimeInForeground entry (provided by the sensor) as a variable).</p>
+          <p id="Par60">The subset of categories considered for the study were communication category, social category, entertainment category, health and fitness category, music and audio category, weather category, travel category, books and reference category, shopping category, events category, photography category, maps and navigation category, business category, etc.
+<list list-type="bullet"><list-item><p id="Par61"><bold>Location probe features</bold></p></list-item></list>Location probe, also known as GPS, periodically records the latitude and longitude entries of the user. Four samples per hour were collected. Using these samples, location variance [<xref ref-type="bibr" rid="CR52">52</xref>] was calculated as the combined Variance of the latitude and longitude components as shown in (<xref rid="Equ2" ref-type="disp-formula">2</xref>).
+<disp-formula id="Equ2"><label>2</label><alternatives><tex-math id="M3">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\text{Location Variance} = \log(\sigma^{2}_{lat}+\sigma^{2}_{long}) $$\end{document}</tex-math><mml:math id="M4"><mml:mtext>Location Variance</mml:mtext><mml:mo>=</mml:mo><mml:mi>log</mml:mi><mml:mo stretchy="false">(</mml:mo><mml:msubsup><mml:mrow><mml:mi>σ</mml:mi></mml:mrow><mml:mrow><mml:mi>l</mml:mi><mml:mi>a</mml:mi><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup><mml:mo>+</mml:mo><mml:msubsup><mml:mrow><mml:mi>σ</mml:mi></mml:mrow><mml:mrow><mml:mi>l</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>g</mml:mi></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup><mml:mo stretchy="false">)</mml:mo></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ2.gif" position="anchor"/></alternatives></disp-formula>Where <inline-formula id="IEq1"><alternatives><tex-math id="M5">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$\sigma ^{2}_{lat}, \sigma ^{2}_{long}$\end{document}</tex-math><mml:math id="M6"><mml:msubsup><mml:mrow><mml:mi>σ</mml:mi></mml:mrow><mml:mrow><mml:mi>l</mml:mi><mml:mi>a</mml:mi><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup><mml:mo>,</mml:mo><mml:msubsup><mml:mrow><mml:mi>σ</mml:mi></mml:mrow><mml:mrow><mml:mi>l</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>g</mml:mi></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup></mml:math><inline-graphic xlink:href="11042_2022_12315_Article_IEq1.gif"/></alternatives></inline-formula> are the Variance’s of latitude and longitude, respectively. Speed mean [<xref ref-type="bibr" rid="CR52">52</xref>] was also extracted, i.e., mean of instantaneous speed’s obtained at each location sample. The instant speed was computed as the change in latitude and longitude values over two consecutive instants, as shown in (<xref rid="Equ3" ref-type="disp-formula">3</xref>)
+<disp-formula id="Equ3"><label>3</label><alternatives><tex-math id="M7">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\text{Speed mean} = \sqrt{(\frac{lat_{i}-lat_{i-1}}{t_{i}-t_{i-1}})^{2}+(\frac{long_{i}-long_{i-1}}{t_{i}-t_{i-1}})^{2}} $$\end{document}</tex-math><mml:math id="M8"><mml:mtext>Speed mean</mml:mtext><mml:mo>=</mml:mo><mml:msqrt><mml:mrow><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:mfrac class="tfrac"><mml:mrow><mml:mi>l</mml:mi><mml:mi>a</mml:mi><mml:msub><mml:mrow><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:mi>l</mml:mi><mml:mi>a</mml:mi><mml:msub><mml:mrow><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>−</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub></mml:mrow><mml:mrow><mml:msub><mml:mrow><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mrow><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>−</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub></mml:mrow></mml:mfrac><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup><mml:mo>+</mml:mo><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:mfrac class="tfrac"><mml:mrow><mml:mi>l</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:msub><mml:mrow><mml:mi>g</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:mi>l</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:msub><mml:mrow><mml:mi>g</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>−</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub></mml:mrow><mml:mrow><mml:msub><mml:mrow><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mrow><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>−</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub></mml:mrow></mml:mfrac><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup></mml:mrow></mml:msqrt></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ3.gif" position="anchor"/></alternatives></disp-formula>Where <italic>l</italic><italic>a</italic><italic>t</italic><sub><italic>i</italic></sub>, <italic>l</italic><italic>o</italic><italic>n</italic><italic>g</italic><sub><italic>i</italic></sub> are the latitude and longitude at the time of sample <italic>i</italic>.</p>
+          <p id="Par62">Variance and mean were computed on instantaneous speed values along with total distance [<xref ref-type="bibr" rid="CR52">52</xref>] -i.e. total geographical displacement using (<xref rid="Equ4" ref-type="disp-formula">4</xref>)
+<disp-formula id="Equ4"><label>4</label><alternatives><tex-math id="M9">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\text{Total distance} = \sum\limits_{i}^{} \sqrt{(lat_{i}-lat_{i-1})^{2}+(long_{i}-long_{i-1})^{2}} $$\end{document}</tex-math><mml:math id="M10"><mml:mtext>Total distance</mml:mtext><mml:mo>=</mml:mo><mml:munderover accent="false" accentunder="false"><mml:mrow><mml:mi>∑</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow><mml:mrow/></mml:munderover><mml:msqrt><mml:mrow><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:mi>l</mml:mi><mml:mi>a</mml:mi><mml:msub><mml:mrow><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:mi>l</mml:mi><mml:mi>a</mml:mi><mml:msub><mml:mrow><mml:mi>t</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>−</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup><mml:mo>+</mml:mo><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:mi>l</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:msub><mml:mrow><mml:mi>g</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:mi>l</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:msub><mml:mrow><mml:mi>g</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>−</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup></mml:mrow></mml:msqrt></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ4.gif" position="anchor"/></alternatives></disp-formula>Where <italic>l</italic><italic>a</italic><italic>t</italic><sub><italic>i</italic></sub>, <italic>l</italic><italic>o</italic><italic>n</italic><italic>g</italic><sub><italic>i</italic></sub> are the latitude and longitude at the time of sample <italic>i</italic>.
+<list list-type="bullet"><list-item><p id="Par63"><bold>Bluetooth probe features</bold></p></list-item></list>Bluetooth probe was used to track nearby devices using Bluetooth via periodic information transmission. There were 12 samples recorded per hour, and the probe components were grouped day wise and the number of unique encounters was computed using addresses as an index. Features such as Average Unique Bluetooth encounters per day, Variance, and Standard Deviation of the number of unique devices encountered were used in the study.
+<list list-type="bullet"><list-item><p id="Par64"><bold>Light/brightness probe features</bold></p></list-item></list>The Light probe measures the illuminance of the device (user). The app recorded light levels 12 times per hour. Mean, Variance, and Standard Deviation of the readings were chosen as features.
+<list list-type="bullet"><list-item><p id="Par65"><bold>Screen unlock probe features</bold></p></list-item></list>The Screen Unlock probe is activated whenever the user unlocks his/her screen. This probe returns true (Boolean value) once the user unlocks the screen and the time stamp is recorded. The total count of all screen unlocks has been used as a feature [<xref ref-type="bibr" rid="CR9">9</xref>, <xref ref-type="bibr" rid="CR40">40</xref>].</p>
+          <p id="Par66">Table <xref rid="Tab4" ref-type="table">4</xref> summarizes all the smart phone usage features.
+<table-wrap id="Tab4"><label>Table 4</label><caption><p>Smart phone usage features</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">Parent feature</th><th align="left">Description</th><th align="left">Statistical features</th><th align="left">No. of</th></tr><tr><th align="left"/><th align="left"/><th align="left">extracted</th><th align="left">features</th></tr></thead><tbody><tr><td align="left">Accelerometer probe</td><td align="left">To measure acceleration (the rate of change of velocity). We approximated accelerometer magnitudes using (<xref rid="Equ1" ref-type="disp-formula">1</xref>).</td><td align="left">Mean of the accelerometer magnitude was computed</td><td align="left">1</td></tr><tr><td align="left">Gyroscope probe</td><td align="left">To measure orientation of the phone.</td><td align="left">Axis-wise variance of entries were calculated</td><td align="left">3</td></tr><tr><td align="left">Application Usage probe</td><td align="left">App categories were extracted using their package references from play store</td><td align="left">Average amount of hours per day spent on each application category by the user</td><td align="left">36</td></tr><tr><td align="left">Location probe</td><td align="left">Raw readings were used to calculate location variance (<xref rid="Equ2" ref-type="disp-formula">2</xref>), speed mean (<xref rid="Equ3" ref-type="disp-formula">3</xref>) total distance (<xref rid="Equ4" ref-type="disp-formula">4</xref>).</td><td align="left">location variance (<xref rid="Equ2" ref-type="disp-formula">2</xref>) and its mean, Variance and mean of the instantaneous speed (<xref rid="Equ3" ref-type="disp-formula">3</xref>) and total distance (<xref rid="Equ4" ref-type="disp-formula">4</xref>) were calculated.</td><td align="left">6</td></tr><tr><td align="left">Bluetooth probe</td><td align="left">The entries are grouped day wise and the number of unique encounters were calculated using the Address entry.</td><td align="left">Day-wise mean, Variance and Standard Deviation of entries</td><td align="left">3</td></tr><tr><td align="left">Light (brightness) probe</td><td align="left">To measure the illumination of the device(user). Brightness probe readings are used here</td><td align="left">Mean, Variance and Standard Deviation of readings</td><td align="left">3</td></tr><tr><td align="left">Screen unlock probe</td><td align="left">The entries were divided on the basis of binary readings provided by the probe</td><td align="left">The percentage of entries where the screen_on entry is True with respect to the total number of entries was calculated</td><td align="left">1</td></tr></tbody></table></table-wrap></p>
+        </sec>
+        <sec id="Sec15">
+          <title>Visual feature extraction</title>
+          <p id="Par67">Two kinds of Openface’s low-level features were used for feature extraction. They are 1) 68 facial landmark location coordinates, their visualization is shown in Fig. <xref rid="Fig3" ref-type="fig">3</xref>(a). 2) Facial Action Coding System(FACS). FACS is a method for categorizing facial movements based on their appearance on the face. The facial Action Unit (AU) represents almost every subtle movement of muscles on the face. Figure <xref rid="Fig3" ref-type="fig">3</xref>(b) shows a few AU’s. A subset of AU (specifically: 1, 2, 4, 5, 6, 7, 9, 10, 12, 14, 15, 17, 20, 23, 25, 26, 28, and 45) are recognized by Openface. Each AU has the following - AU occurrence (0 if the AU is absent and 1 if it is present) and AU intensities (degree of variability in the scale of 0 to 5, where 0,1 and 5 represent not present, minimum and maximum intensity, respectively).
+<fig id="Fig3"><label>Fig. 3</label><caption><p>Visual feature extraction (a) Visualization of 68 facial landmark location coordinates (b) Examples of few action units extracted from Cohn and Kanades database [<xref ref-type="bibr" rid="CR25">25</xref>]</p></caption><graphic xlink:href="11042_2022_12315_Fig3_HTML" id="MO3"/></fig></p>
+          <p id="Par68">In the present study, visual features are of two categories: 1) Geometrical features(using 68- landmark locations) and 2) Facial Action unit features(using FACS). Different geometrical features, i.e., displacement features, distance features, and region unit features were formed. Further statistical features were extracted from these two categories of features.
+<list list-type="bullet"><list-item><p id="Par69"><bold>Geometrical features</bold></p></list-item><list-item><p id="Par70"><bold>Displacement Features</bold></p></list-item></list></p>
+          <p id="Par71">Using one coordinate, the displacements of 6 specific landmark points (marked as dp1,dp2,dp3, dp4,dp5 and dp6 in Fig. <xref rid="Fig4" ref-type="fig">4</xref>) were computed using (<xref rid="Equ5" ref-type="disp-formula">5</xref>)
+<disp-formula id="Equ5"><label>5</label><alternatives><tex-math id="M11">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\text{Displacement} = \sqrt{(x_{i}-x_{i+1})^{2}+(y_{i}-y_{i+1})^{2}} $$\end{document}</tex-math><mml:math id="M12"><mml:mtext>Displacement</mml:mtext><mml:mo>=</mml:mo><mml:msqrt><mml:mrow><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>x</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mrow><mml:mi>x</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>+</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup><mml:mo>+</mml:mo><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>y</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mrow><mml:mi>y</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>+</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup></mml:mrow></mml:msqrt></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ5.gif" position="anchor"/></alternatives></disp-formula>where (<italic>x</italic><sub><italic>i</italic></sub>, <italic>y</italic><sub><italic>i</italic></sub>) denotes the landmark coordinates present in the frame <italic>i</italic>, (<italic>x</italic><sub><italic>i</italic>+ 1</sub>, <italic>y</italic><sub><italic>i</italic>+ 1</sub>) the same landmark coordinates in the frame <italic>i</italic> + 1 where <italic>i</italic> ranges from 0 to <italic>n</italic> − 1 (0 is the first and <italic>n</italic> − 1 is the last frame).
+<list list-type="bullet"><list-item><p id="Par72"><bold>Distance features</bold></p></list-item></list>Using two coordinates, Eight Euclidean distance values i.e mean squared distances (marked as d0,d1,d2,d3,d4,d5,d6, and d7 in Fig. <xref rid="Fig4" ref-type="fig">4</xref>) between two pairs of coordinates were computed using (<xref rid="Equ6" ref-type="disp-formula">6</xref>).
+<disp-formula id="Equ6"><label>6</label><alternatives><tex-math id="M13">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\text{Distance} = \sqrt{(x_{i}-x_{j})^{2}+(y_{i}-y_{j})^{2}} $$\end{document}</tex-math><mml:math id="M14"><mml:mtext>Distance</mml:mtext><mml:mo>=</mml:mo><mml:msqrt><mml:mrow><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>x</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mrow><mml:mi>x</mml:mi></mml:mrow><mml:mrow><mml:mi>j</mml:mi></mml:mrow></mml:msub><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup><mml:mo>+</mml:mo><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>y</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mrow><mml:mi>y</mml:mi></mml:mrow><mml:mrow><mml:mi>j</mml:mi></mml:mrow></mml:msub><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup></mml:mrow></mml:msqrt></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ6.gif" position="anchor"/></alternatives></disp-formula>where (<italic>x</italic><sub><italic>i</italic></sub>, <italic>y</italic><sub><italic>i</italic></sub>) and (<italic>x</italic><sub><italic>j</italic></sub>, <italic>y</italic><sub><italic>j</italic></sub>) represents landmarks of two different coordinates in the same frame. These distances were calculated for all the frames.
+<list list-type="bullet"><list-item><p id="Par73"><bold>Region unit features</bold></p></list-item></list>Using more than two coordinates(as marked as A0, A1, and A2 in Fig. <xref rid="Fig4" ref-type="fig">4</xref>), the Area of the irregular polygon was used to compute the area of the mouth, left eye, and right eye using specific points in that region using (<xref rid="Equ7" ref-type="disp-formula">7</xref>)
+<disp-formula id="Equ7"><label>7</label><alternatives><tex-math id="M15">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$\text{Area} = \frac{1}{2}\left \vert \sum (x_{i} y_{i+1} - x_{i+1} y_{i}) \right \vert $$\end{document}</tex-math><mml:math id="M16"><mml:mtext>Area</mml:mtext><mml:mo>=</mml:mo><mml:mfrac><mml:mrow><mml:mn>1</mml:mn></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:mfrac><mml:mfenced close="|" open="|"><mml:mrow><mml:mo>∑</mml:mo><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>x</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:msub><mml:mrow><mml:mi>y</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>+</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mrow><mml:mi>x</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>+</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msub><mml:msub><mml:mrow><mml:mi>y</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo stretchy="false">)</mml:mo></mml:mrow></mml:mfenced></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ7.gif" position="anchor"/></alternatives></disp-formula>when <italic>i</italic> = <italic>n</italic> − 1, then <italic>i</italic> + 1 is expressed as 0. where (<italic>x</italic><sub><italic>i</italic></sub>, <italic>y</italic><sub><italic>i</italic></sub>),(<italic>x</italic><sub><italic>i</italic>+ 1</sub>, <italic>y</italic><sub><italic>i</italic>+ 1</sub>) to (<italic>x</italic><sub><italic>n</italic>− 1</sub>, <italic>y</italic><sub><italic>n</italic>− 1</sub>) represents the set of points in frame <italic>i</italic>.
+<list list-type="bullet"><list-item><p id="Par74"><bold>Facial action unit features</bold></p></list-item></list>Features from each AU occurrence and AU intensities were taken.
+<fig id="Fig4"><label>Fig. 4</label><caption><p>Geometrical Features representation using facial landmark locations</p></caption><graphic xlink:href="11042_2022_12315_Fig4_HTML" id="MO4"/></fig></p>
+          <p id="Par75">From both: geometrical and action unit features, statistical features like mean, median, standard deviation, etc., listed in Table <xref rid="Tab5" ref-type="table">5</xref> were extracted.
+<table-wrap id="Tab5"><label>Table 5</label><caption><p>Summary of the facial features</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">Feature</th><th align="left">Feature</th><th align="left">Description</th><th align="left">Statistical features</th><th align="left">No. of</th></tr><tr><th align="left">category</th><th align="left">Name</th><th align="left"/><th align="left">extracted</th><th align="left">features</th></tr></thead><tbody><tr><td align="left"/><td align="left">Displacement features</td><td align="left">Displacement (using (<xref rid="Equ5" ref-type="disp-formula">5</xref>)) of the six specific points as marked in Fig. <xref rid="Fig4" ref-type="fig">4</xref> denoted by blue points as dp1 to dp6.</td><td align="left">Mean, median, minimum, maximum, kurtosis, mode, standard deviation, Root mean square, skewness for Each of 6 displacement points. (dp1 to dp6)</td><td align="left">54</td></tr><tr><td align="left">Geometrical features</td><td align="left">Distances features</td><td align="left">Distances(using (<xref rid="Equ6" ref-type="disp-formula">6</xref>)) between 8 pairs of points as marked in Fig. <xref rid="Fig4" ref-type="fig">4</xref> denoted by black lines as d0 to d7</td><td align="left">Mean, median, minimum, maximum, kurtosis, mode, standard deviation, Root mean square, skewness for Each of 8 distances. (d0 to d7)</td><td align="left">72</td></tr><tr><td align="left"/><td align="left">Region Units</td><td align="left">Area of the mouth. Area of the left eye and Areaof the right eye(<xref rid="Equ7" ref-type="disp-formula">7</xref>) as marked in Fig. <xref rid="Fig4" ref-type="fig">4</xref> is denoted by red irregular lines as A0, A1 and A3.</td><td align="left">Mean, median, minimum, maximum, kurtosis, mode, standard deviation, Root mean square, skewness for Areas of mouth, left eye and right eye. (A0 A1 and A2)</td><td align="left">27</td></tr><tr><td align="left">Facial Action Unit Features</td><td align="left">Action Unit features</td><td align="left">The facial action coding system is used to quantify the muscle movements on the face. AU occurrences present(1) or absent(0) for 18 AU.</td><td align="left">Mean, median, standard deviation, kurtosis, mode, Root mean square, skewness for each 18 AU present/ absent.</td><td align="left">126</td></tr><tr><td align="left"/><td align="left"/><td align="left">If present, AU intensities for 17 AU intensities.</td><td align="left">Mean, median, standard deviation, maximum, kurtosis, mode, Root mean square, skewness for each 17 AU intensities</td><td align="left">136</td></tr></tbody></table></table-wrap></p>
+        </sec>
+        <sec id="Sec16">
+          <title>Audio feature extraction</title>
+          <p id="Par76">Generally, depression diagnosis is subjective in nature which can be manipulated. So we assumed that acoustic features are more powerful than linguistic characteristics. Audio features were computed from the audio files which were recorded at the sampling frequency of 32000 Hz during the speech elicitation experiment. Table <xref rid="Tab6" ref-type="table">6</xref> lists the details of the features that were extracted.
+<table-wrap id="Tab6"><label>Table 6</label><caption><p>Audio features</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">Feature</th><th align="left">Description</th><th align="left">Statistical features</th><th align="left">No. of</th></tr><tr><th align="left">Name</th><th align="left"/><th align="left">extracted</th><th align="left">features</th></tr></thead><tbody><tr><td align="left">Pitch</td><td align="left">It is an approximation of the quasi-periodic rate of vibrations per speech cycle.</td><td align="left">mean, median, standard deviation, minimum, mode maximum, kurtosis, Root mean square, skewness</td><td align="left">9</td></tr><tr><td align="left">Intensity</td><td align="left">It is the measure of the perceived loudness.</td><td align="left">mean, median, standard deviation, minimum, mode maximum, kurtosis, Root mean square, skewness</td><td align="left">9</td></tr><tr><td align="left">Formants [F1,F2, F3,F4]</td><td align="left">They indicate resonating frequencies of the vocal tract. The formant with the lowest frequency band is F1, then the second F2, which occurs with 1000Hz intervals.</td><td align="left">mean, median, standard deviation, minimum, maximum, kurtosis, mode, Root mean square, skewness</td><td align="left">36</td></tr><tr><td align="left">Pulses</td><td align="left">A fundamental, audible, and steady beat in the voice.</td><td align="left">Count, Mean, standard deviation, variance</td><td align="left">4</td></tr><tr><td align="left">Amplitude</td><td align="left">It is the size of the oscillations of the vocal folds due to vibrations caused by speech biosignal.</td><td align="left">minimum, maximum, mean, Root mean square</td><td align="left">4</td></tr><tr><td align="left">Mean Absolute jitter</td><td align="left">It is the absolute difference between consecutive vocal periods, divided by the mean vocal period.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Jitter (local, absolute)</td><td align="left">The absolute difference between consecutive periods, in seconds.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Relative average perturbation jitter</td><td align="left">It measures the effects of long-term pitch changes like slow rise/fall in pitch. It is calculated as the average absolute difference between a period and its average and its 2 neighbours, divided by the mean period.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">5-point period perturbation Jitter</td><td align="left">It is calculated using the average absolute difference between a period and the average of it and its 4 closest neighbours, divided by the mean period.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Mean absolute differences Jitter</td><td align="left">It is the absolute difference between consecutive differences between consecutive periods, divided by the mean period</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Shimmer</td><td align="left">It defines the short-term (cycle-to-cycle) tiny fluctuations in the amplitude of the waveform which reflects inherent resistance/noise in the voice biosignal.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Mean Shimmer</td><td align="left">Average absolute difference between the amplitudes of consecutive periods, divided by the average amplitude.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Mean Shimmer dB</td><td align="left">average absolute base-10 logarithm of the difference between the amplitudes of consecutive periods, multiplied by 20.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">3-point Amplitude Perturbation Quotient Shimmer</td><td align="left">It is calculated as the average absolute difference between the amplitude of a vocal period and the average of the amplitudes of its neighbours, divided by the average amplitude.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">5-point Amplitude Perturbation Quotient Shimmer</td><td align="left">It is the average absolute difference between the amplitude of a vocal period and the average of the amplitudes of it and its 4 closest neighbours, divided by the average amplitude.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">11-point Amplitude Perturbation Quotient Shimmer</td><td align="left">It is the average absolute difference between the amplitude of a vocal period and the average of the amplitudes of it and its 10 closest neighbours, divided by the average amplitude</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Mean absolute differences shimmer</td><td align="left">Average absolute difference between consecutive differences between the amplitudes of consecutive periods.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Harmonicity of the voiced parts only</td><td align="left">It is used for measuring the repeating patterns in voiced speech signals.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Mean autocorrelation</td><td align="left">It is used for measuring the repeating patterns in the speech signal.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Mean harmonics-to-noise ratio</td><td align="left">It is a measure which gives the relationship between the periodic and additive noise components of the speech signal.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Mean noise-to-harmonics ratio</td><td align="left">It is a measure which gives the relationship between the periodic and additive noise components of the speech signal.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Fraction of locally unvoiced frames</td><td align="left">It is a fraction of pitch frames analysed as unvoiced pitch (75Hz) frames in a speech biosignal of a specified length.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Number of voice breaks</td><td align="left">The number of distances between consecutive vocal pulses that are longer than 1.25 divided by the pitch floor. Hence, if the pitch floor is 75 Hz, all inter-pulse intervals which are longer than 16.6667 ms are called as voice breaks.</td><td align="left">Count</td><td align="left">1</td></tr><tr><td align="left">Degree of voice breaks</td><td align="left">This measure is the total duration of breaks between the voiced parts of the speech signal.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Total energy</td><td align="left">Total energy of a vocal signal in air.</td><td align="left">Mean</td><td align="left">1</td></tr><tr><td align="left">Mean power</td><td align="left">The mean power of a speech signal in air.</td><td align="left">Mean</td><td align="left">1</td></tr></tbody></table></table-wrap></p>
+        </sec>
+      </sec>
+      <sec id="Sec17">
+        <title>Feature selection</title>
+        <p id="Par77">Feature Selection is a mechanism to choose an optimum subset of features that improves classification efficiency with less complexity and computing costs. In the current study, numerous features (smart phone usage-53,visual-413, and audio-82) were extracted. Generally, high dimensionality of input features may lead to poor performance because feature space becomes huge and also it is observed that our dataset contains correlated features. Therefore, two different feature selection approaches were experimented to select the better features which improves the accuracy.</p>
+        <sec id="Sec18">
+          <title>Feature selection using correlation</title>
+          <p id="Par78">Correlation analysis is a statistical technique used for measuring the strength of the linear relationship between two or more attributes [<xref ref-type="bibr" rid="CR1">1</xref>]. The Pearson correlation coefficient technique was used in the present study for three reasons:1) it is easy to implement,2) it suits our data (type), and 3) it is vastly used in the literature for depression detection [<xref ref-type="bibr" rid="CR31">31</xref>, <xref ref-type="bibr" rid="CR33">33</xref>, <xref ref-type="bibr" rid="CR38">38</xref>, <xref ref-type="bibr" rid="CR39">39</xref>, <xref ref-type="bibr" rid="CR49">49</xref>, <xref ref-type="bibr" rid="CR60">60</xref>].</p>
+          <p id="Par79">Given two attributes X and Y, which have ‘n’ values. The Pearson’s correlation coefficient (r) can be determined using (<xref rid="Equ8" ref-type="disp-formula">8</xref>).
+<disp-formula id="Equ8"><label>8</label><alternatives><tex-math id="M17">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$r= \frac{Cov(X,Y)}{\sigma_{X} \sigma_{Y} } $$\end{document}</tex-math><mml:math id="M18"><mml:mi>r</mml:mi><mml:mo>=</mml:mo><mml:mfrac class="tfrac"><mml:mrow><mml:mi>C</mml:mi><mml:mi>o</mml:mi><mml:mi>v</mml:mi><mml:mo stretchy="false">(</mml:mo><mml:mi>X</mml:mi><mml:mo>,</mml:mo><mml:mi>Y</mml:mi><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:msub><mml:mrow><mml:mi>σ</mml:mi></mml:mrow><mml:mrow><mml:mi>X</mml:mi></mml:mrow></mml:msub><mml:msub><mml:mrow><mml:mi>σ</mml:mi></mml:mrow><mml:mrow><mml:mi>Y</mml:mi></mml:mrow></mml:msub></mml:mrow></mml:mfrac></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ8.gif" position="anchor"/></alternatives></disp-formula><italic>r</italic> is the correlation coefficient, <italic>C</italic><italic>o</italic><italic>v</italic>(<italic>X</italic>, <italic>Y</italic> ) is the covariance, <italic>σ</italic><sub><italic>X</italic></sub>and <italic>σ</italic><sub><italic>Y</italic></sub> are the standard deviation of <italic>X</italic> and <italic>Y</italic>, respectively. Suppose <italic>X</italic> and <italic>Y</italic> are two set of values containing [<italic>x</italic><sub>1</sub>, <italic>x</italic><sub>2</sub>,⋯<italic>x</italic><sub><italic>n</italic></sub>] and [<italic>y</italic><sub>1</sub>, <italic>y</italic><sub>2</sub>,⋯<italic>y</italic><sub><italic>n</italic></sub>]. <italic>r</italic> value can be calculated using (<xref rid="Equ9" ref-type="disp-formula">9</xref>)
+<disp-formula id="Equ9"><label>9</label><alternatives><tex-math id="M19">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$r = \frac{\displaystyle \sum\limits_{i=1}^{n}(X_{i}-\bar{X})(Y_{i}-\bar{Y})}{\sqrt{\displaystyle \sum\limits_{i=1}^{n}(X_{i}-\bar{X})^{2}} \sqrt{\displaystyle \sum\limits_{i=1}^{n}(Y_{i}-\bar{Y})^{2}}} $$\end{document}</tex-math><mml:math id="M20"><mml:mi>r</mml:mi><mml:mo>=</mml:mo><mml:mfrac class="tfrac"><mml:mrow><mml:munderover accent="false" accentunder="false"><mml:mrow><mml:mi>∑</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>=</mml:mo><mml:mn>1</mml:mn></mml:mrow><mml:mrow><mml:mi>n</mml:mi></mml:mrow></mml:munderover><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>X</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:mover accent="true"><mml:mrow><mml:mi>X</mml:mi></mml:mrow><mml:mo>¯</mml:mo></mml:mover><mml:mo stretchy="false">)</mml:mo><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>Y</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:mover accent="true"><mml:mrow><mml:mi>Y</mml:mi></mml:mrow><mml:mo>¯</mml:mo></mml:mover><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:msqrt><mml:mrow><mml:munderover accent="false" accentunder="false"><mml:mrow><mml:mi>∑</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>=</mml:mo><mml:mn>1</mml:mn></mml:mrow><mml:mrow><mml:mi>n</mml:mi></mml:mrow></mml:munderover><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>X</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:mover accent="true"><mml:mrow><mml:mi>X</mml:mi></mml:mrow><mml:mo>¯</mml:mo></mml:mover><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup></mml:mrow></mml:msqrt><mml:msqrt><mml:mrow><mml:munderover accent="false" accentunder="false"><mml:mrow><mml:mi>∑</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi><mml:mo>=</mml:mo><mml:mn>1</mml:mn></mml:mrow><mml:mrow><mml:mi>n</mml:mi></mml:mrow></mml:munderover><mml:msup><mml:mrow><mml:mo stretchy="false">(</mml:mo><mml:msub><mml:mrow><mml:mi>Y</mml:mi></mml:mrow><mml:mrow><mml:mi>i</mml:mi></mml:mrow></mml:msub><mml:mo>−</mml:mo><mml:mover accent="true"><mml:mrow><mml:mi>Y</mml:mi></mml:mrow><mml:mo>¯</mml:mo></mml:mover><mml:mo stretchy="false">)</mml:mo></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msup></mml:mrow></mml:msqrt></mml:mrow></mml:mfrac></mml:math><graphic xlink:href="11042_2022_12315_Article_Equ9.gif" position="anchor"/></alternatives></disp-formula>where <italic>n</italic> is the size of the sample, <italic>X</italic><sub><italic>i</italic></sub> and <italic>Y</italic><sub><italic>i</italic></sub> are the <italic>i</italic><sup><italic>t</italic><italic>h</italic></sup> data value and <inline-formula id="IEq2"><alternatives><tex-math id="M21">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$\bar {X}, \bar {Y}$\end{document}</tex-math><mml:math id="M22"><mml:mover accent="true"><mml:mrow><mml:mi>X</mml:mi></mml:mrow><mml:mo>¯</mml:mo></mml:mover><mml:mo>,</mml:mo><mml:mover accent="true"><mml:mrow><mml:mi>Y</mml:mi></mml:mrow><mml:mo>¯</mml:mo></mml:mover></mml:math><inline-graphic xlink:href="11042_2022_12315_Article_IEq2.gif"/></alternatives></inline-formula> are the mean values of <italic>X</italic>, <italic>Y</italic> respectively.</p>
+          <p id="Par80"><italic>r</italic> value lies in between -1.0 and + 1.0. The <italic>r</italic> defines two parameters for any given two sets of values. They are:1) strength: it measures how much these sets are associated, higher the value greater the relationship) and 2) direction of the relationship: if one value increases in one set, then other value increases in another set or one value decreases in one set, then other value decreases in another set. In short, when both move in the same direction. it is called positive correlation. Converse is a negative correlation, i.e., in the opposite direction. 0 signifies there is no relationship. As the value reaches closer to + 1, the relationship becomes stronger.+ 1 indicates a perfect strong correlation. Similarly, those values close to -1 show a strong negative correlation. Figure <xref rid="Fig5" ref-type="fig">5</xref> shows visualization of three kinds of correlations.
+<fig id="Fig5"><label>Fig. 5</label><caption><p>Visualization of three kinds of correlation :a) positive correlation b) negative correlation, and c) no correlation</p></caption><graphic xlink:href="11042_2022_12315_Fig5_HTML" id="MO5"/></fig></p>
+          <p id="Par81">In the present work, the r values between the features and labels were examined. While examining, we observed a high correlation in the features themselves of our dataset. So, we decided to reduce the redundancy of the dataset by removing the highly correlated features. In all such cases, only one feature with a high correlation value with the label was selected, while other features were removed from the dataset. After deriving feature sets into the training and testing, a threshold correlation value(r) of 85% in the training data set was selected by experimentation(which resulted in improvement in terms of accuracy), and then resultant features were dropped in both the training and also testing dataset (to avoid overfitting).</p>
+        </sec>
+        <sec id="Sec19">
+          <title>Feature transformation using dimensionality reduction</title>
+          <p id="Par82">A feature transformation technique called Principal Component Analysis (PCA) was used. PCA was applied to reduce/minimize the dimensions of the feature vector. The number of components in the resultant feature vector was based on the most promising principal components that have 95% variances to classify the labels.</p>
+        </sec>
+      </sec>
+      <sec id="Sec20">
+        <title>Normalization</title>
+        <p id="Par83">Each modality in our study belongs to various scales. Hence min-max normalization, i.e., scaling between 0 and 1 on the feature vectors on individual modality, was applied. The current study was performed on the normalized feature vectors. Figure <xref rid="Fig12" ref-type="fig">12</xref>(a) for visual representation.</p>
+      </sec>
+    </sec>
+    <sec id="Sec21">
+      <title>Results</title>
+      <p id="Par84">In this section, first, the efficacy of the extracted features using statistical analysis of Pearson’s correlation coefficients is described. Second, the classification results using ML classifiers (LR, DT, NB, RF, and SVM) on individual data modality and fused data modalities are presented. Lastly, the effectiveness of the proposed approach is demonstrated by comparing the results on a subset of feature vectors of a benchmarking dataset in depression detection called the Distress Analysis Interview Corpus (DAIC) dataset [<xref ref-type="bibr" rid="CR23">23</xref>].</p>
+      <sec id="Sec22">
+        <title>Statistical analysis</title>
+        <p id="Par85">This subsection describes the efficacy of the extracted features using statistical analysis to prove the capability of the features to predict the depressed or non-depressed subjects. Each feature value and corresponding binary class label was analysed using pair-wise comparison with Pearson’s correlation analysis. The <italic>r</italic> values(using (<xref rid="Equ9" ref-type="disp-formula">9</xref>)) were computed using this pair-wise comparison to find positive and negative correlated features. These <italic>r</italic> values were sorted to pick the top 10 correlated features in each category.</p>
+        <p id="Par86">Table <xref rid="Tab7" ref-type="table">7</xref> lists the top 10 features which were found to be positively correlated with the ground truth labels. It is worth noting that all the top 10 features are Action Unit (AU) features of the visual modality. Table has the AU feature name, its description, and r value (the strength of the correlation and direction). Table <xref rid="Tab8" ref-type="table">8</xref> lists the top 10 features which are negatively correlated. it contains feature name, its description, and r value. We have listed only 10 features for simplicity because the features extracted were numerous in the conducted study.
+<table-wrap id="Tab7"><label>Table 7</label><caption><p>The top 10 positive correlated features with their description, r value (strength of correlation and direction)</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">S.no</th><th align="left">Feature Name</th><th align="left">Description</th><th align="left"><italic>r</italic> value</th></tr></thead><tbody><tr><td align="left">1</td><td align="left">AU 12 standard deviation (A_12_S)</td><td align="left">Lip corner puller intensity Standard deviation</td><td align="left">0.64277</td></tr><tr><td align="left">2</td><td align="left">AU 12 root mean square (A_12_R)</td><td align="left">Lip corner puller intensity root mean square</td><td align="left">0.62708</td></tr><tr><td align="left">3</td><td align="left">AU 12 maximum (A_12_M)</td><td align="left">Lip corner puller intensity maximum</td><td align="left">0.562378</td></tr><tr><td align="left">4</td><td align="left">AU 12 mean (A_12_MN)</td><td align="left">Lip corner puller intensity mean</td><td align="left">0.51846</td></tr><tr><td align="left">5</td><td align="left">AU 10 standard deviation (A_10_S)</td><td align="left">Upper lip raiser standard deviation</td><td align="left">0.51244</td></tr><tr><td align="left">6</td><td align="left">AU 06 maximum (A_6_M)</td><td align="left">Cheek Raiser maximum</td><td align="left">0.49279</td></tr><tr><td align="left">7</td><td align="left">AU 25 root mean square(A_25_R)</td><td align="left">Lips part root mean square</td><td align="left">0.48731</td></tr><tr><td align="left">8</td><td align="left">AU 25 count (A_25_C)</td><td align="left">Lips part count</td><td align="left">0.48315</td></tr><tr><td align="left">9</td><td align="left">AU 25 mean (A_25_M)</td><td align="left">Lips part mean</td><td align="left">0.47884</td></tr><tr><td align="left">10</td><td align="left">AU 06 standard deviation (A_6_S)</td><td align="left">Cheek raiser standard deviation</td><td align="left">0.473363</td></tr></tbody></table></table-wrap><table-wrap id="Tab8"><label>Table 8</label><caption><p>The top 10 negative correlated features with their description, r value(strength of correlation and direction)</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">S no</th><th align="left">Feature Name</th><th align="left">Description</th><th align="left"><italic>r</italic> value</th></tr></thead><tbody><tr><td align="left">1</td><td align="left">AU 25 skewness (A_25_S)</td><td align="left">Lips part count skewness</td><td align="left">-0.44741</td></tr><tr><td align="left">2</td><td align="left">Fraction of locally unvoiced frames (F_L_U)</td><td align="left">It is a fraction of pitch frames analyzed as unvoiced pitch (pitch is 75Hz) frames in a voice.</td><td align="left">-0.3891</td></tr><tr><td align="left">3</td><td align="left">Degree of voice (D_V_B)</td><td align="left">This measure is total duration of breaks between the voiced parts of the speech signal</td><td align="left">-0.3784</td></tr><tr><td align="left">4</td><td align="left">AU 10 skewness (A_10_SK)</td><td align="left">Upper lip raiser skewness</td><td align="left">-0.36990</td></tr><tr><td align="left">5</td><td align="left">AU 09 skewness (A_9_S)</td><td align="left">Nose wrinkle skewness</td><td align="left">-0.34867</td></tr><tr><td align="left">6</td><td align="left">AU 25 kurtosis (A_25_K)</td><td align="left">Lips part kurtosis</td><td align="left">-0.34069</td></tr><tr><td align="left">7</td><td align="left">Pitch Skewness (P_SK)</td><td align="left">It is pitch’s skewness</td><td align="left">-0.3217</td></tr><tr><td align="left">8</td><td align="left">AU 12 skewness (A_12_SK)</td><td align="left">Lip corner puller skewness</td><td align="left">-0.3195</td></tr><tr><td align="left">9</td><td align="left">Shimmer APQ3 (SAQ)</td><td align="left">It is the average absolute difference between the amplitude of a vocal period and the average of the amplitudes of it and its 2 closest neighbours, divided by the average amplitude.</td><td align="left">-0.312</td></tr><tr><td align="left">10</td><td align="left">Mean absolute differences shimmer(MDS)</td><td align="left">Average absolute difference between consecutive differences between the amplitudes of consecutive periods.</td><td align="left">-0.3129</td></tr></tbody></table></table-wrap></p>
+        <p id="Par87">Figures <xref rid="Fig6" ref-type="fig">6</xref> and <xref rid="Fig7" ref-type="fig">7</xref> show the positive and negative correlations in the sample of participants, respectively. The feature vectors are normalized (0 to 1) for better understanding. To avoid clutter in the graphs, we have chosen only top five features rather then all the top 10 features listed in both categories.
+<fig id="Fig6"><label>Fig. 6</label><caption><p>Top 5 Positive correlated feature variations</p></caption><graphic xlink:href="11042_2022_12315_Fig6_HTML" id="MO7"/></fig><fig id="Fig7"><label>Fig. 7</label><caption><p>Top 5 Negative correlated feature variations</p></caption><graphic xlink:href="11042_2022_12315_Fig7_HTML" id="MO8"/></fig></p>
+        <p id="Par88">The graph in Fig. <xref rid="Fig6" ref-type="fig">6</xref> shows the variations of positively correlated features between depressed and non-depressed subjects. For example, A_12_R (see Table <xref rid="Tab7" ref-type="table">7</xref> S.No 2) has lower values in depressed (1-5) and higher values in Non-depressed (6-10).</p>
+        <p id="Par89">The graph in Fig. <xref rid="Fig7" ref-type="fig">7</xref> shows the variations of negatively correlated features between depressed and non-depressed subjects. For example, F_L_U(see Table <xref rid="Tab8" ref-type="table">8</xref> S.No 2) has higher values in depressed (1-5) and lower values in Non-depressed (6-10).</p>
+        <p id="Par90">Figures <xref rid="Fig8" ref-type="fig">8</xref> and <xref rid="Fig9" ref-type="fig">9</xref> show the participant’s wise variations in the positive and negative correlated features for a sample of participants, respectively.
+<fig id="Fig8"><label>Fig. 8</label><caption><p>Participant wise variations in Top 10 positive correlated features. Red and blue lines indicate the depressed and non-depressed participants, respectively</p></caption><graphic xlink:href="11042_2022_12315_Fig8_HTML" id="MO9"/></fig><fig id="Fig9"><label>Fig. 9</label><caption><p>Participant wise variations in Top 10 negative correlated features. Red and blue lines indicate the depressed and non-depressed participants, respectively</p></caption><graphic xlink:href="11042_2022_12315_Fig9_HTML" id="MO10"/></fig></p>
+        <p id="Par91">The graph in Fig. <xref rid="Fig8" ref-type="fig">8</xref> shows insights into how the positively correlated features vary between depressed and non-depressed subjects. For example, Depressed subjects exhibit lower values in A_12_S (see Table <xref rid="Tab7" ref-type="table">7</xref> S.No 1) features and higher values for non-depressed subjects for the same feature.</p>
+        <p id="Par92">The graph in Fig. <xref rid="Fig9" ref-type="fig">9</xref> shows insights into how the negatively correlated features vary between depressed and non-depressed subjects. Depressed subjects exhibit higher values in A_25_S (see Table <xref rid="Tab8" ref-type="table">8</xref> S.No 1) feature and lower values for non-depressed subjects for the same feature.</p>
+        <p id="Par93">To show single feature variations in all the participants, A_10_S (see Table <xref rid="Tab7" ref-type="table">7</xref>. S.No 5) feature from the positive correlated feature set and A_25_S (see Table <xref rid="Tab8" ref-type="table">8</xref> S.No 1) feature from the negative correlated feature set were selected. Figures <xref rid="Fig10" ref-type="fig">10</xref> and <xref rid="Fig11" ref-type="fig">11</xref> show single feature variations in positive and negative correlated features, respectively.
+<fig id="Fig10"><label>Fig. 10</label><caption><p>Positive correlated single feature variation in all participants</p></caption><graphic xlink:href="11042_2022_12315_Fig10_HTML" id="MO11"/></fig><fig id="Fig11"><label>Fig. 11</label><caption><p>Negative correlated single feature variation in all participants</p></caption><graphic xlink:href="11042_2022_12315_Fig11_HTML" id="MO12"/></fig></p>
+        <p id="Par94">The graph in Fig. <xref rid="Fig10" ref-type="fig">10</xref> shows how values are different in a single feature(positive correlated) between non-depressed and depressed subjects. For example the values of A_10_S (see Table <xref rid="Tab7" ref-type="table">7</xref>. S.No 5) feature have higher values for the most non-depressed subjects and lower for the depressed subjects.</p>
+        <p id="Par95">The graph in Fig. <xref rid="Fig11" ref-type="fig">11</xref> shows how values are different in a single feature(negative correlated) between non-depressed and depressed subjects. For example, the values of A_25_S (see Table <xref rid="Tab8" ref-type="table">8</xref> S.No 1) feature have lower values for the most non-depressed subjects and higher values for the depressed subjects.</p>
+      </sec>
+      <sec id="Sec23">
+        <title>Classification results of individual modality and using feature fusion</title>
+        <p id="Par96">This subsection describes the classification results using a family of machine learning classifiers implemented on individual data modalities and by fused data modalities. ML classifiers like LR, DT, NB, RF and SVM were used with default hyper parameters. All the results presented are in terms of average accuracy because of the balanced dataset. The dataset was randomly categorised (without any overlap) into two components:80 percent training data and 20 percent testing data. Table <xref rid="Tab9" ref-type="table">9</xref> lists the classification results using individual modality (see Fig. <xref rid="Fig12" ref-type="fig">12</xref>b for visual representation) with:1) All the extracted feature vectors (see row# 1 to 5) then with feature selection mechanisms using the reduced feature vectors based on 2) Pearson’s statistical correlation analysis(see row# 6 to 10), and 3) PCA (see row# 11 to 15). Table <xref rid="Tab10" ref-type="table">10</xref> lists the classification results using feature fusion(see Fig. <xref rid="Fig12" ref-type="fig">12</xref>b for visual representation):1)concatenating all the features of the individual modalities.(see row# 1 to 5). 2) concatenating the reduced feature vectors of individual modalities, which are obtained with Pearson correlation analysis(see row# 6 to 10), and 3) Applying PCA over concatenated feature vectors of individual modality(see row# 11 to 15).
+<fig id="Fig12"><label>Fig. 12</label><caption><p>Summary of the investigated system configuration: a) feature preparation steps for smart phone usage, audio-visual modalities. b) using normalised feature vectors of different modalities:Individual and feature fusion techniques that were investigated</p></caption><graphic xlink:href="11042_2022_12315_Fig12_HTML" id="MO6"/></fig><table-wrap id="Tab9"><label>Table 9</label><caption><p>Average accuracy classification results for individual modalities</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">S.no.</th><th align="left">Individual</th><th align="left">ML</th><th align="left" colspan="2">smart phone</th><th align="left" colspan="2">visual</th><th align="left" colspan="2">audio</th><th align="left">Average</th></tr><tr><th align="left"/><th align="left">modalities</th><th align="left">Classifiers</th><th align="left" colspan="2">modality</th><th align="left" colspan="2">modality</th><th align="left" colspan="2">modality</th><th align="left">Accuracy</th></tr><tr><th align="left"/><th align="left"/><th align="left"/><th align="left">#</th><th align="left">Acc</th><th align="left">#</th><th align="left">Acc</th><th align="left">#</th><th align="left">Acc</th><th align="left"/></tr></thead><tbody><tr><td align="left">1</td><td align="left">All features</td><td align="left">LR</td><td align="left">53</td><td align="left">61</td><td align="left">415</td><td align="left">70</td><td align="left">82</td><td align="left">60</td><td align="left">64</td></tr><tr><td align="left">2</td><td align="left"/><td align="left">DT</td><td align="left"/><td align="left">68</td><td align="left"/><td align="left">77</td><td align="left"/><td align="left">55</td><td align="left">67</td></tr><tr><td align="left">3</td><td align="left"/><td align="left">NB</td><td align="left"/><td align="left">62</td><td align="left"/><td align="left">78</td><td align="left"/><td align="left">68</td><td align="left">69</td></tr><tr><td align="left">4</td><td align="left"/><td align="left">RF</td><td align="left"/><td align="left">69</td><td align="left"/><td align="left">79</td><td align="left"/><td align="left">67</td><td align="left">72</td></tr><tr><td align="left">5</td><td align="left"/><td align="left">SVM</td><td align="left"/><td align="left">65</td><td align="left"/><td align="left">80</td><td align="left"/><td align="left">60</td><td align="left">68</td></tr><tr><td align="left">6</td><td align="left">Pearson correlation reduced feature vector</td><td align="left">LR</td><td align="left">45</td><td align="left">60</td><td align="left">166</td><td align="left">79</td><td align="left">57</td><td align="left">67</td><td align="left">69</td></tr><tr><td align="left">7</td><td align="left"/><td align="left">DT</td><td align="left"/><td align="left">50</td><td align="left"/><td align="left">80</td><td align="left"/><td align="left">60</td><td align="left">63</td></tr><tr><td align="left">8</td><td align="left"/><td align="left">NB</td><td align="left"/><td align="left">58</td><td align="left"/><td align="left">66</td><td align="left"/><td align="left">61</td><td align="left">62</td></tr><tr><td align="left">9</td><td align="left"/><td align="left">RF</td><td align="left"/><td align="left">50</td><td align="left"/><td align="left">80</td><td align="left"/><td align="left">68</td><td align="left">66</td></tr><tr><td align="left">10</td><td align="left"/><td align="left">SVM</td><td align="left"/><td align="left">55</td><td align="left"/><td align="left">80</td><td align="left"/><td align="left">72</td><td align="left">69</td></tr><tr><td align="left">11</td><td align="left">PCA</td><td align="left">LR</td><td align="left">28-30</td><td align="left">66</td><td align="left">40-42</td><td align="left">80</td><td align="left">20-22</td><td align="left">69</td><td align="left">72</td></tr><tr><td align="left">12</td><td align="left"/><td align="left">DT</td><td align="left"/><td align="left">68</td><td align="left"/><td align="left">69</td><td align="left"/><td align="left">52</td><td align="left">63</td></tr><tr><td align="left">13</td><td align="left"/><td align="left">NB</td><td align="left"/><td align="left">66</td><td align="left"/><td align="left">72</td><td align="left"/><td align="left">50</td><td align="left">63</td></tr><tr><td align="left">14</td><td align="left"/><td align="left">RF</td><td align="left"/><td align="left">66</td><td align="left"/><td align="left">79</td><td align="left"/><td align="left">50</td><td align="left">65</td></tr><tr><td align="left">15</td><td align="left"/><td align="left">SVM</td><td align="left"/><td align="left">69</td><td align="left"/><td align="left">80</td><td align="left"/><td align="left">69</td><td align="left">73</td></tr><tr><td align="left" colspan="3">Individual modality average</td><td align="left"/><td align="left">62</td><td align="left"/><td align="left">77</td><td align="left"/><td align="left">62</td><td align="left"/></tr></tbody></table><table-wrap-foot><p>#- Number of features in a resultant feature vector, Acc-accuracy, and average accuracy corresponds to the row average to demonstrate each ML classifier used in different methods. Individual modality average corresponds to the column average of the individual modality</p></table-wrap-foot></table-wrap><table-wrap id="Tab10"><label>Table 10</label><caption><p>Average Accuracy classification results for fused modalities</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">S.no.</th><th align="left">Fused</th><th align="left">ML</th><th align="left" colspan="2">smart-phone+</th><th align="left" colspan="2">smartphone +</th><th align="left" colspan="2">video+ audio</th><th align="left">Method</th><th align="left" colspan="2">All</th></tr><tr><th align="left"/><th align="left">modalities</th><th align="left">Classifiers</th><th align="left" colspan="2">audio modality</th><th align="left" colspan="2">video modality</th><th align="left" colspan="2">modality</th><th align="left">Average</th><th align="left" colspan="2">modalities</th></tr><tr><th align="left"/><th align="left"/><th align="left"/><th align="left">#</th><th align="left">Acc</th><th align="left">#</th><th align="left">Acc</th><th align="left">#</th><th align="left">Acc</th><th align="left">Acc</th><th align="left">#</th><th align="left">Acc</th></tr></thead><tbody><tr><td align="left">1</td><td align="left">Concatenate all features</td><td align="left">LR</td><td align="left">135</td><td align="left">82</td><td align="left">468</td><td align="left">78</td><td align="left">497</td><td align="left">81</td><td align="left">80</td><td align="left">550</td><td align="left"><bold>83</bold></td></tr><tr><td align="left">2</td><td align="left"/><td align="left">DT</td><td align="left"/><td align="left">81</td><td align="left"/><td align="left">78</td><td align="left"/><td align="left">80</td><td align="left">80</td><td align="left"/><td align="left">80</td></tr><tr><td align="left">3</td><td align="left"/><td align="left">NB</td><td align="left"/><td align="left">82</td><td align="left"/><td align="left">72</td><td align="left"/><td align="left">75</td><td align="left">76</td><td align="left"/><td align="left">80</td></tr><tr><td align="left">4</td><td align="left"/><td align="left">RF</td><td align="left"/><td align="left">79</td><td align="left"/><td align="left">83</td><td align="left"/><td align="left">83</td><td align="left">82</td><td align="left"/><td align="left">83</td></tr><tr><td align="left">5</td><td align="left"/><td align="left">SVM</td><td align="left"/><td align="left">81</td><td align="left"/><td align="left">79</td><td align="left"/><td align="left">83</td><td align="left">81</td><td align="left"/><td align="left"><bold>84</bold></td></tr><tr><td align="left">6</td><td align="left">Concatenate Pearson correlation removed feature vectors</td><td align="left">LR</td><td align="left">101</td><td align="left">80</td><td align="left">209</td><td align="left">81</td><td align="left">220</td><td align="left">79</td><td align="left">80</td><td align="left">265</td><td align="left">79</td></tr><tr><td align="left">7</td><td align="left"/><td align="left">DT</td><td align="left"/><td align="left">81</td><td align="left"/><td align="left">79</td><td align="left"/><td align="left">82</td><td align="left">81</td><td align="left"/><td align="left">80</td></tr><tr><td align="left">8</td><td align="left"/><td align="left">NB</td><td align="left"/><td align="left">80</td><td align="left"/><td align="left">81</td><td align="left"/><td align="left">82</td><td align="left">81</td><td align="left"/><td align="left"><bold>83</bold></td></tr><tr><td align="left">9</td><td align="left"/><td align="left">RF</td><td align="left"/><td align="left">85</td><td align="left"/><td align="left">80</td><td align="left"/><td align="left">80</td><td align="left">82</td><td align="left"/><td align="left"><bold>85</bold></td></tr><tr><td align="left">10</td><td align="left"/><td align="left">SVM</td><td align="left"/><td align="left">83</td><td align="left"/><td align="left">83</td><td align="left"/><td align="left">84</td><td align="left">83</td><td align="left"/><td align="left"><bold>86</bold></td></tr><tr><td align="left">11</td><td align="left">95% of variance of PCA over concatenated feature vectors</td><td align="left">LR</td><td align="left">40-42</td><td align="left">75</td><td align="left">30-32</td><td align="left">79</td><td align="left">40-42</td><td align="left">79</td><td align="left">78</td><td align="left">50-55</td><td align="left">78</td></tr><tr><td align="left">12</td><td align="left"/><td align="left">DT</td><td align="left"/><td align="left">70</td><td align="left"/><td align="left">62</td><td align="left"/><td align="left">60</td><td align="left">78</td><td align="left"/><td align="left">65</td></tr><tr><td align="left">13</td><td align="left"/><td align="left">NB</td><td align="left"/><td align="left">79</td><td align="left"/><td align="left">72</td><td align="left"/><td align="left">79</td><td align="left">77</td><td align="left"/><td align="left">74</td></tr><tr><td align="left">14</td><td align="left"/><td align="left">RF</td><td align="left"/><td align="left">83</td><td align="left"/><td align="left">73</td><td align="left"/><td align="left">65</td><td align="left">74</td><td align="left"/><td align="left"><bold>75</bold></td></tr><tr><td align="left">15</td><td align="left"/><td align="left">SVM</td><td align="left"/><td align="left">81</td><td align="left"/><td align="left">79</td><td align="left"/><td align="left">80</td><td align="left">80</td><td align="left"/><td align="left"><bold>82</bold></td></tr><tr><td align="left" colspan="4">Fused modalities average</td><td align="left">80</td><td align="left"/><td align="left">77</td><td align="left"/><td align="left">78</td><td align="left"/><td align="left"/><td align="left"><bold>80</bold></td></tr></tbody></table><table-wrap-foot><p>#- Number of features in a resultant feature vector,Acc-Accuracy, and method average corresponds to the row average to demonstrate each ML classifier used in different methods. Fused modalities average corresponds to the column average of the fused modality. <bold>Bold</bold>: fused modalities performed well when compared with the method average. Fused modalities average is the column average to demonstrate the average of each modality combination</p></table-wrap-foot></table-wrap></p>
+        <p id="Par97">From Table <xref rid="Tab9" ref-type="table">9</xref>, it is evident that visual results are more encouraging than smart phone usage and audio modalities in all the performed ways. The reason could be among the features extracted, visual modality features show a higher correlation than smart phone and audio modality features. (refer Section <xref rid="Sec22" ref-type="sec">4.1</xref>).</p>
+        <p id="Par98">From Table <xref rid="Tab10" ref-type="table">10</xref>, using feature fusion, SVM with the concatenation based on Pearson’s correlation analysis showed the best performance, i.e., 86% accuracy(see row# 10).where as naive byes and random forest showed slightly lesser accuracy rates of 83% and 85%, respectively(see row #8-9).</p>
+        <p id="Par99">From Tables <xref rid="Tab9" ref-type="table">9</xref> and <xref rid="Tab10" ref-type="table">10</xref>, the combination of modalities led to better performance in terms of accuracy. In most of cases, bi-modality performed better than uni-modality, tri-modality performed even better than bi-modality.</p>
+        <p id="Par100">From the results, we hypothesise that high correlation among the features contributes to redundancy in the dataset. This could confuse the classifier. Therefore removing the redundant features will enhance the performance of the system.</p>
+      </sec>
+      <sec id="Sec24">
+        <title>Comparisons of results on benchmarking dataset</title>
+        <p id="Par101">Lastly, we demonstrate the effectiveness of the proposed approach by the comparison of the results on a subset of feature vectors on DAIC dataset(widely used benchmarking dataset in depression detection). However, it is to be noted that this dataset contains only visual and audio data modalities and lacks smartphone usage data. To the best of our knowledge, we could not find any benchmarking dataset with all the three data modalities that we have proposed. Hence we have chosen this dataset to compare the results with the two data modalities.</p>
+        <p id="Par102">The features (described in Section <xref rid="Sec15" ref-type="sec">3.4.2</xref> visual feature extraction and Section <xref rid="Sec16" ref-type="sec">3.4.3</xref> audio feature extraction) were extracted on the DAIC dataset, and the results were compared. Table <xref rid="Tab11" ref-type="table">11</xref> lists the average accuracies with the proposed feature vectors on ML Classifiers on DAIC dataset.
+<table-wrap id="Tab11"><label>Table 11</label><caption><p>Results of proposed approach on DAIC Dataset</p></caption><table frame="hsides" rules="groups"><thead><tr><th align="left">S.no.</th><th align="left">ML Classifiers</th><th align="left">Fused</th><th align="left" colspan="2">All features</th><th align="left" colspan="2">Pearson correlation</th><th align="left" colspan="2">PCA</th></tr><tr><th align="left"/><th align="left"/><th align="left">modalities</th><th align="left" colspan="2">features</th><th align="left" colspan="2">reduced feature vector</th><th align="left"/><th align="left"/></tr><tr><th align="left"/><th align="left"/><th align="left"/><th align="left">#</th><th align="left">Acc</th><th align="left">#</th><th align="left">Acc</th><th align="left">#</th><th align="left">Acc</th></tr></thead><tbody><tr><td align="left">1</td><td align="left">Logistic Regression</td><td align="left">Audio</td><td align="left">82</td><td align="left">70</td><td align="left">50</td><td align="left">81</td><td align="left">20-25</td><td align="left">68</td></tr><tr><td align="left">2</td><td align="left"/><td align="left">Video</td><td align="left">230</td><td align="left">81</td><td align="left">72</td><td align="left">83</td><td align="left">20-25</td><td align="left">80</td></tr><tr><td align="left">3</td><td align="left"/><td align="left">Video + Audio</td><td align="left">312</td><td align="left">83</td><td align="left">122</td><td align="left"><bold>86</bold></td><td align="left">30-35</td><td align="left">83</td></tr><tr><td align="left">4</td><td align="left">Decision Tree</td><td align="left">Audio</td><td align="left">82</td><td align="left">62</td><td align="left">50</td><td align="left">71</td><td align="left">20-25</td><td align="left">62</td></tr><tr><td align="left">5</td><td align="left"/><td align="left">Video</td><td align="left">230</td><td align="left">80</td><td align="left">72</td><td align="left">80</td><td align="left">20-25</td><td align="left">82</td></tr><tr><td align="left">6</td><td align="left"/><td align="left">Video + Audio</td><td align="left">312</td><td align="left">80</td><td align="left">122</td><td align="left">82</td><td align="left">30-35</td><td align="left">82</td></tr><tr><td align="left">7</td><td align="left">Naive Bayes</td><td align="left">Audio</td><td align="left">82</td><td align="left">55</td><td align="left">50</td><td align="left">70</td><td align="left">20-25</td><td align="left">70</td></tr><tr><td align="left">8</td><td align="left"/><td align="left">Video</td><td align="left">230</td><td align="left">80</td><td align="left">72</td><td align="left">75</td><td align="left">20-25</td><td align="left">80</td></tr><tr><td align="left">9</td><td align="left"/><td align="left">Video + Audio</td><td align="left">312</td><td align="left">80</td><td align="left">122</td><td align="left">82</td><td align="left">30-35</td><td align="left">80</td></tr><tr><td align="left">10</td><td align="left">Random Forest</td><td align="left">Audio</td><td align="left">82</td><td align="left">74</td><td align="left">50</td><td align="left">66</td><td align="left">20-25</td><td align="left">64</td></tr><tr><td align="left">11</td><td align="left"/><td align="left">Video</td><td align="left">230</td><td align="left">85</td><td align="left">72</td><td align="left">80</td><td align="left">20-25</td><td align="left">81</td></tr><tr><td align="left">12</td><td align="left"/><td align="left">Video + Audio</td><td align="left">312</td><td align="left">85</td><td align="left">122</td><td align="left">85</td><td align="left">30-35</td><td align="left">81</td></tr><tr><td align="left">13</td><td align="left">Support Vector Machines</td><td align="left">Audio</td><td align="left">82</td><td align="left">74</td><td align="left">50</td><td align="left">68</td><td align="left">20-25</td><td align="left">67</td></tr><tr><td align="left">14</td><td align="left"/><td align="left">Video</td><td align="left">230</td><td align="left">85</td><td align="left">72</td><td align="left">83</td><td align="left">20-25</td><td align="left">82</td></tr><tr><td align="left">15</td><td align="left"/><td align="left">Video + Audio</td><td align="left">312</td><td align="left">85</td><td align="left">122</td><td align="left"><bold>86</bold></td><td align="left">30-35</td><td align="left">83</td></tr></tbody></table><table-wrap-foot><p># - number of features in the feature vector. Acc-Accuracy, and <bold>BOLD</bold>: Best accuracies obtained Note- DAIC dataset does not contain all the low-level openface feature sets. Hence we extracted statistical feature vector on the available low-level feature vector of DAIC dataset</p></table-wrap-foot></table-wrap></p>
+        <p id="Par103">From Fig. <xref rid="Fig13" ref-type="fig">13</xref>, it is evident that LR and SVM using audio and video achieved 86% accuracy. Hence we believe that our approach can work on any kind of depressive diagnosis detection with similar cues.
+<fig id="Fig13"><label>Fig. 13</label><caption><p>Comparision of accuracies over ML classifiers with feature selection methods: All Features, Pearson’s correlation analysis, and PCA using both audio and video</p></caption><graphic xlink:href="11042_2022_12315_Fig13_HTML" id="MO13"/></fig></p>
+        <p id="Par104">An alternative measure of accuracy,the Receiver Operating Characteristic(ROC) [<xref ref-type="bibr" rid="CR29">29</xref>] is shown in Fig. <xref rid="Fig14" ref-type="fig">14</xref>. In ROC curve,a graph between true positive rate(sensitivity) and false positive rate(specificity) of ML classifiers were plotted. Curves were plotted using Pearson’s correlation reduced feature vector, which gave the best accuracy. The Area under the ROC Curve called as AUC(Area Under Curve) is also provided is Fig. <xref rid="Fig14" ref-type="fig">14</xref>. it can be seen that, the highest Score of AUC (79%) for SVM classifier that indicates better performance over other classifiers in classifying depressed and non-depressed subjects.
+<fig id="Fig14"><label>Fig. 14</label><caption><p>ROC curve of ML classifiers</p></caption><graphic xlink:href="11042_2022_12315_Fig14_HTML" id="MO14"/></fig></p>
+      </sec>
+    </sec>
+    <sec id="Sec25">
+      <title>Conclusion</title>
+      <p id="Par105">This study investigated multi modal features extracted from MCS and task/interview based mechanism to identify depressed and non-depressed participants. For this purpose, the user data was collected in a unique way by acquiring their smartphones usage data, emotion and speech elicitation mechanisms. In our research, we designed and experimented with an end-to-end machine learning approach, which involves multimodal data collection, feature extraction, feature selection, feature fusion, and classification to determine and distinguish depressed and non-depressed subjects. We experimented with: various features from multimodalities individually, and by fusing them, features selection techniques based on PCA and Pearson’s correlation analysis, and different machine learning classifiers such as Logistic Regression, Decision Tree, Naive Bayes, Random Forest, Support Vector Machines for classification.</p>
+      <p id="Par106">Our findings suggest that combining features from multiple modality performs better than any single data modality and the best classification accuracy is achieved when features from all the three data modality are fused. Also feature selection method based on Pearson’s correlation coefficients improved the accuracy in comparison to using all the features and other selection technique like PCA. Amongst different machine learning classifiers that we experimented with, SVM yielded the best accuracy of 86%. Our proposed approach was also applied on a benchmarking dataset, and results demonstrated multimodal approach to be advantageous in performance with state-of-the-art depression recognition techniques.</p>
+    </sec>
+    <sec id="Sec26">
+      <title>Limitations and future work</title>
+      <p id="Par107">It is a common problem in similar kind of studies, that the limited number of participants because of the selection criteria could affect the result analysis. A large-scale study using a clinically validated depression diagnosis is preferable. Demographic labels(gender, age, marital status, etc.), which are the main factors for depression diagnosis, can be further explored.</p>
+      <p id="Par108">For the study, we have manually collected verbal and non-verbal cues using zoom meetings. Developing an automatic assessment technique using a mobile application that could monitor the mobile phone usage patterns and check the verbal and nonverbal indicators(when user provide permission) would be more beneficial.</p>
+      <p id="Par109">In the present work, we have used a popular technique of Pearson’s correlation for statistical analysis. However, different statistical analysis techniques and their comparative study could reveal the more scientific significance of the work.</p>
+      <p id="Par110">Our proposed approach needs at least 14 days of smart phone usage patterns for classification, which could be a little costly. Any machine learning algorithm has to maintain a trade-off between the time duration required and output prediction. Future studies will build a classification approach with 3/7/10 days of the most influential factors that contribute to depression diagnosis.</p>
+      <p id="Par111">Our future work will explore semantic cues in verbal, head pose and eye gaze features in visual, along with skin conductance and heartbeat in physiological modalities along with a focus on more advanced smart phone usage variables.</p>
+    </sec>
+  </body>
+  <back>
+    <fn-group>
+      <fn id="Fn1">
+        <label>1</label>
+        <p id="Par19">
+          <ext-link ext-link-type="uri" xlink:href="https://www.funf.org/journal.html">https://www.funf.org/journal.html</ext-link>
+        </p>
+      </fn>
+      <fn id="Fn2">
+        <label>2</label>
+        <p id="Par24">
+          <ext-link ext-link-type="uri" xlink:href="https://imotions.com/">https://imotions.com/</ext-link>
+        </p>
+      </fn>
+      <fn id="Fn3">
+        <label>3</label>
+        <p id="Par29">
+          <ext-link ext-link-type="uri" xlink:href="https://www.fon.hum.uva.nl/praat/">https://www.fon.hum.uva.nl/praat/</ext-link>
+        </p>
+      </fn>
+      <fn id="Fn4">
+        <label>4</label>
+        <p id="Par51">
+          <ext-link ext-link-type="uri" xlink:href="http://sox.sourceforge.net/">http://sox.sourceforge.net/</ext-link>
+        </p>
+      </fn>
+      <fn id="Fn5">
+        <label>5</label>
+        <p id="Par52">
+          <ext-link ext-link-type="uri" xlink:href="https://www.fon.hum.uva.nl/praat/">https://www.fon.hum.uva.nl/praat/</ext-link>
+        </p>
+      </fn>
+      <fn>
+        <p>
+          <bold>Publisher’s note</bold>
+        </p>
+        <p>Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.</p>
+      </fn>
+    </fn-group>
+    <ack>
+      <title>Acknowledgements</title>
+      <p>The authors wish to thank all the participants who helped to do this research.</p>
+    </ack>
+    <notes>
+      <title>Declarations</title>
+      <notes id="FPar1">
+        <title>Ethics approval</title>
+        <p id="Par112">The experimental procedure used for the study is approved by the Institutional Committee of Visveswaraya National Institute of Technology, Nagpur, India. For this research study, volunteer’s smart phone usage logs, visual and verbal data were used only after obtaining informed written consent forms.</p>
+      </notes>
+      <notes id="FPar2" notes-type="COI-statement">
+        <title>
+          <bold>Conflict of Interests</bold>
+        </title>
+        <p id="Par113">There is no conflict of interest.</p>
+      </notes>
+    </notes>
+    <ref-list id="Bib1">
+      <title>References</title>
+      <ref id="CR1">
+        <label>1.</label>
+        <mixed-citation publication-type="other">Agarwal S (2013) Data mining: data mining concepts and techniques, 203–207 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR2">
+        <label>2.</label>
+        <mixed-citation publication-type="other">Alghowinem S, Goecke R, Wagner M, Parker G, Breakspear M (2013) Eye movement analysis for depression detection, 4220–4224 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR3">
+        <label>3.</label>
+        <mixed-citation publication-type="other">Alghowinem S, Goecke R, Wagner M, Parkerx G, Breakspear M (2013) Head pose and movement analysis as an indicator of depression, 283–288 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR4">
+        <label>4.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Alghowinem</surname>
+              <given-names>S</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Multimodal depression detection: fusion analysis of paralinguistic, head pose and eye gaze behaviors</article-title>
+          <source>IEEE Trans Affect Comput</source>
+          <year>2016</year>
+          <volume>9</volume>
+          <issue>4</issue>
+          <fpage>478</fpage>
+          <lpage>490</lpage>
+          <pub-id pub-id-type="doi">10.1109/TAFFC.2016.2634527</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR5">
+        <label>5.</label>
+        <mixed-citation publication-type="other">Asgari M, Shafran I, Sheeber LB (2014) Inferring clinical depression from speech and spoken utterances, 1–5 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR6">
+        <label>6.</label>
+        <mixed-citation publication-type="other">Baltrusaitis T, Zadeh A, Lim YC, Morency L-P (2018) Openface 2.0: Facial behavior analysis toolkit 59–66 (IEEE</mixed-citation>
+      </ref>
+      <ref id="CR7">
+        <label>7.</label>
+        <mixed-citation publication-type="other">Barbosa PA, Madureira S (2016) Elicitation techniques for cross-linguistic research on professional and non-professional speaking styles, 503–507</mixed-citation>
+      </ref>
+      <ref id="CR8">
+        <label>8.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Beck</surname>
+              <given-names>AT</given-names>
+            </name>
+            <name>
+              <surname>Ward</surname>
+              <given-names>CH</given-names>
+            </name>
+            <name>
+              <surname>Mendelson</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Mock</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Erbaugh</surname>
+              <given-names>J</given-names>
+            </name>
+          </person-group>
+          <article-title>An inventory for measuring depression</article-title>
+          <source>Arch Gen Psychiatr</source>
+          <year>1961</year>
+          <volume>4</volume>
+          <issue>6</issue>
+          <fpage>561</fpage>
+          <lpage>571</lpage>
+          <pub-id pub-id-type="doi">10.1001/archpsyc.1961.01710120031004</pub-id>
+          <pub-id pub-id-type="pmid">13688369</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR9">
+        <label>9.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ciman</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Wac</surname>
+              <given-names>K</given-names>
+            </name>
+          </person-group>
+          <article-title>Individuals’ stress assessment using human-smartphone interaction analysis</article-title>
+          <source>IEEE Trans Affect Comput</source>
+          <year>2016</year>
+          <volume>9</volume>
+          <issue>1</issue>
+          <fpage>51</fpage>
+          <lpage>65</lpage>
+          <pub-id pub-id-type="doi">10.1109/TAFFC.2016.2592504</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR10">
+        <label>10.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Colom</surname>
+              <given-names>F</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Group psychoeducation for stabilised bipolar disorders: 5-year outcome of a randomised clinical trial</article-title>
+          <source>Br J Psychiatry</source>
+          <year>2009</year>
+          <volume>194</volume>
+          <issue>3</issue>
+          <fpage>260</fpage>
+          <lpage>265</lpage>
+          <pub-id pub-id-type="doi">10.1192/bjp.bp.107.040485</pub-id>
+          <pub-id pub-id-type="pmid">19252157</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR11">
+        <label>11.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Cootes</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Edwards</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Taylor</surname>
+              <given-names>C</given-names>
+            </name>
+          </person-group>
+          <article-title>Robust real-time periodic motion detection, analysis, and applications</article-title>
+          <source>IEEE Trans Patt Analy Mach Intell</source>
+          <year>2001</year>
+          <volume>23</volume>
+          <issue>6</issue>
+          <fpage>681</fpage>
+          <lpage>685</lpage>
+          <pub-id pub-id-type="doi">10.1109/34.927467</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR12">
+        <label>12.</label>
+        <mixed-citation publication-type="other">Cummins N, Epps J, Breakspear M, Goecke R (2011) An investigation of depressed speech detection: features and normalization</mixed-citation>
+      </ref>
+      <ref id="CR13">
+        <label>13.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Cummins</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Sethu</surname>
+              <given-names>V</given-names>
+            </name>
+            <name>
+              <surname>Epps</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Schnieder</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Krajewski</surname>
+              <given-names>J</given-names>
+            </name>
+          </person-group>
+          <article-title>Analysis of acoustic space variability in speech affected by depression</article-title>
+          <source>Speech Comm</source>
+          <year>2015</year>
+          <volume>75</volume>
+          <fpage>27</fpage>
+          <lpage>49</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.specom.2015.09.003</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR14">
+        <label>14.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Cummins</surname>
+              <given-names>N</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>A review of depression and suicide risk assessment using speech analysis</article-title>
+          <source>Speech Comm</source>
+          <year>2015</year>
+          <volume>71</volume>
+          <fpage>10</fpage>
+          <lpage>49</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.specom.2015.03.004</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR15">
+        <label>15.</label>
+        <mixed-citation publication-type="other">De Vos M et al (2016) Detecting bipolar depression from geographic location data IEEE Transactions on Biomedical Engineering 64 (8)</mixed-citation>
+      </ref>
+      <ref id="CR16">
+        <label>16.</label>
+        <mixed-citation publication-type="other">Degottex G, Kane J, Drugman T, Raitio T, Scherer S (2014) Covarep—a collaborative voice analysis repository for speech technologies, 960–964 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR17">
+        <label>17.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ekman</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Davidson</surname>
+              <given-names>RJ</given-names>
+            </name>
+            <name>
+              <surname>Friesen</surname>
+              <given-names>WV</given-names>
+            </name>
+          </person-group>
+          <article-title>The duchenne smile: emotional expression and brain physiology: Ii</article-title>
+          <source>J Pers Soc Psychol</source>
+          <year>1990</year>
+          <volume>58</volume>
+          <issue>2</issue>
+          <fpage>342</fpage>
+          <pub-id pub-id-type="doi">10.1037/0022-3514.58.2.342</pub-id>
+          <pub-id pub-id-type="pmid">2319446</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR18">
+        <label>18.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ekman</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Matsumoto</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Friesen</surname>
+              <given-names>WV</given-names>
+            </name>
+          </person-group>
+          <article-title>Facial expression in affective disorders</article-title>
+          <source>What the Face Reveals: Basic and Applied studies of Spontaneous Expression Using the Facial Action Coding System (FACS)</source>
+          <year>1997</year>
+          <volume>2</volume>
+          <fpage>331</fpage>
+          <lpage>342</lpage>
+        </element-citation>
+      </ref>
+      <ref id="CR19">
+        <label>19.</label>
+        <mixed-citation publication-type="other">Eyben F, Wöllmer M, Schuller B (2010) Opensmile: the munich versatile and fast open-source audio feature extractor, 1459–1462</mixed-citation>
+      </ref>
+      <ref id="CR20">
+        <label>20.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Fukazawa</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Predicting anxiety state using smartphone-based passive sensing</article-title>
+          <source>J Biomed Inform</source>
+          <year>2019</year>
+          <volume>93</volume>
+          <fpage>103151</fpage>
+          <pub-id pub-id-type="doi">10.1016/j.jbi.2019.103151</pub-id>
+          <pub-id pub-id-type="pmid">30880254</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR21">
+        <label>21.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Fukazawa</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Smartphone-based mental state estimation: a survey from a machine learning perspective</article-title>
+          <source>J Inf Process</source>
+          <year>2020</year>
+          <volume>28</volume>
+          <fpage>16</fpage>
+          <lpage>30</lpage>
+        </element-citation>
+      </ref>
+      <ref id="CR22">
+        <label>22.</label>
+        <mixed-citation publication-type="other">Girard JM, Cohn JF, Mahoor MH, Mavadati S, Rosenwald DP (2013) Social risk depression: evidence from manual and automatic facial expression analysis, 1–8 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR23">
+        <label>23.</label>
+        <mixed-citation publication-type="other">Gratch J et al (2014) The distress analysis interview corpus of human and computer interviews, 3123–3128</mixed-citation>
+      </ref>
+      <ref id="CR24">
+        <label>24.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Guntuku</surname>
+              <given-names>SC</given-names>
+            </name>
+            <name>
+              <surname>Yaden</surname>
+              <given-names>DB</given-names>
+            </name>
+            <name>
+              <surname>Kern</surname>
+              <given-names>ML</given-names>
+            </name>
+            <name>
+              <surname>Ungar</surname>
+              <given-names>LH</given-names>
+            </name>
+            <name>
+              <surname>Eichstaedt</surname>
+              <given-names>JC</given-names>
+            </name>
+          </person-group>
+          <article-title>Detecting depression and mental illness on social media: an integrative review</article-title>
+          <source>Curr Opin Behav Sci</source>
+          <year>2017</year>
+          <volume>18</volume>
+          <fpage>43</fpage>
+          <lpage>49</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.cobeha.2017.07.005</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR25">
+        <label>25.</label>
+        <mixed-citation publication-type="other">Kanade T, Cohn JF, Tian Y (2000) Comprehensive database for facial expression analysis, 46–53 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR26">
+        <label>26.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kanter</surname>
+              <given-names>JW</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Comparison of 3 depression screening methods and provider referral in a veterans affairs primary care clinic</article-title>
+          <source>Prim Care Comp J Clin Physchiatry</source>
+          <year>2003</year>
+          <volume>5</volume>
+          <issue>6</issue>
+          <fpage>245</fpage>
+        </element-citation>
+      </ref>
+      <ref id="CR27">
+        <label>27.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kelly</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Condell</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Curran</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Caulfield</surname>
+              <given-names>B</given-names>
+            </name>
+          </person-group>
+          <article-title>A multimodal smartphone sensor system for behaviour measurement and health status inference</article-title>
+          <source>Information Fusion</source>
+          <year>2020</year>
+          <volume>53</volume>
+          <fpage>43</fpage>
+          <lpage>54</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.inffus.2019.06.008</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR28">
+        <label>28.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kelly</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Curran</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Caulfield</surname>
+              <given-names>B</given-names>
+            </name>
+          </person-group>
+          <article-title>Automatic prediction of health status using smartphone-derived behavior profiles</article-title>
+          <source>IEEE Biomed Health Inform</source>
+          <year>2017</year>
+          <volume>21</volume>
+          <issue>6</issue>
+          <fpage>1750</fpage>
+          <lpage>1760</lpage>
+          <pub-id pub-id-type="doi">10.1109/JBHI.2017.2649602</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR29">
+        <label>29.</label>
+        <mixed-citation publication-type="other">Khan A, Zubair S (2020) An improved multi-modal based machine learning approach for the prognosis of alzheimer’s disease. Journal of King Saud University-Computer and Information Sciences</mixed-citation>
+      </ref>
+      <ref id="CR30">
+        <label>30.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kroenke</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Spitzer</surname>
+              <given-names>RL</given-names>
+            </name>
+            <name>
+              <surname>Williams</surname>
+              <given-names>JB</given-names>
+            </name>
+          </person-group>
+          <article-title>The phq-9: validity of a brief depression severity measure</article-title>
+          <source>J Gen Intern Med</source>
+          <year>2001</year>
+          <volume>16</volume>
+          <issue>9</issue>
+          <fpage>606</fpage>
+          <lpage>613</lpage>
+          <pub-id pub-id-type="doi">10.1046/j.1525-1497.2001.016009606.x</pub-id>
+          <pub-id pub-id-type="pmid">11556941</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR31">
+        <label>31.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kumar</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Chong</surname>
+              <given-names>I</given-names>
+            </name>
+          </person-group>
+          <article-title>Correlation analysis to identify the effective data in machine learning: prediction of depressive disorder and emotion states</article-title>
+          <source>Intern Env Res Public Health</source>
+          <year>2018</year>
+          <volume>15</volume>
+          <issue>12</issue>
+          <fpage>2907</fpage>
+          <pub-id pub-id-type="doi">10.3390/ijerph15122907</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR32">
+        <label>32.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Latif</surname>
+              <given-names>S</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Leveraging data science to combat covid-19: a comprehensive review</article-title>
+          <source>IEEE Trans Artif Intell</source>
+          <year>2020</year>
+          <volume>1</volume>
+          <issue>1</issue>
+          <fpage>85</fpage>
+          <lpage>103</lpage>
+          <pub-id pub-id-type="doi">10.1109/TAI.2020.3020521</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR33">
+        <label>33.</label>
+        <mixed-citation publication-type="other">Li M et al (2020) Method of depression classification based on behavioral and physiological signals of eye movement. Complexity 2020</mixed-citation>
+      </ref>
+      <ref id="CR34">
+        <label>34.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lin</surname>
+              <given-names>LY</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Association between social media use and depression among us young adults</article-title>
+          <source>Depression and Anxiety</source>
+          <year>2016</year>
+          <volume>33</volume>
+          <issue>4</issue>
+          <fpage>323</fpage>
+          <lpage>331</lpage>
+          <pub-id pub-id-type="doi">10.1002/da.22466</pub-id>
+          <pub-id pub-id-type="pmid">26783723</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR35">
+        <label>35.</label>
+        <mixed-citation publication-type="other">Littlewort G et al (2011) The computer expression recognition toolbox (cert) 298–305 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR36">
+        <label>36.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Liu</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Shen</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Narman</surname>
+              <given-names>HS</given-names>
+            </name>
+            <name>
+              <surname>Chung</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Lin</surname>
+              <given-names>ZA</given-names>
+            </name>
+          </person-group>
+          <article-title>Survey of mobile crowdsensing techniques: a critical component for the internet of things</article-title>
+          <source>ACM Trans Cyber-Phys Syst</source>
+          <year>2018</year>
+          <volume>2</volume>
+          <issue>3</issue>
+          <fpage>1</fpage>
+          <lpage>26</lpage>
+          <pub-id pub-id-type="doi">10.1145/3185504</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR37">
+        <label>37.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Masud</surname>
+              <given-names>MT</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Unobtrusive monitoring of behavior and movement patterns to detect clinical depression severity level via smartphone</article-title>
+          <source>J Biomed Inform</source>
+          <year>2020</year>
+          <volume>103</volume>
+          <fpage>103371</fpage>
+          <pub-id pub-id-type="doi">10.1016/j.jbi.2019.103371</pub-id>
+          <pub-id pub-id-type="pmid">31935462</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR38">
+        <label>38.</label>
+        <mixed-citation publication-type="other">Morales M, Scherer S, Levitan R (2017) A cross-modal review of indicators for depression detection systems, 1–12</mixed-citation>
+      </ref>
+      <ref id="CR39">
+        <label>39.</label>
+        <mixed-citation publication-type="other">Moshe I et al (2021) Predicting symptoms of depression and anxiety using smartphone and wearable data. Frontiers in psychiatry 12</mixed-citation>
+      </ref>
+      <ref id="CR40">
+        <label>40.</label>
+        <mixed-citation publication-type="other">Moshe I et al (2021) Predicting symptoms of depression and anxiety using smartphone and wearable data. Frontiers in psychiatry 43</mixed-citation>
+      </ref>
+      <ref id="CR41">
+        <label>41.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Narziev</surname>
+              <given-names>N</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Stdd: short-term depression detection with passive sensing</article-title>
+          <source>Sensors</source>
+          <year>2020</year>
+          <volume>20</volume>
+          <issue>5</issue>
+          <fpage>1396</fpage>
+          <pub-id pub-id-type="doi">10.3390/s20051396</pub-id>
+          <pub-id pub-id-type="pmid">32143358</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR42">
+        <label>42.</label>
+        <mixed-citation publication-type="other">Nasir M, Jati A, Shivakumar PG, Nallan Chakravarthula S, Georgiou P (2016) Multimodal and multiresolution depression detection from speech and facial landmark features, 43–50</mixed-citation>
+      </ref>
+      <ref id="CR43">
+        <label>43.</label>
+        <mixed-citation publication-type="other">Organization WH et al (2017) Depression and other common mental disorders: global health estimates. Tech. Rep. World Health Organization</mixed-citation>
+      </ref>
+      <ref id="CR44">
+        <label>44.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Pabba</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Kumar</surname>
+              <given-names>P</given-names>
+            </name>
+          </person-group>
+          <article-title>An intelligent system for monitoring students’ engagement in large classroom teaching through facial expression recognition</article-title>
+          <source>Expert Syst</source>
+          <year>2022</year>
+          <volume>39</volume>
+          <issue>1</issue>
+          <fpage>e12839</fpage>
+          <pub-id pub-id-type="doi">10.1111/exsy.12839</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR45">
+        <label>45.</label>
+        <mixed-citation publication-type="other">Pampouchidou A (2018) Automatic detection of visual cues associated to depression. Ph.d. thesis schooluniversité Bourgogne franche-comté</mixed-citation>
+      </ref>
+      <ref id="CR46">
+        <label>46.</label>
+        <mixed-citation publication-type="other">Pampouchidou A et al (2016) Depression assessment by fusing high and low level features from audio, video, and text, 27–34</mixed-citation>
+      </ref>
+      <ref id="CR47">
+        <label>47.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Pampouchidou</surname>
+              <given-names>A</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Automatic assessment of depression based on visual cues: A systematic review</article-title>
+          <source>IEEE Trans Affect Comput</source>
+          <year>2017</year>
+          <volume>10</volume>
+          <issue>4</issue>
+          <fpage>445</fpage>
+          <lpage>470</lpage>
+          <pub-id pub-id-type="doi">10.1109/TAFFC.2017.2724035</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR48">
+        <label>48.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Panicker</surname>
+              <given-names>SS</given-names>
+            </name>
+            <name>
+              <surname>Gayathri</surname>
+              <given-names>P</given-names>
+            </name>
+          </person-group>
+          <article-title>A survey of machine learning techniques in physiology based mental stress detection systems</article-title>
+          <source>Biocybern Biomed Eng</source>
+          <year>2019</year>
+          <volume>39</volume>
+          <issue>2</issue>
+          <fpage>444</fpage>
+          <lpage>469</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.bbe.2019.01.004</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR49">
+        <label>49.</label>
+        <mixed-citation publication-type="other">Pediaditis M et al (2015) Extraction of facial features as indicators of stress and anxiety, 3711–3714 (IEEE)</mixed-citation>
+      </ref>
+      <ref id="CR50">
+        <label>50.</label>
+        <mixed-citation publication-type="other">Ray A, Kumar S, Reddy R, Mukherjee P, Garg R (2019) Multi-level attention network using text, audio and video for depression prediction, 81–88</mixed-citation>
+      </ref>
+      <ref id="CR51">
+        <label>51.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Rush</surname>
+              <given-names>AJ</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>The 16-item quick inventory of depressive symptomatology (qids), clinician rating (qids-c), and self-report (qids-sr): a psychometric evaluation in patients with chronic major depression</article-title>
+          <source>Biol Psychiatry</source>
+          <year>2003</year>
+          <volume>54</volume>
+          <issue>5</issue>
+          <fpage>573</fpage>
+          <lpage>583</lpage>
+          <pub-id pub-id-type="doi">10.1016/S0006-3223(02)01866-8</pub-id>
+          <pub-id pub-id-type="pmid">12946886</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR52">
+        <label>52.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Saeb</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Lattie</surname>
+              <given-names>EG</given-names>
+            </name>
+            <name>
+              <surname>Schueller</surname>
+              <given-names>SM</given-names>
+            </name>
+            <name>
+              <surname>Kording</surname>
+              <given-names>KP</given-names>
+            </name>
+            <name>
+              <surname>Mohr</surname>
+              <given-names>DC</given-names>
+            </name>
+          </person-group>
+          <article-title>The relationship between mobile phone location sensor data and depressive symptom severity</article-title>
+          <source>PeerJ</source>
+          <year>2016</year>
+          <volume>4</volume>
+          <fpage>e2537</fpage>
+          <pub-id pub-id-type="doi">10.7717/peerj.2537</pub-id>
+          <pub-id pub-id-type="pmid">28344895</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR53">
+        <label>53.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Salari</surname>
+              <given-names>N</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Prevalence of stress, anxiety, depression among the general population during the covid-19 pandemic: a systematic review and meta-analysis</article-title>
+          <source>Glob Health</source>
+          <year>2020</year>
+          <volume>16</volume>
+          <issue>1</issue>
+          <fpage>1</fpage>
+          <lpage>11</lpage>
+        </element-citation>
+      </ref>
+      <ref id="CR54">
+        <label>54.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Scherer</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Lucas</surname>
+              <given-names>GM</given-names>
+            </name>
+            <name>
+              <surname>Gratch</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Rizzo</surname>
+              <given-names>AS</given-names>
+            </name>
+            <name>
+              <surname>Morency</surname>
+              <given-names>L-P</given-names>
+            </name>
+          </person-group>
+          <article-title>Self-reported symptoms of depression and ptsd are associated with reduced vowel space in screening interviews</article-title>
+          <source>IEEE Trans Affect Comput</source>
+          <year>2015</year>
+          <volume>7</volume>
+          <issue>1</issue>
+          <fpage>59</fpage>
+          <lpage>73</lpage>
+        </element-citation>
+      </ref>
+      <ref id="CR55">
+        <label>55.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Seppälä</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Mobile phone and wearable sensor-based mhealth approaches for psychiatric disorders and symptoms: systematic review</article-title>
+          <source>JMIR Mental Health</source>
+          <year>2019</year>
+          <volume>6</volume>
+          <issue>2</issue>
+          <fpage>e9819</fpage>
+          <pub-id pub-id-type="doi">10.2196/mental.9819</pub-id>
+          <pub-id pub-id-type="pmid">30785404</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR56">
+        <label>56.</label>
+        <mixed-citation publication-type="other">Stasak B (2018) An investigation of acoustic, linguistic and affect based methods for speech depression assessment</mixed-citation>
+      </ref>
+      <ref id="CR57">
+        <label>57.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Uhrig</surname>
+              <given-names>MK</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Emotion elicitation: A comparison of pictures and films</article-title>
+          <source>Front Psychol</source>
+          <year>2016</year>
+          <volume>7</volume>
+          <fpage>180</fpage>
+          <pub-id pub-id-type="doi">10.3389/fpsyg.2016.00180</pub-id>
+          <pub-id pub-id-type="pmid">26925007</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR58">
+        <label>58.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Wang</surname>
+              <given-names>Q</given-names>
+            </name>
+            <name>
+              <surname>Yang</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Yu</surname>
+              <given-names>Y</given-names>
+            </name>
+          </person-group>
+          <article-title>Facial expression video analysis for depression detection in chinese patients</article-title>
+          <source>J Vis Commun Image Represent</source>
+          <year>2018</year>
+          <volume>57</volume>
+          <fpage>228</fpage>
+          <lpage>233</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.jvcir.2018.11.003</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR59">
+        <label>59.</label>
+        <mixed-citation publication-type="other">Williamson JR, Quatieri TF, Helfer BS, Ciccarelli G, Mehta DD (2014) Vocal and facial biomarkers of depression based on motor incoordination and timing, 65–72</mixed-citation>
+      </ref>
+      <ref id="CR60">
+        <label>60.</label>
+        <mixed-citation publication-type="other">Williamson JR et al (2016) Detecting depression using vocal, facial and semantic communication cues, 11–18</mixed-citation>
+      </ref>
+      <ref id="CR61">
+        <label>61.</label>
+        <mixed-citation publication-type="other">Xiong H, Huang Y, Barnes LE, Gerber MS (2016) Sensus: a cross-platform, general-purpose system for mobile crowdsensing in human-subject studies, 415–426</mixed-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

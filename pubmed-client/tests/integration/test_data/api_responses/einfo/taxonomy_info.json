@@ -1,0 +1,426 @@
+{
+  "header": { "type": "einfo", "version": "0.3" },
+  "einforesult": {
+    "dbinfo": [
+      {
+        "dbname": "taxonomy",
+        "menuname": "Taxonomy",
+        "description": "Taxonomy db",
+        "dbbuild": "Build250625-0215.1",
+        "count": "2815151",
+        "lastupdate": "2025/06/25 02:56",
+        "fieldlist": [
+          {
+            "name": "ALL",
+            "fullname": "All Fields",
+            "description": "All terms from all searchable fields",
+            "termcount": "47677027",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UID",
+            "fullname": "Taxonomy ID",
+            "description": "Unique number assigned to publication",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "FILT",
+            "fullname": "Filter",
+            "description": "Limits the records",
+            "termcount": "258",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SCIN",
+            "fullname": "Scientific Name",
+            "description": "Scientific name of organism",
+            "termcount": "2688890",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "COMN",
+            "fullname": "Common Name",
+            "description": "Common name of organism",
+            "termcount": "48482",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TXSY",
+            "fullname": "Synonym",
+            "description": "Synonym of organism name",
+            "termcount": "355209",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ALLN",
+            "fullname": "All Names",
+            "description": "All aliases for organism",
+            "termcount": "4474874",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "NXLV",
+            "fullname": "Next Level",
+            "description": "Immediate parent in taxonomic hierarchy",
+            "termcount": "443069",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SBTR",
+            "fullname": "Subtree",
+            "description": "Any parent node in taxonomic hierarchy",
+            "termcount": "7155626",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LNGE",
+            "fullname": "Lineage",
+            "description": "Lineage in taxonomic hierarchy",
+            "termcount": "4474874",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GC",
+            "fullname": "Nuclear Genetic Code",
+            "description": "Nuclear genetic code",
+            "termcount": "36",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "MGC",
+            "fullname": "Mitochondrial Genetic Code",
+            "description": "Mitochondrial genetic code",
+            "termcount": "30",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PGC",
+            "fullname": "Plastid Genetic Code",
+            "description": "Plastid genetic code",
+            "termcount": "6",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TXDV",
+            "fullname": "Division",
+            "description": "GenBank division",
+            "termcount": "24",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RANK",
+            "fullname": "Rank",
+            "description": "Hierarchical position (e.g., order, genus)",
+            "termcount": "46",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "EDAT",
+            "fullname": "Entrez Date",
+            "description": "Date record first accessible through Entrez",
+            "termcount": "9842",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "MDAT",
+            "fullname": "Modification Date",
+            "description": "Date of last update",
+            "termcount": "8088",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PROP",
+            "fullname": "Properties",
+            "description": "Property defined on particular node (e.g., terminal node)",
+            "termcount": "152",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "WORD",
+            "fullname": "Text Word",
+            "description": "Free text associated with record",
+            "termcount": "37941658",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "NTOK",
+            "fullname": "Name Tokens",
+            "description": "Name tokens associated with organism names",
+            "termcount": "10998470",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "HGC",
+            "fullname": "Hydrogenosome Genetic Code",
+            "description": "Hydrogenosome genetic code",
+            "termcount": "4",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          }
+        ],
+        "linklist": [
+          {
+            "name": "taxonomy_assembly_exp",
+            "menu": "Assembly Links",
+            "description": "Assembly records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "assembly"
+          },
+          {
+            "name": "taxonomy_bioproject_exp",
+            "menu": "BioProject Links",
+            "description": "BioProject records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "bioproject"
+          },
+          {
+            "name": "taxonomy_biosample_exp",
+            "menu": "BioSample Links",
+            "description": "BioSample records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "biosample"
+          },
+          {
+            "name": "taxonomy_biosystems_exp",
+            "menu": "Biosystems Links",
+            "description": "BioSystems records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "biosystems"
+          },
+          { "name": "taxonomy_books", "menu": "Books Links", "description": "Books", "dbto": "books" },
+          {
+            "name": "taxonomy_cdd_exp",
+            "menu": "Conserved Domain Links",
+            "description": "CDD records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "cdd"
+          },
+          {
+            "name": "taxonomy_clone_exp",
+            "menu": "Clone DB Links",
+            "description": "Links to Clone DB (exploded for higher taxa)",
+            "dbto": "clone"
+          },
+          {
+            "name": "taxonomy_dbvar_exp",
+            "menu": "dbVar Links",
+            "description": "dbVar records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "dbvar"
+          },
+          {
+            "name": "taxonomy_gds_exp",
+            "menu": "GEO DataSet Links",
+            "description": "GEO DataSet records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "gds"
+          },
+          {
+            "name": "taxonomy_gene_exp",
+            "menu": "Gene Links",
+            "description": "Gene records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "gene"
+          },
+          {
+            "name": "taxonomy_genome",
+            "menu": "Genome Links",
+            "description": "Genome sequences associated with taxonomy record",
+            "dbto": "genome"
+          },
+          {
+            "name": "taxonomy_geoprofiles",
+            "menu": "",
+            "description": "GEO records associated with taxonomy record",
+            "dbto": "geoprofiles"
+          },
+          {
+            "name": "taxonomy_homologene_exp",
+            "menu": "HomoloGene Links",
+            "description": "HomoloGene records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "homologene"
+          },
+          { "name": "taxonomy_mesh", "menu": "MeSH Links", "description": "Related MeSH term", "dbto": "mesh" },
+          {
+            "name": "taxonomy_nucest",
+            "menu": "EST Links",
+            "description": "EST sequences associated with taxonomy record",
+            "dbto": "nucest"
+          },
+          {
+            "name": "taxonomy_nucgss",
+            "menu": "GSS Links",
+            "description": "GSS sequences associated with taxonomy record",
+            "dbto": "nucgss"
+          },
+          {
+            "name": "taxonomy_nucleotide_exp",
+            "menu": "Nucleotide Links",
+            "description": "Nucleotide sequences associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "taxonomy_pcassay",
+            "menu": "PubChem BioAssay Links",
+            "description": "Related PubChem BioAssay",
+            "dbto": "pcassay"
+          },
+          {
+            "name": "taxonomy_pccompound",
+            "menu": "PubChem Compound Links",
+            "description": "PubChem Compounds",
+            "dbto": "pccompound"
+          },
+          {
+            "name": "taxonomy_pcsubstance",
+            "menu": "PubChem Substance Links",
+            "description": "PubChem Substances",
+            "dbto": "pcsubstance"
+          },
+          {
+            "name": "taxonomy_pmc",
+            "menu": "PMC Links",
+            "description": "Free full text articles in PMC",
+            "dbto": "pmc"
+          },
+          {
+            "name": "taxonomy_popset",
+            "menu": "PopSet Links",
+            "description": "Popset sequences associated with taxonomy record",
+            "dbto": "popset"
+          },
+          {
+            "name": "taxonomy_probe_exp",
+            "menu": "Probe Links",
+            "description": "Probe records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "probe"
+          },
+          {
+            "name": "taxonomy_protein_exp",
+            "menu": "Protein Links",
+            "description": "Protein sequences associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "protein"
+          },
+          {
+            "name": "taxonomy_protein_species2wp",
+            "menu": "Links from species level taxonomic nodes to autonomous proteins",
+            "description": "Autonomous proteins",
+            "dbto": "protein"
+          },
+          {
+            "name": "taxonomy_proteinclusters_exp",
+            "menu": "Protein Clusters Links",
+            "description": "Protein Clusters records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "proteinclusters"
+          },
+          {
+            "name": "taxonomy_pubmed",
+            "menu": "PubMed Links",
+            "description": "Link to related PubMed articles",
+            "dbto": "pubmed"
+          },
+          {
+            "name": "taxonomy_pubmed_entrez",
+            "menu": "PubMed via GenBank",
+            "description": "Related PubMed articles computed using other Entrez links",
+            "dbto": "pubmed"
+          },
+          {
+            "name": "taxonomy_snp_exp",
+            "menu": "SNP Links",
+            "description": "Snp records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "snp"
+          },
+          {
+            "name": "taxonomy_sra_exp",
+            "menu": "SRA Links",
+            "description": "Sra records associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "sra"
+          },
+          {
+            "name": "taxonomy_structure_exp",
+            "menu": "Structure Links",
+            "description": "Structure sequences associated with taxonomy record (exploded for higher taxa)",
+            "dbto": "structure"
+          }
+        ]
+      }
+    ]
+  }
+}
