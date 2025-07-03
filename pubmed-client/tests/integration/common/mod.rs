@@ -155,7 +155,7 @@ pub fn get_pubmed_xml_test_cases() -> Vec<PubMedXmlTestCase> {
 
 /// Get a specific PubMed XML test case by PMID
 pub fn get_pubmed_xml_test_case(pmid: &str) -> Option<PubMedXmlTestCase> {
-    let xml_path = Path::new("test_data/pubmed_xml").join(format!("{}.xml", pmid));
+    let xml_path = Path::new("test_data/pubmed_xml").join(format!("{pmid}.xml"));
 
     if xml_path.exists() {
         Some(PubMedXmlTestCase::new(xml_path))

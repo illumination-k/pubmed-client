@@ -21,7 +21,7 @@ async fn test_related_articles_model_parsing() {
     let mut parsed_count = 0;
 
     for pmid in TEST_PMIDS {
-        let fixture_path = format!("test_data/api_responses/elink/related_{}.json", pmid);
+        let fixture_path = format!("test_data/api_responses/elink/related_{pmid}.json");
 
         if !std::path::Path::new(&fixture_path).exists() {
             warn!(pmid = pmid, "Related articles fixture not found, skipping");
@@ -91,7 +91,7 @@ async fn test_pmc_links_model_parsing() {
     let mut parsed_count = 0;
 
     for pmid in TEST_PMIDS {
-        let fixture_path = format!("test_data/api_responses/elink/pmc_links_{}.json", pmid);
+        let fixture_path = format!("test_data/api_responses/elink/pmc_links_{pmid}.json");
 
         if !std::path::Path::new(&fixture_path).exists() {
             warn!(pmid = pmid, "PMC links fixture not found, skipping");
@@ -157,7 +157,7 @@ async fn test_citations_model_parsing() {
     let mut parsed_count = 0;
 
     for pmid in TEST_PMIDS {
-        let fixture_path = format!("test_data/api_responses/elink/citations_{}.json", pmid);
+        let fixture_path = format!("test_data/api_responses/elink/citations_{pmid}.json");
 
         if !std::path::Path::new(&fixture_path).exists() {
             warn!(pmid = pmid, "Citations fixture not found, skipping");
