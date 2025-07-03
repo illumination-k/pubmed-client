@@ -1,0 +1,45 @@
+# Source code
+src/
+tests/
+scripts/
+
+# Build tools and configs
+Cargo.toml
+Cargo.lock
+dprint.json
+biome.json
+tsconfig.json
+vitest.config.ts
+.mise.toml
+
+# Test files
+*.test.ts
+*.test.js
+
+# Documentation (except README in pkg)
+README.md
+README-WASM.md
+CLAUDE.md
+
+# Development dependencies
+node_modules/
+target/
+coverage.lcov
+
+# OS and editor files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+
+# Coverage and logs
+*.log
+coverage/
