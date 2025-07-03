@@ -1,0 +1,399 @@
+{
+  "header": { "type": "einfo", "version": "0.3" },
+  "einforesult": {
+    "dbinfo": [
+      {
+        "dbname": "nuccore",
+        "menuname": "Nucleotide",
+        "description": "Core Nucleotide db",
+        "dbbuild": "Build250621-2235m.1",
+        "count": "667059807",
+        "lastupdate": "2025/06/24 13:15",
+        "fieldlist": [
+          {
+            "name": "ALL",
+            "fullname": "All Fields",
+            "description": "All terms from all searchable fields",
+            "termcount": "17144434545",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UID",
+            "fullname": "UID",
+            "description": "Unique number assigned to each sequence",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "FILT",
+            "fullname": "Filter",
+            "description": "Limits the records",
+            "termcount": "407",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "WORD",
+            "fullname": "Text Word",
+            "description": "Free text associated with record",
+            "termcount": "3290077989",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TITL",
+            "fullname": "Title",
+            "description": "Words in definition line",
+            "termcount": "501106308",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "KYWD",
+            "fullname": "Keyword",
+            "description": "Nonstandardized terms provided by submitter",
+            "termcount": "28161648",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "AUTH",
+            "fullname": "Author",
+            "description": "Author(s) of publication",
+            "termcount": "3692934",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "JOUR",
+            "fullname": "Journal",
+            "description": "Journal abbreviation of publication",
+            "termcount": "31405",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "VOL",
+            "fullname": "Volume",
+            "description": "Volume number of publication",
+            "termcount": "4427",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ISS",
+            "fullname": "Issue",
+            "description": "Issue number of publication",
+            "termcount": "4983",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PAGE",
+            "fullname": "Page Number",
+            "description": "Page number(s) of publication",
+            "termcount": "206362",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ORGN",
+            "fullname": "Organism",
+            "description": "Scientific and common names of organism, and all higher levels of taxonomy",
+            "termcount": "6695699",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "ACCN",
+            "fullname": "Accession",
+            "description": "Accession number of sequence",
+            "termcount": "1370929597",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PACC",
+            "fullname": "Primary Accession",
+            "description": "Does not include retired secondary accessions",
+            "termcount": "1336806711",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GENE",
+            "fullname": "Gene Name",
+            "description": "Name of gene associated with sequence",
+            "termcount": "13385075194",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PROT",
+            "fullname": "Protein Name",
+            "description": "Name of protein associated with sequence",
+            "termcount": "10951486",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ECNO",
+            "fullname": "EC/RN Number",
+            "description": "EC number for enzyme or CAS registry number",
+            "termcount": "6424",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PDAT",
+            "fullname": "Publication Date",
+            "description": "Date sequence added to GenBank",
+            "termcount": "13435",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "MDAT",
+            "fullname": "Modification Date",
+            "description": "Date of last update",
+            "termcount": "9987",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SUBS",
+            "fullname": "Substance Name",
+            "description": "CAS chemical name or MEDLINE Substance Name",
+            "termcount": "296230",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PROP",
+            "fullname": "Properties",
+            "description": "Classification by source qualifiers and molecule type",
+            "termcount": "1279",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SQID",
+            "fullname": "SeqID String",
+            "description": "String identifier for sequence",
+            "termcount": "384197289",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GPRJ",
+            "fullname": "BioProject",
+            "description": "BioProject",
+            "termcount": "316670",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "SLEN",
+            "fullname": "Sequence Length",
+            "description": "Length of sequence",
+            "termcount": "1739636",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "FKEY",
+            "fullname": "Feature key",
+            "description": "Feature annotated on sequence",
+            "termcount": "469",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PORG",
+            "fullname": "Primary Organism",
+            "description": "Scientific and common names of primary organism, and all higher levels of taxonomy",
+            "termcount": "6680019",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "COMP",
+            "fullname": "Component Accession",
+            "description": "Component accessions for an assembly",
+            "termcount": "202940132",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ASSM",
+            "fullname": "Assembly",
+            "description": "Assembly",
+            "termcount": "438163",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DIV",
+            "fullname": "Division",
+            "description": "Division",
+            "termcount": "19",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "STRN",
+            "fullname": "Strain",
+            "description": "Strain",
+            "termcount": "4036149",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ISOL",
+            "fullname": "Isolate",
+            "description": "Isolate",
+            "termcount": "11425321",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CULT",
+            "fullname": "Cultivar",
+            "description": "Cultivar",
+            "termcount": "45959",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "BRD",
+            "fullname": "Breed",
+            "description": "Breed",
+            "termcount": "7112",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "BIOS",
+            "fullname": "BioSample",
+            "description": "BioSample",
+            "termcount": "10979401",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          }
+        ],
+        "linklist": [
+          {
+            "name": "nucleotide_genome",
+            "menu": "Assembly to Genome",
+            "description": "Genome record containing nucleotide sequence",
+            "dbto": "genome"
+          }
+        ]
+      }
+    ]
+  }
+}

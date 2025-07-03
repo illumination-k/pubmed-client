@@ -1,0 +1,2061 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:09:20Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:7500000" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:7500000</identifier><datestamp>2020-09-21</datestamp><setSpec>bmcmedgeno</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" article-type="case-report">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">BMC Med Genomics</journal-id>
+      <journal-id journal-id-type="iso-abbrev">BMC Med Genomics</journal-id>
+      <journal-title-group>
+        <journal-title>BMC Medical Genomics</journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">1755-8794</issn>
+      <publisher>
+        <publisher-name>BioMed Central</publisher-name>
+        <publisher-loc>London</publisher-loc>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC7500000</article-id>
+      <article-id pub-id-type="pmcid">PMC7500000</article-id>
+      <article-id pub-id-type="pmc-uid">7500000</article-id>
+      <article-id pub-id-type="pmid">32948182</article-id>
+      <article-id pub-id-type="publisher-id">789</article-id>
+      <article-id pub-id-type="doi">10.1186/s12920-020-00789-8</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>Case Report</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Multiple paragangliomas: a case report</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author" equal-contrib="yes">
+          <name>
+            <surname>Pavlov</surname>
+            <given-names>Vladislav S.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author" equal-contrib="yes">
+          <name>
+            <surname>Kalinin</surname>
+            <given-names>Dmitry V.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Lukyanova</surname>
+            <given-names>Elena N.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Golovyuk</surname>
+            <given-names>Alexander L.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Fedorova</surname>
+            <given-names>Maria S.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Pudova</surname>
+            <given-names>Elena A.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Savvateeva</surname>
+            <given-names>Maria V.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Lipatova</surname>
+            <given-names>Anastasiya V.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Guvatova</surname>
+            <given-names>Zulfiya G.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Kaprin</surname>
+            <given-names>Andrey D.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Kiseleva</surname>
+            <given-names>Marina V.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Demidova</surname>
+            <given-names>Tatiana B.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff4">4</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Simanovsky</surname>
+            <given-names>Sergey A.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff4">4</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Melnikova</surname>
+            <given-names>Nataliya V.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Dmitriev</surname>
+            <given-names>Alexey A.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Krasnov</surname>
+            <given-names>George S.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author" corresp="yes">
+          <contrib-id contrib-id-type="orcid">http://orcid.org/0000-0002-4421-4364</contrib-id>
+          <name>
+            <surname>Snezhkina</surname>
+            <given-names>Anastasiya V.</given-names>
+          </name>
+          <address>
+            <email>leftger@rambler.ru</email>
+          </address>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Kudryavtseva</surname>
+            <given-names>Anna V.</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <aff id="Aff1"><label>1</label><institution-wrap><institution-id institution-id-type="GRID">grid.4886.2</institution-id><institution-id institution-id-type="ISNI">0000 0001 2192 9124</institution-id><institution>Engelhardt Institute of Molecular Biology, </institution><institution>Russian Academy of Sciences, </institution></institution-wrap>32 Vavilova str, Moscow, 119991 Russia </aff>
+        <aff id="Aff2"><label>2</label><institution-wrap><institution-id institution-id-type="GRID">grid.415738.c</institution-id><institution-id institution-id-type="ISNI">0000 0000 9216 2496</institution-id><institution>Vishnevsky Institute of Surgery, </institution><institution>Ministry of Health of the Russian Federation, </institution></institution-wrap>27 Bol’shaya Serpukhovskaya str, Moscow, 117997 Russia </aff>
+        <aff id="Aff3"><label>3</label><institution-wrap><institution-id institution-id-type="GRID">grid.415738.c</institution-id><institution-id institution-id-type="ISNI">0000 0000 9216 2496</institution-id><institution>National Medical Research Radiological Center, </institution><institution>Ministry of Health of the Russian Federation, </institution></institution-wrap>3 2nd Botkinski drive, Moscow, 125284 Russia </aff>
+        <aff id="Aff4"><label>4</label><institution-wrap><institution-id institution-id-type="GRID">grid.4886.2</institution-id><institution-id institution-id-type="ISNI">0000 0001 2192 9124</institution-id><institution>A. N. Severtsov Institute of Ecology and Evolution, </institution><institution>Russian Academy of Sciences, </institution></institution-wrap>33 Leninskij prosp, Moscow, 119071 Russia </aff>
+      </contrib-group>
+      <pub-date pub-type="epub">
+        <day>18</day>
+        <month>9</month>
+        <year>2020</year>
+      </pub-date>
+      <pub-date pub-type="pmc-release">
+        <day>18</day>
+        <month>9</month>
+        <year>2020</year>
+      </pub-date>
+      <pub-date pub-type="collection">
+        <year>2020</year>
+      </pub-date>
+      <volume>13</volume>
+      <issue>Suppl 8</issue>
+      <issue-sponsor>Publication of this supplement has not been supported by sponsorship. Information about the source of funding for publication charges can be found in the individual articles. The articles have undergone the journal's standard peer review process for supplements. The Supplement Editors were not involved in the review of any articles they co-authored. No other competing interests were declared.</issue-sponsor>
+      <elocation-id>125</elocation-id>
+      <history>
+        <date date-type="received">
+          <day>27</day>
+          <month>7</month>
+          <year>2020</year>
+        </date>
+        <date date-type="accepted">
+          <day>31</day>
+          <month>8</month>
+          <year>2020</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-statement>© The Author(s) 2020</copyright-statement>
+        <license license-type="OpenAccess">
+          <license-p><bold>Open Access</bold>This article is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if changes were made. The images or other third party material in this article are included in the article's Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the article's Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder. To view a copy of this licence, visit <ext-link ext-link-type="uri" xlink:href="http://creativecommons.org/licenses/by/4.0/">http://creativecommons.org/licenses/by/4.0/</ext-link>. The Creative Commons Public Domain Dedication waiver (<ext-link ext-link-type="uri" xlink:href="http://creativecommons.org/publicdomain/zero/1.0/">http://creativecommons.org/publicdomain/zero/1.0/</ext-link>) applies to the data made available in this article, unless otherwise stated in a credit line to the data.</license-p>
+        </license>
+      </permissions>
+      <abstract id="Abs1">
+        <sec>
+          <title>Background</title>
+          <p id="Par1">Carotid and vagal paragangliomas (CPGLs and VPGLs) are rare neoplasms that arise from the paraganglia located at the bifurcation of carotid arteries and vagal trunk, respectively. Both tumors can occur jointly as multiple paragangliomas accounting for approximately 10 to 20% of all head and neck paragangliomas. However, molecular and genetic mechanisms underlying the pathogenesis of multiple paragangliomas remain elusive.</p>
+        </sec>
+        <sec>
+          <title>Case presentation</title>
+          <p id="Par2">We report a case of multiple paragangliomas in a patient, manifesting as bilateral CPGL and unilateral VPGL. Tumors were revealed via computed tomography and ultrasound study and were resected in two subsequent surgeries. Both CPGLs and VPGL were subjected to immunostaining for succinate dehydrogenase (SDH) subunits and exome analysis. A likely pathogenic germline variant in the <italic>SDHD</italic> gene was indicated, while likely pathogenic somatic variants differed among the tumors.</p>
+        </sec>
+        <sec>
+          <title>Conclusions</title>
+          <p id="Par3">The identified germline variant in the <italic>SDHD</italic> gene seems to be a driver in the development of multiple paragangliomas. However, different spectra of somatic variants identified in each tumor indicate individual molecular mechanisms underlying their pathogenesis.</p>
+        </sec>
+      </abstract>
+      <kwd-group xml:lang="en">
+        <title>Keywords</title>
+        <kwd>Multiple paragangliomas</kwd>
+        <kwd>Carotid and vagal paragangliomas</kwd>
+        <kwd>
+          <italic>SDHx</italic>
+        </kwd>
+        <kwd>Germline and somatic mutations</kwd>
+        <kwd>High-throughput exome sequencing</kwd>
+        <kwd>Immunohistochemistry</kwd>
+        <kwd>Case report</kwd>
+      </kwd-group>
+      <funding-group>
+        <award-group>
+          <funding-source>
+            <institution-wrap>
+              <institution-id institution-id-type="FundRef">http://dx.doi.org/10.13039/501100006769</institution-id>
+              <institution>Russian Science Foundation</institution>
+            </institution-wrap>
+          </funding-source>
+          <award-id>17-75-20105</award-id>
+          <award-id>19-15-00419</award-id>
+          <principal-award-recipient>
+            <name>
+              <surname>Kudryavtseva</surname>
+              <given-names>Anna V.</given-names>
+            </name>
+          </principal-award-recipient>
+        </award-group>
+      </funding-group>
+      <conference xlink:href="http://conf.bionet.nsc.ru/sbb2019/en/">
+        <conf-name>11th International Young Scientists School “Systems Biology and Bioinformatics” – SBB-2019</conf-name>
+        <conf-loc>Novosibirsk, Russia</conf-loc>
+        <conf-date>24-28 June 2019</conf-date>
+      </conference>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>issue-copyright-statement</meta-name>
+          <meta-value>© The Author(s) 2020</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="Sec1">
+      <title>Background</title>
+      <p id="Par12">Paragangliomas of the head and neck (HNPGLs) are rare neuroendocrine tumors [<xref ref-type="bibr" rid="CR1">1</xref>]. There are several common paraganglioma localizations corresponding to the locations of paraganglia from which they are formed. Carotid paragangliomas (CPGLs) are most common, followed by middle ear paragangliomas, vagal (VPGL), and laryngeal paragangliomas [<xref ref-type="bibr" rid="CR2">2</xref>]. These tumors are highly hereditary and associated with the germline mutations in known susceptibility genes, including <italic>SDHx</italic>, <italic>SDHAF2</italic>, <italic>TMEM127</italic>, <italic>MAX</italic>, and others [<xref ref-type="bibr" rid="CR3">3</xref>]. Mutations in these genes predispose to different forms of paragangliomas (early, syndromic, multiple, and malignant).</p>
+      <p id="Par13">HNPGLs commonly develop as single unilateral tumors, with only 1% of sporadic cases being multiple [<xref ref-type="bibr" rid="CR4">4</xref>]. However, the number of multiple HNPGLs greatly increases in familial tumors. As multiple paragangliomas are rare, every case is important to study for a better understanding of genetics and molecular mechanisms causing their initiation and progression.</p>
+    </sec>
+    <sec id="Sec2">
+      <title>Case presentation</title>
+      <p id="Par15">The case below describes multiple paragangliomas diagnosed in a Russian woman, presenting as two CPGLs at both sides of the neck and one VPGL. The aim of the study was to investigate the molecular mechanisms underlying the development of multiple paragangliomas by examining clinical and pathological characteristics along with the genetic variations of the three tumors.</p>
+      <p id="Par16">A 50-year-old female was diagnosed with extravascular compression of the carotid arteries and CPGLs on both sides of the neck. Clinical symptoms include arterial hypertension and painless rounded masses. Computed tomography (CT) and ultrasound (US) study revealed the presence of tumors in the areas of the carotid bifurcation, solid neoplasia 32 × 25 mm on the left side of the neck and two-nodal tumor 46 × 24 mm on the right side of the neck, respectively. These neck masses were heterogeneous in structure and predominantly hypoechoic and hypervascular<italic>.</italic> The CT study with contrast also revealed the presence of hypointense, highly vascularized masses at the right and left carotid bifurcations (Fig. <xref rid="Fig1" ref-type="fig">1</xref>).
+<fig id="Fig1"><label>Fig. 1</label><caption><p>Computed tomography of the patient's head and neck before surgery. CT scan (left); 3D reconstruction (right)</p></caption><graphic xlink:href="12920_2020_789_Fig1_HTML" id="MO1"/></fig></p>
+      <p id="Par17">The patient was subjected to surgery for the left tumor resection. At the time of surgery, the lower pole of the hypervascularized tumor was located below the outer carotid artery (OCA) bifurcation, spreading along the carotid arteries in the proximal direction and wrapping around the posterior, anterior, and lateral surfaces. Bifurcation of carotid arteries was involved in the tumor mass. The upper pole of the tumor was associated with the vagus nerve. The tumor (25 × 2 × 17 mm) was completely removed and subjected to pathological evaluation. The patient was discharged with a planned re-hospitalization to remove the tumor on the right. Histological examination of the resected tumor confirmed carotid paraganglioma (Fig. <xref rid="Fig2" ref-type="fig">2</xref>). Hematoxylin-eosin (H&amp;E) staining showed a Zellballen structure that is typical for paragangliomas. Chief tumor cells exhibited positive staining for chromogranin A, synaptophysin, and CD56 antibodies indicating a neuroendocrine tumor. S100 protein was expressed in sustentacular cells. Tumor cells were negative for cytokeratin AE1/AE3.
+<fig id="Fig2"><label>Fig. 2</label><caption><p>Hematoxylin-eosin (H&amp;E) staining of carotid and vagal paragangliomas. <bold>a</bold> left CPGL, <bold>b</bold> right CPGL, and <bold>c</bold> right VPGL. Specific “Zellballen” growth pattern of paragangliomas (small nests of chief cells with pale eosinophilic staining, surrounded by supporting sustentacular cells) can be seen</p></caption><graphic xlink:href="12920_2020_789_Fig2_HTML" id="MO2"/></fig></p>
+      <p id="Par18">A surgery on the right side of the neck was performed after a year. As per the US study reports, VPGL and enlarged lymph node were primarily detected. During the surgery, lymph node (15 × 5 mm) above the carotid artery bifurcation was removed and further subjected to histological examination for metastases. In addition, tumor-like mass (35 × 20 mm), laterally suppressing the internal carotid artery (ICA) was observed directly at carotid artery bifurcation and resected. After the tumor resection, one more tumor-like formation (60 × 20 mm) originating from the vagus nerve was visualized under it and removed. The vagus nerve was resected and ligated. Both the tumors were histologically examined and displayed paragangliomas with no lymph node metastases (Fig. <xref rid="Fig2" ref-type="fig">2</xref>).</p>
+      <p id="Par19">For all the tumor samples from the patient (left and right CPGLs, VPGL), immunohistochemistry (IHC) analysis of succinate dehydrogenase (SDH) subunit expression was performed (Additional file <xref rid="MOESM1" ref-type="media">1</xref>). SDH complex consists of four subunits (SDHA, SDHB, SDHC, and SDHD) encoded by the corresponding genes [<xref ref-type="bibr" rid="CR5">5</xref>, <xref ref-type="bibr" rid="CR6">6</xref>]. Germline and somatic mutations in the <italic>SDHx</italic> genes are commonly associated with paragangliomas/pheochromocytomas [<xref ref-type="bibr" rid="CR7">7</xref>, <xref ref-type="bibr" rid="CR8">8</xref>]. Immunohistochemistry for SDH subunits is a valuable additional tool in the histopathological study of paragangliomas that is used in the clinic for assessment of SDH loss, which can be associated with the pathogenic mutations in any <italic>SDHx</italic> genes.</p>
+      <p id="Par20">Immunoreactions for SDH subunits were carried out using primary antibodies from Abcam (USA) for each SDH subunit: SDHA, monoclonal, clone 2E3GC12FB2AE2; SDHB, monoclonal, clone 21A11AE7; SDHC, monoclonal, clone EPR11035(B); SDHD, polyclonal. We found weak diffuse weak SDHB staining in VPGL and both the left and right side CPGLs. According to the literature, weak diffuse staining of the SDHB subunit can reflect pathogenic mutations in any SDHx genes. We detected weak diffuse SDHB staining in all studied tumors indicating the presence of germline pathogenic mutation in one of the <italic>SDHx</italic> genes in the patient.</p>
+      <p id="Par21">Additionally, we carried out the exome-sequencing of three tumors, lymph node, and blood from the patient. The DNA from tumors and lymph node was extracted with a High Pure FFPET DNA Isolation Kit (Roche, Switzerland). The DNA was isolated from blood cells using a MagNA Pure Compact Nucleic Acid Isolation Kit I (Roche) on a MagNA Pure Compact Instrument (Roche). Exome libraries were prepared with the Rapid Capture Exome Kit (left CPGL) and TruSeq Exome Library Prep Kit (right CPGL and VPGL) from Illumina (USA). High-throughput exome sequencing was performed on a NextSeq 500 System (Illumina) under a paired-end mode of 76 × 2 bp for tumors and lymph node, and 156 × 2 bp for blood with 300x minimum coverage. The exome sequencing data of paragangliomas are available in the NCBI SRA under the accession numbers PRJNA411769 (left CPGL, Pat01), PRJNA476932 (right CPGL, Pat104), and PRJNA561073 (VPGL, Pat6). Bioinformatic analysis is described in our previous study [<xref ref-type="bibr" rid="CR9">9</xref>]. Missense variants were considered as likely pathogenic if they were predicted by at least three prediction tools and characterized by conservation score ≥ 0.5.</p>
+      <p id="Par22">Exome analysis revealed a likely pathogenic germline missense variant in the <italic>SDHD</italic> gene, NM_003002.3: c.305A &gt; G, p.H102R (chr11: 111959726, rs104894302). Pathogenic/likely pathogenic germline variants in other genes, for which the association with paragangliomas/pheochromocytomas has been shown, were not found.</p>
+      <p id="Par23">Identified likely pathogenic somatic variants were different for each tumor (Additional file <xref rid="MOESM2" ref-type="media">2</xref>). In left CPGL, we found missense likely pathogenic somatic variants in two genes, <italic>TENM3</italic> [NM_001080477: c.C5082A, p.N1694K (chr4: 183696084)] and <italic>EPHA5</italic> [NM_004439: c.G682A, p.V228I (chr4: 66467587)].</p>
+      <p id="Par24">In right CPGL, a variety of likely pathogenic variants (stop-gain, frameshift, and missense) were detected. Stop-gain variants were found in <italic>NRXN3</italic> [NM_004796: c.C1387T, p.Q463X (chr14: 79432478)] and <italic>RELN</italic> [NM_005045: c.C9052T, p.R3018X (chr7: 103137114)], missense variants were revealed in <italic>TRIP12</italic>, <italic>JAG1</italic>, <italic>ASXL1</italic>, <italic>LMBRD</italic>1, <italic>DHX9</italic>, <italic>AASS</italic>, and <italic>TP53</italic>. For the <italic>TP53</italic> gene, we found two mutations: a pathogenic/likely pathogenic variant, NM_001126115: c.A446T, p.D149V (chr17: 7577096, rs587781525), that has been reported in ClinVar, and a previously undescribed likely pathogenic variant, NM_000546: c.A170G, p.D57G (chr17: 7579517).</p>
+      <p id="Par25">In the case of VPGL, we found a pathogenic variant in mtDNA (MT: 3243, rs199474657) and likely pathogenic missense, frameshift and stop-gain variants in a number of genes (<italic>LRP1, SPEN, PPP4R1</italic>, <italic>XPO6</italic>, <italic>FBN1</italic>, <italic>C1QB</italic>, and others) (Additional file <xref rid="MOESM2" ref-type="media">2</xref>).</p>
+    </sec>
+    <sec id="Sec3">
+      <title>Discussion</title>
+      <p id="Par26">We found a germline pathogenic variant in the <italic>SDHD</italic> gene in the patient. According to the literature, <italic>SDHD</italic> mutations are frequently associated with multiple paragangliomas. A study of 176 patients with HNPGLs divulged multiple paragangliomas in 33 individuals (18.9%) [<xref ref-type="bibr" rid="CR10">10</xref>]. <italic>SDHx</italic> mutations were found in 34 patients, of which 22 were diagnosed with multiple paragangliomas. Moreover, 18 out of 22 patients with multiple paragangliomas had mutations in <italic>SDHD</italic>, 1 patient exhibited <italic>SDHB</italic> mutation, and 3 patients carried variations in the <italic>SDHC</italic> gene.</p>
+      <p id="Par27">In a recent report, multiple synchronous or metachronous HNPGLs were found in 79 out of 147 patients studied (54%) [<xref ref-type="bibr" rid="CR11">11</xref>]. A group of patients (98/147) were tested for the status of <italic>SDHx</italic> mutations; 74 patients carried mutations in either <italic>SDHB</italic> (10/74) or <italic>SDHD</italic> (64/74) genes. <italic>SDHB</italic> mutations were found in two cases of multiple paragangliomas, whereas 56 had mutated <italic>SDHD.</italic> Notably, p.Asp92Tyr mutation in the <italic>SDHD</italic> gene (one of the Dutch founder mutations) was the most prevalent variant identified in 50% of <italic>SDHD</italic> mutation carriers (32/64).</p>
+      <p id="Par28">Another study on <italic>SDHB</italic>, <italic>SDHC</italic>, and <italic>SDHD</italic> gene mutation analysis in a large cohort of patients with a personal or family history of paragangliomas/pheochromocytomas was performed [<xref ref-type="bibr" rid="CR12">12</xref>]. From the 1832 individuals tested, 876 patients carried mutations in either <italic>SDHB</italic> (673), <italic>SDHC</italic> (43), or <italic>SDHD</italic> (160). In summary, results from all the studies indicate a high frequency of <italic>SDHx</italic> mutations in paragangliomas. Moreover, most multiple paragangliomas are associated with <italic>SDHx</italic> variants, predominantly <italic>SDHD</italic> mutations, which are in accordance with our results.</p>
+      <p id="Par29">The variant in the <italic>SDHD</italic> gene identified in the study has been described only once in a malignant paraganglioma [<xref ref-type="bibr" rid="CR13">13</xref>]. Thus, the mutation seems to be quite rare; although, at the same position, histidine replaced with leucine, proline, or tyrosine was found in several cases of hereditary paragangliomas [<xref ref-type="bibr" rid="CR14">14</xref>–<xref ref-type="bibr" rid="CR16">16</xref>].</p>
+      <p id="Par30">We observed different spectra of somatic mutations in three tumors studied. In left CPGL, only two genes, <italic>TENM3</italic> and <italic>EPHA5</italic> with likely pathogenic somatic variants were identified. Mutations in these genes have first been found in paragangliomas/pheochromocytomas. <italic>TENM3</italic> and <italic>EPHA5</italic> encode for proteins with important functions in neuronal cells and have been shown to be involved in tumorigenesis [<xref ref-type="bibr" rid="CR17">17</xref>–<xref ref-type="bibr" rid="CR20">20</xref>].</p>
+      <p id="Par31">In right CPGL, a greater number of likely pathogenic somatic variants were revealed; however, no variants were found in the genes mutated in left CPGL. Stop-gain variants were determined in <italic>NRXN3</italic> and <italic>RELN</italic> encoding for proteins that are involved in cell adhesion and cell-cell interactions in neural cells, respectively. Both genes were shown to be associated with glioblastoma pathogenesis [<xref ref-type="bibr" rid="CR21">21</xref>–<xref ref-type="bibr" rid="CR23">23</xref>] and variants in these genes were also detected in a number of tumors [<xref ref-type="bibr" rid="CR24">24</xref>–<xref ref-type="bibr" rid="CR26">26</xref>]. We also found two variants in the <italic>TP53</italic> gene in the right CPGL. One variant was previously reported in ClinVar as a pathogenic mutation, the other variant was first detected in ourstudy. The presence of these two variants in <italic>TP53</italic> can enhance the deleterious effect on protein function. More missense likely pathogenic mutations and frameshift variants were identified in the genes encoding for proteins that participate in important cellular processes, such as ubiquitin fusion degradation and regulation of DNA repair (<italic>TRIP12</italic>, a tumor suppressor gene), mediation of Notch signaling (<italic>JAG1</italic>), and transcriptional regulation (<italic>DHX9</italic>, <italic>KLF12</italic>, and <italic>KAT6B</italic>). Several genes with frameshift mutations are highly expressed in neural cells and involved in the neurite growth (<italic>PLPPR5</italic>) and the brain development (<italic>KAT6B</italic> and <italic>ADGRV1</italic>).</p>
+      <p id="Par32">In VPGL, we identified variants that have not been found in the left and right CPGLs in the patient. Stop-gain mutations were revealed in the genes involved in the regulation of cell cycle (<italic>LIN54</italic>) and transcription (<italic>ZNF717</italic>), and in the <italic>CCDC82</italic> gene, encoding for protein with unknown function. Variants in <italic>ZNF717</italic> were previously observed in gastric, colorectal, and hepatocellular cancer [<xref ref-type="bibr" rid="CR27">27</xref>–<xref ref-type="bibr" rid="CR29">29</xref>]. Missense mutations in the genes shown to be involved in tumorigenesis that were predicted as likely pathogenic by a majority of prediction tools (<italic>C1QB</italic>, <italic>XPO6</italic>, <italic>PPP4R1</italic>, <italic>PPIP5K2</italic>, and <italic>LRP1),</italic> were also found in VPGL [<xref ref-type="bibr" rid="CR30">30</xref>–<xref ref-type="bibr" rid="CR34">34</xref>]. Frameshift mutations which usually result in nonfunctional protein were observed in many genes. In addition, we detected mutation in mtDNA that was reported in ClinVar as a germline or somatic pathogenic variant associated with mitochondrial diseases.</p>
+    </sec>
+    <sec id="Sec4">
+      <title>Conclusion</title>
+      <p id="Par33">We identified a likely pathogenic germline variant in the <italic>SDHD</italic> gene and likely pathogenic somatic variants in a number of genes in the patient with multiple paragangliomas (left and right CPGLs, and VPGL). Somatic variants differed amongst the tumors. Thus, we assume that the variant found in the <italic>SDHD</italic> gene is a driver mutation and its co-occurrence with other mutations in each of the three tumors can lead to the development of paraganglioma via different molecular pathways.</p>
+    </sec>
+    <sec sec-type="supplementary-material">
+      <title>Supplementary information</title>
+      <sec id="Sec5">
+        <p>
+<supplementary-material content-type="local-data" id="MOESM1"><media xlink:href="12920_2020_789_MOESM1_ESM.pdf"><caption><p><bold>Additional file 1.</bold> Immunohistochemical staining of SDH subunits in carotid and vagal paragangliomas.</p></caption></media></supplementary-material><supplementary-material content-type="local-data" id="MOESM2"><media xlink:href="12920_2020_789_MOESM2_ESM.xls"><caption><p><bold>Additional file 2.</bold> Pathogenic/likely pathogenic somatic variants in carotid and vagal paragangliomas.</p></caption></media></supplementary-material></p>
+      </sec>
+    </sec>
+  </body>
+  <back>
+    <glossary>
+      <title>Abbreviations</title>
+      <def-list>
+        <def-item>
+          <term>HNPGL</term>
+          <def>
+            <p id="Par4">Head and neck paraganglioma</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>CPGL</term>
+          <def>
+            <p id="Par5">Carotid paraganglioma</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>VPGL</term>
+          <def>
+            <p id="Par6">Vagal paraganglioma</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>CT</term>
+          <def>
+            <p id="Par7">Computed tomography</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>US</term>
+          <def>
+            <p id="Par8">Ultrasound study</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>CCA</term>
+          <def>
+            <p id="Par9">Common carotid artery</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>ICA</term>
+          <def>
+            <p id="Par10">Internal carotid artery</p>
+          </def>
+        </def-item>
+        <def-item>
+          <term>OCA</term>
+          <def>
+            <p id="Par11">Outer carotid artery</p>
+          </def>
+        </def-item>
+      </def-list>
+    </glossary>
+    <fn-group>
+      <fn>
+        <p>
+          <bold>Publisher’s Note</bold>
+        </p>
+        <p>Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.</p>
+      </fn>
+      <fn>
+        <p>Vladislav S. Pavlov and Dmitry V. Kalinin contributed equally to this work.</p>
+      </fn>
+    </fn-group>
+    <sec>
+      <title>Supplementary information</title>
+      <p><bold>Supplementary information</bold> accompanies this paper at 10.1186/s12920-020-00789-8.</p>
+    </sec>
+    <ack>
+      <p>The authors thank the Vishnevsky Institute of Surgery for tissue samples, the National Medical Research Center of Radiology and A. N. Severtsov Institute of Ecology and Evolution for assistance in data analysis. This work was performed using the equipment of EIMB RAS “Genome” center (<ext-link ext-link-type="uri" xlink:href="http://www.eimb.ru/rus/ckp/ccu_genome_c.php">http://www.eimb.ru/rus/ckp/ccu_genome_c.php</ext-link>).</p>
+      <sec id="FPar1">
+        <title>About this supplement</title>
+        <p id="Par34">This article has been published as part of BMC Medical Genomics Volume 13 Supplement 8, 2020: Selected Topics in “Systems Biology and Bioinformatics” - 2019: medical genomics. The full contents of the supplement are available online at <ext-link ext-link-type="uri" xlink:href="https://bmcmedgenomics.biomedcentral.com/articles/supplements/volume-13-supplement-8">https://bmcmedgenomics.biomedcentral.com/articles/supplements/volume-13-supplement-8</ext-link>.</p>
+      </sec>
+    </ack>
+    <notes notes-type="author-contribution">
+      <title>Authors’ contributions</title>
+      <p>DVK and ALG managed the patient and obtained the patient’s history; MSF, EAP, and ZGG carried out experimental work; DVK performed immunohistochemistry; ENL, AAD, and GSK performed bioinformatics analysis; MVS, AVL, SAS, and NVM participated in data interpretation; MVK, TBD, and ADK assisted in the manuscript editing; VSP, AVS, DVK, and AVK wrote the manuscript. All authors read and approved the final manuscript.</p>
+    </notes>
+    <notes notes-type="funding-information">
+      <title>Funding</title>
+      <p>This work and publication costs were financially supported by the Russian Science Foundation, grant 17–75-20105 and 19–15-00419. The design of the study and writing of the manuscript were supported by both grants. Sample collection and experimental procedure (high-throughput exome sequencing, histological and immunohistochemical examination), as well as data analysis and interpretation concerning carotid tumors of the patient were supported by the grant 17–75-20105. All procedures for vagal paraganglioma of the patient, including sample collection, exome sequencing, histological and immunohistochemical study, data analysis and interpretation, were performed with the financial assistance of the grant 19–15-00419.</p>
+      <p>The funding bodies played no role in the design of the study and collection, analysis, and interpretation of data and in writing the manuscript.</p>
+    </notes>
+    <notes notes-type="data-availability">
+      <title>Availability of data and materials</title>
+      <p>All data generated or analyzed in this study are included in the published article. The exome sequencing data of carotid paragangliomas are available in the NCBI SRA under the accession numbers PRJNA411769 and PRJNA476932. The sequencing data of vagal paraganglioma are available in the NCBI SRA under the accession number PRJNA561073.</p>
+    </notes>
+    <notes id="FPar2">
+      <title>Ethics approval and consent to participate</title>
+      <p id="Par35">The study was approved by the ethics committee from the Vishnevsky Institute of Surgery and performed according to the Declaration of Helsinki (1964). Written informed consent was obtained from the patient.</p>
+    </notes>
+    <notes id="FPar3">
+      <title>Consent for publication</title>
+      <p id="Par36">Written informed consent was obtained from the patient for publication of this study and its copy is available for the journal.</p>
+    </notes>
+    <notes id="FPar4" notes-type="COI-statement">
+      <title>Competing interests</title>
+      <p id="Par37">The authors declare that they have no competing interests.</p>
+    </notes>
+    <ref-list id="Bib1">
+      <title>References</title>
+      <ref id="CR1">
+        <label>1.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lopez-Vazquez</surname>
+              <given-names>ME</given-names>
+            </name>
+            <name>
+              <surname>Llamas-Macias</surname>
+              <given-names>FJ</given-names>
+            </name>
+            <name>
+              <surname>Nuno-Escobar</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Gonzalez-Ojeda</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Fuentes-Orozco</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Macias-Amezcua</surname>
+              <given-names>MD</given-names>
+            </name>
+          </person-group>
+          <article-title>Carotid body paraganglioma in a teenager. Case report</article-title>
+          <source>Cir Cir</source>
+          <year>2014</year>
+          <volume>82</volume>
+          <issue>3</issue>
+          <fpage>316</fpage>
+          <lpage>322</lpage>
+          <?supplied-pmid 25238474?>
+          <pub-id pub-id-type="pmid">25238474</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR2">
+        <label>2.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>El-Naggar</surname>
+              <given-names>AK</given-names>
+            </name>
+            <name>
+              <surname>Chan</surname>
+              <given-names>JKC</given-names>
+            </name>
+            <name>
+              <surname>Grandis</surname>
+              <given-names>JR</given-names>
+            </name>
+            <name>
+              <surname>Takata</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Slootweg</surname>
+              <given-names>PJ</given-names>
+            </name>
+          </person-group>
+          <article-title>Classification of head and neck tumours. Fourth ed</article-title>
+          <source>World Health Organ</source>
+          <year>2017</year>
+          <volume>9</volume>
+          <fpage>348</fpage>
+        </element-citation>
+      </ref>
+      <ref id="CR3">
+        <label>3.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Buffet</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Burnichon</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Favier</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Gimenez-Roqueplo</surname>
+              <given-names>AP</given-names>
+            </name>
+          </person-group>
+          <article-title>An overview of 20 years of genetic studies in pheochromocytoma and paraganglioma</article-title>
+          <source>Best Pract Res Clin Endocrinol Metab</source>
+          <year>2020</year>
+          <volume>32</volume>
+          <fpage>101416</fpage>
+          <pub-id pub-id-type="doi">10.1016/j.beem.2020.101416</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR4">
+        <label>4.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ikram</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Rehman</surname>
+              <given-names>A</given-names>
+            </name>
+          </person-group>
+          <article-title>Paraganglioma</article-title>
+          <source>StatPearls. Treasure Island (FL)</source>
+          <year>2020</year>
+        </element-citation>
+      </ref>
+      <ref id="CR5">
+        <label>5.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhikrivetskaya</surname>
+              <given-names>SO</given-names>
+            </name>
+            <name>
+              <surname>Snezhkina</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Zaretsky</surname>
+              <given-names>AR</given-names>
+            </name>
+            <name>
+              <surname>Alekseev</surname>
+              <given-names>BY</given-names>
+            </name>
+            <name>
+              <surname>Pokrovsky</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Golovyuk</surname>
+              <given-names>AL</given-names>
+            </name>
+            <name>
+              <surname>Melnikova</surname>
+              <given-names>NV</given-names>
+            </name>
+            <name>
+              <surname>Stepanov</surname>
+              <given-names>OA</given-names>
+            </name>
+            <name>
+              <surname>Kalinin</surname>
+              <given-names>DV</given-names>
+            </name>
+            <name>
+              <surname>Moskalev</surname>
+              <given-names>AA</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Molecular markers of paragangliomas/pheochromocytomas</article-title>
+          <source>Oncotarget</source>
+          <year>2017</year>
+          <volume>8</volume>
+          <issue>15</issue>
+          <fpage>25756</fpage>
+          <lpage>25782</lpage>
+          <pub-id pub-id-type="doi">10.18632/oncotarget.15201</pub-id>
+          <pub-id pub-id-type="pmid">28187001</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR6">
+        <label>6.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Snezhkina</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Lukyanova</surname>
+              <given-names>EN</given-names>
+            </name>
+            <name>
+              <surname>Fedorova</surname>
+              <given-names>MS</given-names>
+            </name>
+            <name>
+              <surname>Kalinin</surname>
+              <given-names>DV</given-names>
+            </name>
+            <name>
+              <surname>Melnikova</surname>
+              <given-names>NV</given-names>
+            </name>
+            <name>
+              <surname>Stepanov</surname>
+              <given-names>OA</given-names>
+            </name>
+            <name>
+              <surname>Kiseleva</surname>
+              <given-names>MV</given-names>
+            </name>
+            <name>
+              <surname>Kaprin</surname>
+              <given-names>AD</given-names>
+            </name>
+            <name>
+              <surname>Pudova</surname>
+              <given-names>EA</given-names>
+            </name>
+          </person-group>
+          <article-title>Kudryavtseva AV: [Novel genes associated with the development of carotid paragangliomas]</article-title>
+          <source>Mol Biol</source>
+          <year>2019</year>
+          <volume>53</volume>
+          <issue>4</issue>
+          <fpage>613</fpage>
+          <lpage>626</lpage>
+          <pub-id pub-id-type="doi">10.1134/S0026893319040137</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR7">
+        <label>7.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Snezhkina</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Lukyanova</surname>
+              <given-names>EN</given-names>
+            </name>
+            <name>
+              <surname>Kalinin</surname>
+              <given-names>DV</given-names>
+            </name>
+            <name>
+              <surname>Pokrovsky</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Dmitriev</surname>
+              <given-names>AA</given-names>
+            </name>
+            <name>
+              <surname>Koroban</surname>
+              <given-names>NV</given-names>
+            </name>
+            <name>
+              <surname>Pudova</surname>
+              <given-names>EA</given-names>
+            </name>
+            <name>
+              <surname>Fedorova</surname>
+              <given-names>MS</given-names>
+            </name>
+            <name>
+              <surname>Volchenko</surname>
+              <given-names>NN</given-names>
+            </name>
+            <name>
+              <surname>Stepanov</surname>
+              <given-names>OA</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Exome analysis of carotid body tumor</article-title>
+          <source>BMC Med Genet</source>
+          <year>2018</year>
+          <volume>11</volume>
+          <issue>Suppl 1</issue>
+          <fpage>17</fpage>
+        </element-citation>
+      </ref>
+      <ref id="CR8">
+        <label>8.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kudryavtseva</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Lukyanova</surname>
+              <given-names>EN</given-names>
+            </name>
+            <name>
+              <surname>Kalinin</surname>
+              <given-names>DV</given-names>
+            </name>
+            <name>
+              <surname>Zaretsky</surname>
+              <given-names>AR</given-names>
+            </name>
+            <name>
+              <surname>Pokrovsky</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Golovyuk</surname>
+              <given-names>AL</given-names>
+            </name>
+            <name>
+              <surname>Fedorova</surname>
+              <given-names>MS</given-names>
+            </name>
+            <name>
+              <surname>Pudova</surname>
+              <given-names>EA</given-names>
+            </name>
+            <name>
+              <surname>Kharitonov</surname>
+              <given-names>SL</given-names>
+            </name>
+            <name>
+              <surname>Pavlov</surname>
+              <given-names>VS</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Mutational load in carotid body tumor</article-title>
+          <source>BMC Med Genet</source>
+          <year>2019</year>
+          <volume>12</volume>
+          <issue>Suppl 2</issue>
+          <fpage>39</fpage>
+        </element-citation>
+      </ref>
+      <ref id="CR9">
+        <label>9.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Snezhkina</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Lukyanova</surname>
+              <given-names>EN</given-names>
+            </name>
+            <name>
+              <surname>Zaretsky</surname>
+              <given-names>AR</given-names>
+            </name>
+            <name>
+              <surname>Kalinin</surname>
+              <given-names>DV</given-names>
+            </name>
+            <name>
+              <surname>Pokrovsky</surname>
+              <given-names>AV</given-names>
+            </name>
+            <name>
+              <surname>Golovyuk</surname>
+              <given-names>AL</given-names>
+            </name>
+            <name>
+              <surname>Krasnov</surname>
+              <given-names>GS</given-names>
+            </name>
+            <name>
+              <surname>Fedorova</surname>
+              <given-names>MS</given-names>
+            </name>
+            <name>
+              <surname>Pudova</surname>
+              <given-names>EA</given-names>
+            </name>
+            <name>
+              <surname>Kharitonov</surname>
+              <given-names>SL</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Novel potential causative genes in carotid paragangliomas</article-title>
+          <source>BMC Med Genet</source>
+          <year>2019</year>
+          <volume>20</volume>
+          <issue>Suppl 1</issue>
+          <fpage>48</fpage>
+          <pub-id pub-id-type="doi">10.1186/s12881-019-0770-6</pub-id>
+          <pub-id pub-id-type="pmid">30967136</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR10">
+        <label>10.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Papaspyrou</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Mewes</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Rossmann</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Fottner</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Schneider-Raetzke</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Bartsch</surname>
+              <given-names>O</given-names>
+            </name>
+            <name>
+              <surname>Schreckenberger</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Lackner</surname>
+              <given-names>KJ</given-names>
+            </name>
+            <name>
+              <surname>Amedee</surname>
+              <given-names>RG</given-names>
+            </name>
+            <name>
+              <surname>Mann</surname>
+              <given-names>WJ</given-names>
+            </name>
+          </person-group>
+          <article-title>Head and neck paragangliomas: report of 175 patients (1989-2010)</article-title>
+          <source>Head Neck</source>
+          <year>2012</year>
+          <volume>34</volume>
+          <issue>5</issue>
+          <fpage>632</fpage>
+          <lpage>637</lpage>
+          <pub-id pub-id-type="doi">10.1002/hed.21790</pub-id>
+          <pub-id pub-id-type="pmid">21692132</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR11">
+        <label>11.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Rijken</surname>
+              <given-names>JA</given-names>
+            </name>
+            <name>
+              <surname>de Vos</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>van Hest</surname>
+              <given-names>LP</given-names>
+            </name>
+            <name>
+              <surname>Dreijerink</surname>
+              <given-names>KMA</given-names>
+            </name>
+            <name>
+              <surname>den Heijer</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Wisselink</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Blom</surname>
+              <given-names>GJ</given-names>
+            </name>
+            <name>
+              <surname>Hensen</surname>
+              <given-names>EF</given-names>
+            </name>
+            <name>
+              <surname>Leemans</surname>
+              <given-names>CR</given-names>
+            </name>
+          </person-group>
+          <article-title>Evolving management strategies in head and neck paragangliomas: a single-centre experience with 147 patients over a 60-year period</article-title>
+          <source>Clin Otolaryngol</source>
+          <year>2019</year>
+          <volume>44</volume>
+          <issue>5</issue>
+          <fpage>836</fpage>
+          <lpage>841</lpage>
+          <pub-id pub-id-type="doi">10.1111/coa.13380</pub-id>
+          <pub-id pub-id-type="pmid">31125515</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR12">
+        <label>12.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Andrews</surname>
+              <given-names>KA</given-names>
+            </name>
+            <name>
+              <surname>Ascher</surname>
+              <given-names>DB</given-names>
+            </name>
+            <name>
+              <surname>Pires</surname>
+              <given-names>DEV</given-names>
+            </name>
+            <name>
+              <surname>Barnes</surname>
+              <given-names>DR</given-names>
+            </name>
+            <name>
+              <surname>Vialard</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Casey</surname>
+              <given-names>RT</given-names>
+            </name>
+            <name>
+              <surname>Bradshaw</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Adlard</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Aylwin</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Brennan</surname>
+              <given-names>P</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Tumour risks and genotype-phenotype correlations associated with germline variants in succinate dehydrogenase subunit genes SDHB, SDHC and SDHD</article-title>
+          <source>J Med Genet</source>
+          <year>2018</year>
+          <volume>55</volume>
+          <issue>6</issue>
+          <fpage>384</fpage>
+          <lpage>394</lpage>
+          <pub-id pub-id-type="doi">10.1136/jmedgenet-2017-105127</pub-id>
+          <pub-id pub-id-type="pmid">29386252</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR13">
+        <label>13.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Poeppel</surname>
+              <given-names>TD</given-names>
+            </name>
+            <name>
+              <surname>Yuece</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Boy</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Metz</surname>
+              <given-names>KA</given-names>
+            </name>
+            <name>
+              <surname>Kaminsky</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Neumann</surname>
+              <given-names>HP</given-names>
+            </name>
+            <name>
+              <surname>Rosenbaum</surname>
+              <given-names>SJ</given-names>
+            </name>
+            <name>
+              <surname>Mann</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Moeller</surname>
+              <given-names>LC</given-names>
+            </name>
+          </person-group>
+          <article-title>Novel SDHD gene mutation (H102R) in a patient with metastatic cervical paraganglioma effectively treated by peptide receptor radionuclide therapy</article-title>
+          <source>J Clin Oncol</source>
+          <year>2011</year>
+          <volume>29</volume>
+          <issue>33</issue>
+          <fpage>e812</fpage>
+          <lpage>e815</lpage>
+          <pub-id pub-id-type="doi">10.1200/JCO.2011.36.2269</pub-id>
+          <pub-id pub-id-type="pmid">22025150</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR14">
+        <label>14.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Baysal</surname>
+              <given-names>BE</given-names>
+            </name>
+            <name>
+              <surname>Ferrell</surname>
+              <given-names>RE</given-names>
+            </name>
+            <name>
+              <surname>Willett-Brozick</surname>
+              <given-names>JE</given-names>
+            </name>
+            <name>
+              <surname>Lawrence</surname>
+              <given-names>EC</given-names>
+            </name>
+            <name>
+              <surname>Myssiorek</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Bosch</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>van der Mey</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Taschner</surname>
+              <given-names>PE</given-names>
+            </name>
+            <name>
+              <surname>Rubinstein</surname>
+              <given-names>WS</given-names>
+            </name>
+            <name>
+              <surname>Myers</surname>
+              <given-names>EN</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Mutations in SDHD, a mitochondrial complex II gene, in hereditary paraganglioma</article-title>
+          <source>Science</source>
+          <year>2000</year>
+          <volume>287</volume>
+          <issue>5454</issue>
+          <fpage>848</fpage>
+          <lpage>851</lpage>
+          <pub-id pub-id-type="doi">10.1126/science.287.5454.848</pub-id>
+          <pub-id pub-id-type="pmid">10657297</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR15">
+        <label>15.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Burnichon</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Rohmer</surname>
+              <given-names>V</given-names>
+            </name>
+            <name>
+              <surname>Amar</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Herman</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Leboulleux</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Darrouzet</surname>
+              <given-names>V</given-names>
+            </name>
+            <name>
+              <surname>Niccoli</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Gaillard</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Chabrier</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Chabolle</surname>
+              <given-names>F</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>The succinate dehydrogenase genetic testing in a large prospective series of patients with paragangliomas</article-title>
+          <source>J Clin Endocrinol Metab</source>
+          <year>2009</year>
+          <volume>94</volume>
+          <issue>8</issue>
+          <fpage>2817</fpage>
+          <lpage>2827</lpage>
+          <pub-id pub-id-type="doi">10.1210/jc.2008-2504</pub-id>
+          <pub-id pub-id-type="pmid">19454582</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR16">
+        <label>16.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Piccini</surname>
+              <given-names>V</given-names>
+            </name>
+            <name>
+              <surname>Rapizzi</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Bacca</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Di Trapani</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Pulli</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Giache</surname>
+              <given-names>V</given-names>
+            </name>
+            <name>
+              <surname>Zampetti</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Lucci-Cordisco</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Canu</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Corsini</surname>
+              <given-names>E</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Head and neck paragangliomas: genetic spectrum and clinical variability in 79 consecutive patients</article-title>
+          <source>Endocr Relat Cancer</source>
+          <year>2012</year>
+          <volume>19</volume>
+          <issue>2</issue>
+          <fpage>149</fpage>
+          <lpage>155</lpage>
+          <pub-id pub-id-type="doi">10.1530/ERC-11-0369</pub-id>
+          <pub-id pub-id-type="pmid">22241717</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR17">
+        <label>17.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ziegler</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Corvalan</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Roa</surname>
+              <given-names>I</given-names>
+            </name>
+            <name>
+              <surname>Branes</surname>
+              <given-names>JA</given-names>
+            </name>
+            <name>
+              <surname>Wollscheid</surname>
+              <given-names>B</given-names>
+            </name>
+          </person-group>
+          <article-title>Teneurin protein family: an emerging role in human tumorigenesis and drug resistance</article-title>
+          <source>Cancer Lett</source>
+          <year>2012</year>
+          <volume>326</volume>
+          <issue>1</issue>
+          <fpage>1</fpage>
+          <lpage>7</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.canlet.2012.07.021</pub-id>
+          <pub-id pub-id-type="pmid">22841666</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR18">
+        <label>18.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Molenaar</surname>
+              <given-names>JJ</given-names>
+            </name>
+            <name>
+              <surname>Koster</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Zwijnenburg</surname>
+              <given-names>DA</given-names>
+            </name>
+            <name>
+              <surname>van Sluis</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Valentijn</surname>
+              <given-names>LJ</given-names>
+            </name>
+            <name>
+              <surname>van der Ploeg</surname>
+              <given-names>I</given-names>
+            </name>
+            <name>
+              <surname>Hamdi</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>van Nes</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Westerman</surname>
+              <given-names>BA</given-names>
+            </name>
+            <name>
+              <surname>van Arkel</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Sequencing of neuroblastoma identifies chromothripsis and defects in neuritogenesis genes</article-title>
+          <source>Nature</source>
+          <year>2012</year>
+          <volume>483</volume>
+          <issue>7391</issue>
+          <fpage>589</fpage>
+          <lpage>593</lpage>
+          <pub-id pub-id-type="doi">10.1038/nature10910</pub-id>
+          <pub-id pub-id-type="pmid">22367537</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR19">
+        <label>19.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Li</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Zhu</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Ma</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Qiu</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Kang</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Wu</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Xu</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>H</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Downregulation of EphA5 by promoter methylation in human prostate cancer</article-title>
+          <source>BMC Cancer</source>
+          <year>2015</year>
+          <volume>15</volume>
+          <fpage>18</fpage>
+          <pub-id pub-id-type="doi">10.1186/s12885-015-1025-3</pub-id>
+          <pub-id pub-id-type="pmid">25609195</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR20">
+        <label>20.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhang</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Wei</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Guo</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>H</given-names>
+            </name>
+          </person-group>
+          <article-title>Differential expression of EphA5 protein in gastric carcinoma and its clinical significance</article-title>
+          <source>Oncol Lett</source>
+          <year>2019</year>
+          <volume>17</volume>
+          <issue>6</issue>
+          <fpage>5147</fpage>
+          <lpage>5153</lpage>
+          <?supplied-pmid 31186729?>
+          <pub-id pub-id-type="pmid">31186729</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR21">
+        <label>21.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yang</surname>
+              <given-names>Q</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Wei</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Peng</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Hu</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Kong</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Du</surname>
+              <given-names>C</given-names>
+            </name>
+          </person-group>
+          <article-title>Gene and microRNA signatures are associated with the development and survival of glioblastoma patients</article-title>
+          <source>DNA Cell Biol</source>
+          <year>2019</year>
+          <volume>38</volume>
+          <issue>7</issue>
+          <fpage>688</fpage>
+          <lpage>699</lpage>
+          <pub-id pub-id-type="doi">10.1089/dna.2018.4353</pub-id>
+          <pub-id pub-id-type="pmid">31188028</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR22">
+        <label>22.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Sun</surname>
+              <given-names>HT</given-names>
+            </name>
+            <name>
+              <surname>Cheng</surname>
+              <given-names>SX</given-names>
+            </name>
+            <name>
+              <surname>Tu</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>XH</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>S</given-names>
+            </name>
+          </person-group>
+          <article-title>FoxQ1 promotes glioma cells proliferation and migration by regulating NRXN3 expression</article-title>
+          <source>PLoS One</source>
+          <year>2013</year>
+          <volume>8</volume>
+          <issue>1</issue>
+          <fpage>e55693</fpage>
+          <pub-id pub-id-type="doi">10.1371/journal.pone.0055693</pub-id>
+          <pub-id pub-id-type="pmid">23383267</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR23">
+        <label>23.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Schulze</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Violonchi</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Swoboda</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Welz</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Kerkhoff</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Hoja</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Bruggemann</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Simburger</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Reinders</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Riemenschneider</surname>
+              <given-names>MJ</given-names>
+            </name>
+          </person-group>
+          <article-title>RELN signaling modulates glioblastoma growth and substrate-dependent migration</article-title>
+          <source>Brain Pathol</source>
+          <year>2018</year>
+          <volume>28</volume>
+          <issue>5</issue>
+          <fpage>695</fpage>
+          <lpage>709</lpage>
+          <pub-id pub-id-type="doi">10.1111/bpa.12584</pub-id>
+          <pub-id pub-id-type="pmid">29222813</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR24">
+        <label>24.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kusinska</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Gorniak</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Pastorczak</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Fendler</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Potemski</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Mlynarski</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Kordek</surname>
+              <given-names>R</given-names>
+            </name>
+          </person-group>
+          <article-title>Influence of genomic variation in FTO at 16q12.2, MC4R at 18q22 and NRXN3 at 14q31 genes on breast cancer risk</article-title>
+          <source>Mol Biol Rep</source>
+          <year>2012</year>
+          <volume>39</volume>
+          <issue>3</issue>
+          <fpage>2915</fpage>
+          <lpage>2919</lpage>
+          <pub-id pub-id-type="doi">10.1007/s11033-011-1053-2</pub-id>
+          <pub-id pub-id-type="pmid">21688152</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR25">
+        <label>25.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhang</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Ding</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Holmfeldt</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Wu</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Heatley</surname>
+              <given-names>SL</given-names>
+            </name>
+            <name>
+              <surname>Payne-Turner</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Easton</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Rusch</surname>
+              <given-names>M</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>The genetic basis of early T-cell precursor acute lymphoblastic leukaemia</article-title>
+          <source>Nature</source>
+          <year>2012</year>
+          <volume>481</volume>
+          <issue>7380</issue>
+          <fpage>157</fpage>
+          <lpage>163</lpage>
+          <pub-id pub-id-type="doi">10.1038/nature10725</pub-id>
+          <pub-id pub-id-type="pmid">22237106</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR26">
+        <label>26.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Govindan</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Ding</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Griffith</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Subramanian</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Dees</surname>
+              <given-names>ND</given-names>
+            </name>
+            <name>
+              <surname>Kanchi</surname>
+              <given-names>KL</given-names>
+            </name>
+            <name>
+              <surname>Maher</surname>
+              <given-names>CA</given-names>
+            </name>
+            <name>
+              <surname>Fulton</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Fulton</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Wallis</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Genomic landscape of non-small cell lung cancer in smokers and never-smokers</article-title>
+          <source>Cell</source>
+          <year>2012</year>
+          <volume>150</volume>
+          <issue>6</issue>
+          <fpage>1121</fpage>
+          <lpage>1134</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.cell.2012.08.024</pub-id>
+          <pub-id pub-id-type="pmid">22980976</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR27">
+        <label>27.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Cui</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Yin</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Ma</surname>
+              <given-names>Q</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Olman</surname>
+              <given-names>V</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Chou</surname>
+              <given-names>WC</given-names>
+            </name>
+            <name>
+              <surname>Hong</surname>
+              <given-names>CS</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Cao</surname>
+              <given-names>S</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Comprehensive characterization of the genomic alterations in human gastric cancer</article-title>
+          <source>Int J Cancer</source>
+          <year>2015</year>
+          <volume>137</volume>
+          <issue>1</issue>
+          <fpage>86</fpage>
+          <lpage>95</lpage>
+          <pub-id pub-id-type="doi">10.1002/ijc.29352</pub-id>
+          <pub-id pub-id-type="pmid">25422082</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR28">
+        <label>28.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Liang</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Jiang</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Zhong</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Hochwald</surname>
+              <given-names>SN</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Huang</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Nie</surname>
+              <given-names>Q</given-names>
+            </name>
+            <name>
+              <surname>Huang</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Xu</surname>
+              <given-names>JF</given-names>
+            </name>
+          </person-group>
+          <article-title>Discovery of aberrant alteration of genome in colorectal cancer by exome sequencing</article-title>
+          <source>Am J Med Sci</source>
+          <year>2019</year>
+          <volume>358</volume>
+          <issue>5</issue>
+          <fpage>340</fpage>
+          <lpage>349</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.amjms.2019.07.012</pub-id>
+          <pub-id pub-id-type="pmid">31445671</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR29">
+        <label>29.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Duan</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Hao</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Cui</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Worthley</surname>
+              <given-names>DL</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Shi</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Ke</surname>
+              <given-names>A</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Diverse modes of clonal evolution in HBV-related hepatocellular carcinoma revealed by single-cell genome sequencing</article-title>
+          <source>Cell Res</source>
+          <year>2018</year>
+          <volume>28</volume>
+          <issue>3</issue>
+          <fpage>359</fpage>
+          <lpage>373</lpage>
+          <pub-id pub-id-type="doi">10.1038/cr.2018.11</pub-id>
+          <pub-id pub-id-type="pmid">29327728</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR30">
+        <label>30.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Mangogna</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Belmonte</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Agostinis</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Zacchi</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Iacopino</surname>
+              <given-names>DG</given-names>
+            </name>
+            <name>
+              <surname>Martorana</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Rodolico</surname>
+              <given-names>V</given-names>
+            </name>
+            <name>
+              <surname>Bonazza</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Zanconati</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Kishore</surname>
+              <given-names>U</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Prognostic implications of the complement protein C1q in gliomas</article-title>
+          <source>Front Immunol</source>
+          <year>2019</year>
+          <volume>10</volume>
+          <fpage>2366</fpage>
+          <pub-id pub-id-type="doi">10.3389/fimmu.2019.02366</pub-id>
+          <pub-id pub-id-type="pmid">31649675</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR31">
+        <label>31.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hao</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Chiang</surname>
+              <given-names>YT</given-names>
+            </name>
+            <name>
+              <surname>Gout</surname>
+              <given-names>PW</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>Y</given-names>
+            </name>
+          </person-group>
+          <article-title>Elevated XPO6 expression as a potential prognostic biomarker for prostate cancer recurrence</article-title>
+          <source>Front Biosci (Schol Ed)</source>
+          <year>2016</year>
+          <volume>8</volume>
+          <fpage>44</fpage>
+          <lpage>55</lpage>
+          <pub-id pub-id-type="doi">10.2741/s445</pub-id>
+          <pub-id pub-id-type="pmid">26709895</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR32">
+        <label>32.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Addou-Klouche</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Adelaide</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Finetti</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Cervera</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Ferrari</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Bekhouche</surname>
+              <given-names>I</given-names>
+            </name>
+            <name>
+              <surname>Sircoulomb</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Sotiriou</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Viens</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Moulessehoul</surname>
+              <given-names>S</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Loss, mutation and deregulation of L3MBTL4 in breast cancers</article-title>
+          <source>Mol Cancer</source>
+          <year>2010</year>
+          <volume>9</volume>
+          <fpage>213</fpage>
+          <pub-id pub-id-type="doi">10.1186/1476-4598-9-213</pub-id>
+          <pub-id pub-id-type="pmid">20698951</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR33">
+        <label>33.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Chen</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Sun</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Ge</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Qian</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Bai</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Zheng</surname>
+              <given-names>S</given-names>
+            </name>
+          </person-group>
+          <article-title>A seven-gene signature predicts overall survival of patients with colorectal cancer</article-title>
+          <source>Oncotarget</source>
+          <year>2017</year>
+          <volume>8</volume>
+          <issue>56</issue>
+          <fpage>95054</fpage>
+          <lpage>95065</lpage>
+          <pub-id pub-id-type="doi">10.18632/oncotarget.10982</pub-id>
+          <pub-id pub-id-type="pmid">29221110</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR34">
+        <label>34.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Maletinska</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Blakely</surname>
+              <given-names>EA</given-names>
+            </name>
+            <name>
+              <surname>Bjornstad</surname>
+              <given-names>KA</given-names>
+            </name>
+            <name>
+              <surname>Deen</surname>
+              <given-names>DF</given-names>
+            </name>
+            <name>
+              <surname>Knoff</surname>
+              <given-names>LJ</given-names>
+            </name>
+            <name>
+              <surname>Forte</surname>
+              <given-names>TM</given-names>
+            </name>
+          </person-group>
+          <article-title>Human glioblastoma cell lines: levels of low-density lipoprotein receptor and low-density lipoprotein receptor-related protein</article-title>
+          <source>Cancer Res</source>
+          <year>2000</year>
+          <volume>60</volume>
+          <issue>8</issue>
+          <fpage>2300</fpage>
+          <lpage>2303</lpage>
+          <?supplied-pmid 10786698?>
+          <pub-id pub-id-type="pmid">10786698</pub-id>
+        </element-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

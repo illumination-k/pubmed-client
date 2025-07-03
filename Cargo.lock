@@ -1038,16 +1038,13 @@ name = "pubmed-client-rs"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "console_error_panic_hook",
  "getrandom 0.2.16",
- "js-sys",
  "quick-xml",
  "rand",
  "regex",
  "reqwest",
  "rstest",
  "serde",
- "serde-wasm-bindgen",
  "serde_json",
  "thiserror",
  "tokio",
@@ -1057,13 +1054,27 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "tracing-test",
- "tsify",
  "urlencoding",
+ "wiremock",
+]
+
+[[package]]
+name = "pubmed-client-wasm"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "console_error_panic_hook",
+ "getrandom 0.2.16",
+ "js-sys",
+ "pubmed-client-rs",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "tsify",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
  "wee_alloc",
- "wiremock",
 ]
 
 [[package]]

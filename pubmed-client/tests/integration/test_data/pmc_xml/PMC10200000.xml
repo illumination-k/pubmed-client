@@ -1,0 +1,2218 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:16:56Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:10200000" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:10200000</identifier><datestamp>2023-05-22</datestamp><setSpec>nanmiclet</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" article-type="research-article" dtd-version="1.3">
+  <processing-meta base-tagset="archiving" mathml-version="3.0" table-model="xhtml" tagset-family="jats">
+    <restricted-by>pmc</restricted-by>
+  </processing-meta>
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">Nanomicro Lett</journal-id>
+      <journal-id journal-id-type="iso-abbrev">Nanomicro Lett</journal-id>
+      <journal-title-group>
+        <journal-title>Nano-Micro Letters</journal-title>
+      </journal-title-group>
+      <issn pub-type="ppub">2311-6706</issn>
+      <issn pub-type="epub">2150-5551</issn>
+      <publisher>
+        <publisher-name>Springer Nature Singapore</publisher-name>
+        <publisher-loc>Singapore</publisher-loc>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC10200000</article-id>
+      <article-id pub-id-type="pmcid">PMC10200000</article-id>
+      <article-id pub-id-type="pmc-uid">10200000</article-id>
+      <article-id pub-id-type="pmid">37209189</article-id>
+      <article-id pub-id-type="pmid">37209189</article-id>
+      <article-id pub-id-type="publisher-id">1106</article-id>
+      <article-id pub-id-type="doi">10.1007/s40820-023-01106-5</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>Article</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Engineering Multi-field-coupled Synergistic Ion Transport System Based on the Heterogeneous Nanofluidic Membrane for High-Efficient Lithium Extraction</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Fu</surname>
+            <given-names>Lin</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Hu</surname>
+            <given-names>Yuhao</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Lin</surname>
+            <given-names>Xiangbin</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Wang</surname>
+            <given-names>Qingchen</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Yang</surname>
+            <given-names>Linsen</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Xin</surname>
+            <given-names>Weiwen</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Zhou</surname>
+            <given-names>Shengyang</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Qian</surname>
+            <given-names>Yongchao</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author" corresp="yes">
+          <name>
+            <surname>Kong</surname>
+            <given-names>Xiang-Yu</given-names>
+          </name>
+          <address>
+            <email>kongxiangyu@mail.ipc.ac.cn</email>
+          </address>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Jiang</surname>
+            <given-names>Lei</given-names>
+          </name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author" corresp="yes">
+          <name>
+            <surname>Wen</surname>
+            <given-names>Liping</given-names>
+          </name>
+          <address>
+            <email>wen@mail.ipc.ac.cn</email>
+          </address>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+          <xref ref-type="aff" rid="Aff2">2</xref>
+          <xref ref-type="aff" rid="Aff3">3</xref>
+        </contrib>
+        <aff id="Aff1"><label>1</label><institution-wrap><institution-id institution-id-type="GRID">grid.9227.e</institution-id><institution-id institution-id-type="ISNI">0000000119573309</institution-id><institution>CAS Key Laboratory of Bio-Inspired Materials and Interfacial Science, Technical Institute of Physics and Chemistry, </institution><institution>Chinese Academy of Sciences, </institution></institution-wrap>Beijing, 100190 People’s Republic of China </aff>
+        <aff id="Aff2"><label>2</label><institution-wrap><institution-id institution-id-type="ROR">https://ror.org/05qbk4x57</institution-id><institution-id institution-id-type="GRID">grid.410726.6</institution-id><institution-id institution-id-type="ISNI">0000 0004 1797 8419</institution-id><institution>School of Future Technology, </institution><institution>University of Chinese Academy of Sciences, </institution></institution-wrap>Beijing, 100049 People’s Republic of China </aff>
+        <aff id="Aff3"><label>3</label><institution-wrap><institution-id institution-id-type="GRID">grid.9227.e</institution-id><institution-id institution-id-type="ISNI">0000000119573309</institution-id><institution>Qingdao Institute of Bioenergy and Bioprocess Technology, </institution><institution>Chinese Academy of Sciences, </institution></institution-wrap>Qingdao, 266101 People’s Republic of China </aff>
+      </contrib-group>
+      <pub-date pub-type="epub">
+        <day>20</day>
+        <month>5</month>
+        <year>2023</year>
+      </pub-date>
+      <pub-date pub-type="pmc-release">
+        <day>20</day>
+        <month>5</month>
+        <year>2023</year>
+      </pub-date>
+      <pub-date pub-type="collection">
+        <month>12</month>
+        <year>2023</year>
+      </pub-date>
+      <volume>15</volume>
+      <elocation-id>130</elocation-id>
+      <history>
+        <date date-type="received">
+          <day>6</day>
+          <month>3</month>
+          <year>2023</year>
+        </date>
+        <date date-type="accepted">
+          <day>13</day>
+          <month>4</month>
+          <year>2023</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-statement>© The Author(s) 2023</copyright-statement>
+        <license>
+          <ali:license_ref specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref>
+          <license-p><bold>Open Access</bold> This article is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if changes were made. The images or other third party material in this article are included in the article's Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the article's Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder. To view a copy of this licence, visit <ext-link ext-link-type="uri" xlink:href="https://creativecommons.org/licenses/by/4.0/">http://creativecommons.org/licenses/by/4.0/</ext-link>.</license-p>
+        </license>
+      </permissions>
+      <abstract id="Abs1" abstract-type="highlights">
+        <title>Highlights</title>
+        <p id="Par23">
+<list list-type="bullet"><list-item><p id="Par24">The first construct of a multi-field-coupled synergistic ion transport system (MSITS) in Li<sup>+</sup> extraction is proposed.</p></list-item><list-item><p id="Par25">Effectively suppress the ion concentration polarization effect of the ion-enrichment zone at the membrane interface.</p></list-item><list-item><p id="Par26">The MSITS equipped with heterogeneous membrane exhibited outstanding separation performance with Li<sup>+</sup> flux of 367.4 mmol m<sup>−2</sup> h<sup>−1</sup> and Li<sup>+</sup>/Co<sup>2+</sup> selectivity of 216,412, outperforming previous reports.</p></list-item></list>
+</p>
+        <sec>
+          <title>Supplementary Information</title>
+          <p>The online version contains supplementary material available at 10.1007/s40820-023-01106-5.</p>
+        </sec>
+      </abstract>
+      <abstract id="Abs2">
+        <p id="Par1">The global carbon neutrality strategy brings a wave of rechargeable lithium‐ion batteries technique development and induces an ever-growing consumption and demand for lithium (Li). Among all the Li exploitation, extracting Li from spent LIBs would be a strategic and perspective approach, especially with the low energy consumption and eco-friendly membrane separation method. However, current membrane separation systems mainly focus on monotonous membrane design and structure optimization, and rarely further consider the coordination of inherent structure and applied external field, resulting in limited ion transport. Here, we propose a heterogeneous nanofluidic membrane as a platform for coupling multi-external fields (i.e., light-induced heat, electrical, and concentration gradient fields) to construct the multi-field-coupled synergistic ion transport system (MSITS) for Li-ion extraction from spent LIBs. The Li flux of the MSITS reaches 367.4 mmol m<sup>−2</sup> h<sup>−1</sup>, even higher than the sum flux of those applied individual fields, reflecting synergistic enhancement for ion transport of the multi-field-coupled effect. Benefiting from the adaptation of membrane structure and multi-external fields, the proposed system exhibits ultrahigh selectivity with a Li<sup>+</sup>/Co<sup>2+</sup> factor of 216,412, outperforming previous reports. MSITS based on nanofluidic membrane proves to be a promising ion transport strategy, as it could accelerate ion transmembrane transport and alleviate the ion concentration polarization effect. This work demonstrated a collaborative system equipped with an optimized membrane for high-efficient Li extraction, providing an expanded strategy to investigate the other membrane-based applications of their common similarities in core concepts.<graphic position="anchor" xlink:href="40820_2023_1106_Figa_HTML" id="MO1"/></p>
+        <sec>
+          <title>Supplementary Information</title>
+          <p>The online version contains supplementary material available at 10.1007/s40820-023-01106-5.</p>
+        </sec>
+      </abstract>
+      <kwd-group xml:lang="en">
+        <title>Keywords</title>
+        <kwd>Nanofluids</kwd>
+        <kwd>Ion separation</kwd>
+        <kwd>Lithium extraction</kwd>
+        <kwd>Synergistic effect</kwd>
+        <kwd>Spent lithium-ion battery</kwd>
+      </kwd-group>
+      <funding-group>
+        <award-group>
+          <funding-source>
+            <institution>Shanghai Jiao Tong University</institution>
+          </funding-source>
+        </award-group>
+        <open-access>
+          <p>Open access funding provided by Shanghai Jiao Tong University.</p>
+        </open-access>
+      </funding-group>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>issue-copyright-statement</meta-name>
+          <meta-value>© Shanghai Jiao Tong University 2023</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="Sec1">
+      <title>Introduction</title>
+      <p id="Par3">Lithium-ion batteries (LIBs) have become an indispensable energy storage system with wide applications, especially in portable electronic devices [<xref ref-type="bibr" rid="CR1">1</xref>–<xref ref-type="bibr" rid="CR4">4</xref>], electric vehicles, and power stations, which result in soaring demand for global lithium consumption as well as a surge of end-of-life LIBs [<xref ref-type="bibr" rid="CR5">5</xref>–<xref ref-type="bibr" rid="CR7">7</xref>]. Threatened by the uneven regional distribution of Li resources and the ever-growing environmental crisis, recycling spent LIBs is expected to reduce production costs and alleviate resource consumption, which remains an enormous challenge [<xref ref-type="bibr" rid="CR8">8</xref>–<xref ref-type="bibr" rid="CR10">10</xref>]. Li resource extraction and recovery, which calls for efficient and eco-friendly methods, is key to the development of sustainable energy and environmental protection [<xref ref-type="bibr" rid="CR11">11</xref>, <xref ref-type="bibr" rid="CR12">12</xref>]. Over the past years, many approaches have been developed to extract Li including electrodialysis [<xref ref-type="bibr" rid="CR13">13</xref>–<xref ref-type="bibr" rid="CR15">15</xref>], solvent extraction [<xref ref-type="bibr" rid="CR16">16</xref>], ion-sieve adsorption [<xref ref-type="bibr" rid="CR17">17</xref>], solar evaporation precipitation [<xref ref-type="bibr" rid="CR18">18</xref>], and electrochemical methods [<xref ref-type="bibr" rid="CR19">19</xref>–<xref ref-type="bibr" rid="CR21">21</xref>]. Separation technology based on the nanofluidic membrane is considered a promising and eco-friendly alternative for Li extraction, owing to the advantages of tunable ion transport and continuous operation [<xref ref-type="bibr" rid="CR22">22</xref>–<xref ref-type="bibr" rid="CR26">26</xref>]. Nanofluidic membranes, as advanced platforms integrating sufficient nanochannels and adjustable host–guest chemistries, exhibit a wide range of confined ion transport properties such as ion selective transport [<xref ref-type="bibr" rid="CR27">27</xref>–<xref ref-type="bibr" rid="CR29">29</xref>]. In particular, integrating Li<sup>+</sup>-selective nanofluidic membranes with well-designed transport systems can switch the trade-off between selectivity and flux positively, achieving improved Li<sup>+</sup> extraction performance.</p>
+      <p id="Par4">As known, the biological ion channel is not only capable of ultra-high ion selectivity and ion flux but also responds intelligently to environmental stimuli, allowing it the tunable ion transport properties under stimuli [<xref ref-type="bibr" rid="CR30">30</xref>, <xref ref-type="bibr" rid="CR31">31</xref>]. Biomimetic artificial nanofluidic has been explored to regulate ion transport performance for wide applications such as energy conversion by applying external fields (e.g. light [<xref ref-type="bibr" rid="CR32">32</xref>–<xref ref-type="bibr" rid="CR34">34</xref>], heat [<xref ref-type="bibr" rid="CR35">35</xref>], and force [<xref ref-type="bibr" rid="CR36">36</xref>]). The external fields exerting at the systems may provide additional driven force for the ion transmembrane movement and hydrodynamic convection at the membrane interface, alleviating the degree of ICP in nanofluidic membranes during ion extraction, promising efficient recovery of resources [<xref ref-type="bibr" rid="CR37">37</xref>]. Nevertheless, the current system emphasizes the effect of individual fields on confined ion transport, while ignoring the cooperative effect of multiple external fields. Transmembrane ionic transport promoted by physical fields has been found to promise efficient resource recovery. In addition to constructing nanofluidic membranes with controllable ion transport and stimuli responding, the collaboration of optimized membranes with multi-external fields needs to be considered to achieve enhanced ion transport.</p>
+      <p id="Par5">Here, we demonstrate the MSITS based on heterogeneous nanofluidic membrane Li<sub>1.5</sub>Al<sub>0.5</sub>Ge<sub>1.5</sub>P<sub>3</sub>O<sub>12</sub> (LAGP)/(multi-walled carbon nanotubes/cellulose nanofiber) (MWCNTs/CNF), assisted by multi-external fields (i.e., light-induced heat, electrical and concentration gradient fields) (Fig. <xref rid="Fig1" ref-type="fig">1</xref>a). Heterogeneous nanofluidic membrane retains the intrinsic structure and properties of LAGP, with three-dimensional lithium channels, contributing to high ion selectivity and low mass transfer resistance. In addition, MWCNTs/CNF functions as a photothermal layer due to its excellent photothermal conversion effect, which contributes to improving the ion transmembrane migration by increasing ionic mobility of the ion-enrichment zone at the membrane interface and suppressing the ICP effect. The Li<sup>+</sup> flux of the MSITS can be up to 367.4 mmol m<sup>−2</sup> h<sup>−1</sup> as extracting Li from the spent LIBs leaching solutions, an approximately 1300% increase compared with the system driven by concentration gradient field. Furthermore, the proposed transport system exhibits ultrahigh Li<sup>+</sup> selectivity with factors of 216,412, 142,043, 51,843, 23,276, and 3907, for Li<sup>+</sup>/Co<sup>2+</sup>, Li<sup>+</sup>/Mn<sup>2+</sup>, Li<sup>+</sup>/Cu<sup>2+</sup>, Li<sup>+</sup>/Ni<sup>2+</sup>, and Li<sup>+</sup>/Na<sup>+</sup>, respectively, outperforming the previous reports of Li-ion sieving systems. The significant performance improvement shows the practical potential of our strategy, indicating the imperative of multi-field-coupled strategy in membrane separation resource extraction, and it also provides a technical reference for the novel Li<sup>+</sup> enrichment technology based on nanofluidic membrane separation system.<fig id="Fig1"><label>Fig. 1</label><caption><p>Setup of the MSITS. <bold>a</bold> Schematic representation of MSITS based on heterogeneous membrane (HM). The HM consists of LAGP and MWCNTs/CNF layers. Four external fields applied to the system include concentration gradient field (Δ<italic>C</italic>), concentration gradient field coupled with light-induced heat field (Δ<italic>C</italic> + <italic>hv</italic>), concentration gradient field coupled with electrical field (Δ<italic>C</italic> + <italic>E</italic>) and concentration gradient field coupled with light-induced heat field and electrical field (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>). The transport system was employed to selectively extract Li<sup>+</sup> from a lithium-containing leaching solution, which is obtained from a battery recycling factory and generated during the dismantling and recycling of spent LIBs. <bold>b</bold> Polyhedral representation of the rhombohedral crystal structure of LAGP. Dark grey: Li; cornflower blue: Ge/Al, light green: P, light coral: O. <bold>c</bold> BVEL maps with isosurfaces (yellow) drawn at the 1.4 eV level above <italic>E</italic><sub>min</sub>. Li-ion migration channels of rhombohedral LAGP are obtained from crystal structure analysis and bond valence energy landscape (BVEL) method. The potential diffusion pathway is illustrated by a continuous yellow band area, and visualization of the positions of three Li-ions, Li(1): light coral sphere, Li(2): dark grey sphere, and Li(3): light green sphere</p></caption><graphic xlink:href="40820_2023_1106_Fig1_HTML" id="MO2"/></fig></p>
+    </sec>
+    <sec id="Sec2">
+      <title>Experimental and Calculation</title>
+      <sec id="Sec3">
+        <title>Fabrication of the Heterogeneous Membrane</title>
+        <p id="Par6">The heterogeneous membrane was fabricated by the dip-coating method. Firstly, the CNF gel was dissolved in deionized water to obtain a uniform dispersion (5 mg mL<sup>−1</sup>) after ultrasonication. And then 5 mL MWCNTs-COOH suspension (12 mg mL<sup>−1</sup>) was added to 1 mL CNF dispersion to form a mixed solution, which was sonicated for 10 min and stirred for 1 h to form a uniform suspension. The MWCNTs/CNF suspension was drop-cast on a LAGP pellet and dried in a 60 °C oven. The evaporation of solvent will result in a uniform coating of the MWCNTs/CNF layer, called the photothermal layer, thereby achieving the preparation of a heterogeneous membrane.</p>
+      </sec>
+      <sec id="Sec4">
+        <title>Characterizations</title>
+        <p id="Par7">The morphology of heterogeneous membranes was observed using scanning electron microscopy (SEM, Hitachi S-4800). X-ray diffraction (XRD) pattern was carried out on a Bruker D8 Focus Powder diffractometer with a Cu Kα radiation source (<italic>λ</italic> = 0.154 nm). Fourier transform infrared (FTIR) spectra were performed on an Excalibur 3100 Fourier transform infrared spectrometer (Varian, USA). Raman spectra were measured by an inVia-Reflex microscope spectrometer (Renishaw, UK) with the radiation of a 532-nm laser. X-ray photoelectron spectroscopy (XPS) spectra were collected on an Al Kα source (ESCALAB 250Xi). The zeta potential of MWCNT/CNF was evaluated using a Zetasizer Nano (ZS90, Malvern Instruments Ltd., Malvern, England). The contact angles of the membranes were measured at room temperature using an OCA25 contact angle measuring instrument (Dataphysics, Germany).</p>
+      </sec>
+      <sec id="Sec5">
+        <title>Photothermal Conversion Property Measurements</title>
+        <p id="Par8">Membranes were used for the photothermal conversion performance measurement. Light with different wavelengths was applied at a light intensity of ~ 250 mW cm<sup>−2</sup>. The temperature of the heterogeneous membrane was monitored every 5 s using a Fluke thermal imaging camera, and the measurement accuracy of the camera is ± 2 °C. (Ti450; Everett, Washington, USA).</p>
+      </sec>
+      <sec id="Sec6">
+        <title>Electrical Measurements</title>
+        <p id="Par9">The electrical measurements were conducted using Keithley 6430 (Keithley Instruments, Cleveland, OH). For the ionic transport properties of current–voltage curve, the electrolytes in the two cells are the same. For energy conversion properties, the low-concentration electrolyte faced the MWCNTs/CNF layer, while the high-concentration electrolyte faced the LAGP layer. Ag/AgCl electrodes were used to collect the current and voltage signals, with the anode positioned on the high-concentration electrolyte side. With respect to light density-dependent measurements, the light density can be controlled by adjusting the instrument output light intensity density.</p>
+      </sec>
+      <sec id="Sec7">
+        <title>Theoretical Calculations</title>
+        <p id="Par10">All the calculations are performed in the framework of the density functional theory (DFT) with the projector augmented plane-wave method, as implemented in the Vienna ab initio simulation package. The generalized gradient approximation proposed by Perdew, Burke, and Ernzerhof is selected for the exchange–correlation potential. The cutoff energy for the plane wave is set to 450 eV. The energy criterion is set to 10<sup>−4</sup> eV in the iterative solution of the Kohn–Sham equation. The Brillouin zone integration is performed using a 2 × 2 × 1 k-mesh. All the structures are relaxed until the residual forces on the atoms have declined to less than 0.02 eV Å<sup>−1</sup>.</p>
+        <p id="Par11">The bond valence energy landscape (BVEL) analysis [<xref ref-type="bibr" rid="CR38">38</xref>–<xref ref-type="bibr" rid="CR40">40</xref>], based on the theory that transport pathways can be evaluated by calculating the accessible sites for mobile ions, has been used as an effective ionic migration pathways simulation tool. Our BVEL methods take 10 Å as the cutoff radius and 0.1 Å as the grid resolution to obtain the mobile ions migration energy barrier by defining the Morse and Coulombic potentials as the following formulas:<disp-formula id="Equ1"><label>1</label><alternatives><tex-math id="M1">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$E\left( {{\text{Li}}} \right)_{{{\text{morse}}}} = D_{0} \left\{ {\left( {\exp \left[ {\alpha \left( {R_{\min } - R} \right)} \right] - 1} \right)^{2} - 1} \right\}$$\end{document}</tex-math><mml:math id="M2" display="block"><mml:mrow><mml:mi>E</mml:mi><mml:msub><mml:mfenced close=")" open="("><mml:mtext>Li</mml:mtext></mml:mfenced><mml:mtext>morse</mml:mtext></mml:msub><mml:mo>=</mml:mo><mml:msub><mml:mi>D</mml:mi><mml:mn>0</mml:mn></mml:msub><mml:mfenced close="}" open="{"><mml:mrow><mml:msup><mml:mfenced close=")" open="("><mml:mrow><mml:mo>exp</mml:mo><mml:mfenced close="]" open="["><mml:mrow><mml:mi>α</mml:mi><mml:mfenced close=")" open="("><mml:mrow><mml:msub><mml:mi>R</mml:mi><mml:mo movablelimits="true">min</mml:mo></mml:msub><mml:mo>-</mml:mo><mml:mi>R</mml:mi></mml:mrow></mml:mfenced></mml:mrow></mml:mfenced><mml:mo>-</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:mfenced><mml:mn>2</mml:mn></mml:msup><mml:mo>-</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:mfenced></mml:mrow></mml:math><graphic xlink:href="40820_2023_1106_Article_Equ1.gif" position="anchor"/></alternatives></disp-formula><disp-formula id="Equ2"><label>2</label><alternatives><tex-math id="M3">\documentclass[12pt]{minimal}
+				\usepackage{amsmath}
+				\usepackage{wasysym}
+				\usepackage{amsfonts}
+				\usepackage{amssymb}
+				\usepackage{amsbsy}
+				\usepackage{mathrsfs}
+				\usepackage{upgreek}
+				\setlength{\oddsidemargin}{-69pt}
+				\begin{document}$$E\left( {{\text{Li}} - A} \right)_{{{\text{coulomb}}}} = \frac{{q_{{{\text{Li}}}} q_{A} }}{{R_{{{\text{Li}} - A}} }}{\text{erfc}}\left( {\frac{{R_{{{\text{Li}} - A}} }}{{\rho_{{{\text{Li}} - A}} }}} \right)$$\end{document}</tex-math><mml:math id="M4" display="block"><mml:mrow><mml:mi>E</mml:mi><mml:msub><mml:mfenced close=")" open="("><mml:mrow><mml:mtext>Li</mml:mtext><mml:mo>-</mml:mo><mml:mi>A</mml:mi></mml:mrow></mml:mfenced><mml:mtext>coulomb</mml:mtext></mml:msub><mml:mo>=</mml:mo><mml:mfrac><mml:mrow><mml:msub><mml:mi>q</mml:mi><mml:mtext>Li</mml:mtext></mml:msub><mml:msub><mml:mi>q</mml:mi><mml:mi>A</mml:mi></mml:msub></mml:mrow><mml:msub><mml:mi>R</mml:mi><mml:mrow><mml:mtext>Li</mml:mtext><mml:mo>-</mml:mo><mml:mi>A</mml:mi></mml:mrow></mml:msub></mml:mfrac><mml:mtext>erfc</mml:mtext><mml:mfenced close=")" open="("><mml:mfrac><mml:msub><mml:mi>R</mml:mi><mml:mrow><mml:mtext>Li</mml:mtext><mml:mo>-</mml:mo><mml:mi>A</mml:mi></mml:mrow></mml:msub><mml:msub><mml:mi>ρ</mml:mi><mml:mrow><mml:mtext>Li</mml:mtext><mml:mo>-</mml:mo><mml:mi>A</mml:mi></mml:mrow></mml:msub></mml:mfrac></mml:mfenced></mml:mrow></mml:math><graphic xlink:href="40820_2023_1106_Article_Equ2.gif" position="anchor"/></alternatives></disp-formula>where <italic>D</italic><sub>0</sub>, α, <italic>R</italic><sub>min</sub> are morse potential parameters determined from a large amount of stable compounds and <italic>q</italic> and <italic>R</italic> refer to effective charges of atoms and bond distance between atoms, respectively.</p>
+        <p id="Par12">To complete the analysis of ionic migration, the quasi-empirical BVEL methods with high calculation efficiency are employed to obtain the basic information on possible ionic migration channels for LAGP. By adding the morse potential energy of mobile ions and the related anions and the coulomb repulsion potential of mobile ions and cations to the basic approximate methods, BVEL has been performed to calculate the ionic migration pathways for LAGP.</p>
+      </sec>
+    </sec>
+    <sec id="Sec8">
+      <title>Results and Discussion</title>
+      <sec id="Sec9">
+        <title>Strategy and Characterizations</title>
+        <p id="Par13">As shown in Fig. S1, the heterogeneous LAGP/(MWCNTs/CNF) membrane, prepared by drop coating method, is assembled into a designed transfer system which is divided into feed and receiving chambers by the membrane. The heterogeneous nanofluidic membrane consists of LAGP and MWCNTs/CNF layer, wherein the thicknesses of corresponding portions are approximately 260 and 1.2 μm, respectively. The specially designed structure results in rapid Li<sup>+</sup> transport properties and external field responsivity. Transport systems under the diverse external field to promote ion transport across nanofluidic membranes are illustrated in Fig. <xref rid="Fig1" ref-type="fig">1</xref>a. The behavior of transmembrane transport under different driving forces (Δ<italic>C</italic>, Δ<italic>C</italic> + <italic>hv</italic>, Δ<italic>C</italic> + <italic>E</italic>, and Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>) was investigated and analyzed detailedly in the subsequent sections. The local magnification in Fig. S1 indicates that the LAGP demonstrated a typical continuous dense structure, serving as a selective layer that controls Li-ion selective transport across the membrane. LAGP was a rhombohedral lithium superionic conductor [<xref ref-type="bibr" rid="CR41">41</xref>–<xref ref-type="bibr" rid="CR43">43</xref>], whose basic structure consists of PO<sub>4</sub> tetrahedra, GeO<sub>6</sub>/AlO<sub>6</sub> octahedra and LiO<sub>6</sub> units in trigonal antiprismatic coordination (Fig. <xref rid="Fig1" ref-type="fig">1</xref>b). The Li (denoted as Li(1) in the following), Ge/Al, P and O ions occupied the crystallographic Wyckoff 6b, 12c, 18e, and 36f sites, respectively. Heterovalent cation substitution introduced additional Li, located in Li(2) and Li(3) sites, in each formulation unit for charge compensation, enabling a further increase in ionic conductivity by increasing carrier concentration [<xref ref-type="bibr" rid="CR44">44</xref>].</p>
+        <p id="Par14">Understanding the three-dimensional diffusion process of Li<sup>+</sup> in LAGP has obvious implications for revealing the ionic transmembrane transport process [<xref ref-type="bibr" rid="CR45">45</xref>, <xref ref-type="bibr" rid="CR46">46</xref>]. As shown in Fig. <xref rid="Fig1" ref-type="fig">1</xref>c, we conducted an in-depth analysis of Li-ion diffusion channels in rhombohedral LAGP by integrating crystal structure analysis and bond-valence energy landscape (BVEL) analysis. Based on the theory that transport pathways could be evaluated by calculating the accessible sites for mobile ions, the BVEL method has served as an effective ionic migration pathways simulation tool [<xref ref-type="bibr" rid="CR47">47</xref>, <xref ref-type="bibr" rid="CR48">48</xref>]. According to Fig. <xref rid="Fig1" ref-type="fig">1</xref>c, the topology of the ionic-conduction pathways is consistent with BVEL maps of Li<sub>1.5</sub>Al<sub>0.5</sub>Ge<sub>1.5</sub>(PO<sub>4</sub>)<sub>3</sub>, where the isosurfaces (yellow) illustrated that conduction occurs along the continuous zigzag channel containing sites associated with Li. The transport mechanism in LAGP materials was considered a concerted migration mechanism, which involved the simultaneous correlated motion of several neighbouring atoms [<xref ref-type="bibr" rid="CR49">49</xref>]. Aside from the configuration, the coulomb interaction between migrating and neighbouring mobile ions was critical to orchestrating concerted migration. Migration barriers for correlated motions of several mobile ions tended to be lower than those for uncorrelated single ion hopping. Additionally, the MWCNTs/CNF layer acted as the photothermal layer to enhance ion transport [<xref ref-type="bibr" rid="CR50">50</xref>]. By illuminating the MWCNTs/CNF layer, its excellent photothermal conversion property enabled the membrane surface to be heated up, which contributed to the increase of ion thermophoresis mobility and accelerated the diffusion of ions at the membrane interface. The ICP phenomenon was reflected by the formation of an ion-depletion zone at the surface facing the concentrated solution, and an ion-enrichment zone comprising the target ions transported across the membrane at its opposite side. Therefore, the diffusion boundary layer adjacent to the membrane induced by ICP weakened the driving force for preferential ion transport across the membrane, thereby inhibiting the practical application of numerous membrane separation processes. While the above weakening effect to driving force was effectively released by suppressing ICP through light-induced heat-promoting ion transport at the membrane interface. Overall, the functional nanofluidic membrane could integrate with a coupled multiple-driven force to achieve the efficient recovery of specific ions.</p>
+      </sec>
+      <sec id="Sec10">
+        <title>Evaluation of Electrochemical Properties</title>
+        <p id="Par15">The ion transport properties of the LAGP membrane (LM) and heterogeneous membrane (HM) were investigated with a homemade symmetric double electrochemical cell, as shown in Fig. <xref rid="Fig2" ref-type="fig">2</xref>a. Ion current–voltage (<italic>I</italic>–<italic>V</italic>) curves were conducted in LiCl solutions at concentrations ranging from 0.01 to 0.5 M, all exhibiting linear ohmic behavior (Figs. <xref rid="Fig2" ref-type="fig">2</xref>b and S2). The ionic conductance was derived from the corresponding <italic>I</italic>–<italic>V</italic> curves (Fig. <xref rid="Fig2" ref-type="fig">2</xref>c). Notably, the ionic conductance of the HM with an additional MWCNTs/CNF photothermal layer was slightly higher than that of the bare LM, indicating that the addition of the photothermal layer positively promoted ion transport even without light illumination. The enhancement was realized via surface negative charge and wettability [<xref ref-type="bibr" rid="CR51">51</xref>, <xref ref-type="bibr" rid="CR52">52</xref>]. In detail, the water contact angle of the HM (photothermal layer side) was reduced to 59° from 103° for that of bare LM (Fig. S3), owing to the presence of hydrophilic groups (carboxyl, hydroxyl) within the MWCNTs/CNF photothermal layer, as confirmed by XPS analysis and FTIR spectrum analysis (Figs. S4–S5) [<xref ref-type="bibr" rid="CR53">53</xref>, <xref ref-type="bibr" rid="CR54">54</xref>]. In addition, MWCNTs/CNF was negatively charged in a neutral aqueous solution with a zeta potential of ~ − 33 mV (Fig. S6).<fig id="Fig2"><label>Fig. 2</label><caption><p>Transmembrane ionic transport. <bold>a</bold> Schematic illustration of the experimental setup to measure transmembrane ionic transport. <bold>b</bold>
+<italic>I</italic>–<italic>V</italic> curves of HM measured in LiCl electrolyte with different concentration ranging from 0.01 to 0.5 M. <bold>c</bold> Conductance measurement of the LM and HM in LiCl electrolyte. <bold>d</bold>
+<italic>I-V</italic> curves of the HM at a 50-fold gradient under forward and backward LiCl concentration gradient. <bold>e</bold> Plot of voltage as a function of load resistance in the transport system equipped with HM. The harvested energy under a concentration gradient can be transferred to supply an external resistance. Under 5, 10, and 50-fold concentration gradients, the measured voltages all gradually increase with increasing load resistance. <bold>f</bold> The transmembrane potential value of the LM and HM</p></caption><graphic xlink:href="40820_2023_1106_Fig2_HTML" id="MO3"/></fig></p>
+        <p id="Par16">Osmotic energy is well known as a sustainable and clean energy source for the future [<xref ref-type="bibr" rid="CR55">55</xref>, <xref ref-type="bibr" rid="CR56">56</xref>]. When constructing an ion transport system utilizing a functional membrane (i.e., ion selective permeation membranes), the specific ions could be selectively transported directionally across the membrane driven by the concentration gradient field, enabling the enrichment and recovery of the target ions. It is worth noting that part of the Gibbs free energy contained in the concentration gradient could also be converted to an external circuit. To evaluate the osmotic energy-driven ion transport properties, LiCl solutions (0.5/0.01 M) were applied across the HM. Two configurations could be arranged for the concentration gradient. The transmembrane ion currents were recorded under a concentration gradient from the LAGP side fixed at 0.5 M concentration to the MWCNTs/CNF side fixed at 0.01 M concentration (blue curve in Fig. <xref rid="Fig2" ref-type="fig">2</xref>d) and under the reverse concentration gradient (red curve in Fig. <xref rid="Fig2" ref-type="fig">2</xref>d). The short-circuit current (<italic>I</italic><sub>sc</sub>) and open-circuit voltage (<italic>V</italic><sub>oc</sub>) were 22.4 μA and 167 mV, respectively, when the low-concentration solution was placed in the MWCNTs/CNT side. Under the reverse concentration gradient with low-concentration solution placed in the LAGP side, the corresponding <italic>I</italic><sub>sc</sub> and <italic>V</italic><sub>oc</sub> are 18.7 μA and 178 mV, and the calculated internal resistance was increased by ~ 28%, which severely suppresses the ion transmembrane transport performance. The former concentration gradient configuration had a smaller internal resistance and a larger<italic> I</italic><sub>sc</sub> of 22.4 μA, as shown in Fig. <xref rid="Fig2" ref-type="fig">2</xref>d, which was considered a favourable direction. Regarding ion transport driven by concentration gradient, the driving force could be evaluated by voltage (<italic>U</italic> = <italic>I</italic> × <italic>R</italic><sub>L</sub>, <italic>R</italic><sub>L</sub> is the load resistance of the external circuit). The voltage increased as loading resistance, eventually reaching a plateau with the internal resistance was much smaller than the load resistance, which approximately corresponds to the output voltage based on the osmotic energy driving ion transport across the membrane. As the concentration gradient gradually increased from 5 to 50-fold, the output voltage rose from 75 to 175 mV (Fig. <xref rid="Fig2" ref-type="fig">2</xref>e). The corresponding current density and power density are shown in Figs. S7–S8, of which the power density also increases as raising concentration gradient. The opposite trend of current density, which decreases with an increasing concentration gradient, is caused by the low conductivity of the corresponding low-concentration solution, indicating that it is advisable to add a supporting electrolyte to the receiving solution in later separation tests. The output voltage of the HM is slightly higher than that of the LM (Figs. <xref rid="Fig2" ref-type="fig">2</xref>f and S9), indicating that the ions within the transport system assembled with the HM are subject to a heightened driving force for transmembrane transport at the same concentration gradient, which is more conducive to directional transport ions.</p>
+      </sec>
+      <sec id="Sec11">
+        <title>Photothermal Effect of the HM</title>
+        <p id="Par17">Carbon-based nanomaterials (such as MWCNTs) emerged as preferred candidates for photothermal materials because of their low cost, ease of processing, and excellent photothermal activity, comprising both light absorption and thermal conductivities. Light, carrying photonic energy, which could be absorbed when light interacts with the MWCNTs/CNF photothermal layer, leading to the photoexcitation of electrons. The energy of the excited electrons was transferred to the lattice of <italic>sp</italic><sup>2</sup> or <italic>sp</italic><sup>3</sup> through electron–phonon coupling (phonons account for the majority) thereby generating heat. Raman spectrum verified the coexistence of <italic>sp</italic><sup>2</sup> and <italic>sp</italic><sup>3</sup> carbon atoms in the MWCNTs/CNF layer (Fig. S10) [<xref ref-type="bibr" rid="CR57">57</xref>, <xref ref-type="bibr" rid="CR58">58</xref>]. Moreover, the MWCNTs within the photothermal layer exhibit broadband adsorption owing to the wide distribution of diverse chirality. Efficient photothermal conversion allowed for intense heat accumulation induced by excellent light absorption capability, contributing to temperature redistribution.</p>
+        <p id="Par18">The temperature distributions measured by infrared thermography and the corresponding ion currents with and without illumination were employed to evaluate the photothermal behavior of the nanofluidic membranes under different conditions. Figure <xref rid="Fig3" ref-type="fig">3</xref>a demonstrates the infrared (IR) image of the LM upon light irradiation. Light induced a slight increase in surface temperature (Fig. <xref rid="Fig3" ref-type="fig">3</xref>b) and corresponding current (Fig. <xref rid="Fig3" ref-type="fig">3</xref>c) for LM. However, the surface temperature of the HM was significantly elevated to 51 °C under light irradiation condition (Fig. <xref rid="Fig3" ref-type="fig">3</xref>d), which ascribed to the excellent photothermal conversion and light absorption capabilities of the photothermal layer of the HM. In the illumination cycling test, the temperature of the HM increased rapidly (~ 30 °C, Fig. <xref rid="Fig3" ref-type="fig">3</xref>e), and the corresponding ion current increased sharply to 41.5 μA (Fig. <xref rid="Fig3" ref-type="fig">3</xref>f), exhibiting light-induced heat promoted ion migration. When the illumination was stopped, the temperature and current values decreased and returned to the initial state, demonstrating excellent cycling stability. Under unilateral illumination, the temperature of the photothermal layer increased under illumination, and the corresponding electrolyte at the membrane interface in contact with the photothermal layer is also heated. Benefiting from the temperature redistribution caused by the photothermal conversion, the ion thermophoresis migration is enhanced. And the ICP effect was effectively suppressed by the impairing ion-enrichment zone through accelerating ionic diffusion from the membrane interface to the bulk solution, which improved the ion transport performance and enhance the recovery efficiency of Li-ions. In addition, the LM also exhibited a minor photothermal effect, while significantly less than that of the HM with a photothermal layer (Fig. <xref rid="Fig3" ref-type="fig">3</xref>g, h). The enhancement ratios of temperature (<italic>T</italic>) and current (<italic>I</italic>) are approximately 10 and 3.8. Thus, the light-induced heat field could successfully accelerate the directional transport of specific ions through thermal gradients, allowing for the efficient extraction of ions from resources.<fig id="Fig3"><label>Fig. 3</label><caption><p>The photothermal effect of the LM and HM. <bold>a</bold> IR camera image of the LM under light irradiation. Light-induced <bold>b</bold> temperature changes and <bold>c</bold> ionic current changes of the LM under alternating illumination. <bold>d</bold> IR camera image of the HM under light irradiation. Light-induced <bold>e</bold> temperature changes and <bold>f</bold> ionic current changes of the HM under alternating illumination. <bold>g</bold> Comparison of the enhanced temperature (<italic>T</italic>) of the LM and HM after a certain time (25 s) of light irradiation. <bold>h</bold> Comparison of the enhanced current (<italic>I</italic>) of the LM and HM after a certain time (25 s) of light irradiation</p></caption><graphic xlink:href="40820_2023_1106_Fig3_HTML" id="MO4"/></fig></p>
+      </sec>
+      <sec id="Sec12">
+        <title>Multi-field-coupled Synergistic Ion Transport</title>
+        <p id="Par19">Furthermore, the dual-field and multi-field coupled transport systems were investigated in detail. When light irradiated, photothermal conversion renders the enhancement of temperature upon the HM surface. According to Einstein relation, an increase in temperature would lead to an increase in ion migration, allowing for a significant reduction in ICP effects that impair ion transport. Figure <xref rid="Fig4" ref-type="fig">4</xref>a demonstrates the curves of current density and voltage as the function of load resistance in the circuit, in which the corresponding curves under light irradiation were higher than that without light. The current densities and voltages of the HM in different concentration gradients were significantly higher with light than without light (Fig. <xref rid="Fig4" ref-type="fig">4</xref>b, c). Owing to the temperature redistribution induced by the photothermal effect, the ions were driven to accelerate across the HM, prompting higher current density and voltage values with light irradiation than without it (Figs. S11–S14). Figure <xref rid="Fig4" ref-type="fig">4</xref>d illustrates the schematic of the dual-field and multi-field coupled transport system including concentration gradient field coupled with light-induced heat field (Δ<italic>C</italic> + <italic>hv</italic>) and concentration gradient field coupled with light-induced heat field and electrical field (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>). Notably, the voltage increased from 177 to 220 mV by increasing the light intensity, and similarly, the current density increased from 7 to 13 A cm<sup>−2</sup> (Figs. <xref rid="Fig4" ref-type="fig">4</xref>e and S15). Moreover, the wavelength dependence of the light-promoted ion transport process was investigated, which attributes to the variation in light absorption intensity at specific wavelengths, as evaluated by the ultraviolet–visible (UV–Vis) spectroscopy (Fig. S16). Since the light absorption intensity of the photothermal layer declines with the increase of wavelength, the ion current and voltage also decreased with the increase of wavelength. The voltage was reduced from 177 to 168 mV, and the current density drops from 7.2 to 6.7 A cm<sup>−2</sup>, as shown in Figs. <xref rid="Fig4" ref-type="fig">4</xref>f and S17. It was indicated that the light absorption capacity of the photothermal layer has a significant effect on light-enhanced ion transport.<fig id="Fig4"><label>Fig. 4</label><caption><p>MSITS transmembrane ionic transport. <bold>a</bold> The plot of current density and voltage as a function of load resistance under the condition of with (blue line) and without (green line) light irradiation. Comparison of<bold> b</bold> the current density and <bold>c</bold> voltage of the HM under various concentration gradients with and without light irradiation. <bold>d</bold> Schematic of the MSITS including concentration gradient field coupled with light-induced heat field (Δ<italic>C</italic> + <italic>hv</italic>) and concentration gradient field coupled with light-induced heat field and electrical field (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>). Inset: equivalent circuit of the schematic, <italic>V</italic><sub>Δ<italic>C</italic></sub> represents the ion-driven force derived from the concentration gradient, <italic>V</italic><sub><italic>E</italic></sub> represents the applied voltage, and <italic>V</italic><sub><italic>hv</italic></sub> represents the additional ion-driven force under light derived from photothermal conversion. <bold>e</bold> The relationship between the voltage and current density of the HM at a 50-fold gradient with the light intensity. <bold>f</bold> The relationship between the voltage and current density of HM at a 50-fold gradient with the wavelength. <bold>g</bold> The ion current of the transport system applied with concentration gradient and various electric voltages before light irradiation and after light irradiation for a certain time of 25 s. <bold>h</bold> The enhanced current of the HM under light irradiation</p></caption><graphic xlink:href="40820_2023_1106_Fig4_HTML" id="MO5"/></fig></p>
+        <p id="Par20">In addition to the concentration gradient field coupled with the light-induced heat field to accelerate ion transmembrane transport, the voltage-driven force could be introduced into our transport system as an ideal driving force owing to its sustainability and tunability. Applying a forward voltage to the transport system equipped with a concentration gradient, the ionic current increased with raising applied voltage following Ohm's law (Fig. <xref rid="Fig4" ref-type="fig">4</xref>g). Applying light-induced heat field to the above system, the ion current was further enhanced, and the enhancement of which increases with increasing value of applied voltage, which could be attributed to multiple external fields coupling positively promoting ion transport across the membrane (Fig. <xref rid="Fig4" ref-type="fig">4</xref>h). The strategy proved to be functional in accelerating ion transmembrane transport.</p>
+      </sec>
+      <sec id="Sec13">
+        <title>Lithium Recovery from Spent LIBs</title>
+        <p id="Par21">The MSITS was systematically investigated to effectively extract lithium from industrial Li-containing wastewater, which was the leaching solution obtained from a battery recycling factory and generated during the dismantling and recycling of spent LIBs (Fig. <xref rid="Fig5" ref-type="fig">5</xref>a). The experimental setup and ion concentration were described detailly in electrical measurements part (Fig. S18, Table S1). External fields included concentration gradient field (Δ<italic>C</italic>), concentration gradient field coupled with light-induced heat field (Δ<italic>C</italic> + <italic>hv</italic>), concentration gradient field coupled with electrical field (Δ<italic>C</italic> + <italic>E</italic>), and concentration gradient field coupled with light-induced heat field and electrical field (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>). According to Fig. <xref rid="Fig5" ref-type="fig">5</xref>b, the Li<sup>+</sup> concentration in the receiving compartment increases linearly over time, and the increase rate was dependent upon the external field coupling condition. A multi-field-coupled synergistic driving condition contributed to a significantly higher ion concentration than a single or dual external field driving condition. The excellent photothermal conversion property enabled the temperature enhancement of the membrane interface as light irradiates the photothermal layer of the HM, facilitating an increase in ion thermophoresis mobility and a reduction in ICP. With the introduction of electrical field into the transport system, ion transmembrane transport was accelerated, accompanied by an apparent increase in Li<sup>+</sup> concentration in the recovery compartment. While the electrical field may induce more severe ICP around the membrane interface, at this time the temperature gradient induced by photothermal conversion effectively restricted the expansion of the ICP zone. At the condition of applying multi-external field (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>), the Li<sup>+</sup> flux is 367.4 mmol m<sup>−2</sup> h<sup>−1</sup>, which was significantly higher than that of others and even higher than the summation of the other conditions, indicating that the synergistic effect of multiple external fields improved ion transmembrane transport and thus contributed to ions enrichment in the receiving compartment (Fig. <xref rid="Fig5" ref-type="fig">5</xref>c). We investigated the enhanced ratios of flux for different external field application conditions, as shown in Fig. <xref rid="Fig5" ref-type="fig">5</xref>d, for two different external fields TC-1 to TC-5 corresponding to (Δ<italic>C</italic> + <italic>hv</italic>)/Δ<italic>C</italic>, (Δ<italic>C</italic> + <italic>E</italic>)/Δ<italic>C</italic>, (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>)/Δ<italic>C</italic>, (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>)/(Δ<italic>C</italic> + <italic>hv</italic>), and (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>)/(Δ<italic>C</italic> + <italic>E</italic>), respectively. Li<sup>+</sup> flux in multiple external fields (ΔC + <italic>hv</italic> + E) was 13-fold higher than that in an individual concentration gradient field (Δ<italic>C</italic>), indicating that a significant enhancement of ion transport could be achieved by modulating the external fields applied to the system. For (Δ<italic>C</italic> + <italic>hv</italic>)/Δ<italic>C</italic> and (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>)/(Δ<italic>C</italic> + <italic>E</italic>), the introduction of the light-induced heat field increases the ion flux to 2.61 and 2.75-fold of the original external field, respectively. Also, the electrical field was observed to exert a further driving force for ion transmembrane transport, leading to flux ratios of 4.7 and 5-fold for (Δ<italic>C</italic> + <italic>E</italic>)/Δ<italic>C</italic> and (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>)/(Δ<italic>C</italic> + <italic>hv</italic>) as well. The MSITS exhibits high selectivity for other ions when used to extract Li-ions from spent LIBs, which could be attributed to the intrinsic crystal structure of LAGP. The lithium-containing leaching solution was selected as the feed solution mainly containing Li<sup>+</sup> and other coexisting ions such as Na<sup>+</sup>, Ni<sup>2+</sup>, Mn<sup>2+</sup>, Cu<sup>2+</sup>, and Co<sup>2+</sup>. Under a MSITS (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>), the Li<sup>+</sup> flux (367.4 mmol m<sup>−2</sup> h<sup>−1</sup>) is much higher than the Na<sup>+</sup>, Mn<sup>2+</sup>, Co<sup>2+</sup>, Ni<sup>2+</sup>, and Cu<sup>2+</sup> flux (0.094, 2.59 × 10<sup>−3</sup>, 1.7 × 10<sup>−3</sup>, 0.015, and 7.09 × 10<sup>−3</sup> mmol m<sup>−2</sup> h<sup>−1</sup>, respectively), as shown in Fig. <xref rid="Fig5" ref-type="fig">5</xref>e. The ion selectivity (ratio of Li<sup>+</sup> flux to other metal ion flux during the test process), measured by ICP-MS, is shown in Fig. <xref rid="Fig5" ref-type="fig">5</xref>f. The MSITS (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>) displayed selectivity for Li<sup>+</sup>/Na<sup>+</sup> of 3907, Li<sup>+</sup>/Mn<sup>2+</sup> of 142,043, Li<sup>+</sup>/Co<sup>2+</sup> of 216,412, Li<sup>+</sup>/Ni<sup>2+</sup> of 23,276, and Li<sup>+</sup>/Cu<sup>2+</sup> of 51,843. The Li<sup>+</sup> was preferentially transport across heterogeneous nanofluidic, and other cations were intercepted in the feed solution, allowing the selective extraction of lithium resources and the recycling of lithium resources within spent LIBs. Although recently reported nanofluidic membranes exhibited promising Li<sup>+</sup> selectivity, as shown in Fig. S19 and Table S2, the selectivity was relatively low for most porous membrane materials, including MOF-based membranes, polymer membranes, 2D-based membranes, and COF-based membranes. Our work demonstrated a significantly higher lithium-ion selectivity than other membranes mentioned above and provide a methodology for the design of a Li extraction device. Considering the widespread use of LIBs in contemporary energy applications, optimizing this highly effective lithium extraction system is expected to ease the looming shortage of lithium resources.<fig id="Fig5"><label>Fig. 5</label><caption><p>Lithium recovery from spent LIBs. <bold>a</bold> Schematic of the MSITS used for extracting lithium from spent LIBs. <bold>b</bold> Variation of lithium-ion concentration in the receiving solution with operating time under different coupled transport systems. The lithium-ion concentration is much higher in the MSITS (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>) than in other external field-applied conditions. <bold>c</bold> Ion fluxes of the transport system under different external field application conditions. <bold>d</bold> The enhanced ratios of flux for two different external field (TC) application conditions. TC-1 to TC-5 corresponding to the (Δ<italic>C</italic> + <italic>hv</italic>)/Δ<italic>C</italic>, (Δ<italic>C</italic> + <italic>E</italic>)/Δ<italic>C</italic>, (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>)/Δ<italic>C</italic>, (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>)/(Δ<italic>C</italic> + <italic>hv</italic>), and (Δ<italic>C</italic> + <italic>hv</italic> + <italic>E</italic>)/(Δ<italic>C</italic> + <italic>E</italic>), respectively. <bold>e</bold> Ion fluxes of the MSITS for the extraction of Li<sup>+</sup> from lithium-containing leachate generated during the dismantling and recycling of spent LIBs. Inset: ion fluxes of other coexisting ions, which are extremely small compared to lithium, are barely visible in the same coordinate range. <bold>f</bold> Ion selectivity of Li ions with other coexisting metal ions</p></caption><graphic xlink:href="40820_2023_1106_Fig5_HTML" id="MO6"/></fig></p>
+      </sec>
+    </sec>
+    <sec id="Sec14">
+      <title>Conclusions</title>
+      <p id="Par22">In summary, we demonstrated a MSITS based on an elaborate heterogeneous nanofluidic as a promising platform for Li extraction. LAGP provided Li-ion selectivity for its intrinsic crystal structure, and the MWCNTs endowed the heterogeneous nanofluidic with an excellent photothermal conversion property, for amplifying the thermophoretic mobility of ions and alleviating the ICP effect. We adopted a multi-field-coupled synergistic ion transport strategy for lithium recovery from spent LIBs. The MSITS demonstrates a significantly higher Li<sup>+</sup> ion flux of 367.4 mmol m<sup>−2</sup> h<sup>−1</sup>, which was improved to 1300% of the flux at a single concentration gradient field. Benefiting from the efficient coordination of multi-external fields and heterogeneous nanofluidic membrane, the proposed transport system exhibited ultrahigh Li-ion selectivity, achieving Li<sup>+</sup>/Co<sup>2+</sup>, Li<sup>+</sup>/Mn<sup>2+</sup>, Li<sup>+</sup>/Cu<sup>2+</sup>, Li<sup>+</sup>/Ni<sup>2+</sup>, and Li<sup>+</sup>/Na<sup>+</sup> selectivity with ratios of 216,412, 142,043, 51,843, 23,276, and 3907, respectively, outperforming reported Li-ion sieving systems. Our work presented an ideal strategy for designing an extraction system by integrating multiple external fields to ensure efficient resource recovery. This may further inspire the exploration of the next-generation advanced transport system with multiple intelligences to improve recovery, seawater desalination, and osmotic energy conversion.</p>
+    </sec>
+    <sec sec-type="supplementary-material">
+      <sec id="Sec16">
+        <title>Supplementary Information</title>
+        <p>Below is the link to the electronic supplementary material.<supplementary-material content-type="local-data" id="MOESM1"><media xlink:href="40820_2023_1106_MOESM1_ESM.pdf"><caption><p>Supplementary file1 (PDF 1712 KB)</p></caption></media></supplementary-material></p>
+      </sec>
+    </sec>
+  </body>
+  <back>
+    <ack>
+      <title>Acknowledgements</title>
+      <p>This work was supported by the National Key R&amp;D Program of China (2022YFB3805904, 2022YFB3805900), the National Natural Science Foundation of China (22122207, 21988102, 21905287), CAS Project for Young Scientists in Basic Research (YSBR-039).</p>
+    </ack>
+    <notes notes-type="funding-information">
+      <title>Funding</title>
+      <p>Open access funding provided by Shanghai Jiao Tong University.</p>
+    </notes>
+    <notes id="FPar1" notes-type="COI-statement">
+      <title>Conflict of Interest</title>
+      <p>The authors declare no interest conflict. They have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.</p>
+    </notes>
+    <ref-list id="Bib1">
+      <title>References</title>
+      <ref id="CR1">
+        <label>1.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Dunn</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Kamath</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Tarascon</surname>
+              <given-names>J-M</given-names>
+            </name>
+          </person-group>
+          <article-title>Electrical energy storage for the grid: a battery of choices</article-title>
+          <source>Science</source>
+          <year>2011</year>
+          <volume>334</volume>
+          <issue>6058</issue>
+          <fpage>928</fpage>
+          <lpage>935</lpage>
+          <pub-id pub-id-type="doi">10.1126/science.1212741</pub-id>
+          <pub-id pub-id-type="pmid">22096188</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR2">
+        <label>2.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ding</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Cano</surname>
+              <given-names>ZP</given-names>
+            </name>
+            <name>
+              <surname>Yu</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Lu</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>Z</given-names>
+            </name>
+          </person-group>
+          <article-title>Automotive Li-ion batteries: current status and future perspectives</article-title>
+          <source>Electrochem. Energy Rev.</source>
+          <year>2019</year>
+          <volume>2</volume>
+          <issue>1</issue>
+          <fpage>1</fpage>
+          <lpage>28</lpage>
+          <pub-id pub-id-type="doi">10.1007/s41918-018-0022-z</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR3">
+        <label>3.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Battistel</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Palagonia</surname>
+              <given-names>MS</given-names>
+            </name>
+            <name>
+              <surname>Brogioli</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>La Mantia</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Trócoli</surname>
+              <given-names>R</given-names>
+            </name>
+          </person-group>
+          <article-title>Electrochemical methods for lithium recovery: a comprehensive and critical review</article-title>
+          <source>Adv. Mater.</source>
+          <year>2020</year>
+          <volume>32</volume>
+          <issue>23</issue>
+          <fpage>1905440</fpage>
+          <pub-id pub-id-type="doi">10.1002/adma.201905440</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR4">
+        <label>4.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hou</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Thornton</surname>
+              <given-names>AW</given-names>
+            </name>
+            <name>
+              <surname>Hill</surname>
+              <given-names>AJ</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>H</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Lithium extraction by emerging metal-organic framework-based membranes</article-title>
+          <source>Adv. Funct. Mater.</source>
+          <year>2021</year>
+          <volume>31</volume>
+          <issue>46</issue>
+          <fpage>2105991</fpage>
+          <pub-id pub-id-type="doi">10.1002/adfm.202105991</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR5">
+        <label>5.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Harper</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Sommerville</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Kendrick</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Driscoll</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Slater</surname>
+              <given-names>P</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Recycling lithium-ion batteries from electric vehicles</article-title>
+          <source>Nature</source>
+          <year>2019</year>
+          <volume>575</volume>
+          <issue>7781</issue>
+          <fpage>75</fpage>
+          <lpage>86</lpage>
+          <pub-id pub-id-type="doi">10.1038/s41586-019-1682-5</pub-id>
+          <pub-id pub-id-type="pmid">31695206</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR6">
+        <label>6.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Chen</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Ma</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Arsenault</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Karlson</surname>
+              <given-names>P</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Recycling end-of-life electric vehicle lithium-ion batteries</article-title>
+          <source>Joule</source>
+          <year>2019</year>
+          <volume>3</volume>
+          <issue>11</issue>
+          <fpage>2622</fpage>
+          <lpage>2646</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.joule.2019.09.014</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR7">
+        <label>7.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Mrozik</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Rajaeifar</surname>
+              <given-names>MA</given-names>
+            </name>
+            <name>
+              <surname>Heidrich</surname>
+              <given-names>O</given-names>
+            </name>
+            <name>
+              <surname>Christensen</surname>
+              <given-names>P</given-names>
+            </name>
+          </person-group>
+          <article-title>Environmental impacts, pollution sources and pathways of spent lithium-ion batteries</article-title>
+          <source>Energy Environ. Sci.</source>
+          <year>2021</year>
+          <volume>14</volume>
+          <issue>12</issue>
+          <fpage>6099</fpage>
+          <lpage>6121</lpage>
+          <pub-id pub-id-type="doi">10.1039/D1EE00691F</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR8">
+        <label>8.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Chang</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Fan</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Gu</surname>
+              <given-names>C-F</given-names>
+            </name>
+            <name>
+              <surname>He</surname>
+              <given-names>W-H</given-names>
+            </name>
+            <name>
+              <surname>Meng</surname>
+              <given-names>Q</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Selective extraction of transition metals from spent LiNi<sub>x</sub>Co<sub>y</sub>Mn<sub>1−x−y</sub>O<sub>2</sub> cathode via regulation of coordination environment</article-title>
+          <source>Angew. Chem. Int. Ed.</source>
+          <year>2022</year>
+          <volume>61</volume>
+          <issue>24</issue>
+          <fpage>e202202558</fpage>
+          <pub-id pub-id-type="doi">10.1002/anie.202202558</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR9">
+        <label>9.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yu</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Zhou</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>Q</given-names>
+            </name>
+          </person-group>
+          <article-title>A redox targeting-based material recycling strategy for spent lithium ion batteries</article-title>
+          <source>Energy Environ. Sci.</source>
+          <year>2019</year>
+          <volume>12</volume>
+          <issue>9</issue>
+          <fpage>2672</fpage>
+          <lpage>2677</lpage>
+          <pub-id pub-id-type="doi">10.1039/C9EE01478K</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR10">
+        <label>10.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zheng</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Salim</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Stewart</surname>
+              <given-names>RA</given-names>
+            </name>
+            <name>
+              <surname>Lu</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Intelligence-assisted predesign for the sustainable recycling of lithium-ion batteries and beyond</article-title>
+          <source>Energy Environ. Sci.</source>
+          <year>2021</year>
+          <volume>14</volume>
+          <issue>11</issue>
+          <fpage>5801</fpage>
+          <lpage>5815</lpage>
+          <pub-id pub-id-type="doi">10.1039/D1EE01812D</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR11">
+        <label>11.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Fan</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Chang</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Guo</surname>
+              <given-names>Y-J</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>W-P</given-names>
+            </name>
+            <name>
+              <surname>Yin</surname>
+              <given-names>Y-X</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Increased residual lithium compounds guided design for green recycling of spent lithium-ion cathodes</article-title>
+          <source>Energy Environ. Sci.</source>
+          <year>2021</year>
+          <volume>14</volume>
+          <issue>3</issue>
+          <fpage>1461</fpage>
+          <lpage>1468</lpage>
+          <pub-id pub-id-type="doi">10.1039/D0EE03914D</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR12">
+        <label>12.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kang</surname>
+              <given-names>DHP</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Ogunseitan</surname>
+              <given-names>OA</given-names>
+            </name>
+          </person-group>
+          <article-title>Potential environmental and human health impacts of rechargeable lithium batteries in electronic waste</article-title>
+          <source>Environ. Sci. Technol.</source>
+          <year>2013</year>
+          <volume>47</volume>
+          <issue>10</issue>
+          <fpage>5495</fpage>
+          <lpage>5503</lpage>
+          <pub-id pub-id-type="doi">10.1021/es400614y</pub-id>
+          <pub-id pub-id-type="pmid">23638841</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR13">
+        <label>13.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Swain</surname>
+              <given-names>B</given-names>
+            </name>
+          </person-group>
+          <article-title>Recovery and recycling of lithium: a review</article-title>
+          <source>Sep. Purif. Technol.</source>
+          <year>2017</year>
+          <volume>172</volume>
+          <fpage>388</fpage>
+          <lpage>403</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.seppur.2016.08.031</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR14">
+        <label>14.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lu</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Wu</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Ding</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Wei</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>H</given-names>
+            </name>
+          </person-group>
+          <article-title>A lamellar mxene (Ti<sub>3</sub>C<sub>2</sub>T<sub>x</sub>)/PSS composite membrane for fast and selective lithium-ion separation</article-title>
+          <source>Angew. Chem. Int. Ed.</source>
+          <year>2021</year>
+          <volume>60</volume>
+          <issue>41</issue>
+          <fpage>22265</fpage>
+          <lpage>22269</lpage>
+          <pub-id pub-id-type="doi">10.1002/anie.202108801</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR15">
+        <label>15.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hou</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Xian</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Bing</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Song</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Sun</surname>
+              <given-names>Q</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Understanding the ion transport behavior across nanofluidic membranes in response to the charge variations</article-title>
+          <source>Adv. Funct. Mater.</source>
+          <year>2021</year>
+          <volume>31</volume>
+          <issue>16</issue>
+          <fpage>2009970</fpage>
+          <pub-id pub-id-type="doi">10.1002/adfm.202009970</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR16">
+        <label>16.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lu</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Stevens</surname>
+              <given-names>GW</given-names>
+            </name>
+            <name>
+              <surname>Mumford</surname>
+              <given-names>KA</given-names>
+            </name>
+          </person-group>
+          <article-title>Development of heterogeneous equilibrium model for lithium solvent extraction using organophosphinic acid</article-title>
+          <source>Sep. Purif. Technol.</source>
+          <year>2021</year>
+          <volume>276</volume>
+          <fpage>119307</fpage>
+          <pub-id pub-id-type="doi">10.1016/j.seppur.2021.119307</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR17">
+        <label>17.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Meng</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Cao</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Highly flexible interconnected Li<sup>+</sup> ion-sieve porous hydrogels with self-regulating nanonetwork structure for marine lithium recovery</article-title>
+          <source>Chem. Eng. J.</source>
+          <year>2022</year>
+          <volume>445</volume>
+          <fpage>136780</fpage>
+          <pub-id pub-id-type="doi">10.1016/j.cej.2022.136780</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR18">
+        <label>18.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yu</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Wu</surname>
+              <given-names>Q</given-names>
+            </name>
+            <name>
+              <surname>Bu</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Nie</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Experimental study on improving lithium extraction efficiency of salinity-gradient solar pond through sodium carbonate addition and agitation</article-title>
+          <source>Sol. Energy</source>
+          <year>2022</year>
+          <volume>242</volume>
+          <fpage>364</fpage>
+          <lpage>377</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.solener.2022.07.027</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR19">
+        <label>19.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yan</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Kim</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Yuan</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Hoenig</surname>
+              <given-names>E</given-names>
+            </name>
+            <name>
+              <surname>Shi</surname>
+              <given-names>F</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>The role of solid solutions in iron phosphate-based electrodes for selective electrochemical lithium extraction</article-title>
+          <source>Nat. Commun.</source>
+          <year>2022</year>
+          <volume>13</volume>
+          <issue>1</issue>
+          <fpage>4579</fpage>
+          <pub-id pub-id-type="doi">10.1038/s41467-022-32369-y</pub-id>
+          <pub-id pub-id-type="pmid">35931691</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR20">
+        <label>20.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Fu</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Teng</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Xin</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Qian</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Electrochemical ion-pumping-assisted transfer system featuring a heterogeneous membrane for lithium recovery</article-title>
+          <source>Chem. Eng. J.</source>
+          <year>2022</year>
+          <volume>435</volume>
+          <fpage>134955</fpage>
+          <pub-id pub-id-type="doi">10.1016/j.cej.2022.134955</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR21">
+        <label>21.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhang</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Cheng</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Qin</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Gao</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>M</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Recent advances in lithium extraction from salt lake brine using coupled and tandem technologies</article-title>
+          <source>Desalination</source>
+          <year>2023</year>
+          <volume>547</volume>
+          <fpage>116225</fpage>
+          <pub-id pub-id-type="doi">10.1016/j.desal.2022.116225</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR22">
+        <label>22.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Li</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Cao</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>P</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Continuous electrical pumping membrane process for seawater lithium mining</article-title>
+          <source>Energy Environ. Sci.</source>
+          <year>2021</year>
+          <volume>14</volume>
+          <issue>5</issue>
+          <fpage>3152</fpage>
+          <lpage>3159</lpage>
+          <pub-id pub-id-type="doi">10.1039/D1EE00354B</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR23">
+        <label>23.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhang</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Bai</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Zhao</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Ren</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Wen</surname>
+              <given-names>T</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Precise cation recognition in two-dimensional nanofluidic channels of clay membranes imparted from intrinsic selectivity of clays</article-title>
+          <source>ACS Nano</source>
+          <year>2022</year>
+          <volume>16</volume>
+          <issue>3</issue>
+          <fpage>4930</fpage>
+          <lpage>4939</lpage>
+          <pub-id pub-id-type="doi">10.1021/acsnano.2c00866</pub-id>
+          <pub-id pub-id-type="pmid">35171573</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR24">
+        <label>24.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Sheng</surname>
+              <given-names>F</given-names>
+            </name>
+            <name>
+              <surname>Wu</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Xu</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Shehzad</surname>
+              <given-names>MA</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Efficient ion sieving in covalent organic framework membranes with sub-2-nanometer channels</article-title>
+          <source>Adv. Mater.</source>
+          <year>2021</year>
+          <volume>33</volume>
+          <issue>44</issue>
+          <fpage>2104404</fpage>
+          <pub-id pub-id-type="doi">10.1002/adma.202104404</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR25">
+        <label>25.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Xu</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Kang</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Pan</surname>
+              <given-names>B</given-names>
+            </name>
+          </person-group>
+          <article-title>Oriented UiO-67 metal-organic framework membrane with fast and selective lithium-ion transport</article-title>
+          <source>Angew. Chem. Int. Ed.</source>
+          <year>2022</year>
+          <volume>61</volume>
+          <issue>3</issue>
+          <fpage>e202115443</fpage>
+          <pub-id pub-id-type="doi">10.1002/anie.202115443</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR26">
+        <label>26.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Xiao</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Chai</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Abdollahzadeh</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Ahmadi</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>V</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>A lithium ion selective membrane synthesized from a double layered Zrbased metal organic framework (MOF-on-MOF) thin film</article-title>
+          <source>Desalination</source>
+          <year>2022</year>
+          <volume>532</volume>
+          <fpage>115733</fpage>
+          <pub-id pub-id-type="doi">10.1016/j.desal.2022.115733</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR27">
+        <label>27.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Bing</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Xian</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Song</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Hou</surname>
+              <given-names>L</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Bio-inspired construction of ion conductive pathway in covalent organic framework membranes for efficient lithium extraction</article-title>
+          <source>Matter</source>
+          <year>2021</year>
+          <volume>4</volume>
+          <issue>6</issue>
+          <fpage>2027</fpage>
+          <lpage>2038</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.matt.2021.03.017</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR28">
+        <label>28.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Xin</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Lin</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Fu</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Kong</surname>
+              <given-names>X-Y</given-names>
+            </name>
+            <name>
+              <surname>Yang</surname>
+              <given-names>L</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Nacre-like mechanically robust heterojunction for lithium-ion extraction</article-title>
+          <source>Matter</source>
+          <year>2021</year>
+          <volume>4</volume>
+          <issue>2</issue>
+          <fpage>737</fpage>
+          <lpage>754</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.matt.2020.12.003</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR29">
+        <label>29.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Abraham</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Vasu</surname>
+              <given-names>KS</given-names>
+            </name>
+            <name>
+              <surname>Williams</surname>
+              <given-names>CD</given-names>
+            </name>
+            <name>
+              <surname>Gopinadhan</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Su</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Tunable sieving of ions using graphene oxide membranes</article-title>
+          <source>Nat. Nanotechnol.</source>
+          <year>2017</year>
+          <volume>12</volume>
+          <issue>6</issue>
+          <fpage>546</fpage>
+          <lpage>550</lpage>
+          <pub-id pub-id-type="doi">10.1038/nnano.2017.21</pub-id>
+          <pub-id pub-id-type="pmid">28369049</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR30">
+        <label>30.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Reyes</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Gadsby</surname>
+              <given-names>DC</given-names>
+            </name>
+          </person-group>
+          <article-title>Ion permeation through the Na<sup>+</sup>, <sup>K</sup>+-ATPase</article-title>
+          <source>Nature</source>
+          <year>2006</year>
+          <volume>443</volume>
+          <issue>7110</issue>
+          <fpage>470</fpage>
+          <lpage>474</lpage>
+          <pub-id pub-id-type="doi">10.1038/nature05129</pub-id>
+          <pub-id pub-id-type="pmid">17006516</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR31">
+        <label>31.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Martin</surname>
+              <given-names>CR</given-names>
+            </name>
+            <name>
+              <surname>Siwy</surname>
+              <given-names>ZS</given-names>
+            </name>
+          </person-group>
+          <article-title>Learning nature's way: biosensing with synthetic nanopores</article-title>
+          <source>Science</source>
+          <year>2007</year>
+          <volume>317</volume>
+          <issue>5836</issue>
+          <fpage>331</fpage>
+          <lpage>332</lpage>
+          <pub-id pub-id-type="doi">10.1126/science.1146126</pub-id>
+          <pub-id pub-id-type="pmid">17641190</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR32">
+        <label>32.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Graf</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Lihter</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Unuchek</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>Sarathy</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Leburton</surname>
+              <given-names>J-P</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Light-enhanced blue energy generation using MoS<sub>2</sub> nanopores</article-title>
+          <source>Joule</source>
+          <year>2019</year>
+          <volume>3</volume>
+          <issue>6</issue>
+          <fpage>1549</fpage>
+          <lpage>1564</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.joule.2019.04.011</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR33">
+        <label>33.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Li</surname>
+              <given-names>Z-Q</given-names>
+            </name>
+            <name>
+              <surname>Zhu</surname>
+              <given-names>G-L</given-names>
+            </name>
+            <name>
+              <surname>Mo</surname>
+              <given-names>R-J</given-names>
+            </name>
+            <name>
+              <surname>Wu</surname>
+              <given-names>M-Y</given-names>
+            </name>
+            <name>
+              <surname>Ding</surname>
+              <given-names>X-L</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Light-enhanced osmotic energy harvester using photoactive porphyrin metal–organic framework membranes</article-title>
+          <source>Angew. Chem. Int. Ed.</source>
+          <year>2022</year>
+          <volume>61</volume>
+          <issue>22</issue>
+          <fpage>e202202698</fpage>
+          <pub-id pub-id-type="doi">10.1002/anie.202202698</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR34">
+        <label>34.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Liu</surname>
+              <given-names>P</given-names>
+            </name>
+            <name>
+              <surname>Zhou</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Yang</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Zhu</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Teng</surname>
+              <given-names>Y</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Synergy of light and acid-base reaction in energy conversion based on cellulose nanofiber intercalated titanium carbide composite nanofluidics</article-title>
+          <source>Energy Environ. Sci.</source>
+          <year>2021</year>
+          <volume>14</volume>
+          <issue>8</issue>
+          <fpage>4400</fpage>
+          <lpage>4409</lpage>
+          <pub-id pub-id-type="doi">10.1039/D1EE00908G</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR35">
+        <label>35.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yu</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Hou</surname>
+              <given-names>X</given-names>
+            </name>
+          </person-group>
+          <article-title>Thermally responsive ionic transport system reinforced by aligned functional carbon nanotubes backbone</article-title>
+          <source>Chin. Chem. Lett.</source>
+          <year>2022</year>
+          <pub-id pub-id-type="doi">10.1016/j.cclet.2022.107785</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR36">
+        <label>36.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Chen</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>D</given-names>
+            </name>
+            <name>
+              <surname>He</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Qin</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>J</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Bio-inspired nanocomposite membranes for osmotic energy harvesting</article-title>
+          <source>Joule</source>
+          <year>2020</year>
+          <volume>4</volume>
+          <issue>1</issue>
+          <fpage>247</fpage>
+          <lpage>261</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.joule.2019.11.010</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR37">
+        <label>37.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhu</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Zuo</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Xian</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Guo</surname>
+              <given-names>Q</given-names>
+            </name>
+            <name>
+              <surname>Meng</surname>
+              <given-names>Q-W</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Integration of thermoelectric conversion with reverse electrodialysis for mitigating ion concentration polarization and achieving enhanced output power density</article-title>
+          <source>ACS Energy Lett.</source>
+          <year>2022</year>
+          <volume>7</volume>
+          <issue>9</issue>
+          <fpage>2937</fpage>
+          <lpage>2943</lpage>
+          <pub-id pub-id-type="doi">10.1021/acsenergylett.2c01681</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR38">
+        <label>38.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Adams</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Rao</surname>
+              <given-names>RP</given-names>
+            </name>
+          </person-group>
+          <article-title>High power lithium ion battery materials by computational design</article-title>
+          <source>Phys. Status Solidi A</source>
+          <year>2011</year>
+          <volume>208</volume>
+          <issue>8</issue>
+          <fpage>1746</fpage>
+          <lpage>1753</lpage>
+          <pub-id pub-id-type="doi">10.1002/pssa.201001116</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR39">
+        <label>39.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Sale</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Avdeev</surname>
+              <given-names>M</given-names>
+            </name>
+          </person-group>
+          <article-title>3DBVSMAPPER: a program for automatically generating bond-valence sum landscapes</article-title>
+          <source>J. Appl. Crystallogr.</source>
+          <year>2012</year>
+          <volume>45</volume>
+          <issue>5</issue>
+          <fpage>1054</fpage>
+          <lpage>1056</lpage>
+          <pub-id pub-id-type="doi">10.1107/S0021889812032906</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR40">
+        <label>40.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Xiao</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>L</given-names>
+            </name>
+          </person-group>
+          <article-title>High-throughput design and optimization of fast lithium ion conductors by the combination of bond-valence method and density functional theory</article-title>
+          <source>Sci. Rep.</source>
+          <year>2015</year>
+          <volume>5</volume>
+          <issue>1</issue>
+          <fpage>14227</fpage>
+          <pub-id pub-id-type="doi">10.1038/srep14227</pub-id>
+          <pub-id pub-id-type="pmid">26387639</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR41">
+        <label>41.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Bachman</surname>
+              <given-names>JC</given-names>
+            </name>
+            <name>
+              <surname>Muy</surname>
+              <given-names>S</given-names>
+            </name>
+            <name>
+              <surname>Grimaud</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Chang</surname>
+              <given-names>H-H</given-names>
+            </name>
+            <name>
+              <surname>Pour</surname>
+              <given-names>N</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Inorganic solid-state electrolytes for lithium batteries: mechanisms and properties governing ion conduction</article-title>
+          <source>Chem. Rev.</source>
+          <year>2016</year>
+          <volume>116</volume>
+          <issue>1</issue>
+          <fpage>140</fpage>
+          <lpage>162</lpage>
+          <pub-id pub-id-type="doi">10.1021/acs.chemrev.5b00563</pub-id>
+          <pub-id pub-id-type="pmid">26713396</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR42">
+        <label>42.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Weiss</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Weber</surname>
+              <given-names>DA</given-names>
+            </name>
+            <name>
+              <surname>Senyshyn</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Janek</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Zeier</surname>
+              <given-names>WG</given-names>
+            </name>
+          </person-group>
+          <article-title>Correlating transport and structural properties in Li<sub>1+x</sub>Al<sub>x</sub>Ge<sub>2</sub><sub>−</sub><sub>x</sub>(PO<sub>4</sub>)<sub>3</sub> (LAGP) prepared from aqueous solution</article-title>
+          <source>ACS Appl. Mater. Interfaces</source>
+          <year>2018</year>
+          <volume>10</volume>
+          <issue>13</issue>
+          <fpage>10935</fpage>
+          <lpage>10944</lpage>
+          <pub-id pub-id-type="doi">10.1021/acsami.8b00842</pub-id>
+          <pub-id pub-id-type="pmid">29516733</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR43">
+        <label>43.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>He</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Bai</surname>
+              <given-names>Q</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Nolan</surname>
+              <given-names>AM</given-names>
+            </name>
+            <name>
+              <surname>Ling</surname>
+              <given-names>C</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Crystal structural framework of lithium super-ionic conductors</article-title>
+          <source>Adv. Energy Mater.</source>
+          <year>2019</year>
+          <volume>9</volume>
+          <issue>43</issue>
+          <fpage>1902078</fpage>
+          <pub-id pub-id-type="doi">10.1002/aenm.201902078</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR44">
+        <label>44.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhang</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Tan</surname>
+              <given-names>R</given-names>
+            </name>
+            <name>
+              <surname>Yang</surname>
+              <given-names>L</given-names>
+            </name>
+            <name>
+              <surname>Zheng</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>K</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Mechanisms and properties of ion-transport in inorganic solid electrolytes</article-title>
+          <source>Energy Storage Mater.</source>
+          <year>2018</year>
+          <volume>10</volume>
+          <fpage>139</fpage>
+          <lpage>159</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.ensm.2017.08.015</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR45">
+        <label>45.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kuo</surname>
+              <given-names>PH</given-names>
+            </name>
+            <name>
+              <surname>Du</surname>
+              <given-names>J</given-names>
+            </name>
+          </person-group>
+          <article-title>Lithium ion diffusion mechanism and associated defect behaviors in crystalline Li<sub>1+x</sub>Al<sub>x</sub>Ge<sub>2</sub><sub>−</sub><sub>x</sub>(PO<sub>4</sub>)<sub>3</sub> solid-state electrolytes</article-title>
+          <source>J. Phys. Chem. C</source>
+          <year>2019</year>
+          <volume>123</volume>
+          <issue>45</issue>
+          <fpage>27385</fpage>
+          <lpage>27398</lpage>
+          <pub-id pub-id-type="doi">10.1021/acs.jpcc.9b08390</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR46">
+        <label>46.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Jiang</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Lu</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Cao</surname>
+              <given-names>D</given-names>
+            </name>
+          </person-group>
+          <article-title>First-principles insight into the entanglements between superionic diffusion and Li/Al antisite in Al-doped Li<sub>1+x</sub>Al<sub>x</sub>Ge<sub>2</sub><sub>−</sub><sub>x</sub>(PO<sub>4</sub>)<sub>3</sub> (LAGP)</article-title>
+          <source>Sci. China Technol. Sci.</source>
+          <year>2020</year>
+          <volume>63</volume>
+          <issue>9</issue>
+          <fpage>1787</fpage>
+          <lpage>1794</lpage>
+          <pub-id pub-id-type="doi">10.1007/s11431-020-1562-3</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR47">
+        <label>47.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yang</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>G</given-names>
+            </name>
+            <name>
+              <surname>Avdeev</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Wan</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Han</surname>
+              <given-names>F</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Ultrastable all-solid-state sodium rechargeable batteries</article-title>
+          <source>ACS Energy Lett.</source>
+          <year>2020</year>
+          <volume>5</volume>
+          <issue>9</issue>
+          <fpage>2835</fpage>
+          <lpage>2841</lpage>
+          <pub-id pub-id-type="doi">10.1021/acsenergylett.0c01432</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR48">
+        <label>48.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zou</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Ma</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Ran</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Song</surname>
+              <given-names>T</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Identifying migration channels and bottlenecks in monoclinic NASICON-type solid electrolytes with hierarchical ion-transport algorithms</article-title>
+          <source>Adv. Funct. Mater.</source>
+          <year>2021</year>
+          <volume>31</volume>
+          <issue>49</issue>
+          <fpage>2107747</fpage>
+          <pub-id pub-id-type="doi">10.1002/adfm.202107747</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR49">
+        <label>49.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zou</surname>
+              <given-names>Z</given-names>
+            </name>
+            <name>
+              <surname>Ma</surname>
+              <given-names>N</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>A</given-names>
+            </name>
+            <name>
+              <surname>Ran</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Song</surname>
+              <given-names>T</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Relationships between Na<sup>+</sup> distribution, concerted migration, and diffusion properties in rhombohedral nasicon</article-title>
+          <source>Adv. Energy Mater.</source>
+          <year>2020</year>
+          <volume>10</volume>
+          <issue>30</issue>
+          <fpage>2001486</fpage>
+          <pub-id pub-id-type="doi">10.1002/aenm.202001486</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR50">
+        <label>50.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Song</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Wang</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Huang</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Gul</surname>
+              <given-names>S</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Solar-intensified ultrafiltration system based on porous photothermal membrane for efficient water treatment</article-title>
+          <source>ACS Sustain. Chem. Eng.</source>
+          <year>2019</year>
+          <volume>7</volume>
+          <issue>5</issue>
+          <fpage>4889</fpage>
+          <lpage>4896</lpage>
+          <pub-id pub-id-type="doi">10.1021/acssuschemeng.8b05397</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR51">
+        <label>51.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Wu</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Feng</surname>
+              <given-names>J</given-names>
+            </name>
+            <name>
+              <surname>Gao</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Feng</surname>
+              <given-names>X</given-names>
+            </name>
+            <name>
+              <surname>Jiang</surname>
+              <given-names>L</given-names>
+            </name>
+          </person-group>
+          <article-title>Superwettability-based interfacial chemical reactions</article-title>
+          <source>Adv. Mater.</source>
+          <year>2019</year>
+          <volume>31</volume>
+          <issue>8</issue>
+          <fpage>1800718</fpage>
+          <pub-id pub-id-type="doi">10.1002/adma.201800718</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR52">
+        <label>52.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Chang</surname>
+              <given-names>C-W</given-names>
+            </name>
+            <name>
+              <surname>Chu</surname>
+              <given-names>C-W</given-names>
+            </name>
+            <name>
+              <surname>Su</surname>
+              <given-names>Y-S</given-names>
+            </name>
+            <name>
+              <surname>Yeh</surname>
+              <given-names>L-H</given-names>
+            </name>
+          </person-group>
+          <article-title>Space charge enhanced ion transport in heterogeneous polyelectrolyte/alumina nanochannel membranes for high-performance osmotic energy conversion</article-title>
+          <source>J. Mater. Chem. A</source>
+          <year>2022</year>
+          <volume>10</volume>
+          <issue>6</issue>
+          <fpage>2867</fpage>
+          <lpage>2875</lpage>
+          <pub-id pub-id-type="doi">10.1039/D1TA08560C</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR53">
+        <label>53.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Aboutalebi</surname>
+              <given-names>SH</given-names>
+            </name>
+            <name>
+              <surname>Chidembo</surname>
+              <given-names>AT</given-names>
+            </name>
+            <name>
+              <surname>Salari</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Konstantinov</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Wexler</surname>
+              <given-names>D</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Comparison of GO, GO/MWCNTs composite and MWCNTs as potential electrode materials for supercapacitors</article-title>
+          <source>Energy Environ. Sci.</source>
+          <year>2011</year>
+          <volume>4</volume>
+          <issue>5</issue>
+          <fpage>1855</fpage>
+          <lpage>1865</lpage>
+          <pub-id pub-id-type="doi">10.1039/C1EE01039E</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR54">
+        <label>54.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Vijaya Kumar Saroja</surname>
+              <given-names>AP</given-names>
+            </name>
+            <name>
+              <surname>Muruganathan</surname>
+              <given-names>M</given-names>
+            </name>
+            <name>
+              <surname>Muthusamy</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>Mizuta</surname>
+              <given-names>H</given-names>
+            </name>
+            <name>
+              <surname>Sundara</surname>
+              <given-names>R</given-names>
+            </name>
+          </person-group>
+          <article-title>Enhanced sodium ion storage in interlayer expanded multiwall carbon nanotubes</article-title>
+          <source>Nano Lett.</source>
+          <year>2018</year>
+          <volume>18</volume>
+          <issue>9</issue>
+          <fpage>5688</fpage>
+          <lpage>5696</lpage>
+          <pub-id pub-id-type="doi">10.1021/acs.nanolett.8b02275</pub-id>
+          <pub-id pub-id-type="pmid">30067912</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR55">
+        <label>55.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Sun</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Dong</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Lu</surname>
+              <given-names>C</given-names>
+            </name>
+            <name>
+              <surname>Xin</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Yang</surname>
+              <given-names>L</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Tailoring a poly(ether sulfone) bipolar membrane: osmotic-energy generator with high power density</article-title>
+          <source>Angew. Chem. Int. Ed.</source>
+          <year>2020</year>
+          <volume>59</volume>
+          <issue>40</issue>
+          <fpage>17423</fpage>
+          <lpage>17428</lpage>
+          <pub-id pub-id-type="doi">10.1002/anie.202006320</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR56">
+        <label>56.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Chen</surname>
+              <given-names>W</given-names>
+            </name>
+            <name>
+              <surname>Dong</surname>
+              <given-names>T</given-names>
+            </name>
+            <name>
+              <surname>Xiang</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Qian</surname>
+              <given-names>Y</given-names>
+            </name>
+            <name>
+              <surname>Zhao</surname>
+              <given-names>X</given-names>
+            </name>
+            <etal/>
+          </person-group>
+          <article-title>Ionic crosslinking-induced nanochannels: nanophase separation for ion transport promotion</article-title>
+          <source>Adv. Mater.</source>
+          <year>2022</year>
+          <volume>34</volume>
+          <issue>3</issue>
+          <fpage>2108410</fpage>
+          <pub-id pub-id-type="doi">10.1002/adma.202108410</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR57">
+        <label>57.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Han</surname>
+              <given-names>B</given-names>
+            </name>
+            <name>
+              <surname>Zhang</surname>
+              <given-names>Y-L</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>Q-D</given-names>
+            </name>
+            <name>
+              <surname>Sun</surname>
+              <given-names>H-B</given-names>
+            </name>
+          </person-group>
+          <article-title>Carbon-based photothermal actuators</article-title>
+          <source>Adv. Funct. Mater.</source>
+          <year>2018</year>
+          <volume>28</volume>
+          <issue>40</issue>
+          <fpage>1802235</fpage>
+          <pub-id pub-id-type="doi">10.1002/adfm.201802235</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="CR58">
+        <label>58.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Xiao</surname>
+              <given-names>K</given-names>
+            </name>
+            <name>
+              <surname>SchmidtOliver</surname>
+              <given-names>G</given-names>
+            </name>
+          </person-group>
+          <article-title>Light-driven ion transport in nanofluidic devices: photochemical, photoelectric, and photothermal effects</article-title>
+          <source>CCS Chem.</source>
+          <year>2021</year>
+          <volume>4</volume>
+          <issue>1</issue>
+          <fpage>54</fpage>
+          <lpage>65</lpage>
+          <pub-id pub-id-type="doi">10.31635/ccschem.021.202101297</pub-id>
+        </element-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

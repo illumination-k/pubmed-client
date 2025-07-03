@@ -1,0 +1,2548 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:16:35Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:10653940" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:10653940</identifier><datestamp>2023-09-05</datestamp><setSpec>mbio</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" dtd-version="1.3" xml:lang="en" article-type="research-article">
+  <processing-meta base-tagset="archiving" mathml-version="3.0" table-model="xhtml" tagset-family="jats">
+    <restricted-by>pmc</restricted-by>
+  </processing-meta>
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">mBio</journal-id>
+      <journal-id journal-id-type="iso-abbrev">mBio</journal-id>
+      <journal-id journal-id-type="publisher-id">mbio</journal-id>
+      <journal-title-group>
+        <journal-title>mBio</journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">2150-7511</issn>
+      <publisher>
+        <publisher-name>American Society for Microbiology</publisher-name>
+        <publisher-loc>1752 N St., N.W., Washington, DC</publisher-loc>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="accession">PMC10653940</article-id>
+      <article-id pub-id-type="pmcid">PMC10653940</article-id>
+      <article-id pub-id-type="pmc-uid">10653940</article-id>
+      <article-id pub-id-type="pmid">37668408</article-id>
+      <article-id pub-id-type="pmid">37668408</article-id>
+      <article-id pub-id-type="publisher-id">01197-23</article-id>
+      <article-id pub-id-type="doi">10.1128/mbio.01197-23</article-id>
+      <article-id pub-id-type="publisher-id">mbio.01197-23</article-id>
+      <article-categories>
+        <subj-group subj-group-type="heading">
+          <subject>Research Article</subject>
+        </subj-group>
+        <subj-group subj-group-type="biological-terms">
+          <compound-subject>
+            <compound-subject-part content-type="code">applied-and-industrial-microbiology</compound-subject-part>
+            <compound-subject-part content-type="label">Applied and Industrial Microbiology</compound-subject-part>
+          </compound-subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Bioluminescent monitoring of recombinant lactic acid bacteria and their products</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Choi</surname>
+            <given-names>In Young</given-names>
+          </name>
+          <xref rid="aff1" ref-type="aff">
+<sup>1</sup>
+</xref>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Conceptualization" vocab-term-identifier="https://credit.niso.org/contributor-roles/conceptualization/">Conceptualization</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Formal analysis" vocab-term-identifier="https://credit.niso.org/contributor-roles/formal-analysis/">Formal analysis</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Methodology" vocab-term-identifier="https://credit.niso.org/contributor-roles/methodology/">Methodology</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Visualization" vocab-term-identifier="https://credit.niso.org/contributor-roles/visualization/">Visualization</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – original draft" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-original-draft/">Writing – original draft</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review and editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review and editing</role>
+        </contrib>
+        <contrib contrib-type="author">
+          <contrib-id contrib-id-type="orcid" authenticated="false">https://orcid.org/0000-0001-9033-8539</contrib-id>
+          <name>
+            <surname>Oh</surname>
+            <given-names>Jee-Hwan</given-names>
+          </name>
+          <xref rid="aff1" ref-type="aff">
+<sup>1</sup>
+</xref>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Methodology" vocab-term-identifier="https://credit.niso.org/contributor-roles/methodology/">Methodology</role>
+        </contrib>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Wang</surname>
+            <given-names>Zhiying</given-names>
+          </name>
+          <xref rid="aff1" ref-type="aff">
+<sup>1</sup>
+</xref>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Methodology" vocab-term-identifier="https://credit.niso.org/contributor-roles/methodology/">Methodology</role>
+        </contrib>
+        <contrib contrib-type="author" corresp="yes">
+          <contrib-id contrib-id-type="orcid" authenticated="false">https://orcid.org/0000-0003-4649-5726</contrib-id>
+          <name>
+            <surname>van Pijkeren</surname>
+            <given-names>Jan-Peter</given-names>
+          </name>
+          <xref rid="aff1" ref-type="aff">
+<sup>1</sup>
+</xref>
+          <xref rid="cor1" ref-type="corresp"/>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Conceptualization" vocab-term-identifier="https://credit.niso.org/contributor-roles/conceptualization/">Conceptualization</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Funding acquisition" vocab-term-identifier="https://credit.niso.org/contributor-roles/funding-acquisition/">Funding acquisition</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Methodology" vocab-term-identifier="https://credit.niso.org/contributor-roles/methodology/">Methodology</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Project administration" vocab-term-identifier="https://credit.niso.org/contributor-roles/project-administration/">Project administration</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Supervision" vocab-term-identifier="https://credit.niso.org/contributor-roles/supervision/">Supervision</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – original draft" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-original-draft/">Writing – original draft</role>
+          <role vocab="credit" vocab-identifier="https://credit.niso.org/" vocab-term="Writing – review and editing" vocab-term-identifier="https://credit.niso.org/contributor-roles/writing-review-editing/">Writing – review and editing</role>
+          <email>vanpijkeren@wisc.edu</email>
+        </contrib>
+        <aff id="aff1">
+<label>1</label>
+<institution-wrap><institution>Department of Food Science, University of Wisconsin-Madison</institution></institution-wrap>, <city>Madison</city>, <state>Wisconsin</state>, <country>USA</country>
+</aff>
+      </contrib-group>
+      <contrib-group>
+        <contrib contrib-type="editor">
+          <role>Editor</role>
+          <name>
+            <surname>Turner</surname>
+            <given-names>Mark S.</given-names>
+          </name>
+          <aff>
+<institution-wrap><institution>The University of Queensland</institution></institution-wrap>, <city>Brisbane</city>, <state>Queensland</state>, <country>Australia</country>
+</aff>
+        </contrib>
+      </contrib-group>
+      <author-notes>
+        <corresp id="cor1">Address correspondence to Jan-Peter van Pijkeren, <email xlink:href="mailto:vanpijkeren@wisc.edu">vanpijkeren@wisc.edu</email>
+</corresp>
+        <fn fn-type="COI-statement">
+          <p>Jan-Peter van Pijkeren received unrestricted funds from BioGaia AB, a probiotic-producing company. J.-P.V.P. is the founder of the consulting company Next-Gen Probiotics, LLC.</p>
+        </fn>
+      </author-notes>
+      <pub-date publication-format="electronic" date-type="collection">
+        <season>Sep-Oct</season>
+        <year>2023</year>
+      </pub-date>
+      <pub-date date-type="pub" publication-format="electronic">
+        <day>05</day>
+        <month>9</month>
+        <year>2023</year>
+      </pub-date>
+      <pub-date pub-type="pmc-release">
+        <day>05</day>
+        <month>9</month>
+        <year>2023</year>
+      </pub-date>
+      <!--PMC Release delay is 0 months and 0 days and was based on the <pub-date pub-type="epub"/>.-->
+      <volume>14</volume>
+      <issue>5</issue>
+      <elocation-id>e01197-23</elocation-id>
+      <history>
+<date date-type="received"><day>09</day><month>5</month><year>2023</year></date>
+<date date-type="accepted"><day>29</day><month>6</month><year>2023</year></date>
+</history>
+      <permissions>
+        <copyright-statement>Copyright © 2023 Choi et al.</copyright-statement>
+        <copyright-year>2023</copyright-year>
+        <copyright-holder>Choi et al.</copyright-holder>
+        <ali:free_to_read start_date="2023-09-05"/>
+        <license>
+          <ali:license_ref specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref>
+          <license-p>This is an open-access article distributed under the terms of the <ext-link ext-link-type="uri" xlink:href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International license</ext-link>.</license-p>
+        </license>
+      </permissions>
+      <self-uri content-type="pdf" xlink:href="mbio.01197-23.pdf"/>
+      <abstract abstract-type="primary">
+        <title>ABSTRACT</title>
+        <p>Biotherapeutic strategies to promote health, including the application of engineered microbes to deliver therapeutic molecules, hold strong promise. However, without precision tools to detect therapeutic microbes and their products, we are hampered in our ability to monitor and fine-tune therapeutic delivery. Here, we adapted a bioluminescent peptide tagging system for use in lactic acid bacteria, a group of organisms whose members are commonly exploited as delivery vehicles of therapeutics and vaccines. As a proof of concept, we developed various <italic toggle="yes">Limosilactobacillus reuteri</italic> strains that each produced a recombinant therapeutic protein with an 11 amino acid tag, which is essential to yield a luminescent signal. Luminescent-based quantification of recombinant protein was more sensitive than commercially available immunoassays. In addition, we demonstrated that the bioluminescent peptide tagging system allows <italic toggle="yes">in situ</italic> recombinant protein detection in a continuous-culture parallel bioreactor system. This presents an exciting opportunity to determine recombinant protein production dynamics in response to different stimuli. Finally, following oral administration of recombinant microbes, luminescence in intestinal and fecal samples allowed for rapid detection of microbes with equal sensitivity to conventional plate count. Because we demonstrated the functionality of this bioluminescent peptide tagging system in 12 species encompassing nine genera<italic toggle="yes">,</italic> our approach will create previously unexplored opportunities in lactic acid bacteria research.</p>
+        <sec>
+          <title>IMPORTANCE</title>
+          <p>Lactic acid bacteria constitute a genetically diverse group of microorganisms with significant roles in the food industry, biotechnology, agriculture, and medicine. A core understanding of bacterial physiology in diverse environments is crucial to select and develop bacteria for industrial and medical applications. However, there is a lack of versatile tools to track (recombinant) protein production in lactic acid bacteria. In this study, we adapted a peptide-based bioluminescent tagging system that is functional across multiple genera and species. This system enables tracking of tagged proteins both <italic toggle="yes">in vitro</italic> and <italic toggle="yes">in situ</italic>, while it also can be used to enumerate recombinant bacteria from the mouse gastrointestinal tract with accuracy comparable to that of conventional plate counts. Our work expands the lactic acid bacteria genetic toolbox and will facilitate researchers in industry and academia with opportunities to monitor microbes and proteins under different physiologically relevant conditions.</p>
+        </sec>
+      </abstract>
+      <kwd-group>
+        <title>KEYWORDS</title>
+        <kwd>bioluminescence</kwd>
+        <kwd>lactic acid bacteria</kwd>
+        <kwd>probiotics</kwd>
+        <kwd>microbial therapeutics</kwd>
+      </kwd-group>
+      <funding-group specific-use="FundRef">
+        <award-group award-type="grant" id="award-1">
+          <funding-source>
+<institution-wrap><institution>National Research Foundation of Korea (NRF)</institution></institution-wrap>
+</funding-source>
+          <award-id>NRF-2021R1A6A3A03045314</award-id>
+          <principal-award-recipient>
+<name><surname>Choi</surname><given-names>In Young</given-names></name>
+</principal-award-recipient>
+        </award-group>
+        <award-group award-type="grant" id="award-2">
+          <funding-source>
+<institution-wrap><institution>U.S. Department of Agriculture (USDA)</institution></institution-wrap>
+</funding-source>
+          <award-id>2021-67015-34316</award-id>
+          <principal-award-recipient>
+<name><surname>van Pijkeren</surname><given-names>Jan-Peter</given-names></name>
+</principal-award-recipient>
+        </award-group>
+        <award-group award-type="grant" id="award-3">
+          <funding-source>
+<institution-wrap><institution>HHS | National Institutes of Health (NIH)</institution></institution-wrap>
+</funding-source>
+          <award-id>R01GM135483, R01AT011202</award-id>
+          <principal-award-recipient>
+<name><surname>van Pijkeren</surname><given-names>Jan-Peter</given-names></name>
+</principal-award-recipient>
+        </award-group>
+        <award-group award-type="grant" id="award-4">
+          <funding-source>
+<institution-wrap><institution>UW-Madison Food Research Institutes</institution></institution-wrap>
+</funding-source>
+          <principal-award-recipient>
+<name><surname>van Pijkeren</surname><given-names>Jan-Peter</given-names></name>
+</principal-award-recipient>
+        </award-group>
+      </funding-group>
+      <counts>
+        <count count="1" count-type="supplementary-material"/>
+        <count count-type="authors" count="4"/>
+        <fig-count count="5"/>
+        <table-count count="3"/>
+        <ref-count count="44"/>
+        <page-count count="19"/>
+        <word-count count="9745"/>
+      </counts>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>cover-date</meta-name>
+          <meta-value>September/October 2023</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="intro" id="s1">
+      <title>INTRODUCTION</title>
+      <p>Lactic acid bacteria (LAB) constitute a large family of gram-positive bacteria and nonspore or endospore-forming bacteria. Apart from some notable exceptions, many LAB are considered nonpathogenic and are naturally occurring in diverse habitats, including the gastrointestinal tract (GIT) of humans and other vertebrates (<xref rid="B1" ref-type="bibr">1</xref>, <xref rid="B2" ref-type="bibr">2</xref>), as well as environments such as milk, soil, and fermented foods (<xref rid="B3" ref-type="bibr">3</xref>). Due to their long history of safe consumption, select strains of LAB are approved as Generally Recognized as Safe by the U.S. Food and Drug Administration (<xref rid="B4" ref-type="bibr">4</xref>) and are widely utilized as starter cultures and probiotics (<xref rid="B3" ref-type="bibr">3</xref>). Beyond their probiotic applications, LAB show promise as delivery systems of therapeutic proteins (<xref rid="B5" ref-type="bibr">5</xref>
+<xref rid="B6" ref-type="bibr">–</xref>
+<xref rid="B7" ref-type="bibr">7</xref>). To better understand the dynamics by which microbes transition and produce recombinant proteins <italic toggle="yes">in vitro</italic> and throughout the GIT, tools to track LAB and their products are essential.</p>
+      <p>Fluorescent methods, such as green fluorescent protein (GFP) or mCherry, have been employed to track recombinant LAB in the GIT (<xref rid="B8" ref-type="bibr">8</xref>
+<xref rid="B9" ref-type="bibr">–</xref>
+<xref rid="B11" ref-type="bibr">11</xref>). Although fluorescent protein labeling has proven effective to track bacteria, this approach has limitations when quantifying recombinant proteins. Indeed, the fusion of native proteins with fluorescent proteins may lead to mislocalization, aggregation, misfolding, or loss of protein function (<xref rid="B12" ref-type="bibr">12</xref>). In addition, phototoxicity from fluorescent tagging may negatively impact live host cells and tissues (<xref rid="B13" ref-type="bibr">13</xref>) and the fluorescent assay often faces challenges related to reduced sensitivity, reduced solubility, and elevated background levels compared to luminescent assays (<xref rid="B14" ref-type="bibr">14</xref>).</p>
+      <p>To track recombinant proteins, bioluminescence-based assays have proven fruitful, including the HiBiT system, which was originally developed for use in eukaryotic cells. The HiBiT system employs an 11 amino acid tag, which generates a luminescent signal upon high-affinity complementation with LgBiT, an 18 kDa subunit (<xref rid="B15" ref-type="bibr">15</xref>). Compared to larger protein fusions, the small tag is less likely to interfere with protein folding or functionality (<xref rid="B16" ref-type="bibr">16</xref>). In addition, the HiBiT system has a relatively low detection limit (femtomolar) (<xref rid="B17" ref-type="bibr">17</xref>), a broad dynamic range (<xref rid="B18" ref-type="bibr">18</xref>), and a rapid detection time (&lt; 15 min). More recently, the HiBiT system has proven to be functional in some gram-negative bacteria (<xref rid="B19" ref-type="bibr">19</xref>, <xref rid="B20" ref-type="bibr">20</xref>) and gram-positive bacteria (<xref rid="B21" ref-type="bibr">21</xref>, <xref rid="B22" ref-type="bibr">22</xref>).</p>
+      <p>Here, we developed the bioluminescent peptide (HiBiT) tagging system for <italic toggle="yes">in vitro</italic>, <italic toggle="yes">in vivo</italic>, and <italic toggle="yes">in situ</italic> applications in multiple LAB species. Key features described in this study are the broad applicability and ability of the bioluminescent peptide tagging system to detect recombinant proteins <italic toggle="yes">in situ</italic> without cell lysis. In addition, bacteria isolated from culture or intestinal tissues can be quantified in minutes with an accuracy comparable to the conventional plate count method. The bioluminescent peptide tagging system showed superior sensitivity to detect recombinant proteins compared to commercial enzyme-linked immunosorbent assays (ELISAs). Because of the robustness, we envision that the bioluminescent peptide tagging system described in this study will be much welcomed by the LAB communities in academia and industry, and by the microbiome community in general.</p>
+    </sec>
+    <sec sec-type="results" id="s2">
+      <title>RESULTS</title>
+      <sec id="s2-1">
+        <title>Establishing bioluminescent peptide tagging in <italic toggle="yes">Limosilactobacillus reuteri</italic>
+</title>
+        <p>The overall goal of this study was to adapt a bioluminescent peptide tagging system for broad application in LAB (<xref rid="F1" ref-type="fig">Fig. 1A</xref>). As a first step, we cloned the sequence encoding the 11 amino acid tag (VSGWRLFKKIS) directly upstream of the stop codon of murine leptin, which is encoded from plasmid pJP_Leptin (<xref rid="B2" ref-type="bibr">2</xref>), to yield pJP_Leptin_tag. Next, cultures of <italic toggle="yes">Limosilactobacillus reuteri</italic> harboring pJP_Leptin or pJP_Leptin_tag, or their respective cell pellets resuspended in phosphate-buffered saline with Tween 20 (PBS-T), were disrupted by mechanical lysis. Lysates derived from the cultures and cell pellets derived from <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag both yielded a 4-log increase in luminescence, compared to lysates derived from the untagged control (<italic toggle="yes">P</italic> &lt; 0.001; <xref rid="F1" ref-type="fig">Fig. 1B</xref>). Total luminescence level of cell culture in deMan Rogosa Sharpe (MRS) medium was approximately 10-fold lower compared to the respective samples that were resuspended in PBS-T. Overall, these data demonstrated the proof of concept of the application of bioluminescent peptide tagging in <italic toggle="yes">Lm. reuteri</italic> and established that cell suspensions in PBS-T yielded a slightly more robust signal compared to cell suspensions in MRS.</p>
+        <fig position="float" fig-type="figure" id="F1">
+          <label>Fig 1</label>
+          <caption>
+            <p>Development of a bioluminescent peptide tagging system in <italic toggle="yes">Lm. reuteri</italic>. (<bold>A</bold>) Schematic diagram of the bioluminescent peptide tagging system and (<bold>B</bold>) Comparison of luminescent signal derived from <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin or pJP_Leptin_tag. (<bold>C</bold>) Effect of pH on the luminescent signal. (<bold>D</bold>) Effect of MRS on the luminescent signal. (<bold>E</bold>) Visualizing luminescence of the HiBiT control protein and of lysates derived from <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag. (<bold>F</bold>) Dynamic range of luminescence emitted by leptin_HiBiT in MRS and PBS-T. The dashed black line marks the background luminescence level. The correlation equation between bacterial concentrations and luminescent signals was determined by a simple linear regression analysis. Data are presented as means ± SD based on three biological replicates. **<italic toggle="yes">P</italic> &lt; 0.01, ***<italic toggle="yes">P</italic> &lt; 0.001, ns; no significant differences (<italic toggle="yes">P</italic> &gt; 0.05) (two-tailed paired <italic toggle="yes">t</italic>-test). The letters (a and b) represent statistical differences among the groups (<italic toggle="yes">P</italic> &lt; 0.05, one-way ANOVA).</p>
+          </caption>
+          <graphic xlink:href="mbio.01197-23.f001" position="float"/>
+        </fig>
+      </sec>
+      <sec id="s2-2">
+        <title>Robust dynamic range of luminescence in MRS and PBS-T</title>
+        <p>Because the culture pH of <italic toggle="yes">Lm. reuteri</italic> decreased from 6.5 to 4.5 after 8-h incubation, we investigated the effect of pH on luminescence detection (<xref rid="F1" ref-type="fig">Fig. 1C</xref>). The cell pellet from 8-h culture [9-log colony forming unit (CFU)/mL] was resuspended in fresh MRS (pH 6.5) or pH-adjusted MRS (pH 4.5). Luminescent readings revealed that luminescence levels obtained from MRS pH 6.5 were comparable to those obtained at pH 4.5 (<italic toggle="yes">P</italic> &gt; 0.05). Thus, luminescence is not affected in MRS within the pH range of 4.5–6.5.</p>
+        <p>To test whether the dark media color, or select ingredients in MRS, interfered with luminescent readings, we resuspended nine 9-log CFU of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag in 1 mL of MRS or MRS that was diluted up to 1,000-fold, followed by cell disruption and luminescent detection (<xref rid="F1" ref-type="fig">Fig. 1D</xref>). Compared to the undiluted sample, we identified that at least a 2-fold dilution increased luminescence levels by 1.6-fold (<italic toggle="yes">P</italic> &lt; 0.05). Compared to the 2-fold diluted MRS suspension, additional dilutions did not significantly change luminescence levels. Thus, the color of MRS, perhaps combined with inhibitory substance(s) present in MRS, can be recognized as interference factors for luminescence detection, which can be alleviated by diluting the sample 2-fold.</p>
+        <p>As an initial step to gain insight into the dynamic range of luminescence, we used a bioluminescent imaging system to visualize twofold dilutions of lysates derived from engineered <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag (<xref rid="F1" ref-type="fig">Fig. 1E</xref>). Over the full dilution range (2<sup>0</sup>–2<sup>6</sup>), we observed a linear correlation between the dilution and the bioluminescence levels (<italic toggle="yes">R<sup>2</sup>
+</italic> = 0.98). To assess a broader range, we resuspended cell pellets of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag (9-log CFU/mL) in MRS or PBS-T, followed by 10-fold serial dilution in PBS-T and mechanical cell disruption (<xref rid="F1" ref-type="fig">Fig. 1F</xref>). A linear correlation between bacterial cell numbers and luminescence was identified for PBS-T in the dilution range from 10<sup>0</sup> to 10<sup>6</sup> (<italic toggle="yes">R<sup>2</sup> =</italic> 0.94), while for MRS the dynamic range spanned from 10<sup>1</sup> to 10<sup>6</sup> (<italic toggle="yes">R<sup>2</sup>
+</italic> = 0.92).</p>
+      </sec>
+      <sec id="s2-3">
+        <title>Quantification by bioluminescent peptide tagging is more robust than ELISA</title>
+        <p>ELISAs are routinely used to quantify (recombinant) proteins, including cytokines. In addition to <italic toggle="yes">Lm. reuteri</italic>-producing murine leptin, we previously engineered <italic toggle="yes">Lm. reuteri</italic> to produce murine interleukin-22 (IL-22) (<xref rid="B6" ref-type="bibr">6</xref>). In this work, we engineered <italic toggle="yes">Lm. reuteri</italic> to produce murine interferon- (IFN-β). We additionally developed <italic toggle="yes">Lm. reuteri</italic> harboring pJP_IL-22_tag and <italic toggle="yes">Lm. reuteri</italic> harboring pJP_IFN-β_tag. To compare the performance between commercial ELISAs and bioluminescent peptide tagging, lysates derived from each recombinant <italic toggle="yes">Lm. reuteri</italic> were diluted and subjected to each assay. Although the optical density (OD) of the ELISA correlated with the dilution of the recombinant proteins (<xref rid="F2" ref-type="fig">Fig. 2A through C</xref> ), the dynamic range of ELISA was limited to the nanogram level, whereas the luminescent assay detected recombinant proteins down to the femtogram level (<xref rid="T1" ref-type="table">Table 1</xref>; <xref rid="SuF1" ref-type="supplementary-material">Fig. S1</xref>). We found that the total protein levels determined by ELISA and luminescent assay were comparable for leptin_tag and IL-22_tag. However, the IFN-β_tag levels detected by ELISA were lower than that from the luminescent assay (<italic toggle="yes">P</italic> &lt; 0.05). We also found that the presence of the 3′-tag on IFN-β interfered with the immune assay, as the level of IFN-β detected by ELISA was two times higher than IFN-β_tag. To test whether moving the tag would overcome this issue, we generated a derivative that had the tag at the 5′ end of IFN-β. While the luminescent level of 5′-tagged IFN-β was comparable to 3′-tagged IFN-β, the ELISA for the 5′-tagged IFN-β failed, suggesting that the 5′-end tag abolished binding of the antibody with the protein (<xref rid="F2" ref-type="fig">Fig. 2D</xref>). Despite this limitation, this result demonstrated that the bioluminescent peptide tagging system provides a faster and more robust quantification of recombinant proteins compared to ELISA.</p>
+        <fig position="float" fig-type="figure" id="F2">
+          <label>Fig 2</label>
+          <caption>
+            <p>Comparison of dynamic range between a luminescent assay and ELISA. (A–D) Dynamic range of (<bold>A</bold>) leptin_tag, (<bold>B</bold>) IL-22_tag, (<bold>C</bold>) IFN-β_tag, and (<bold>D</bold>) tag_ IFN-β represented in relative light unit (RLU) and OD. Data are presented as means ± SD based on three biological replicates.</p>
+          </caption>
+          <graphic xlink:href="mbio.01197-23.f002" position="float"/>
+        </fig>
+        <table-wrap position="float" id="T1">
+          <label>TABLE 1</label>
+          <caption>
+            <p>Performance comparison of luminescent assay and ELISA</p>
+          </caption>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th align="left" valign="bottom" rowspan="2" colspan="1"/>
+                <th align="center" valign="bottom" colspan="4" rowspan="1">ELISA</th>
+                <th align="center" valign="bottom" colspan="4" rowspan="1">Luminescent assay</th>
+              </tr>
+              <tr>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">Leptin_tag</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">IL-22_tag</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">IFN-β_tag</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">Tag_IFN-β</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">Leptin_tag</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">IL-22_tag</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">IFN-β_tag</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">Tag_IFN-β</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Linear range<break/>(pg/mL)</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">114.93–999.91</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">13.37–103.59</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">193.13–289.31</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Not detected</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">0.16–64,550</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">0.16–43,953</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">0.5–32213.9</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Not detected</td>
+              </tr>
+            </tbody>
+          </table>
+        </table-wrap>
+      </sec>
+      <sec id="s2-4">
+        <title>
+<italic toggle="yes">In situ</italic> protein detection</title>
+        <p>While the small luminescent tag can be used to identify and quantify recombinant proteins, bacterial lysis is required to release the recombinant protein. To overcome this bottleneck, we introduced the gene encoding LgBiT on a plasmid (see <xref rid="F1" ref-type="fig">Fig. 1A</xref>) so an interaction can be formed between LgBiT and the luminescent tagged protein inside the cell. For <italic toggle="yes">in situ</italic> detection of recombinant proteins, it is required that the luminescent substrate enters the cell and that the luminescent signal from live cells can be detected. We determined that adding Nano-Glo HiBiT Extracellular Substrate yielded a luminescent signal in cells expressing the luminescent tagged protein and LgBiT, while no signal was obtained in cells lacking LgBiT (<xref rid="F3" ref-type="fig">Fig. 3A</xref>). <italic toggle="yes">In situ</italic> protein levels were comparable to protein levels obtained following cell lysis (<italic toggle="yes">P</italic> &gt; 0.05; <xref rid="F3" ref-type="fig">Fig. 3A</xref>). Thus, protein production can be tracked in live bacterial cells.</p>
+        <fig position="float" fig-type="figure" id="F3">
+          <label>Fig 3</label>
+          <caption>
+            <p>Real-time <italic toggle="yes">in situ</italic> detection of recombinant leptin in <italic toggle="yes">Lm. reuteri</italic>. (<bold>A</bold>) Luminescent signal of leptin_tag from <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag and <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT with or without bacterial cell lysis and additional LgBiT. (<bold>B</bold>) Leptin and induction peptide concentrations during 12 h continuous culture of <italic toggle="yes">Lm. reuteri</italic> harboring pSIP_Leptin_tag_EFTu_LgBiT. (<bold>C</bold>) Maintenance of OD of <italic toggle="yes">Lm. reuteri</italic> harboring pSIP_Leptin_tag_LgBiT. Data are presented as means ± SD based on three biological replicates. **<italic toggle="yes">P</italic> &lt; 0.01, ns; no significant differences (<italic toggle="yes">P</italic> &gt; 0.05) (two-tailed paired <italic toggle="yes">t</italic>-test).</p>
+          </caption>
+          <graphic xlink:href="mbio.01197-23.f003" position="float"/>
+        </fig>
+        <p>We aimed next to determine <italic toggle="yes">in situ</italic> detection of recombinant protein production during continuous bioprocessing. We constructed <italic toggle="yes">Lm. reuteri</italic> harboring pSIP_Leptin_tag_EFTu_LgBiT where Leptin_tag is under the control of an inducible promoter and the LgBiT protein is expressed from the constitutive EFTu promoter. In a continuous bioreactor system, we cultured <italic toggle="yes">Lm. reuteri</italic> harboring pSIP_Leptin_tag_EFTu_LgBiT in two vessels each containing 200 mL of culture. During the early logarithmic phase [absorption units (AU) = 0.05, which is equivalent to OD<sub>600</sub> = 0.3], one vessel was supplemented with induction peptide (2.5 ng/mL) to initiate the expression of leptin_tag. Samples were harvested every hour for up to 12 h (<xref rid="F3" ref-type="fig">Fig. 3B</xref>). Once cells reached AU = 0.15 (OD<sub>600</sub> = 1.0), approximately 2 h upon induction, the cell density was stably maintained at AU = 0.15 (<xref rid="F3" ref-type="fig">Fig. 3C</xref>). Three hours following induction, maximum intracellular levels of leptin_tag were observed (8.9 ng/mL) after which leptin_tag levels gradually reduced (<xref rid="F3" ref-type="fig">Fig. 3B</xref>). Modeling of the flow rate and induction peptide concentration over time revealed that 6 h post-induction less than 0.072 ng/mL of induction peptide would be present (<xref rid="F3" ref-type="fig">Fig. 3B</xref>). Because of the continuous culture setup, the concentration of the induction peptide gradually reduced, which explains why we detected lower levels of leptin_tag over time. In the vessel without induction peptide, recombinant protein levels remained below 0.8 ng/mL. Collectively, these data revealed that the bioluminescent peptide tagging system can be applied for <italic toggle="yes">in situ</italic> detection of (recombinant) proteins and opens up exciting opportunities for optimization studies of protein production in microbial cell factories along with addressing fundamental questions on native protein production in different experimental setups.</p>
+      </sec>
+      <sec id="s2-5">
+        <title>Tracking recombinant bacteria during gastrointestinal transit</title>
+        <p>Now we have laid a foundation for the <italic toggle="yes">in vitro</italic> and <italic toggle="yes">in situ</italic> use of the bioluminescent peptide tagging system in <italic toggle="yes">Lm. reuteri</italic>, we next explored its applicability to quantify bacteria during and following gastrointestinal transit. First, we investigated to what extent mouse feces, a complex matrix, interferes with luminescence. <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT was inoculated in 1 mL of PBS-T, fecal suspension (100 mg/mL) in PBS-T, or in diluted fecal suspensions at the final concentration of 7-log CFU/mL. Compared to PBS-T, luminescence levels were 10-fold lower in the fecal suspension of 100 mg/mL (<xref rid="F4" ref-type="fig">Fig. 4A</xref>). Diluting the fecal suspension 10-fold (or more) yielded comparable luminescence levels to those observed in PBS-T. Thus, analogous to what we observed in MRS medium, a simple dilution step removes the inhibitory signal.</p>
+        <fig position="float" fig-type="figure" id="F4">
+          <label>Fig 4</label>
+          <caption>
+            <p>
+<italic toggle="yes">In vivo</italic> quantification by luminescence. (<bold>A</bold>) Diluting fecal material removes inhibitory factors impacting luminescent signal. (<bold>B</bold>) Standard curve of luminescent signal vs concentration of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT in fecal suspension (1 mg/mL). (C–E) Detection of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT throughout the mouse gut with different oral gavage dose at (<bold>C</bold>) 10<sup>9</sup> CFU, (<bold>D</bold>) 10<sup>8</sup> CFU, and (<bold>E</bold>) 10<sup>7</sup> CFU. All data are presented as means ± SD based on three biological replicates. The letters (A –C) represent statistical differences between the groups (<italic toggle="yes">P</italic> &lt; 0.05, one-way ANOVA). ns; no statistical significance (two-tailed paired <italic toggle="yes">t</italic>-test).</p>
+          </caption>
+          <graphic xlink:href="mbio.01197-23.f004" position="float"/>
+        </fig>
+        <p>Next, we constructed the dynamic range curve to predict the bacterial concentration based on relative light unit (RLU) (<xref rid="F4" ref-type="fig">Fig. 4B</xref>). The luminescent signal was increased linearly according to increasing the concentration of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT, as determined by the conventional plate count method, with a correlation coefficient of 0.96. In addition, we analyzed the sensitivity which referred to the change in signal along with a change in sample mass. Thus, the sensitivity was defined as the slope of the linear standard curve (<xref rid="B23" ref-type="bibr">23</xref>). The sensitivity and limit of detection were determined to be 0.928-log RLU/log CFU and 3-log CFU/100 mg of feces, respectively. Thus, in feces, luminescent <italic toggle="yes">Lm. reuteri</italic> can be detected over a broad linear range.</p>
+        <p>To investigate whether bacteria can be quantified by luminescence in different regions of the GIT, and in feces, we administered oral gavage mice with 10<sup>7</sup>, 10<sup>8</sup>, and 10<sup>9</sup> CFU of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT. Twenty-four hours following oral administration, fresh fecal pellets were collected and animals were subsequently sacrificed. We harvested contents from the large intestine, small intestine, and cecum. Using the conventional plate count method, we determined CFU levels. Luminescence levels of the various contents were determined in PBS-T. Using a standard curve we established based on fecal suspensions (<xref rid="F4" ref-type="fig">Fig. 4B</xref>), we converted luminescence levels to CFU to predict the concentration of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT, which we compared to the conventional plate counts (<xref rid="F4" ref-type="fig">Fig. 4C through E</xref>). Our data revealed that the predicted concentration of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT by luminescence was similar to the conventional plate count method (<italic toggle="yes">P</italic> &gt; 0.05; <xref rid="F4" ref-type="fig">Fig. 4C through E</xref>) even at the lowest doses of 7-log CFU. Thus, the bioluminescent peptide tagging system now opens up the exciting opportunity to quantify bacteria and <italic toggle="yes">in situ</italic> recombinant protein production throughout the GIT.</p>
+      </sec>
+      <sec id="s2-6">
+        <title>Bioluminescent peptide tagging system is broadly applicable in LAB and <italic toggle="yes">Bifidobacterium bifidum</italic>
+</title>
+        <p>Now we have established the versatility of the bioluminescent peptide tagging system in <italic toggle="yes">Lm. reuteri</italic>, we next assessed the applicability of this bioluminescent system in other microbes. We established pJP_Leptin_tag or the control plasmid pNZ8048 in 11 different LAB strains (<xref rid="B24" ref-type="bibr">24</xref>) and in <italic toggle="yes">Bifidobacterium bifidum</italic>. Late log phase cultures were harvested by centrifugation, and cell pellets were disrupted by mechanical lysis. Following the addition of the luminescent substrate harboring LgBiT, luminescent signals were recorded (<xref rid="F5" ref-type="fig">Fig. 5A</xref>). For all strains, luminescence levels were 3- to 4-log higher than luminescence levels obtained from lysates derived from cells harboring the pNZ8048 control plasmid.</p>
+        <fig position="float" fig-type="figure" id="F5">
+          <label>Fig 5</label>
+          <caption>
+            <p>Bioluminescent peptide tagging is broadly applicable. (<bold>A</bold>) Luminescent signals in lysates derived from bacteria harboring pNZ8048 or pJP_Leptin_tag. (<bold>B</bold>) Luminescent signals from whole bacterial cells harboring pNZ8048 or pJP_Leptin_tag_EFTu_LgBiT. (<bold>C</bold>) Spread plates of four cultures including <italic toggle="yes">Lm. reuteri</italic> ATCC PTA 6475 (Lr)_pJP_Leptin_tag_EFTu_LgBiT, Lr_pJP_Leptin, <italic toggle="yes">Lacicaseibacillus casei</italic> BL23 VPL1021 (Lc)_pNZ8048, and <italic toggle="yes">Lactiplantibacillus plantarum</italic> ATCC BAA-793 (Lp)_pNZ8048, and a mixture thereof. (<bold>D</bold>) Luminescent imaging of colonies on plate. Data in panels A and B are presented as means ± SD based on three biological replicates. **<italic toggle="yes">P</italic> &lt; 0.01, ***<italic toggle="yes">P</italic> &lt; 0.001 (two-tailed paired <italic toggle="yes">t</italic>-test). Panels C and D are representative images from at least two independent experiments.</p>
+          </caption>
+          <graphic xlink:href="mbio.01197-23.f005" position="float"/>
+        </fig>
+        <p>Next, we assessed whether <italic toggle="yes">in situ</italic> measurement of recombinant protein is broadly applicable. To this end, bacteria were transformed with pJP_Leptin_tag_EFTu_LgBiT. Despite numerous attempts, we could not obtain transformants of pJP_Leptin_tag_EFTu_LgBiT in <italic toggle="yes">B. bifidum</italic>, which was therefore excluded from the analysis. Cultures were harvested at OD<sub>600</sub> = 5, and cell pellets were mixed with the luminescent substrate that lacked LgBiT. Analogous to our findings with pJP_Leptin_tag_EFTu_LgBiT, all strains harboring pJP_Leptin_tag_EFTu_LgBiT yielded a significant increase in luminescence compared to the empty vector control pNZ8048 (<xref rid="F5" ref-type="fig">Fig. 5B</xref>). Thus, the bioluminescent peptide tagging is broadly applicable among LAB, and we established proof of-concept in a <italic toggle="yes">Bifidobacterium</italic> spp.</p>
+        <p>Whole cell luminescence now creates opportunities to identify microbes from a mixed community, to identify genetic transformants, or to determine plasmid stability. As a proof of concept, we created five spread plates: (1) <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT; (2) <italic toggle="yes">Lm. reuteri_</italic>pJP_Leptin; (3) <italic toggle="yes">L. casei</italic>_pNZ8048; (4) <italic toggle="yes">Lp. plantarum</italic>_pNZ8048; and (5) a random mixture of cultures 1–4 (<xref rid="F5" ref-type="fig">Fig. 5C</xref>). Plates were flooded with luminescent substrate and subjected to luminescent imaging (<xref rid="F5" ref-type="fig">Fig. 5D</xref>). Colony luminescence was observed on all colonies present on the plate with <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT, whereas colonies derived from strains harboring the control plasmid pNZ8048 did not luminesce. Mixing different cultures easily led to the identification of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT, which collectively demonstrates the proof of concept of the application of colony luminescence.</p>
+      </sec>
+    </sec>
+    <sec sec-type="discussion" id="s3">
+      <title>DISCUSSION</title>
+      <p>LAB are extensively applied in the food industry for various fermentation processes, in medicine as probiotics, and in biotechnology as production factories of recombinant proteins (<xref rid="B25" ref-type="bibr">25</xref>). In this study, we developed a peptide-based bioluminescent tagging system and demonstrated its use in 11 different LAB encompassing eight genera, and <italic toggle="yes">B. bifidum</italic>. Although the 11 LAB strains belonged to a single genus previously, they were recently reclassified into eight different genera due to the high phenotypic, ecological, and genetic diversities (<xref rid="B24" ref-type="bibr">24</xref>). The successful implementation of the peptide-based luminescent system within such a diverse group of organisms means that our approach will be highly relevant to LAB of industrial interest and to generate live biotherapeutic products. In fact, we envision that the described applications to detect bacteria and their recombinant proteins <italic toggle="yes">in vitro</italic>, <italic toggle="yes">in vivo</italic>, and <italic toggle="yes">in situ</italic> will be a valuable asset to the microbiome community.</p>
+      <p>We determined that the substrate required for <italic toggle="yes">in situ</italic> luminescence is able to enter the cells, which opened up the possibility of <italic toggle="yes">in situ</italic> luminescence measurements during growth. We did not notice major fluctuations in luminescence levels between <italic toggle="yes">in situ</italic> measurements and lysates. This not only suggests that the uptake of the substrate appears efficient but also points toward the broad applicability of bioluminescent peptide tagging for <italic toggle="yes">in situ</italic>, at least in LAB. However, a current drawback is that this system described in this work is currently only applicable for short-term true real-time detection of protein production, mainly because of the relatively short half-life—less than 2 h—of the substrate in MRS medium. Nevertheless, the <italic toggle="yes">in situ</italic> quantification following sampling can provide useful insight into microbial physiology in response to different stimuli.</p>
+      <p>The luminescent peptide system also presents an opportunity to serve as a selection marker to identify crossover recombinants, particularly in members that belong to the <italic toggle="yes">Lb. delbrueckii</italic>, <italic toggle="yes">Holzapfelia floricola,</italic> and <italic toggle="yes">Amylolactobacillus amylophilus</italic> (<xref rid="B24" ref-type="bibr">24</xref>, <xref rid="B26" ref-type="bibr">26</xref>). The vancomycin-sensitive phenotype in these strains means that the broadly applicable vancomycin-based counterselection system cannot be applied (<xref rid="B27" ref-type="bibr">27</xref>). Instead, the bioluminescent peptide tagging could be applied to identify the cells in which single-crossover homologous recombination has occurred or to identify the cells that have lost the suicide vector following a second homologous recombination event. This application would be straightforward since adding the bioluminescence substrate to an agar plate suffices to yield a luminescent signal (<xref rid="F5" ref-type="fig">Fig. 5C and D</xref>). If a higher-throughput application would be required one could consider flow cytometry, analogous to what previously has been described by Santoro <italic toggle="yes">et al</italic>., who applied fluorescence-activated cell sorting (FACS) to identify Cre recombinase mutants based on GFP expression level (<xref rid="B28" ref-type="bibr">28</xref>). Likely, the luminescent detection will be favorable over this technique because fluorescence-based assays have lower sensitivity and lower signal-to-noise ratio due to autofluorescence (<xref rid="B14" ref-type="bibr">14</xref>). In addition to serving as a selection marker, we envision that the HiBiT tagging system can also be used to detect bacterial cell–cell interactions. By surface exposure of HiBiT in one microbe and LgBiT in another microbe, it is expected that the interaction of both microbes, for example within a biofilm, will result in a luminescent signal.</p>
+      <p>However, whatever the application, when developing a bioluminescent peptide tagging system in your microbe of interest, one may consider generating independent clones encoding a tag on either the N- or the C-terminal end. While it has been suggested that smaller tag sizes are less likely to disrupt protein folding or function (<xref rid="B16" ref-type="bibr">16</xref>), we observed that the presence of the 11-amino acid tag on the N-terminal end of IFN-β abolished detection by ELISA. This could be due to the tag affecting protein folding, thereby blocking the binding of the antibody, or it is also possible that the location of the tag influences the luminescence level for the analogous reason that the LgBiT protein may bind less efficiently. Regardless, once the location of the tag is optimized, the bioluminescence-based protein detection system will offer plenty of applications, including the quantification of engineered microbes in the mouse GIT. We also detected luminescent microbes throughout the mouse GIT following oral administration of 10<sup>7</sup> CFU’s, a dose that is 100-fold lower compared to that used in most animal studies (<xref rid="B29" ref-type="bibr">29</xref>
+<xref rid="B30" ref-type="bibr">–</xref>
+<xref rid="B32" ref-type="bibr">32</xref>). This opens the possibility to perform higher-throughput time course studies on intestinal persistence, for example, where luminescence levels can be used to quantify microbes in feces in minutes, which we determined is comparable to the standard plate counts.</p>
+      <p>We also tested whether we could detect released recombinant proteins in the various regions of the GIT. Specifically, we engineered <italic toggle="yes">Lm. reuteri</italic> to accumulate recombinant leptin inside the cell, which is released during gastrointestinal transit via the activation of prophages (<xref rid="B2" ref-type="bibr">2</xref>, <xref rid="B33" ref-type="bibr">33</xref>). Prophage-mediated release of recombinant proteins has proven fruitful in various preclinical models (<xref rid="B7" ref-type="bibr">7</xref>, <xref rid="B34" ref-type="bibr">34</xref>). However, upon oral administration of the engineered <italic toggle="yes">Lm. reuteri</italic>, we could not detect an increase in luminescence in samples derived from the small intestine (data not shown). Attempts to detect luminescence following a boost in recombinant protein release by <italic toggle="yes">in vitro</italic> mitomycin-C induction, to induce prophages and thus increase therapeutic release, were unsuccessful (data not shown). Possibly, the amount of recombinant protein released was not enough to overcome the inhibitory effects of bile acids and digestive enzymes present in the small intestine (<xref rid="B35" ref-type="bibr">35</xref>), perhaps combined with the possibility of absorption of the recombinant protein by the intestinal epithelium (<xref rid="B36" ref-type="bibr">36</xref>). We are looking forward to revisiting the opportunity to track recombinant proteins in the GIT with constructs optimized to release recombinant proteins.</p>
+      <p>In conclusion, the bioluminescent peptide tagging system serves as a potent tool to monitor <italic toggle="yes">in vitr</italic>o and <italic toggle="yes">in situ</italic> protein production in a wide range of microbes, as well as for understanding the fate of probiotics in the GIT, their intestinal behavior, and ultimate localization. Its broad applicability opens the door to higher-throughput screening of probiotics and the development of next-generation probiotics for use in agriculture and in the clinic.</p>
+    </sec>
+    <sec sec-type="materials|methods" id="s4">
+      <title>MATERIALS AND METHODS</title>
+      <sec id="s4-1">
+        <title>Bacterial strains and growth conditions</title>
+        <p>The bacterial strains and plasmids used in this study are listed in <xref rid="T2" ref-type="table">Table 2</xref>. All lactobacilli strains and <italic toggle="yes">Bifidobacterium bifidum</italic> were cultured at 37°C in MRS medium (MRS, BD BioSciences) under hypoxic conditions (5% CO<sub>2</sub> and 2% O<sub>2</sub>), and <italic toggle="yes">Lactococcus lactis</italic> strains were cultured in M17 (BD) containing 0.5% (w/v) of glucose at 30°C (static). <italic toggle="yes">Escherichia coli</italic> was grown at 37°C with gentle agitation (200 rpm) in lysogeny broth (LB, Neogen). If applicable, erythromycin was used at the concentrations of 300 µg/mL for <italic toggle="yes">E. coli</italic> and at 5 µg/mL for other strains listed in <xref rid="T2" ref-type="table">Table 2</xref>.</p>
+        <table-wrap position="float" id="T2">
+          <label>TABLE 2</label>
+          <caption>
+            <p>Bacterial strains and plasmids used in this study<xref rid="T2_FN1" ref-type="table-fn">
+<sup>
+<italic toggle="yes">a</italic>
+</sup>
+</xref>
+</p>
+          </caption>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th align="left" valign="top" colspan="1" rowspan="1">Bacterial strains or plasmids</th>
+                <th align="left" valign="top" colspan="1" rowspan="1">Characteristics</th>
+                <th align="left" valign="top" colspan="1" rowspan="1">Source/Reference</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Escherichia coli</italic> EC1000</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">in <italic toggle="yes">trans</italic> RepA provider, Kan<sup>R</sup> (<italic toggle="yes">E. coli</italic> cloning host)</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">(<xref rid="B37" ref-type="bibr">37</xref>)</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL3789</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">EC1000 harboring pVPL3789, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">(<xref rid="B2" ref-type="bibr">2</xref>)</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31599</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31655</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31948</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31948, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31964</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring VPL31964, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31974</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31974, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31970</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31970, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31954</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31954, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31994</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31994, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31998</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31998, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Bifidobacterium bifidum</italic> NRRL B-41410</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Feces of breast-fed human infant</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">NRRL</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31866</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31885</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Ligilactobacillus agilis</italic> VPL1214</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Cow</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Laboratory stock</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31875</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31854</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31936</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Levilactobacillus brevis</italic> ATCC 8287</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Green fermenting Sevillano variety olives</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ATCC</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31887</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31868</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31950</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Laticaseibacillus casei</italic> BL23 VPL1021</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Cheese</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">(<xref rid="B38" ref-type="bibr">38</xref>), Cheese</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31879</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31858</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31940</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Limosilactobacillus fermentum</italic> ATCC 14931</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Fermented beets</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ATCC</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31889</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31869</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31952</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Lactobacillus gasseri</italic> ATCC 33323</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">-</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ATCC</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31881</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31860</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31942</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Lactiplantibacillus plantarum</italic> ATCC BAA-793</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Saliva</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ATCC</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31871</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31850</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31932</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Limosilactobacillus reuteri</italic> ATCC PTA6475</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This strain is also known as MM4-1A</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">BioGaia AB</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL 3791</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL3789, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">(<xref rid="B2" ref-type="bibr">2</xref>)</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL2048</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Laboratory stock</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL4069</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring il-22 gene in Lm. reuteri chromosome</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Laboratory stock</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31250</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring IFN-β</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Laboratory stock</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31611</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31657</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31976</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31974, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31972</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31970, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31956</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31954, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL32004</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31998, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Lactiplantibacillus rhamnosus</italic> GG ATCC53103</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Human fecal sample</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ATCC</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31873</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31852</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31934</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Latilactobacillus sakei</italic> ATCC 15521</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Moto, starter of sake</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ATCC</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31877</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31856</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31938</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Ligilactobacillus salivarius</italic> VPL1245</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Cow</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Laboratory stock</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31883</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31864</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31946</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">
+<italic toggle="yes">Lactococcus lactis</italic> subsp. <italic toggle="yes">cremoris</italic> MG1363</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Dairy starter</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">(<xref rid="B39" ref-type="bibr">39</xref>)</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL2042</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pNZ8048, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Laboratory stock</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31862</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31599, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> VPL31944</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Harboring pVPL31655, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">Plasmid</td>
+                <td align="left" valign="top" colspan="1" rowspan="1"/>
+                <td align="left" valign="top" colspan="1" rowspan="1"/>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL2042</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pNZ8048 derivative; Cm<sup>R</sup> was replaced by EM<sup>R</sup>, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Laboratory stock</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL3789</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pJP028_EFTu_noSP_Leptin, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1"/>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31250</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pJP025_ EFTu _murine_pmut_ThyA</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Laboratory stock</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31599</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pJP028_ EFTu _noSP_Leptin_tag, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31655</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pJP028_ EFTu _noSP_Leptin_tag_EFTu_LgBiT, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31948</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pSIP411_Leptin_tag, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31974</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pJP028_ EFTu _noSP_ IFN-β _tag, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31970</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pJP028_ EFTu _noSP_IL22_tag, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31954</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pSIP411_Leptin_tag_EFTu _LgBiT, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31994</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pJP028_EFTu_noSP_ IFN-β, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1"> pVPL31998</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">pJP028_EFTu_noSP tag_IFN-β, Em<sup>R</sup>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">This study</td>
+              </tr>
+            </tbody>
+          </table>
+          <table-wrap-foot>
+            <fn id="T2_FN1">
+              <label>
+<sup>
+<italic toggle="yes">a</italic>
+</sup>
+</label>
+              <p>VPL: Van Pijkeren Lab strain identification number; pVPL: Van Pijkeren Lab plasmid identification number; ATCC: American Type Culture Collection; LRRL: Agricultural Research Service Culture Collection; Kan<sup>R</sup>: kanamycin resistant; Em<sup>R</sup>: erythromycin resistant; Cm<sup>R</sup>: chloramphenicol resistant.</p>
+            </fn>
+          </table-wrap-foot>
+        </table-wrap>
+      </sec>
+      <sec id="s4-2">
+        <title>Reagents and enzymes</title>
+        <p>Reagents were obtained from Thermo Fisher unless stated otherwise. To fuse DNA fragments, we used ligase cycle reaction (LCR) (<xref rid="B40" ref-type="bibr">40</xref>). For cloning and screening purposes, we used Phusion Hot Start Polymerase II and Taq polymerase (Denville Scientific), respectively. DpnI was used to digest methylated template DNA after backbone amplification. The DNA was phosphorylated with T4 polynucleotide kinase and ligated with T4 DNA ligase. Oligonucleotides and synthetic double-stranded DNA fragments were synthesized by Integrated DNA Technologies (IDT) and are listed in <xref rid="T3" ref-type="table">Table 3</xref>.</p>
+        <table-wrap position="float" id="T3">
+          <label>TABLE 3</label>
+          <caption>
+            <p>Oligonucleotides used in this study</p>
+          </caption>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">Oligonucleotides<xref rid="T3_FN1" ref-type="table-fn">
+<sup>
+<italic toggle="yes">a</italic>
+</sup>
+</xref>
+</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">Sequence (5’ – 3’)</th>
+                <th align="left" valign="bottom" colspan="1" rowspan="1">Description<xref rid="T3_FN2" ref-type="table-fn">
+<sup>
+<italic toggle="yes">b</italic>
+</sup>
+</xref>
+</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL329</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">attccttggacttcatttactgggtttaac</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev for screening pJP_Leptin_tag</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL659</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">tgccccgttagttgaagaag</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for pSIP411</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL660</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">attctgctcccgcccttatg</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev for pSIP411</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL1221</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">gcttgaaacgttcaattgaaatggca</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Screening oligonucleotide for pJP_Leptin_tag</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL1326</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ccagttggtaacaatgccatgt</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for pSIP_Leptin_tag_EFTu_LgBiT</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL1366</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">taaagcaattactgatattgctg</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for EFTu amplification</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL1447</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">cgaattaatagaaaaacattagtcaaatac</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for pJP backbone</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL1448</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">taatgaaaacctcctgataatttacaag</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev for pJP backbone</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL2115</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">aacacaagcattacgtaaactca</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev for IL-22 amplification</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL2238</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">atggttccaattcaaaaagttcaagatg</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for pJP_Leptin_tag</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL2239</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">atgttaccagttaatactcgttgtaaat</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for IL-22 amplification</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL2351</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">taatctcgctttgattgttctatcg</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for pJP_Leptin_tag</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4252</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">tgatctttgaaccaaaattagaaaacc</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for pJP backbone</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4254</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">tatttaaaaaaattagttgatctttgaaccaaaattagaaaacc</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd starting at stop codon of leptin with 17 bases of tag sequence</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4255</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">aacgccaaccactaacacattctggactaacatctaattgttg</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev upstream of stop codon leptin with 16 bases of tag sequence</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4307</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">gctttcgatagaacaatcaaagcgagattattaagagttgatagtaacacgaaataacat</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Bridging oligonucleotide to fuse LgBiT and pJP backbone</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4308</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">accaacgaaatcctcaagagtaaataccattaatgaaaacctcctgataatttacaagta</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Bridging oligonucleotide to fuse LgBiT and EFTu</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4309</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">gtatttgactaatgtttttctattaattcgtaaggaagataaatcccataagggcgggag</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Bridging oligonucleotide to fuse pJP backbone and EFTu</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4310</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">taaggaagataaatcccataaggg</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for pJP backbone</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4312</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">tcatcaagtgttatatagcggtc</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev for LgBiT screening</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4336</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">cattgagaagattgccgaaa</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for LgBiT</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4337</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">atttgatccgctgacaatcc</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for LgBiT and EFTu</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4339</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">cccgtctaaggaattgtcagat</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for pSIP_Leptin_tag_EFTu_LgBiT</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4418</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">gttagtggttggcgtttatttaa</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for pJP_Leptin_tag backbone</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4493</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">atgattaattataaacaattacaattac</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for IFN-β amplification</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4493</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">atgattaattataaacaattacaattac</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Screening oligonucleotide for IFN-β</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4494</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">attttgaaaattacgagttaaacgacg</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev for IFN-β amplification</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4538</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">caaccatatatgcaagaagt</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for IL-22</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4538</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">caaccatatatgcaagaagt</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Screening and sequencing oligonucleotide for IL-22</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4539</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">cgtgatttattacatttattagc</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for Leptin</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4540</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ttggcgtgttcaacgttatt</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for IFN-β</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4540</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ttggcgtgttcaacgttatt</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Sequencing oligonucleotide for oligo for IFN-β</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4543</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">ttgattacctccttatcatca</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev for pSIP_Leptin_tag</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">oVPL4544</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">tctagactcgaggaattcggt</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd for pSIP_Leptin_tag</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4848</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">aaacgccaaccactaaccattaatgaaaacctcctgataatt</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Fwd starting at stop codon of IFN-β with 17 bases of tag sequence</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">oVPL4849</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">atttaaaaaaattagtattaattataaacaattacaattacaa</td>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">Rev upstream of stop codon IFN-β with 16 bases of tag sequence</td>
+              </tr>
+              <tr>
+                <td align="left" valign="bottom" colspan="1" rowspan="1">
+<bold>Recombinant DNA</bold>
+</td>
+                <td align="left" valign="top" colspan="1" rowspan="1"/>
+                <td align="left" valign="bottom" colspan="1" rowspan="1"/>
+              </tr>
+              <tr>
+                <td align="left" valign="top" colspan="1" rowspan="1">gVPL71</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">atggtatttactcttgaggatttcgttggtgactgggaacagactgccgctta<break/>taatttagatcaagtattagaacaaggcggcgtgtcttcattgctccagaac<break/>ttggcagtttcagttactcctattcaacggattgttcggagtggggaaaatgc<break/>gctgaagattgatattcatgttattattccgtacgaaggattgtcagcggatc<break/>aaatggcacaaatagaagaagtttttaaagtggtatatccggtcgatgatc<break/>atcatttcaaagttattttaccttacgggaccttagtaattgatggtgtgactcc<break/>taatatgttaaactattttggacgtccttatgaaggaattgctgtttttgatggaa<break/>agaagattacagttacaggaactttgtggaatggaaataagattatcgatg<break/>agagattaattactccagatggaagtatgttatttcgtgttactatcaactcttaa</td>
+                <td align="left" valign="top" colspan="1" rowspan="1">Codon optimized LgBiT</td>
+              </tr>
+            </tbody>
+          </table>
+          <table-wrap-foot>
+            <fn id="T3_FN1">
+              <label>
+<sup>a</sup>
+</label>
+              <p>oVPL, van Pijkeren Laboratory primer identification number.</p>
+            </fn>
+            <fn id="T3_FN2">
+              <label>
+<sup>b</sup>
+</label>
+              <p>Fwd, forward oligonucleotide; Rev, reverse oligonucleotide.</p>
+            </fn>
+          </table-wrap-foot>
+        </table-wrap>
+      </sec>
+      <sec id="s4-3">
+        <title>Construction of <italic toggle="yes">Lm</italic>. <italic toggle="yes">reuteri</italic>_pJP_Leptin_tag</title>
+        <p>To develop <italic toggle="yes">Lm. reuteri</italic> that produces HiBiT-tagged leptin, we first amplified the backbone of pVPL3789—a derivative of pNZ8048 that encodes murine leptin under the control of the EFTu promoter (<xref rid="B2" ref-type="bibr">2</xref>)—with oligo pair oVPL4254 and oVPL4255. Each oligonucleotide contained a 5′-end clamp that upon self-ligation yielded a 33-base tag that encodes HiBiT. Following DpnI treatment, phosphorylation, and self-circularization with T4 DNA ligase, the ligation reaction was introduced into <italic toggle="yes">E. coli</italic> EC 1000 by electroporation. By colony PCR (oVPL1447-oVPL329), putative clones were identified. The integrity of the purified plasmid DNA was determined by Sanger sequencing (Genewiz), and the resultant plasmid was named pJP_Leptin_tag (pVPL31599). Next, we transformed by electroporation pVPL31599 into <italic toggle="yes">Lm. reuteri</italic> VPL1014, resulting in <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag (VPL31611). The integrity of the transformant was confirmed by amplification of the pJP_Leptin_tag backbone (oVPL2238-oVPL2351) followed by Sanger sequence analyses (oVPL2351).</p>
+      </sec>
+      <sec id="s4-4">
+        <title>Proof-of-concept luminescence in <italic toggle="yes">Lm. reuteri</italic>
+</title>
+        <p>To release the intracellularly accumulated (tagged) leptin from bacterial cells, <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin (VPL3791) and pJP_Leptin_tag were diluted to OD<sub>600</sub> = 0.1 and harvested after 8-h growth. After measuring the OD, cells were washed once with PBS-T (PBS with 0.05% (v/v) Tween 20) and resuspended in PBS-T. Subsequently, cells in MRS culture or PBS-T were disrupted by bead-beating. Briefly, approximately 200 µL of zirconia glass beads (BioSpecP) was added to 1 mL of cell suspension followed by two cycles of 1.5 min bead-beating with a 30-s interval on ice. Cell-free extracts were prepared by centrifugation (1 min, 9,391× <italic toggle="yes">g</italic>, 4°C) and filtered by a 0.2-µm-pore syringe filter (Argos Technologies). The luminescent signals were determined in a Glomax Discover Microplate Reader (Promega) using the HiBiT extracellular detection kit (Promega Co., Madison, WI, USA), following the manufacturer’s instructions. RLUs were normalized as RLU/the initial RLU ×5 (OD when the bacterial concentration was 9-log CFU/mL).</p>
+      </sec>
+      <sec id="s4-5">
+        <title>Optimization of luminescence detection in <italic toggle="yes">Lm. reuteri</italic>
+</title>
+        <p>To investigate the inhibitory effect of pH on luminescent signal, cells derived from 1 mL of late log phase (OD<sub>600</sub> = 4.5) <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag were washed, as described above, and resuspended to 9-log CFU/mL in the original supernatant (non-pH adjusted; pH 4.6) or in the supernatant that was adjusted to pH 6.5 with 5 N NaOH. Subsequently, we prepared lysates and determined luminescence levels as described above.</p>
+        <p>To determine the extent to which MRS inhibits luminescence, we measured the luminescence of leptin_tag in different concentrations of MRS. First, we diluted MRS to 2-, 5-, 10-, 100-, and 1,000-fold with PBS-T (PBS with 0.05% (v/v) Tween 20). Late log phase of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag was prepared as shown above and resuspended into 1 mL (diluted) MRS to reach 9-log CFU/mL. Subsequently, we prepared lysates and performed luminescent signal analysis as described above.</p>
+        <p>To visualize bioluminescence in bacterial cultures, stationary phase cultures of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag (VPL31611) were centrifuged (1 min, 9,391× <italic toggle="yes">g</italic>, 4°C), and the cell pellets were washed once with PBS-T. Cell suspensions were used to prepare the lysate as described above. The lysate was twofold serially diluted into PBS-T and 100 µL of each diluted sample was added in a 96-well plate. The luminescent signal of each sample was measured using the HiBiT extracellular detection kit as described above with the Glomax Discover Microplate Reader. The bioluminescence image of the same 96-well plate was obtained with the ChemiDoc imaging system (Bio-Rad), using the chemiluminescent filter. The luminescent intensity was visualized using the ImageLab software (Bio-Rad, version 6.1).</p>
+        <p>To investigate the dynamic range by which CFU can be quantified using luminescent analysis, we measured the luminescent signal of leptin_tag obtained from different concentrations of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag. Late log phase culture was harvested, washed, and resuspended into PBS-T or MRS to reach the final concentration of 9-log CFU/mL. Each bacterial suspension was 10-fold serially diluted into PBS-T. After dilution, cells underwent the same procedure to prepare samples for luminescent analysis.</p>
+      </sec>
+      <sec id="s4-6">
+        <title>Comparison of bioluminescent-based quantification and commercial ELISA</title>
+        <p>To compare luminescent-based quantification of the HiBiT tag with commercial ELISAs, we constructed two additional plasmid constructs including pJP_IL-22_tag (pVPL31970) and pJP_IFN-β_tag (pVPL31974). First, we amplified a backbone from pJP_Leptin_HiBiT with oligonucleotide pair oVPL1448-oVPL4418 to generate a plasmid backbone lacking the leptin gene. <italic toggle="yes">Il-22</italic> and <italic toggle="yes">ifn-β</italic> genes were amplified with oVPL2239-oVPL2115 and oVPL4493-oVPL4494 from <italic toggle="yes">Lm. reuteri</italic> harboring pHelp_IL22 (VPL4069) or pJP_IFN-β_pMut_<italic toggle="yes">thyA</italic> (pVPL31250), respectively. Each gene was cloned into the pJP_Leptin_HiBiT backbone by LCR, as described previously (<xref rid="B40" ref-type="bibr">40</xref>) with bridging oligonucleotides oVPL4688-oVPL4490 for <italic toggle="yes">il-22</italic> and oVPL4689-oVPL4496 for <italic toggle="yes">ifn-β</italic>. Each LCR product, including pJP_IL-22_tag and pJP_IFN-β_tag, was transformed into <italic toggle="yes">E. coli</italic> EC1000. The insertion of <italic toggle="yes">il-22</italic> and <italic toggle="yes">ifn-β</italic> genes was confirmed by mismatch amplification mutation assay PCR (<xref rid="B41" ref-type="bibr">41</xref>) with oligonucleotide oVPL1447-oVPL4535-oVPL329 and oVPL1447-oVPL4493-oVPL329, respectively. The insertion of <italic toggle="yes">il-22</italic> and <italic toggle="yes">ifn-β</italic> genes was analyzed by Sanger sequencing with oVPL2115-oVPL2351 and oVPL1447-oVPL2351-oVPL4494, respectively. Finally, each plasmid was transformed to <italic toggle="yes">Lm. reuteri</italic> to generate <italic toggle="yes">Lm. reuteri</italic> harboring pJP_IL-22_tag and <italic toggle="yes">Lm. reuteri</italic> harboring pJP_IFN-β_tag. To add the sequence encoding the HiBiT tag to the 5′-end of the <italic toggle="yes">ifn</italic>-β gene, the backbone was amplified from pVPL31974 with the oVPL4494-4252, followed by blunt-end ligation and transformation. The deletion of the tag gene was analyzed by Sanger sequencing with oVPL1447-oVPL2351. Next, we constructed pJP_tag_IFN-β (pVPL31998) using pJP_IFN-β (pVPL31994) with oVPL4848-oVPL4849 which contains the HiBiT gene at the 5′-end following the method for pJP_Leptin_tag as described above. After transformation into <italic toggle="yes">E. coli</italic>, the Sanger sequencing was performed with oVPL1447-oVPL2351 to identify the insertion of HiBiT.</p>
+        <p>Stationary phase <italic toggle="yes">Lm. reuteri</italic> strains harboring pJP_Leptin_tag, pJP_IL-22_tag, or pJP_IFN-β_tag were inoculated separately into MRS + EM5 to OD<sub>600</sub> = 0.1. Once the cell density reached OD<sub>600</sub> 4–5, cells were washed and disrupted in PBS-T as stated above. The lysates were serially diluted in ELISA dilution buffer or PBS-T and quantified by ELISA (R&amp;D Systems Inc., Minneapolis, MN, USA) and HiBiT extracellular detection kit.</p>
+      </sec>
+      <sec id="s4-7">
+        <title>
+<italic toggle="yes">In situ</italic> detection of recombinant proteins</title>
+        <p>To detect recombinant proteins <italic toggle="yes">in situ</italic>, we engineered <italic toggle="yes">Lm. reuteri</italic> to produce the LgBiT protein that interacts with HiBiT to yield a luminescent signal. Briefly, the LgBiT sequence was codon optimized for expression in <italic toggle="yes">L reuteri</italic> using the OPTIMIZER web server (<xref rid="B42" ref-type="bibr">42</xref>, <xref rid="B43" ref-type="bibr">43</xref>) and synthesized by Integrated DNA Technologies (<xref rid="T3" ref-type="table">Table 3</xref>). The synthesized LgBiT product was named gVPL71. We amplified gVPL71 with oligonucleotide pair oVPL4326-oVPL4327, and the EFTu promoter was amplified from pJP_Leptin (VPL3791) with oligonucleotide pairs of oVPL1447 and oVPL1448. All these amplicons were then subjected to the LCR to fuse the three amplicons with bridging oligonucleotides of oVPL4307, oVPL4308, and oVPL4309. The LCR product was transformed into <italic toggle="yes">E. coli</italic> EC1000, and the cloning of the EFTu-LgBiT fusion into pJP_Leptin_tag was confirmed by PCR using oVPL1221 and oVPL4312. The plasmid sequence was analyzed by Sanger sequencing with oVPL1221 and oVPL4337. The resultant plasmid was named pJP_Leptin_tag_EFTu_LgBiT (pVPL31655). Finally, we transformed pVPL31655 into <italic toggle="yes">Lm. reuteri</italic> VPL1014 to yield <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT (VPL31657).</p>
+        <p>To detect leptin <italic toggle="yes">in situ</italic>, stationary phase cultures of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag (VPL31611) and <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT (VPL31657) were diluted to OD<sub>600</sub> = 0.1 followed by culture until late log (OD<sub>600</sub> = 4.5). Each culture was subsequently divided into two groups of which one of the cultures was subjected to bead-beating. The luminescent signal of each sample was measured using the HiBiT extracellular detection kit with or without LgBiT.</p>
+      </sec>
+      <sec id="s4-8">
+        <title>
+<italic toggle="yes">In situ</italic> detection of recombinant protein during the continuous bioprocessing</title>
+        <p>To investigate the applicability of a bioluminescent peptide tagging system for <italic toggle="yes">in situ</italic> detection of recombinant protein, we cloned the gene encoding murine leptin with at the 3′-end the sequence encoding HiBiT downstream of the inducible promoter of plasmid pSIP411; downstream we cloned the EFTu promoter fused to the sequence encoding LgBiT to yield pVPL31952. Briefly, the backbone was amplified from pSIP_Leptin_HiBiT (pVPL31948) with oligonucleotide pairs of oVPL4543 and oVPL4544. The fusion of EFTu-LgBiT was amplified from pJP_Leptin_tag_EFTu_LgBiT (pVPL31657) using oVPL1366 and oVPL1221. The amplicons were mixed at a 1:1 molar ratio for blunt-end ligation, followed by electroporation into <italic toggle="yes">E. coli</italic> EC1000. The insertion of leptin_tag and EFTu_LgBiT was confirmed with the oligonucleotides oVPL659-oVPL4539-oVPL660 and oVPL659-oVPL4337-oVPL660, respectively. The integrity of the DNA sequence was confirmed by Sanger sequencing using oligonucleotides oVPL4339, oVPL4539, oVPL1326, and oVPL1447.</p>
+        <p>We used the DASbox Mini Bioreactor System (Eppendorf, 76D × 04 MB) to continuously culture <italic toggle="yes">Lm. reuteri</italic> harboring pSIP_Leptin_tag. We used two continuously operated stirred bioreactor vessels in parallel. Each bioreactor vessel contained 200 mL of MRS supplemented with 5 µg/mL of erythromycin and was operated with 2% of dissolved oxygen with agitation (50 rpm) at 37°C. The pH was maintained within a range of 6.3–6.7 and was adjusted with 1.5 N NaOH (Sigma-Aldrich). A stationary culture of <italic toggle="yes">Lm. reuteri</italic> harboring pSIP_Leptin_tag_EFTu_LgBiT was inoculated in each vessel to AU = 0.011 (OD<sub>600</sub> = 0.1). At an AU of 0.050 (OD<sub>600</sub> = 0.3), induction peptide was added to a final concentration of 2.5 ng/mL. For the continuous bioprocessing, fresh MRS containing 5 µg/mL of erythromycin was added at a flow rate of 300 mL/h to sustain the AU of 0.15 (OD<sub>600</sub> = 1.0). To track <italic toggle="yes">in situ</italic> recombinant protein production, samples were aseptically collected every hour and luminescence was measured instantly using the above-described procedures.</p>
+      </sec>
+      <sec id="s4-9">
+        <title>Microbial luminescence in murine feces</title>
+        <p>To examine the inhibitory effect of murine feces on luminescence detection, we measured the luminescent signal from <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT in different fecal dilutions. The fecal suspension (100 mg/mL) was 10-fold serially diluted in PBS-T. Late log phase <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT (OD<sub>600</sub> = 4.5, 9-log CFU/mL) was prepared as described above followed by inoculation in each diluted fecal suspension or PBS-T to reach a final concentration of 7-log CFU/mL. The luminescent signal was measured as described above.</p>
+        <p>The standard curve of luminescent signal vs bacterial concentration in the fecal sample was constructed by measuring the <italic toggle="yes">in situ</italic> luminescent signal from different concentrations of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT. The late log phase bacteria were prepared in PBS-T as stated above and inoculated into 100-fold diluted fecal suspension (1 mg/mL) to reach a final concentration of 2- to 7-log CFU/1 mL of fecal suspension. After then, the luminescent signal was measured from each suspension. The standard curve for quantification of bacterial cells was constructed to represent the relationship between bacterial concentration and luminescent signal.</p>
+      </sec>
+      <sec id="s4-10">
+        <title>Microbial luminescence during gastrointestinal transit</title>
+        <p>All mouse experiments were performed in accordance with NIH guidelines, Animal Welfare Act, and US federal law and were approved by the Application Review for Research Oversight at Wisconsin (ARROW) committee and overseen by the Institutional Animal Care and Use Committee (IACUC) under protocol ID A006078-R1. Conventional pathogen-free and germ-free mice were housed at the Animal Science and Laboratory of Animal Research Facilities, respectively, at the University of Wisconsin-Madison.</p>
+        <p>Eight-week-old male B6 mice (C57BL/6J) were purchased from Jackson Labs (Bar Harbor, ME) and adapted for 1 week to the new environment prior to the start of the experiment. Animals were housed at an environmentally controlled facility with a 12-h light and dark cycle. Standard chow diet (LabDiet 5008) and water were provided <italic toggle="yes">ad libitum</italic>.</p>
+        <p>For oral administration, bacteria were prepared as follows. <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT was cultured in fresh MRS until OD<sub>600</sub> = 2. Cells were washed and resuspended in PBS to adjust the concentration at 8-, 9-, and 10-log CFU/mL. Mice were administered oral gavage bacteria (100 µL of each concentration of cell) or PBS (<italic toggle="yes">n</italic> = 5/group). At 24 h post-gavage, each mouse was sacrificed, and the contents from the large intestine, small intestine, cecum, and feces were harvested. Each sample was resuspended in PBS to 100 mg/mL, and the luminescent signal was measured from sample suspension as described above. To predict the bacterial concentration, the luminescent signal was subjected to a preconstructed standard curve between the luminescent signal and bacterial concentration in fecal samples. In addition, all samples were plated on MRS agar containing 5 µg/mL of erythromycin to compare the bacterial concentration determined by RLU.</p>
+      </sec>
+      <sec id="s4-11">
+        <title>Bioluminescent peptide tagging in LAB and <italic toggle="yes">Bifidobacterium bifidum</italic>
+</title>
+        <p>To investigate to what extent the bioluminescent peptide tagging system can be applied in other bacteria, we established by electroporation pJP_Leptin_tag in 10 different LAB species and one strain of <italic toggle="yes">B. bifidum</italic>. The plasmid pJP_Leptin_tag_EFTu_LgBiT could only be established in the LAB strains (<xref rid="T2" ref-type="table">Table 2</xref>). Competent cells were prepared as described by Oh et al. (<xref rid="B44" ref-type="bibr">44</xref>). Successful transformants were confirmed in an identical manner as described for the method of the construction of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag and <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT. All strains harboring pJP_Leptin_tag and pJP_Leptin_tag_EFTu_LgBiT were used for luminescent analysis following bead-beating and <italic toggle="yes">in situ</italic> luminescent analysis, respectively, as described above.</p>
+      </sec>
+      <sec id="s4-12">
+        <title>Bioluminescence image analysis of cultures and colonies</title>
+        <p>To identify bioluminescent bacteria on agar plates, we plated stationary phase cultures of <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag (VPL31611), <italic toggle="yes">Lm. reuteri</italic> harboring pJP_Leptin_tag_EFTu_LgBiT (VPL31657), <italic toggle="yes">L. casei</italic>_pNZ8048 (VPL31879), <italic toggle="yes">Lp. plantarum</italic>_pNZ8048 (VPL31871), or the four-strain mixture, on MRS agar plates (5 mm diameter) supplemented with 5 µg/mL erythromycin. After incubation at 37°C for 48 h, 1 mL of Nano-Glo HiBiT Extracellular Buffer containing 10 µL of Nano-Glo HiBiT Extracellular Substrate was poured on the agar plate. The colonies were visualized by the ChemiDoc imaging system with colorimetric and chemiluminescent filters, and images were analyzed using the ImageLab software.</p>
+      </sec>
+      <sec id="s4-13">
+        <title>Statistical analysis</title>
+        <p>A minimum of three biological replicates were performed, and the results were expressed as mean ± SD. All samples were included in the analyses, and experiments were performed without blinding. Graphs were prepared using GraphPad Prism software (GraphPad Software, San Diego, CA, USA). All statistical analyses were performed using paired <italic toggle="yes">t</italic>-test and one-way analysis of variance (ANOVA) (GraphPad Prism, version 9). For Pearson correlation, we performed multivariate pairwise correlations (JMP pro 11.0.0).</p>
+      </sec>
+    </sec>
+  </body>
+  <back>
+    <ack>
+      <title>ACKNOWLEDGMENTS</title>
+      <p>We thank Gautam Gaur and Mark A. Heggen for critically reviewing the manuscript.</p>
+      <p>We thank Aric Morgan (Promega) for discussion and technical support with the installation of the Glowmax Discover Microplate Reader.</p>
+    </ack>
+    <sec sec-type="supplementary-material" id="s5-1">
+      <title>SUPPLEMENTAL MATERIAL</title>
+      <p specific-use="print-only">The following material is available online at <ext-link xlink:href="https://doi.org/10.1128/mbio.01197-23" ext-link-type="uri">https://doi.org/10.1128/mbio.01197-23</ext-link>.</p>
+      <supplementary-material id="SuF1" position="float" content-type="local-data">
+        <object-id pub-id-type="doi">10.1128/mbio.01197-23.SuF1</object-id>
+        <label>Fig. S1</label>
+        <caption>
+          <title>mbio.01197-23-s0001.docx</title>
+          <p>Comparison of dynamic range between the HiBiT peptide tagging luminescent assay and ELISA.</p>
+        </caption>
+        <media xlink:href="mbio.01197-23-s0001.docx">
+          <caption>
+            <p>Click here for additional data file.</p>
+          </caption>
+        </media>
+      </supplementary-material>
+      <p specific-use="online-only">ASM does not own the copyrights to Supplemental Material that may be linked to, or accessed through, an article. The authors have granted ASM a non-exclusive, world-wide license to publish the Supplemental Material files. Please contact the corresponding author directly for reuse. </p>
+    </sec>
+    <ref-list>
+      <title>REFERENCES</title>
+      <ref id="B1">
+        <label>1</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Marteau</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Rambaud</surname>
+<given-names>JC</given-names>
+</string-name>
+</person-group>. <year>1993</year>. <article-title>Potential of using lactic acid bacteria for therapy and immunomodulation in man</article-title>. <source>FEMS Microbiol Rev</source>
+<volume>12</volume>:<fpage>207</fpage>–<lpage>220</lpage>. doi:<pub-id pub-id-type="doi">10.1111/j.1574-6976.1993.tb00019.x</pub-id>
+<pub-id pub-id-type="pmid">8398215</pub-id></mixed-citation>
+      </ref>
+      <ref id="B2">
+        <label>2</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Alexander</surname>
+<given-names>LM</given-names>
+</string-name>, <string-name>
+<surname>Oh</surname>
+<given-names>J-H</given-names>
+</string-name>, <string-name>
+<surname>Stapleton</surname>
+<given-names>DS</given-names>
+</string-name>, <string-name>
+<surname>Schueler</surname>
+<given-names>KL</given-names>
+</string-name>, <string-name>
+<surname>Keller</surname>
+<given-names>MP</given-names>
+</string-name>, <string-name>
+<surname>Attie</surname>
+<given-names>AD</given-names>
+</string-name>, <string-name>
+<surname>van Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>
+</person-group>. <year>2019</year>. <article-title>Exploiting prophage-mediated iysis for biotherapeutic release by Lactobacillus reuteri</article-title>. <source>Appl Environ Microbiol</source>
+<volume>85</volume>:<elocation-id>e02335-18</elocation-id>. doi:<pub-id pub-id-type="doi">10.1128/AEM.02335-18</pub-id>
+<pub-id pub-id-type="pmid">30683744</pub-id></mixed-citation>
+      </ref>
+      <ref id="B3">
+        <label>3</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Ruiz Rodríguez</surname>
+<given-names>LG</given-names>
+</string-name>, <string-name>
+<surname>Mohamed</surname>
+<given-names>F</given-names>
+</string-name>, <string-name>
+<surname>Bleckwedel</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Medina</surname>
+<given-names>R</given-names>
+</string-name>, <string-name>
+<surname>De Vuyst</surname>
+<given-names>L</given-names>
+</string-name>, <string-name>
+<surname>Hebert</surname>
+<given-names>EM</given-names>
+</string-name>, <string-name>
+<surname>Mozzi</surname>
+<given-names>F</given-names>
+</string-name>
+</person-group>. <year>2019</year>. <article-title>Diversity and functional properties of lactic acid bacteria isolated from wild fruits and flowers present in Northern Argentina</article-title>. <source>Front Microbiol</source>
+<volume>10</volume>:<fpage>1091</fpage>. doi:<pub-id pub-id-type="doi">10.3389/fmicb.2019.01091</pub-id>
+<pub-id pub-id-type="pmid">31164879</pub-id></mixed-citation>
+      </ref>
+      <ref id="B4">
+        <label>4</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Mattila-Sandholm</surname>
+<given-names>T</given-names>
+</string-name>, <string-name>
+<surname>Mättö</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Saarela</surname>
+<given-names>M</given-names>
+</string-name>
+</person-group>. <year>1999</year>. <article-title>Lactic acid bacteria with health claims—interactions and interference with gastrointestinal flora</article-title>. <source>International Dairy Journal</source>
+<volume>9</volume>:<fpage>25</fpage>–<lpage>35</lpage>. doi:<pub-id pub-id-type="doi">10.1016/S0958-6946(99)00041-2</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B5">
+        <label>5</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Steidler</surname>
+<given-names>L</given-names>
+</string-name>, <string-name>
+<surname>Hans</surname>
+<given-names>W</given-names>
+</string-name>, <string-name>
+<surname>Schotte</surname>
+<given-names>L</given-names>
+</string-name>, <string-name>
+<surname>Neirynck</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Obermeier</surname>
+<given-names>F</given-names>
+</string-name>, <string-name>
+<surname>Falk</surname>
+<given-names>W</given-names>
+</string-name>, <string-name>
+<surname>Fiers</surname>
+<given-names>W</given-names>
+</string-name>, <string-name>
+<surname>Remaut</surname>
+<given-names>E</given-names>
+</string-name>
+</person-group>. <year>2000</year>. <article-title>Treatment of murine colitis by Lactococcus lactis secreting Interleukin-10</article-title>. <source>Science</source>
+<volume>289</volume>:<fpage>1352</fpage>–<lpage>1355</lpage>. doi:<pub-id pub-id-type="doi">10.1126/science.289.5483.1352</pub-id>
+<pub-id pub-id-type="pmid">10958782</pub-id></mixed-citation>
+      </ref>
+      <ref id="B6">
+        <label>6</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Oh</surname>
+<given-names>J-H</given-names>
+</string-name>, <string-name>
+<surname>Schueler</surname>
+<given-names>KL</given-names>
+</string-name>, <string-name>
+<surname>Stapleton</surname>
+<given-names>DS</given-names>
+</string-name>, <string-name>
+<surname>Alexander</surname>
+<given-names>LM</given-names>
+</string-name>, <string-name>
+<surname>Yen</surname>
+<given-names>C-L</given-names>
+</string-name>, <string-name>
+<surname>Keller</surname>
+<given-names>MP</given-names>
+</string-name>, <string-name>
+<surname>Attie</surname>
+<given-names>AD</given-names>
+</string-name>, <string-name>
+<surname>van Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>, <string-name>
+<surname>Marco</surname>
+<given-names>ML</given-names>
+</string-name>
+</person-group>. <year>2020</year>. <article-title>Secretion of recombinant Interleukin-22 by engineered Lactobacillus reuteri reduces fatty liver disease in a mouse model of diet-induced obesity</article-title>. <source>mSphere</source>
+<volume>5</volume>:<elocation-id>e00183-20</elocation-id>. doi:<pub-id pub-id-type="doi">10.1128/mSphere.00183-20</pub-id>
+<pub-id pub-id-type="pmid">32581074</pub-id></mixed-citation>
+      </ref>
+      <ref id="B7">
+        <label>7</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Hendrikx</surname>
+<given-names>T</given-names>
+</string-name>, <string-name>
+<surname>Duan</surname>
+<given-names>Y</given-names>
+</string-name>, <string-name>
+<surname>Wang</surname>
+<given-names>Y</given-names>
+</string-name>, <string-name>
+<surname>Oh</surname>
+<given-names>J-H</given-names>
+</string-name>, <string-name>
+<surname>Alexander</surname>
+<given-names>LM</given-names>
+</string-name>, <string-name>
+<surname>Huang</surname>
+<given-names>W</given-names>
+</string-name>, <string-name>
+<surname>Stärkel</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Ho</surname>
+<given-names>SB</given-names>
+</string-name>, <string-name>
+<surname>Gao</surname>
+<given-names>B</given-names>
+</string-name>, <string-name>
+<surname>Fiehn</surname>
+<given-names>O</given-names>
+</string-name>, <string-name>
+<surname>Emond</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Sokol</surname>
+<given-names>H</given-names>
+</string-name>, <string-name>
+<surname>van Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>, <string-name>
+<surname>Schnabl</surname>
+<given-names>B</given-names>
+</string-name>
+</person-group>. <year>2019</year>. <article-title>Bacteria engineered to produce IL-22 in intestine induce expression of REG3G to reduce ethanol-induced liver disease in mice</article-title>. <source>Gut</source>
+<volume>68</volume>:<fpage>1504</fpage>–<lpage>1515</lpage>. doi:<pub-id pub-id-type="doi">10.1136/gutjnl-2018-317232</pub-id>
+<pub-id pub-id-type="pmid">30448775</pub-id></mixed-citation>
+      </ref>
+      <ref id="B8">
+        <label>8</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Berlec</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Završnik</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Butinar</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Turk</surname>
+<given-names>B</given-names>
+</string-name>, <string-name>
+<surname>Štrukelj</surname>
+<given-names>B</given-names>
+</string-name>
+</person-group>. <year>2015</year>. <article-title>In vivo imaging of Lactococcus lactis, Lactobacillus Plantarum and Escherichia coli expressing infrared fluorescent protein in mice</article-title>. <source>Microb Cell Fact</source>
+<volume>14</volume>:<fpage>181</fpage>. doi:<pub-id pub-id-type="doi">10.1186/s12934-015-0376-4</pub-id>
+<pub-id pub-id-type="pmid">26577444</pub-id></mixed-citation>
+      </ref>
+      <ref id="B9">
+        <label>9</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Geoffroy</surname>
+<given-names>M-C</given-names>
+</string-name>, <string-name>
+<surname>Guyard</surname>
+<given-names>C</given-names>
+</string-name>, <string-name>
+<surname>Quatannens</surname>
+<given-names>B</given-names>
+</string-name>, <string-name>
+<surname>Pavan</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Lange</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Mercenier</surname>
+<given-names>A</given-names>
+</string-name>
+</person-group>. <year>2000</year>. <article-title>Use of green fluorescent protein to tag lactic acid bacterium strains under development as live vaccine vectors</article-title>. <source>Appl Environ Microbiol</source>
+<volume>66</volume>:<fpage>383</fpage>–<lpage>391</lpage>. doi:<pub-id pub-id-type="doi">10.1128/AEM.66.1.383-391.2000</pub-id>
+<pub-id pub-id-type="pmid">10618252</pub-id></mixed-citation>
+      </ref>
+      <ref id="B10">
+        <label>10</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Javorský</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Fecskeová</surname>
+<given-names>LK</given-names>
+</string-name>, <string-name>
+<surname>Hrehová</surname>
+<given-names>L</given-names>
+</string-name>, <string-name>
+<surname>Sabo</surname>
+<given-names>R</given-names>
+</string-name>, <string-name>
+<surname>Legáth</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Pristas</surname>
+<given-names>P</given-names>
+</string-name>
+</person-group>. <year>2017</year>. <article-title>Establishment of Lactobacillus plantarum strain in honey bee digestive tract monitored using gfp fluorescence</article-title>. <source>Benef Microbes</source>
+<volume>8</volume>:<fpage>291</fpage>–<lpage>297</lpage>. doi:<pub-id pub-id-type="doi">10.3920/BM2016.0022</pub-id>
+<pub-id pub-id-type="pmid">28008785</pub-id></mixed-citation>
+      </ref>
+      <ref id="B11">
+        <label>11</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>van Zyl</surname>
+<given-names>WF</given-names>
+</string-name>, <string-name>
+<surname>Deane</surname>
+<given-names>SM</given-names>
+</string-name>, <string-name>
+<surname>Dicks</surname>
+<given-names>LMT</given-names>
+</string-name>
+</person-group>. <year>2015</year>
+<month>a</month>. <article-title>Use of the mCherry fluorescent protein to study intestinal colonization by enterococcus mundtii ST4SA and Lactobacillus plantarum 423 in mice</article-title>. <source>Appl Environ Microbiol</source>
+<volume>81</volume>:<fpage>5993</fpage>–<lpage>6002</lpage>. doi:<pub-id pub-id-type="doi">10.1128/AEM.01247-15</pub-id>
+<pub-id pub-id-type="pmid">26116681</pub-id></mixed-citation>
+      </ref>
+      <ref id="B12">
+        <label>12</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Tsirkas</surname>
+<given-names>I</given-names>
+</string-name>, <string-name>
+<surname>Zur</surname>
+<given-names>T</given-names>
+</string-name>, <string-name>
+<surname>Dovrat</surname>
+<given-names>D</given-names>
+</string-name>, <string-name>
+<surname>Cohen</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Ravkaie</surname>
+<given-names>L</given-names>
+</string-name>, <string-name>
+<surname>Aharoni</surname>
+<given-names>A</given-names>
+</string-name>
+</person-group>. <year>2022</year>. <article-title>Protein fluorescent labeling in live yeast cells using scFv-based probes</article-title>. <source>Cell Rep Methods</source>
+<volume>2</volume>:<elocation-id>100357</elocation-id>. doi:<pub-id pub-id-type="doi">10.1016/j.crmeth.2022.100357</pub-id>
+<pub-id pub-id-type="pmid">36590693</pub-id></mixed-citation>
+      </ref>
+      <ref id="B13">
+        <label>13</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>van Zyl</surname>
+<given-names>WF</given-names>
+</string-name>, <string-name>
+<surname>Deane</surname>
+<given-names>SM</given-names>
+</string-name>, <string-name>
+<surname>Dicks</surname>
+<given-names>LMT</given-names>
+</string-name>
+</person-group>. <year>2015</year>
+<month>b</month>. <article-title>Reporter systems for in vivo tracking of lactic acid bacteria in animal model studies</article-title>. <source>Gut Microbes</source>
+<volume>6</volume>:<fpage>291</fpage>–<lpage>299</lpage>. doi:<pub-id pub-id-type="doi">10.1080/19490976.2015.1086058</pub-id>
+<pub-id pub-id-type="pmid">26516656</pub-id></mixed-citation>
+      </ref>
+      <ref id="B14">
+        <label>14</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Boute</surname>
+<given-names>N</given-names>
+</string-name>, <string-name>
+<surname>Lowe</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Berger</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Malissard</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Robert</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Tesar</surname>
+<given-names>M</given-names>
+</string-name>
+</person-group>. <year>2016</year>. <article-title>Nanoluc uciferase–a multifunctional tool for high throughput antibody screening</article-title>. <source>Front Pharmacol</source>
+<volume>7</volume>:<elocation-id>27</elocation-id>. doi:<pub-id pub-id-type="doi">10.3389/fphar.2016.00027</pub-id>
+<pub-id pub-id-type="pmid">26924984</pub-id></mixed-citation>
+      </ref>
+      <ref id="B15">
+        <label>15</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Boursier</surname>
+<given-names>ME</given-names>
+</string-name>, <string-name>
+<surname>Levin</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Zimmerman</surname>
+<given-names>K</given-names>
+</string-name>, <string-name>
+<surname>Machleidt</surname>
+<given-names>T</given-names>
+</string-name>, <string-name>
+<surname>Hurst</surname>
+<given-names>R</given-names>
+</string-name>, <string-name>
+<surname>Butler</surname>
+<given-names>BL</given-names>
+</string-name>, <string-name>
+<surname>Eggers</surname>
+<given-names>CT</given-names>
+</string-name>, <string-name>
+<surname>Kirkland</surname>
+<given-names>TA</given-names>
+</string-name>, <string-name>
+<surname>Wood</surname>
+<given-names>KV</given-names>
+</string-name>, <string-name>
+<surname>Friedman Ohana</surname>
+<given-names>R</given-names>
+</string-name>
+</person-group>. <year>2020</year>. <article-title>The luminescent hibit peptide enables selective quantitation of G protein–coupled receptor ligand engagement and internalization in living cells</article-title>. <source>J Biol Chem</source>
+<volume>295</volume>:<fpage>5124</fpage>–<lpage>5135</lpage>. doi:<pub-id pub-id-type="doi">10.1074/jbc.RA119.011952</pub-id>
+<pub-id pub-id-type="pmid">32107310</pub-id></mixed-citation>
+      </ref>
+      <ref id="B16">
+        <label>16</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Lin</surname>
+<given-names>MZ</given-names>
+</string-name>, <string-name>
+<surname>Wang</surname>
+<given-names>L</given-names>
+</string-name>
+</person-group>. <year>2008</year>. <article-title>Selective labeling of proteins with chemical probes in living cells</article-title>. <source>Physiology (Bethesda)</source>
+<volume>23</volume>:<fpage>131</fpage>–<lpage>141</lpage>. doi:<pub-id pub-id-type="doi">10.1152/physiol.00007.2008</pub-id>
+<pub-id pub-id-type="pmid">18556466</pub-id></mixed-citation>
+      </ref>
+      <ref id="B17">
+        <label>17</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Schwinn</surname>
+<given-names>MK</given-names>
+</string-name>, <string-name>
+<surname>Machleidt</surname>
+<given-names>T</given-names>
+</string-name>, <string-name>
+<surname>Zimmerman</surname>
+<given-names>K</given-names>
+</string-name>, <string-name>
+<surname>Eggers</surname>
+<given-names>CT</given-names>
+</string-name>, <string-name>
+<surname>Dixon</surname>
+<given-names>AS</given-names>
+</string-name>, <string-name>
+<surname>Hurst</surname>
+<given-names>R</given-names>
+</string-name>, <string-name>
+<surname>Hall</surname>
+<given-names>MP</given-names>
+</string-name>, <string-name>
+<surname>Encell</surname>
+<given-names>LP</given-names>
+</string-name>, <string-name>
+<surname>Binkowski</surname>
+<given-names>BF</given-names>
+</string-name>, <string-name>
+<surname>Wood</surname>
+<given-names>KV</given-names>
+</string-name>
+</person-group>. <year>2018</year>. <article-title>CRISPR-mediated tagging of endogenous proteins with a luminescent peptide</article-title>. <source>ACS Chem Biol</source>
+<volume>13</volume>:<fpage>467</fpage>–<lpage>474</lpage>. doi:<pub-id pub-id-type="doi">10.1021/acschembio.7b00549</pub-id>
+<pub-id pub-id-type="pmid">28892606</pub-id></mixed-citation>
+      </ref>
+      <ref id="B18">
+        <label>18</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Sasaki</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Anindita</surname>
+<given-names>PD</given-names>
+</string-name>, <string-name>
+<surname>Phongphaew</surname>
+<given-names>W</given-names>
+</string-name>, <string-name>
+<surname>Carr</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Kobayashi</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Orba</surname>
+<given-names>Y</given-names>
+</string-name>, <string-name>
+<surname>Sawa</surname>
+<given-names>H</given-names>
+</string-name>
+</person-group>. <year>2018</year>. <article-title>Development of a rapid and quantitative method for the analysis of viral entry and release using a nanoluc luciferase complementation assay</article-title>. <source>Virus Res</source>
+<volume>243</volume>:<fpage>69</fpage>–<lpage>74</lpage>. doi:<pub-id pub-id-type="doi">10.1016/j.virusres.2017.10.015</pub-id>
+<pub-id pub-id-type="pmid">29074234</pub-id></mixed-citation>
+      </ref>
+      <ref id="B19">
+        <label>19</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Westerhausen</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Nowak</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Torres-Vargas</surname>
+<given-names>CE</given-names>
+</string-name>, <string-name>
+<surname>Bilitewski</surname>
+<given-names>U</given-names>
+</string-name>, <string-name>
+<surname>Bohn</surname>
+<given-names>E</given-names>
+</string-name>, <string-name>
+<surname>Grin</surname>
+<given-names>I</given-names>
+</string-name>, <string-name>
+<surname>Wagner</surname>
+<given-names>S</given-names>
+</string-name>
+</person-group>. <year>2020</year>. <article-title>A NanoLuc luciferase‐based assay enabling the real‐time analysis of protein secretion and injection by bacterial type III secretion systems</article-title>. <source>Mol Microbiol</source>
+<volume>113</volume>:<fpage>1240</fpage>–<lpage>1254</lpage>. doi:<pub-id pub-id-type="doi">10.1111/mmi.14490</pub-id>
+<pub-id pub-id-type="pmid">32068313</pub-id></mixed-citation>
+      </ref>
+      <ref id="B20">
+        <label>20</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Pereira</surname>
+<given-names>GC</given-names>
+</string-name>, <string-name>
+<surname>Allen</surname>
+<given-names>WJ</given-names>
+</string-name>, <string-name>
+<surname>Watkins</surname>
+<given-names>DW</given-names>
+</string-name>, <string-name>
+<surname>Buddrus</surname>
+<given-names>L</given-names>
+</string-name>, <string-name>
+<surname>Noone</surname>
+<given-names>D</given-names>
+</string-name>, <string-name>
+<surname>Liu</surname>
+<given-names>X</given-names>
+</string-name>, <string-name>
+<surname>Richardson</surname>
+<given-names>AP</given-names>
+</string-name>, <string-name>
+<surname>Chacinska</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Collinson</surname>
+<given-names>I</given-names>
+</string-name>
+</person-group>. <year>2019</year>. <article-title>A high-resolution luminescent assay for rapid and continuous monitoring of protein translocation across biological membranes</article-title>. <source>J Mol Biol</source>
+<volume>431</volume>:<fpage>1689</fpage>–<lpage>1699</lpage>. doi:<pub-id pub-id-type="doi">10.1016/j.jmb.2019.03.007</pub-id>
+<pub-id pub-id-type="pmid">30878481</pub-id></mixed-citation>
+      </ref>
+      <ref id="B21">
+        <label>21</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wang</surname>
+<given-names>CY</given-names>
+</string-name>, <string-name>
+<surname>Patel</surname>
+<given-names>N</given-names>
+</string-name>, <string-name>
+<surname>Wholey</surname>
+<given-names>W-Y</given-names>
+</string-name>, <string-name>
+<surname>Dawid</surname>
+<given-names>S</given-names>
+</string-name>
+</person-group>. <year>2018</year>. <article-title>ABC transporter content diversity in streptococcus pneumoniae impacts competence regulation and bacteriocin production</article-title>. <source>Proc Natl Acad Sci U S A</source>
+<volume>115</volume>:<fpage>E5776</fpage>–<lpage>E5785</lpage>. doi:<pub-id pub-id-type="doi">10.1073/pnas.1804668115</pub-id>
+<pub-id pub-id-type="pmid">29866828</pub-id></mixed-citation>
+      </ref>
+      <ref id="B22">
+        <label>22</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Oliveira Paiva</surname>
+<given-names>AM</given-names>
+</string-name>, <string-name>
+<surname>de Jong</surname>
+<given-names>L</given-names>
+</string-name>, <string-name>
+<surname>Friggen</surname>
+<given-names>AH</given-names>
+</string-name>, <string-name>
+<surname>Smits</surname>
+<given-names>WK</given-names>
+</string-name>, <string-name>
+<surname>Corver</surname>
+<given-names>J</given-names>
+</string-name>
+</person-group>. <year>2020</year>. <article-title>The C-terminal domain of clostridioides difficile TcdC is exposed on the bacterial cell surface</article-title>. <source>J Bacteriol</source>
+<volume>202</volume>:<elocation-id>e00771-19</elocation-id>. doi:<pub-id pub-id-type="doi">10.1128/JB.00771-19</pub-id>
+<pub-id pub-id-type="pmid">32868401</pub-id></mixed-citation>
+      </ref>
+      <ref id="B23">
+        <label>23</label>
+        <mixed-citation publication-type="book">
+<person-group person-group-type="author">
+<string-name>
+<surname>Dijkstra</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Massart</surname>
+<given-names>D</given-names>
+</string-name>, <string-name>
+<surname>Kaufman</surname>
+<given-names>L</given-names>
+</string-name>
+</person-group>. <year>1978</year>. <source>Evaluation and optimization of laboratory methods and analytical procedures</source>. <edition>1st ed</edition>. <publisher-name>Elsevier</publisher-name>, <publisher-loc>Amsterdam</publisher-loc>.</mixed-citation>
+      </ref>
+      <ref id="B24">
+        <label>24</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zheng</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Wittouck</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Salvetti</surname>
+<given-names>E</given-names>
+</string-name>, <string-name>
+<surname>Franz</surname>
+<given-names>CMAP</given-names>
+</string-name>, <string-name>
+<surname>Harris</surname>
+<given-names>HMB</given-names>
+</string-name>, <string-name>
+<surname>Mattarelli</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>O’Toole</surname>
+<given-names>PW</given-names>
+</string-name>, <string-name>
+<surname>Pot</surname>
+<given-names>B</given-names>
+</string-name>, <string-name>
+<surname>Vandamme</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Walter</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Watanabe</surname>
+<given-names>K</given-names>
+</string-name>, <string-name>
+<surname>Wuyts</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Felis</surname>
+<given-names>GE</given-names>
+</string-name>, <string-name>
+<surname>Gänzle</surname>
+<given-names>MG</given-names>
+</string-name>, <string-name>
+<surname>Lebeer</surname>
+<given-names>S</given-names>
+</string-name>
+</person-group>. <year>2020</year>. <article-title>A taxonomic note on the genus Lactobacillus: description of 23 novel genera, emended description of the genus Lactobacillus beijerinck 1901, and union of Lactobacillaceae and Leuconostocaceae</article-title>. <source>Int J Syst Evol Microbiol</source>
+<volume>70</volume>:<fpage>2782</fpage>–<lpage>2858</lpage>. doi:<pub-id pub-id-type="doi">10.1099/ijsem.0.004107</pub-id>
+<pub-id pub-id-type="pmid">32293557</pub-id></mixed-citation>
+      </ref>
+      <ref id="B25">
+        <label>25</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>García-Fruitós</surname>
+<given-names>E</given-names>
+</string-name>
+</person-group>. <year>2012</year>. <article-title>Lactic acid bacteria: a promising alternative for recombinant protein production</article-title>. <source>Microb Cell Fact</source>
+<volume>11</volume>:<elocation-id>157</elocation-id>. doi:<pub-id pub-id-type="doi">10.1186/1475-2859-11-157</pub-id>
+<pub-id pub-id-type="pmid">23234563</pub-id></mixed-citation>
+      </ref>
+      <ref id="B26">
+        <label>26</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Hamilton-Miller</surname>
+<given-names>JM</given-names>
+</string-name>, <string-name>
+<surname>Shah</surname>
+<given-names>S</given-names>
+</string-name>
+</person-group>. <year>1998</year>. <article-title>Vancomycin susceptibility as an aid to the identification of Lactobacilli</article-title>. <source>Lett Appl Microbiol</source>
+<volume>26</volume>:<fpage>153</fpage>–<lpage>154</lpage>. doi:<pub-id pub-id-type="doi">10.1046/j.1472-765x.1998.00297.x</pub-id>
+<pub-id pub-id-type="pmid">9569701</pub-id></mixed-citation>
+      </ref>
+      <ref id="B27">
+        <label>27</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zhang</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Oh</surname>
+<given-names>J-H</given-names>
+</string-name>, <string-name>
+<surname>Alexander</surname>
+<given-names>LM</given-names>
+</string-name>, <string-name>
+<surname>Özçam</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>van Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>
+</person-group>. <year>2018</year>. <article-title>d-alanyl-d-alanine ligase as a broad-host-range counterselection marker in vancomycin-resistant lactic acid bacteria</article-title>. <source>J Bacteriol</source>
+<volume>200</volume>:<elocation-id>e00607-17</elocation-id>. doi:<pub-id pub-id-type="doi">10.1128/JB.00607-17</pub-id>
+<pub-id pub-id-type="pmid">29686137</pub-id></mixed-citation>
+      </ref>
+      <ref id="B28">
+        <label>28</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Santoro</surname>
+<given-names>SW</given-names>
+</string-name>, <string-name>
+<surname>Schultz</surname>
+<given-names>PG</given-names>
+</string-name>
+</person-group>. <year>2002</year>. <article-title>Directed evolution of the site specificity of Cre recombinase</article-title>. <source>Proc Natl Acad Sci U S A</source>
+<volume>99</volume>:<fpage>4185</fpage>–<lpage>4190</lpage>. doi:<pub-id pub-id-type="doi">10.1073/pnas.022039799</pub-id>
+<pub-id pub-id-type="pmid">11904359</pub-id></mixed-citation>
+      </ref>
+      <ref id="B29">
+        <label>29</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Özçam</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Oh</surname>
+<given-names>J-H</given-names>
+</string-name>, <string-name>
+<surname>Tocmo</surname>
+<given-names>R</given-names>
+</string-name>, <string-name>
+<surname>Acharya</surname>
+<given-names>D</given-names>
+</string-name>, <string-name>
+<surname>Zhang</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Astmann</surname>
+<given-names>TJ</given-names>
+</string-name>, <string-name>
+<surname>Heggen</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Ruiz-Ramírez</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Li</surname>
+<given-names>F</given-names>
+</string-name>, <string-name>
+<surname>Cheng</surname>
+<given-names>CC</given-names>
+</string-name>, <string-name>
+<surname>Vivas</surname>
+<given-names>E</given-names>
+</string-name>, <string-name>
+<surname>Rey</surname>
+<given-names>FE</given-names>
+</string-name>, <string-name>
+<surname>Claesen</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Bugni</surname>
+<given-names>TS</given-names>
+</string-name>, <string-name>
+<surname>Walter</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>van Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>
+</person-group>. <year>2022</year>. <article-title>A secondary metabolite drives intraspecies antagonism in a gut symbiont that is inhibited by cell-wall acetylation</article-title>. <source>Cell Host Microbe</source>
+<volume>30</volume>:<fpage>824</fpage>–<lpage>835</lpage>. doi:<pub-id pub-id-type="doi">10.1016/j.chom.2022.03.033</pub-id>
+<pub-id pub-id-type="pmid">35443156</pub-id></mixed-citation>
+      </ref>
+      <ref id="B30">
+        <label>30</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Oh</surname>
+<given-names>J-H</given-names>
+</string-name>, <string-name>
+<surname>Alexander</surname>
+<given-names>LM</given-names>
+</string-name>, <string-name>
+<surname>Pan</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Schueler</surname>
+<given-names>KL</given-names>
+</string-name>, <string-name>
+<surname>Keller</surname>
+<given-names>MP</given-names>
+</string-name>, <string-name>
+<surname>Attie</surname>
+<given-names>AD</given-names>
+</string-name>, <string-name>
+<surname>Walter</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>van Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>
+</person-group>. <year>2019</year>. <article-title>Dietary fructose and microbiota-derived short-chain fatty acids promote bacteriophage production in the gut symbiont Lactobacillus reuteri</article-title>. <source>Cell Host Microbe</source>
+<volume>25</volume>:<fpage>273</fpage>–<lpage>284</lpage>. doi:<pub-id pub-id-type="doi">10.1016/j.chom.2018.11.016</pub-id>
+<pub-id pub-id-type="pmid">30658906</pub-id></mixed-citation>
+      </ref>
+      <ref id="B31">
+        <label>31</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Saeedi</surname>
+<given-names>BJ</given-names>
+</string-name>, <string-name>
+<surname>Liu</surname>
+<given-names>KH</given-names>
+</string-name>, <string-name>
+<surname>Owens</surname>
+<given-names>JA</given-names>
+</string-name>, <string-name>
+<surname>Hunter-Chang</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Camacho</surname>
+<given-names>MC</given-names>
+</string-name>, <string-name>
+<surname>Eboka</surname>
+<given-names>RU</given-names>
+</string-name>, <string-name>
+<surname>Chandrasekharan</surname>
+<given-names>B</given-names>
+</string-name>, <string-name>
+<surname>Baker</surname>
+<given-names>NF</given-names>
+</string-name>, <string-name>
+<surname>Darby</surname>
+<given-names>TM</given-names>
+</string-name>, <string-name>
+<surname>Robinson</surname>
+<given-names>BS</given-names>
+</string-name>, <string-name>
+<surname>Jones</surname>
+<given-names>RM</given-names>
+</string-name>, <string-name>
+<surname>Jones</surname>
+<given-names>DP</given-names>
+</string-name>, <string-name>
+<surname>Neish</surname>
+<given-names>AS</given-names>
+</string-name>
+</person-group>. <year>2020</year>. <article-title>Gut-resident Lactobacilli activate hepatic Nrf2 and protect against oxidative liver injury</article-title>. <source>Cell Metab</source>
+<volume>31</volume>:<fpage>956</fpage>–<lpage>968</lpage>. doi:<pub-id pub-id-type="doi">10.1016/j.cmet.2020.03.006</pub-id>
+<pub-id pub-id-type="pmid">32213347</pub-id></mixed-citation>
+      </ref>
+      <ref id="B32">
+        <label>32</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Mohamadzadeh</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Pfeiler</surname>
+<given-names>EA</given-names>
+</string-name>, <string-name>
+<surname>Brown</surname>
+<given-names>JB</given-names>
+</string-name>, <string-name>
+<surname>Zadeh</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Gramarossa</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Managlia</surname>
+<given-names>E</given-names>
+</string-name>, <string-name>
+<surname>Bere</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Sarraj</surname>
+<given-names>B</given-names>
+</string-name>, <string-name>
+<surname>Khan</surname>
+<given-names>MW</given-names>
+</string-name>, <string-name>
+<surname>Pakanati</surname>
+<given-names>KC</given-names>
+</string-name>, <string-name>
+<surname>Ansari</surname>
+<given-names>MJ</given-names>
+</string-name>, <string-name>
+<surname>O’Flaherty</surname>
+<given-names>SO</given-names>
+</string-name>, <string-name>
+<surname>Barrett</surname>
+<given-names>T</given-names>
+</string-name>, <string-name>
+<surname>Klaenhammer</surname>
+<given-names>TR</given-names>
+</string-name>
+</person-group>. <year>2011</year>. <article-title>Regulation of induced colonic inflammation by Lactobacillus acidophilus deficient in lipoteichoic acid</article-title>. <source>Proc Natl Acad Sci U S A</source>
+<volume>108 Suppl 1</volume>:<fpage>4623</fpage>–<lpage>4630</lpage>. doi:<pub-id pub-id-type="doi">10.1073/pnas.1005066107</pub-id>
+<pub-id pub-id-type="pmid">21282652</pub-id></mixed-citation>
+      </ref>
+      <ref id="B33">
+        <label>33</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Oh</surname>
+<given-names>J-H</given-names>
+</string-name>, <string-name>
+<surname>Lin</surname>
+<given-names>XB</given-names>
+</string-name>, <string-name>
+<surname>Zhang</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Tollenaar</surname>
+<given-names>SL</given-names>
+</string-name>, <string-name>
+<surname>Özçam</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Dunphy</surname>
+<given-names>C</given-names>
+</string-name>, <string-name>
+<surname>Walter</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>van Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>, <string-name>
+<surname>Kivisaar</surname>
+<given-names>M</given-names>
+</string-name>
+</person-group>. <year>2019</year>. <article-title>Prophages in Lactobacillus reuteri are associated with fitness trade-offs but can increase competitiveness in the gut ecosystem</article-title>. <source>Appl Environ Microbiol</source>
+<volume>86</volume>. doi:<pub-id pub-id-type="doi">10.1128/AEM.01922-19</pub-id>
+</mixed-citation>
+      </ref>
+      <ref id="B34">
+        <label>34</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Zhang</surname>
+<given-names>X</given-names>
+</string-name>, <string-name>
+<surname>Fisher</surname>
+<given-names>R</given-names>
+</string-name>, <string-name>
+<surname>Hou</surname>
+<given-names>W</given-names>
+</string-name>, <string-name>
+<surname>Shields</surname>
+<given-names>D</given-names>
+</string-name>, <string-name>
+<surname>Epperly</surname>
+<given-names>MW</given-names>
+</string-name>, <string-name>
+<surname>Wang</surname>
+<given-names>H</given-names>
+</string-name>, <string-name>
+<surname>Wei</surname>
+<given-names>L</given-names>
+</string-name>, <string-name>
+<surname>Leibowitz</surname>
+<given-names>BJ</given-names>
+</string-name>, <string-name>
+<surname>Yu</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Alexander</surname>
+<given-names>LM</given-names>
+</string-name>, <string-name>
+<surname>VAN Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>, <string-name>
+<surname>Watkins</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Wipf</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Greenberger</surname>
+<given-names>JS</given-names>
+</string-name>
+</person-group>. <year>2020</year>. <article-title>Second-generation probiotics producing IL-22 increase survival of mice after total body irradiation</article-title>. <source>In Vivo</source>
+<volume>34</volume>:<fpage>39</fpage>–<lpage>50</lpage>. doi:<pub-id pub-id-type="doi">10.21873/invivo.11743</pub-id>
+<pub-id pub-id-type="pmid">31882461</pub-id></mixed-citation>
+      </ref>
+      <ref id="B35">
+        <label>35</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wagner</surname>
+<given-names>AM</given-names>
+</string-name>, <string-name>
+<surname>Gran</surname>
+<given-names>MP</given-names>
+</string-name>, <string-name>
+<surname>Peppas</surname>
+<given-names>NA</given-names>
+</string-name>
+</person-group>. <year>2018</year>. <article-title>Designing the new generation of intelligent biocompatible carriers for protein and peptide delivery</article-title>. <source>Acta Pharm Sin B</source>
+<volume>8</volume>:<fpage>147</fpage>–<lpage>164</lpage>. doi:<pub-id pub-id-type="doi">10.1016/j.apsb.2018.01.013</pub-id>
+<pub-id pub-id-type="pmid">29719776</pub-id></mixed-citation>
+      </ref>
+      <ref id="B36">
+        <label>36</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Yue</surname>
+<given-names>W-F</given-names>
+</string-name>, <string-name>
+<surname>Zhou</surname>
+<given-names>F</given-names>
+</string-name>, <string-name>
+<surname>Malik</surname>
+<given-names>FA</given-names>
+</string-name>, <string-name>
+<surname>Yang</surname>
+<given-names>H-J</given-names>
+</string-name>, <string-name>
+<surname>Li</surname>
+<given-names>X-H</given-names>
+</string-name>, <string-name>
+<surname>Roy</surname>
+<given-names>B</given-names>
+</string-name>, <string-name>
+<surname>Reddy</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Miao</surname>
+<given-names>Y-G</given-names>
+</string-name>
+</person-group>. <year>2010</year>. <article-title>Demonstration of protein absorption in the intestinal epithelium of fish and mice by laser scanning confocal microscopy</article-title>. <source>Biol Chem</source>
+<volume>391</volume>:<fpage>1197</fpage>–<lpage>1203</lpage>. doi:<pub-id pub-id-type="doi">10.1515/BC.2010.121</pub-id>
+<pub-id pub-id-type="pmid">20707606</pub-id></mixed-citation>
+      </ref>
+      <ref id="B37">
+        <label>37</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Leenhouts</surname>
+<given-names>K</given-names>
+</string-name>, <string-name>
+<surname>Bolhuis</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Venema</surname>
+<given-names>G</given-names>
+</string-name>, <string-name>
+<surname>Kok</surname>
+<given-names>J</given-names>
+</string-name>
+</person-group>. <year>1998</year>. <article-title>Construction of a food-grade multiple-copy integration system for Lactococcus lactis</article-title>
+<italic toggle="yes">.</italic>
+<source>Appl Microbiol Biotechnol</source>
+<volume>49</volume>:<fpage>417</fpage>–<lpage>423</lpage>. doi:<pub-id pub-id-type="doi">10.1007/s002530051192</pub-id>
+<pub-id pub-id-type="pmid">9615484</pub-id></mixed-citation>
+      </ref>
+      <ref id="B38">
+        <label>38</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Mazé</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Boël</surname>
+<given-names>G</given-names>
+</string-name>, <string-name>
+<surname>Zúñiga</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Bourand</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Loux</surname>
+<given-names>V</given-names>
+</string-name>, <string-name>
+<surname>Yebra</surname>
+<given-names>MJ</given-names>
+</string-name>, <string-name>
+<surname>Monedero</surname>
+<given-names>V</given-names>
+</string-name>, <string-name>
+<surname>Correia</surname>
+<given-names>K</given-names>
+</string-name>, <string-name>
+<surname>Jacques</surname>
+<given-names>N</given-names>
+</string-name>, <string-name>
+<surname>Beaufils</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Poncet</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Joyet</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Milohanic</surname>
+<given-names>E</given-names>
+</string-name>, <string-name>
+<surname>Casarégola</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Auffray</surname>
+<given-names>Y</given-names>
+</string-name>, <string-name>
+<surname>Pérez-Martínez</surname>
+<given-names>G</given-names>
+</string-name>, <string-name>
+<surname>Gibrat</surname>
+<given-names>J-F</given-names>
+</string-name>, <string-name>
+<surname>Zagorec</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Francke</surname>
+<given-names>C</given-names>
+</string-name>, <string-name>
+<surname>Hartke</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Deutscher</surname>
+<given-names>J</given-names>
+</string-name>
+</person-group>. <year>2010</year>. <article-title>Complete genome sequence of the probiotic Lactobacillus casei strain BL23</article-title>. <source>J Bacteriol</source>
+<volume>192</volume>:<fpage>2647</fpage>–<lpage>2648</lpage>. doi:<pub-id pub-id-type="doi">10.1128/JB.00076-10</pub-id>
+<pub-id pub-id-type="pmid">20348264</pub-id></mixed-citation>
+      </ref>
+      <ref id="B39">
+        <label>39</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Wegmann</surname>
+<given-names>U</given-names>
+</string-name>, <string-name>
+<surname>O’Connell-Motherway</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Zomer</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Buist</surname>
+<given-names>G</given-names>
+</string-name>, <string-name>
+<surname>Shearman</surname>
+<given-names>C</given-names>
+</string-name>, <string-name>
+<surname>Canchaya</surname>
+<given-names>C</given-names>
+</string-name>, <string-name>
+<surname>Ventura</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Goesmann</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Gasson</surname>
+<given-names>MJ</given-names>
+</string-name>, <string-name>
+<surname>Kuipers</surname>
+<given-names>OP</given-names>
+</string-name>, <string-name>
+<surname>van Sinderen</surname>
+<given-names>D</given-names>
+</string-name>, <string-name>
+<surname>Kok</surname>
+<given-names>J</given-names>
+</string-name>
+</person-group>. <year>2007</year>. <article-title>Complete genome sequence of the prototype lactic acid bacterium Lactococcus Lactis Subsp. Cremoris Mg1363</article-title>. <source>Journal of bacteriology</source>
+<volume>189</volume>:<fpage>3256</fpage>–<lpage>3270</lpage>. doi:<pub-id pub-id-type="doi">10.1128/JB.01768-06</pub-id>
+<pub-id pub-id-type="pmid">17307855</pub-id></mixed-citation>
+      </ref>
+      <ref id="B40">
+        <label>40</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>de Kok</surname>
+<given-names>S</given-names>
+</string-name>, <string-name>
+<surname>Stanton</surname>
+<given-names>LH</given-names>
+</string-name>, <string-name>
+<surname>Slaby</surname>
+<given-names>T</given-names>
+</string-name>, <string-name>
+<surname>Durot</surname>
+<given-names>M</given-names>
+</string-name>, <string-name>
+<surname>Holmes</surname>
+<given-names>VF</given-names>
+</string-name>, <string-name>
+<surname>Patel</surname>
+<given-names>KG</given-names>
+</string-name>, <string-name>
+<surname>Platt</surname>
+<given-names>D</given-names>
+</string-name>, <string-name>
+<surname>Shapland</surname>
+<given-names>EB</given-names>
+</string-name>, <string-name>
+<surname>Serber</surname>
+<given-names>Z</given-names>
+</string-name>, <string-name>
+<surname>Dean</surname>
+<given-names>J</given-names>
+</string-name>, <string-name>
+<surname>Newman</surname>
+<given-names>JD</given-names>
+</string-name>, <string-name>
+<surname>Chandran</surname>
+<given-names>SS</given-names>
+</string-name>
+</person-group>. <year>2014</year>. <article-title>Rapid and reliable DNA assembly via ligase cycling reaction</article-title>. <source>ACS Synth Biol</source>
+<volume>3</volume>:<fpage>97</fpage>–<lpage>106</lpage>. doi:<pub-id pub-id-type="doi">10.1021/sb4001992</pub-id>
+<pub-id pub-id-type="pmid">24932563</pub-id></mixed-citation>
+      </ref>
+      <ref id="B41">
+        <label>41</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Cha</surname>
+<given-names>RS</given-names>
+</string-name>, <string-name>
+<surname>Zarbl</surname>
+<given-names>H</given-names>
+</string-name>, <string-name>
+<surname>Keohavong</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Thilly</surname>
+<given-names>WG</given-names>
+</string-name>
+</person-group>. <year>1992</year>. <article-title>Mismatch amplification mutation assay (MAMA): application to the c-H-ras gene</article-title>. <source>PCR Methods Appl</source>
+<volume>2</volume>:<fpage>14</fpage>–<lpage>20</lpage>. doi:<pub-id pub-id-type="doi">10.1101/gr.2.1.14</pub-id>
+<pub-id pub-id-type="pmid">1490171</pub-id></mixed-citation>
+      </ref>
+      <ref id="B42">
+        <label>42</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Puigbò</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Guzmán</surname>
+<given-names>E</given-names>
+</string-name>, <string-name>
+<surname>Romeu</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Garcia-Vallvé</surname>
+<given-names>S</given-names>
+</string-name>
+</person-group>. <year>2007</year>. <article-title>OPTIMIZER: a web server for optimizing the codon usage of DNA sequences</article-title>. <source>Nucleic Acids Res</source>
+<volume>35</volume>:<fpage>W126</fpage>–<lpage>31</lpage>. doi:<pub-id pub-id-type="doi">10.1093/nar/gkm219</pub-id>
+<pub-id pub-id-type="pmid">17439967</pub-id></mixed-citation>
+      </ref>
+      <ref id="B43">
+        <label>43</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Puigbò</surname>
+<given-names>P</given-names>
+</string-name>, <string-name>
+<surname>Romeu</surname>
+<given-names>A</given-names>
+</string-name>, <string-name>
+<surname>Garcia-Vallvé</surname>
+<given-names>S</given-names>
+</string-name>
+</person-group>. <year>2008</year>. <article-title>HEG-DB: a database of predicted highly expressed genes in prokaryotic complete genomes under translational selection</article-title>. <source>Nucleic Acids Res</source>
+<volume>36</volume>:<fpage>D524</fpage>–<lpage>7</lpage>. doi:<pub-id pub-id-type="doi">10.1093/nar/gkm831</pub-id>
+<pub-id pub-id-type="pmid">17933767</pub-id></mixed-citation>
+      </ref>
+      <ref id="B44">
+        <label>44</label>
+        <mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<string-name>
+<surname>Oh</surname>
+<given-names>J-H</given-names>
+</string-name>, <string-name>
+<surname>van Pijkeren</surname>
+<given-names>J-P</given-names>
+</string-name>
+</person-group>. <year>2014</year>. <article-title>CRISPR-Cas9-assisted recombineering in Lactobacillus reuteri</article-title>. <source>Nucleic Acids Res</source>
+<volume>42</volume>:<elocation-id>e131</elocation-id>. doi:<pub-id pub-id-type="doi">10.1093/nar/gku623</pub-id>
+<pub-id pub-id-type="pmid">25074379</pub-id></mixed-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>

@@ -1,0 +1,1523 @@
+<?xml version="1.0" encoding="UTF-8"?><OAI-PMH
+	xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2025-06-24T04:16:39Z</responseDate><request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:10906259" metadataPrefix="pmc">https:/www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</request><GetRecord><record><header><identifier>oai:pubmedcentral.nih.gov:10906259</identifier><datestamp>2024-03-01</datestamp><setSpec>peerj</setSpec><setSpec>pmc-open</setSpec></header><metadata><article xmlns="https://jats.nlm.nih.gov/ns/archiving/1.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xsi:schemaLocation="https://jats.nlm.nih.gov/ns/archiving/1.3/ https://jats.nlm.nih.gov/archiving/1.3/xsd/JATS-archivearticle1-3.xsd" dtd-version="1.3" xml:lang="en" article-type="research-article">
+  <processing-meta base-tagset="archiving" mathml-version="3.0" table-model="xhtml" tagset-family="jats">
+    <restricted-by>pmc</restricted-by>
+  </processing-meta>
+  <front><journal-meta><journal-id journal-id-type="nlm-ta">PeerJ</journal-id><journal-id journal-id-type="iso-abbrev">PeerJ</journal-id><journal-id journal-id-type="publisher-id">peerj</journal-id><journal-title-group><journal-title>PeerJ</journal-title></journal-title-group><issn pub-type="epub">2167-8359</issn><publisher><publisher-name>PeerJ Inc.</publisher-name><publisher-loc>San Diego, USA</publisher-loc></publisher></journal-meta>
+<article-meta><article-id pub-id-type="accession">PMC10906259</article-id><article-id pub-id-type="pmcid">PMC10906259</article-id><article-id pub-id-type="pmc-uid">10906259</article-id><article-id pub-id-type="pmid">38436005</article-id><article-id pub-id-type="publisher-id">16824</article-id><article-id pub-id-type="doi">10.7717/peerj.16824</article-id><article-categories><subj-group subj-group-type="heading"><subject>Science Policy</subject></subj-group><subj-group subj-group-type="heading"><subject>Statistics</subject></subj-group><subj-group subj-group-type="heading"><subject>Data Science</subject></subj-group></article-categories><title-group><article-title>Does it pay to pay? A comparison of the benefits of open-access publishing across various sub-fields in biology</article-title></title-group><contrib-group><contrib id="author-1" contrib-type="author" corresp="yes" equal-contrib="yes"><name><surname>Clark</surname><given-names>Amanda D.</given-names></name><email>clarkad@uab.edu</email><xref rid="aff-1" ref-type="aff">1</xref><xref rid="aff-2" ref-type="aff">2</xref></contrib><contrib id="author-2" contrib-type="author" corresp="yes" equal-contrib="yes"><name><surname>Myers</surname><given-names>Tanner C.</given-names></name><email>tannercmyers@gmail.com</email><xref rid="aff-1" ref-type="aff">1</xref></contrib><contrib id="author-3" contrib-type="author"><name><surname>Steury</surname><given-names>Todd D.</given-names></name><xref rid="aff-3" ref-type="aff">3</xref></contrib><contrib id="author-4" contrib-type="author"><name><surname>Krzton</surname><given-names>Ali</given-names></name><xref rid="aff-4" ref-type="aff">4</xref></contrib><contrib id="author-5" contrib-type="author"><name><surname>Yanes</surname><given-names>Julio</given-names></name><xref rid="aff-1" ref-type="aff">1</xref></contrib><contrib id="author-6" contrib-type="author"><name><surname>Barber</surname><given-names>Angela</given-names></name><xref rid="aff-1" ref-type="aff">1</xref></contrib><contrib id="author-7" contrib-type="author"><name><surname>Barry</surname><given-names>Jacqueline</given-names></name><xref rid="aff-1" ref-type="aff">1</xref></contrib><contrib id="author-8" contrib-type="author"><name><surname>Barua</surname><given-names>Subarna</given-names></name><xref rid="aff-5" ref-type="aff">5</xref></contrib><contrib id="author-9" contrib-type="author"><name><surname>Eaton</surname><given-names>Katherine</given-names></name><xref rid="aff-1" ref-type="aff">1</xref></contrib><contrib id="author-10" contrib-type="author"><name><surname>Gosavi</surname><given-names>Devadatta</given-names></name><xref rid="aff-1" ref-type="aff">1</xref></contrib><contrib id="author-11" contrib-type="author"><name><surname>Nance</surname><given-names>Rebecca</given-names></name><xref rid="aff-5" ref-type="aff">5</xref></contrib><contrib id="author-12" contrib-type="author"><name><surname>Pervaiz</surname><given-names>Zahida</given-names></name><xref rid="aff-1" ref-type="aff">1</xref></contrib><contrib id="author-13" contrib-type="author"><name><surname>Ugochukwu</surname><given-names>Chidozie</given-names></name><xref rid="aff-6" ref-type="aff">6</xref></contrib><contrib id="author-14" contrib-type="author"><name><surname>Hartman</surname><given-names>Patricia</given-names></name><xref rid="aff-4" ref-type="aff">4</xref></contrib><contrib id="author-15" contrib-type="author"><name><surname>Stevison</surname><given-names>Laurie S.</given-names></name><xref rid="aff-1" ref-type="aff">1</xref></contrib><aff id="aff-1"><label>1</label><institution>Department of Biological Sciences, Auburn University</institution>, <city>Auburn</city>, <state>AL</state>, <country>United States of America</country></aff><aff id="aff-2"><label>2</label><institution>Department of Cell, Developmental, and Integrative Biology, University of Alabama-Birmingham</institution>, <city> Birmingham</city>, <state>AL</state>, <country>United States of America</country></aff><aff id="aff-3"><label>3</label><institution>College of Forestry, Wildlife, and Environment, Auburn University</institution>, <city>Auburn</city>, <state>AL</state>, <country>United States of America</country></aff><aff id="aff-4"><label>4</label><institution>Auburn University Libraries, Auburn University</institution>, <city>Auburn</city>, <state>AL</state>, <country>United States of America</country></aff><aff id="aff-5"><label>5</label><institution>Department of Pathobiology, Auburn University</institution>, <city>Auburn</city>, <state>AL</state>, <country>United States of America</country></aff><aff id="aff-6"><label>6</label><institution>Department of Chemistry and Biochemistry, Auburn University</institution>, <city>Auburn</city>, <state>AL</state>, <country>United States of America</country></aff></contrib-group><contrib-group><contrib contrib-type="editor"><name><surname>Piccolo</surname><given-names>Stephen</given-names></name></contrib></contrib-group><pub-date pub-type="epub"><day>27</day><month>2</month><year iso-8601-date="2024">2024</year></pub-date><pub-date pub-type="collection"><year>2024</year></pub-date><volume>12</volume><elocation-id>e16824</elocation-id><history><date date-type="received" iso-8601-date="2022-12-13"><day>13</day><month>12</month><year iso-8601-date="2022">2022</year></date><date date-type="accepted" iso-8601-date="2024-01-02"><day>2</day><month>1</month><year iso-8601-date="2024">2024</year></date></history><permissions><copyright-statement>©2024 Clark et al.</copyright-statement><copyright-year>2024</copyright-year><copyright-holder>Clark et al.</copyright-holder><license><ali:license_ref specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>This is an open access article distributed under the terms of the <ext-link ext-link-type="uri" xlink:href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution License</ext-link>, which permits unrestricted use, distribution, reproduction and adaptation in any medium and for any purpose provided that it is properly attributed. For attribution, the original author(s), title, publication source (PeerJ) and either DOI or URL of the article must be cited.</license-p></license></permissions><self-uri xlink:href="https://peerj.com/articles/16824"/><abstract><p>Authors are often faced with the decision of whether to maximize traditional impact metrics or minimize costs when choosing where to publish the results of their research. Many subscription-based journals now offer the option of paying an article processing charge (APC) to make their work open. Though such “hybrid” journals make research more accessible to readers, their APCs often come with high price tags and can exclude authors who lack the capacity to pay to make their research accessible. Here, we tested if paying to publish open access in a subscription-based journal benefited authors by conferring more citations relative to closed access articles. We identified 146,415 articles published in 152 hybrid journals in the field of biology from 2013–2018 to compare the number of citations between various types of open access and closed access articles. In a simple generalized linear model analysis of our full dataset, we found that publishing open access in hybrid journals that offer the option confers an average citation advantage to authors of 17.8 citations compared to closed access articles in similar journals. After taking into account the number of authors, Journal Citation Reports 2020 Quartile, year of publication, and Web of Science category, we still found that open access generated significantly more citations than closed access (<italic toggle="yes">p</italic> &lt; 0.0001). However, results were complex, with exact differences in citation rates among access types impacted by these other variables. This citation advantage based on access type was even similar when comparing open and closed access articles published in the same issue of a journal (<italic toggle="yes">p</italic> &lt; 0.0001). However, by examining articles where the authors paid an article processing charge, we found that cost itself was not predictive of citation rates (<italic toggle="yes">p</italic> = 0.14). Based on our findings of access type and other model parameters, we suggest that, in the case of the 152 journals we analyzed, paying for open access does confer a citation advantage. For authors with limited budgets, we recommend pursuing open access alternatives that do not require paying a fee as they still yielded more citations than closed access. For authors who are considering where to submit their next article, we offer additional suggestions on how to balance exposure <italic toggle="yes">via</italic> citations with publishing costs.</p></abstract><kwd-group kwd-group-type="author"><kwd>Open-access publishing</kwd><kwd>Paywall</kwd><kwd>Hybrid journal</kwd><kwd>Article processing charge</kwd><kwd>Citation advantage</kwd><kwd>Mixed-effect model</kwd></kwd-group><funding-group><funding-statement>The authors received no funding for this work.</funding-statement></funding-group></article-meta></front>
+  <body>
+    <sec sec-type="intro">
+      <title>Introduction</title>
+      <p>Scientists have a strong interest in ensuring global access to published research. To facilitate this goal, scientific journals have increasingly adopted open access (OA) publishing models. In contrast to traditional subscription-based (or closed access) publishing, OA allows any reader to access articles online without paying a subscription fee. As OA publishing has grown, several OA publishing modalities have emerged, each offering distinct benefits to authors and readers. The “gold” OA category describes articles made freely available at the time of publication directly from the publisher’s website. Further, gold OA articles are explicitly published under an irrevocable open license. While gold OA makes accessing research easiest for readers, it can, in some cases, impose challenges upon authors in the form of an article processing charge (APC). Authors report difficulty in finding funds to cover APCs, with the majority of funding obtained from research grants (<xref rid="ref-4" ref-type="bibr">American Association for the Advancement of Science, 2022</xref>), or a combination of sources, including personal funds (<xref rid="ref-35" ref-type="bibr">Monaghan, Lucraft &amp; Allin, 2020</xref>). APC pricing strategies may limit the number of outlets where they can publish their research or force trade-offs with allocations to other expenditures, such as materials and supplies or conference attendance (<xref rid="ref-4" ref-type="bibr">American Association for the Advancement of Science, 2022</xref>).</p>
+      <p>Gold OA articles may be published either in open access journals or in traditional, subscription-based journals that give authors the option to pay an APC to make their articles freely available while other articles in the same journal remain behind a paywall. The latter type refers to “hybrid” journals, and this model of publishing articles under an open license in these subscription journals is known as “hybrid gold”. Hybrid gold open access is appealing to authors who wish to publish in well-established journals while simultaneously making their work freely available to non-subscribers. Some of these authors are subject to OA mandates by funding agencies and universities, while others simply want to reduce barriers to prospective readers. The number of subscription-based journals that have introduced a gold OA option has exploded over the past 15 years (<xref rid="ref-24" ref-type="bibr">Jahn, Matthias &amp; Laakso, 2022</xref>; <xref rid="ref-8" ref-type="bibr">Björk, 2017</xref>), which suggests the popularity of hybrid gold OA is growing. During this same period, APCs have risen dramatically. The increase in APCs from 2005–2018 greatly outstripped the rate of inflation in the same time frame, but the volume of articles published in gold open access journals still went up in spite of these fees (<xref rid="ref-25" ref-type="bibr">Khoo, 2019</xref>). Data on year-to-year increases in APCs is scarce due to the difficulty of finding out what various journals charged historically. However, when a small sample of gold open access biology journals for which 2019 APC data were available were checked again in 2022, all but one had increased their APCs, and the number of journals with APCs over $5,000 jumped from one to three (<xref rid="table-1" ref-type="table">Table 1</xref>; <xref rid="ref-26" ref-type="bibr">Krzton, 2019</xref>).</p>
+      <table-wrap position="float" id="table-1">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/table-1</object-id>
+        <label>Table 1</label>
+        <caption>
+          <title>Gold OA journal APC changes over time.</title>
+          <p>A selection of gold OA biology journals for which 2019 APC data were published (<xref rid="ref-26" ref-type="bibr">Krzton, 2019</xref>) are compared to 2022 APC amounts recorded as part of the present study to illustrate general APC increase over time. All amounts are listed in US currency.</p>
+        </caption>
+        <alternatives>
+          <graphic xlink:href="peerj-12-16824-g006" position="float"/>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowspan="1" colspan="1">Journal</th>
+                <th rowspan="1" colspan="1">2019 APC</th>
+                <th rowspan="1" colspan="1">2022 APC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="1" colspan="1">Genome Biology</td>
+                <td rowspan="1" colspan="1">3,490</td>
+                <td rowspan="1" colspan="1">5,030</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Nature Communications</td>
+                <td rowspan="1" colspan="1">5,200</td>
+                <td rowspan="1" colspan="1">5,790</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">PLoS Biology</td>
+                <td rowspan="1" colspan="1">3,000</td>
+                <td rowspan="1" colspan="1">5,300</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Scientific Reports</td>
+                <td rowspan="1" colspan="1">1,790</td>
+                <td rowspan="1" colspan="1">2,090</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Database: The Journal of Biological Databases and Curation</td>
+                <td rowspan="1" colspan="1">1,680</td>
+                <td rowspan="1" colspan="1">2,475</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Frontiers in Plant Science</td>
+                <td rowspan="1" colspan="1">2,950</td>
+                <td rowspan="1" colspan="1">2,950</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Ecology and Evolution</td>
+                <td rowspan="1" colspan="1">1,950</td>
+                <td rowspan="1" colspan="1">2,200</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">PeerJ</td>
+                <td rowspan="1" colspan="1">1,095</td>
+                <td rowspan="1" colspan="1">1,395</td>
+              </tr>
+            </tbody>
+          </table>
+        </alternatives>
+      </table-wrap>
+      <p>With increased pressure in recent years to make research open, and rising APCs, authors are left with difficult decisions when choosing how and where to effectively communicate their science (but see below). Due to the relatively recent rise of OA publishing, gold OA journals tend to be younger and lack the long-term brand recognition and marketing power of traditional subscription journals that have introduced OA options. In addition to comparatively higher traditional proxies for prestige (<italic toggle="yes">i.e., Journal Citation Reports</italic> metrics (hereafter, “journal impact”)), hybrid journals often come with higher APCs than fully open journals (<xref rid="ref-6" ref-type="bibr">Asai, 2022</xref>). While traditional considerations of ‘journal impact and target audience remain important for many situations (<xref rid="ref-32" ref-type="bibr">McKiernan et al., 2019</xref>; <xref rid="ref-12" ref-type="bibr">Chapman et al., 2019</xref>; <xref rid="ref-45" ref-type="bibr">Tregoning, 2018</xref>), authors must factor budget into their decisions more heavily now than they did in pre-OA times.</p>
+      <p>Other OA categories in addition to gold OA have emerged that do not require fees of the authors. Bronze describes articles that are made freely available by the journals themselves and at no cost to the author (<xref rid="ref-38" ref-type="bibr">Piwowar et al., 2018</xref>). However, the process by which articles are selected for bronze designation is unknown and may not be permanent (<xref rid="ref-38" ref-type="bibr">Piwowar et al., 2018</xref>). A perhaps under-utilized alternative to publishing articles OA in either fully OA or hybrid journals is “green” OA, in which authors self-archive their work by uploading preprints to servers like bioRxiv or by depositing post-prints in institutional repositories or other archives (<xref rid="ref-44" ref-type="bibr">Tennant et al., 2016</xref>; <xref rid="ref-20" ref-type="bibr">Gadd &amp; Troll Covey, 2019</xref>). Although green OA is typically subject to journal permissions, formatting restrictions, and embargo periods, there is no cost to the author under this model, making green OA a particularly appealing alternative to costly APCs.</p>
+      <p>For certain budgets, one of the most important considerations authors face when deciding to pay an APC is whether paying to increase access to their work would translate to increased citations. Thus far, attempts to answer whether OA publishing confers a citation advantage to authors relative to publishing closed access have produced mixed results (<xref rid="ref-28" ref-type="bibr">Langham-Putrow, Bakker &amp; Riegelman, 2021</xref>). While many studies have found support for an OA citation advantage (<xref rid="ref-17" ref-type="bibr">Emery et al., 2021</xref>), others have found the opposite (<xref rid="ref-16" ref-type="bibr">Dorta-González, González-Betancor &amp; Dorta-González, 2017</xref>). Furthermore, studies that have found support for a citation advantage between OA and closed access (<xref rid="ref-38" ref-type="bibr">Piwowar et al., 2018</xref>; <xref rid="ref-42" ref-type="bibr">Sotudeh, Arabzadeh &amp; Mirzabeigi, 2019</xref>; <xref rid="ref-36" ref-type="bibr">Ottaviani, 2016</xref>) have been careful to avoid concluding that OA status leads to greater citations due to methodological and statistical challenges involved in designing a robust citation study that limits the effect of confounders, including language (<xref rid="ref-30" ref-type="bibr">Lewis, 2018</xref>; <xref rid="ref-7" ref-type="bibr">Basson, Blanckenberg &amp; Prozesky, 2021</xref>; <xref rid="ref-34" ref-type="bibr">Moed, 2007</xref>), field or subject area (<xref rid="ref-5" ref-type="bibr">Archambault et al., 2016</xref>; <xref rid="ref-22" ref-type="bibr">Holmberg et al., 2020</xref>; <xref rid="ref-23" ref-type="bibr">Hubbard, 2017</xref>), and journal age. Therefore, any attempt to estimate differences in citation rates between access types must be aware of the potentially confounding forces that may influence citations and account for article attributes that may influence citation rates.</p>
+      <p>Hybrid journals provide the closest thing to a direct comparison that could be used to test whether a citation advantage for OA publishing exists (<xref rid="ref-8" ref-type="bibr">Björk, 2017</xref>; <xref rid="ref-21" ref-type="bibr">Harnad &amp; Brody, 2004</xref>; <xref rid="ref-43" ref-type="bibr">Tang, Bever &amp; Yu, 2017</xref>). Specifically, hybrid journals circumvent the confounding factor of variation in journal name recognition or perceived quality as both OA and closed access articles can be compared for the same journal. However, few existing studies have taken advantage of the comparison presented by hybrid OA journals to test if OA confers a citation advantage. One such example recovered evidence that OA articles were cited earlier and more frequently than closed access articles published in the same journal during the same period of time (<xref rid="ref-18" ref-type="bibr">Eysenbach, 2006</xref>). However, a comprehensive assessment testing whether OA confers greater citations while taking differeneces among subject areas into account is lacking.</p>
+      <p>Biology has a higher than average number of hybrid OA papers than other fields (<xref rid="ref-27" ref-type="bibr">Laakso &amp; Björk, 2016</xref>), and a citation advantage for OA has been documented (<xref rid="ref-5" ref-type="bibr">Archambault et al., 2016</xref>; <xref rid="ref-31" ref-type="bibr">McCabe &amp; Snyder, 2014</xref>). Although a few previous studies have looked at the citation pattern in biology, they have largely been limited to just one sub-field within biology (<xref rid="ref-3" ref-type="bibr">AlRyalat et al., 2019</xref>), analyzed relatively small number of records or subset of publications (∼3,500 records; <xref rid="ref-43" ref-type="bibr">Tang, Bever &amp; Yu, 2017</xref>), or a combination of these (<xref rid="ref-11" ref-type="bibr">Calver &amp; Bradley, 2010</xref>; <xref rid="ref-14" ref-type="bibr">Clements, 2017</xref>). Furthermore, the results of these studies are conflicting with regard to whether paying to publish OA actually confers a citation advantage to the authors, with some finding a benefit (<xref rid="ref-43" ref-type="bibr">Tang, Bever &amp; Yu, 2017</xref>; <xref rid="ref-14" ref-type="bibr">Clements, 2017</xref>), and others recovering a minimal effect (<xref rid="ref-11" ref-type="bibr">Calver &amp; Bradley, 2010</xref>). <xref rid="ref-14" ref-type="bibr">Clements (2017)</xref>, controlling for self-citation, Journal Impact Factor, number of authors, and article type, investigated the citation patterns and found an OA citation advantage in three marine ecology journals, yet no such advantage was identified in six conservation biology journals (<xref rid="ref-11" ref-type="bibr">Calver &amp; Bradley, 2010</xref>). Due to the limited scope of prior research, it remains unclear whether there is any citations advantage provided by OA across sub-fields in biology.</p>
+      <p>In this study, we addressed the question of whether authors across sub-fields in the biological sciences can expect to gain more citations by paying an APC to publish OA in a hybrid journal. Using the Clarivate Analytics™ Web of Science Core Collection, we collected a sample of 146,415 articles published in 152 hybrid journals published between 2013 and 2018 to compare the rates of citation between OA and non-OA articles. We used these data to assess (1) the degree to which OA articles published in hybrid journals are cited more than non-OA articles, (2) the contributions of factors such as author count, Journal Impact Factor, and sub-field to citation rates, and (3) if and how these factors influenced any differences in citations rates among access types. Overall, our results show a general citation advantage for OA over closed access, and a clear advantage for hybrid gold OA over other types of OA, but this advantage varies depending on article attributes, such as number of authors or journal metrics. Based on our results, we aim to provide specific and concrete recommendations to authors that should aid decision-making regarding when to and whether it is worthwhile to pay an APC to publish OA in hybrid biology journals.</p>
+    </sec>
+    <sec sec-type="materials|methods">
+      <title>Materials and Methods</title>
+      <p>Portions of this text were previously published as part of a preprint (<xref rid="ref-13" ref-type="bibr">Clark et al., 2022</xref>). Our methodology to acquire and curate the data is laid out in <xref rid="fig-1" ref-type="fig">Fig. 1</xref>. With permission from Clarivate Analytics™, we downloaded a large bibliographic dataset from the Web of Science Core Collection. This project began as a class assignment in which students selected journals based on their subject area of interest. These journals were later classified according to the 12 Web of Science categories encompassing biology: Biochemistry and Molecular Biology, Cell Biology, Entomology, Evolutionary Biology, Genetics and Heredity, Marine and Freshwater Biology, Microbiology, Mycology, Neurosciences and Neurology, Oncology, Plant Sciences, and Zoology. Next, a small cohort of students worked together following the course to re-acquire citation records for the journals identified during the course and to expand the journal list further by adding journals addressing noticeable gaps. Still, the selection of journals was not meant to be exhaustive of all the hybrid journals in each of these categories. Student selected journals were later validated as conforming to a hybrid gold publishing model by excluding all journals that did not include records classified as “Other gold”, the Clarivate Analytics™ Web of Science designation for articles with Creative Commons licenses not published in DOAJ, or solely OA, journals (<ext-link xlink:href="https://doaj.org/" ext-link-type="uri">https://doaj.org/</ext-link>). Our goal was to use the same six-year span for all journals to capture the period in which many subscription-based journals began to offer hybrid publishing options and to also not include articles that had not had enough time to accumulate citations. In our data filtering, we noted some records were included that were outside of the 6-year window. Therefore, we filtered results to remove records not published between 2013 and 2018. We also manually verified whether each journal met the hybrid publishing model requirement (<xref rid="fig-1" ref-type="fig">Fig 1</xref>). In addition to the bibliographic data obtained for each article (<italic toggle="yes">i.e.,</italic> number of authors and OA status: closed access, bronze, green, or hybrid gold), we collected data for the following journal-level citation metrics from Clarivate Analytics™ Journal Citation Reports (JCR): JCR Quartile within a selected Web of Science category, and Article Influence Score (AIS), which quantifies the average influence of a journal’s article within five years of publication. We also collected APCs as of June 2021 from publisher websites for each journal.</p>
+      <fig position="float" id="fig-1">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/fig-1</object-id>
+        <label>Figure 1</label>
+        <caption>
+          <title>Data preparation.</title>
+          <p>(A) With the permission of the Clarivate Analytics™ legal team, we obtained citation records for articles published in hybrid journals by conducting searches in the Web of Science Core Collection for different Web of Science Categories in biology. We verified whether the journals found by each search were hybrid journals and, if so, we downloaded data, including number of citations, OA type, <italic toggle="yes">etc</italic>., for all articles published in each journal between 2013 and 2018. We also obtained citation metrics that we used as predictors in our full and “matched” analyses. (B) For the matched analysis, we restricted our dataset to compare hybrid gold and closed access articles published in the same volume and issue of our journals. (C) Lastly, we obtained values as of June 2021 for each journal’s APC to test APC values associated with number of citations.</p>
+        </caption>
+        <graphic xlink:href="peerj-12-16824-g001" position="float"/>
+      </fig>
+      <p>To examine the relationship between OA and citation rates while controlling for other factors, we used generalized linear models. In all models, our response variable was raw citations counts. As citation count is likely non-normally distributed, we initially fit generalized linear models to the data with a Poisson distribution for the response. However, likelihood-ratio (chi-square) tests always indicated that the negative binomial distribution described the data better due to variance inflation in the number of citations (all <italic toggle="yes">χ</italic><sup>2</sup> &gt; 3, 437, 870, <italic toggle="yes">p</italic> &lt; 0.0001), and thus we used that distribution for all analyses. In the “full analysis”, we included OA status, author count, JCR quartile (1, 2, 3, or 4), AIS, and year as fixed effects, and field and journal (nested in field) as random effects (<xref rid="table-2" ref-type="table">Table 2</xref>). To improve model convergence and adjust for skewed distributions of the independent variables, we scaled AIS and author count. We also included two-way interaction terms between OA status and each of the other fixed effects. Collinearity among fixed effects was generally low as evidenced by low generalized variance inflation factor scores (all &lt;1.31). Thus, we considered variance inflation not to be an issue in the full model. In all analyses, statistical significance of fixed effects and interactions was assessed <italic toggle="yes">via</italic> Type II Wald chi-square tests using the ‘Anova’ function from the R package ‘car’ v3.1 (<xref rid="ref-19" ref-type="bibr">Fox &amp; Weisberg, 2022</xref>). Pairwise comparisons among groups within a variable were assessed by a Wald Z test with a Bonferroni correction using the ‘emmeans’ v1.8 R package (<xref rid="ref-29" ref-type="bibr">Lenth et al., 2022</xref>). All analyses were done in R (version 4.2.1; <xref rid="ref-39" ref-type="bibr">R Core Team, 2020</xref>) and RStudio (version 2022.07.1+554; <xref rid="ref-41" ref-type="bibr">RStudio Team, 2020</xref>).</p>
+      <table-wrap position="float" id="table-2">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/table-2</object-id>
+        <label>Table 2</label>
+        <caption>
+          <title>Model parameters for full open access dataset.</title>
+          <p>The various variables included as predictor variables are listed along with random variables in the statistical model of the full dataset. In the “Matched Analysis”, an additional random variable of “volume and issue” was included and the records were subset to only include volumes/issues with both OA and closed access articles. Finally, in the third “APC analysis” model, the predictor variable of APC was added and articles were subset to only include hybrid gold where authors paid an APC, thus removing the predictor of access type. All models shared the same response variable of Citation Counts.</p>
+        </caption>
+        <alternatives>
+          <graphic xlink:href="peerj-12-16824-g007" position="float"/>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowspan="1" colspan="1">
+<bold>Predictor variables</bold>
+</th>
+                <th rowspan="1" colspan="1">
+<bold>Response variable</bold>
+</th>
+                <th rowspan="1" colspan="1">Response variable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="1" colspan="1">Access type</td>
+                <td rowspan="1" colspan="1">Field</td>
+                <td rowspan="1" colspan="1">Citation counts</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Author count</td>
+                <td rowspan="1" colspan="1">Journal in field</td>
+                <td rowspan="1" colspan="1"/>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1"><italic toggle="yes">Journal citation reports</italic> (JCR) quartile</td>
+                <td rowspan="1" colspan="1"/>
+                <td rowspan="1" colspan="1"/>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1"><italic toggle="yes">JCR</italic> article influence score</td>
+                <td rowspan="1" colspan="1"/>
+                <td rowspan="1" colspan="1"/>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Year</td>
+                <td rowspan="1" colspan="1"/>
+                <td rowspan="1" colspan="1"/>
+              </tr>
+            </tbody>
+          </table>
+        </alternatives>
+      </table-wrap>
+      <p>In a separate analysis, we used a paired design to compare the number of citations between articles published hybrid gold OA and closed access within the same volume and issue of a journal. Thus, we filtered the downloaded records including only issues with both hybrid gold and closed access articles (<xref rid="fig-1" ref-type="fig">Fig. 1</xref>). These matched data were used in a second statistical analysis (hereafter “matched analysis”) with the response variable of citation count; all independent model parameters for this analysis were the same as those used for the full dataset. However, volume (nested within journal nested within field) and issue (nested within volume nested within journal nested within field) were also included as random effects in the matched analysis. Again, we used a generalized linear model with negative binomial family structure to analyze the data.</p>
+      <p>In a final sub-analysis, we examined the relationship between citation count and APCs (hereafter “APC analysis”). The full data was restricted to only include articles published under the hybrid gold access model (<italic toggle="yes">i.e.,</italic> those in which APCs had been paid; <xref rid="fig-1" ref-type="fig">Fig. 1</xref>). A generalized linear model with negative binomial family structure was used to model the relationships between citation count (the response variable) and the same independent variables that were used in the full model analysis with the exception that access type was removed (since all articles were published hybrid gold), and APC charge was included.</p>
+    </sec>
+    <sec sec-type="Limitations">
+      <title>Limitations</title>
+      <p>There are a few limitations to this study worth noting here. First, the journal selection of 152 is a non-random sample of biology journals from a non-random sample of biology disciplines. To control for this, we included both journal and field in our statistical model as random effects. However, it is worth noting that because we compared green and gold articles from the same journal, any bias in journal selection would only become problematic if that bias were to impact citation rates between articles based on type of access within the same journal. Second, we used 2021 APC rates to analyze the journals due to the difficulty in obtaining past APCs. Recent studies that have accounted for APC changes over time found it to be a labor-intensive data collection step (<xref rid="ref-10" ref-type="bibr">Butler et al., 2023</xref>). Specifically, our approach likely overestimates the actual APCs of the articles analyzed here.</p>
+    </sec>
+    <sec sec-type="results">
+      <title>Results</title>
+      <p>After filtering, we obtained citation data for 146,415 journal articles from 152 hybrid journals across 12 fields within biology (<xref rid="table-3" ref-type="table">Table 3</xref>). The full list of journals and all raw data are provided <italic toggle="yes">via</italic> an archived GitHub repository (see Data Availability). The number of records per journal averaged 963 and ranged from 15 to 11,286. Records across research fields averaged 12,201 and ranged from 4,575 to 31,253. Across all articles, 61,117 articles were considered closed access whereas 85,298 had some form of OA. Specifically, 18,032 articles were classified as hybrid gold, 9,261 were classified as green, and 58,005 were classified as bronze.</p>
+      <table-wrap position="float" id="table-3">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/table-3</object-id>
+        <label>Table 3</label>
+        <caption>
+          <title>Breakdown of records by sub-field in Biology.</title>
+          <p>A summary of the data used in this study, including Web of Science category, number of journals targeted and total number of articles used. Additionally, the number of articles in the “matched analysis” are included as well as a break down by access type of each sub-field.</p>
+        </caption>
+        <alternatives>
+          <graphic xlink:href="peerj-12-16824-g008" position="float"/>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowspan="1" colspan="1">
+<bold>Research area</bold>
+</th>
+                <th rowspan="1" colspan="1">
+<bold>Number of journals</bold>
+</th>
+                <th rowspan="1" colspan="1">
+<bold>Number of articles</bold>
+</th>
+                <th rowspan="1" colspan="1">
+<bold>Number of matched articles</bold>
+</th>
+                <th rowspan="1" colspan="1">
+<bold>Bronze</bold>
+</th>
+                <th rowspan="1" colspan="1">
+<bold>Closed access</bold>
+</th>
+                <th rowspan="1" colspan="1">
+<bold>Green</bold>
+</th>
+                <th rowspan="1" colspan="1">
+<bold>Hybrid gold</bold>
+</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="1" colspan="1">Biochemistry and Molecular Biology</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">11,286</td>
+                <td rowspan="1" colspan="1">8,624</td>
+                <td rowspan="1" colspan="1">28</td>
+                <td rowspan="1" colspan="1">9,799</td>
+                <td rowspan="1" colspan="1">969</td>
+                <td rowspan="1" colspan="1">490</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Cell Biology</td>
+                <td rowspan="1" colspan="1">4</td>
+                <td rowspan="1" colspan="1">4,575</td>
+                <td rowspan="1" colspan="1">7</td>
+                <td rowspan="1" colspan="1">3,868</td>
+                <td rowspan="1" colspan="1">10</td>
+                <td rowspan="1" colspan="1">50</td>
+                <td rowspan="1" colspan="1">647</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Entomology</td>
+                <td rowspan="1" colspan="1">8</td>
+                <td rowspan="1" colspan="1">5,777</td>
+                <td rowspan="1" colspan="1">1,567</td>
+                <td rowspan="1" colspan="1">380</td>
+                <td rowspan="1" colspan="1">4,669</td>
+                <td rowspan="1" colspan="1">445</td>
+                <td rowspan="1" colspan="1">283</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Evolutionary Biology</td>
+                <td rowspan="1" colspan="1">16</td>
+                <td rowspan="1" colspan="1">16,061</td>
+                <td rowspan="1" colspan="1">3,007</td>
+                <td rowspan="1" colspan="1">8,133</td>
+                <td rowspan="1" colspan="1">4,806</td>
+                <td rowspan="1" colspan="1">1,186</td>
+                <td rowspan="1" colspan="1">1,936</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Genetics and Heredity</td>
+                <td rowspan="1" colspan="1">6</td>
+                <td rowspan="1" colspan="1">7,190</td>
+                <td rowspan="1" colspan="1">336</td>
+                <td rowspan="1" colspan="1">2,512</td>
+                <td rowspan="1" colspan="1">1,016</td>
+                <td rowspan="1" colspan="1">232</td>
+                <td rowspan="1" colspan="1">3,430</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Marine and Freshwater Biology</td>
+                <td rowspan="1" colspan="1">6</td>
+                <td rowspan="1" colspan="1">8,708</td>
+                <td rowspan="1" colspan="1">2,805</td>
+                <td rowspan="1" colspan="1">77</td>
+                <td rowspan="1" colspan="1">7,812</td>
+                <td rowspan="1" colspan="1">549</td>
+                <td rowspan="1" colspan="1">270</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Microbiology</td>
+                <td rowspan="1" colspan="1">8</td>
+                <td rowspan="1" colspan="1">21,921</td>
+                <td rowspan="1" colspan="1">596</td>
+                <td rowspan="1" colspan="1">18,700</td>
+                <td rowspan="1" colspan="1">720</td>
+                <td rowspan="1" colspan="1">581</td>
+                <td rowspan="1" colspan="1">1,920</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Mycology</td>
+                <td rowspan="1" colspan="1">16</td>
+                <td rowspan="1" colspan="1">7,099</td>
+                <td rowspan="1" colspan="1">1,627</td>
+                <td rowspan="1" colspan="1">1,059</td>
+                <td rowspan="1" colspan="1">5,116</td>
+                <td rowspan="1" colspan="1">346</td>
+                <td rowspan="1" colspan="1">578</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Neurosciences and Neurology</td>
+                <td rowspan="1" colspan="1">5</td>
+                <td rowspan="1" colspan="1">6,465</td>
+                <td rowspan="1" colspan="1">1,366</td>
+                <td rowspan="1" colspan="1">2,707</td>
+                <td rowspan="1" colspan="1">1,510</td>
+                <td rowspan="1" colspan="1">927</td>
+                <td rowspan="1" colspan="1">1,321</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Oncology</td>
+                <td rowspan="1" colspan="1">5</td>
+                <td rowspan="1" colspan="1">16,152</td>
+                <td rowspan="1" colspan="1">1,724</td>
+                <td rowspan="1" colspan="1">9,250</td>
+                <td rowspan="1" colspan="1">1,413</td>
+                <td rowspan="1" colspan="1">898</td>
+                <td rowspan="1" colspan="1">4,591</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Plant Sciences</td>
+                <td rowspan="1" colspan="1">7</td>
+                <td rowspan="1" colspan="1">9,928</td>
+                <td rowspan="1" colspan="1">990</td>
+                <td rowspan="1" colspan="1">7,005</td>
+                <td rowspan="1" colspan="1">1,603</td>
+                <td rowspan="1" colspan="1">144</td>
+                <td rowspan="1" colspan="1">1,176</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Zoology</td>
+                <td rowspan="1" colspan="1">70</td>
+                <td rowspan="1" colspan="1">31,253</td>
+                <td rowspan="1" colspan="1">5,432</td>
+                <td rowspan="1" colspan="1">4,286</td>
+                <td rowspan="1" colspan="1">22,643</td>
+                <td rowspan="1" colspan="1">2,934</td>
+                <td rowspan="1" colspan="1">1,390</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Totals</td>
+                <td rowspan="1" colspan="1">152</td>
+                <td rowspan="1" colspan="1">146,415</td>
+                <td rowspan="1" colspan="1">28,081</td>
+                <td rowspan="1" colspan="1">58,005</td>
+                <td rowspan="1" colspan="1">61,117</td>
+                <td rowspan="1" colspan="1">9,261</td>
+                <td rowspan="1" colspan="1">18,032</td>
+              </tr>
+            </tbody>
+          </table>
+        </alternatives>
+      </table-wrap>
+      <p>In a simple generalized linear model analyses with access as the only independent variable, we found that hybrid gold articles had an average of 31.1 (30.6–31.5; 95% C.L.) citations, compared to 13.3 (13.2–13.4) citations for closed access articles. Bronze articles averaged 35.9 (35.6–36.2) citations, while green access articles averaged 19.3 (18.9–19.7) citations. All categories of access were statistically different from one another (Wald <italic toggle="yes">z</italic> statistic with Bonferroni correction, all <italic toggle="yes">z</italic> &gt; 16.411, all <italic toggle="yes">p</italic> &lt; 0.0001).</p>
+      <p>Our full model indicated that, in addition to access type, all other variables included in the model had significant relationships with citation counts. Variation in the log number of citations due to the specific journal an article was published in had a standard deviation of 0.27. Similarly, variation in the log number of citations due to the biological sub-field in which an article was published had a standard deviation of 0.15. Moreover, we found that fixed-effects variables all interacted with access type to influence citation counts (<xref rid="table-4" ref-type="table">Table 4</xref>). For example, the model suggested that hybrid gold access generated more citations than the other three access types when articles had few authors, but generated fewer citations than other access types when articles had many authors. Thus, to explore potential non-linearities in the relationship between number of authors and number of citations, as well as the interaction between number of authors and access type, we binned the number of authors into the following discrete categories: 1, 2, 3–4, 5–8, 9–16, 17–32, 33–64, 65–128, 129–256, and &gt;257 authors. However, we note that only 118 (0.08%) articles had more than 64 authors. A likelihood-ratio test indicated that categorizing the author-count variable in this way significantly improved the model (<inline-formula><alternatives><inline-graphic xlink:href="peerj-12-16824-i001.jpg"/><tex-math id="tex-ieqn-11">\documentclass[12pt]{minimal}
+\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{upgreek}
+\usepackage{mathrsfs}
+\setlength{\oddsidemargin}{-69pt}
+\begin{document}
+${\chi }_{30}^{2}=467.07$\end{document}</tex-math><mml:math id="mml-ieqn-11" overflow="scroll"><mml:msubsup><mml:mrow><mml:mi>χ</mml:mi></mml:mrow><mml:mrow><mml:mn>30</mml:mn></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup><mml:mo>=</mml:mo><mml:mn>467</mml:mn><mml:mo>.</mml:mo><mml:mn>07</mml:mn></mml:math></alternatives></inline-formula>, <italic toggle="yes">p</italic> &lt; 0.0001). Therefore, we used this categorized variable in our full model analysis. The model indicated that with only a single author, hybrid gold generated 2.86 (3.66–2.24; 95% C.L.), 2.25 (2.72–1.86; 95% C.L.), and 2.08 (2.77–1.57; 95% C.L.) times as many citations as closed access, bronze, and green access types respectively (<xref rid="fig-2" ref-type="fig">Fig. 2A</xref>; all <italic toggle="yes">z</italic> &gt; 6.812, all Bonferroni-adjusted <italic toggle="yes">p</italic> &lt; 0.0001). With only a single author, green and bronze also generated significantly more citations than closed access (<italic toggle="yes">p</italic> = 0.0121 and 0.0061, respectively), but differences were relatively small: 1.38 (1.05–1.81) and 1.27 (1.04–1.54) times as many citations, respectively. With one author, green and bronze access types were not significantly different from each other (<italic toggle="yes">p</italic> = 1.000). This ranked pattern in citations as a function of access was generally maintained between 2 and 32 authors, with hybrid gold generating the most citations, followed by green/bronze, and last by closed access (<xref rid="fig-2" ref-type="fig">Fig. 2A</xref>). Differences among OA types were not always statistically significant, but OA types always generated significantly more citations than closed access over this author-count range (all <italic toggle="yes">z</italic> &gt; 4.18, all <italic toggle="yes">p</italic> &lt; 0.0002). Above 33 authors, differences among access types were more variable but typically not significantly different (<xref rid="fig-2" ref-type="fig">Fig. 2A</xref>).</p>
+      <table-wrap position="float" id="table-4">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/table-4</object-id>
+        <label>Table 4</label>
+        <caption>
+          <title>Results of analysis of full dataset.</title>
+          <p>Type II Wald chi-square tests were used. Thus, significance tests of interactions terms were marginal, but significance tests of main-effects terms were marginal excluding all interaction terms.</p>
+        </caption>
+        <alternatives>
+          <graphic xlink:href="peerj-12-16824-g009" position="float"/>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowspan="1" colspan="1">Variable</th>
+                <th align="center" rowspan="1" colspan="1">
+<italic toggle="yes">χ</italic>
+<sup>2</sup>
+</th>
+                <th align="center" rowspan="1" colspan="1">df</th>
+                <th align="center" rowspan="1" colspan="1"><italic toggle="yes">p</italic>-value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="1" colspan="1">Access type</td>
+                <td rowspan="1" colspan="1">540.16</td>
+                <td rowspan="1" colspan="1">3</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Author count</td>
+                <td rowspan="1" colspan="1">2,391.91</td>
+                <td rowspan="1" colspan="1">9</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">JCR quartile</td>
+                <td rowspan="1" colspan="1">115.45</td>
+                <td rowspan="1" colspan="1">3</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">AIS</td>
+                <td rowspan="1" colspan="1">109.91</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Year</td>
+                <td rowspan="1" colspan="1">27,708.11</td>
+                <td rowspan="1" colspan="1">5</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Access type × Author count</td>
+                <td rowspan="1" colspan="1">174.90</td>
+                <td rowspan="1" colspan="1">25</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Access type × JCR quartile</td>
+                <td rowspan="1" colspan="1">64.10</td>
+                <td rowspan="1" colspan="1">9</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Access type × AIS</td>
+                <td rowspan="1" colspan="1">36.57</td>
+                <td rowspan="1" colspan="1">3</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Access type × Year</td>
+                <td rowspan="1" colspan="1">141.52</td>
+                <td rowspan="1" colspan="1">15</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+            </tbody>
+          </table>
+        </alternatives>
+      </table-wrap>
+      <fig position="float" id="fig-2">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/fig-2</object-id>
+        <label>Figure 2</label>
+        <caption>
+          <title>Citations as a function of various model parameters and access type.</title>
+          <p>Access type is color coded to match the named color scheme (<italic toggle="yes">e.g.</italic>, green is indicated in green), except closed access which is indicated in black. (A) Interaction between access type and author count. The number of authors was treated as categorical. Only values under 64 are plotted to emphasize relationships in the majority of the dataset. (B) Interaction between access type and JCR quartile. JCR Quartile of 1 represents the highest journals by Journal Impact Factor. (C) Interaction between access type and scaled (standardized) AIS values. (D) Interaction between access type and year.</p>
+        </caption>
+        <graphic xlink:href="peerj-12-16824-g002" position="float"/>
+      </fig>
+      <p>Although the full model indicated significant interactions between JCR quartile and access type, as well year of publication and access type (<xref rid="table-4" ref-type="table">Table 4</xref>), the general pattern of hybrid gold &gt; green/bronze &gt; closed access in terms of number of citations held across JCR Quartiles, scaled AIS, and year of publication (<xref rid="fig-2" ref-type="fig">Fig. 2</xref>). However, the differences among the 4 types of access decreased with higher JCR Quartiles (<xref rid="fig-2" ref-type="fig">Fig. 2B</xref>), lower scaled AIS scores (<xref rid="fig-2" ref-type="fig">Fig. 2C</xref>), and year of publication (<xref rid="fig-2" ref-type="fig">Fig. 2D</xref>). By the 4th quartile, differences between hybrid gold and bronze, and between bronze and closed access were no longer statistically significant (<italic toggle="yes">z</italic> = 1.80, 1.84;  <italic toggle="yes">p</italic> = 0.43 , 0.40, respectively). Similarly, at scaled AIS values &lt;1.5, differences between bronze/green and closed access were not significantly different (all <italic toggle="yes">z</italic> &gt; 2.66, all <italic toggle="yes">p</italic> &gt; 0.05). Finally, from 2016 to 2018, differences between green and closed access were not significantly different (all <italic toggle="yes">z</italic> &gt; 2.56; all <italic toggle="yes">p</italic> &gt; 0.062), and in 2018 differences between bronze and closed access were not significantly different (<italic toggle="yes">z</italic> = 2.02; <italic toggle="yes">p</italic> = 0.26).</p>
+      <p>Our matched analysis included 28,081 journal articles from 129 journals across the same 12 fields within biology (<xref rid="table-3" ref-type="table">Table 3</xref>). The number of records per journal averaged 218 and ranged from two to 8,624. Records across research fields averaged 2,340 and ranged from seven to 8,624 as some fields were only represented by a single journal. Across all articles, 23,598 were considered closed access whereas 4,483 were classified as hybrid gold.</p>
+      <p>Our model of the matched analysis dataset indicated that, in addition to access type, all other variables included in the model had significant relationships with citation counts, but moreover, the variables all interacted with access type to influence citation counts, except for year (<xref rid="table-5" ref-type="table">Table 5</xref>). Unlike with the full dataset, treating author count as a categorical (<italic toggle="yes">i.e.,</italic> binned) variable did not significantly improve the model (<inline-formula><alternatives><inline-graphic xlink:href="peerj-12-16824-i002.jpg"/><tex-math id="tex-ieqn-38">\documentclass[12pt]{minimal}
+\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{upgreek}
+\usepackage{mathrsfs}
+\setlength{\oddsidemargin}{-69pt}
+\begin{document}
+${\chi }_{12}^{2}=10.46$\end{document}</tex-math><mml:math id="mml-ieqn-38" overflow="scroll"><mml:msubsup><mml:mrow><mml:mi>χ</mml:mi></mml:mrow><mml:mrow><mml:mn>12</mml:mn></mml:mrow><mml:mrow><mml:mn>2</mml:mn></mml:mrow></mml:msubsup><mml:mo>=</mml:mo><mml:mn>10</mml:mn><mml:mo>.</mml:mo><mml:mn>46</mml:mn></mml:math></alternatives></inline-formula>, <italic toggle="yes">p</italic> = 0.56). The model indicated that with only a single author, hybrid gold generated 1.26 (1.136–1.4; 95% C.L.) times as many citations as closed access (<xref rid="fig-3" ref-type="fig">Fig. 3A</xref>; <italic toggle="yes">z</italic> = 4.339, Bonferroni-adjusted <italic toggle="yes">p</italic> &lt; 0.0001). The differences between hybrid gold and closed access decreased with increasing number of authors until 16 authors, at which point differences were not statistically significant (<xref rid="fig-3" ref-type="fig">Fig. 3A</xref>; <italic toggle="yes">z</italic> = 1.823, Bonferroni-adjusted <italic toggle="yes">p</italic> = 0.068). Above ∼60 authors, differences between access types were once again significant, with closed access generating more citations than hybrid gold (<xref rid="fig-3" ref-type="fig">Fig. 3A</xref>; <italic toggle="yes">z</italic> =  − 2.290, Bonferroni-adjusted <italic toggle="yes">p</italic> = 0.0220).</p>
+      <table-wrap position="float" id="table-5">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/table-5</object-id>
+        <label>Table 5</label>
+        <caption>
+          <title>Results of analysis of matched dataset.</title>
+          <p>Type II Wald chi-square tests were used. Thus, significance tests of interactions terms were marginal, but significance tests of main-effects terms were marginal excluding all interaction terms.</p>
+        </caption>
+        <alternatives>
+          <graphic xlink:href="peerj-12-16824-g010" position="float"/>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowspan="1" colspan="1">Variable</th>
+                <th align="center" rowspan="1" colspan="1">
+<italic toggle="yes">χ</italic>
+<sup>2</sup>
+</th>
+                <th align="center" rowspan="1" colspan="1">df</th>
+                <th align="center" rowspan="1" colspan="1"><italic toggle="yes">p</italic>-value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="1" colspan="1">Access type</td>
+                <td rowspan="1" colspan="1">221.06</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Author count</td>
+                <td rowspan="1" colspan="1">238.65</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">JCR quartile</td>
+                <td rowspan="1" colspan="1">86.64</td>
+                <td rowspan="1" colspan="1">3</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">AIS</td>
+                <td rowspan="1" colspan="1">55.73</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Year</td>
+                <td rowspan="1" colspan="1">1,846.44</td>
+                <td rowspan="1" colspan="1">5</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Access type × Author count</td>
+                <td rowspan="1" colspan="1"> 14.43</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">0.00014</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Access type × JCR quartile</td>
+                <td rowspan="1" colspan="1">19.42</td>
+                <td rowspan="1" colspan="1">3</td>
+                <td rowspan="1" colspan="1">&lt;0.0002</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Access type × AIS</td>
+                <td rowspan="1" colspan="1">4.12</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">0.04</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Access type × Year</td>
+                <td rowspan="1" colspan="1">6.86</td>
+                <td rowspan="1" colspan="1">5</td>
+                <td rowspan="1" colspan="1">0.23</td>
+              </tr>
+            </tbody>
+          </table>
+        </alternatives>
+      </table-wrap>
+      <fig position="float" id="fig-3">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/fig-3</object-id>
+        <label>Figure 3</label>
+        <caption>
+          <title>Citations as a function of various variables and access type from same issue of journal.</title>
+          <p>Access type is color coded to match <xref rid="fig-2" ref-type="fig">Fig. 2</xref>. (A) Interaction between access type and author count. (B) Interaction between access type and JCR quartile. JCR Quartile of 1 represents the highest journals by Journal Impact Factor. (C) Interaction between access type and scaled (standardized) AIS values. Note: Access type by year is not shown here because this interaction term was not significant in this analysis (see <xref rid="table-5" ref-type="table">Table 5</xref>).</p>
+        </caption>
+        <graphic xlink:href="peerj-12-16824-g003" position="float"/>
+      </fig>
+      <p>Similar to the analysis of the full dataset, and despite the interaction, the general pattern of hybrid gold &gt; closed access, in terms of number of citations, held across JCR Quartiles and scaled AIS values (<xref rid="fig-3" ref-type="fig">Figs. 3B</xref>, <xref rid="fig-3" ref-type="fig">3C</xref>. As with the full dataset, the differences between the two types of access decreased with higher-numbered JCR Quartiles (<xref rid="fig-3" ref-type="fig">Fig. 3B</xref>) or lower scaled AIS scores (<xref rid="fig-3" ref-type="fig">Fig. 3C</xref>). By the 4th JCR quartile, differences between hybrid gold and closed access were no longer statistically significant (<xref rid="fig-3" ref-type="fig">Fig. 3B</xref>; <italic toggle="yes">z</italic> =  − 0.407; p = 0 .68). Finally, we observed significantly greater number of citations for hybrid gold compared to closed access at all scaled AIS values, although differences decreased very slightly with increasing AIS values (<xref rid="fig-3" ref-type="fig">Fig. 3C</xref>; all <italic toggle="yes">z</italic> &gt; 3.677, all <italic toggle="yes">p</italic> &gt; 0.0002).</p>
+      <p>Our APC analysis included 17,542 journal articles from 152 journals across 11 fields; the field of Biochemistry and Cellular Biology was comprised of articles from a single journal, and hence was removed from the analysis due to limited sample sizes that impacted model convergence. The number of records per journal averaged 116 and ranged from one to 2,649. Records across research fields averaged 1,594 and ranged from 270 to 4,501. In a simple analysis of the relationship between number of citations and APCs, we found that for each standard deviation increase in APC (about $1,500), we observed a 19.7% (17.7%–21.9%; 95% C.L.) increase in the number of citations (<italic toggle="yes">p</italic> &lt; 0.0001). However, we also found that for each $1,000 dollar increase in APC, there was about a 1 unit (0.93 ± 0.03; ± 95% C.I.) increase in AIS (standard linear regression; <italic toggle="yes">p</italic> &lt; 0.0001; <italic toggle="yes">r</italic><sup>2</sup> = 0.21; note that AIS in the data ranged from 0.17 to 20.8). After statistically controlling for AIS, JCR quartile, author count, and year, we found that the main effect of APC was not significant, but that there were significant interactions between APC and year, as well as APC and scaled AIS values (<xref rid="table-6" ref-type="table">Table 6</xref>). Specifically, increasing APC resulted in slight increases in number of citations at low AIS, but almost no increase in number of citations at high AIS (<xref rid="fig-4" ref-type="fig">Fig. 4A</xref>). Similarly, increasing APCs resulted in negligible to a slight increase in number of citations for all years except 2017, in which cases increasing APCs resulted in a decrease in the number of citations (<xref rid="fig-4" ref-type="fig">Fig. 4B</xref>).</p>
+      <table-wrap position="float" id="table-6">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/table-6</object-id>
+        <label>Table 6</label>
+        <caption>
+          <title>Results of analysis of APC dataset.</title>
+          <p>Type II Wald chi-square tests were used. Thus, significance tests of interactions terms were marginal, but significance tests of main-effects terms were marginal excluding all interaction terms.</p>
+        </caption>
+        <alternatives>
+          <graphic xlink:href="peerj-12-16824-g011" position="float"/>
+          <table frame="hsides" rules="groups">
+            <colgroup span="1">
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+              <col span="1"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowspan="1" colspan="1">Variable</th>
+                <th align="center" rowspan="1" colspan="1">
+<italic toggle="yes">χ</italic>
+<sup>2</sup>
+</th>
+                <th align="center" rowspan="1" colspan="1">df</th>
+                <th align="center" rowspan="1" colspan="1"><italic toggle="yes">p</italic>-value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="1" colspan="1">APC</td>
+                <td rowspan="1" colspan="1">2.16</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">0.14</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Author count</td>
+                <td rowspan="1" colspan="1">172.62</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">JCR quartile</td>
+                <td rowspan="1" colspan="1">35.79</td>
+                <td rowspan="1" colspan="1">3</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">AIS</td>
+                <td rowspan="1" colspan="1">62.51</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">Year</td>
+                <td rowspan="1" colspan="1">3,284.59</td>
+                <td rowspan="1" colspan="1">5</td>
+                <td rowspan="1" colspan="1">&lt;0.0001</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">APC × Author count</td>
+                <td rowspan="1" colspan="1">1.91</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">0.17</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">APC × JCR quartile</td>
+                <td rowspan="1" colspan="1">5.20</td>
+                <td rowspan="1" colspan="1">3</td>
+                <td rowspan="1" colspan="1">0.15</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">APC × AIS</td>
+                <td rowspan="1" colspan="1">12.90</td>
+                <td rowspan="1" colspan="1">1</td>
+                <td rowspan="1" colspan="1">0.0003</td>
+              </tr>
+              <tr>
+                <td rowspan="1" colspan="1">APC × Year</td>
+                <td rowspan="1" colspan="1">19.50</td>
+                <td rowspan="1" colspan="1">5</td>
+                <td rowspan="1" colspan="1">0.0015</td>
+              </tr>
+            </tbody>
+          </table>
+        </alternatives>
+      </table-wrap>
+      <fig position="float" id="fig-4">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/fig-4</object-id>
+        <label>Figure 4</label>
+        <caption>
+          <title>Citations in hybrid gold articles as a function of APC and AIS or year.</title>
+          <p>(A) Interaction between APC and scaled (standardized) AIS values. (B) Interaction between APC and year of publication.</p>
+        </caption>
+        <graphic xlink:href="peerj-12-16824-g004" position="float"/>
+      </fig>
+    </sec>
+    <sec>
+      <title>Discussion and Conclusion</title>
+      <p>In this study we found a significant open access citation advantage for OA articles of all types—gold, green, and bronze—relative to closed access articles published in hybrid journals (<xref rid="fig-2" ref-type="fig">Fig. 2</xref>). The citation advantage was more pronounced advantage for hybrid gold articles than for bronze or green articles, suggesting that paying an APC to make an article available from the publisher’s website under an open license provides a greater comparative citation advantage (but see further discussion of the APC charges below). However, this pattern may be due to the fact that we operated as if bronze and green articles were made open upon publication, which is not necessarily the case. For example, an article may be considered green if a preprint was made available a year prior to publication, or an article classified as bronze may have only been made open temporarily. Future research investigating whether publishing open access yields more citations should attempt to account for when articles classified as non-gold OA became open and how long they stayed open, using tools such as the Unpaywall<sup>®</sup> database (<xref rid="ref-46" ref-type="bibr">Unpaywall, 2024</xref>). Two exceptions to this pattern were articles with a large number of authors (&gt; ∼32 authors) and articles published in relatively low profile journals (AIS scores close to 0 and/or in the lowest JCR quartile). We observed the same general patterns when comparing only hybrid gold and closed access articles that were published in the same issue of a journal (<xref rid="fig-3" ref-type="fig">Fig. 3</xref>).</p>
+      <p>When publishing under hybrid gold access models, journals with higher AIS scores (<italic toggle="yes">i.e.,</italic> higher citation rate) tend to have higher APCs (<xref rid="ref-9" ref-type="bibr">Budzinski et al., 2020</xref>). Thus, paying the higher APCs associated with high impact hybrid journals may result in more citations, a pattern we recovered support for in our APC analysis. However, after controlling for the effect of journal impact quantified by AIS, higher APCs had minimal effects on citation counts. It is worth noting that our APC values were collected from 2021 despite the records being from 2013–2018. As a result, these do not fully reflect the variation in APCs within journals over time in our dataset. In fact, we found obtaining past values of APCs to be challenging. Therefore, it may be helpful if cost at the time of publishing were included somehow in the meta data of each article through Clarivate Analytics™ to facilitate these types of studies in the future. Disentangling the effects of journal metrics when trying to assess whether paying an APC adds additional citations has proven difficult, as authors may prioritize making their more high profile work open (<xref rid="ref-15" ref-type="bibr">Craig et al., 2007</xref>). Our results were consistent with <xref rid="ref-38" ref-type="bibr">Piwowar et al. (2018)</xref>, who found an OA citation advantage primarily driven by hybrid gold publishing.</p>
+      <p>Our results indicate that paying an APC for gold OA in a hybrid journal or self-depositing at no cost to the authors is a tradeoff between time and money. Opting for the gold route by paying an APC allows an article to be freely available immediately upon publication, increasing the potential audience size by removing barriers to reader access while the research is new, likely increasing the attention the article receives. Indeed, our results suggest that publishing gold OA article in a hybrid journal maximizes citations in most scenarios. Additionally, choosing to publish gold OA avoids the embargo period imposed by publishers that authors face when choosing to publish green OA, which may last six months or more post-publication. That said, our results do indicate that self-archiving also confers an (albeit less pronounced) citation advantage; therefore, if funds are not available it is still advantageous for authors to deposit their works in repositories (<xref rid="fig-5" ref-type="fig">Fig. 5</xref>).</p>
+      <fig position="float" id="fig-5">
+        <object-id pub-id-type="doi">10.7717/peerj.16824/fig-5</object-id>
+        <label>Figure 5</label>
+        <caption>
+          <title>What to consider when publishing open access.</title>
+          <p>Authors have many junctures between article submission and appearance in a journal when they can make their research available while also saving money. After deciding which journal is a good fit for their research, if the journal has a lower Journal Impact Factor, authors can opt for the green route without sacrificing many potential citations (although a low profile journal likely will not have a prohibitively expensive APC). If the journal has a high Journal Impact Factor, whether author(s) should pay an APC comes down to their funding—if they have limited funds, they should forgo paying an APC and opt for the green route as that will be likely to garner more citations than publishing closed access. If authors go with the green route, they can submit their articles to a pre-print server before publication and archive in an institutional repository post-publication; the latter suggestion also applies to articles published closed access older than two years.</p>
+        </caption>
+        <graphic xlink:href="peerj-12-16824-g005" position="float"/>
+      </fig>
+      <p>Publishers are aware of this tradeoff, as evidenced by the mainstreaming of the hybrid model, the rise of APCs themselves (<xref rid="ref-9" ref-type="bibr">Budzinski et al., 2020</xref>), and increased restrictions on self-archiving (<xref rid="ref-20" ref-type="bibr">Gadd &amp; Troll Covey, 2019</xref>). Though many authors have noticed higher APCs within the same journals over time (<xref rid="ref-25" ref-type="bibr">Khoo, 2019</xref>), historical data on APCs is difficult to find. In 2019, then-current APCs were published for a selection of journals listed in the Directory of Open Access Journals (<xref rid="ref-26" ref-type="bibr">Krzton, 2019</xref>). In a 4-year time frame (between 2019 and 2022), the APCs for all but one journal became more expensive, and one title (PLoS Biology) increased its APC by nearly 77% (<xref rid="table-1" ref-type="table">Table 1</xref>). While these figures are from gold (fully OA) journals rather than hybrid journals, they do reflect the trend of increasing APCs, and several of those journals are controlled by commercial publishers that also have substantial hybrid journal offerings within biology. Along with rising APCs, publishers have increased restrictions on the conditions of self-archiving one’s work, particularly by adding embargoes on green OA deposits (<xref rid="ref-20" ref-type="bibr">Gadd &amp; Troll Covey, 2019</xref>). Beyond putting authors in the difficult position of having to choose between allocating funds to new research or publishing their existing work gold OA, these new barriers threaten to drive further inequity between the Global North and South, which has spurred a growing movement to eliminate APCs altogether (<xref rid="ref-2" ref-type="bibr">Alperin, 2022</xref>; <xref rid="ref-37" ref-type="bibr">Peterson et al., 2019</xref>; <xref rid="ref-1" ref-type="bibr">Alizon, 2018</xref>; <xref rid="ref-33" ref-type="bibr">Mekonnen et al., 2022</xref>).</p>
+      <p>In light of the foregoing discussion, we offer the following recommendations to authors submitting a manuscript to a biology journal (visualized in <xref rid="fig-5" ref-type="fig">Fig. 5</xref>):</p>
+      <list list-type="simple" id="list-1">
+        <list-item>
+          <label> •</label>
+          <p><bold>Check whether your institution has a nonexclusive right to deposit prior to publication</bold>. Some universities have adopted policies that assert a nonexclusive right to distribute scholarly work by affiliated personnel <italic toggle="yes">via</italic> the institutional repository on behalf of the authors. These policies are designed to supersede publisher embargoes on self-deposit and may allow for green open access to articles at the time of acceptance without paying an APC.</p>
+        </list-item>
+        <list-item>
+          <label> •</label>
+          <p><bold>Consider depositing all closed access articles at least two years old</bold>. While it is preferable to know when a publisher will allow a closed access article to be deposited in an open repository prior to submission to a subscription journal, many authors do not realize green OA is an option until after they have a substantial publication history. As green OA articles were found to have a citation advantage in this study and others (<xref rid="ref-36" ref-type="bibr">Ottaviani, 2016</xref>), we suggest authors consider depositing earlier published works when journal policies allow. Embargo periods for accepted manuscripts typically range from six months to two years for self-archiving in an institutional repository, allowing authors to leverage the OA citation advantage for these older articles at no cost to themselves. We recommend contacting scholarly communications units and/or libraries with questions about copyright and self-archiving. Some institutions may even provide assistance with deposit through their scholarly communication units and/or libraries. The online resource Sherpa Romeo (<xref rid="ref-40" ref-type="bibr">Romeo, 2024</xref>) is another helpful tool for finding open access policies.</p>
+        </list-item>
+        <list-item>
+          <label> •</label>
+          <p><bold>Choice of journal should not be dependent on access status</bold>. Due to the widespread adoption of OA through a variety of channels, most authors today have the option of publishing OA regardless of target journal. Authors should choose the best-fit journal for their research according to their preferred criteria, separate from the issue of when and how to make their work open. The only exception would be if a research sponsor mandates gold OA, which would limit researchers to publishing in gold or hybrid journals.</p>
+        </list-item>
+        <list-item>
+          <label> •</label>
+          <p><bold>If a research sponsor requires gold OA, their funding should cover the APC.</bold> Authors should review the terms of sponsored research agreements closely to see whether an OA mandate applies to any resulting publications. If sponsors specify immediate public access to the version of record <italic toggle="yes">via</italic> gold OA, authors should request that the sponsor cover the APC if publication fees are not already written into the grant.</p>
+        </list-item>
+        <list-item>
+          <label> •</label>
+          <p><bold>Authors should save the final accepted manuscript version for later deposit in institutional repositories</bold>. Many journals that permit green OA <italic toggle="yes">via</italic> deposit into an institutional repository still prohibit deposit of the publisher’s PDF with all journal formatting and typesetting applied. When the final version of the manuscript has been approved by the journal editors and all authors, at least one author should retain that version in manuscript form to deposit into an open repository. If the journal requires an embargo period, contact repositories to see whether an immediate deposit is possible with an embargo that will automatically expire on a certain date. This eliminates the need for authors to personally keep track of when they can self-deposit and also minimizes the chances of misplacing the manuscript file in the meantime.</p>
+        </list-item>
+        <list-item>
+          <label> •</label>
+          <p><bold>Ensure that articles will be published under a recognized open license when paying an APC for gold OA</bold>. When authors pay an APC, it is important to verify that the article will be published under a Creative Commons Attribution (“CC-BY”) or similar open license clearly listed either on the journal page or in the text of the article itself. This guarantees that authors only pay APCs for true gold OA as opposed to temporary free-to-read access.</p>
+        </list-item>
+      </list>
+    </sec>
+  </body>
+  <back>
+    <ack>
+      <p>This project began as a class assignment for the Fall 2020 iteration of the BIOL 6800 course at Auburn University. We would like to thank the students of this course for their contributions to this work.</p>
+    </ack>
+    <sec sec-type="additional-information">
+      <title>Additional Information and Declarations</title>
+      <fn-group content-type="competing-interests">
+        <title>Competing Interests</title>
+        <fn id="conflict-1" fn-type="COI-statement">
+          <p>The authors declare there are no competing interests.</p>
+        </fn>
+      </fn-group>
+      <fn-group content-type="author-contributions">
+        <title>Author Contributions</title>
+        <fn id="contribution-1" fn-type="con">
+          <p><xref rid="author-1" ref-type="contrib">Amanda D. Clark</xref> conceived and designed the experiments, performed the experiments, analyzed the data, prepared figures and/or tables, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-2" fn-type="con">
+          <p><xref rid="author-2" ref-type="contrib">Tanner C. Myers</xref> performed the experiments, analyzed the data, prepared figures and/or tables, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-3" fn-type="con">
+          <p><xref rid="author-3" ref-type="contrib">Todd D. Steury</xref> analyzed the data, prepared figures and/or tables, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-4" fn-type="con">
+          <p><xref rid="author-4" ref-type="contrib">Ali Krzton</xref> conceived and designed the experiments, performed the experiments, prepared figures and/or tables, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-5" fn-type="con">
+          <p><xref rid="author-5" ref-type="contrib">Julio Yanes</xref> performed the experiments, analyzed the data, prepared figures and/or tables, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-6" fn-type="con">
+          <p><xref rid="author-6" ref-type="contrib">Angela Barber</xref> performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-7" fn-type="con">
+          <p><xref rid="author-7" ref-type="contrib">Jacqueline Barry</xref> performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-8" fn-type="con">
+          <p><xref rid="author-8" ref-type="contrib">Subarna Barua</xref> performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-9" fn-type="con">
+          <p><xref rid="author-9" ref-type="contrib">Katherine Eaton</xref> performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-10" fn-type="con">
+          <p><xref rid="author-10" ref-type="contrib">Devadatta Gosavi</xref> performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-11" fn-type="con">
+          <p><xref rid="author-11" ref-type="contrib">Rebecca Nance</xref> performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-12" fn-type="con">
+          <p><xref rid="author-12" ref-type="contrib">Zahida Pervaiz</xref> performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-13" fn-type="con">
+          <p><xref rid="author-13" ref-type="contrib">Chidozie Ugochukwu</xref> performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-14" fn-type="con">
+          <p><xref rid="author-14" ref-type="contrib">Patricia Hartman</xref> conceived and designed the experiments, performed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+        <fn id="contribution-15" fn-type="con">
+          <p><xref rid="author-15" ref-type="contrib">Laurie S. Stevison</xref> conceived and designed the experiments, analyzed the data, prepared figures and/or tables, authored or reviewed drafts of the article, and approved the final draft.</p>
+        </fn>
+      </fn-group>
+      <fn-group content-type="other">
+        <title>Data Availability</title>
+        <fn id="addinfo-1">
+          <p>The following information was supplied regarding data availability:</p>
+          <p>The data and scripts are available at Zenodo: Amanda Clark, Tanner Myers, Laurie Stevison, steu4718, &amp; Julio Alejandro Yanes. (2022). AUCompBio/OA_2021_AU: v1.0 updated (v1.1). Zenodo. <ext-link xlink:href="https://doi.org/10.5281/zenodo.7416222" ext-link-type="uri">https://doi.org/10.5281/zenodo.7416222</ext-link>.</p>
+          <p>Data included herein are derived from Clarivate Analytics™ Web of Science. Copyright Clarivate 2021.</p>
+        </fn>
+      </fn-group>
+    </sec>
+    <ref-list content-type="authoryear">
+      <title>References</title>
+      <ref id="ref-1">
+        <label>Alizon (2018)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Alizon</surname><given-names>S</given-names></name>
+</person-group><year iso-8601-date="2018">2018</year><article-title>Inexpensive research in the golden open-access era</article-title><source>Trends in Ecology &amp; Evolution</source><volume>33</volume><issue>5</issue><fpage>301</fpage><lpage>303</lpage><pub-id pub-id-type="doi">10.1016/j.tree.2018.02.005</pub-id><pub-id pub-id-type="pmid">29625710</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-2">
+        <label>Alperin (2022)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Alperin</surname><given-names>JP</given-names></name>
+</person-group><year iso-8601-date="2022">2022</year><article-title>Why I think ending article-processing charges will save open access</article-title><source>Nature</source><volume>610</volume><fpage>233</fpage><pub-id pub-id-type="doi">10.1038/d41586-022-03201-w</pub-id><pub-id pub-id-type="pmid">36224414</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-3">
+        <label>AlRyalat et al. (2019)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>AlRyalat</surname><given-names>SA</given-names></name>
+<name><surname>Nassar</surname><given-names>AA</given-names></name>
+<name><surname>Tamimi</surname><given-names>F</given-names></name>
+<name><surname>Al-Fraihat</surname><given-names>E</given-names></name>
+<name><surname>Assaf</surname><given-names>L</given-names></name>
+<name><surname>Ghareeb</surname><given-names>R</given-names></name>
+<name><surname>Masoudi</surname><given-names>M</given-names></name>
+<name><surname>Al-Essa</surname><given-names>M</given-names></name>
+</person-group><year iso-8601-date="2019">2019</year><article-title>The impact of the open-access status on journal indices: oncology journals</article-title><source>Journal of Gastrointestinal Oncology</source><volume>10</volume><issue>4</issue><fpage>777</fpage><lpage>782</lpage><pub-id pub-id-type="doi">10.21037/jgo.2019.02.13</pub-id><pub-id pub-id-type="pmid">31392058</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-4">
+        <label>American Association for the Advancement of Science (2022)</label>
+        <element-citation publication-type="report">
+          <person-group person-group-type="author">
+<collab>American Association for the Advancement of Science</collab>
+</person-group>
+          <year iso-8601-date="2022">2022</year>
+          <article-title>Exploring the hidden impacts of open access financing mechanisms: AAAS survey on scholarly publication experiences &amp; perspectives</article-title>
+          <fpage>1</fpage>
+          <lpage>7</lpage>
+          <uri xlink:href="https://www.aaas.org/sites/default/files/2022-10/OpenAccessSurveyReport_Oct2022_FINAL.pdf">https://www.aaas.org/sites/default/files/2022-10/OpenAccessSurveyReport_Oct2022_FINAL.pdf</uri>
+        </element-citation>
+      </ref>
+      <ref id="ref-5">
+        <label>Archambault et al. (2016)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Archambault</surname><given-names>É</given-names></name>
+<name><surname>Côté</surname><given-names>G</given-names></name>
+<name><surname>Struck</surname><given-names>B</given-names></name>
+<name><surname>Voorons</surname><given-names>M</given-names></name>
+</person-group>
+          <year iso-8601-date="2016">2016</year>
+          <article-title>Research impact of paywalled versus open access papers</article-title>
+          <source>Copyright, Fair Use, Scholarly Communication, Etc.</source>
+          <fpage>1</fpage>
+          <lpage>5</lpage>
+        </element-citation>
+      </ref>
+      <ref id="ref-6">
+        <label>Asai (2022)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Asai</surname><given-names>S</given-names></name>
+</person-group>
+          <year iso-8601-date="2022">2022</year>
+          <article-title>Determinants of article processing charges for hybrid and gold open access journals</article-title>
+          <source>Information Discovery and Delivery</source>
+          <volume>51</volume>
+          <fpage>121</fpage>
+          <lpage>129</lpage>
+          <pub-id pub-id-type="doi">10.1108/IDD-09-2021-0098</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-7">
+        <label>Basson, Blanckenberg &amp; Prozesky (2021)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Basson</surname><given-names>I</given-names></name>
+<name><surname>Blanckenberg</surname><given-names>JP</given-names></name>
+<name><surname>Prozesky</surname><given-names>H</given-names></name>
+</person-group>
+          <year iso-8601-date="2021">2021</year>
+          <article-title>Do open access journal articles experience a citation advantage? Results and methodological reflections of an application of multiple measures to an analysis by WoS subject areas</article-title>
+          <source>Scientometrics</source>
+          <volume>126</volume>
+          <issue>1</issue>
+          <fpage>459</fpage>
+          <lpage>484</lpage>
+          <pub-id pub-id-type="doi">10.1007/s11192-020-03734-9</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-8">
+        <label>Björk (2017)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Björk</surname><given-names>B-C</given-names></name>
+</person-group><year iso-8601-date="2017">2017</year><article-title>Growth of hybrid open access, 2009–2016</article-title><source>PeerJ</source><volume>5</volume><elocation-id>e3878</elocation-id><pub-id pub-id-type="doi">10.7717/peerj.3878</pub-id><pub-id pub-id-type="pmid">28975059</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-9">
+        <label>Budzinski et al. (2020)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Budzinski</surname><given-names>O</given-names></name>
+<name><surname>Grebel</surname><given-names>T</given-names></name>
+<name><surname>Wolling</surname><given-names>J</given-names></name>
+<name><surname>Zhang</surname><given-names>X</given-names></name>
+</person-group>
+          <year iso-8601-date="2020">2020</year>
+          <article-title>Drivers of article processing charges in open access</article-title>
+          <source>Scientometrics</source>
+          <volume>124</volume>
+          <issue>3</issue>
+          <fpage>2185</fpage>
+          <lpage>2206</lpage>
+          <pub-id pub-id-type="doi">10.1007/s11192-020-03578-3</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-10">
+        <label>Butler et al. (2023)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Butler</surname><given-names>L-A</given-names></name>
+<name><surname>Matthias</surname><given-names>L</given-names></name>
+<name><surname>Simard</surname><given-names>M-A</given-names></name>
+<name><surname>Mongeon</surname><given-names>P</given-names></name>
+<name><surname>Haustein</surname><given-names>S</given-names></name>
+</person-group>
+          <article-title>The oligopoly’s shift to open access: How the big five academic publishers profit from article processing charges</article-title>
+          <source>Quantitative Science Studies</source>
+          <year iso-8601-date="2023">2023</year>
+          <fpage>1</fpage>
+          <lpage>22</lpage>
+          <pub-id pub-id-type="doi">10.1162/qss_a_00272</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-11">
+        <label>Calver &amp; Bradley (2010)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Calver</surname><given-names>MC</given-names></name>
+<name><surname>Bradley</surname><given-names>JS</given-names></name>
+</person-group><year iso-8601-date="2010">2010</year><article-title>Patterns of citations of open access and non-open access conservation biology journal papers and book chapters</article-title><source>Conservation Biology: The Journal of the Society for Conservation Biology</source><volume>24</volume><issue>3</issue><fpage>872</fpage><lpage>880</lpage><pub-id pub-id-type="doi">10.1111/j.1523-1739.2010.01509.x</pub-id><pub-id pub-id-type="pmid">20455909</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-12">
+        <label>Chapman et al. (2019)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Chapman</surname><given-names>CA</given-names></name>
+<name><surname>Bicca-Marques</surname><given-names>JC</given-names></name>
+<name><surname>Calvignac-Spencer</surname><given-names>S</given-names></name>
+<name><surname>Fan</surname><given-names>P</given-names></name>
+<name><surname>Fashing</surname><given-names>PJ</given-names></name>
+<name><surname>Gogarten</surname><given-names>J</given-names></name>
+<name><surname>Guo</surname><given-names>S</given-names></name>
+<name><surname>Hemingway</surname><given-names>CA</given-names></name>
+<name><surname>Leendertz</surname><given-names>F</given-names></name>
+<name><surname>Li</surname><given-names>B</given-names></name>
+<name><surname>Matsuda</surname><given-names>I</given-names></name>
+<name><surname>Hou</surname><given-names>R</given-names></name>
+<name><surname>Serio-Silva</surname><given-names>JC</given-names></name>
+<name><surname>Chr. Stenseth</surname><given-names>N</given-names></name>
+</person-group>
+          <year iso-8601-date="2019">2019</year>
+          <article-title>Games academics play and their consequences: how authorship, h-index and journal impact factors are shaping the future of academia</article-title>
+          <source>Proceedings of the Royal Society B: Biological Sciences</source>
+          <volume>286</volume>
+          <issue>1916</issue>
+          <fpage>20192047</fpage>
+          <pub-id pub-id-type="doi">10.1098/rspb.2019.2047</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-13">
+        <label>Clark et al. (2022)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Clark</surname><given-names>AD</given-names></name>
+<name><surname>Myers</surname><given-names>TC</given-names></name>
+<name><surname>Steury</surname><given-names>TD</given-names></name>
+<name><surname>Krzton</surname><given-names>A</given-names></name>
+<name><surname>Yanes</surname><given-names>JA</given-names></name>
+<name><surname>Barber</surname><given-names>A</given-names></name>
+<name><surname>Barry</surname><given-names>JL</given-names></name>
+<name><surname>Barua</surname><given-names>S</given-names></name>
+<name><surname>Eaton</surname><given-names>KM</given-names></name>
+<name><surname>Gosavi</surname><given-names>D</given-names></name>
+<name><surname>Nance</surname><given-names>RL</given-names></name>
+<name><surname>Pervaiz</surname><given-names>ZH</given-names></name>
+<name><surname>Ugochukwu</surname><given-names>CG</given-names></name>
+<name><surname>Hartman</surname><given-names>P</given-names></name>
+<name><surname>Stevison</surname><given-names>LS</given-names></name>
+</person-group>
+          <year iso-8601-date="2022">2022</year>
+          <article-title>Does it pay to pay? A comparison of the benefits of open-access publishing across various sub-fields in Biology</article-title>
+          <source>BioRxiv</source>
+          <fpage>1</fpage>
+          <lpage>31</lpage>
+          <pub-id pub-id-type="doi">10.1101/2022.12.10.519925</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-14">
+        <label>Clements (2017)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Clements</surname><given-names>JC</given-names></name>
+</person-group>
+          <year iso-8601-date="2017">2017</year>
+          <article-title>Open access articles receive more citations in hybrid marine ecology journals</article-title>
+          <source>Facets</source>
+          <volume>2</volume>
+          <issue>1</issue>
+          <fpage>1</fpage>
+          <lpage>14</lpage>
+          <pub-id pub-id-type="doi">10.1139/facets-2016-0032</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-15">
+        <label>Craig et al. (2007)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Craig</surname><given-names>ID</given-names></name>
+<name><surname>Plume</surname><given-names>AM</given-names></name>
+<name><surname>McVeigh</surname><given-names>ME</given-names></name>
+<name><surname>Pringle</surname><given-names>J</given-names></name>
+<name><surname>Amin</surname><given-names>M</given-names></name>
+</person-group>
+          <year iso-8601-date="2007">2007</year>
+          <article-title>Do open access articles have greater citation impact?: a critical review of the literature</article-title>
+          <source>Journal of Informetrics</source>
+          <volume>1</volume>
+          <issue>3</issue>
+          <series>The Hirsch Index</series>
+          <fpage>239</fpage>
+          <lpage>248</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.joi.2007.04.001</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-16">
+        <label>Dorta-González, González-Betancor &amp; Dorta-González (2017)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Dorta-González</surname><given-names>P</given-names></name>
+<name><surname>González-Betancor</surname><given-names>SM</given-names></name>
+<name><surname>Dorta-González</surname><given-names>MI</given-names></name>
+</person-group>
+          <year iso-8601-date="2017">2017</year>
+          <article-title>Reconsidering the gold open access citation advantage postulate in a multidisciplinary context: an analysis of the subject categories in the Web of Science database 2009–2014</article-title>
+          <source>Scientometrics</source>
+          <volume>112</volume>
+          <issue>2</issue>
+          <fpage>877</fpage>
+          <lpage>901</lpage>
+          <pub-id pub-id-type="doi">10.1007/s11192-017-2422-y</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-17">
+        <label>Emery et al. (2021)</label>
+        <element-citation publication-type="report">
+          <person-group person-group-type="author">
+<name><surname>Emery</surname><given-names>C</given-names></name>
+<name><surname>Lucraft</surname><given-names>M</given-names></name>
+<name><surname>Monaghan</surname><given-names>J</given-names></name>
+<name><surname>Stuart</surname><given-names>D</given-names></name>
+<name><surname>Winter</surname><given-names>S</given-names></name>
+</person-group>
+          <year iso-8601-date="2021">2021</year>
+          <article-title>Going for gold: exploring the reach and impact of Gold open access articles in hybrid journals</article-title>
+          <source>Technical report</source>
+          <institution>Cham: Springer Nature</institution>
+          <fpage>1</fpage>
+          <lpage>33</lpage>
+        </element-citation>
+      </ref>
+      <ref id="ref-18">
+        <label>Eysenbach (2006)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Eysenbach</surname><given-names>G</given-names></name>
+</person-group><year iso-8601-date="2006">2006</year><article-title>Citation advantage of open access articles</article-title><source>PLOS Biology</source><volume>4</volume><issue>5</issue><elocation-id>e157</elocation-id><pub-id pub-id-type="doi">10.1371/journal.pbio.0040157</pub-id><pub-id pub-id-type="pmid">16683865</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-19">
+        <label>Fox &amp; Weisberg (2019)</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+<name><surname>Fox</surname><given-names>J</given-names></name>
+<name><surname>Weisberg</surname><given-names>S</given-names></name>
+</person-group>
+          <year iso-8601-date="2019">2019</year>
+          <source>An R companion to applied regression, Third edition</source>
+          <publisher-loc>Thousand Oaks, CA</publisher-loc>
+          <publisher-name>Sage</publisher-name>
+        </element-citation>
+      </ref>
+      <ref id="ref-20">
+        <label>Gadd &amp; Troll Covey (2019)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Gadd</surname><given-names>E</given-names></name>
+<name><surname>Troll Covey</surname><given-names>D</given-names></name>
+</person-group>
+          <year iso-8601-date="2019">2019</year>
+          <article-title>What does ‘green’ open access mean? Tracking twelve years of changes to journal publisher self-archiving policies</article-title>
+          <source>Journal of Librarianship and Information Science</source>
+          <volume>51</volume>
+          <issue>1</issue>
+          <fpage>106</fpage>
+          <lpage>122</lpage>
+          <pub-id pub-id-type="doi">10.1177/0961000616657406</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-21">
+        <label>Harnad &amp; Brody (2004)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Harnad</surname><given-names>S</given-names></name>
+<name><surname>Brody</surname><given-names>T</given-names></name>
+</person-group>
+          <year iso-8601-date="2004">2004</year>
+          <article-title>Comparing the impact of open access (OA) vs. non-OA articles in the same journals</article-title>
+          <source>D-Lib Magazine</source>
+          <volume>10</volume>
+          <issue>6</issue>
+          <comment>Number: 6</comment>
+        </element-citation>
+      </ref>
+      <ref id="ref-22">
+        <label>Holmberg et al. (2020)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Holmberg</surname><given-names>K</given-names></name>
+<name><surname>Hedman</surname><given-names>J</given-names></name>
+<name><surname>Bowman</surname><given-names>TD</given-names></name>
+<name><surname>Didegah</surname><given-names>F</given-names></name>
+<name><surname>Laakso</surname><given-names>M</given-names></name>
+</person-group>
+          <year iso-8601-date="2020">2020</year>
+          <article-title>Do articles in open access journals have more frequent altmetric activity than articles in subscription-based journals? An investigation of the research output of Finnish universities</article-title>
+          <source>Scientometrics</source>
+          <volume>122</volume>
+          <issue>1</issue>
+          <fpage>645</fpage>
+          <lpage>659</lpage>
+          <pub-id pub-id-type="doi">10.1007/s11192-019-03301-x</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-23">
+        <label>Hubbard (2017)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Hubbard</surname><given-names>DE</given-names></name>
+</person-group>
+          <year iso-8601-date="2017">2017</year>
+          <article-title>Open access citation advantage? A local study at a large research university</article-title>
+          <source>Proceedings of the Association for Information Science and Technology</source>
+          <volume>54</volume>
+          <issue>1</issue>
+          <fpage>712</fpage>
+          <lpage>713</lpage>
+          <pub-id pub-id-type="doi">10.1002/pra2.2017.14505401126</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-24">
+        <label>Jahn, Matthias &amp; Laakso (2022)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Jahn</surname><given-names>N</given-names></name>
+<name><surname>Matthias</surname><given-names>L</given-names></name>
+<name><surname>Laakso</surname><given-names>M</given-names></name>
+</person-group>
+          <year iso-8601-date="2022">2022</year>
+          <article-title>Toward transparency of hybrid open access through publisher-provided metadata: an article-level study of Elsevier</article-title>
+          <source>Journal of the Association for Information Science and Technology</source>
+          <volume>73</volume>
+          <issue>1</issue>
+          <fpage>104</fpage>
+          <lpage>118</lpage>
+          <pub-id pub-id-type="doi">10.1002/asi.24549</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-25">
+        <label>Khoo (2019)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Khoo</surname><given-names>SY-S</given-names></name>
+</person-group>
+          <year iso-8601-date="2019">2019</year>
+          <article-title>Article processing charge hyperinflation and price insensitivity: an open access sequel to the serials crisis</article-title>
+          <source>LIBER Quarterly: The Journal of the Association of European Research Libraries</source>
+          <volume>29</volume>
+          <issue>1</issue>
+          <fpage>1</fpage>
+          <lpage>18</lpage>
+          <comment>Number: 1</comment>
+          <pub-id pub-id-type="doi">10.18352/lq.10280</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-26">
+        <label>Krzton (2019)</label>
+        <element-citation publication-type="confproc">
+          <person-group person-group-type="author">
+<name><surname>Krzton</surname><given-names>A</given-names></name>
+</person-group>
+          <year iso-8601-date="2019">2019</year>
+          <article-title>Support scholars who share: combating the mismatch between openness policies and professional rewards</article-title>
+          <conf-name>Recasting the Narrative: The Proceedings of the ACRL 2019 Conference</conf-name>
+          <fpage>578</fpage>
+          <lpage>586</lpage>
+          <pub-id pub-id-type="doi">10.35099/aurora-75</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-27">
+        <label>Laakso &amp; Björk (2016)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Laakso</surname><given-names>M</given-names></name>
+<name><surname>Björk</surname><given-names>B-C</given-names></name>
+</person-group>
+          <year iso-8601-date="2016">2016</year>
+          <article-title>Hybrid open access—A longitudinal study</article-title>
+          <source>Journal of Informetrics</source>
+          <volume>10</volume>
+          <issue>4</issue>
+          <fpage>919</fpage>
+          <lpage>932</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.joi.2016.08.002</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-28">
+        <label>Langham-Putrow, Bakker &amp; Riegelman (2021)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Langham-Putrow</surname><given-names>A</given-names></name>
+<name><surname>Bakker</surname><given-names>C</given-names></name>
+<name><surname>Riegelman</surname><given-names>A</given-names></name>
+</person-group><year iso-8601-date="2021">2021</year><article-title>Is the open access citation advantage real? A systematic review of the citation of open access and subscription-based articles</article-title><source>PLOS ONE</source><volume>16</volume><issue>6</issue><fpage>e0253129</fpage><pub-id pub-id-type="doi">10.1371/journal.pone.0253129</pub-id><pub-id pub-id-type="pmid">34161369</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-29">
+        <label>Lenth et al. (2022)</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+<name><surname>Lenth</surname><given-names>RV</given-names></name>
+<name><surname>Buerkner</surname><given-names>P</given-names></name>
+<name><surname>Giné-Vázquez</surname><given-names>I</given-names></name>
+<name><surname>Herve</surname><given-names>M</given-names></name>
+<name><surname>Jung</surname><given-names>M</given-names></name>
+<name><surname>Love</surname><given-names>J</given-names></name>
+<name><surname>Miguez</surname><given-names>F</given-names></name>
+<name><surname>Riebl</surname><given-names>H</given-names></name>
+<name><surname>Singmann</surname><given-names>H</given-names></name>
+</person-group>
+          <year iso-8601-date="2022">2022</year>
+          <source>emmeans: estimated marginal means, aka least-squares means</source>
+          <publisher-loc>Vienna, Austria</publisher-loc>
+          <publisher-name>R Foundation for Statistical Computing</publisher-name>
+        </element-citation>
+      </ref>
+      <ref id="ref-30">
+        <label>Lewis (2018)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Lewis</surname><given-names>CL</given-names></name>
+</person-group>
+          <year iso-8601-date="2018">2018</year>
+          <article-title>The open access citation advantage: does it exist and what does it mean for libraries?</article-title>
+          <source>Information Technology and Libraries</source>
+          <volume>37</volume>
+          <issue>3</issue>
+          <fpage>50</fpage>
+          <lpage>65</lpage>
+          <pub-id pub-id-type="doi">10.6017/ital.v37i3.10604</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-31">
+        <label>McCabe &amp; Snyder (2014)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>McCabe</surname><given-names>MJ</given-names></name>
+<name><surname>Snyder</surname><given-names>CM</given-names></name>
+</person-group>
+          <year iso-8601-date="2014">2014</year>
+          <article-title>Identifying the effect of open access on citations using a panel of science journals</article-title>
+          <source>Economic Inquiry</source>
+          <volume>52</volume>
+          <issue>4</issue>
+          <fpage>1284</fpage>
+          <lpage>1300</lpage>
+          <pub-id pub-id-type="doi">10.1111/ecin.12064</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-32">
+        <label>McKiernan et al. (2019)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>McKiernan</surname><given-names>EC</given-names></name>
+<name><surname>Schimanski</surname><given-names>LA</given-names></name>
+<name><surname>Muñoz Nieves</surname><given-names>C</given-names></name>
+<name><surname>Matthias</surname><given-names>L</given-names></name>
+<name><surname>Niles</surname><given-names>MT</given-names></name>
+<name><surname>Alperin</surname><given-names>JP</given-names></name>
+</person-group><year iso-8601-date="2019">2019</year><article-title>Use of the Journal Impact Factor in academic review, promotion, and tenure evaluations</article-title><source>ELife</source><volume>8</volume><person-group person-group-type="editor">
+<name><surname>Pewsey</surname><given-names>E</given-names></name>
+<name><surname>Rodgers</surname><given-names>P</given-names></name>
+<name><surname>Brembs</surname><given-names>B</given-names></name>
+</person-group><elocation-id>e47338</elocation-id><pub-id pub-id-type="doi">10.7554/eLife.47338</pub-id><pub-id pub-id-type="pmid">31364991</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-33">
+        <label>Mekonnen et al. (2022)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Mekonnen</surname><given-names>A</given-names></name>
+<name><surname>Downs</surname><given-names>C</given-names></name>
+<name><surname>Effiom</surname><given-names>EO</given-names></name>
+<name><surname>Kibaja</surname><given-names>M</given-names></name>
+<name><surname>Lawes</surname><given-names>MJ</given-names></name>
+<name><surname>Omeja</surname><given-names>P</given-names></name>
+<name><surname>Ratsoavina</surname><given-names>FM</given-names></name>
+<name><surname>Razafindratsima</surname><given-names>O</given-names></name>
+<name><surname>Sarkar</surname><given-names>D</given-names></name>
+<name><surname>Stenseth</surname><given-names>NC</given-names></name>
+<name><surname>Chapman</surname><given-names>CA</given-names></name>
+</person-group><year iso-8601-date="2022">2022</year><article-title>Can I afford to publish? A dilemma for African scholars</article-title><source>Ecology Letters</source><volume>25</volume><issue>4</issue><fpage>711</fpage><lpage>715</lpage><pub-id pub-id-type="doi">10.1111/ele.13949</pub-id><pub-id pub-id-type="pmid">34957647</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-34">
+        <label>Moed (2007)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Moed</surname><given-names>HF</given-names></name>
+</person-group>
+          <year iso-8601-date="2007">2007</year>
+          <article-title>The effect of “open access” on citation impact: an analysis of ArXiv’s condensed matter section</article-title>
+          <source>Journal of the American Society for Information Science and Technology</source>
+          <volume>58</volume>
+          <issue>13</issue>
+          <fpage>2047</fpage>
+          <lpage>2054</lpage>
+          <pub-id pub-id-type="doi">10.1002/asi.20663</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-35">
+        <label>Monaghan, Lucraft &amp; Allin (2020)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Monaghan</surname><given-names>J</given-names></name>
+<name><surname>Lucraft</surname><given-names>M</given-names></name>
+<name><surname>Allin</surname><given-names>K</given-names></name>
+</person-group>
+          <year iso-8601-date="2020">2020</year>
+          <article-title>’APCs in the Wild’: Could increased monitoring and consolidation of funding accelerate the transition to open access?</article-title>
+          <source>Figshare</source>
+          <pub-id pub-id-type="doi">10.6084/m9.figshare.11988123.v4</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-36">
+        <label>Ottaviani (2016)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Ottaviani</surname><given-names>J</given-names></name>
+</person-group><year iso-8601-date="2016">2016</year><article-title>The post-embargo open access citation advantage: it exists (probably), it’s modest (usually), and the rich get richer (of course)</article-title><source>PLOS ONE</source><volume>11</volume><issue>8</issue><elocation-id>e0159614</elocation-id><pub-id pub-id-type="doi">10.1371/journal.pone.0159614</pub-id><pub-id pub-id-type="pmid">27548723</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-37">
+        <label>Peterson et al. (2019)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Peterson</surname><given-names>AT</given-names></name>
+<name><surname>Anderson</surname><given-names>RP</given-names></name>
+<name><surname>Beger</surname><given-names>M</given-names></name>
+<name><surname>Bolliger</surname><given-names>J</given-names></name>
+<name><surname>Brotons</surname><given-names>L</given-names></name>
+<name><surname>Burridge</surname><given-names>CP</given-names></name>
+<name><surname>Cobos</surname><given-names>ME</given-names></name>
+<name><surname>Cuervo-Robayo</surname><given-names>AP</given-names></name>
+<name><surname>Di Minin</surname><given-names>E</given-names></name>
+<name><surname>Diez</surname><given-names>J</given-names></name>
+<name><surname>Elith</surname><given-names>J</given-names></name>
+<name><surname>Embling</surname><given-names>CB</given-names></name>
+<name><surname>Escobar</surname><given-names>LE</given-names></name>
+<name><surname>Essl</surname><given-names>F</given-names></name>
+<name><surname>Feeley</surname><given-names>KJ</given-names></name>
+<name><surname>Hawkes</surname><given-names>L</given-names></name>
+<name><surname>Jiménez-García</surname><given-names>D.</given-names></name>
+<name><surname>Jimenez</surname><given-names>L</given-names></name>
+<name><surname>Green</surname><given-names>DM</given-names></name>
+<name><surname>Knop</surname><given-names>E</given-names></name>
+<name><surname>Kühn</surname><given-names>I</given-names></name>
+<name><surname>Lahoz-Monfort</surname><given-names>JJ</given-names></name>
+<name><surname>Lira-Noriega</surname><given-names>A</given-names></name>
+<name><surname>Lobo</surname><given-names>JM</given-names></name>
+<name><surname>Loyola</surname><given-names>R</given-names></name>
+<name><surname>Mac Nally</surname><given-names>R</given-names></name>
+<name><surname>Machado-Stredel</surname><given-names>F</given-names></name>
+<name><surname>Martínez-Meyer</surname><given-names>E</given-names></name>
+<name><surname>McCarthy</surname><given-names>M</given-names></name>
+<name><surname>Merow</surname><given-names>C</given-names></name>
+<name><surname>Nori</surname><given-names>J</given-names></name>
+<name><surname>Nuñez-Penichet</surname><given-names>C</given-names></name>
+<name><surname>Osorio-Olvera</surname><given-names>L</given-names></name>
+<name><surname>Pyšek</surname><given-names>P</given-names></name>
+<name><surname>Rejmánek</surname><given-names>M.</given-names></name>
+<name><surname>Ricciardi</surname><given-names>A</given-names></name>
+<name><surname>Robertson</surname><given-names>M</given-names></name>
+<name><surname>Rojas-Soto</surname><given-names>O</given-names></name>
+<name><surname>Romero-Alvarez</surname><given-names>D</given-names></name>
+<name><surname>Roura-Pascual</surname><given-names>N</given-names></name>
+<name><surname>Santini</surname><given-names>L</given-names></name>
+<name><surname>Schoeman</surname><given-names>DS</given-names></name>
+<name><surname>Schröder</surname><given-names>B</given-names></name>
+<name><surname>Soberon</surname><given-names>J</given-names></name>
+<name><surname>Strubbe</surname><given-names>D</given-names></name>
+<name><surname>Thuiller</surname><given-names>W</given-names></name>
+<name><surname>Traveset</surname><given-names>A</given-names></name>
+<name><surname>Treml</surname><given-names>EA</given-names></name>
+<name><surname>Václavík</surname><given-names>T</given-names></name>
+<name><surname>Varela</surname><given-names>S</given-names></name>
+<name><surname>Watson</surname><given-names>JEM</given-names></name>
+<name><surname>Wiersma</surname><given-names>Y</given-names></name>
+<name><surname>Wintle</surname><given-names>B</given-names></name>
+<name><surname>Yañez-Arenas</surname><given-names>C</given-names></name>
+<name><surname>Zurell</surname><given-names>D</given-names></name>
+</person-group>
+          <year iso-8601-date="2019">2019</year>
+          <article-title>Open access solutions for biodiversity journals: do not replace one problem with another</article-title>
+          <source>Diversity and Distributions</source>
+          <volume>25</volume>
+          <issue>1</issue>
+          <fpage>5</fpage>
+          <lpage>8</lpage>
+          <pub-id pub-id-type="doi">10.1111/ddi.12885</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-38">
+        <label>Piwowar et al. (2018)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Piwowar</surname><given-names>H</given-names></name>
+<name><surname>Priem</surname><given-names>J</given-names></name>
+<name><surname>Larivière</surname><given-names>V</given-names></name>
+<name><surname>Alperin</surname><given-names>JP</given-names></name>
+<name><surname>Matthias</surname><given-names>L</given-names></name>
+<name><surname>Norlander</surname><given-names>B</given-names></name>
+<name><surname>Farley</surname><given-names>A</given-names></name>
+<name><surname>West</surname><given-names>J</given-names></name>
+<name><surname>Haustein</surname><given-names>S</given-names></name>
+</person-group><year iso-8601-date="2018">2018</year><article-title>The state of OA: a large-scale analysis of the prevalence and impact of Open Access articles</article-title><source>PeerJ</source><volume>6</volume><elocation-id>e4375</elocation-id><pub-id pub-id-type="doi">10.7717/peerj.4375</pub-id><pub-id pub-id-type="pmid">29456894</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-39">
+        <label>R Core Team (2020)</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+<collab>R Core Team</collab>
+</person-group>
+          <year iso-8601-date="2020">2020</year>
+          <data-title>R: a language and environment for statistical computing</data-title>
+          <publisher-name>R Foundation for Statistical Computing</publisher-name>
+          <publisher-loc>Vienna, Austria</publisher-loc>
+        </element-citation>
+      </ref>
+      <ref id="ref-40">
+        <label>Romeo (2024)</label>
+        <element-citation publication-type="other">
+          <person-group person-group-type="author">
+<name><surname>Romeo</surname><given-names>S</given-names></name>
+</person-group>
+          <year iso-8601-date="2024">2024</year>
+          <article-title>Sherpa Romeo. Sherpa services</article-title>
+          <uri xlink:href="https://v2.sherpa.ac.uk/romeo/">https://v2.sherpa.ac.uk/romeo/</uri>
+        </element-citation>
+      </ref>
+      <ref id="ref-41">
+        <label>RStudio Team (2020)</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+<collab>RStudio Team</collab>
+</person-group>
+          <year iso-8601-date="2020">2020</year>
+          <data-title>RStudio: integrated development for R</data-title>
+          <publisher-name>RStudio</publisher-name>
+          <publisher-loc>Boston, MA</publisher-loc>
+        </element-citation>
+      </ref>
+      <ref id="ref-42">
+        <label>Sotudeh, Arabzadeh &amp; Mirzabeigi (2019)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Sotudeh</surname><given-names>H</given-names></name>
+<name><surname>Arabzadeh</surname><given-names>H</given-names></name>
+<name><surname>Mirzabeigi</surname><given-names>M</given-names></name>
+</person-group>
+          <year iso-8601-date="2019">2019</year>
+          <article-title>How do self-archiving and author-pays models associate and contribute to OA citation advantage within hybrid journals?</article-title>
+          <source>Journal of Academic Librarianship</source>
+          <volume>45</volume>
+          <issue>4</issue>
+          <fpage>377</fpage>
+          <lpage>385</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.acalib.2019.05.004</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-43">
+        <label>Tang, Bever &amp; Yu (2017)</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+<name><surname>Tang</surname><given-names>M</given-names></name>
+<name><surname>Bever</surname><given-names>JD</given-names></name>
+<name><surname>Yu</surname><given-names>F-H</given-names></name>
+</person-group>
+          <year iso-8601-date="2017">2017</year>
+          <article-title>Open access increases citations of papers in ecology</article-title>
+          <source>Ecosphere</source>
+          <volume>8</volume>
+          <issue>7</issue>
+          <elocation-id>e01887</elocation-id>
+          <pub-id pub-id-type="doi">10.1002/ecs2.1887</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-44">
+        <label>Tennant et al. (2016)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Tennant</surname><given-names>JP</given-names></name>
+<name><surname>Waldner</surname><given-names>F</given-names></name>
+<name><surname>Jacques</surname><given-names>DC</given-names></name>
+<name><surname>Masuzzo</surname><given-names>P</given-names></name>
+<name><surname>Collister</surname><given-names>LB</given-names></name>
+<name><surname>Hartgerink</surname><given-names>CHJ</given-names></name>
+</person-group><year iso-8601-date="2016">2016</year><article-title>The academic, economic and societal impacts of Open Access: an evidence-based review</article-title><source>F1000Research</source><volume>5</volume><fpage>632</fpage><pub-id pub-id-type="doi">10.12688/f1000research.8460.3</pub-id><pub-id pub-id-type="pmid">27158456</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-45">
+        <label>Tregoning (2018)</label>
+        <element-citation publication-type="journal"><person-group person-group-type="author">
+<name><surname>Tregoning</surname><given-names>J</given-names></name>
+</person-group><year iso-8601-date="2018">2018</year><article-title>How will you judge me if not by impact factor?</article-title><source>Nature</source><volume> 558</volume><issue>7710</issue><fpage>345</fpage><lpage>345</lpage><pub-id pub-id-type="doi">10.1038/d41586-018-05467-5</pub-id><pub-id pub-id-type="pmid">29921857</pub-id>
+</element-citation>
+      </ref>
+      <ref id="ref-46">
+        <label>Unpaywall (2024)</label>
+        <element-citation publication-type="other">
+          <person-group person-group-type="author">
+<collab>Unpaywall</collab>
+</person-group>
+          <year iso-8601-date="2024">2024</year>
+          <article-title>Unpaywall</article-title>
+          <uri xlink:href="https://unpaywall.org/">https://unpaywall.org/</uri>
+        </element-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
+
+</metadata></record></GetRecord></OAI-PMH>
