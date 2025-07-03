@@ -316,10 +316,10 @@ async fn test_high_concurrency_rate_limiting() {
                 rate_limited_requests += 1;
             }
             Ok(Err(e)) => {
-                panic!("Unexpected error: {:?}", e);
+                panic!("Unexpected error: {e:?}");
             }
             Err(e) => {
-                panic!("Task panicked: {:?}", e);
+                panic!("Task panicked: {e:?}");
             }
         }
     }
@@ -350,7 +350,7 @@ async fn test_rate_limiting_with_429_responses() {
             assert_eq!(status, 429);
             assert!(message.contains("Too Many Requests"));
         }
-        other => panic!("Expected ApiError, got: {:?}", other),
+        other => panic!("Expected ApiError, got: {other:?}"),
     }
 }
 
@@ -373,7 +373,7 @@ async fn test_realistic_429_rate_limit_response() {
             assert_eq!(status, 429);
             assert!(message.contains("Too Many Requests"));
         }
-        other => panic!("Expected ApiError for 429, got: {:?}", other),
+        other => panic!("Expected ApiError for 429, got: {other:?}"),
     }
 }
 
