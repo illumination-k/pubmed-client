@@ -1,0 +1,861 @@
+{
+  "header": { "type": "einfo", "version": "0.3" },
+  "einforesult": {
+    "dbinfo": [
+      {
+        "dbname": "pubmed",
+        "menuname": "PubMed",
+        "description": "PubMed bibliographic record",
+        "dbbuild": "Build-2025.06.25.07.12",
+        "count": "38997024",
+        "lastupdate": "2025/06/25 07:12",
+        "fieldlist": [
+          {
+            "name": "ALL",
+            "fullname": "All Fields",
+            "description": "All terms from all searchable fields",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UID",
+            "fullname": "UID",
+            "description": "Unique number assigned to publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "FILT",
+            "fullname": "Filter",
+            "description": "Limits the records",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TITL",
+            "fullname": "Title",
+            "description": "Words in title of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "MESH",
+            "fullname": "MeSH Terms",
+            "description": "Medical Subject Headings assigned to publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "MAJR",
+            "fullname": "MeSH Major Topic",
+            "description": "MeSH terms of major importance to publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "JOUR",
+            "fullname": "Journal",
+            "description": "Journal abbreviation of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "AFFL",
+            "fullname": "Affiliation",
+            "description": "Author's institutional affiliation and address",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ECNO",
+            "fullname": "EC/RN Number",
+            "description": "EC number for enzyme or CAS registry number",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SUBS",
+            "fullname": "Supplementary Concept",
+            "description": "CAS chemical name or MEDLINE Substance Name",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PDAT",
+            "fullname": "Date - Publication",
+            "description": "Date of publication",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "EDAT",
+            "fullname": "Date - Entry",
+            "description": "Date publication first accessible through Entrez",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "VOL",
+            "fullname": "Volume",
+            "description": "Volume number of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PAGE",
+            "fullname": "Pagination",
+            "description": "Page number(s) of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PTYP",
+            "fullname": "Publication Type",
+            "description": "Type of publication (e.g., review)",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "LANG",
+            "fullname": "Language",
+            "description": "Language of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ISS",
+            "fullname": "Issue",
+            "description": "Issue number of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SUBH",
+            "fullname": "MeSH Subheading",
+            "description": "Additional specificity for MeSH term",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "SI",
+            "fullname": "Secondary Source ID",
+            "description": "Cross-reference from publication to other databases",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "MHDA",
+            "fullname": "Date - MeSH",
+            "description": "Date publication was indexed with MeSH terms",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TIAB",
+            "fullname": "Title/Abstract",
+            "description": "Free text associated with Abstract/Title",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "OTRM",
+            "fullname": "Other Term",
+            "description": "Other terms associated with publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "COLN",
+            "fullname": "Author - Corporate",
+            "description": "Corporate Author of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CNTY",
+            "fullname": "Place of Publication",
+            "description": "Country of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "PAPX",
+            "fullname": "Pharmacological Action",
+            "description": "MeSH pharmacological action pre-explosions",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GRNT",
+            "fullname": "Grants and Funding",
+            "description": "NIH Grant Numbers",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "MDAT",
+            "fullname": "Date - Modification",
+            "description": "Date of last modification",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CDAT",
+            "fullname": "Date - Completion",
+            "description": "Date of completion",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PID",
+            "fullname": "Publisher ID",
+            "description": "Publisher ID",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "FAUT",
+            "fullname": "Author - First",
+            "description": "First Author of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "FULL",
+            "fullname": "Author",
+            "description": "Full Author Name(s) of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "FINV",
+            "fullname": "Investigator",
+            "description": "Full name of investigator",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TT",
+            "fullname": "Transliterated Title",
+            "description": "Words in transliterated title of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LAUT",
+            "fullname": "Author - Last",
+            "description": "Last Author of publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PPDT",
+            "fullname": "Print Publication Date",
+            "description": "Date of print publication",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "EPDT",
+            "fullname": "Electronic Publication Date",
+            "description": "Date of Electronic publication",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "LID",
+            "fullname": "Location ID",
+            "description": "ELocation ID",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CRDT",
+            "fullname": "Date - Create",
+            "description": "Date publication first accessible through Entrez",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "BOOK",
+            "fullname": "Book",
+            "description": "ID of the book that contains the document",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ED",
+            "fullname": "Editor",
+            "description": "Section's Editor",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ISBN",
+            "fullname": "ISBN",
+            "description": "ISBN",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PUBN",
+            "fullname": "Publisher",
+            "description": "Publisher's name",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "AUCL",
+            "fullname": "Author Cluster ID",
+            "description": "Author Cluster ID",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "EID",
+            "fullname": "Extended PMID",
+            "description": "Extended PMID",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "DSO",
+            "fullname": "DSO",
+            "description": "Additional text from the summary",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "AUID",
+            "fullname": "Author - Identifier",
+            "description": "Author Identifier",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PS",
+            "fullname": "Subject - Personal Name",
+            "description": "Personal Name as Subject",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "COIS",
+            "fullname": "Conflict of Interest Statements",
+            "description": "Conflict of Interest Statements",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "WORD",
+            "fullname": "Text Word",
+            "description": "Free text associated with publication",
+            "termcount": "",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "P1DAT",
+            "fullname": "P1DAT",
+            "description": "Date publication first accessible through Solr",
+            "termcount": "",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          }
+        ],
+        "linklist": [
+          { "name": "pubmed_assembly", "menu": "Assembly", "description": "Assembly", "dbto": "assembly" },
+          {
+            "name": "pubmed_bioproject",
+            "menu": "Project Links",
+            "description": "Related Projects",
+            "dbto": "bioproject"
+          },
+          {
+            "name": "pubmed_biosample",
+            "menu": "BioSample Links",
+            "description": "BioSample links",
+            "dbto": "biosample"
+          },
+          { "name": "pubmed_biosystems", "menu": "BioSystem Links", "description": "BioSystems", "dbto": "biosystems" },
+          {
+            "name": "pubmed_books_refs",
+            "menu": "Cited in Books",
+            "description": "PubMed links associated with Books",
+            "dbto": "books"
+          },
+          {
+            "name": "pubmed_cdd",
+            "menu": "Conserved Domain Links",
+            "description": "Link to related CDD entry",
+            "dbto": "cdd"
+          },
+          {
+            "name": "pubmed_clinvar",
+            "menu": "ClinVar",
+            "description": "Clinical variations associated with publication",
+            "dbto": "clinvar"
+          },
+          {
+            "name": "pubmed_clinvar_calculated",
+            "menu": "ClinVar (calculated)",
+            "description": "Clinical variations calculated to be associated with publication",
+            "dbto": "clinvar"
+          },
+          { "name": "pubmed_dbvar", "menu": "dbVar", "description": "Link from PubMed to dbVar", "dbto": "dbvar" },
+          { "name": "pubmed_gap", "menu": "dbGaP Links", "description": "Related dbGaP record", "dbto": "gap" },
+          { "name": "pubmed_gds", "menu": "GEO DataSet Links", "description": "Related GEO DataSets", "dbto": "gds" },
+          { "name": "pubmed_gene", "menu": "Gene Links", "description": "Link to related Genes", "dbto": "gene" },
+          {
+            "name": "pubmed_gene_bookrecords",
+            "menu": "Gene (from Bookshelf)",
+            "description": "Gene records in this citation",
+            "dbto": "gene"
+          },
+          {
+            "name": "pubmed_gene_citedinomim",
+            "menu": "Gene (OMIM) Links",
+            "description": "PubMed links to Gene derived from pubmed_omim_cited links",
+            "dbto": "gene"
+          },
+          {
+            "name": "pubmed_gene_pmc_nucleotide",
+            "menu": "Gene (nucleotide/PMC)",
+            "description": "Records in Gene identified from shared sequence and PMC links.",
+            "dbto": "gene"
+          },
+          {
+            "name": "pubmed_gene_rif",
+            "menu": "Gene (GeneRIF) Links",
+            "description": "Link to Gene for the GeneRIF subcategory",
+            "dbto": "gene"
+          },
+          {
+            "name": "pubmed_genome",
+            "menu": "Genome Links",
+            "description": "Published genome sequences",
+            "dbto": "genome"
+          },
+          {
+            "name": "pubmed_geoprofiles",
+            "menu": "GEO Profile Links",
+            "description": "GEO records associated with pubmed record",
+            "dbto": "geoprofiles"
+          },
+          {
+            "name": "pubmed_homologene",
+            "menu": "HomoloGene Links",
+            "description": "Related HomoloGene",
+            "dbto": "homologene"
+          },
+          {
+            "name": "pubmed_medgen",
+            "menu": "MedGen",
+            "description": "Related information in MedGen",
+            "dbto": "medgen"
+          },
+          {
+            "name": "pubmed_medgen_bookshelf_cited",
+            "menu": "MedGen (Bookshelf cited)",
+            "description": "Related records in MedGen based on citations in GeneReviews and Medical Genetics Summaries",
+            "dbto": "medgen"
+          },
+          {
+            "name": "pubmed_medgen_genereviews",
+            "menu": "MedGen (GeneReviews)",
+            "description": "Related MedGen records",
+            "dbto": "medgen"
+          },
+          {
+            "name": "pubmed_medgen_omim",
+            "menu": "MedGen (OMIM)",
+            "description": "Related information in MedGen (OMIM)",
+            "dbto": "medgen"
+          },
+          {
+            "name": "pubmed_nuccore",
+            "menu": "Nucleotide Links",
+            "description": "Published Nucleotide sequences",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "pubmed_nuccore_refseq",
+            "menu": "Nucleotide (RefSeq) Links",
+            "description": "Link to Nucleotide RefSeqs",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "pubmed_nuccore_weighted",
+            "menu": "Nucleotide (Weighted) Links",
+            "description": "Links to nuccore",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "pubmed_omim_bookrecords",
+            "menu": "OMIM (from Bookshelf)",
+            "description": "OMIM records in this citation",
+            "dbto": "omim"
+          },
+          {
+            "name": "pubmed_omim_calculated",
+            "menu": "OMIM (calculated) Links",
+            "description": "OMIM (calculated) Links",
+            "dbto": "omim"
+          },
+          {
+            "name": "pubmed_omim_cited",
+            "menu": "OMIM (cited) Links",
+            "description": "OMIM (cited) Links",
+            "dbto": "omim"
+          },
+          {
+            "name": "pubmed_pcassay",
+            "menu": "PubChem BioAssay",
+            "description": "Related PubChem BioAssay",
+            "dbto": "pcassay"
+          },
+          {
+            "name": "pubmed_pccompound",
+            "menu": "PubChem Compound",
+            "description": "Related PubChem Compound",
+            "dbto": "pccompound"
+          },
+          {
+            "name": "pubmed_pccompound_mesh",
+            "menu": "PubChem Compound (MeSH Keyword)",
+            "description": "Related PubChem Compound via MeSH",
+            "dbto": "pccompound"
+          },
+          {
+            "name": "pubmed_pccompound_publisher",
+            "menu": "PubChem Compound (Publisher)",
+            "description": "Publisher deposited structures linked to PubChem Compound",
+            "dbto": "pccompound"
+          },
+          {
+            "name": "pubmed_pcsubstance",
+            "menu": "PubChem Substance Links",
+            "description": "Related PubChem Substance",
+            "dbto": "pcsubstance"
+          },
+          {
+            "name": "pubmed_pcsubstance_bookrecords",
+            "menu": "PubChem Substance (from Bookshelf)",
+            "description": "Structures in the PubChem Substance database in this citation",
+            "dbto": "pcsubstance"
+          },
+          {
+            "name": "pubmed_pcsubstance_publisher",
+            "menu": "PubChem Substance (Publisher)",
+            "description": "PubChem Substances supplied by publisher",
+            "dbto": "pcsubstance"
+          },
+          { "name": "pubmed_pmc", "menu": "PMC Links", "description": "Free full text articles in PMC", "dbto": "pmc" },
+          {
+            "name": "pubmed_pmc_bookrecords",
+            "menu": "References in PMC for this Bookshelf citation",
+            "description": "Full text of articles in PubMed Central cited in this record",
+            "dbto": "pmc"
+          },
+          {
+            "name": "pubmed_pmc_embargo",
+            "menu": "",
+            "description": "Embargoed PMC article associated with PubMed",
+            "dbto": "pmc"
+          },
+          { "name": "pubmed_pmc_local", "menu": "", "description": "Free full text articles in PMC", "dbto": "pmc" },
+          {
+            "name": "pubmed_pmc_refs",
+            "menu": "Cited in PMC",
+            "description": "PubMed links associated with PMC",
+            "dbto": "pmc"
+          },
+          {
+            "name": "pubmed_popset",
+            "menu": "PopSet Links",
+            "description": "Published population set",
+            "dbto": "popset"
+          },
+          { "name": "pubmed_probe", "menu": "Probe Links", "description": "Related Probe entry", "dbto": "probe" },
+          {
+            "name": "pubmed_protein",
+            "menu": "Protein Links",
+            "description": "Published protein sequences",
+            "dbto": "protein"
+          },
+          {
+            "name": "pubmed_protein_refseq",
+            "menu": "Protein (RefSeq) Links",
+            "description": "Link to Protein RefSeqs",
+            "dbto": "protein"
+          },
+          {
+            "name": "pubmed_protein_weighted",
+            "menu": "Protein (Weighted) Links",
+            "description": "Links to protein",
+            "dbto": "protein"
+          },
+          {
+            "name": "pubmed_proteinclusters",
+            "menu": "Protein Cluster Links",
+            "description": "Related Protein Clusters",
+            "dbto": "proteinclusters"
+          },
+          {
+            "name": "pubmed_protfam",
+            "menu": "Protein Family Models",
+            "description": "Protein family models supported by a particular publication",
+            "dbto": "protfam"
+          },
+          {
+            "name": "pubmed_pubmed",
+            "menu": "Similar articles",
+            "description": "Similar PubMed articles, obtained by matching text and MeSH terms",
+            "dbto": "pubmed"
+          },
+          {
+            "name": "pubmed_pubmed_alsoviewed",
+            "menu": "Articles frequently viewed together",
+            "description": "Articles frequently viewed together",
+            "dbto": "pubmed"
+          },
+          {
+            "name": "pubmed_pubmed_bookrecords",
+            "menu": "References for this Bookshelf citation",
+            "description": "PubMed abstracts for articles cited in this record",
+            "dbto": "pubmed"
+          },
+          {
+            "name": "pubmed_pubmed_refs",
+            "menu": "References for PMC Articles",
+            "description": "References for this PMC Article",
+            "dbto": "pubmed"
+          },
+          { "name": "pubmed_snp", "menu": "SNP Links", "description": "PubMed to SNP links", "dbto": "snp" },
+          {
+            "name": "pubmed_snp_cited",
+            "menu": "SNP (Cited)",
+            "description": "Related SNP (Cited) records",
+            "dbto": "snp"
+          },
+          {
+            "name": "pubmed_sra",
+            "menu": "SRA Links",
+            "description": "Links to Short Read Archive Experiments",
+            "dbto": "sra"
+          },
+          {
+            "name": "pubmed_structure",
+            "menu": "Structure Links",
+            "description": "Published 3D structures",
+            "dbto": "structure"
+          },
+          {
+            "name": "pubmed_taxonomy_entrez",
+            "menu": "Taxonomy via GenBank",
+            "description": "Related Taxonomy entry computed using other Entrez links",
+            "dbto": "taxonomy"
+          }
+        ]
+      }
+    ]
+  }
+}

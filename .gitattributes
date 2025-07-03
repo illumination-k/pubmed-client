@@ -1,14 +1,17 @@
 # Git LFS configuration for test data
 
-# Track all test data files with Git LFS
+# Track all test data files with Git LFS (workspace structure)
+pubmed-client/tests/integration/test_data/**/*.xml filter=lfs diff=lfs merge=lfs -text
+pubmed-client/tests/integration/test_data/**/*.json filter=lfs diff=lfs merge=lfs -text
+# Track large API response files
+pubmed-client/tests/integration/test_data/api_responses/**/*.json filter=lfs diff=lfs merge=lfs -text
+# Track PMC XML files
+pubmed-client/tests/integration/test_data/pmc_xml/*.xml filter=lfs diff=lfs merge=lfs -text
+# Track PubMed XML files
+pubmed-client/tests/integration/test_data/pubmed_xml/*.xml filter=lfs diff=lfs merge=lfs -text
+# Legacy paths (for backward compatibility during transition)
 tests/integration/test_data/**/*.xml filter=lfs diff=lfs merge=lfs -text
 tests/integration/test_data/**/*.json filter=lfs diff=lfs merge=lfs -text
-# Track large API response files
-tests/integration/test_data/api_responses/**/*.json filter=lfs diff=lfs merge=lfs -text
-# Track PMC XML files
-tests/integration/test_data/pmc_xml/*.xml filter=lfs diff=lfs merge=lfs -text
-# Track PubMed XML files
-tests/integration/test_data/pubmed_xml/*.xml filter=lfs diff=lfs merge=lfs -text
 *.xml filter=lfs diff=lfs merge=lfs -text
 *.nxml filter=lfs diff=lfs merge=lfs -text
 *.pdf filter=lfs diff=lfs merge=lfs -text

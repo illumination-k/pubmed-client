@@ -1,0 +1,712 @@
+{
+  "header": { "type": "einfo", "version": "0.3" },
+  "einforesult": {
+    "dbinfo": [
+      {
+        "dbname": "structure",
+        "menuname": "Structure",
+        "description": "Three-dimensional molecular model",
+        "dbbuild": "Build250619-0000.1",
+        "count": "237765",
+        "lastupdate": "2025/06/19 01:32",
+        "fieldlist": [
+          {
+            "name": "ALL",
+            "fullname": "All Fields",
+            "description": "All terms from all searchable fields",
+            "termcount": "3636381",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UID",
+            "fullname": "MMDB ID",
+            "description": "mmdbId",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "FILT",
+            "fullname": "Filter",
+            "description": "Limits the records",
+            "termcount": "36",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ACCN",
+            "fullname": "PDB Accession",
+            "description": "PDB Accession",
+            "termcount": "237760",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ECNO",
+            "fullname": "EC/RN Number",
+            "description": "EC/RN Number",
+            "termcount": "491",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RESO",
+            "fullname": "Resolution",
+            "description": "Resolution",
+            "termcount": "872",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "EXPM",
+            "fullname": "Experimental Method",
+            "description": "Experimental Method",
+            "termcount": "60",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TITL",
+            "fullname": "Title",
+            "description": "Citation Title",
+            "termcount": "408787",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ABS",
+            "fullname": "Abstract",
+            "description": "The abstracts of all PubMed references that are linked to the structure",
+            "termcount": "1604788",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "AUTH",
+            "fullname": "Author",
+            "description": "Citation Author",
+            "termcount": "549062",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PCLA",
+            "fullname": "PDB Class",
+            "description": "Pdb Class",
+            "termcount": "7330",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PSRC",
+            "fullname": "PDB Source",
+            "description": "Pdb Source",
+            "termcount": "60090",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PDSC",
+            "fullname": "PDB Description",
+            "description": "PdbDescr",
+            "termcount": "564368",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PCOM",
+            "fullname": "PDB Comment",
+            "description": "PdbComment",
+            "termcount": "934262",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PDD",
+            "fullname": "PDB Deposit Date",
+            "description": "PDB Deposit Date",
+            "termcount": "12443",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DDAT",
+            "fullname": "MMDB Entry Date",
+            "description": "MMDB Deposit Date",
+            "termcount": "1502",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "MDAT",
+            "fullname": "MMDB Modify Date",
+            "description": "MMDB Modify Date",
+            "termcount": "1097",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LCOD",
+            "fullname": "PDB Chemical Code",
+            "description": "chemical ligand codes taken from PDB file",
+            "termcount": "44270",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LNAM",
+            "fullname": "Chemical Name",
+            "description": "chemical ligand names taken from PDB file",
+            "termcount": "7251",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CSYN",
+            "fullname": "Chemical Synonyms",
+            "description": "Chemical synonyms taken from PubChem",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LDES",
+            "fullname": "Chemical Description",
+            "description": "Chemical description taken from PDB",
+            "termcount": "65622",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ORGN",
+            "fullname": "Organism",
+            "description": "Organism Name",
+            "termcount": "94198",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "TXID",
+            "fullname": "Taxonomy ID",
+            "description": "Numerical taxonomy identifier",
+            "termcount": "9309",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PMC",
+            "fullname": "BioUnit Protein Molecule Count",
+            "description": "Count of Protein Molecules in BioUnit",
+            "termcount": "273",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DMC",
+            "fullname": "BioUnit DNA Molecule Count",
+            "description": "Count of DNA molecules in BioUnit",
+            "termcount": "36",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RMC",
+            "fullname": "BioUnit RNA Molecule Count",
+            "description": "Count of RNA molecules in BioUnit",
+            "termcount": "46",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "BPC",
+            "fullname": "BioUnit Biopolymer Count",
+            "description": "Count of Biopolymers in BioUnit",
+            "termcount": "286",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "LCOU",
+            "fullname": "BioUnit Chemical Count",
+            "description": "Count of Chemical Molecules in BioUnit",
+            "termcount": "796",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "OCOU",
+            "fullname": "BioUnit Other Molecule Count",
+            "description": "Count of Other Molecules in BioUnit",
+            "termcount": "21",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "JOUR",
+            "fullname": "Journal",
+            "description": "Source journal of structure",
+            "termcount": "1522",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CDID",
+            "fullname": "Conserved Domain PSSMID",
+            "description": "identifier for a conserved domain cluster",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CDSN",
+            "fullname": "Conserved Domain Short Name",
+            "description": "Short name of the domain of a conserved domain cluster",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CDDT",
+            "fullname": "Conserved Domain Title",
+            "description": "Title of the domain of a conserved domain cluster",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CDDF",
+            "fullname": "Conserved Domain Description",
+            "description": "Defline of the domain of a conserved domain cluster",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SFID",
+            "fullname": "Conserved Domain Superfamily PSSMID",
+            "description": "identifier for a superfamily domain cluster",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SPFN",
+            "fullname": "Conserved Domain Superfamily Short Name",
+            "description": "Short name of a superfamily of conserved domain clusters",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SPTL",
+            "fullname": "Conserved Domain Superfamily Title",
+            "description": "Title of a superfamily of conserved domain clusters",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "SPDF",
+            "fullname": "Conserved Domain Superfamily Description",
+            "description": "Definition line of a superfamily cluster of conserved domain",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "OS",
+            "fullname": "Oligomeric State",
+            "description": "Oligomeric state of the biological unit",
+            "termcount": "287",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PNAM",
+            "fullname": "Protein Name",
+            "description": "Names of Protein Molecules",
+            "termcount": "178696",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GN",
+            "fullname": "Gene Name",
+            "description": "Names of genes associated with protein molecules",
+            "termcount": "22902",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GDSC",
+            "fullname": "Gene Description",
+            "description": "Descriptions of genes associated with protein molecules",
+            "termcount": "53950",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DNAM",
+            "fullname": "DNA Name",
+            "description": "Names of DNA Molecules",
+            "termcount": "20608",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RNAM",
+            "fullname": "RNA Name",
+            "description": "Names of RNA Molecules",
+            "termcount": "11273",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ONAM",
+            "fullname": "Other Molecule Name",
+            "description": "Names of Other Molecules",
+            "termcount": "2964",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "APMC",
+            "fullname": "ASU Protein Molecule Count",
+            "description": "Count of Protein Molecules in ASU",
+            "termcount": "212",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ADMC",
+            "fullname": "ASU DNA Molecule Count",
+            "description": "Count of DNA molecules in ASU",
+            "termcount": "28",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ARMC",
+            "fullname": "ASU RNA Molecule Count",
+            "description": "Count of RNA molecules in ASU",
+            "termcount": "33",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ABPC",
+            "fullname": "ASU Biopolymer Count",
+            "description": "Count of Biopolymers in ASU",
+            "termcount": "224",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ALCT",
+            "fullname": "ASU Chemical Count",
+            "description": "Count of Chemicals in ASU",
+            "termcount": "795",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "AOCT",
+            "fullname": "ASU Other Molecule Count",
+            "description": "Count of other molecules in ASU",
+            "termcount": "20",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "MLWT",
+            "fullname": "BioUnit Molecular Weight",
+            "description": "Molecular Weight of the default Biological Assembly",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "FC",
+            "fullname": "Number of PDB Records per Structure",
+            "description": "Number of PDB records that have been combined to define a complete biological assembly. (For most structures, one record suffices; very large structures were split by the PDB into multiple records.)",
+            "termcount": "1",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          }
+        ],
+        "linklist": [
+          {
+            "name": "structure_biosystems",
+            "menu": "BioSystem Links",
+            "description": "BioSystems",
+            "dbto": "biosystems"
+          },
+          {
+            "name": "structure_cdd",
+            "menu": "Conserved Domain Links",
+            "description": "Conserved domain annotations",
+            "dbto": "cdd"
+          },
+          {
+            "name": "structure_cdd_family_2",
+            "menu": "Conserved Domain Family Links",
+            "description": "Conserved domain family",
+            "dbto": "cdd"
+          },
+          {
+            "name": "structure_cdd_superfamily_2",
+            "menu": "Conserved Domain Superfamily Links",
+            "description": "Link to a conserved domain superfamily",
+            "dbto": "cdd"
+          },
+          { "name": "structure_gene", "menu": "Gene", "description": "Genes found in a 3D structure", "dbto": "gene" },
+          {
+            "name": "structure_mmdb",
+            "menu": "Related Structures",
+            "description": "identify similar 3-dimensional macromolecular structures by geometric criteria",
+            "dbto": "structure"
+          },
+          {
+            "name": "structure_nuccore",
+            "menu": "Nucleotide Links",
+            "description": "Nucleotide sequence of 3D structure",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "structure_omim",
+            "menu": "OMIM Links",
+            "description": "OMIM records associated with 3D structure",
+            "dbto": "omim"
+          },
+          {
+            "name": "structure_pcassay",
+            "menu": "BioAssay Links",
+            "description": "Related PubChem BioAssay",
+            "dbto": "pcassay"
+          },
+          {
+            "name": "structure_pccompound",
+            "menu": "PubChem Compound Links",
+            "description": "Related PubChem Compound",
+            "dbto": "pccompound"
+          },
+          {
+            "name": "structure_pcsubstance",
+            "menu": "PubChem Substance Links",
+            "description": "Related PubChem Substance",
+            "dbto": "pcsubstance"
+          },
+          {
+            "name": "structure_pmc",
+            "menu": "PMC Links",
+            "description": "Free full text articles in PMC",
+            "dbto": "pmc"
+          },
+          {
+            "name": "structure_protein",
+            "menu": "Identical Proteins",
+            "description": "Proteins with known 3D structure",
+            "dbto": "protein"
+          },
+          {
+            "name": "structure_protein_direct",
+            "menu": "Proteins",
+            "description": "Proteins derived from 3D structure",
+            "dbto": "protein"
+          },
+          {
+            "name": "structure_protein_related_list",
+            "menu": "Related Proteins",
+            "description": "List of related proteins",
+            "dbto": "protein"
+          },
+          {
+            "name": "structure_protfam",
+            "menu": "Protein Family Models",
+            "description": "Protein family models associated with a particular protein structure",
+            "dbto": "protfam"
+          },
+          {
+            "name": "structure_pubmed",
+            "menu": "PubMed Links",
+            "description": "PubMed articles cited by structure record",
+            "dbto": "pubmed"
+          },
+          { "name": "structure_snp", "menu": "SNP Links", "description": "Related SNPs", "dbto": "snp" },
+          {
+            "name": "structure_sparcle",
+            "menu": "Functional Class",
+            "description": "Functional class of the sequence domain architecture",
+            "dbto": "sparcle"
+          },
+          {
+            "name": "structure_taxonomy",
+            "menu": "Taxonomy Links",
+            "description": "Taxonomy sequences associated with structure record",
+            "dbto": "taxonomy"
+          }
+        ]
+      }
+    ]
+  }
+}

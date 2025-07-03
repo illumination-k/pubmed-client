@@ -1,0 +1,13 @@
+{
+  "header": { "type": "elink", "version": "0.3" },
+  "linksets": [
+    {
+      "dbfrom": "pubmed",
+      "ids": ["35123456"],
+      "linksetdbs": [
+        { "dbto": "pmc", "linkname": "pubmed_pmc", "links": ["8818254"] },
+        { "dbto": "pmc", "linkname": "pubmed_pmc_local", "links": ["8818254"] }
+      ]
+    }
+  ]
+}

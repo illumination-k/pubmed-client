@@ -1,0 +1,499 @@
+{
+  "header": { "type": "einfo", "version": "0.3" },
+  "einforesult": {
+    "dbinfo": [
+      {
+        "dbname": "bioproject",
+        "menuname": "BioProject",
+        "description": "BioProject Database",
+        "dbbuild": "Build250624-1445.1",
+        "count": "903524",
+        "lastupdate": "2025/06/24 15:25",
+        "fieldlist": [
+          {
+            "name": "ALL",
+            "fullname": "All Fields",
+            "description": "All terms from all searchable fields",
+            "termcount": "21413602",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "N",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "UID",
+            "fullname": "UID",
+            "description": "Unique number assigned to publication",
+            "termcount": "0",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "FILT",
+            "fullname": "Filter",
+            "description": "Limits the records",
+            "termcount": "112",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ORGN",
+            "fullname": "Organism",
+            "description": "Organism",
+            "termcount": "1521172",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "PRJA",
+            "fullname": "Project Accession",
+            "description": "Project Accession",
+            "termcount": "1161091",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TYPE",
+            "fullname": "Project Type",
+            "description": "Project Type",
+            "termcount": "2",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "STPE",
+            "fullname": "Project Subtype",
+            "description": "Project Subtype",
+            "termcount": "7",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DATE",
+            "fullname": "Registration Date",
+            "description": "Registration Date",
+            "termcount": "8197",
+            "isdate": "Y",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "TITL",
+            "fullname": "Title",
+            "description": "Title",
+            "termcount": "2263273",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "CEN",
+            "fullname": "Submitter Organization",
+            "description": "Submitter Organization(s)",
+            "termcount": "164484",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ACCN",
+            "fullname": "Replicon accession",
+            "description": "Space delimited GenBank or RefSeq Replicon Accessions",
+            "termcount": "473874",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RTYP",
+            "fullname": "Replicon type",
+            "description": "Replicon Type",
+            "termcount": "17",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "RNME",
+            "fullname": "Replicon name",
+            "description": "Replicon Name",
+            "termcount": "129",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "LTP",
+            "fullname": "Locus Tag Prefix",
+            "description": "Locus Tag Prefix",
+            "termcount": "3465744",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "WORD",
+            "fullname": "Description",
+            "description": "Organism/Project Description",
+            "termcount": "9222981",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "KWRD",
+            "fullname": "Keyword",
+            "description": "Keyword",
+            "termcount": "357",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PROP",
+            "fullname": "Properties",
+            "description": "Project/Organism Properties",
+            "termcount": "50",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DTPE",
+            "fullname": "Project Data Type",
+            "description": "Project Data Type",
+            "termcount": "37",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "GRNT",
+            "fullname": "Grant ID",
+            "description": "Grant ID",
+            "termcount": "54042",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "FUND",
+            "fullname": "Funding Agency",
+            "description": "Funding Agency",
+            "termcount": "13448",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "PMID",
+            "fullname": "PMID",
+            "description": "Pubmed ID",
+            "termcount": "198512",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "DOID",
+            "fullname": "DOI",
+            "description": "DOI ID",
+            "termcount": "6356",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "PID",
+            "fullname": "ProjectID",
+            "description": "Project ID",
+            "termcount": "903626",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "Y",
+            "ishidden": "N"
+          },
+          {
+            "name": "RELV",
+            "fullname": "Relevance",
+            "description": "Relevance",
+            "termcount": "4519",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ANME",
+            "fullname": "Assembly name",
+            "description": "Assembly Name",
+            "termcount": "3368404",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "BPRJ",
+            "fullname": "BioProject ID",
+            "description": "BioProject ID or accession",
+            "termcount": "2064615",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "TPRJ",
+            "fullname": "Top Bioproject",
+            "description": "Top Bioproject ID",
+            "termcount": "57650",
+            "isdate": "N",
+            "isnumerical": "Y",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "Y"
+          },
+          {
+            "name": "WGSA",
+            "fullname": "WGS Accession",
+            "description": "WGS Accessions",
+            "termcount": "2095334",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "AACC",
+            "fullname": "Assembly Accession",
+            "description": "Assembly Accession",
+            "termcount": "2543042",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ATNM",
+            "fullname": "Attribute Name",
+            "description": "Attribute Name",
+            "termcount": "6",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          },
+          {
+            "name": "ATTR",
+            "fullname": "Attribute",
+            "description": "Attribute",
+            "termcount": "192741",
+            "isdate": "N",
+            "isnumerical": "N",
+            "singletoken": "Y",
+            "hierarchy": "N",
+            "ishidden": "N"
+          }
+        ],
+        "linklist": [
+          {
+            "name": "bioproject_assembly_all",
+            "menu": "Assembly Links",
+            "description": "All related Assemblies",
+            "dbto": "assembly"
+          },
+          {
+            "name": "bioproject_bioproject",
+            "menu": "BioProject",
+            "description": "Links from project to related projects",
+            "dbto": "bioproject"
+          },
+          {
+            "name": "bioproject_bioproject_d2u",
+            "menu": "Umbrella projects",
+            "description": "All Umbrella projects",
+            "dbto": "bioproject"
+          },
+          {
+            "name": "bioproject_bioproject_u2d",
+            "menu": "Data projects",
+            "description": "All Data projects",
+            "dbto": "bioproject"
+          },
+          {
+            "name": "bioproject_biosample_all",
+            "menu": "BioSample Links",
+            "description": "All related BioSamples",
+            "dbto": "biosample"
+          },
+          {
+            "name": "bioproject_dbvar",
+            "menu": "dbVar",
+            "description": "Link from BioProjects to dbVar",
+            "dbto": "dbvar"
+          },
+          { "name": "bioproject_gap", "menu": "dbGaP Links", "description": "dbGaP Links", "dbto": "gap" },
+          { "name": "bioproject_gds", "menu": "GEO DataSet Links", "description": "GEO DataSet links", "dbto": "gds" },
+          {
+            "name": "bioproject_gene",
+            "menu": "Related Genes",
+            "description": "Genes related to a genome project",
+            "dbto": "gene"
+          },
+          { "name": "bioproject_genome", "menu": "Genome Links", "description": "Related Genomes", "dbto": "genome" },
+          {
+            "name": "bioproject_nuccore",
+            "menu": "Nucleotide Links",
+            "description": "Related Nucleotide entry",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_genomic_dna",
+            "menu": "Genomic DNA",
+            "description": "Link to genomic DNA records",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_genomic_rna",
+            "menu": "Genomic RNA",
+            "description": "Link to genomic RNA records",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_map",
+            "menu": "Map Records",
+            "description": "Link to map record(s)",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_reference",
+            "menu": "Reference Genome Sequences Links",
+            "description": "Reference Genome Sequences",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_repr",
+            "menu": "Representative Genome Sequences Links",
+            "description": "Representative Genome Sequences",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_transcript",
+            "menu": "Transcript",
+            "description": "Link to transcript records",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_tsamaster",
+            "menu": "TSA master",
+            "description": "Link to TSA master record(s)",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_tsatranscript",
+            "menu": "TSA transcript",
+            "description": "Link to TSA transcript record(s)",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_wgsmaster",
+            "menu": "WGS master",
+            "description": "Link to WGS master record(s)",
+            "dbto": "nuccore"
+          },
+          {
+            "name": "bioproject_nuccore_wgstranscript",
+            "menu": "WGS transcript",
+            "description": "Link to WGS transcript record(s)",
+            "dbto": "nuccore"
+          },
+          { "name": "bioproject_pmc", "menu": "PMC Links", "description": "PMC links", "dbto": "pmc" },
+          {
+            "name": "bioproject_popset",
+            "menu": "PopSet Links",
+            "description": "Population sets for BioProject",
+            "dbto": "popset"
+          },
+          {
+            "name": "bioproject_protein",
+            "menu": "Protein Links",
+            "description": "Related Proteins",
+            "dbto": "protein"
+          },
+          { "name": "bioproject_pubmed", "menu": "PubMed Links", "description": "PubMed Links", "dbto": "pubmed" },
+          { "name": "bioproject_snp", "menu": "SNP Links", "description": "Related SNP record", "dbto": "snp" },
+          {
+            "name": "bioproject_sra_all",
+            "menu": "SRA Links",
+            "description": "All related SRA Experiments",
+            "dbto": "sra"
+          },
+          {
+            "name": "bioproject_taxonomy",
+            "menu": "Taxonomy Links",
+            "description": "Taxonomy Links",
+            "dbto": "taxonomy"
+          },
+          { "name": "bioproject_trace", "menu": "trace", "description": "Link to related Traces", "dbto": "trace" }
+        ]
+      }
+    ]
+  }
+}
