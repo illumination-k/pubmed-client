@@ -4,11 +4,90 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Rust client library for accessing PubMed and PMC (PubMed Central) APIs. It provides async interfaces for searching biomedical research articles and fetching full-text content.
+This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library and WebAssembly bindings for JavaScript/TypeScript environments.
+
+## Workspace Structure
+
+```
+pubmed-client-rs/                    # Cargo workspace root
+├── Cargo.toml                       # Workspace definition
+├── pubmed-client/                   # Core Rust library
+│   ├── Cargo.toml                   # Rust library configuration
+│   └── src/                         # Core library source code
+├── pubmed-client-wasm/              # WASM bindings for npm
+│   ├── Cargo.toml                   # WASM crate configuration
+│   ├── package.json                 # npm package configuration
+│   ├── src/lib.rs                   # WASM bindings source
+│   ├── pkg/                         # Generated WASM package
+│   ├── tests/                       # WASM-specific TypeScript tests
+│   └── *.json, *.ts                # TypeScript/npm configuration
+└── tests/                           # Shared integration tests
+```
 
 ## Commands
 
 ### Build & Development
+
+#### Workspace Commands (from root)
+
+```bash
+# Build all workspace members
+cargo build
+
+# Test all workspace members
+cargo test
+
+# Check all workspace members
+cargo check
+
+# Run specific integration test suite
+cargo test --test comprehensive_pmc_tests
+cargo test --test comprehensive_pubmed_tests
+cargo test --test test_elink_integration
+
+# Run new real API integration tests (requires network and env var)
+PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pubmed_api_tests
+PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pmc_api_tests
+PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test error_handling_tests
+
+# Run single unit test in core library
+cargo test --lib -p pubmed-client-rs pubmed::parser::tests::test_mesh_term_parsing
+```
+
+#### Core Library Commands (from pubmed-client/)
+
+```bash
+# Build only the core library
+cargo build
+
+# Test only the core library
+cargo test
+
+# Generate documentation
+cargo doc --open
+```
+
+#### WASM Package Commands (from pubmed-client-wasm/)
+
+```bash
+# Build WASM package for Node.js
+pnpm run build
+
+# Build for different targets
+pnpm run build:web      # For web/browser
+pnpm run build:bundler  # For bundlers
+pnpm run build:all      # All targets
+
+# Run TypeScript tests
+pnpm run test
+pnpm run test:watch     # Watch mode
+pnpm run test:coverage  # With coverage
+
+# Publish to npm
+pnpm run publish        # wasm-pack publish --access public
+```
+
+#### Legacy mise Commands (if available)
 
 Using `mise` for task management (configured in `.mise.toml`):
 
@@ -30,19 +109,6 @@ mise r doc
 
 # Check code without building
 mise r check
-
-# Run specific integration test suite
-cargo test --test comprehensive_pmc_tests
-cargo test --test comprehensive_pubmed_tests
-cargo test --test test_elink_integration
-
-# Run new real API integration tests (requires network and env var)
-PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pubmed_api_tests
-PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pmc_api_tests
-PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test error_handling_tests
-
-# Run single unit test
-cargo test --lib pubmed::parser::tests::test_mesh_term_parsing
 ```
 
 ### Code Quality
@@ -57,9 +123,9 @@ mise r lint
 mise r fmt
 ```
 
-#### WASM/TypeScript Code Quality
+#### WASM/TypeScript Code Quality (from pubmed-client-wasm/)
 
-The project uses Biome for TypeScript/JavaScript linting and formatting:
+The WASM package uses Biome for TypeScript/JavaScript linting and formatting:
 
 ```bash
 # Format TypeScript and JavaScript files
@@ -108,7 +174,7 @@ RUST_LOG=trace cargo test       # All tracing output
 
 ## Architecture
 
-### Module Structure
+### Core Library Architecture (pubmed-client/)
 
 - `src/lib.rs` - Main library entry point, re-exports public API and unified `Client`
 - `src/pubmed/` - PubMed module directory
@@ -133,6 +199,23 @@ RUST_LOG=trace cargo test       # All tracing output
 - `src/config.rs` - Client configuration options for API keys and rate limiting
 - `src/rate_limit.rs` - Rate limiting implementation using token bucket algorithm
 - `src/retry.rs` - Retry logic with exponential backoff for network failures
+
+### WASM Bindings Architecture (pubmed-client-wasm/)
+
+The WASM package provides JavaScript/TypeScript bindings for the core Rust library:
+
+- `src/lib.rs` - WASM bindings entry point with JavaScript-compatible types
+- `package.json` - npm package configuration for publishing
+- `pkg/` - Generated WASM package output (created by wasm-pack)
+- `tests/` - TypeScript tests for WASM bindings using Vitest
+- Configuration files: `tsconfig.json`, `vitest.config.ts`, `biome.json`
+
+**Key WASM Types:**
+
+- `WasmPubMedClient` - JavaScript wrapper around the core Rust client
+- `WasmClientConfig` - JavaScript-friendly configuration object
+- `JsArticle`, `JsFullText` - JavaScript-compatible data structures
+- Promise-based async API matching modern JavaScript patterns
 
 ### Key Types
 
@@ -491,56 +574,43 @@ cargo test test_get_pmc_links_integration
 cargo test test_get_citations_integration
 ```
 
-## WASM TypeScript Testing
+## WASM Development and Publishing
 
-The project includes comprehensive TypeScript tests for the WASM bindings using Vitest:
+The workspace includes a complete npm package for WebAssembly bindings.
 
-### WASM Test Commands
+### WASM Package Publishing
+
+The WASM package can be automatically published to npm:
 
 ```bash
-# Build WASM package
-pnpm run build
-
-# Run TypeScript tests
-pnpm run test
-
-# Run tests in watch mode
-pnpm run test:watch
-
-# Run tests with coverage
-pnpm run test:coverage
-
-# Type checking
-pnpm run typecheck
-
-# Full quality check (lint + format + test)
-pnpm run check && pnpm run test
+# From pubmed-client-wasm/ directory
+pnpm run publish    # Equivalent to: wasm-pack publish --access public
 ```
 
-### WASM Test Architecture
+The workspace structure ensures:
 
-- **Test Framework**: Vitest with TypeScript support
-- **Test Location**: `tests/wasm/simple.test.ts`
-- **Test Coverage**: All WASM exported functions with success/failure scenarios
-- **Setup**: Automatic WASM module loading via `tests/wasm/setup.ts`
+- Correct package name (`pubmed-client-wasm`) generated automatically
+- All npm dependencies and TypeScript configuration contained within the WASM package
+- Independent versioning and publishing from the core Rust library
 
-### WASM Functions Tested
+### WASM TypeScript Testing
 
-1. **Client Configuration**: `WasmClientConfig` creation and property setting
-2. **Client Creation**: Default and custom configuration clients
-3. **Article Search**: `search_articles()` with various queries and limits
-4. **Article Fetching**: `fetch_article()` by PMID with validation
-5. **PMC Availability**: `check_pmc_availability()` for full-text access
-6. **Full Text Retrieval**: `fetch_full_text()` from PMC with structure validation
-7. **Markdown Conversion**: `convert_to_markdown()` with content validation
-8. **Related Articles**: `get_related_articles()` with PMID arrays
+Comprehensive TypeScript tests using Vitest:
 
-### Test Data and Fixtures
+```bash
+# From pubmed-client-wasm/ directory
+pnpm run test              # Run TypeScript tests
+pnpm run test:watch        # Watch mode
+pnpm run test:coverage     # With coverage
+pnpm run typecheck         # Type checking only
+```
 
-- **Live API Tests**: Uses real PMIDs like `31978945` (COVID-19 research)
-- **PMC Test Data**: `PMC7092803` for full-text validation
-- **Error Testing**: Invalid PMIDs and malformed inputs
-- **Network Resilience**: Graceful handling of API failures
+**Test Coverage:**
+
+- All WASM exported functions with success/failure scenarios
+- Live API tests using real PMIDs (e.g., `31978945` for COVID-19 research)
+- Error handling for invalid inputs and network failures
+- Promise-based async API validation
 
 ## Test Fixtures and Data
 

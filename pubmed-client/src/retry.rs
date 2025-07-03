@@ -3,7 +3,7 @@
 //! This module provides a configurable retry mechanism with exponential backoff
 //! and jitter to handle temporary network issues when communicating with NCBI APIs.
 
-use crate::time::{Duration, sleep};
+use crate::time::{sleep, Duration};
 use rand::Rng;
 use std::future::Future;
 use tracing::{debug, warn};
@@ -195,8 +195,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::Arc;
     use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::sync::Arc;
 
     #[derive(Debug, thiserror::Error)]
     enum TestError {

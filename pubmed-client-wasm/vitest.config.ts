@@ -5,9 +5,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    setupFiles: ['./tests/wasm/setup.ts'],
-    include: ['tests/wasm/**/*.test.ts'],
-    exclude: ['tests/wasm/test_wasm_integration.js'],
+    setupFiles: ['./tests/setup.ts'],
+    include: ['tests/**/*.test.ts'],
+    exclude: ['tests/test_wasm_integration.js'],
     testTimeout: 30000, // 30 seconds for network operations
     hookTimeout: 10000,
     coverage: {
@@ -28,7 +28,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './tests'),
-      '@/wasm': resolve(__dirname, './tests/wasm'),
+      '@/tests': resolve(__dirname, './tests'),
       '@/pkg': resolve(__dirname, './pkg'),
     },
   },

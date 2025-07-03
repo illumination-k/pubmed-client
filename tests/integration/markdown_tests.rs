@@ -6,7 +6,7 @@ use pubmed_client_rs::pmc::{
 };
 
 mod common;
-use common::{PmcXmlTestCase, pmc_xml_test_cases};
+use common::{pmc_xml_test_cases, PmcXmlTestCase};
 
 /// 全XMLファイルを返すフィクスチャ
 #[fixture]

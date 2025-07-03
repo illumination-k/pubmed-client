@@ -30,8 +30,8 @@ mod integration_tests {
 
     // Import test utilities
     use crate::common::integration_test_utils::{
-        TEST_PMIDS, TEST_PMIDS_STR, TEST_SEARCH_QUERIES, create_test_pubmed_client,
-        should_run_real_api_tests,
+        create_test_pubmed_client, should_run_real_api_tests, TEST_PMIDS, TEST_PMIDS_STR,
+        TEST_SEARCH_QUERIES,
     };
 
     /// Test basic article search functionality with real API

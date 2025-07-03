@@ -276,6 +276,70 @@ async function initClient() {
 }
 ```
 
+## Publishing to npm
+
+This package can be published to npm registry. Follow these steps:
+
+### Prerequisites
+
+1. Create an npm account at [npmjs.com](https://www.npmjs.com)
+2. Install npm CLI and login: `npm login`
+3. Ensure you have permission to publish the package name
+
+### Publishing Steps
+
+#### Method 1: Using wasm-pack (Recommended)
+
+```bash
+# Build and publish in one command
+wasm-pack publish --access public
+```
+
+#### Method 2: Manual Publishing
+
+```bash
+# 1. Build the WASM package
+pnpm run build
+
+# 2. Navigate to pkg directory and publish
+cd pkg
+npm publish --access public
+```
+
+### Pre-publish Checklist
+
+Before publishing, ensure:
+
+- [ ] Version number is updated in both `package.json` and `Cargo.toml`
+- [ ] All tests pass: `pnpm run test`
+- [ ] WASM builds successfully: `pnpm run build`
+- [ ] Documentation is up to date
+- [ ] `.npmignore` excludes unnecessary files
+
+### Version Management
+
+```bash
+# Update version in both files
+# package.json
+npm version patch|minor|major
+
+# Cargo.toml (update manually or use cargo-edit)
+cargo install cargo-edit
+cargo set-version --bump patch|minor|major
+```
+
+### Package Verification
+
+After publishing, verify the package:
+
+```bash
+# Install from npm
+npm install pubmed-client-wasm
+
+# Test basic functionality
+node -e "const client = require('pubmed-client-wasm'); console.log('✅ Package installed successfully');"
+```
+
 ## License
 
 MIT OR Apache-2.0

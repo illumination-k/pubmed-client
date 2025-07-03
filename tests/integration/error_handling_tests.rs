@@ -16,7 +16,7 @@ mod common;
 
 #[cfg(feature = "integration-tests")]
 mod integration_tests {
-    use pubmed_client_rs::time::{Duration, sleep};
+    use pubmed_client_rs::time::{sleep, Duration};
     use tracing::{debug, info, warn};
     use tracing_test::traced_test;
 

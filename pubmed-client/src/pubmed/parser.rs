@@ -2,8 +2,8 @@ use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
     Affiliation, Author, ChemicalConcept, MeshHeading, MeshQualifier, MeshTerm, PubMedArticle,
 };
-use quick_xml::Reader;
 use quick_xml::events::Event;
+use quick_xml::Reader;
 use std::io::BufReader;
 use tracing::{debug, instrument};
 
@@ -670,13 +670,11 @@ mod tests {
         assert_eq!(author.full_name, "John Doe");
         assert_eq!(author.orcid, Some("0000-0001-2345-6789".to_string()));
         assert_eq!(author.affiliations.len(), 1);
-        assert!(
-            author.affiliations[0]
-                .institution
-                .as_ref()
-                .unwrap()
-                .contains("Harvard Medical School")
-        );
+        assert!(author.affiliations[0]
+            .institution
+            .as_ref()
+            .unwrap()
+            .contains("Harvard Medical School"));
 
         // Test keywords
         assert!(article.keywords.is_some());
@@ -788,13 +786,11 @@ mod tests {
         let affiliation = parse_affiliation_text(affiliation_text);
 
         assert!(affiliation.institution.is_some());
-        assert!(
-            affiliation
-                .institution
-                .as_ref()
-                .unwrap()
-                .contains("Harvard Medical School")
-        );
+        assert!(affiliation
+            .institution
+            .as_ref()
+            .unwrap()
+            .contains("Harvard Medical School"));
         assert_eq!(
             affiliation.email,
             Some("john.doe@hms.harvard.edu".to_string())

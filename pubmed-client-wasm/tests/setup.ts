@@ -12,7 +12,7 @@ beforeAll(async () => {
   // Ensure WASM module is available and initialized
   try {
     // Import the WASM module (Node.js target auto-initializes)
-    const wasmModule = await import('../../pkg/pubmed_client_rs.js')
+    const wasmModule = await import('../pkg/pubmed_client_wasm.js')
 
     if (!wasmModule.WasmPubMedClient || !wasmModule.WasmClientConfig) {
       throw new Error('WASM module not properly exported')

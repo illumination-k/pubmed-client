@@ -5,7 +5,7 @@ use tracing_test::traced_test;
 use pubmed_client_rs::pubmed::parser::PubMedXmlParser;
 
 mod common;
-use common::{PubMedXmlTestCase, pubmed_xml_test_cases};
+use common::{pubmed_xml_test_cases, PubMedXmlTestCase};
 
 /// Fixture for all PubMed XML test cases
 #[fixture]

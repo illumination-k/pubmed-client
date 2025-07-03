@@ -920,11 +920,9 @@ mod tests {
             config.effective_base_url(),
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
         );
-        assert!(
-            config
-                .effective_user_agent()
-                .starts_with("pubmed-client-rs/")
-        );
+        assert!(config
+            .effective_user_agent()
+            .starts_with("pubmed-client-rs/"));
         assert_eq!(config.effective_tool(), "TestApp");
     }
 
