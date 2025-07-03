@@ -99,18 +99,22 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pubmed-client-wasm/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
       - name: Build WASM package
+        working-directory: pubmed-client-wasm
         run: pnpm run build
 
       - name: Install TypeScript dependencies
+        working-directory: pubmed-client-wasm
         run: pnpm install
 
       - name: Run Biome linting and formatting
+        working-directory: pubmed-client-wasm
         run: pnpm run ci
 
       - name: Run TypeScript tests
+        working-directory: pubmed-client-wasm
         run: pnpm run test

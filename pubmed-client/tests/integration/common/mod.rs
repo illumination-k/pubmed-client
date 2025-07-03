@@ -48,7 +48,18 @@ impl PmcXmlTestCase {
 
 /// Get all PMC XML test files from the test data directory
 pub fn get_pmc_xml_test_cases() -> Vec<PmcXmlTestCase> {
-    let xml_dir = Path::new("test_data/pmc_xml");
+    // Try both relative paths depending on where the test is run from
+    let xml_dir_workspace = Path::new("pubmed-client/tests/integration/test_data/pmc_xml");
+    let xml_dir_local = Path::new("tests/integration/test_data/pmc_xml");
+    let xml_dir_fallback = Path::new("test_data/pmc_xml");
+
+    let xml_dir = if xml_dir_workspace.exists() {
+        xml_dir_workspace
+    } else if xml_dir_local.exists() {
+        xml_dir_local
+    } else {
+        xml_dir_fallback
+    };
 
     if !xml_dir.exists() {
         return Vec::new();
@@ -73,10 +84,18 @@ pub fn get_pmc_xml_test_cases() -> Vec<PmcXmlTestCase> {
 
 /// Get a specific PMC XML test case by filename
 pub fn get_pmc_xml_test_case(filename: &str) -> Option<PmcXmlTestCase> {
-    let xml_path = Path::new("test_data/pmc_xml").join(filename);
+    // Try both relative paths depending on where the test is run from
+    let xml_path_workspace =
+        Path::new("pubmed-client/tests/integration/test_data/pmc_xml").join(filename);
+    let xml_path_local = Path::new("tests/integration/test_data/pmc_xml").join(filename);
+    let xml_path_fallback = Path::new("test_data/pmc_xml").join(filename);
 
-    if xml_path.exists() {
-        Some(PmcXmlTestCase::new(xml_path))
+    if xml_path_workspace.exists() {
+        Some(PmcXmlTestCase::new(xml_path_workspace))
+    } else if xml_path_local.exists() {
+        Some(PmcXmlTestCase::new(xml_path_local))
+    } else if xml_path_fallback.exists() {
+        Some(PmcXmlTestCase::new(xml_path_fallback))
     } else {
         None
     }
@@ -130,7 +149,18 @@ impl PubMedXmlTestCase {
 
 /// Get all PubMed XML test files from the test data directory
 pub fn get_pubmed_xml_test_cases() -> Vec<PubMedXmlTestCase> {
-    let xml_dir = Path::new("test_data/pubmed_xml");
+    // Try both relative paths depending on where the test is run from
+    let xml_dir_workspace = Path::new("pubmed-client/tests/integration/test_data/pubmed_xml");
+    let xml_dir_local = Path::new("tests/integration/test_data/pubmed_xml");
+    let xml_dir_fallback = Path::new("test_data/pubmed_xml");
+
+    let xml_dir = if xml_dir_workspace.exists() {
+        xml_dir_workspace
+    } else if xml_dir_local.exists() {
+        xml_dir_local
+    } else {
+        xml_dir_fallback
+    };
 
     if !xml_dir.exists() {
         return Vec::new();
@@ -155,7 +185,20 @@ pub fn get_pubmed_xml_test_cases() -> Vec<PubMedXmlTestCase> {
 
 /// Get a specific PubMed XML test case by PMID
 pub fn get_pubmed_xml_test_case(pmid: &str) -> Option<PubMedXmlTestCase> {
-    let xml_path = Path::new("test_data/pubmed_xml").join(format!("{pmid}.xml"));
+    // Try both relative paths depending on where the test is run from
+    let xml_path_workspace = Path::new("pubmed-client/tests/integration/test_data/pubmed_xml")
+        .join(format!("{pmid}.xml"));
+    let xml_path_local =
+        Path::new("tests/integration/test_data/pubmed_xml").join(format!("{pmid}.xml"));
+    let xml_path_fallback = Path::new("test_data/pubmed_xml").join(format!("{pmid}.xml"));
+
+    let xml_path = if xml_path_workspace.exists() {
+        xml_path_workspace
+    } else if xml_path_local.exists() {
+        xml_path_local
+    } else {
+        xml_path_fallback
+    };
 
     if xml_path.exists() {
         Some(PubMedXmlTestCase::new(xml_path))

@@ -28,10 +28,26 @@ async fn test_einfo_model_parsing_with_real_responses() {
 
     for (database_fixture, database_actual) in TEST_DATABASES {
         total_count += 1;
-        let fixture_path = format!(
-            "test_data/api_responses/einfo/{}_info.json",
+        // Try both relative paths depending on where the test is run from
+        let fixture_path_workspace = format!(
+            "pubmed-client/tests/integration/test_data/api_responses/einfo/{}_info.json",
             database_fixture
         );
+        let fixture_path_local = format!(
+            "tests/integration/test_data/api_responses/einfo/{}_info.json",
+            database_fixture
+        );
+
+        let fixture_path = if std::path::Path::new(&fixture_path_workspace).exists() {
+            fixture_path_workspace
+        } else if std::path::Path::new(&fixture_path_local).exists() {
+            fixture_path_local
+        } else {
+            format!(
+                "test_data/api_responses/einfo/{}_info.json",
+                database_fixture
+            ) // fallback
+        };
 
         if !std::path::Path::new(&fixture_path).exists() {
             warn!(database = database_fixture, "Fixture not found, skipping");

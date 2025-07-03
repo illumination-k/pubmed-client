@@ -21,7 +21,20 @@ async fn test_related_articles_model_parsing() {
     let mut parsed_count = 0;
 
     for pmid in TEST_PMIDS {
-        let fixture_path = format!("test_data/api_responses/elink/related_{pmid}.json");
+        // Try both relative paths depending on where the test is run from
+        let fixture_path_workspace = format!(
+            "pubmed-client/tests/integration/test_data/api_responses/elink/related_{pmid}.json"
+        );
+        let fixture_path_local =
+            format!("tests/integration/test_data/api_responses/elink/related_{pmid}.json");
+
+        let fixture_path = if std::path::Path::new(&fixture_path_workspace).exists() {
+            fixture_path_workspace
+        } else if std::path::Path::new(&fixture_path_local).exists() {
+            fixture_path_local
+        } else {
+            format!("test_data/api_responses/elink/related_{pmid}.json") // fallback
+        };
 
         if !std::path::Path::new(&fixture_path).exists() {
             warn!(pmid = pmid, "Related articles fixture not found, skipping");
@@ -91,7 +104,20 @@ async fn test_pmc_links_model_parsing() {
     let mut parsed_count = 0;
 
     for pmid in TEST_PMIDS {
-        let fixture_path = format!("test_data/api_responses/elink/pmc_links_{pmid}.json");
+        // Try both relative paths depending on where the test is run from
+        let fixture_path_workspace = format!(
+            "pubmed-client/tests/integration/test_data/api_responses/elink/pmc_links_{pmid}.json"
+        );
+        let fixture_path_local =
+            format!("tests/integration/test_data/api_responses/elink/pmc_links_{pmid}.json");
+
+        let fixture_path = if std::path::Path::new(&fixture_path_workspace).exists() {
+            fixture_path_workspace
+        } else if std::path::Path::new(&fixture_path_local).exists() {
+            fixture_path_local
+        } else {
+            format!("test_data/api_responses/elink/pmc_links_{pmid}.json") // fallback
+        };
 
         if !std::path::Path::new(&fixture_path).exists() {
             warn!(pmid = pmid, "PMC links fixture not found, skipping");
@@ -157,7 +183,20 @@ async fn test_citations_model_parsing() {
     let mut parsed_count = 0;
 
     for pmid in TEST_PMIDS {
-        let fixture_path = format!("test_data/api_responses/elink/citations_{pmid}.json");
+        // Try both relative paths depending on where the test is run from
+        let fixture_path_workspace = format!(
+            "pubmed-client/tests/integration/test_data/api_responses/elink/citations_{pmid}.json"
+        );
+        let fixture_path_local =
+            format!("tests/integration/test_data/api_responses/elink/citations_{pmid}.json");
+
+        let fixture_path = if std::path::Path::new(&fixture_path_workspace).exists() {
+            fixture_path_workspace
+        } else if std::path::Path::new(&fixture_path_local).exists() {
+            fixture_path_local
+        } else {
+            format!("test_data/api_responses/elink/citations_{pmid}.json") // fallback
+        };
 
         if !std::path::Path::new(&fixture_path).exists() {
             warn!(pmid = pmid, "Citations fixture not found, skipping");
