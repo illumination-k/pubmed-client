@@ -14,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "mise run fmt && mise run lint; exit $(( $? ? 2 : 0 ))"
+            "command": "pre-commit run && mise run fmt && mise run lint; exit $(( $? ? 2 : 0 ))"
           }
         ]
       }
