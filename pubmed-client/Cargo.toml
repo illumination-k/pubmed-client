@@ -98,6 +98,10 @@ path = "tests/integration/test_mesh_integration.rs"
 name = "test_rate_limiting_mocked"
 path = "tests/integration/test_rate_limiting_mocked.rs"
 
+[[test]]
+name = "test_supplemental_material"
+path = "tests/integration/test_supplementary_materials.rs"
+
 # Real API tests (opt-in)
 [[test]]
 name = "test_real_api_rate_limiting"

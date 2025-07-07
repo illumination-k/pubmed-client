@@ -4,6 +4,11 @@
 //! both native and WASM targets without requiring external dependencies.
 //! It focuses on the minimal functionality needed by the PubMed client.
 
+#[cfg(not(target_arch = "wasm32"))]
+use std::time::Duration as StdDuration;
+#[cfg(not(target_arch = "wasm32"))]
+use tokio::time;
+
 /// Simple duration representation for cross-platform compatibility
 ///
 /// This struct provides basic duration functionality without relying on
@@ -124,7 +129,7 @@ pub async fn sleep(duration: Duration) {
     if duration.is_zero() {
         return;
     }
-    tokio::time::sleep(std::time::Duration::from_secs(duration.as_secs())).await;
+    time::sleep(StdDuration::from_secs(duration.as_secs())).await;
 }
 
 /// Sleep for the specified duration (WASM implementation)

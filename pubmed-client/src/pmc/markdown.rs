@@ -3,7 +3,9 @@
 //! This module provides functionality to convert parsed PMC articles into
 //! well-formatted Markdown documents with configurable styling options.
 
-use crate::pmc::models::{ArticleSection, Author, FundingInfo, PmcFullText, Reference};
+use crate::pmc::models::{
+    ArticleSection, Author, Figure, FundingInfo, PmcFullText, Reference, Table,
+};
 
 /// Configuration options for Markdown conversion
 #[derive(Debug, Clone)]
@@ -501,7 +503,7 @@ impl PmcMarkdownConverter {
     }
 
     /// Convert figure to markdown
-    fn convert_figure(&self, figure: &crate::pmc::models::Figure) -> String {
+    fn convert_figure(&self, figure: &Figure) -> String {
         let mut content = String::new();
 
         if let Some(label) = &figure.label {
@@ -523,7 +525,7 @@ impl PmcMarkdownConverter {
     }
 
     /// Convert table to markdown
-    fn convert_table(&self, table: &crate::pmc::models::Table) -> String {
+    fn convert_table(&self, table: &Table) -> String {
         let mut content = String::new();
 
         if let Some(label) = &table.label {
@@ -686,6 +688,7 @@ mod tests {
             conflict_of_interest: None,
             acknowledgments: None,
             data_availability: None,
+            supplementary_materials: vec![],
         };
 
         let markdown = converter.convert(&article);
