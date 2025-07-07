@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(git reset:*)",
+      "Bash(git rebase:*)",
+      "Bash(git commit*--no-verify*)",
+      "Bash(git commit*-n *)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pre-commit run && mise run fmt && mise run lint; exit $(( $? ? 2 : 0 ))"
+          }
+        ]
+      }
+    ]
+  }
+}
