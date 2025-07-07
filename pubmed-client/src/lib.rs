@@ -1,3 +1,10 @@
+#![deny(
+    clippy::panic,
+    clippy::absolute_paths,
+    clippy::print_stderr,
+    clippy::print_stdout
+)]
+
 //! # PubMed Client
 //!
 //! A Rust client library for accessing PubMed and PMC (PubMed Central) APIs.

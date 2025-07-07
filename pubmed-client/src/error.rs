@@ -1,3 +1,5 @@
+use std::result;
+
 use crate::retry::RetryableError;
 use thiserror::Error;
 
@@ -49,7 +51,7 @@ pub enum PubMedError {
     ApiError { status: u16, message: String },
 }
 
-pub type Result<T> = std::result::Result<T, PubMedError>;
+pub type Result<T> = result::Result<T, PubMedError>;
 
 impl RetryableError for PubMedError {
     fn is_retryable(&self) -> bool {

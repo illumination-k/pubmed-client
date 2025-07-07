@@ -358,6 +358,8 @@ impl Default for ClientConfig {
 
 #[cfg(test)]
 mod tests {
+    use std::mem;
+
     use super::*;
 
     #[test]
@@ -445,6 +447,6 @@ mod tests {
         let config = ClientConfig::new().with_rate_limit(5.0);
         let rate_limiter = config.create_rate_limiter();
         // The rate limiter creation should succeed
-        assert!(std::mem::size_of_val(&rate_limiter) > 0);
+        assert!(mem::size_of_val(&rate_limiter) > 0);
     }
 }

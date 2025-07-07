@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pmc::models::PmcFullText;
@@ -60,7 +62,7 @@ impl PmcClient {
             {
                 Client::builder()
                     .user_agent(config.effective_user_agent())
-                    .timeout(std::time::Duration::from_secs(config.timeout.as_secs()))
+                    .timeout(Duration::from_secs(config.timeout.as_secs()))
                     .build()
                     .expect("Failed to create HTTP client")
             }

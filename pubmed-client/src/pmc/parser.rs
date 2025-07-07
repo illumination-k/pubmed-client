@@ -1,6 +1,7 @@
 use crate::error::Result;
 use crate::pmc::models::{
-    ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcFullText, Reference, Table,
+    ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcFullText, Reference,
+    SupplementaryMaterial, Table,
 };
 
 /// XML parser for PMC articles
@@ -55,6 +56,9 @@ impl PmcXmlParser {
         // Extract references with detailed information
         let references = parser.extract_references_detailed(xml_content);
 
+        // Extract supplementary materials
+        let supplementary_materials = parser.extract_supplementary_materials(xml_content);
+
         Ok(PmcFullText {
             pmcid: pmcid.to_string(),
             pmid,
@@ -71,6 +75,7 @@ impl PmcXmlParser {
             conflict_of_interest,
             acknowledgments,
             data_availability,
+            supplementary_materials,
         })
     }
 
@@ -950,6 +955,79 @@ impl PmcXmlParser {
 
         result.trim().to_string()
     }
+
+    /// Extract supplementary materials from XML content
+    fn extract_supplementary_materials(&self, content: &str) -> Vec<SupplementaryMaterial> {
+        let mut materials = Vec::new();
+
+        let mut pos = 0;
+        while let Some(supp_start) = content[pos..].find("<supplementary-material") {
+            let supp_start = pos + supp_start;
+            if let Some(supp_end) = content[supp_start..].find("</supplementary-material>") {
+                let supp_end = supp_start + supp_end;
+                let supp_content = &content[supp_start..supp_end];
+
+                if let Some(material) = self.parse_supplementary_material(supp_content) {
+                    materials.push(material);
+                }
+
+                pos = supp_end;
+            } else {
+                break;
+            }
+        }
+
+        materials
+    }
+
+    /// Parse a single supplementary material element
+    fn parse_supplementary_material(&self, supp_content: &str) -> Option<SupplementaryMaterial> {
+        // Extract ID from the opening tag
+        let id = self
+            .extract_attribute_value(supp_content, "id")
+            .unwrap_or_else(|| {
+                // Generate a simple ID based on content hash
+                use std::collections::hash_map::DefaultHasher;
+                use std::hash::{Hash, Hasher};
+                let mut hasher = DefaultHasher::new();
+                supp_content.hash(&mut hasher);
+                format!("supp_{}", hasher.finish())
+            });
+
+        let mut material = SupplementaryMaterial::new(id);
+
+        // Extract attributes from the opening tag
+        material.content_type = self.extract_attribute_value(supp_content, "content-type");
+        material.position = self.extract_attribute_value(supp_content, "position");
+
+        // Extract title from caption
+        material.title = self.extract_text_between(supp_content, "<title>", "</title>");
+
+        // Extract description from caption paragraph
+        material.description = self
+            .extract_text_between(supp_content, "<caption>", "</caption>")
+            .map(|caption| self.strip_xml_tags(&caption));
+
+        // Extract file URL from media element
+        if let Some(media_start) = supp_content.find("<media") {
+            if let Some(media_end) = supp_content[media_start..].find(">") {
+                let media_tag = &supp_content[media_start..media_start + media_end + 1];
+                material.file_url = self.extract_attribute_value(media_tag, "xlink:href");
+
+                // Infer file type from URL
+                if material.file_url.is_some() {
+                    material.file_type = material.get_file_extension();
+                }
+            }
+        }
+
+        // Only return materials with valid URLs
+        if material.file_url.is_some() {
+            Some(material)
+        } else {
+            None
+        }
+    }
 }
 
 #[cfg(test)]
@@ -978,5 +1056,78 @@ mod tests {
         let content = "<year>2023</year><month>12</month><day>25</day>";
         let result = parser.extract_pub_date(content);
         assert_eq!(result, "2023-12-25");
+    }
+
+    #[test]
+    fn test_extract_supplementary_materials() {
+        let parser = PmcXmlParser;
+        let content = r#"
+            <supplementary-material id="supp1" content-type="local-data" position="float">
+                <caption>
+                    <title>Supplementary Data</title>
+                    <p>Click here for additional data file.</p>
+                </caption>
+                <media xlink:href="dataset.tar.gz"/>
+            </supplementary-material>
+            <supplementary-material id="supp2" content-type="local-data">
+                <caption>
+                    <title>Figures</title>
+                </caption>
+                <media xlink:href="figures.zip"/>
+            </supplementary-material>
+        "#;
+
+        let materials = parser.extract_supplementary_materials(content);
+        assert_eq!(materials.len(), 2);
+
+        let first_material = &materials[0];
+        assert_eq!(first_material.id, "supp1");
+        assert_eq!(first_material.content_type, Some("local-data".to_string()));
+        assert_eq!(first_material.position, Some("float".to_string()));
+        assert_eq!(first_material.title, Some("Supplementary Data".to_string()));
+        assert_eq!(first_material.file_url, Some("dataset.tar.gz".to_string()));
+        assert!(first_material.is_tar_file());
+
+        let second_material = &materials[1];
+        assert_eq!(second_material.id, "supp2");
+        assert_eq!(second_material.file_url, Some("figures.zip".to_string()));
+        assert!(!second_material.is_tar_file());
+        assert!(second_material.is_archive());
+    }
+
+    #[test]
+    fn test_parse_supplementary_material_single() {
+        let parser = PmcXmlParser;
+        let content = r#"<supplementary-material id="test-supp" content-type="local-data">
+            <caption>
+                <title>Test Data</title>
+                <p>This is a test archive file.</p>
+            </caption>
+            <media xlink:href="test-data.tar.gz"/>
+        </supplementary-material>"#;
+
+        let material = parser.parse_supplementary_material(content);
+        assert!(material.is_some());
+
+        let material = material.unwrap();
+        assert_eq!(material.id, "test-supp");
+        assert_eq!(material.content_type, Some("local-data".to_string()));
+        assert_eq!(material.title, Some("Test Data".to_string()));
+        assert_eq!(material.file_url, Some("test-data.tar.gz".to_string()));
+        assert!(material.is_tar_file());
+        assert_eq!(material.get_file_extension(), Some("gz".to_string()));
+    }
+
+    #[test]
+    fn test_parse_supplementary_material_no_url() {
+        let parser = PmcXmlParser;
+        let content = r#"<supplementary-material id="test-supp" content-type="local-data">
+            <caption>
+                <title>Test Data</title>
+            </caption>
+        </supplementary-material>"#;
+
+        let material = parser.parse_supplementary_material(content);
+        assert!(material.is_none()); // Should return None if no URL
     }
 }
