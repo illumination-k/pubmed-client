@@ -3,9 +3,10 @@
 //! This module provides a configurable retry mechanism with exponential backoff
 //! and jitter to handle temporary network issues when communicating with NCBI APIs.
 
+use std::{fmt::Display, future::Future};
+
 use crate::time::{sleep, Duration};
 use rand::Rng;
-use std::future::Future;
 use tracing::{debug, warn};
 
 /// Configuration for retry behavior
@@ -118,7 +119,7 @@ pub async fn with_retry<F, Fut, T, E>(
 where
     F: FnMut() -> Fut,
     Fut: Future<Output = Result<T, E>>,
-    E: RetryableError + std::fmt::Display,
+    E: RetryableError + Display,
 {
     let mut attempt = 0;
     let mut last_error = None;

@@ -1,7 +1,7 @@
 //! Query validation and optimization methods
 
 use super::SearchQuery;
-use crate::error::Result;
+use crate::error::{PubMedError, Result};
 
 impl SearchQuery {
     /// Validate the query structure and parameters
@@ -21,7 +21,7 @@ impl SearchQuery {
     pub fn validate(&self) -> Result<()> {
         // Check if query is completely empty
         if self.terms.is_empty() && self.filters.is_empty() {
-            return Err(crate::error::PubMedError::InvalidQuery(
+            return Err(PubMedError::InvalidQuery(
                 "Query cannot be empty".to_string(),
             ));
         }
@@ -29,12 +29,12 @@ impl SearchQuery {
         // Validate limit is reasonable
         if let Some(limit) = self.limit {
             if limit == 0 {
-                return Err(crate::error::PubMedError::InvalidQuery(
+                return Err(PubMedError::InvalidQuery(
                     "Limit must be greater than 0".to_string(),
                 ));
             }
             if limit > 10000 {
-                return Err(crate::error::PubMedError::InvalidQuery(
+                return Err(PubMedError::InvalidQuery(
                     "Limit should not exceed 10,000 for performance reasons".to_string(),
                 ));
             }
@@ -43,7 +43,7 @@ impl SearchQuery {
         // Check for potentially problematic patterns
         let query_string = self.build();
         if query_string.len() > 4000 {
-            return Err(crate::error::PubMedError::InvalidQuery(
+            return Err(PubMedError::InvalidQuery(
                 "Query string is too long (>4000 characters)".to_string(),
             ));
         }
@@ -52,7 +52,7 @@ impl SearchQuery {
         let open_parens = query_string.matches('(').count();
         let close_parens = query_string.matches(')').count();
         if open_parens != close_parens {
-            return Err(crate::error::PubMedError::InvalidQuery(
+            return Err(PubMedError::InvalidQuery(
                 "Unbalanced parentheses in query".to_string(),
             ));
         }

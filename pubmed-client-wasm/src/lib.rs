@@ -364,6 +364,7 @@ impl From<JsFullText> for PmcFullText {
             conflict_of_interest: None,
             acknowledgments: None,
             data_availability: None,
+            supplementary_materials: Vec::new(),
         }
     }
 }

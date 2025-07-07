@@ -4,7 +4,9 @@
       "Bash(git reset:*)",
       "Bash(git rebase:*)",
       "Bash(git commit*--no-verify*)",
-      "Bash(git commit*-n *)"
+      "Bash(git commit*-n *)",
+      "Write(**/human_verified/**)",
+      "Write(.env*)"
     ]
   },
   "hooks": {
