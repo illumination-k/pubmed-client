@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
 use serde::{Deserialize, Serialize};
 
 /// Represents an author's institutional affiliation
@@ -518,8 +520,8 @@ impl PartialEq<&str> for Author {
     }
 }
 
-impl std::fmt::Display for Author {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for Author {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.full_name)
     }
 }

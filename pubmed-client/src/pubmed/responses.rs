@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -19,7 +21,7 @@ pub(crate) struct ESummaryResult {
 pub(crate) struct ESummaryResultData {
     pub uids: Vec<String>,
     #[serde(flatten)]
-    pub articles: std::collections::HashMap<String, ESummaryData>,
+    pub articles: HashMap<String, ESummaryData>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

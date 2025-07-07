@@ -521,6 +521,7 @@ fn test_markdown_config_builder() {
         conflict_of_interest: None,
         acknowledgments: None,
         data_availability: None,
+        supplementary_materials: vec![],
     };
 
     let markdown = converter.convert(&test_article);
@@ -569,6 +570,7 @@ fn test_markdown_edge_cases() {
         conflict_of_interest: None,
         acknowledgments: None,
         data_availability: None,
+        supplementary_materials: vec![],
     };
 
     let converter = PmcMarkdownConverter::new();
@@ -598,6 +600,7 @@ fn test_markdown_edge_cases() {
         conflict_of_interest: None,
         acknowledgments: None,
         data_availability: None,
+        supplementary_materials: vec![],
     };
 
     let markdown = converter.convert(&special_article);
