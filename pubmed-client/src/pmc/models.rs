@@ -94,6 +94,76 @@ pub struct Table {
     pub footnotes: Vec<String>,
 }
 
+/// Represents supplementary material in the article
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SupplementaryMaterial {
+    /// Supplementary material ID
+    pub id: String,
+    /// Content type (e.g., "local-data")
+    pub content_type: Option<String>,
+    /// Title/caption of the supplementary material
+    pub title: Option<String>,
+    /// Description or additional caption
+    pub description: Option<String>,
+    /// File URL or path (from xlink:href)
+    pub file_url: Option<String>,
+    /// File extension/type inferred from URL
+    pub file_type: Option<String>,
+    /// Position attribute (e.g., "float")
+    pub position: Option<String>,
+}
+
+impl SupplementaryMaterial {
+    /// Create a new SupplementaryMaterial instance
+    pub fn new(id: String) -> Self {
+        Self {
+            id,
+            content_type: None,
+            title: None,
+            description: None,
+            file_url: None,
+            file_type: None,
+            position: None,
+        }
+    }
+
+    /// Check if this supplementary material is a tar file
+    pub fn is_tar_file(&self) -> bool {
+        if let Some(url) = &self.file_url {
+            url.ends_with(".tar")
+                || url.ends_with(".tar.gz")
+                || url.ends_with(".tar.bz2")
+                || url.ends_with(".tgz")
+        } else {
+            false
+        }
+    }
+
+    /// Get the file extension from the URL
+    pub fn get_file_extension(&self) -> Option<String> {
+        if let Some(url) = &self.file_url {
+            if let Some(filename) = url.split('/').next_back() {
+                if let Some(dot_index) = filename.rfind('.') {
+                    return Some(filename[dot_index + 1..].to_lowercase());
+                }
+            }
+        }
+        None
+    }
+
+    /// Check if this is an archive file (zip, tar, etc.)
+    pub fn is_archive(&self) -> bool {
+        if let Some(ext) = self.get_file_extension() {
+            matches!(
+                ext.as_str(),
+                "zip" | "tar" | "gz" | "bz2" | "tgz" | "rar" | "7z"
+            )
+        } else {
+            false
+        }
+    }
+}
+
 /// Represents a full-text article from PMC
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PmcFullText {
@@ -127,6 +197,8 @@ pub struct PmcFullText {
     pub acknowledgments: Option<String>,
     /// Data availability statement
     pub data_availability: Option<String>,
+    /// Supplementary materials
+    pub supplementary_materials: Vec<SupplementaryMaterial>,
 }
 
 /// Represents a section of an article
@@ -202,6 +274,7 @@ impl PmcFullText {
             conflict_of_interest: None,
             acknowledgments: None,
             data_availability: None,
+            supplementary_materials: Vec::new(),
         }
     }
 
@@ -237,6 +310,43 @@ impl PmcFullText {
                 .join("\n\n")
         }
         collect_content(&self.sections)
+    }
+
+    /// Get all tar files from supplementary materials
+    pub fn get_tar_files(&self) -> Vec<&SupplementaryMaterial> {
+        self.supplementary_materials
+            .iter()
+            .filter(|material| material.is_tar_file())
+            .collect()
+    }
+
+    /// Get all archive files from supplementary materials
+    pub fn get_archive_files(&self) -> Vec<&SupplementaryMaterial> {
+        self.supplementary_materials
+            .iter()
+            .filter(|material| material.is_archive())
+            .collect()
+    }
+
+    /// Check if the article has supplementary materials
+    pub fn has_supplementary_materials(&self) -> bool {
+        !self.supplementary_materials.is_empty()
+    }
+
+    /// Get supplementary materials by content type
+    pub fn get_supplementary_materials_by_type(
+        &self,
+        content_type: &str,
+    ) -> Vec<&SupplementaryMaterial> {
+        self.supplementary_materials
+            .iter()
+            .filter(|material| {
+                material
+                    .content_type
+                    .as_ref()
+                    .is_some_and(|ct| ct == content_type)
+            })
+            .collect()
     }
 }
 
@@ -547,5 +657,74 @@ mod tests {
         let full_text = article.get_full_text();
         assert!(full_text.contains("Abstract content."));
         assert!(full_text.contains("Introduction content."));
+    }
+
+    #[test]
+    fn test_supplementary_material_creation() {
+        let mut material = SupplementaryMaterial::new("supp1".to_string());
+        material.file_url = Some("https://example.com/data.tar.gz".to_string());
+        material.content_type = Some("local-data".to_string());
+        material.title = Some("Supplementary Data".to_string());
+
+        assert_eq!(material.id, "supp1");
+        assert!(material.is_tar_file());
+        assert!(material.is_archive());
+        assert_eq!(material.get_file_extension(), Some("gz".to_string()));
+    }
+
+    #[test]
+    fn test_tar_file_detection() {
+        let mut material = SupplementaryMaterial::new("tar1".to_string());
+
+        // Test various tar file extensions
+        material.file_url = Some("data.tar".to_string());
+        assert!(material.is_tar_file());
+
+        material.file_url = Some("data.tar.gz".to_string());
+        assert!(material.is_tar_file());
+
+        material.file_url = Some("data.tar.bz2".to_string());
+        assert!(material.is_tar_file());
+
+        material.file_url = Some("data.tgz".to_string());
+        assert!(material.is_tar_file());
+
+        // Test non-tar files
+        material.file_url = Some("data.zip".to_string());
+        assert!(!material.is_tar_file());
+        assert!(material.is_archive());
+
+        material.file_url = Some("data.pdf".to_string());
+        assert!(!material.is_tar_file());
+        assert!(!material.is_archive());
+    }
+
+    #[test]
+    fn test_pmc_full_text_with_supplementary_materials() {
+        let mut article = PmcFullText::new("PMC1234567".to_string());
+
+        let mut tar_material = SupplementaryMaterial::new("supp1".to_string());
+        tar_material.file_url = Some("dataset.tar.gz".to_string());
+        tar_material.content_type = Some("local-data".to_string());
+
+        let mut zip_material = SupplementaryMaterial::new("supp2".to_string());
+        zip_material.file_url = Some("figures.zip".to_string());
+        zip_material.content_type = Some("local-data".to_string());
+
+        article.supplementary_materials.push(tar_material);
+        article.supplementary_materials.push(zip_material);
+
+        assert!(article.has_supplementary_materials());
+        assert_eq!(article.supplementary_materials.len(), 2);
+
+        let tar_files = article.get_tar_files();
+        assert_eq!(tar_files.len(), 1);
+        assert_eq!(tar_files[0].id, "supp1");
+
+        let archive_files = article.get_archive_files();
+        assert_eq!(archive_files.len(), 2);
+
+        let local_data_materials = article.get_supplementary_materials_by_type("local-data");
+        assert_eq!(local_data_materials.len(), 2);
     }
 }

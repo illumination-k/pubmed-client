@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
@@ -90,7 +92,7 @@ impl PubMedClient {
             {
                 Client::builder()
                     .user_agent(config.effective_user_agent())
-                    .timeout(std::time::Duration::from_secs(config.timeout.as_secs()))
+                    .timeout(Duration::from_secs(config.timeout.as_secs()))
                     .build()
                     .expect("Failed to create HTTP client")
             }
@@ -868,8 +870,12 @@ impl Default for PubMedClient {
 
 #[cfg(test)]
 mod tests {
+    use std::{
+        mem,
+        time::{Duration, Instant},
+    };
+
     use super::*;
-    use std::time::{Duration, Instant};
 
     #[test]
     fn test_client_config_rate_limiting() {
@@ -937,7 +943,7 @@ mod tests {
         // Rate limiter should be created successfully
         // We can't easily test the exact rate without async context,
         // but we can verify it was created
-        assert!(std::mem::size_of_val(&rate_limiter) > 0);
+        assert!(mem::size_of_val(&rate_limiter) > 0);
     }
 
     #[tokio::test]
