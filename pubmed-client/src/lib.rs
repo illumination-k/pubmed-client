@@ -102,6 +102,29 @@
 //!     Ok(())
 //! }
 //! ```
+//!
+//! ### Downloading and Extracting PMC Articles as TAR files
+//!
+//! ```no_run
+//! use pubmed_client_rs::PmcClient;
+//! use std::path::Path;
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = PmcClient::new();
+//!     let output_dir = Path::new("./extracted_articles");
+//!
+//!     // Download and extract a PMC article as tar.gz from the OA API
+//!     let files = client.download_and_extract_tar("PMC7906746", output_dir).await?;
+//!
+//!     println!("Extracted {} files:", files.len());
+//!     for file in files {
+//!         println!("  - {}", file);
+//!     }
+//!
+//!     Ok(())
+//! }
+//! ```
 
 pub mod config;
 pub mod error;

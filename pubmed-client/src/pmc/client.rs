@@ -9,6 +9,15 @@ use crate::retry::with_retry;
 use reqwest::{Client, Response};
 use tracing::debug;
 
+#[cfg(not(target_arch = "wasm32"))]
+use {
+    flate2::read::GzDecoder,
+    futures_util::StreamExt,
+    std::{fs, fs::File, path::Path},
+    tar::Archive,
+    tokio::{fs as tokio_fs, io::AsyncWriteExt},
+};
+
 /// Client for interacting with PMC (PubMed Central) API
 #[derive(Clone)]
 pub struct PmcClient {
@@ -350,6 +359,223 @@ impl PmcClient {
         }
 
         Ok(results)
+    }
+
+    /// Download and extract tar.gz file for a PMC article using the OA API
+    ///
+    /// # Arguments
+    ///
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    /// * `output_dir` - Directory to extract the tar.gz contents to
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<String>>` containing the list of extracted file paths
+    ///
+    /// # Errors
+    ///
+    /// * `PubMedError::InvalidPmid` - If the PMCID format is invalid
+    /// * `PubMedError::RequestError` - If the HTTP request fails
+    /// * `PubMedError::IoError` - If file operations fail
+    /// * `PubMedError::PmcNotAvailable` - If the article is not available in OA
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PmcClient;
+    /// use std::path::Path;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     let output_dir = Path::new("./extracted_articles");
+    ///     let files = client.download_and_extract_tar("PMC7906746", output_dir).await?;
+    ///
+    ///     for file in files {
+    ///         println!("Extracted: {}", file);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn download_and_extract_tar<P: AsRef<Path>>(
+        &self,
+        pmcid: &str,
+        output_dir: P,
+    ) -> Result<Vec<String>> {
+        let normalized_pmcid = self.normalize_pmcid(pmcid);
+
+        // Validate PMCID format
+        let clean_pmcid = normalized_pmcid.trim_start_matches("PMC");
+        if clean_pmcid.is_empty() || !clean_pmcid.chars().all(|c| c.is_ascii_digit()) {
+            return Err(PubMedError::InvalidPmid {
+                pmid: pmcid.to_string(),
+            });
+        }
+
+        // Build OA API URL
+        let mut url = format!(
+            "https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={}&format=tgz",
+            normalized_pmcid
+        );
+
+        // Add API parameters if available
+        let api_params = self.config.build_api_params();
+        for (key, value) in api_params {
+            url.push('&');
+            url.push_str(&key);
+            url.push('=');
+            url.push_str(&urlencoding::encode(&value));
+        }
+
+        debug!("Downloading tar.gz from OA API: {}", url);
+
+        // Download the tar.gz file
+        let response = self.make_request(&url).await?;
+
+        if !response.status().is_success() {
+            return Err(PubMedError::ApiError {
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
+            });
+        }
+
+        // Check if the response contains an error message
+        let content_type = response
+            .headers()
+            .get("content-type")
+            .and_then(|v| v.to_str().ok())
+            .unwrap_or("");
+
+        if content_type.contains("text/html") || content_type.contains("text/plain") {
+            // Likely an error response, check the content
+            let error_text = response.text().await?;
+            if error_text.contains("error") || error_text.contains("Error") {
+                return Err(PubMedError::PmcNotAvailableById {
+                    pmcid: pmcid.to_string(),
+                });
+            }
+            // If we get here, it's likely still an error but we consumed the response
+            return Err(PubMedError::PmcNotAvailableById {
+                pmcid: pmcid.to_string(),
+            });
+        }
+
+        // Create output directory if it doesn't exist
+        let output_path = output_dir.as_ref();
+        tokio_fs::create_dir_all(output_path)
+            .await
+            .map_err(|e| PubMedError::IoError {
+                message: format!("Failed to create output directory: {}", e),
+            })?;
+
+        // Stream the response to a temporary file
+        let temp_file_path = output_path.join(format!("{}.tar.gz", normalized_pmcid));
+        let mut temp_file =
+            tokio_fs::File::create(&temp_file_path)
+                .await
+                .map_err(|e| PubMedError::IoError {
+                    message: format!("Failed to create temporary file: {}", e),
+                })?;
+
+        let mut stream = response.bytes_stream();
+        while let Some(chunk) = stream.next().await {
+            let chunk = chunk.map_err(PubMedError::from)?;
+            temp_file
+                .write_all(&chunk)
+                .await
+                .map_err(|e| PubMedError::IoError {
+                    message: format!("Failed to write to temporary file: {}", e),
+                })?;
+        }
+
+        temp_file.flush().await.map_err(|e| PubMedError::IoError {
+            message: format!("Failed to flush temporary file: {}", e),
+        })?;
+
+        debug!("Downloaded tar.gz to: {}", temp_file_path.display());
+
+        // Extract the tar.gz file
+        let extracted_files = self
+            .extract_tar_gz(&temp_file_path, &output_path.to_path_buf())
+            .await?;
+
+        // Clean up temporary file
+        tokio_fs::remove_file(&temp_file_path)
+            .await
+            .map_err(|e| PubMedError::IoError {
+                message: format!("Failed to remove temporary file: {}", e),
+            })?;
+
+        Ok(extracted_files)
+    }
+
+    /// Extract tar.gz file to the specified directory
+    ///
+    /// # Arguments
+    ///
+    /// * `tar_path` - Path to the tar.gz file
+    /// * `output_dir` - Directory to extract contents to
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<String>>` containing the list of extracted file paths
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn extract_tar_gz<P: AsRef<Path>>(
+        &self,
+        tar_path: P,
+        output_dir: P,
+    ) -> Result<Vec<String>> {
+        let tar_path = tar_path.as_ref();
+        let output_dir = output_dir.as_ref();
+
+        // Read the tar.gz file
+        let tar_file = File::open(tar_path).map_err(|e| PubMedError::IoError {
+            message: format!("Failed to open tar.gz file: {}", e),
+        })?;
+
+        let tar_gz = GzDecoder::new(tar_file);
+        let mut archive = Archive::new(tar_gz);
+
+        let mut extracted_files = Vec::new();
+
+        // Extract all entries
+        for entry in archive.entries().map_err(|e| PubMedError::IoError {
+            message: format!("Failed to read tar entries: {}", e),
+        })? {
+            let mut entry = entry.map_err(|e| PubMedError::IoError {
+                message: format!("Failed to read tar entry: {}", e),
+            })?;
+
+            let path = entry.path().map_err(|e| PubMedError::IoError {
+                message: format!("Failed to get entry path: {}", e),
+            })?;
+
+            let output_path = output_dir.join(&path);
+
+            // Create parent directories if they don't exist
+            if let Some(parent) = output_path.parent() {
+                fs::create_dir_all(parent).map_err(|e| PubMedError::IoError {
+                    message: format!("Failed to create parent directories: {}", e),
+                })?;
+            }
+
+            // Extract the entry
+            entry
+                .unpack(&output_path)
+                .map_err(|e| PubMedError::IoError {
+                    message: format!("Failed to extract entry: {}", e),
+                })?;
+
+            extracted_files.push(output_path.to_string_lossy().to_string());
+            debug!("Extracted: {}", output_path.display());
+        }
+
+        Ok(extracted_files)
     }
 
     /// Normalize PMCID format (ensure it starts with "PMC")
