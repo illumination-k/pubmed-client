@@ -156,7 +156,7 @@ impl PmcTarClient {
                 // Parse XML to extract the actual download URL
                 let xml_content = response.text().await?;
                 debug!("OA API returned XML, parsing for download URL");
-                let parsed_url = self.parse_oa_response(&xml_content)?;
+                let parsed_url = self.parse_oa_response(&xml_content, &normalized_pmcid)?;
                 // Convert FTP URLs to HTTPS for HTTP client compatibility
                 if parsed_url.starts_with("ftp://ftp.ncbi.nlm.nih.gov/") {
                     parsed_url.replace(
@@ -295,6 +295,14 @@ impl PmcTarClient {
     ) -> Result<Vec<ExtractedFigure>> {
         let normalized_pmcid = self.normalize_pmcid(pmcid);
 
+        // Create output directory early (before any potential failures)
+        let output_path = output_dir.as_ref();
+        tokio_fs::create_dir_all(output_path)
+            .await
+            .map_err(|e| PubMedError::IoError {
+                message: format!("Failed to create output directory: {}", e),
+            })?;
+
         // First, fetch the XML to get figure captions
         let xml_content = self.fetch_xml(&normalized_pmcid).await?;
         let full_text = PmcXmlParser::parse(&xml_content, &normalized_pmcid)?;
@@ -364,7 +372,7 @@ impl PmcTarClient {
 
     /// Parse OA API XML response to extract download URL
     #[cfg(not(target_arch = "wasm32"))]
-    fn parse_oa_response(&self, xml_content: &str) -> Result<String> {
+    fn parse_oa_response(&self, xml_content: &str, pmcid: &str) -> Result<String> {
         use quick_xml::events::Event;
         use quick_xml::Reader;
 
@@ -408,7 +416,7 @@ impl PmcTarClient {
 
         debug!("No href attribute found in XML response");
         Err(PubMedError::PmcNotAvailableById {
-            pmcid: "Unknown".to_string(),
+            pmcid: pmcid.to_string(),
         })
     }
 
