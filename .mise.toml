@@ -7,6 +7,7 @@ dprint = "latest"
 
 pnpm = "10"
 node = "20"
+"rust" = { version = "1.87.0", components = "rustfmt,clippy" }
 
 [tasks.fmt]
 run = ["dprint fmt", "cargo fmt --all"]
@@ -51,27 +52,21 @@ run = [
 ]
 
 [tasks."coverage:open"]
-run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html --open"]
+run = [
+  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --html --open",
+]
 
 [tasks."wasm:build"]
-run = [
-  "cd pubmed-client-wasm && wasm-pack build --target web",
-]
+run = ["cd pubmed-client-wasm && wasm-pack build --target web"]
 
 [tasks."wasm:build:node"]
-run = [
-  "cd pubmed-client-wasm && wasm-pack build --target nodejs",
-]
+run = ["cd pubmed-client-wasm && wasm-pack build --target nodejs"]
 
 [tasks."wasm:test"]
-run = [
-  "cd pubmed-client-wasm && pnpm run build && pnpm run test",
-]
+run = ["cd pubmed-client-wasm && pnpm run build && pnpm run test"]
 
 [tasks."wasm:publish"]
-run = [
-  "cd pubmed-client-wasm && pnpm run publish",
-]
+run = ["cd pubmed-client-wasm && pnpm run publish"]
 
 [tasks."core:test"]
 run = ["cargo test -p pubmed-client-rs"]
