@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
-use crate::pmc::models::PmcFullText;
+use crate::pmc::models::{ArticleSection, ExtractedFigure, Figure, PmcFullText};
 use crate::pmc::parser::PmcXmlParser;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -15,7 +15,7 @@ use {
     futures_util::StreamExt,
     std::{fs, fs::File, path::Path},
     tar::Archive,
-    tokio::{fs as tokio_fs, io::AsyncWriteExt},
+    tokio::{fs as tokio_fs, io::AsyncWriteExt, task},
 };
 
 /// Client for interacting with PMC (PubMed Central) API
@@ -512,6 +512,207 @@ impl PmcClient {
             })?;
 
         Ok(extracted_files)
+    }
+
+    /// Download, extract tar.gz file, and match figures with their captions from XML
+    ///
+    /// # Arguments
+    ///
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    /// * `output_dir` - Directory to extract the tar.gz contents to
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<ExtractedFigure>>` containing figures with both XML metadata and file paths
+    ///
+    /// # Errors
+    ///
+    /// * `PubMedError::InvalidPmid` - If the PMCID format is invalid
+    /// * `PubMedError::RequestError` - If the HTTP request fails
+    /// * `PubMedError::IoError` - If file operations fail
+    /// * `PubMedError::PmcNotAvailable` - If the article is not available in OA
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PmcClient;
+    /// use std::path::Path;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     let output_dir = Path::new("./extracted_articles");
+    ///     let figures = client.extract_figures_with_captions("PMC7906746", output_dir).await?;
+    ///
+    ///     for figure in figures {
+    ///         println!("Figure {}: {}", figure.figure.id, figure.figure.caption);
+    ///         println!("File: {}", figure.extracted_file_path);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn extract_figures_with_captions<P: AsRef<Path>>(
+        &self,
+        pmcid: &str,
+        output_dir: P,
+    ) -> Result<Vec<ExtractedFigure>> {
+        let normalized_pmcid = self.normalize_pmcid(pmcid);
+
+        // First, fetch the XML to get figure captions
+        let xml_content = self.fetch_xml(&normalized_pmcid).await?;
+        let full_text = PmcXmlParser::parse(&xml_content, &normalized_pmcid)?;
+
+        // Extract the tar.gz file
+        let extracted_files = self
+            .download_and_extract_tar(&normalized_pmcid, &output_dir)
+            .await?;
+
+        // Find and match figures
+        let figures = self
+            .match_figures_with_files(&full_text, &extracted_files, &output_dir)
+            .await?;
+
+        Ok(figures)
+    }
+
+    /// Match figures from XML with extracted files
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn match_figures_with_files<P: AsRef<Path>>(
+        &self,
+        full_text: &PmcFullText,
+        extracted_files: &[String],
+        output_dir: P,
+    ) -> Result<Vec<ExtractedFigure>> {
+        let output_path = output_dir.as_ref();
+        let mut matched_figures = Vec::new();
+
+        // Collect all figures from all sections
+        let mut all_figures = Vec::new();
+        for section in &full_text.sections {
+            Self::collect_figures_recursive(section, &mut all_figures);
+        }
+
+        // Common image extensions to look for
+        let image_extensions = [
+            "jpg", "jpeg", "png", "gif", "tiff", "tif", "svg", "eps", "pdf",
+        ];
+
+        for figure in all_figures {
+            // Try to find a matching file for this figure
+            let matching_file =
+                self.find_matching_file(&figure, extracted_files, &image_extensions);
+
+            if let Some(file_path) = matching_file {
+                let absolute_path =
+                    if file_path.starts_with(&output_path.to_string_lossy().to_string()) {
+                        file_path.clone()
+                    } else {
+                        output_path.join(&file_path).to_string_lossy().to_string()
+                    };
+
+                // Get file size
+                let file_size = tokio_fs::metadata(&absolute_path)
+                    .await
+                    .map(|m| m.len())
+                    .ok();
+
+                // Try to get image dimensions
+                let dimensions = self.get_image_dimensions(&absolute_path).await;
+
+                matched_figures.push(ExtractedFigure {
+                    figure: figure.clone(),
+                    extracted_file_path: absolute_path,
+                    file_size,
+                    dimensions,
+                });
+            }
+        }
+
+        Ok(matched_figures)
+    }
+
+    /// Recursively collect all figures from sections and subsections
+    #[cfg(not(target_arch = "wasm32"))]
+    fn collect_figures_recursive(section: &ArticleSection, figures: &mut Vec<Figure>) {
+        figures.extend(section.figures.clone());
+        for subsection in &section.subsections {
+            Self::collect_figures_recursive(subsection, figures);
+        }
+    }
+
+    /// Find a matching file for a figure based on ID, label, or filename patterns
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn find_matching_file(
+        &self,
+        figure: &Figure,
+        extracted_files: &[String],
+        image_extensions: &[&str],
+    ) -> Option<String> {
+        // First try to match by figure file_name if available
+        if let Some(file_name) = &figure.file_name {
+            for file_path in extracted_files {
+                if let Some(filename) = Path::new(file_path).file_name() {
+                    if filename.to_string_lossy().contains(file_name) {
+                        return Some(file_path.clone());
+                    }
+                }
+            }
+        }
+
+        // Try to match by figure ID
+        for file_path in extracted_files {
+            if let Some(filename) = Path::new(file_path).file_name() {
+                let filename_str = filename.to_string_lossy().to_lowercase();
+                let figure_id_lower = figure.id.to_lowercase();
+
+                // Check if filename contains figure ID and has image extension
+                if filename_str.contains(&figure_id_lower) {
+                    if let Some(extension) = Path::new(file_path).extension() {
+                        let ext_str = extension.to_string_lossy().to_lowercase();
+                        if image_extensions.contains(&ext_str.as_str()) {
+                            return Some(file_path.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        // Try to match by label if available
+        if let Some(label) = &figure.label {
+            let label_clean = label.to_lowercase().replace(" ", "").replace(".", "");
+            for file_path in extracted_files {
+                if let Some(filename) = Path::new(file_path).file_name() {
+                    let filename_str = filename.to_string_lossy().to_lowercase();
+                    if filename_str.contains(&label_clean) {
+                        if let Some(extension) = Path::new(file_path).extension() {
+                            let ext_str = extension.to_string_lossy().to_lowercase();
+                            if image_extensions.contains(&ext_str.as_str()) {
+                                return Some(file_path.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        None
+    }
+
+    /// Get image dimensions using the image crate
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn get_image_dimensions(&self, file_path: &str) -> Option<(u32, u32)> {
+        task::spawn_blocking({
+            let file_path = file_path.to_string();
+            move || {
+                image::open(&file_path)
+                    .ok()
+                    .map(|img| (img.width(), img.height()))
+            }
+        })
+        .await
+        .ok()
+        .flatten()
     }
 
     /// Extract tar.gz file to the specified directory

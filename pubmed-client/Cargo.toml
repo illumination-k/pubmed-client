@@ -33,6 +33,7 @@ tokio-util = "0.7"
 tar = "0.4"
 flate2 = "1.0"
 futures-util = "0.3"
+image = "0.24"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 reqwest = { version = "0.11", features = ["json"], default-features = false }
@@ -109,6 +110,10 @@ path = "tests/integration/test_supplementary_materials.rs"
 [[test]]
 name = "test_tar_extraction"
 path = "tests/integration/test_tar_extraction.rs"
+
+[[test]]
+name = "test_figure_extraction"
+path = "tests/integration/test_figure_extraction.rs"
 
 # Real API tests (opt-in)
 [[test]]

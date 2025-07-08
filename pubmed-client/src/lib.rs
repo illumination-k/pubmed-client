@@ -125,6 +125,32 @@
 //!     Ok(())
 //! }
 //! ```
+//!
+//! ### Extracting Figures with Captions
+//!
+//! ```no_run
+//! use pubmed_client_rs::PmcClient;
+//! use std::path::Path;
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = PmcClient::new();
+//!     let output_dir = Path::new("./extracted_articles");
+//!
+//!     // Extract figures and match them with captions from XML
+//!     let figures = client.extract_figures_with_captions("PMC7906746", output_dir).await?;
+//!
+//!     for figure in figures {
+//!         println!("Figure {}: {}", figure.figure.id, figure.figure.caption);
+//!         println!("File: {}", figure.extracted_file_path);
+//!         if let Some(dimensions) = figure.dimensions {
+//!             println!("Dimensions: {}x{}", dimensions.0, dimensions.1);
+//!         }
+//!     }
+//!
+//!     Ok(())
+//! }
+//! ```
 
 pub mod config;
 pub mod error;
@@ -138,9 +164,9 @@ pub mod time;
 pub use config::ClientConfig;
 pub use error::{PubMedError, Result};
 pub use pmc::{
-    Affiliation, ArticleSection, Author, Figure, FundingInfo, HeadingStyle, JournalInfo,
-    MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter, PmcXmlParser, Reference,
-    ReferenceStyle, Table,
+    models::ExtractedFigure, Affiliation, ArticleSection, Author, Figure, FundingInfo,
+    HeadingStyle, JournalInfo, MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter,
+    PmcXmlParser, Reference, ReferenceStyle, Table,
 };
 pub use pubmed::{
     Affiliation as PubMedAffiliation, ArticleType, Author as PubMedAuthor, Citations, DatabaseInfo,
