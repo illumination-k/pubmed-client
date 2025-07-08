@@ -315,52 +315,6 @@ impl PmcClient {
         Ok(None)
     }
 
-    /// Batch check PMC availability for multiple PMIDs
-    ///
-    /// # Arguments
-    ///
-    /// * `pmids` - List of PubMed IDs
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<Vec<(String, Option<String>)>>` containing PMID and optional PMCID pairs
-    pub async fn batch_check_pmc_availability(
-        &self,
-        pmids: &[String],
-    ) -> Result<Vec<(String, Option<String>)>> {
-        let mut results = Vec::new();
-
-        for pmid in pmids {
-            let pmcid = self.check_pmc_availability(pmid).await?;
-            results.push((pmid.clone(), pmcid));
-        }
-
-        Ok(results)
-    }
-
-    /// Batch fetch full text for multiple PMCIDs
-    ///
-    /// # Arguments
-    ///
-    /// * `pmcids` - List of PMC IDs
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<Vec<Result<PmcFullText>>>` containing results for each PMCID
-    pub async fn batch_fetch_full_text(
-        &self,
-        pmcids: &[String],
-    ) -> Result<Vec<Result<PmcFullText>>> {
-        let mut results = Vec::new();
-
-        for pmcid in pmcids {
-            let result = self.fetch_full_text(pmcid).await;
-            results.push(result);
-        }
-
-        Ok(results)
-    }
-
     /// Download and extract tar.gz file for a PMC article using the OA API
     ///
     /// # Arguments
