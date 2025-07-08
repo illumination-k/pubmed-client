@@ -26,10 +26,14 @@ tracing = { workspace = true }
 urlencoding = { workspace = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.11", features = ["json", "stream"] }
 tokio = { version = "1.0", features = ["full"] }
 tokio-retry = "0.3"
 tokio-util = "0.7"
+tar = "0.4"
+flate2 = "1.0"
+futures-util = "0.3"
+image = "0.24"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 reqwest = { version = "0.11", features = ["json"], default-features = false }
@@ -41,7 +45,10 @@ default = []
 integration-tests = []
 
 [dev-dependencies]
+chrono = "0.4"
+clap = { version = "3.2", features = ["derive"] }
 rstest = "0.18"
+tempfile = "3.0"
 tokio-test = "0.4"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-test = "0.2"
@@ -102,6 +109,14 @@ path = "tests/integration/test_rate_limiting_mocked.rs"
 name = "test_supplemental_material"
 path = "tests/integration/test_supplementary_materials.rs"
 
+[[test]]
+name = "test_tar_extraction"
+path = "tests/integration/test_tar_extraction.rs"
+
+[[test]]
+name = "test_figure_extraction"
+path = "tests/integration/test_figure_extraction.rs"
+
 # Real API tests (opt-in)
 [[test]]
 name = "test_real_api_rate_limiting"
@@ -118,3 +133,8 @@ path = "tests/integration/pmc_api_tests.rs"
 [[test]]
 name = "error_handling_tests"
 path = "tests/integration/error_handling_tests.rs"
+
+# Examples
+[[example]]
+name = "figure_extraction_complete"
+path = "../examples/figure_extraction_complete.rs"

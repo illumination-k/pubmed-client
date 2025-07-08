@@ -79,6 +79,23 @@ pub struct Figure {
     pub alt_text: Option<String>,
     /// Figure type (e.g., "figure", "scheme", "chart")
     pub fig_type: Option<String>,
+    /// File path to the extracted figure image (when available)
+    pub file_path: Option<String>,
+    /// File name from the XML href attribute (when available)
+    pub file_name: Option<String>,
+}
+
+/// Represents an extracted figure with both XML metadata and file path
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ExtractedFigure {
+    /// Figure metadata from XML
+    pub figure: Figure,
+    /// Actual file path where the figure was extracted
+    pub extracted_file_path: String,
+    /// File size in bytes
+    pub file_size: Option<u64>,
+    /// Image dimensions (width, height) if available
+    pub dimensions: Option<(u32, u32)>,
 }
 
 /// Represents a table in the article
@@ -581,6 +598,8 @@ impl Figure {
             caption,
             alt_text: None,
             fig_type: None,
+            file_path: None,
+            file_name: None,
         }
     }
 }

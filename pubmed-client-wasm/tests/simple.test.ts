@@ -76,6 +76,9 @@ describe('WASM Client Basic Tests', () => {
     it('should fetch article by PMID successfully', async () => {
       const client = new WasmPubMedClient()
 
+      // Add delay to prevent rate limiting
+      await new Promise(resolve => setTimeout(resolve, 500))
+
       const article = await client.fetch_article('31978945')
 
       expect(article).toBeDefined()
