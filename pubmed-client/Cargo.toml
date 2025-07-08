@@ -45,6 +45,8 @@ default = []
 integration-tests = []
 
 [dev-dependencies]
+chrono = "0.4"
+clap = { version = "3.2", features = ["derive"] }
 rstest = "0.18"
 tempfile = "3.0"
 tokio-test = "0.4"
@@ -131,3 +133,8 @@ path = "tests/integration/pmc_api_tests.rs"
 [[test]]
 name = "error_handling_tests"
 path = "tests/integration/error_handling_tests.rs"
+
+# Examples
+[[example]]
+name = "figure_extraction_complete"
+path = "../examples/figure_extraction_complete.rs"

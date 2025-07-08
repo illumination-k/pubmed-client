@@ -166,7 +166,7 @@ pub use error::{PubMedError, Result};
 pub use pmc::{
     models::ExtractedFigure, Affiliation, ArticleSection, Author, Figure, FundingInfo,
     HeadingStyle, JournalInfo, MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter,
-    PmcXmlParser, Reference, ReferenceStyle, Table,
+    PmcTarClient, PmcXmlParser, Reference, ReferenceStyle, Table,
 };
 pub use pubmed::{
     Affiliation as PubMedAffiliation, ArticleType, Author as PubMedAuthor, Citations, DatabaseInfo,

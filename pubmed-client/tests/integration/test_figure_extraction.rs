@@ -1,10 +1,11 @@
-use pubmed_client_rs::{PmcClient, PubMedError};
+use pubmed_client_rs::{ClientConfig, PmcTarClient, PubMedError};
 use tempfile::tempdir;
 
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_extract_figures_with_captions_invalid_pmcid() {
-    let client = PmcClient::new();
+    let config = ClientConfig::new();
+    let client = PmcTarClient::new(config);
     let temp_dir = tempdir().expect("Failed to create temp dir");
 
     // Test with invalid PMCID
@@ -23,7 +24,8 @@ async fn test_extract_figures_with_captions_invalid_pmcid() {
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_extract_figures_with_captions_empty_pmcid() {
-    let client = PmcClient::new();
+    let config = ClientConfig::new();
+    let client = PmcTarClient::new(config);
     let temp_dir = tempdir().expect("Failed to create temp dir");
 
     // Test with empty PMCID
@@ -42,7 +44,8 @@ async fn test_extract_figures_with_captions_empty_pmcid() {
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_extract_figures_with_captions_directory_creation() {
-    let client = PmcClient::new();
+    let config = ClientConfig::new();
+    let client = PmcTarClient::new(config);
     let temp_dir = tempdir().expect("Failed to create temp dir");
     let nested_path = temp_dir.path().join("figures").join("extracted");
 
@@ -73,7 +76,8 @@ async fn test_extract_figures_with_captions_directory_creation() {
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_figure_matching_functions() {
-    let client = PmcClient::new();
+    let config = ClientConfig::new();
+    let _client = PmcTarClient::new(config);
 
     // Test the internal matching logic with mock data
     let figure_id = "fig1".to_string();
@@ -102,7 +106,8 @@ async fn test_figure_matching_functions() {
     };
 
     // Test figure ID matching
-    let matching_file = client.find_matching_file(&figure, &extracted_files, &image_extensions);
+    let matching_file =
+        PmcTarClient::find_matching_file(&figure, &extracted_files, &image_extensions);
     assert!(matching_file.is_some());
     assert_eq!(matching_file.unwrap(), "/path/to/fig1.jpg");
 }
@@ -110,7 +115,8 @@ async fn test_figure_matching_functions() {
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_figure_matching_by_label() {
-    let client = PmcClient::new();
+    let config = ClientConfig::new();
+    let _client = PmcTarClient::new(config);
 
     let extracted_files = vec![
         "/path/to/some_figure1.jpg".to_string(),
@@ -132,7 +138,8 @@ async fn test_figure_matching_by_label() {
         file_name: None,
     };
 
-    let matching_file = client.find_matching_file(&figure, &extracted_files, &image_extensions);
+    let matching_file =
+        PmcTarClient::find_matching_file(&figure, &extracted_files, &image_extensions);
     assert!(matching_file.is_some());
     assert_eq!(matching_file.unwrap(), "/path/to/some_figure1.jpg");
 }
@@ -140,7 +147,8 @@ async fn test_figure_matching_by_label() {
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_figure_matching_by_filename() {
-    let client = PmcClient::new();
+    let config = ClientConfig::new();
+    let _client = PmcTarClient::new(config);
 
     let extracted_files = vec![
         "/path/to/graph_data.jpg".to_string(),
@@ -162,7 +170,8 @@ async fn test_figure_matching_by_filename() {
         file_name: Some("specific_file".to_string()),
     };
 
-    let matching_file = client.find_matching_file(&figure, &extracted_files, &image_extensions);
+    let matching_file =
+        PmcTarClient::find_matching_file(&figure, &extracted_files, &image_extensions);
     assert!(matching_file.is_some());
     assert_eq!(matching_file.unwrap(), "/path/to/specific_file.png");
 }
@@ -170,7 +179,8 @@ async fn test_figure_matching_by_filename() {
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_figure_no_match() {
-    let client = PmcClient::new();
+    let config = ClientConfig::new();
+    let _client = PmcTarClient::new(config);
 
     let extracted_files = vec![
         "/path/to/table1.csv".to_string(),
@@ -192,7 +202,8 @@ async fn test_figure_no_match() {
         file_name: None,
     };
 
-    let matching_file = client.find_matching_file(&figure, &extracted_files, &image_extensions);
+    let matching_file =
+        PmcTarClient::find_matching_file(&figure, &extracted_files, &image_extensions);
     assert!(matching_file.is_none());
 }
 
