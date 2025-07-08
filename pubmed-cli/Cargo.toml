@@ -1,0 +1,38 @@
+[package]
+name = "pubmed-cli"
+version.workspace = true
+authors.workspace = true
+categories = ["command-line-utilities", "api-bindings", "science"]
+edition.workspace = true
+keywords = ["pubmed", "cli", "biomedical", "research", "pmc"]
+license.workspace = true
+repository.workspace = true
+description = "Command-line interface for PubMed and PMC APIs"
+
+[[bin]]
+name = "pubmed-cli"
+path = "src/main.rs"
+
+[dependencies]
+# Core library
+pubmed-client-rs = { path = "../pubmed-client" }
+
+# CLI framework
+clap = { version = "4.0", features = ["derive", "env", "string"] }
+
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Date/time
+chrono = { version = "0.4", features = ["serde"] }
