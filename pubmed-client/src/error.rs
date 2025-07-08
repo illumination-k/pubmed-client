@@ -49,6 +49,10 @@ pub enum PubMedError {
     /// Generic API error with HTTP status code
     #[error("API error {status}: {message}")]
     ApiError { status: u16, message: String },
+
+    /// IO error for file operations
+    #[error("IO error: {message}")]
+    IoError { message: String },
 }
 
 pub type Result<T> = result::Result<T, PubMedError>;
@@ -105,7 +109,8 @@ impl RetryableError for PubMedError {
             | PubMedError::PmcNotAvailable { .. }
             | PubMedError::PmcNotAvailableById { .. }
             | PubMedError::InvalidPmid { .. }
-            | PubMedError::InvalidQuery(_) => false,
+            | PubMedError::InvalidQuery(_)
+            | PubMedError::IoError { .. } => false,
         }
     }
 
@@ -136,6 +141,7 @@ impl RetryableError for PubMedError {
                 }
                 PubMedError::InvalidPmid { .. } => "Invalid input",
                 PubMedError::InvalidQuery(_) => "Invalid query",
+                PubMedError::IoError { .. } => "File system error",
                 _ => "Non-transient error",
             }
         }

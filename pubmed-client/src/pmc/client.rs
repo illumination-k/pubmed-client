@@ -2,12 +2,15 @@ use std::time::Duration;
 
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
-use crate::pmc::models::PmcFullText;
+use crate::pmc::models::{ExtractedFigure, PmcFullText};
 use crate::pmc::parser::PmcXmlParser;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
 use reqwest::{Client, Response};
 use tracing::debug;
+
+#[cfg(not(target_arch = "wasm32"))]
+use {crate::pmc::tar::PmcTarClient, std::path::Path};
 
 /// Client for interacting with PMC (PubMed Central) API
 #[derive(Clone)]
@@ -16,6 +19,8 @@ pub struct PmcClient {
     base_url: String,
     rate_limiter: RateLimiter,
     config: ClientConfig,
+    #[cfg(not(target_arch = "wasm32"))]
+    tar_client: PmcTarClient,
 }
 
 impl PmcClient {
@@ -80,6 +85,8 @@ impl PmcClient {
             client,
             base_url,
             rate_limiter,
+            #[cfg(not(target_arch = "wasm32"))]
+            tar_client: PmcTarClient::new(config.clone()),
             config,
         }
     }
@@ -113,6 +120,8 @@ impl PmcClient {
             client,
             base_url,
             rate_limiter,
+            #[cfg(not(target_arch = "wasm32"))]
+            tar_client: PmcTarClient::new(config.clone()),
             config,
         }
     }
@@ -306,50 +315,99 @@ impl PmcClient {
         Ok(None)
     }
 
-    /// Batch check PMC availability for multiple PMIDs
+    /// Download and extract tar.gz file for a PMC article using the OA API
     ///
     /// # Arguments
     ///
-    /// * `pmids` - List of PubMed IDs
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    /// * `output_dir` - Directory to extract the tar.gz contents to
     ///
     /// # Returns
     ///
-    /// Returns a `Result<Vec<(String, Option<String>)>>` containing PMID and optional PMCID pairs
-    pub async fn batch_check_pmc_availability(
+    /// Returns a `Result<Vec<String>>` containing the list of extracted file paths
+    ///
+    /// # Errors
+    ///
+    /// * `PubMedError::InvalidPmid` - If the PMCID format is invalid
+    /// * `PubMedError::RequestError` - If the HTTP request fails
+    /// * `PubMedError::IoError` - If file operations fail
+    /// * `PubMedError::PmcNotAvailable` - If the article is not available in OA
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PmcClient;
+    /// use std::path::Path;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     let output_dir = Path::new("./extracted_articles");
+    ///     let files = client.download_and_extract_tar("PMC7906746", output_dir).await?;
+    ///
+    ///     for file in files {
+    ///         println!("Extracted: {}", file);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn download_and_extract_tar<P: AsRef<Path>>(
         &self,
-        pmids: &[String],
-    ) -> Result<Vec<(String, Option<String>)>> {
-        let mut results = Vec::new();
-
-        for pmid in pmids {
-            let pmcid = self.check_pmc_availability(pmid).await?;
-            results.push((pmid.clone(), pmcid));
-        }
-
-        Ok(results)
+        pmcid: &str,
+        output_dir: P,
+    ) -> Result<Vec<String>> {
+        self.tar_client
+            .download_and_extract_tar(pmcid, output_dir)
+            .await
     }
 
-    /// Batch fetch full text for multiple PMCIDs
+    /// Download, extract tar.gz file, and match figures with their captions from XML
     ///
     /// # Arguments
     ///
-    /// * `pmcids` - List of PMC IDs
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    /// * `output_dir` - Directory to extract the tar.gz contents to
     ///
     /// # Returns
     ///
-    /// Returns a `Result<Vec<Result<PmcFullText>>>` containing results for each PMCID
-    pub async fn batch_fetch_full_text(
+    /// Returns a `Result<Vec<ExtractedFigure>>` containing figures with both XML metadata and file paths
+    ///
+    /// # Errors
+    ///
+    /// * `PubMedError::InvalidPmid` - If the PMCID format is invalid
+    /// * `PubMedError::RequestError` - If the HTTP request fails
+    /// * `PubMedError::IoError` - If file operations fail
+    /// * `PubMedError::PmcNotAvailable` - If the article is not available in OA
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PmcClient;
+    /// use std::path::Path;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     let output_dir = Path::new("./extracted_articles");
+    ///     let figures = client.extract_figures_with_captions("PMC7906746", output_dir).await?;
+    ///
+    ///     for figure in figures {
+    ///         println!("Figure {}: {}", figure.figure.id, figure.figure.caption);
+    ///         println!("File: {}", figure.extracted_file_path);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn extract_figures_with_captions<P: AsRef<Path>>(
         &self,
-        pmcids: &[String],
-    ) -> Result<Vec<Result<PmcFullText>>> {
-        let mut results = Vec::new();
-
-        for pmcid in pmcids {
-            let result = self.fetch_full_text(pmcid).await;
-            results.push(result);
-        }
-
-        Ok(results)
+        pmcid: &str,
+        output_dir: P,
+    ) -> Result<Vec<ExtractedFigure>> {
+        self.tar_client
+            .extract_figures_with_captions(pmcid, output_dir)
+            .await
     }
 
     /// Normalize PMCID format (ensure it starts with "PMC")
