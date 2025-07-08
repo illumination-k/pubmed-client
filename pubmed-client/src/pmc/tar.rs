@@ -111,6 +111,14 @@ impl PmcTarClient {
             });
         }
 
+        // Create output directory early (before any potential failures)
+        let output_path = output_dir.as_ref();
+        tokio_fs::create_dir_all(output_path)
+            .await
+            .map_err(|e| PubMedError::IoError {
+                message: format!("Failed to create output directory: {}", e),
+            })?;
+
         // Build OA API URL
         let mut url = format!(
             "https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={}&format=tgz",
@@ -156,7 +164,7 @@ impl PmcTarClient {
                 // Parse XML to extract the actual download URL
                 let xml_content = response.text().await?;
                 debug!("OA API returned XML, parsing for download URL");
-                let parsed_url = self.parse_oa_response(&xml_content, &normalized_pmcid)?;
+                let parsed_url = self.parse_oa_response(&xml_content, pmcid)?;
                 // Convert FTP URLs to HTTPS for HTTP client compatibility
                 if parsed_url.starts_with("ftp://ftp.ncbi.nlm.nih.gov/") {
                     parsed_url.replace(
