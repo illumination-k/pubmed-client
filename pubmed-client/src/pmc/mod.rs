@@ -7,6 +7,7 @@ pub mod client;
 pub mod markdown;
 pub mod models;
 pub mod parser;
+pub mod tar;
 
 // Re-export public types
 pub use client::PmcClient;
@@ -16,3 +17,4 @@ pub use models::{
     Table,
 };
 pub use parser::PmcXmlParser;
+pub use tar::PmcTarClient;
