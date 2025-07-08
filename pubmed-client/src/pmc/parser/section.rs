@@ -206,10 +206,14 @@ impl SectionParser {
         }
 
         if !section_content.trim().is_empty() {
-            Some(ArticleSection::new(
-                "body".to_string(),
-                section_content.trim().to_string(),
-            ))
+            let mut section =
+                ArticleSection::new("body".to_string(), section_content.trim().to_string());
+
+            // Extract figures and tables from the entire content
+            section.figures = Self::extract_figures_from_section(content);
+            section.tables = Self::extract_tables_from_section(content);
+
+            Some(section)
         } else {
             None
         }
@@ -242,10 +246,15 @@ impl SectionParser {
                     xml_utils::extract_text_between(fig_content, "<alt-text>", "</alt-text>");
                 let fig_type = xml_utils::extract_attribute_value(fig_content, "fig-type");
 
+                // Extract file name from graphic element
+                let file_name = xml_utils::extract_attribute_value(fig_content, "xlink:href")
+                    .or_else(|| xml_utils::extract_attribute_value(fig_content, "href"));
+
                 let mut figure = Figure::new(id, caption);
                 figure.label = label;
                 figure.alt_text = alt_text;
                 figure.fig_type = fig_type;
+                figure.file_name = file_name;
 
                 figures.push(figure);
                 pos = fig_end;
