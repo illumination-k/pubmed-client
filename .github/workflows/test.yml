@@ -22,7 +22,7 @@ jobs:
       - uses: jdx/mise-action@v2
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.87.0
         with:
           components: rustfmt, clippy
 
@@ -39,27 +39,13 @@ jobs:
 
   test:
     name: Test Suite
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        rust: [stable, beta]
-        exclude:
-          # Reduce matrix size - only test beta on Ubuntu
-          - os: windows-latest
-            rust: beta
-          - os: macos-latest
-            rust: beta
+    runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
         with:
           lfs: true
 
       - uses: jdx/mise-action@v2
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ matrix.rust }}
 
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
@@ -71,7 +57,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.os }}-${{ matrix.rust }}
+          name: test-results
           path: target/nextest/*/junit.xml
 
   wasm-tests:
@@ -101,9 +87,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pubmed-client-wasm/pnpm-lock.yaml') }}
+          key: pnpm-${{ hashFiles('pubmed-client-wasm/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-
+            pnpm-
 
       - name: Build WASM package
         working-directory: pubmed-client-wasm
