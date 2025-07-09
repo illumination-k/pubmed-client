@@ -21,6 +21,8 @@ jobs:
 
       - name: setup mise
         uses: jdx/mise-action@v2
+        with:
+          cache: false
 
       - name: Run Claude Code Review
         id: claude-review
