@@ -16,6 +16,7 @@ crate-type = ["rlib"]
 
 [dependencies]
 anyhow = { workspace = true }
+moka = { version = "0.12", features = ["future"] }
 quick-xml = { workspace = true }
 rand = "0.8"
 regex = "1.10"
@@ -133,6 +134,11 @@ path = "tests/integration/pmc_api_tests.rs"
 [[test]]
 name = "error_handling_tests"
 path = "tests/integration/error_handling_tests.rs"
+
+# Caching tests
+[[test]]
+name = "test_pmc_cache"
+path = "tests/integration/test_pmc_cache.rs"
 
 # Examples
 [[example]]
