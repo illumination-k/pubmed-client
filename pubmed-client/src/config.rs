@@ -1,3 +1,4 @@
+use crate::cache::CacheConfig;
 use crate::rate_limit::RateLimiter;
 use crate::retry::RetryConfig;
 use crate::time::Duration;
@@ -60,6 +61,11 @@ pub struct ClientConfig {
     ///
     /// Default: 3 retries with exponential backoff starting at 1 second
     pub retry_config: RetryConfig,
+
+    /// Cache configuration for response caching
+    ///
+    /// Default: Memory-only cache with 1000 items max
+    pub cache_config: Option<CacheConfig>,
 }
 
 impl ClientConfig {
@@ -82,6 +88,7 @@ impl ClientConfig {
             email: None,
             tool: None,
             retry_config: RetryConfig::default(),
+            cache_config: None,
         }
     }
 
@@ -263,6 +270,62 @@ impl ClientConfig {
     /// ```
     pub fn with_retry_config(mut self, retry_config: RetryConfig) -> Self {
         self.retry_config = retry_config;
+        self
+    }
+
+    /// Enable caching with default configuration
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::config::ClientConfig;
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_cache();
+    /// ```
+    pub fn with_cache(mut self) -> Self {
+        self.cache_config = Some(CacheConfig::default());
+        self
+    }
+
+    /// Set cache configuration
+    ///
+    /// # Arguments
+    ///
+    /// * `cache_config` - Custom cache configuration
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client_rs::cache::CacheConfig;
+    ///
+    /// let cache_config = CacheConfig {
+    ///     memory_size: 5000,
+    ///     disk_cache_enabled: true,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_cache_config(cache_config);
+    /// ```
+    pub fn with_cache_config(mut self, cache_config: CacheConfig) -> Self {
+        self.cache_config = Some(cache_config);
+        self
+    }
+
+    /// Disable all caching
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::config::ClientConfig;
+    ///
+    /// let config = ClientConfig::new()
+    ///     .without_cache();
+    /// ```
+    pub fn without_cache(mut self) -> Self {
+        self.cache_config = None;
         self
     }
 

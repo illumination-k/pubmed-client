@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::cache::{create_cache, PmcCache};
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pmc::models::{ExtractedFigure, PmcFullText};
@@ -7,7 +8,7 @@ use crate::pmc::parser::PmcXmlParser;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
 use reqwest::{Client, Response};
-use tracing::debug;
+use tracing::{debug, info};
 
 #[cfg(not(target_arch = "wasm32"))]
 use {crate::pmc::tar::PmcTarClient, std::path::Path};
@@ -21,6 +22,7 @@ pub struct PmcClient {
     config: ClientConfig,
     #[cfg(not(target_arch = "wasm32"))]
     tar_client: PmcTarClient,
+    cache: Option<PmcCache>,
 }
 
 impl PmcClient {
@@ -81,12 +83,15 @@ impl PmcClient {
             }
         };
 
+        let cache = config.cache_config.as_ref().map(create_cache);
+
         Self {
             client,
             base_url,
             rate_limiter,
             #[cfg(not(target_arch = "wasm32"))]
             tar_client: PmcTarClient::new(config.clone()),
+            cache,
             config,
         }
     }
@@ -122,6 +127,7 @@ impl PmcClient {
             rate_limiter,
             #[cfg(not(target_arch = "wasm32"))]
             tar_client: PmcTarClient::new(config.clone()),
+            cache: None,
             config,
         }
     }
@@ -167,9 +173,27 @@ impl PmcClient {
     /// }
     /// ```
     pub async fn fetch_full_text(&self, pmcid: &str) -> Result<PmcFullText> {
-        let xml_content = self.fetch_xml(pmcid).await?;
         let normalized_pmcid = self.normalize_pmcid(pmcid);
-        PmcXmlParser::parse(&xml_content, &normalized_pmcid)
+        let cache_key = format!("pmc:{}", normalized_pmcid);
+
+        // Check cache first if available
+        if let Some(cache) = &self.cache {
+            if let Some(cached) = cache.get(&cache_key).await {
+                info!(pmcid = %normalized_pmcid, "Cache hit for PMC full text");
+                return Ok(cached);
+            }
+        }
+
+        // Fetch from API if not cached
+        let xml_content = self.fetch_xml(pmcid).await?;
+        let full_text = PmcXmlParser::parse(&xml_content, &normalized_pmcid)?;
+
+        // Store in cache if available
+        if let Some(cache) = &self.cache {
+            cache.insert(cache_key, full_text.clone()).await;
+        }
+
+        Ok(full_text)
     }
 
     /// Fetch raw XML content from PMC
@@ -408,6 +432,53 @@ impl PmcClient {
         self.tar_client
             .extract_figures_with_captions(pmcid, output_dir)
             .await
+    }
+
+    /// Clear all cached PMC data
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PmcClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     client.clear_cache().await;
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn clear_cache(&self) {
+        if let Some(cache) = &self.cache {
+            cache.clear().await;
+            info!("Cleared PMC cache");
+        }
+    }
+
+    /// Get cache statistics
+    ///
+    /// Returns the number of items in cache, or 0 if caching is disabled
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::PmcClient;
+    ///
+    /// let client = PmcClient::new();
+    /// let count = client.cache_entry_count();
+    /// println!("Cache entries: {}", count);
+    /// ```
+    pub fn cache_entry_count(&self) -> u64 {
+        self.cache.as_ref().map_or(0, |cache| cache.entry_count())
+    }
+
+    /// Synchronize cache operations to ensure all pending operations are flushed
+    ///
+    /// This is useful for testing to ensure cache statistics are accurate
+    pub async fn sync_cache(&self) {
+        if let Some(cache) = &self.cache {
+            cache.sync().await;
+        }
     }
 
     /// Normalize PMCID format (ensure it starts with "PMC")
