@@ -109,11 +109,18 @@ impl AuthorParser {
 
         let mut author = Author::with_names(given_names, surname);
 
-        // Extract ORCID
-        if let Some(orcid_start) = contrib_content.find("https://orcid.org/") {
-            if let Some(orcid_end) = contrib_content[orcid_start..].find('"') {
-                let orcid = contrib_content[orcid_start..orcid_start + orcid_end].to_string();
-                author.orcid = Some(orcid);
+        // Extract ORCID from contrib-id tags
+        let contrib_id_tags = xml_utils::find_all_tags(contrib_content, "contrib-id");
+        for tag in contrib_id_tags {
+            if tag.contains("contrib-id-type=\"orcid\"") || tag.contains("https://orcid.org/") {
+                if let Some(orcid_content) = xml_utils::extract_element_content(&tag, "contrib-id")
+                {
+                    let clean_orcid = xml_utils::strip_xml_tags(&orcid_content);
+                    if clean_orcid.contains("https://orcid.org/") {
+                        author.orcid = Some(clean_orcid.trim().to_string());
+                        break;
+                    }
+                }
             }
         }
 
@@ -337,5 +344,107 @@ mod tests {
         assert_eq!(authors.len(), 2);
         assert_eq!(authors[0].full_name, "John Doe");
         assert_eq!(authors[1].full_name, "Jane Smith");
+    }
+
+    #[test]
+    fn test_extract_orcid_from_contrib_id() {
+        let content = r#"
+        <contrib-group>
+            <contrib corresp="yes">
+                <contrib-id contrib-id-type="orcid">https://orcid.org/0000-0002-3066-2940</contrib-id>
+                <name name-style="western">
+                    <surname>Doe</surname>
+                    <given-names>John</given-names>
+                </name>
+                <email>john.doe@example.com</email>
+            </contrib>
+        </contrib-group>
+        "#;
+
+        let authors = AuthorParser::extract_authors_detailed(content);
+        assert_eq!(authors.len(), 1);
+        assert_eq!(authors[0].surname, Some("Doe".to_string()));
+        assert_eq!(authors[0].given_names, Some("John".to_string()));
+        assert_eq!(
+            authors[0].orcid,
+            Some("https://orcid.org/0000-0002-3066-2940".to_string())
+        );
+        assert!(authors[0].is_corresponding);
+    }
+
+    #[test]
+    fn test_extract_orcid_with_xml_tags() {
+        let content = r#"
+        <contrib-group>
+            <contrib>
+                <contrib-id contrib-id-type="orcid">https://orcid.org/0000-0001-2345-6789</contrib-id><name name-style="western">
+                    <surname>Smith</surname>
+                    <given-names>Jane</given-names>
+                </name>
+            </contrib>
+        </contrib-group>
+        "#;
+
+        let authors = AuthorParser::extract_authors_detailed(content);
+        assert_eq!(authors.len(), 1);
+        assert_eq!(authors[0].surname, Some("Smith".to_string()));
+        assert_eq!(authors[0].given_names, Some("Jane".to_string()));
+        assert_eq!(
+            authors[0].orcid,
+            Some("https://orcid.org/0000-0001-2345-6789".to_string())
+        );
+        assert!(!authors[0].is_corresponding);
+    }
+
+    #[test]
+    fn test_extract_multiple_authors_with_orcid() {
+        let content = r#"
+        <contrib-group>
+            <contrib>
+                <contrib-id contrib-id-type="orcid">https://orcid.org/0000-0001-1111-1111</contrib-id>
+                <name>
+                    <surname>First</surname>
+                    <given-names>Author</given-names>
+                </name>
+            </contrib>
+            <contrib corresp="yes">
+                <contrib-id contrib-id-type="orcid">https://orcid.org/0000-0002-2222-2222</contrib-id>
+                <name>
+                    <surname>Second</surname>
+                    <given-names>Author</given-names>
+                </name>
+            </contrib>
+            <contrib>
+                <name>
+                    <surname>Third</surname>
+                    <given-names>Author</given-names>
+                </name>
+            </contrib>
+        </contrib-group>
+        "#;
+
+        let authors = AuthorParser::extract_authors_detailed(content);
+        assert_eq!(authors.len(), 3);
+
+        // First author with ORCID
+        assert_eq!(authors[0].surname, Some("First".to_string()));
+        assert_eq!(
+            authors[0].orcid,
+            Some("https://orcid.org/0000-0001-1111-1111".to_string())
+        );
+        assert!(!authors[0].is_corresponding);
+
+        // Second author with ORCID and corresponding
+        assert_eq!(authors[1].surname, Some("Second".to_string()));
+        assert_eq!(
+            authors[1].orcid,
+            Some("https://orcid.org/0000-0002-2222-2222".to_string())
+        );
+        assert!(authors[1].is_corresponding);
+
+        // Third author without ORCID
+        assert_eq!(authors[2].surname, Some("Third".to_string()));
+        assert_eq!(authors[2].orcid, None);
+        assert!(!authors[2].is_corresponding);
     }
 }

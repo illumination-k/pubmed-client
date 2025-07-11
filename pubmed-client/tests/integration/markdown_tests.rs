@@ -497,6 +497,7 @@ fn test_markdown_config_builder() {
         include_orcid_links: false,
         include_identifier_links: false,
         include_figure_captions: true,
+        include_local_figures: false,
     };
 
     let converter = PmcMarkdownConverter::with_config(config.clone());
