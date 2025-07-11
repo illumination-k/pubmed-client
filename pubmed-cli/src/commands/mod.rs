@@ -1,4 +1,5 @@
 pub mod figures;
+pub mod markdown;
 
 use anyhow::Result;
 use pubmed_client_rs::{ClientConfig, PmcClient};

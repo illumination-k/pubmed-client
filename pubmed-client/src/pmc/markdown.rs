@@ -3,9 +3,77 @@
 //! This module provides functionality to convert parsed PMC articles into
 //! well-formatted Markdown documents with configurable styling options.
 
+use std::collections::HashMap;
+
 use crate::pmc::models::{
     ArticleSection, Author, Figure, FundingInfo, PmcFullText, Reference, Table,
 };
+
+/// HTML entity mappings for common entities found in PMC articles
+static HTML_ENTITIES: &[(&str, &str)] = &[
+    // Basic HTML entities
+    ("&amp;", "&"),
+    ("&lt;", "<"),
+    ("&gt;", ">"),
+    ("&quot;", "\""),
+    ("&#x27;", "'"),
+    ("&apos;", "'"),
+    // Quotation marks
+    ("&#8217;", "'"),  // right single quotation mark
+    ("&#8216;", "'"),  // left single quotation mark
+    ("&#8220;", "\""), // left double quotation mark
+    ("&#8221;", "\""), // right double quotation mark
+    ("&rsquo;", "'"),  // right single quote
+    ("&lsquo;", "'"),  // left single quote
+    ("&rdquo;", "\""), // right double quote
+    ("&ldquo;", "\""), // left double quote
+    // Dashes and spacing
+    ("&#8211;", "-"),  // en dash
+    ("&#8212;", "--"), // em dash
+    ("&#160;", " "),   // non-breaking space
+    ("&nbsp;", " "),   // non-breaking space
+    ("&ndash;", "-"),  // en dash
+    ("&mdash;", "--"), // em dash
+    // Special punctuation
+    ("&#8230;", "..."),  // ellipsis
+    ("&hellip;", "..."), // ellipsis
+    // Symbols
+    ("&#8482;", "(TM)"), // trademark
+    ("&#174;", "(R)"),   // registered trademark
+    ("&#169;", "(C)"),   // copyright
+    ("&trade;", "(TM)"), // trademark
+    ("&reg;", "(R)"),    // registered trademark
+    ("&copy;", "(C)"),   // copyright
+    // Currency (simplified)
+    ("&#8364;", "EUR"), // euro
+    ("&#163;", "GBP"),  // pound
+    ("&#165;", "JPY"),  // yen
+    // Mathematical symbols
+    ("&#8722;", "-"),  // minus sign
+    ("&#215;", "x"),   // multiplication sign
+    ("&#247;", "/"),   // division sign
+    ("&#177;", "±"),   // plus-minus sign
+    ("&times;", "x"),  // multiplication sign
+    ("&divide;", "/"), // division sign
+    ("&plusmn;", "±"), // plus-minus sign
+    // Greek letters (common in scientific texts)
+    ("&#945;", "α"),    // alpha
+    ("&#946;", "β"),    // beta
+    ("&#947;", "γ"),    // gamma
+    ("&#948;", "δ"),    // delta
+    ("&#949;", "ε"),    // epsilon
+    ("&#956;", "μ"),    // mu
+    ("&#960;", "π"),    // pi
+    ("&#963;", "σ"),    // sigma
+    ("&alpha;", "α"),   // alpha
+    ("&beta;", "β"),    // beta
+    ("&gamma;", "γ"),   // gamma
+    ("&delta;", "δ"),   // delta
+    ("&epsilon;", "ε"), // epsilon
+    ("&mu;", "μ"),      // mu
+    ("&pi;", "π"),      // pi
+    ("&sigma;", "σ"),   // sigma
+];
 
 /// Configuration options for Markdown conversion
 #[derive(Debug, Clone)]
@@ -26,6 +94,8 @@ pub struct MarkdownConfig {
     pub include_identifier_links: bool,
     /// Include figure and table captions
     pub include_figure_captions: bool,
+    /// Include local figure file paths in markdown images
+    pub include_local_figures: bool,
 }
 
 /// Heading style options
@@ -59,6 +129,7 @@ impl Default for MarkdownConfig {
             include_orcid_links: true,
             include_identifier_links: true,
             include_figure_captions: true,
+            include_local_figures: false,
         }
     }
 }
@@ -121,6 +192,44 @@ impl PmcMarkdownConverter {
     pub fn with_include_identifier_links(mut self, include: bool) -> Self {
         self.config.include_identifier_links = include;
         self
+    }
+
+    /// Convert a PMC article to Markdown with optional figure paths
+    pub fn convert_with_figures(
+        &self,
+        article: &PmcFullText,
+        figure_paths: Option<&HashMap<String, String>>,
+    ) -> String {
+        let mut markdown = String::new();
+
+        // Add metadata section
+        if self.config.include_metadata {
+            markdown.push_str(&self.convert_metadata(article));
+            markdown.push_str("\n\n");
+        } else {
+            // Always include at least the title even when metadata is disabled
+            markdown.push_str(&self.format_heading(&self.clean_content(&article.title), 1));
+            markdown.push_str("\n\n");
+        }
+
+        // Add table of contents if requested
+        if self.config.include_toc {
+            markdown.push_str(&self.convert_toc(article));
+            markdown.push_str("\n\n");
+        }
+
+        // Add main content sections
+        markdown.push_str(&self.convert_sections_with_figures(&article.sections, 1, figure_paths));
+
+        // Add references section
+        if !article.references.is_empty() {
+            markdown.push_str(&self.convert_references(&article.references));
+        }
+
+        // Add additional sections
+        markdown.push_str(&self.convert_additional_sections(article));
+
+        markdown.trim().to_string()
     }
 
     /// Convert a PMC article to Markdown
@@ -278,6 +387,59 @@ impl PmcMarkdownConverter {
         toc
     }
 
+    /// Convert article sections with figure paths
+    fn convert_sections_with_figures(
+        &self,
+        sections: &[ArticleSection],
+        level: u8,
+        figure_paths: Option<&HashMap<String, String>>,
+    ) -> String {
+        let mut content = String::new();
+
+        for section in sections {
+            // Section heading
+            if let Some(title) = &section.title {
+                content.push_str(&self.format_heading(title, level));
+                content.push_str("\n\n");
+            }
+
+            // Section content
+            if !section.content.is_empty() {
+                content.push_str(&self.clean_content(&section.content));
+                content.push_str("\n\n");
+            }
+
+            // Figures
+            if self.config.include_figure_captions {
+                for figure in &section.figures {
+                    let figure_path = figure_paths.and_then(|paths| paths.get(&figure.id));
+                    content.push_str(&self.convert_figure_with_path(figure, figure_path));
+                    content.push_str("\n\n");
+                }
+            }
+
+            // Tables
+            if self.config.include_figure_captions {
+                for table in &section.tables {
+                    content.push_str(&self.convert_table(table));
+                    content.push_str("\n\n");
+                }
+            }
+
+            // Subsections
+            if !section.subsections.is_empty() {
+                let next_level = (level + 1).min(self.config.max_heading_level);
+                content.push_str(&self.convert_sections_with_figures(
+                    &section.subsections,
+                    next_level,
+                    figure_paths,
+                ));
+            }
+        }
+
+        content
+    }
+
     /// Convert article sections
     fn convert_sections(&self, sections: &[ArticleSection], level: u8) -> String {
         let mut content = String::new();
@@ -416,34 +578,36 @@ impl PmcMarkdownConverter {
         }
     }
 
-    /// Format authors list
+    /// Format authors list (simplified)
     fn format_authors(&self, authors: &[Author]) -> String {
-        let formatted_authors: Vec<String> = authors
+        authors
             .iter()
             .map(|author| {
                 let mut name = self.clean_content(&author.full_name);
 
-                // Add ORCID link if available and enabled
+                // Add corresponding author indicator with *
+                if author.is_corresponding {
+                    name.push('*');
+                }
+
+                // Add simple ORCID link if available and enabled
                 if self.config.include_orcid_links {
                     if let Some(orcid) = &author.orcid {
-                        let clean_orcid = orcid.trim_start_matches("https://orcid.org/");
-                        if clean_orcid.len() > 10 {
-                            // Basic ORCID format check
+                        // Clean the ORCID string first to remove any XML tags
+                        let cleaned_orcid = self.clean_content(orcid);
+                        let clean_orcid = cleaned_orcid.trim_start_matches("https://orcid.org/");
+
+                        // Basic ORCID format validation (should be like 0000-0000-0000-0000)
+                        if clean_orcid.len() >= 19 && clean_orcid.matches('-').count() == 3 {
                             name.push_str(&format!(" ([ORCID](https://orcid.org/{clean_orcid}))"));
                         }
                     }
                 }
 
-                // Add corresponding author indicator
-                if author.is_corresponding {
-                    name.push_str(" **(corresponding)**");
-                }
-
                 name
             })
-            .collect();
-
-        formatted_authors.join(", ")
+            .collect::<Vec<String>>()
+            .join(", ")
     }
 
     /// Format a single reference
@@ -500,6 +664,40 @@ impl PmcMarkdownConverter {
         }
 
         text
+    }
+
+    /// Convert figure to markdown with optional path
+    fn convert_figure_with_path(&self, figure: &Figure, figure_path: Option<&String>) -> String {
+        let mut content = String::new();
+
+        // Add image if path is provided and include_local_figures is enabled
+        if self.config.include_local_figures {
+            if let Some(path) = figure_path {
+                let alt_text = figure
+                    .alt_text
+                    .as_deref()
+                    .or(figure.label.as_deref())
+                    .unwrap_or(&figure.id);
+                content.push_str(&format!("![{alt_text}]({path})\n\n"));
+            }
+        }
+
+        if let Some(label) = &figure.label {
+            content.push_str(&format!("**{label}**"));
+        } else {
+            let figure_id = &figure.id;
+            content.push_str(&format!("**Figure {figure_id}**"));
+        }
+
+        let caption = self.clean_content(&figure.caption);
+        content.push_str(&format!(": {caption}"));
+
+        if let Some(alt_text) = &figure.alt_text {
+            let alt_content = self.clean_content(alt_text);
+            content.push_str(&format!("\n\n*Alt text: {alt_content}*"));
+        }
+
+        content
     }
 
     /// Convert figure to markdown
@@ -561,13 +759,10 @@ impl PmcMarkdownConverter {
             .replace_all(&cleaned, "")
             .to_string();
 
-        // Fix common HTML entities
-        cleaned = cleaned
-            .replace("&amp;", "&")
-            .replace("&lt;", "<")
-            .replace("&gt;", ">")
-            .replace("&quot;", "\"")
-            .replace("&#x27;", "'");
+        // Fix HTML entities using the predefined table
+        for (entity, replacement) in HTML_ENTITIES {
+            cleaned = cleaned.replace(entity, replacement);
+        }
 
         // Normalize whitespace
         cleaned = regex::Regex::new(r"\s+")
