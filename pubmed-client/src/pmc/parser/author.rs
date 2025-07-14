@@ -5,56 +5,7 @@ use crate::pmc::models::{Affiliation, Author};
 pub struct AuthorParser;
 
 impl AuthorParser {
-    /// Extract simple author names from contributor group (legacy method for compatibility)
-    pub fn extract_authors(content: &str) -> Vec<String> {
-        let mut authors = Vec::new();
-
-        if let Some(contrib_start) = content.find("<contrib-group>") {
-            if let Some(contrib_end) = content[contrib_start..].find("</contrib-group>") {
-                let contrib_section = &content[contrib_start..contrib_start + contrib_end];
-
-                let mut pos = 0;
-                while let Some(surname_start) = contrib_section[pos..].find("<surname>") {
-                    let surname_start = pos + surname_start + 9;
-                    if let Some(surname_end) = contrib_section[surname_start..].find("</surname>") {
-                        let surname_end = surname_start + surname_end;
-                        let surname = &contrib_section[surname_start..surname_end];
-
-                        if let Some(given_start) =
-                            contrib_section[surname_end..].find("<given-names")
-                        {
-                            let given_start = surname_end + given_start;
-                            if let Some(given_content_start) =
-                                contrib_section[given_start..].find(">")
-                            {
-                                let given_content_start = given_start + given_content_start + 1;
-                                if let Some(given_end) =
-                                    contrib_section[given_content_start..].find("</given-names>")
-                                {
-                                    let given_end = given_content_start + given_end;
-                                    let given_names =
-                                        &contrib_section[given_content_start..given_end];
-                                    authors.push(format!("{given_names} {surname}"));
-                                    pos = given_end;
-                                    continue;
-                                }
-                            }
-                        }
-
-                        authors.push(surname.to_string());
-                        pos = surname_end;
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-
-        authors
-    }
-
-    /// Extract detailed author information with affiliations and ORCID
-    pub fn extract_authors_detailed(content: &str) -> Vec<Author> {
+    pub fn extract_authors(content: &str) -> Vec<Author> {
         let mut authors = Vec::new();
 
         if let Some(contrib_start) = content.find("<contrib-group>") {
@@ -78,12 +29,6 @@ impl AuthorParser {
                     }
                 }
             }
-        }
-
-        // Fallback to simple author extraction if detailed extraction fails
-        if authors.is_empty() {
-            let simple_authors = Self::extract_authors(content);
-            authors = simple_authors.into_iter().map(Author::new).collect();
         }
 
         authors
@@ -238,53 +183,11 @@ impl AuthorParser {
 
         authors
     }
-
-    /// Extract author names from a string-name element (alternative author format)
-    pub fn extract_string_name_authors(content: &str) -> Vec<Author> {
-        let mut authors = Vec::new();
-
-        let string_name_tags = xml_utils::find_all_tags(content, "string-name");
-        for tag in string_name_tags {
-            if let Some(name_content) = xml_utils::extract_element_content(&tag, "string-name") {
-                let clean_name = xml_utils::strip_xml_tags(&name_content);
-                if !clean_name.trim().is_empty() {
-                    authors.push(Author::new(clean_name.trim().to_string()));
-                }
-            }
-        }
-
-        authors
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_extract_authors() {
-        let content = r#"
-        <contrib-group>
-            <contrib>
-                <name>
-                    <surname>Doe</surname>
-                    <given-names>John</given-names>
-                </name>
-            </contrib>
-            <contrib>
-                <name>
-                    <surname>Smith</surname>
-                    <given-names>Jane</given-names>
-                </name>
-            </contrib>
-        </contrib-group>
-        "#;
-
-        let authors = AuthorParser::extract_authors(content);
-        assert_eq!(authors.len(), 2);
-        assert_eq!(authors[0], "John Doe");
-        assert_eq!(authors[1], "Jane Smith");
-    }
 
     #[test]
     fn test_extract_authors_detailed() {
@@ -301,7 +204,7 @@ mod tests {
         </contrib-group>
         "#;
 
-        let authors = AuthorParser::extract_authors_detailed(content);
+        let authors = AuthorParser::extract_authors(content);
         assert_eq!(authors.len(), 1);
         assert_eq!(authors[0].surname, Some("Doe".to_string()));
         assert_eq!(authors[0].given_names, Some("John".to_string()));
@@ -334,19 +237,6 @@ mod tests {
     }
 
     #[test]
-    fn test_extract_string_name_authors() {
-        let content = r#"
-        <string-name>John Doe</string-name>
-        <string-name>Jane Smith</string-name>
-        "#;
-
-        let authors = AuthorParser::extract_string_name_authors(content);
-        assert_eq!(authors.len(), 2);
-        assert_eq!(authors[0].full_name, "John Doe");
-        assert_eq!(authors[1].full_name, "Jane Smith");
-    }
-
-    #[test]
     fn test_extract_orcid_from_contrib_id() {
         let content = r#"
         <contrib-group>
@@ -361,7 +251,7 @@ mod tests {
         </contrib-group>
         "#;
 
-        let authors = AuthorParser::extract_authors_detailed(content);
+        let authors = AuthorParser::extract_authors(content);
         assert_eq!(authors.len(), 1);
         assert_eq!(authors[0].surname, Some("Doe".to_string()));
         assert_eq!(authors[0].given_names, Some("John".to_string()));
@@ -385,7 +275,7 @@ mod tests {
         </contrib-group>
         "#;
 
-        let authors = AuthorParser::extract_authors_detailed(content);
+        let authors = AuthorParser::extract_authors(content);
         assert_eq!(authors.len(), 1);
         assert_eq!(authors[0].surname, Some("Smith".to_string()));
         assert_eq!(authors[0].given_names, Some("Jane".to_string()));
@@ -423,7 +313,7 @@ mod tests {
         </contrib-group>
         "#;
 
-        let authors = AuthorParser::extract_authors_detailed(content);
+        let authors = AuthorParser::extract_authors(content);
         assert_eq!(authors.len(), 3);
 
         // First author with ORCID

@@ -38,7 +38,7 @@ impl PmcXmlParser {
         let supplementary_materials = MetadataParser::extract_supplementary_materials(xml_content);
 
         // Extract authors using AuthorParser
-        let authors = AuthorParser::extract_authors_detailed(xml_content);
+        let authors = AuthorParser::extract_authors(xml_content);
 
         // Extract sections using SectionParser
         let sections = SectionParser::extract_sections_enhanced(xml_content);
