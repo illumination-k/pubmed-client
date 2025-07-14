@@ -1,3 +1,10 @@
+//! TAR extraction functionality for PMC Open Access articles
+//!
+//! This module is only available on non-WASM targets due to file system and
+//! compression dependencies.
+
+#![cfg(not(target_arch = "wasm32"))]
+
 use std::{path::Path, str, time::Duration};
 
 use crate::config::ClientConfig;
@@ -6,17 +13,65 @@ use crate::pmc::models::{ArticleSection, ExtractedFigure, Figure, PmcFullText};
 use crate::pmc::parser::PmcXmlParser;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
+use flate2::read::GzDecoder;
+use futures_util::StreamExt;
+use quick_xml::de::from_str;
 use reqwest::{Client, Response};
+use serde::{Deserialize, Serialize};
+use std::{fs, fs::File};
+use tar::Archive;
+use tokio::{fs as tokio_fs, io::AsyncWriteExt, task};
 use tracing::debug;
 
-#[cfg(not(target_arch = "wasm32"))]
-use {
-    flate2::read::GzDecoder,
-    futures_util::StreamExt,
-    std::{fs, fs::File},
-    tar::Archive,
-    tokio::{fs as tokio_fs, io::AsyncWriteExt, task},
-};
+/// OA API XML response structures for deserialization
+#[derive(Debug, Deserialize, Serialize)]
+struct OaResponse {
+    #[serde(rename = "responseDate")]
+    response_date: Option<String>,
+    request: Option<String>,
+    records: Option<OaRecords>,
+    error: Option<OaError>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct OaRecords {
+    #[serde(rename = "returned-count")]
+    returned_count: Option<String>,
+    #[serde(rename = "total-count")]
+    total_count: Option<String>,
+    record: Option<OaRecord>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct OaRecord {
+    #[serde(rename = "@id")]
+    id: Option<String>,
+    #[serde(rename = "@citation")]
+    citation: Option<String>,
+    #[serde(rename = "@license")]
+    license: Option<String>,
+    #[serde(rename = "@retracted")]
+    retracted: Option<String>,
+    link: Option<OaLink>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct OaLink {
+    #[serde(rename = "@format")]
+    format: Option<String>,
+    #[serde(rename = "@updated")]
+    updated: Option<String>,
+    #[serde(rename = "@href")]
+    href: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct OaError {
+    #[serde(rename = "@code")]
+    code: Option<String>,
+    #[serde(rename = "$text")]
+    message: Option<String>,
+}
 
 /// TAR extraction client for PMC Open Access articles
 #[derive(Clone)]
@@ -31,24 +86,11 @@ impl PmcTarClient {
     pub fn new(config: ClientConfig) -> Self {
         let rate_limiter = config.create_rate_limiter();
 
-        let client = {
-            #[cfg(not(target_arch = "wasm32"))]
-            {
-                Client::builder()
-                    .user_agent(config.effective_user_agent())
-                    .timeout(Duration::from_secs(config.timeout.as_secs()))
-                    .build()
-                    .expect("Failed to create HTTP client")
-            }
-
-            #[cfg(target_arch = "wasm32")]
-            {
-                Client::builder()
-                    .user_agent(config.effective_user_agent())
-                    .build()
-                    .expect("Failed to create HTTP client")
-            }
-        };
+        let client = Client::builder()
+            .user_agent(config.effective_user_agent())
+            .timeout(Duration::from_secs(config.timeout.as_secs()))
+            .build()
+            .expect("Failed to create HTTP client");
 
         Self {
             client,
@@ -95,7 +137,6 @@ impl PmcTarClient {
     ///     Ok(())
     /// }
     /// ```
-    #[cfg(not(target_arch = "wasm32"))]
     pub async fn download_and_extract_tar<P: AsRef<Path>>(
         &self,
         pmcid: &str,
@@ -120,19 +161,7 @@ impl PmcTarClient {
             })?;
 
         // Build OA API URL
-        let mut url = format!(
-            "https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={}&format=tgz",
-            normalized_pmcid
-        );
-
-        // Add API parameters if available
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
+        let url = self.build_oa_api_url(&normalized_pmcid);
 
         debug!("Downloading tar.gz from OA API: {}", url);
 
@@ -295,7 +324,6 @@ impl PmcTarClient {
     ///     Ok(())
     /// }
     /// ```
-    #[cfg(not(target_arch = "wasm32"))]
     pub async fn extract_figures_with_captions<P: AsRef<Path>>(
         &self,
         pmcid: &str,
@@ -303,7 +331,10 @@ impl PmcTarClient {
     ) -> Result<Vec<ExtractedFigure>> {
         let normalized_pmcid = self.normalize_pmcid(pmcid);
 
-        // Create output directory early (before any potential failures)
+        // First, check if PMC is available in OA before creating any directories
+        self.check_oa_availability(&normalized_pmcid).await?;
+
+        // Create output directory only after confirming OA availability
         let output_path = output_dir.as_ref();
         tokio_fs::create_dir_all(output_path)
             .await
@@ -311,14 +342,16 @@ impl PmcTarClient {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
-        // First, fetch the XML to get figure captions
-        let xml_content = self.fetch_xml(&normalized_pmcid).await?;
-        let full_text = PmcXmlParser::parse(&xml_content, &normalized_pmcid)?;
-
         // Extract the tar.gz file
         let extracted_files = self
             .download_and_extract_tar(&normalized_pmcid, &output_dir)
             .await?;
+
+        // Find and read the NXML file from extracted files instead of making API call
+        let xml_content = self
+            .read_nxml_from_extracted_files(&extracted_files, &normalized_pmcid)
+            .await?;
+        let full_text = PmcXmlParser::parse(&xml_content, &normalized_pmcid)?;
 
         // Find and match figures
         let figures = self
@@ -328,10 +361,39 @@ impl PmcTarClient {
         Ok(figures)
     }
 
-    /// Fetch raw XML content from PMC
-    #[cfg(not(target_arch = "wasm32"))]
-    async fn fetch_xml(&self, pmcid: &str) -> Result<String> {
-        // Remove PMC prefix if present and validate
+    /// Read NXML file content from extracted tar files
+    pub async fn read_nxml_from_extracted_files(
+        &self,
+        extracted_files: &[String],
+        pmcid: &str,
+    ) -> Result<String> {
+        // Look for .nxml files in the extracted files
+        let nxml_file = extracted_files
+            .iter()
+            .find(|file_path| {
+                Path::new(file_path)
+                    .extension()
+                    .and_then(|ext| ext.to_str())
+                    .map(|ext| ext.to_lowercase() == "nxml")
+                    .unwrap_or(false)
+            })
+            .ok_or_else(|| PubMedError::PmcNotAvailableById {
+                pmcid: pmcid.to_string(),
+            })?;
+
+        debug!("Found NXML file: {}", nxml_file);
+
+        // Read the NXML file content
+        tokio_fs::read_to_string(nxml_file)
+            .await
+            .map_err(|e| PubMedError::IoError {
+                message: format!("Failed to read NXML file {}: {}", nxml_file, e),
+            })
+    }
+
+    /// Check if PMC ID is available in Open Access subset
+    async fn check_oa_availability(&self, pmcid: &str) -> Result<()> {
+        // Validate PMCID format
         let clean_pmcid = pmcid.trim_start_matches("PMC");
         if clean_pmcid.is_empty() || !clean_pmcid.chars().all(|c| c.is_ascii_digit()) {
             return Err(PubMedError::InvalidPmid {
@@ -339,20 +401,12 @@ impl PmcTarClient {
             });
         }
 
-        // Build URL with API parameters
-        let mut url = format!(
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=PMC{clean_pmcid}&retmode=xml"
-        );
+        // Build OA API URL
+        let url = self.build_oa_api_url(pmcid);
 
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
+        debug!("Checking OA availability: {}", url);
 
+        // Make request to check availability
         let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
@@ -366,70 +420,65 @@ impl PmcTarClient {
             });
         }
 
-        let xml_content = response.text().await?;
+        let content_type = response
+            .headers()
+            .get("content-type")
+            .and_then(|ct| ct.to_str().ok())
+            .unwrap_or("");
 
-        // Check if the response contains an error
-        if xml_content.contains("<ERROR>") {
+        debug!("OA API response content-type: {}", content_type);
+
+        if content_type.contains("text/xml") {
+            debug!("OA API returned XML, checking for errors");
+            let xml_content = response.text().await?;
+
+            // Check for error in XML response
+            if xml_content.contains("<error") {
+                return Err(PubMedError::PmcNotAvailableById {
+                    pmcid: pmcid.to_string(),
+                });
+            }
+        }
+
+        // If we reach here, the PMC ID is available
+        Ok(())
+    }
+
+    /// Parse OA API XML response to extract download URL using serde deserialization
+    pub(crate) fn parse_oa_response(&self, xml_content: &str, pmcid: &str) -> Result<String> {
+        debug!("Parsing OA API XML response with serde: {}", xml_content);
+
+        // Deserialize XML to struct
+        let oa_response: OaResponse = from_str(xml_content).map_err(|e| {
+            PubMedError::XmlError(format!("Failed to deserialize OA response: {}", e))
+        })?;
+
+        // Check for error in response
+        if let Some(_error) = &oa_response.error {
             return Err(PubMedError::PmcNotAvailableById {
                 pmcid: pmcid.to_string(),
             });
         }
 
-        Ok(xml_content)
-    }
-
-    /// Parse OA API XML response to extract download URL
-    #[cfg(not(target_arch = "wasm32"))]
-    fn parse_oa_response(&self, xml_content: &str, pmcid: &str) -> Result<String> {
-        use quick_xml::events::Event;
-        use quick_xml::Reader;
-
-        debug!("Parsing OA API XML response: {}", xml_content);
-
-        let mut reader = Reader::from_str(xml_content);
-        reader.config_mut().trim_text(true);
-
-        let mut buf = Vec::new();
-
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) | Ok(Event::Empty(ref e))
-                    if e.name().as_ref() == b"link" =>
-                {
-                    debug!("Found link element");
-                    // Look for href attribute
-                    for attr in e.attributes().flatten() {
-                        debug!(
-                            "Attribute: {:?} = {:?}",
-                            str::from_utf8(attr.key.as_ref()).unwrap_or("invalid"),
-                            str::from_utf8(&attr.value).unwrap_or("invalid")
-                        );
-                        if attr.key.as_ref() == b"href" {
-                            let href = str::from_utf8(&attr.value).map_err(|e| {
-                                PubMedError::XmlError(format!("Invalid UTF-8 in href: {}", e))
-                            })?;
-                            debug!("Found href: {}", href);
-                            return Ok(href.to_string());
-                        }
+        // Extract href from records
+        if let Some(records) = &oa_response.records {
+            if let Some(record) = &records.record {
+                if let Some(link) = &record.link {
+                    if let Some(href) = &link.href {
+                        debug!("Found href using serde: {}", href);
+                        return Ok(href.clone());
                     }
                 }
-                Ok(Event::Eof) => break,
-                Err(e) => {
-                    return Err(PubMedError::XmlError(format!("XML parsing error: {}", e)));
-                }
-                _ => {}
             }
-            buf.clear();
         }
 
-        debug!("No href attribute found in XML response");
+        debug!("No href found in OA response");
         Err(PubMedError::PmcNotAvailableById {
             pmcid: pmcid.to_string(),
         })
     }
 
     /// Match figures from XML with extracted files
-    #[cfg(not(target_arch = "wasm32"))]
     async fn match_figures_with_files<P: AsRef<Path>>(
         &self,
         full_text: &PmcFullText,
@@ -485,7 +534,6 @@ impl PmcTarClient {
     }
 
     /// Recursively collect all figures from sections and subsections
-    #[cfg(not(target_arch = "wasm32"))]
     fn collect_figures_recursive(section: &ArticleSection, figures: &mut Vec<Figure>) {
         figures.extend(section.figures.clone());
         for subsection in &section.subsections {
@@ -494,7 +542,6 @@ impl PmcTarClient {
     }
 
     /// Find a matching file for a figure based on ID, label, or filename patterns
-    #[cfg(not(target_arch = "wasm32"))]
     pub fn find_matching_file(
         figure: &Figure,
         extracted_files: &[String],
@@ -551,7 +598,6 @@ impl PmcTarClient {
     }
 
     /// Get image dimensions using the image crate
-    #[cfg(not(target_arch = "wasm32"))]
     async fn get_image_dimensions(file_path: &str) -> Option<(u32, u32)> {
         task::spawn_blocking({
             let file_path = file_path.to_string();
@@ -576,7 +622,6 @@ impl PmcTarClient {
     /// # Returns
     ///
     /// Returns a `Result<Vec<String>>` containing the list of extracted file paths
-    #[cfg(not(target_arch = "wasm32"))]
     async fn extract_tar_gz<P: AsRef<Path>>(
         &self,
         tar_path: P,
@@ -639,6 +684,25 @@ impl PmcTarClient {
         }
     }
 
+    /// Build OA API URL with parameters
+    fn build_oa_api_url(&self, pmcid: &str) -> String {
+        let mut url = format!(
+            "https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={}&format=tgz",
+            pmcid
+        );
+
+        // Add API parameters if available
+        let api_params = self.config.build_api_params();
+        for (key, value) in api_params {
+            url.push('&');
+            url.push_str(&key);
+            url.push('=');
+            url.push_str(&urlencoding::encode(&value));
+        }
+
+        url
+    }
+
     /// Internal helper method for making HTTP requests with retry logic
     async fn make_request(&self, url: &str) -> Result<Response> {
         with_retry(
@@ -691,5 +755,92 @@ mod tests {
         let config = ClientConfig::new();
         let _client = PmcTarClient::new(config);
         // Test that client is created successfully
+    }
+
+    #[test]
+    fn test_parse_oa_response_success() {
+        let config = ClientConfig::new();
+        let client = PmcTarClient::new(config);
+
+        // Sample successful OA API response
+        let xml_response = r#"<OA>
+            <responseDate>2025-07-14 01:46:30</responseDate>
+            <request id="PMC7906746" format="tgz">https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC7906746;format=tgz;tool=pubmed-client-rs</request>
+            <records returned-count="1" total-count="1">
+                <record id="PMC7906746" citation="Lancet. 2021 Jan 27 6-12 February; 397(10273):452-455" license="none" retracted="no">
+                    <link format="tgz" updated="2022-12-16 07:10:15" href="ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/f1/69/PMC7906746.tar.gz" />
+                </record>
+            </records>
+        </OA>"#;
+
+        let result = client.parse_oa_response(xml_response, "PMC7906746");
+        assert!(result.is_ok());
+        assert_eq!(
+            result.unwrap(),
+            "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/f1/69/PMC7906746.tar.gz"
+        );
+    }
+
+    #[test]
+    fn test_parse_oa_response_error() {
+        let config = ClientConfig::new();
+        let client = PmcTarClient::new(config);
+
+        // Sample error OA API response
+        let xml_response = r#"<OA>
+            <responseDate>2025-07-13 23:54:19</responseDate>
+            <request>https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC1474093;format=tgz;tool=pubmed-client-rs</request>
+            <error code="idIsNotOpenAccess">identifier 'PMC1474093' is not Open Access</error>
+        </OA>"#;
+
+        let result = client.parse_oa_response(xml_response, "PMC1474093");
+        assert!(result.is_err());
+
+        assert!(
+            matches!(result, Err(PubMedError::PmcNotAvailableById { pmcid }) if pmcid == "PMC1474093"),
+            "Expected PmcNotAvailableById error with correct pmcid"
+        );
+    }
+
+    #[test]
+    fn test_parse_oa_response_no_href() {
+        let config = ClientConfig::new();
+        let client = PmcTarClient::new(config);
+
+        // Response with records but no href
+        let xml_response = r#"<OA>
+            <responseDate>2025-07-14 01:46:30</responseDate>
+            <request id="PMC1234567" format="tgz">test request</request>
+            <records returned-count="1" total-count="1">
+                <record id="PMC1234567" citation="Test Citation" license="none" retracted="no">
+                    <link format="tgz" updated="2022-12-16 07:10:15" />
+                </record>
+            </records>
+        </OA>"#;
+
+        let result = client.parse_oa_response(xml_response, "PMC1234567");
+        assert!(result.is_err());
+
+        assert!(
+            matches!(result, Err(PubMedError::PmcNotAvailableById { pmcid }) if pmcid == "PMC1234567"),
+            "Expected PmcNotAvailableById error for missing href"
+        );
+    }
+
+    #[test]
+    fn test_parse_oa_response_invalid_xml() {
+        let config = ClientConfig::new();
+        let client = PmcTarClient::new(config);
+
+        // Invalid XML
+        let xml_response = r#"<OA><unclosed-tag></OA>"#;
+
+        let result = client.parse_oa_response(xml_response, "PMC1234567");
+        assert!(result.is_err());
+
+        assert!(
+            matches!(result, Err(PubMedError::XmlError(_))),
+            "Expected XmlError for invalid XML"
+        );
     }
 }
