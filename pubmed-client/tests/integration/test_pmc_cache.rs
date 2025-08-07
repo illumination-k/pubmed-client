@@ -1,5 +1,4 @@
-use pubmed_client_rs::{cache::CacheConfig, ClientConfig, PmcClient};
-use std::time::Duration;
+use pubmed_client_rs::{cache::CacheConfig, ClientConfig, Duration, PmcClient};
 use wiremock::{
     matchers::{method, path_regex},
     Mock, MockServer, ResponseTemplate,

@@ -140,6 +140,14 @@ path = "tests/integration/error_handling_tests.rs"
 name = "test_pmc_cache"
 path = "tests/integration/test_pmc_cache.rs"
 
+[[test]]
+name = "test_nxml_reading"
+path = "tests/integration/test_nxml_reading.rs"
+
+[[test]]
+name = "test_pmc_variants_parameterized"
+path = "tests/integration/test_pmc_variants_parameterized.rs"
+
 # Examples
 [[example]]
 name = "figure_extraction_complete"

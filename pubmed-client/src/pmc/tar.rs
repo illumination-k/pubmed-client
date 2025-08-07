@@ -331,16 +331,16 @@ impl PmcTarClient {
     ) -> Result<Vec<ExtractedFigure>> {
         let normalized_pmcid = self.normalize_pmcid(pmcid);
 
-        // First, check if PMC is available in OA before creating any directories
-        self.check_oa_availability(&normalized_pmcid).await?;
-
-        // Create output directory only after confirming OA availability
+        // Create output directory first to ensure it exists even if the download fails
         let output_path = output_dir.as_ref();
         tokio_fs::create_dir_all(output_path)
             .await
             .map_err(|e| PubMedError::IoError {
                 message: format!("Failed to create output directory: {}", e),
             })?;
+
+        // Check if PMC is available in OA
+        self.check_oa_availability(&normalized_pmcid).await?;
 
         // Extract the tar.gz file
         let extracted_files = self
@@ -547,18 +547,43 @@ impl PmcTarClient {
         extracted_files: &[String],
         image_extensions: &[&str],
     ) -> Option<String> {
+        use tracing::debug;
+
+        debug!(
+            "Finding matching file for figure: id={}, file_name={:?}, label={:?}",
+            figure.id, figure.file_name, figure.label
+        );
+        debug!(
+            "Available files: {:?}",
+            extracted_files
+                .iter()
+                .map(|f| Path::new(f)
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy())
+                .collect::<Vec<_>>()
+        );
+
         // First try to match by figure file_name if available
         if let Some(file_name) = &figure.file_name {
+            debug!("Trying to match by file_name: {}", file_name);
             for file_path in extracted_files {
                 if let Some(filename) = Path::new(file_path).file_name() {
-                    if filename.to_string_lossy().contains(file_name) {
+                    let filename_str = filename.to_string_lossy();
+                    debug!("Checking if '{}' contains '{}'", filename_str, file_name);
+                    if filename_str.contains(file_name) {
+                        debug!("Found match by file_name: {}", file_path);
                         return Some(file_path.clone());
                     }
                 }
             }
+            debug!("No match found by file_name");
+        } else {
+            debug!("No file_name available for matching");
         }
 
         // Try to match by figure ID
+        debug!("Trying to match by figure ID: {}", figure.id);
         for file_path in extracted_files {
             if let Some(filename) = Path::new(file_path).file_name() {
                 let filename_str = filename.to_string_lossy().to_lowercase();
@@ -569,12 +594,14 @@ impl PmcTarClient {
                     if let Some(extension) = Path::new(file_path).extension() {
                         let ext_str = extension.to_string_lossy().to_lowercase();
                         if image_extensions.contains(&ext_str.as_str()) {
+                            debug!("Found match by figure ID: {}", file_path);
                             return Some(file_path.clone());
                         }
                     }
                 }
             }
         }
+        debug!("No match found by figure ID");
 
         // Try to match by label if available
         if let Some(label) = &figure.label {
@@ -594,6 +621,7 @@ impl PmcTarClient {
             }
         }
 
+        debug!("No matching file found for figure: {}", figure.id);
         None
     }
 

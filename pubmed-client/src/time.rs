@@ -89,6 +89,12 @@ impl Duration {
     pub fn is_zero(&self) -> bool {
         self.millis == 0
     }
+
+    /// Convert to std::time::Duration for use with external libraries
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn to_std(&self) -> StdDuration {
+        StdDuration::from_millis(self.millis)
+    }
 }
 
 impl Default for Duration {

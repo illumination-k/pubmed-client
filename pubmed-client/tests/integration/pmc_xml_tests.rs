@@ -66,7 +66,11 @@ mod tests {
                 xml_content.contains("<article"),
                 "Should contain article tag"
             );
-            assert!(xml_content.contains("PMC"), "Should contain PMC reference");
+            // Check for PMC reference in either format
+            assert!(
+                xml_content.contains("PMC") || xml_content.contains(r#"pub-id-type="pmc""#),
+                "Should contain PMC reference in some format"
+            );
 
             info!(filename = test_case.filename(), "Basic validation passed");
         }

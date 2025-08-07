@@ -1,9 +1,9 @@
 use moka::future::Cache as MokaCache;
 use std::hash::Hash;
-use std::time::Duration;
 use tracing::{debug, info};
 
 use crate::pmc::models::PmcFullText;
+use crate::time::Duration;
 
 /// Configuration for memory cache
 #[derive(Debug, Clone)]
@@ -37,7 +37,7 @@ where
     pub fn new(config: &CacheConfig) -> Self {
         let cache = MokaCache::builder()
             .max_capacity(config.max_capacity)
-            .time_to_live(config.time_to_live)
+            .time_to_live(config.time_to_live.to_std())
             .build();
 
         Self { cache }

@@ -7,6 +7,8 @@ pub struct SectionParser;
 impl SectionParser {
     /// Extract all sections from PMC XML content
     pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
+        use tracing::debug;
+
         let mut sections = Vec::new();
 
         // Extract abstract first
@@ -22,6 +24,12 @@ impl SectionParser {
             }
         }
 
+        // Extract figures from floats-group section (often at the end of the XML)
+        if let Some(floats_section) = Self::extract_floats_group_section(content) {
+            sections.push(floats_section);
+        }
+
+        debug!("Total sections extracted: {}", sections.len());
         sections
     }
 
@@ -221,7 +229,13 @@ impl SectionParser {
 
     /// Extract figures from a section
     fn extract_figures_from_section(content: &str) -> Vec<Figure> {
+        use tracing::{debug, trace};
+
         let mut figures = Vec::new();
+        trace!(
+            "Starting figure extraction from section content ({} chars)",
+            content.len()
+        );
 
         let mut pos = 0;
         while let Some(fig_start) = content[pos..].find("<fig") {
@@ -236,6 +250,8 @@ impl SectionParser {
                         format!("fig_{fig_num}")
                     });
 
+                debug!("Processing figure with ID: {}", id);
+
                 let label = xml_utils::extract_text_between(fig_content, "<label>", "</label>");
                 let caption =
                     xml_utils::extract_text_between(fig_content, "<caption>", "</caption>")
@@ -247,14 +263,18 @@ impl SectionParser {
                 let fig_type = xml_utils::extract_attribute_value(fig_content, "fig-type");
 
                 // Extract file name from graphic element
-                let file_name = xml_utils::extract_attribute_value(fig_content, "xlink:href")
-                    .or_else(|| xml_utils::extract_attribute_value(fig_content, "href"));
+                let file_name = Self::extract_graphic_href(fig_content);
 
-                let mut figure = Figure::new(id, caption);
-                figure.label = label;
-                figure.alt_text = alt_text;
-                figure.fig_type = fig_type;
-                figure.file_name = file_name;
+                let mut figure = Figure::new(id.clone(), caption);
+                figure.label = label.clone();
+                figure.alt_text = alt_text.clone();
+                figure.fig_type = fig_type.clone();
+                figure.file_name = file_name.clone();
+
+                debug!(
+                    "Created figure: id={}, label={:?}, file_name={:?}",
+                    id, label, file_name
+                );
 
                 figures.push(figure);
                 pos = fig_end;
@@ -263,7 +283,64 @@ impl SectionParser {
             }
         }
 
+        debug!(
+            "Figure extraction completed: found {} figures",
+            figures.len()
+        );
         figures
+    }
+
+    /// Extract href from graphic elements within a figure
+    fn extract_graphic_href(fig_content: &str) -> Option<String> {
+        use tracing::{debug, trace};
+
+        trace!(
+            "Extracting graphic href from figure content: {}",
+            &fig_content.chars().take(200).collect::<String>()
+        );
+
+        // First try to find graphic elements and extract xlink:href from them
+        let mut pos = 0;
+        while let Some(graphic_start) = fig_content[pos..].find("<graphic") {
+            let graphic_start = pos + graphic_start;
+
+            // Find the end of the graphic tag (either self-closing or with closing tag)
+            if let Some(graphic_end) = fig_content[graphic_start..].find('>') {
+                let graphic_end = graphic_start + graphic_end + 1;
+                let graphic_tag = &fig_content[graphic_start..graphic_end];
+
+                debug!("Found graphic tag: {}", graphic_tag);
+
+                // Try to extract xlink:href from this specific graphic element
+                if let Some(href) = xml_utils::extract_attribute_value(graphic_tag, "xlink:href") {
+                    debug!("Found xlink:href in graphic element: {}", href);
+                    return Some(href);
+                }
+
+                // Fallback to href without namespace
+                if let Some(href) = xml_utils::extract_attribute_value(graphic_tag, "href") {
+                    debug!("Found href in graphic element: {}", href);
+                    return Some(href);
+                }
+
+                pos = graphic_end;
+            } else {
+                break;
+            }
+        }
+
+        // Fallback: try to extract from the entire figure content (original behavior)
+        debug!("No graphic elements found, trying fallback extraction");
+        let fallback_result = xml_utils::extract_attribute_value(fig_content, "xlink:href")
+            .or_else(|| xml_utils::extract_attribute_value(fig_content, "href"));
+
+        if let Some(ref href) = fallback_result {
+            debug!("Found href via fallback method: {}", href);
+        } else {
+            debug!("No href found in figure content");
+        }
+
+        fallback_result
     }
 
     /// Extract tables from a section
@@ -327,6 +404,34 @@ impl SectionParser {
     /// Extract section ID from section content
     pub fn extract_section_id(content: &str) -> Option<String> {
         xml_utils::extract_attribute_value(content, "id")
+    }
+
+    /// Extract figures from floats-group section
+    fn extract_floats_group_section(content: &str) -> Option<ArticleSection> {
+        use tracing::debug;
+
+        if let Some(floats_start) = content.find("<floats-group") {
+            if let Some(floats_end) = content[floats_start..].find("</floats-group>") {
+                let floats_end = floats_start + floats_end;
+                let floats_content = &content[floats_start..floats_end];
+
+                debug!("Found floats-group section, extracting figures");
+
+                // Extract figures from the floats-group
+                let figures = Self::extract_figures_from_section(floats_content);
+
+                if !figures.is_empty() {
+                    debug!("Found {} figures in floats-group", figures.len());
+                    let mut section =
+                        ArticleSection::new("floats".to_string(), "Figures and Tables".to_string());
+                    section.figures = figures;
+                    return Some(section);
+                }
+            }
+        }
+
+        debug!("No floats-group section found");
+        None
     }
 
     /// Extract all paragraph content from a section
