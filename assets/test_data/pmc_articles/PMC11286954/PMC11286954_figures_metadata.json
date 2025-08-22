@@ -1,0 +1,62 @@
+[
+  {
+    "pmcid": "PMC11286954",
+    "figure_id": "Fig1",
+    "label": "Fig. 1",
+    "caption": "Identification of DUBs associated with metabolism.A Guilt-by-association analysis of all human DUBs. DUBs were arranged by similarity (Spearman correlation) in columns, GSEA of RNA expression data from the TCGA were clustered in rows. Blue: anti-correlated genes; red: correlated genes. B Difference in glycolysis measured by ECAR upon genetic silencing of the indicated DUB compared to the control. Red: highlights DUBs with significantly reduced glycolysis. Error bars&#x02009;&#x000b1;&#x02009;SD. C MSEA on metabolomics data acquired from USP9x knockdown cancer cell samples. Significant pathways with at least 4 hits are depicted in the graph.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC11286954/PMC11286954/41420_2024_2111_Fig1_HTML.gif",
+    "file_size_bytes": 7278,
+    "dimensions": [
+      100,
+      111
+    ],
+    "extracted_at": "2025-07-14T12:59:51.787812+00:00"
+  },
+  {
+    "pmcid": "PMC11286954",
+    "figure_id": "Fig2",
+    "label": "Fig. 2",
+    "caption": "USP9x regulates tumor growth and is elevated in human lung cancer.A Knockdown efficiency of stable inducible shRNA-expressing NCI-H1975 cells following induction for 48&#x02009;h with 20&#x02009;ng/mL doxycycline. B Clonogenicity with quantification (n&#x02009;=&#x02009;3). C Cell growth over 4&#x02009;days upon USP9x knockdown in NCI-H1975 normalized to the non-targeting shRNA control (n&#x02009;=&#x02009;3). D Cell growth as in (C) in A549 and NCI-H2087 cancer cells upon USP9x knockdown for 48&#x02009;h (n&#x02009;=&#x02009;3). E Measurement of cell toxicity upon USP9x knockdown in the cell line panel (n&#x02009;=&#x02009;3). F Knockdown efficiency in xenograft tumors from shRNA-mediated USP9x knockdown cells in mice, (n&#x02009;=&#x02009;6 per condition). G Individual tumor growth of USP9x knockdown tumors measured over 14&#x02009;days. Statistical significance calculated with t-tests from the average of each group on day 14. H Tumor weight of USP9x knockdown tumors from (F). I RNA expression of USP9x in lung adenocarcinoma patient samples (n&#x02009;=&#x02009;535) vs. normal lung samples (n&#x02009;=&#x02009;59) obtained from the TCGA database. J Representative immunohistochemistry staining for USP9x in lung adenocarcinoma samples (n&#x02009;=&#x02009;142) and normal lung tissue (n&#x02009;=&#x02009;92), the scale bar (in black) measures 10&#x02009;&#x000b5;m. Error bars&#x02009;&#x000b1;&#x02009;SD. *p&#x02009;&#x02264;&#x02009;0.05, **p&#x02009;&#x02264;&#x02009;0.01, ***p&#x02009;&#x02264;&#x02009;0.001, ****p&#x02009;&#x02264;&#x02009;0.0001.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC11286954/PMC11286954/41420_2024_2111_Fig2_HTML.gif",
+    "file_size_bytes": 4300,
+    "dimensions": [
+      100,
+      106
+    ],
+    "extracted_at": "2025-07-14T12:59:51.788039+00:00"
+  },
+  {
+    "pmcid": "PMC11286954",
+    "figure_id": "Fig3",
+    "label": "Fig. 3",
+    "caption": "USP9x controls the stability of PYCR3.A Number of unique peptides and their coverage obtained in USP9x and PYCR3 from LC-MS/MS analysis on co-immunoprecipitation assay. B Co-immunoprecipitates from (A) resolved on western blot, normal rabbit IgG was used as control. C Ubiquitination assay showing the levels of ubiquitinated PYCR3 in USP9x overexpression vs. control upon treatment with MG132 for 4&#x02009;h. Bar graph shows quantification of ubiquitinated PYCR3 normalized to total PYCR3 levels and the control. D siRNA-mediated knockdown of USP9x, as well as (E) USP9x inhibition with the specific inhibitor FT709 for 48&#x02009;h reduced PYCR3 protein levels. F USP9x overexpression elevated PYCR3 protein level. G PYCR3 transcription upon USP9x siRNA-mediated knockdown remained unchanged. All quantifications pooled from 3 independent biological replicates. Error bars, &#x000b1; SD. *p&#x02009;&#x02264;&#x02009;0.05, **p&#x02009;&#x02264;&#x02009;0.01, ***p&#x02009;&#x02264;&#x02009;0.001, ****p&#x02009;&#x02264;&#x02009;0.0001.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC11286954/PMC11286954/41420_2024_2111_Fig3_HTML.gif",
+    "file_size_bytes": 3591,
+    "dimensions": [
+      110,
+      79
+    ],
+    "extracted_at": "2025-07-14T12:59:51.788179+00:00"
+  },
+  {
+    "pmcid": "PMC11286954",
+    "figure_id": "Fig4",
+    "label": "Fig. 4",
+    "caption": "USP9x alters the proline metabolism pathway.A Schematic illustration of PYCR3-mediated proline biosynthesis and proline cycle. B Metabolite levels of arginine, ornithine, and proline upon USP9x knockdown. C Cellular fractionation of NCI-H1975 cells. Tubulin served as a marker for the cytosolic fraction, TOMM40 for the membrane fraction. D Enzymatic activity of G6PDH upon USP9x knockdown (n&#x02009;=&#x02009;3). E Ratio of metabolite levels of 6-phosphogluconate and glucose-6-phosphate. F NADP&#x02009;+&#x02009;/NADPH ratio (n&#x02009;=&#x02009;3). G Efficiency of PYCR3 knockdown 48&#x02009;h post transfection. H The effect of PYCR3 knockdown on mitochondrial oxygen consumption rates (OCR) in NCI-H1975 cells normalized to total protein amount. I Calculations of indicated mitochondrial parameters from (H) (n&#x02009;=&#x02009;3). J Cell growth measured over 4&#x02009;days showing the effect of PYCR3 knockdown in NCI-H1975, normalized to siRNA control. K Kaplan&#x02013;Meier analysis of PYCR3. High expression of PYCR3 is associated with poor overall survival of patients with NSCLC. P-value calculated using Log Rank test. Error bars, &#x000b1;SD. *p&#x02009;&#x02264;&#x02009;0.05, **p&#x02009;&#x02264;&#x02009;0.01, ***p&#x02009;&#x02264;&#x02009;0.001, ****p&#x02009;&#x02264;&#x02009;0.0001.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC11286954/PMC11286954/41420_2024_2111_Fig4_HTML.gif",
+    "file_size_bytes": 4649,
+    "dimensions": [
+      100,
+      119
+    ],
+    "extracted_at": "2025-07-14T12:59:51.788323+00:00"
+  }
+]

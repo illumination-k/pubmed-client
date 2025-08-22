@@ -1,0 +1,47 @@
+[
+  {
+    "pmcid": "PMC10118017",
+    "figure_id": "f1",
+    "label": "Figure&#x000a0;1",
+    "caption": "Examples of major anthocyanin species in Andean maize.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10118017/PMC10118017/fpls-14-1154535-g001.gif",
+    "file_size_bytes": 9022,
+    "dimensions": [
+      200,
+      72
+    ],
+    "extracted_at": "2025-07-14T12:58:08.899626+00:00"
+  },
+  {
+    "pmcid": "PMC10118017",
+    "figure_id": "f2",
+    "label": "Figure&#x000a0;2",
+    "caption": "Synthetic pathway of simplified version of anthocyanins.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10118017/PMC10118017/fpls-14-1154535-g002.jpg",
+    "file_size_bytes": 84576,
+    "dimensions": [
+      590,
+      900
+    ],
+    "extracted_at": "2025-07-14T12:58:08.899904+00:00"
+  },
+  {
+    "pmcid": "PMC10118017",
+    "figure_id": "f3",
+    "label": "Figure&#x000a0;3",
+    "caption": "Color of anthocyanins at different pH value.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10118017/PMC10118017/fpls-14-1154535-g003.jpg",
+    "file_size_bytes": 52936,
+    "dimensions": [
+      660,
+      342
+    ],
+    "extracted_at": "2025-07-14T12:58:08.900101+00:00"
+  }
+]

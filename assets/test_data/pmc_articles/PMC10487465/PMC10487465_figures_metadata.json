@@ -1,0 +1,122 @@
+[
+  {
+    "pmcid": "PMC10487465",
+    "figure_id": "ijms-24-13282-f001",
+    "label": "Figure 1",
+    "caption": "Structure of LXs.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10487465/PMC10487465/ijms-24-13282-g001.jpg",
+    "file_size_bytes": 52633,
+    "dimensions": [
+      771,
+      442
+    ],
+    "extracted_at": "2025-07-14T12:58:34.332854+00:00"
+  },
+  {
+    "pmcid": "PMC10487465",
+    "figure_id": "ijms-24-13282-f002",
+    "label": "Figure 2",
+    "caption": "Medical benefits of LXs.",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10487465/PMC10487465/ijms-24-13282-g002.jpg",
+    "file_size_bytes": 91634,
+    "dimensions": [
+      773,
+      480
+    ],
+    "extracted_at": "2025-07-14T12:58:34.333133+00:00"
+  },
+  {
+    "pmcid": "PMC10487465",
+    "figure_id": "ijms-24-13282-f003",
+    "label": "Figure 3",
+    "caption": "Synthesis of LXA4 and LXB4 in vivo by 15-LO/5-LO [12].",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10487465/PMC10487465/ijms-24-13282-g003.gif",
+    "file_size_bytes": 4796,
+    "dimensions": [
+      200,
+      44
+    ],
+    "extracted_at": "2025-07-14T12:58:34.333283+00:00"
+  },
+  {
+    "pmcid": "PMC10487465",
+    "figure_id": "ijms-24-13282-f004",
+    "label": "Figure 4",
+    "caption": "Synthesis of LXA4 and LXB4 in vivo by 5-LO/12-LO [12].",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10487465/PMC10487465/ijms-24-13282-g004.gif",
+    "file_size_bytes": 4768,
+    "dimensions": [
+      151,
+      80
+    ],
+    "extracted_at": "2025-07-14T12:58:34.333417+00:00"
+  },
+  {
+    "pmcid": "PMC10487465",
+    "figure_id": "ijms-24-13282-f005",
+    "label": "Figure 5",
+    "caption": "Synthesis of 15-epi-LXA4 and 15-epi-LXB4 in vivo by COX-2/5-LO induced by Aspirin [12].",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10487465/PMC10487465/ijms-24-13282-g005.jpg",
+    "file_size_bytes": 21380,
+    "dimensions": [
+      734,
+      162
+    ],
+    "extracted_at": "2025-07-14T12:58:34.333548+00:00"
+  },
+  {
+    "pmcid": "PMC10487465",
+    "figure_id": "ijms-24-13282-f006",
+    "label": "Figure 6",
+    "caption": "Chemical synthesis of LXA4 by iodization method (DBU: diazabicyclo-undecene; THF: Tetrahydrofuran; TBAF: Tetrabutylammonium fluoride hydrate; DHF: Dihydrofolic acid).",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10487465/PMC10487465/ijms-24-13282-g006.jpg",
+    "file_size_bytes": 44435,
+    "dimensions": [
+      795,
+      274
+    ],
+    "extracted_at": "2025-07-14T12:58:34.333704+00:00"
+  },
+  {
+    "pmcid": "PMC10487465",
+    "figure_id": "ijms-24-13282-f007",
+    "label": "Figure 7",
+    "caption": "Chemical synthesis of LXB4 by iodization method (THF: Tetrahydrofuran; TMSOTF: Trimethylsilyl trifluoromethanesulfonate; DBU: diazabicyclo-undecene).",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10487465/PMC10487465/ijms-24-13282-g007.jpg",
+    "file_size_bytes": 68684,
+    "dimensions": [
+      739,
+      502
+    ],
+    "extracted_at": "2025-07-14T12:58:34.333838+00:00"
+  },
+  {
+    "pmcid": "PMC10487465",
+    "figure_id": "ijms-24-13282-f008",
+    "label": "Figure 8",
+    "caption": "Chemical-enzymatic synthesis of LXA4 and LXB4 from ARA [73].",
+    "alt_text": null,
+    "fig_type": null,
+    "original_file_path": "tmp/PMC10487465/PMC10487465/ijms-24-13282-g008.jpg",
+    "file_size_bytes": 59114,
+    "dimensions": [
+      771,
+      636
+    ],
+    "extracted_at": "2025-07-14T12:58:34.333974+00:00"
+  }
+]
