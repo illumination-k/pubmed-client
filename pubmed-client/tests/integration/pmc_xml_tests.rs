@@ -12,14 +12,14 @@ fn count_figures_recursive(section: &pubmed_client_rs::pmc::models::ArticleSecti
 
 fn print_figures_recursive(section: &pubmed_client_rs::pmc::models::ArticleSection, indent: &str) {
     for figure in &section.figures {
-        println!("{}Figure ID: {}", indent, figure.id);
-        println!("{}  Label: {:?}", indent, figure.label);
-        println!("{}  Caption: {} chars", indent, figure.caption.len());
-        println!("{}  File name: {:?}", indent, figure.file_name);
-        println!(
-            "{}  Caption preview: {}",
-            indent,
-            figure.caption.chars().take(100).collect::<String>()
+        info!(
+            figure_id = %figure.id,
+            label = ?figure.label,
+            caption_length = figure.caption.len(),
+            file_name = ?figure.file_name,
+            caption_preview = %figure.caption.chars().take(100).collect::<String>(),
+            indent = %indent,
+            "Figure details"
         );
     }
 
@@ -129,7 +129,7 @@ mod tests {
     // Test specific to PMC7906746 to debug figure extraction
     #[test]
     fn test_pmc7906746_figure_extraction() {
-        println!("🔍 Starting PMC7906746 figure extraction debug test");
+        info!("🔍 Starting PMC7906746 figure extraction debug test");
         use pubmed_client_rs::pmc::parser::PmcXmlParser;
         use std::fs;
 
@@ -152,17 +152,23 @@ mod tests {
 
         let article = result.unwrap();
 
-        println!("Article title: {}", article.title);
-        println!("Number of sections: {}", article.sections.len());
+        info!(title = %article.title, "Article title");
+        info!(
+            sections_count = article.sections.len(),
+            "Number of sections"
+        );
 
         // Check for figures in all sections
         let mut total_figures = 0;
         for (i, section) in article.sections.iter().enumerate() {
             let section_figures = count_figures_recursive(section);
             total_figures += section_figures;
-            println!(
-                "Section {}: type={}, title={:?}, figures={}",
-                i, section.section_type, section.title, section_figures
+            info!(
+                section_index = i,
+                section_type = %section.section_type,
+                title = ?section.title,
+                figures_count = section_figures,
+                "Section details"
             );
 
             if section_figures > 0 {
@@ -170,30 +176,30 @@ mod tests {
             }
         }
 
-        println!("Total figures found: {}", total_figures);
+        info!(total_figures = total_figures, "Total figures found");
 
         // Debug: If no figures found, let's examine where the issue is
         if total_figures == 0 {
-            println!("🔍 No figures found by library parser. Debugging...");
+            info!("🔍 No figures found by library parser. Debugging...");
 
             // Check if the XML contains <fig> tags manually
             let fig_count = xml_content.matches("<fig").count();
-            println!("Raw XML contains {} <fig> tags", fig_count);
+            info!(fig_count = fig_count, "Raw XML <fig> tags count");
 
             // Check sections content
             for (i, section) in article.sections.iter().enumerate() {
-                println!(
-                    "Section {}: type={}, content length={}, title={:?}",
-                    i,
-                    section.section_type,
-                    section.content.len(),
-                    section.title
+                info!(
+                    section_index = i,
+                    section_type = %section.section_type,
+                    content_length = section.content.len(),
+                    title = ?section.title,
+                    "Section debug info"
                 );
                 if section.content.contains("fig1") || section.content.contains("Figure") {
-                    println!("  ⚠️  This section mentions figures!");
-                    println!(
-                        "  Content preview: {}",
-                        section.content.chars().take(200).collect::<String>()
+                    info!("⚠️  This section mentions figures!");
+                    info!(
+                        content_preview = %section.content.chars().take(200).collect::<String>(),
+                        "Section content preview"
                     );
                 }
             }
@@ -214,11 +220,11 @@ mod tests {
             assert!(figure.caption.contains("COVID-19 hospitalisations"));
             assert!(figure.caption.contains("Manaus, Brazil"));
             // Note: file_name might not be extracted correctly - let's check
-            println!("Figure file_name: {:?}", figure.file_name);
+            info!(file_name = ?figure.file_name, "Figure file_name");
 
-            println!("✅ PMC7906746 figure extraction test passed!");
+            info!("✅ PMC7906746 figure extraction test passed!");
         } else {
-            println!("❌ No figures extracted by the library parser - this indicates a bug!");
+            warn!("❌ No figures extracted by the library parser - this indicates a bug!");
         }
     }
 }

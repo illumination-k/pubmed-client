@@ -47,14 +47,19 @@ struct PmcTestCase {
 fn test_pmc_variants_parameterized(#[case] test_case: PmcTestCase) {
     // Skip test if file doesn't exist (for CI environments)
     if !Path::new(test_case.file_path).exists() {
-        println!(
-            "Skipping test for {}: {} not found",
-            test_case.pmcid, test_case.file_path
+        info!(
+            pmcid = %test_case.pmcid,
+            file_path = %test_case.file_path,
+            "Skipping test: file not found"
         );
         return;
     }
 
-    println!("Testing {}: {}", test_case.pmcid, test_case.description);
+    info!(
+        pmcid = %test_case.pmcid,
+        description = %test_case.description,
+        "Testing PMC variant"
+    );
 
     // Read the XML file content
     let xml_content = fs::read_to_string(test_case.file_path)
@@ -137,23 +142,24 @@ fn test_pmc_variants_parameterized(#[case] test_case: PmcTestCase) {
         }
     } else {
         // For cases that should fail (like corrupted files)
-        println!(
-            "Expected parse failure for {}: {}",
-            test_case.pmcid, test_case.description
+        info!(
+            pmcid = %test_case.pmcid,
+            description = %test_case.description,
+            "Expected parse failure"
         );
 
         // The parser might still succeed but with incomplete data
         // We mainly check that it doesn't crash and handles the case gracefully
         if let Ok(full_text) = result {
-            println!(
-                "Parser succeeded on corrupted file {} but extracted limited data: {} sections",
-                test_case.pmcid,
-                full_text.sections.len()
+            info!(
+                pmcid = %test_case.pmcid,
+                sections_count = full_text.sections.len(),
+                "Parser succeeded on corrupted file but extracted limited data"
             );
         } else {
-            println!(
-                "Parser appropriately failed on corrupted file {}",
-                test_case.pmcid
+            info!(
+                pmcid = %test_case.pmcid,
+                "Parser appropriately failed on corrupted file"
             );
         }
     }
@@ -266,7 +272,7 @@ fn test_xml_structure_variants(
     #[case] expected_figures: usize,
     #[case] description: &str,
 ) {
-    println!("Testing XML structure: {}", description);
+    info!(description = %description, "Testing XML structure");
 
     let result = PmcXmlParser::parse(xml_content, pmcid);
     assert!(
@@ -298,7 +304,11 @@ fn test_xml_structure_variants(
         );
     }
 
-    println!("✅ {} passed: {} figures", description, total_figures);
+    info!(
+        description = %description,
+        figures_count = total_figures,
+        "✅ XML structure test passed"
+    );
 }
 
 /// Test figure file_name extraction behavior
@@ -336,7 +346,7 @@ fn test_figure_file_name_extraction(
     #[case] expected_file_name: Option<String>,
     #[case] description: &str,
 ) {
-    println!("Testing file name extraction: {}", description);
+    info!(description = %description, "Testing file name extraction");
 
     // Wrap in a minimal XML structure
     let xml_content = format!(
@@ -365,7 +375,11 @@ fn test_figure_file_name_extraction(
         description
     );
 
-    println!("✅ {} passed: {:?}", description, figure.file_name);
+    info!(
+        description = %description,
+        file_name = ?figure.file_name,
+        "✅ File name extraction test passed"
+    );
 }
 
 /// Test error handling and edge cases
@@ -378,23 +392,27 @@ fn test_figure_file_name_extraction(
     "XML without xlink namespace"
 )]
 fn test_error_handling_and_edge_cases(#[case] xml_content: &str, #[case] description: &str) {
-    println!("Testing error handling: {}", description);
+    info!(description = %description, "Testing error handling");
 
     let result = PmcXmlParser::parse(xml_content, "TEST");
 
     // We expect the parser to either succeed gracefully or fail appropriately
     match result {
         Ok(full_text) => {
-            println!(
-                "✅ {} handled gracefully: {} sections",
-                description,
-                full_text.sections.len()
+            info!(
+                description = %description,
+                sections_count = full_text.sections.len(),
+                "✅ Error handling test handled gracefully"
             );
             // Basic validation that the result is reasonable
             assert_eq!(full_text.pmcid, "TEST");
         }
         Err(e) => {
-            println!("✅ {} failed appropriately: {:?}", description, e);
+            info!(
+                description = %description,
+                error = ?e,
+                "✅ Error handling test failed appropriately"
+            );
         }
     }
 }

@@ -65,7 +65,7 @@ fn test_pmc10487465_nxml_parsing() {
 
     // Skip test if file doesn't exist (for CI environments)
     if !std::path::Path::new(test_file_path).exists() {
-        println!("Skipping test: {} not found", test_file_path);
+        info!(file_path = %test_file_path, "Skipping test: file not found");
         return;
     }
 
@@ -102,13 +102,12 @@ fn test_pmc10487465_nxml_parsing() {
         for figure in &section.figures {
             total_figures += 1;
 
-            println!("Figure found:");
-            println!("  ID: {}", figure.id);
-            println!("  Label: {:?}", figure.label);
-            println!("  File name: {:?}", figure.file_name);
-            println!(
-                "  Caption: {}",
-                &figure.caption.chars().take(100).collect::<String>()
+            info!(
+                figure_id = %figure.id,
+                label = ?figure.label,
+                file_name = ?figure.file_name,
+                caption_preview = %figure.caption.chars().take(100).collect::<String>(),
+                "Figure found"
             );
 
             if figure.file_name.is_some() {
@@ -125,10 +124,17 @@ fn test_pmc10487465_nxml_parsing() {
     }
 
     // Verify that figures were extracted
-    println!("Total figures found: {}", total_figures);
-    println!("Number of sections: {}", full_text.sections.len());
+    info!(total_figures = total_figures, "Total figures found");
+    info!(
+        sections_count = full_text.sections.len(),
+        "Number of sections"
+    );
     for (i, section) in full_text.sections.iter().enumerate() {
-        println!("Section {}: {} figures", i, section.figures.len());
+        info!(
+            section_index = i,
+            figures_count = section.figures.len(),
+            "Section figures count"
+        );
     }
     assert!(
         total_figures > 0,
@@ -197,12 +203,11 @@ fn test_pmc10487465_nxml_parsing() {
         }
     }
 
-    println!("✅ PMC10487465 NXML parsing test completed successfully!");
-    println!("   - Total figures: {}", total_figures);
-    println!("   - Figures with file_name: {}", figures_with_file_name);
-    println!(
-        "   - Figures with proper href: {}",
-        figures_with_proper_href
+    info!(
+        total_figures = total_figures,
+        figures_with_file_name = figures_with_file_name,
+        figures_with_proper_href = figures_with_proper_href,
+        "✅ PMC10487465 NXML parsing test completed successfully!"
     );
 }
 
@@ -251,7 +256,7 @@ fn test_enhanced_graphic_href_extraction() {
     assert_eq!(figures[1].file_name, Some("test-graphic-002".to_string()));
     assert_eq!(figures[1].label, Some("Figure 2".to_string()));
 
-    println!("✅ Enhanced graphic href extraction test passed!");
+    info!("✅ Enhanced graphic href extraction test passed!");
 }
 
 /// Test comparison between different PMC articles to verify parser robustness
@@ -277,11 +282,11 @@ fn test_nxml_parser_robustness() {
 
     for (file_path, pmcid, expected_figures) in test_files {
         if !std::path::Path::new(file_path).exists() {
-            println!("Skipping robustness test: {} not found", file_path);
+            info!(file_path = %file_path, "Skipping robustness test: file not found");
             continue;
         }
 
-        println!("Testing parser robustness with {}", pmcid);
+        info!(pmcid = %pmcid, "Testing parser robustness");
 
         let xml_content = fs::read_to_string(file_path)
             .unwrap_or_else(|_| panic!("Failed to read {}", file_path));
@@ -310,9 +315,11 @@ fn test_nxml_parser_robustness() {
         // Log figure information for debugging
         for section in &full_text.sections {
             for figure in &section.figures {
-                println!(
-                    "  {} - Figure: ID={}, file_name={:?}",
-                    pmcid, figure.id, figure.file_name
+                info!(
+                    pmcid = %pmcid,
+                    figure_id = %figure.id,
+                    file_name = ?figure.file_name,
+                    "Figure details"
                 );
             }
         }
@@ -325,7 +332,7 @@ fn test_figure_file_matching_simulation() {
     let test_file_path = "tests/integration/test_data/pmc_xml/PMC10487465.xml";
 
     if !std::path::Path::new(test_file_path).exists() {
-        println!("Skipping file matching test: {} not found", test_file_path);
+        info!(file_path = %test_file_path, "Skipping file matching test: file not found");
         return;
     }
 
@@ -361,9 +368,10 @@ fn test_figure_file_matching_simulation() {
     let figures: Vec<_> = full_text.sections.iter().flat_map(|s| &s.figures).collect();
 
     for figure in &figures {
-        println!(
-            "Testing matching for figure: ID={}, file_name={:?}",
-            figure.id, figure.file_name
+        info!(
+            figure_id = %figure.id,
+            file_name = ?figure.file_name,
+            "Testing matching for figure"
         );
 
         // Use the actual find_matching_file function
@@ -378,7 +386,7 @@ fn test_figure_file_matching_simulation() {
         );
 
         let matched_path = matched_file.unwrap();
-        println!("  Matched file: {}", matched_path);
+        info!(matched_path = %matched_path, "Matched file");
 
         // Verify the match makes sense
         if let Some(ref file_name) = figure.file_name {
@@ -389,5 +397,5 @@ fn test_figure_file_matching_simulation() {
         }
     }
 
-    println!("✅ All figures matched successfully with simulated files!");
+    info!("✅ All figures matched successfully with simulated files!");
 }

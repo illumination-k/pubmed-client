@@ -1,5 +1,6 @@
 use pubmed_client_rs::pmc::parser::PmcXmlParser;
 use std::fs;
+use tracing::info;
 
 #[test]
 fn test_supplementary_material_extraction_from_real_xml() {
@@ -20,21 +21,25 @@ fn test_supplementary_material_extraction_from_real_xml() {
             assert!(result.is_ok(), "Failed to parse XML from {}", file_name);
 
             let article = result.unwrap();
-            println!("Testing file: {}", file_name);
-            println!(
-                "Found {} supplementary materials",
-                article.supplementary_materials.len()
+            info!(file_name = %file_name, "Testing file");
+            info!(
+                supplementary_materials_count = article.supplementary_materials.len(),
+                "Found supplementary materials"
             );
 
             // Check if supplementary materials were found
             for (i, material) in article.supplementary_materials.iter().enumerate() {
-                println!("  Material {}: {}", i + 1, material.id);
-                println!("    Content type: {:?}", material.content_type);
-                println!("    Title: {:?}", material.title);
-                println!("    File URL: {:?}", material.file_url);
-                println!("    Is tar file: {}", material.is_tar_file());
-                println!("    Is archive: {}", material.is_archive());
-                println!("    File extension: {:?}", material.get_file_extension());
+                info!(
+                    material_index = i + 1,
+                    material_id = %material.id,
+                    content_type = ?material.content_type,
+                    title = ?material.title,
+                    file_url = ?material.file_url,
+                    is_tar_file = material.is_tar_file(),
+                    is_archive = material.is_archive(),
+                    file_extension = ?material.get_file_extension(),
+                    "Supplementary material details"
+                );
 
                 // Basic validation
                 assert!(
@@ -51,16 +56,18 @@ fn test_supplementary_material_extraction_from_real_xml() {
             let tar_files = article.get_tar_files();
             let archive_files = article.get_archive_files();
 
-            println!("  Tar files found: {}", tar_files.len());
-            println!("  Archive files found: {}", archive_files.len());
+            info!(
+                tar_files_count = tar_files.len(),
+                archive_files_count = archive_files.len(),
+                "Archive files summary"
+            );
 
-            if article.has_supplementary_materials() {
-                println!("  Article has supplementary materials ✓");
-            } else {
-                println!("  Article has no supplementary materials");
-            }
+            info!(
+                has_supplementary_materials = article.has_supplementary_materials(),
+                "Article supplementary materials status"
+            );
         } else {
-            println!("Warning: Could not read test file {}", file_path);
+            info!(file_path = %file_path, "Warning: Could not read test file");
         }
     }
 }
