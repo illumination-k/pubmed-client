@@ -188,6 +188,37 @@ impl SearchQuery {
         self
     }
 
+    /// Filter by organism (scientific or common name)
+    ///
+    /// # Arguments
+    ///
+    /// * `organism` - Organism name (scientific or common name)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// // Using scientific name
+    /// let query = SearchQuery::new()
+    ///     .query("gene expression")
+    ///     .organism("Mus musculus");
+    ///
+    /// // Using common name
+    /// let query = SearchQuery::new()
+    ///     .query("metabolism")
+    ///     .organism("mouse");
+    ///
+    /// // Using bacteria
+    /// let query = SearchQuery::new()
+    ///     .query("antibiotic resistance")
+    ///     .organism("Escherichia coli");
+    /// ```
+    pub fn organism<S: Into<String>>(mut self, organism: S) -> Self {
+        self.filters.push(format!("{}[Organism]", organism.into()));
+        self
+    }
+
     /// Filter to human studies only
     ///
     /// # Example
@@ -326,6 +357,18 @@ mod tests {
     fn test_orcid() {
         let query = SearchQuery::new().orcid("0000-0001-2345-6789");
         assert_eq!(query.build(), "0000-0001-2345-6789[Author - Identifier]");
+    }
+
+    #[test]
+    fn test_organism() {
+        let query = SearchQuery::new().organism("Mus musculus");
+        assert_eq!(query.build(), "Mus musculus[Organism]");
+    }
+
+    #[test]
+    fn test_organism_with_common_name() {
+        let query = SearchQuery::new().organism("mouse");
+        assert_eq!(query.build(), "mouse[Organism]");
     }
 
     #[test]
