@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library and WebAssembly bindings for JavaScript/TypeScript environments.
+This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library, WebAssembly bindings for JavaScript/TypeScript environments, and a command-line interface for common operations.
 
 ## Workspace Structure
 
@@ -21,6 +21,15 @@ pubmed-client-rs/                    # Cargo workspace root
 │   ├── pkg/                         # Generated WASM package
 │   ├── tests/                       # WASM-specific TypeScript tests
 │   └── *.json, *.ts                # TypeScript/npm configuration
+├── pubmed-cli/                      # Command-line interface
+│   ├── Cargo.toml                   # CLI crate configuration
+│   └── src/                         # CLI source code
+│       ├── main.rs                  # CLI entry point
+│       └── commands/                # CLI subcommands
+│           ├── convert.rs           # PMID to PMCID conversion
+│           ├── figures.rs           # Figure extraction
+│           ├── markdown.rs          # Markdown conversion
+│           └── search.rs            # PubMed search
 └── tests/                           # Shared integration tests
 ```
 
@@ -108,8 +117,17 @@ cargo run -p pubmed-cli -- pmid-to-pmcid 31978945
 # Example: Convert PMID to PMCID (CSV format)
 cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 --format csv
 
+# Example: Convert PMID to PMCID (TXT format - PMCIDs only)
+cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 --format txt
+
 # Example: Convert multiple PMIDs
 cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 33515491
+
+# Example: Convert many PMIDs with custom batch size (to avoid API errors)
+cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 33515491 25760099 --batch-size 50
+
+# Example: Process large list with smaller batches
+cargo run -p pubmed-cli -- pmid-to-pmcid $(cat pmids.txt) --batch-size 25
 
 # Debug CLI with verbose logging
 RUST_LOG=debug cargo run -p pubmed-cli -- pmid-to-pmcid 31978945
