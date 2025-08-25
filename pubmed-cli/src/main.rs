@@ -34,6 +34,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Search PubMed articles with advanced filtering
+    Search(Box<commands::search::Search>),
     /// Extract figures from PMC articles
     Figures {
         /// PMC ID(s) to process (e.g., PMC7906746 or 7906746)
@@ -71,10 +73,16 @@ async fn main() -> Result<()> {
         .init();
 
     // Log startup
-    tracing::info!("PMC Figure Extraction Tool started");
+    tracing::info!("PMC Tool started");
 
     // Execute command
     match &cli.command {
+        Commands::Search(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
         Commands::Figures { pmcids, output_dir } => {
             commands::figures::execute(pmcids.clone(), output_dir.clone(), &cli).await
         }
