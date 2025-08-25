@@ -7,7 +7,6 @@ dprint = "latest"
 
 pnpm = "10"
 node = "20"
-"rust" = { version = "1.87.0", components = "rustfmt,clippy" }
 
 [tasks.fmt]
 run = ["dprint fmt", "cargo fmt --all"]
