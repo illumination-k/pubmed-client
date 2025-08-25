@@ -87,6 +87,40 @@ pnpm run test:coverage  # With coverage
 pnpm run publish        # wasm-pack publish --access public
 ```
 
+#### CLI Commands (from workspace root)
+
+```bash
+# Run CLI with cargo from workspace root
+cargo run -p pubmed-cli -- <COMMAND>
+
+# Example: Get help
+cargo run -p pubmed-cli -- --help
+
+# Example: Extract figures from PMC articles
+cargo run -p pubmed-cli -- figures PMC7906746
+
+# Example: Convert PMC to markdown
+cargo run -p pubmed-cli -- markdown PMC7906746
+
+# Example: Convert PMID to PMCID (JSON format)
+cargo run -p pubmed-cli -- pmid-to-pmcid 31978945
+
+# Example: Convert PMID to PMCID (CSV format)
+cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 --format csv
+
+# Example: Convert multiple PMIDs
+cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 33515491
+
+# Debug CLI with verbose logging
+RUST_LOG=debug cargo run -p pubmed-cli -- pmid-to-pmcid 31978945
+
+# Use API key for higher rate limits
+cargo run -p pubmed-cli -- --api-key YOUR_API_KEY pmid-to-pmcid 31978945
+
+# Specify email and tool name
+cargo run -p pubmed-cli -- --email you@example.com --tool MyApp pmid-to-pmcid 31978945
+```
+
 #### mise Commands (if available)
 
 Using `mise` for task management (configured in `.mise.toml`):
