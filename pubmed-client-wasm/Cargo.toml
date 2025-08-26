@@ -28,6 +28,7 @@ wee_alloc = "0.4"
 
 # Required for WASM target
 getrandom = { version = "0.2", features = ["js"] }
+uuid = { version = "1.17", features = ["js"] }
 
 # Re-export some core dependencies for WASM use
 anyhow = { workspace = true }
