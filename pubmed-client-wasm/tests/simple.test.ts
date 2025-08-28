@@ -27,6 +27,13 @@ describe('WASM Client Basic Tests', () => {
       client.free()
     })
 
+    it('should create test client successfully', () => {
+      const client = WasmPubMedClient.new_for_testing()
+      expect(client).toBeDefined()
+      expect(typeof client.search_articles).toBe('function')
+      client.free()
+    })
+
     it('should create client with config successfully', () => {
       const config = new WasmClientConfig()
       config.email = 'test@example.com'
@@ -42,7 +49,7 @@ describe('WASM Client Basic Tests', () => {
 
   describe('Search Articles', () => {
     it('should search articles successfully', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       const articles = await client.search_articles('covid-19', 2)
 
@@ -59,7 +66,7 @@ describe('WASM Client Basic Tests', () => {
     })
 
     it('should handle empty query', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       try {
         await client.search_articles('', 5)
@@ -74,10 +81,7 @@ describe('WASM Client Basic Tests', () => {
 
   describe('Fetch Article', () => {
     it('should fetch article by PMID successfully', async () => {
-      const client = new WasmPubMedClient()
-
-      // Add delay to prevent rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500))
+      const client = WasmPubMedClient.new_for_testing()
 
       const article = await client.fetch_article('31978945')
 
@@ -91,7 +95,7 @@ describe('WASM Client Basic Tests', () => {
     })
 
     it('should fail with invalid PMID', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       await expect(client.fetch_article('invalid_pmid')).rejects.toThrow()
 
@@ -101,7 +105,7 @@ describe('WASM Client Basic Tests', () => {
 
   describe('Check PMC Availability', () => {
     it('should check PMC availability successfully', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       const pmcId = await client.check_pmc_availability('31978945')
 
@@ -117,7 +121,7 @@ describe('WASM Client Basic Tests', () => {
     })
 
     it('should handle invalid PMID for PMC check', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       await expect(client.check_pmc_availability('invalid_pmid')).rejects.toThrow()
 
@@ -127,7 +131,7 @@ describe('WASM Client Basic Tests', () => {
 
   describe('Fetch Full Text', () => {
     it('should fetch full text successfully', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       const fullText = await client.fetch_full_text('PMC7092803')
 
@@ -140,7 +144,7 @@ describe('WASM Client Basic Tests', () => {
     })
 
     it('should fail with invalid PMC ID', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       await expect(client.fetch_full_text('invalid_pmc')).rejects.toThrow()
 
@@ -150,7 +154,7 @@ describe('WASM Client Basic Tests', () => {
 
   describe('Convert to Markdown', () => {
     it('should convert full text to markdown successfully', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       const fullText = await client.fetch_full_text('PMC7092803')
       const markdown = client.convert_to_markdown(fullText)
@@ -163,7 +167,7 @@ describe('WASM Client Basic Tests', () => {
     })
 
     it('should fail with invalid full text object', () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       expect(() => {
         client.convert_to_markdown(null as any)
@@ -175,7 +179,7 @@ describe('WASM Client Basic Tests', () => {
 
   describe('Get Related Articles', () => {
     it('should get related articles successfully', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       const pmids = new Uint32Array([31978945, 33515491])
 
@@ -196,7 +200,7 @@ describe('WASM Client Basic Tests', () => {
     })
 
     it('should handle empty PMID array', async () => {
-      const client = new WasmPubMedClient()
+      const client = WasmPubMedClient.new_for_testing()
 
       const emptyArray = new Uint32Array([])
 

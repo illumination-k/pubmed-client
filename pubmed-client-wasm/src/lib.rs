@@ -121,10 +121,16 @@ impl Default for WasmPubMedClient {
 #[wasm_bindgen]
 impl WasmPubMedClient {
     /// Create a new client with default configuration
+    /// Uses a conservative rate limit of 1 request per second for testing
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
+        // Use a conservative rate limit for WASM environments to avoid 429 errors
+        let config = ClientConfig::new()
+            .with_rate_limit(1.0) // 1 request per second
+            .with_tool("pubmed-client-wasm");
+
         Self {
-            client: Client::new(),
+            client: Client::with_config(config),
         }
     }
 
@@ -134,6 +140,18 @@ impl WasmPubMedClient {
         let client_config: ClientConfig = config.into();
         Self {
             client: Client::with_config(client_config),
+        }
+    }
+
+    /// Create a new client optimized for testing with very conservative rate limits
+    #[wasm_bindgen]
+    pub fn new_for_testing() -> Self {
+        let config = ClientConfig::new()
+            .with_rate_limit(0.5) // 0.5 requests per second (1 request every 2 seconds)
+            .with_tool("pubmed-client-wasm-test");
+
+        Self {
+            client: Client::with_config(config),
         }
     }
 
