@@ -1,180 +1,290 @@
-use super::xml_utils;
+use crate::error::{PubMedError, Result};
 use crate::pmc::models::{Affiliation, Author};
+use quick_xml::de::from_str;
+use serde::Deserialize;
 
-/// Extract authors from PMC XML content
-pub fn extract_authors(content: &str) -> Vec<Author> {
-    let mut authors = Vec::new();
-
-    if let Some(contrib_start) = content.find("<contrib-group>") {
-        if let Some(contrib_end) = content[contrib_start..].find("</contrib-group>") {
-            let contrib_section = &content[contrib_start..contrib_start + contrib_end];
-
-            let mut pos = 0;
-            while let Some(contrib_start) = contrib_section[pos..].find("<contrib") {
-                let contrib_start = pos + contrib_start;
-                if let Some(contrib_end) = contrib_section[contrib_start..].find("</contrib>") {
-                    let contrib_end = contrib_start + contrib_end;
-                    let contrib_content = &contrib_section[contrib_start..contrib_end];
-
-                    if let Some(author) = parse_single_author(contrib_content) {
-                        authors.push(author);
-                    }
-
-                    pos = contrib_end;
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-
-    authors
+/// XML structure for contrib-group element
+#[derive(Debug, Deserialize)]
+#[serde(rename = "contrib-group")]
+struct ContribGroup {
+    #[serde(rename = "contrib", default)]
+    contribs: Vec<Contrib>,
 }
 
-/// Parse a single author from contrib XML
-fn parse_single_author(contrib_content: &str) -> Option<Author> {
-    let surname = xml_utils::extract_text_between(contrib_content, "<surname>", "</surname>");
-    let given_names =
-        xml_utils::extract_text_between(contrib_content, "<given-names>", "</given-names>")
-            .or_else(|| {
-                // Handle self-closing given-names tag
-                if let Some(start) = contrib_content.find("<given-names") {
-                    if let Some(end) = contrib_content[start..].find(">") {
-                        let tag_content = &contrib_content[start..start + end + 1];
-                        if tag_content.contains("/>") {
-                            return None; // Self-closing tag with no content
-                        }
-                    }
-                }
-                None
-            });
+/// XML structure for contrib element
+#[derive(Debug, Deserialize)]
+struct Contrib {
+    #[serde(rename = "@corresp", default)]
+    corresp: Option<String>,
 
-    let mut author = Author::with_names(given_names, surname);
+    #[serde(rename = "contrib-id", default)]
+    contrib_ids: Vec<ContribId>,
+
+    #[serde(rename = "name", default)]
+    name: Option<Name>,
+
+    #[serde(rename = "email", default)]
+    email: Option<String>,
+
+    #[serde(rename = "role", default)]
+    roles: Vec<String>,
+
+    #[serde(rename = "xref", default)]
+    xrefs: Vec<Xref>,
+
+    #[serde(rename = "aff", default)]
+    affs: Vec<Aff>,
+}
+
+/// XML structure for contrib-id element
+#[derive(Debug, Deserialize)]
+struct ContribId {
+    #[serde(rename = "@contrib-id-type")]
+    contrib_id_type: Option<String>,
+
+    #[serde(rename = "$text")]
+    value: Option<String>,
+}
+
+/// XML structure for name element
+#[derive(Debug, Deserialize)]
+struct Name {
+    #[serde(rename = "surname", default)]
+    surname: Option<String>,
+
+    #[serde(rename = "given-names", default)]
+    given_names: Option<String>,
+}
+
+/// XML structure for xref element
+#[derive(Debug, Deserialize)]
+struct Xref {
+    #[serde(rename = "@ref-type")]
+    ref_type: Option<String>,
+
+    #[serde(rename = "@rid")]
+    rid: Option<String>,
+}
+
+/// XML structure for aff element
+#[derive(Debug, Deserialize)]
+struct Aff {
+    #[serde(rename = "@id")]
+    id: Option<String>,
+
+    #[serde(rename = "$text")]
+    text: Option<String>,
+}
+
+/// XML structure for element-citation or mixed-citation
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+struct Citation {
+    #[serde(rename = "person-group", default)]
+    person_groups: Vec<PersonGroup>,
+    #[serde(rename = "name", default)]
+    names: Vec<Name>,
+}
+
+/// XML structure for person-group element
+#[derive(Debug, Deserialize)]
+#[serde(rename = "person-group")]
+struct PersonGroup {
+    #[serde(rename = "@person-group-type")]
+    _group_type: Option<String>,
+    #[serde(rename = "name", default)]
+    names: Vec<Name>,
+}
+
+/// Extract authors from PMC XML content
+pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
+    // Find and extract the contrib-group section
+    if let Some(contrib_start) = content.find("<contrib-group>") {
+        if let Some(contrib_end) = content[contrib_start..].find("</contrib-group>") {
+            let contrib_section =
+                &content[contrib_start..contrib_start + contrib_end + "</contrib-group>".len()];
+
+            // Try to deserialize the contrib-group
+            match from_str::<ContribGroup>(contrib_section) {
+                Ok(contrib_group) => {
+                    let authors = contrib_group
+                        .contribs
+                        .into_iter()
+                        .filter_map(parse_contrib_to_author)
+                        .collect();
+                    Ok(authors)
+                }
+                Err(e) => Err(PubMedError::XmlError(format!(
+                    "Failed to parse contrib-group XML: {}",
+                    e
+                ))),
+            }
+        } else {
+            Err(PubMedError::XmlError(
+                "Found contrib-group start tag but no matching end tag".to_string(),
+            ))
+        }
+    } else {
+        // No contrib-group found - return empty vector as success
+        Ok(Vec::new())
+    }
+}
+
+/// Convert a Contrib to an Author
+fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
+    let name = contrib.name?;
+
+    let mut author = Author::with_names(name.given_names.clone(), name.surname.clone());
 
     // Extract ORCID from contrib-id tags
-    let contrib_id_tags = xml_utils::find_all_tags(contrib_content, "contrib-id");
-    for tag in contrib_id_tags {
-        if tag.contains("contrib-id-type=\"orcid\"") || tag.contains("https://orcid.org/") {
-            if let Some(orcid_content) = xml_utils::extract_element_content(&tag, "contrib-id") {
-                let clean_orcid = xml_utils::strip_xml_tags(&orcid_content);
-                if clean_orcid.contains("https://orcid.org/") {
-                    author.orcid = Some(clean_orcid.trim().to_string());
-                    break;
+    for contrib_id in &contrib.contrib_ids {
+        if let Some(id_type) = &contrib_id.contrib_id_type {
+            if id_type == "orcid" {
+                if let Some(value) = &contrib_id.value {
+                    let clean_orcid = value.trim();
+                    if clean_orcid.contains("orcid.org") || !clean_orcid.is_empty() {
+                        author.orcid = Some(clean_orcid.to_string());
+                        break;
+                    }
                 }
             }
         }
     }
 
-    // Extract email
-    author.email = xml_utils::extract_text_between(contrib_content, "<email", "</email>").and_then(
-        |email_content| {
-            // Extract actual email from the tag content
-            email_content
-                .find(">")
-                .map(|start| email_content[start + 1..].to_string())
-        },
-    );
+    // Set email
+    author.email = contrib.email.map(|e| e.trim().to_string());
 
-    // Check if corresponding author
-    author.is_corresponding = contrib_content.contains("corresp=\"yes\"");
+    // Set corresponding author flag
+    author.is_corresponding = contrib.corresp.map(|c| c == "yes").unwrap_or(false);
 
-    // Extract roles
-    let mut roles = Vec::new();
-    let mut pos = 0;
-    while let Some(role_start) = contrib_content[pos..].find("<role") {
-        let role_start = pos + role_start;
-        if let Some(role_end) = contrib_content[role_start..].find("</role>") {
-            let role_end = role_start + role_end;
-            let role_section = &contrib_content[role_start..role_end];
+    // Set roles
+    author.roles = contrib
+        .roles
+        .into_iter()
+        .map(|r| r.trim().to_string())
+        .filter(|r| !r.is_empty())
+        .collect();
 
-            if let Some(content_start) = role_section.find(">") {
-                let role_content = &role_section[content_start + 1..];
-                if !role_content.trim().is_empty() {
-                    roles.push(role_content.trim().to_string());
+    // Extract affiliations from xrefs
+    let mut affiliations = Vec::new();
+
+    // Process xref affiliations
+    for xref in &contrib.xrefs {
+        if let Some(ref_type) = &xref.ref_type {
+            if ref_type == "aff" {
+                if let Some(rid) = &xref.rid {
+                    affiliations.push(Affiliation {
+                        id: Some(rid.clone()),
+                        institution: rid.clone(), // Use rid as institution for now
+                        department: None,
+                        address: None,
+                        country: None,
+                    });
                 }
             }
-
-            pos = role_end;
-        } else {
-            break;
         }
     }
 
-    author.roles = roles;
+    // Process direct affiliations
+    for aff in &contrib.affs {
+        if let Some(text) = &aff.text {
+            let clean_text = text.trim();
+            if !clean_text.is_empty() {
+                affiliations.push(Affiliation {
+                    id: aff.id.clone(),
+                    institution: clean_text.to_string(),
+                    department: None,
+                    address: None,
+                    country: None,
+                });
+            }
+        }
+    }
 
-    // Extract affiliations
-    author.affiliations = extract_affiliations(contrib_content);
+    author.affiliations = affiliations;
 
     Some(author)
 }
 
-/// Extract affiliations from author contribution content
-fn extract_affiliations(contrib_content: &str) -> Vec<Affiliation> {
-    let mut affiliations = Vec::new();
-
-    // Look for xref elements that reference affiliations
-    let xref_tags = xml_utils::find_all_tags(contrib_content, "xref");
-    for xref_tag in xref_tags {
-        if xref_tag.contains("ref-type=\"aff\"") {
-            if let Some(rid) = xml_utils::extract_attribute_value(&xref_tag, "rid") {
-                let affiliation = Affiliation {
-                    id: Some(rid.clone()),
-                    institution: rid, // Use rid as institution for now
-                    department: None,
-                    address: None,
-                    country: None,
-                };
-                affiliations.push(affiliation);
-            }
-        }
-    }
-
-    // Also look for direct affiliation content
-    let aff_tags = xml_utils::find_all_tags(contrib_content, "aff");
-    for aff_tag in aff_tags {
-        if let Some(aff_content) = xml_utils::extract_element_content(&aff_tag, "aff") {
-            let clean_aff = xml_utils::strip_xml_tags(&aff_content);
-            if !clean_aff.trim().is_empty() {
-                let affiliation = Affiliation {
-                    id: xml_utils::extract_attribute_value(&aff_tag, "id"),
-                    institution: clean_aff.trim().to_string(),
-                    department: None,
-                    address: None,
-                    country: None,
-                };
-                affiliations.push(affiliation);
-            }
-        }
-    }
-
-    affiliations
-}
-
 /// Extract authors from reference sections
-pub fn extract_reference_authors(ref_content: &str) -> Vec<Author> {
+pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
     let mut authors = Vec::new();
 
-    let mut pos = 0;
-    while let Some(name_start) = ref_content[pos..].find("<name>") {
-        let name_start = pos + name_start;
-        if let Some(name_end) = ref_content[name_start..].find("</name>") {
-            let name_end = name_start + name_end;
-            let name_content = &ref_content[name_start..name_end];
-
-            let surname = xml_utils::extract_text_between(name_content, "<surname>", "</surname>");
-            let given_names =
-                xml_utils::extract_text_between(name_content, "<given-names>", "</given-names>");
-
-            let author = Author::with_names(given_names, surname);
-            authors.push(author);
-
-            pos = name_end;
-        } else {
-            break;
+    // Try to parse as element-citation
+    if ref_content.contains("<element-citation") {
+        if let Some(start) = ref_content.find("<element-citation") {
+            if let Some(end) = ref_content[start..].find("</element-citation>") {
+                let citation_content =
+                    &ref_content[start..start + end + "</element-citation>".len()];
+                match from_str::<Citation>(citation_content) {
+                    Ok(citation) => {
+                        // Extract names from person-groups first
+                        for person_group in citation.person_groups {
+                            for name in person_group.names {
+                                authors.push(Author::with_names(name.given_names, name.surname));
+                            }
+                        }
+                        // Also check for direct names (without person-group wrapper)
+                        for name in citation.names {
+                            authors.push(Author::with_names(name.given_names, name.surname));
+                        }
+                        if !authors.is_empty() {
+                            return Ok(authors);
+                        }
+                    }
+                    Err(e) => {
+                        return Err(PubMedError::XmlError(format!(
+                            "Failed to parse element-citation XML: {}",
+                            e
+                        )));
+                    }
+                }
+            } else {
+                return Err(PubMedError::XmlError(
+                    "Found element-citation start tag but no matching end tag".to_string(),
+                ));
+            }
         }
     }
 
-    authors
+    // Try to parse as mixed-citation
+    if ref_content.contains("<mixed-citation") {
+        if let Some(start) = ref_content.find("<mixed-citation") {
+            if let Some(end) = ref_content[start..].find("</mixed-citation>") {
+                let citation_content = &ref_content[start..start + end + "</mixed-citation>".len()];
+                match from_str::<Citation>(citation_content) {
+                    Ok(citation) => {
+                        // Extract names from person-groups first
+                        for person_group in citation.person_groups {
+                            for name in person_group.names {
+                                authors.push(Author::with_names(name.given_names, name.surname));
+                            }
+                        }
+                        // Also check for direct names (without person-group wrapper)
+                        for name in citation.names {
+                            authors.push(Author::with_names(name.given_names, name.surname));
+                        }
+                        if !authors.is_empty() {
+                            return Ok(authors);
+                        }
+                    }
+                    Err(e) => {
+                        return Err(PubMedError::XmlError(format!(
+                            "Failed to parse mixed-citation XML: {}",
+                            e
+                        )));
+                    }
+                }
+            } else {
+                return Err(PubMedError::XmlError(
+                    "Found mixed-citation start tag but no matching end tag".to_string(),
+                ));
+            }
+        }
+    }
+
+    // No citations found or no authors in citations - return empty vector as success
+    Ok(authors)
 }
 
 #[cfg(test)]
@@ -196,7 +306,7 @@ mod tests {
         </contrib-group>
         "#;
 
-        let authors = extract_authors(content);
+        let authors = extract_authors(content).unwrap();
         assert_eq!(authors.len(), 1);
         assert_eq!(authors[0].surname, Some("Doe".to_string()));
         assert_eq!(authors[0].given_names, Some("John".to_string()));
@@ -220,7 +330,7 @@ mod tests {
         </element-citation>
         "#;
 
-        let authors = extract_reference_authors(content);
+        let authors = extract_reference_authors(content).unwrap();
         assert_eq!(authors.len(), 2);
         assert_eq!(authors[0].surname, Some("Johnson".to_string()));
         assert_eq!(authors[0].given_names, Some("Alice".to_string()));
@@ -243,7 +353,7 @@ mod tests {
         </contrib-group>
         "#;
 
-        let authors = extract_authors(content);
+        let authors = extract_authors(content).unwrap();
         assert_eq!(authors.len(), 1);
         assert_eq!(authors[0].surname, Some("Doe".to_string()));
         assert_eq!(authors[0].given_names, Some("John".to_string()));
@@ -267,7 +377,7 @@ mod tests {
         </contrib-group>
         "#;
 
-        let authors = extract_authors(content);
+        let authors = extract_authors(content).unwrap();
         assert_eq!(authors.len(), 1);
         assert_eq!(authors[0].surname, Some("Smith".to_string()));
         assert_eq!(authors[0].given_names, Some("Jane".to_string()));
@@ -305,7 +415,7 @@ mod tests {
         </contrib-group>
         "#;
 
-        let authors = extract_authors(content);
+        let authors = extract_authors(content).unwrap();
         assert_eq!(authors.len(), 3);
 
         // First author with ORCID

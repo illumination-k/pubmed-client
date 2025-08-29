@@ -44,7 +44,8 @@
 //!
 //!     for article in articles {
 //!         println!("Title: {}", article.title);
-//!         println!("Authors: {}", article.authors.join(", "));
+//!         let author_names: Vec<&str> = article.authors.iter().map(|a| a.full_name.as_str()).collect();
+//!         println!("Authors: {}", author_names.join(", "));
 //!     }
 //!
 //!     Ok(())
@@ -182,19 +183,15 @@
 //!
 //! ```no_run
 //! use pubmed_client_rs::{PmcClient, ClientConfig};
-//! use pubmed_client_rs::cache::{CacheConfig, CacheBackend, MemoryCacheConfig, HybridCacheConfig};
+//! use pubmed_client_rs::cache::CacheConfig;
 //! use std::time::Duration;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     // Memory-only cache with custom settings
+//!     // Memory cache with custom settings
 //!     let cache_config = CacheConfig {
-//!         backend: CacheBackend::Memory(MemoryCacheConfig {
-//!             max_capacity: 5000,
-//!             time_to_live: Duration::from_secs(24 * 60 * 60), // 24 hours
-//!         }),
-//!         pmc_ttl: Duration::from_secs(7 * 24 * 60 * 60), // 7 days
-//!         search_ttl: Duration::from_secs(60 * 60), // 1 hour
+//!         max_capacity: 5000,
+//!         time_to_live: Duration::from_secs(24 * 60 * 60), // 24 hours
 //!     };
 //!
 //!     let config = ClientConfig::new()
@@ -214,29 +211,23 @@
 //! #[cfg(not(target_arch = "wasm32"))]
 //! {
 //! use pubmed_client_rs::{PmcClient, ClientConfig};
-//! use pubmed_client_rs::cache::{CacheConfig, CacheBackend, MemoryCacheConfig, HybridCacheConfig};
+//! use pubmed_client_rs::cache::CacheConfig;
 //! use std::time::Duration;
 //! use std::path::PathBuf;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     // Hybrid cache with memory and disk storage
+//!     // Memory cache configuration
 //!     let cache_config = CacheConfig {
-//!         backend: CacheBackend::Hybrid(HybridCacheConfig {
-//!             memory_config: MemoryCacheConfig {
-//!                 max_capacity: 1000,
-//!                 time_to_live: Duration::from_secs(24 * 60 * 60),
-//!             },
-//!             disk_cache_dir: Some(PathBuf::from("./pmc_cache")),
-//!         }),
-//!         ..Default::default()
+//!         max_capacity: 1000,
+//!         time_to_live: Duration::from_secs(24 * 60 * 60),
 //!     };
 //!
 //!     let config = ClientConfig::new()
 //!         .with_cache_config(cache_config);
 //!     let client = PmcClient::with_config(config);
 //!
-//!     // Articles are cached in memory and persisted to disk
+//!     // Articles are cached in memory
 //!     let article = client.fetch_full_text("PMC7906746").await?;
 //!
 //!     Ok(())
@@ -259,9 +250,8 @@
 //!     client.fetch_full_text("PMC10618641").await?;
 //!
 //!     // Check cache statistics
-//!     let stats = client.cache_stats();
-//!     println!("Cached items: {} in memory, {} on disk",
-//!         stats.memory_items, stats.disk_items);
+//!     let count = client.cache_entry_count();
+//!     println!("Cached items: {}", count);
 //!
 //!     // Clear the cache when needed
 //!     client.clear_cache().await;

@@ -73,7 +73,7 @@ fn parse_detailed_reference(ref_content: &str, id: String) -> Reference {
         xml_utils::extract_text_between(ref_content, "<pub-id pub-id-type=\"pmid\">", "</pub-id>");
 
     // Extract authors
-    reference.authors = author::extract_reference_authors(ref_content);
+    reference.authors = author::extract_reference_authors(ref_content).unwrap_or_default();
 
     // Determine reference type
     if ref_content.contains("<element-citation publication-type") {
