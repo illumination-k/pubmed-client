@@ -242,13 +242,19 @@ RUST_LOG=trace cargo test       # All tracing output
 - `src/lib.rs` - Main library entry point, re-exports public API and unified `Client`
 - `src/pubmed/` - PubMed module directory
   - `client.rs` - PubMed API client for article metadata search and ELink API
-  - `parser.rs` - XML parsing logic for PubMed article metadata
+  - `parser.rs` - XML parsing module functions for PubMed article metadata (refactored from empty struct)
   - `models.rs` - Data structures for PubMed articles, ELink results
   - `responses.rs` - Internal API response structures for JSON/XML parsing
   - `mod.rs` - Module exports and public API
 - `src/pmc/` - PMC module directory
   - `client.rs` - PMC client for full-text article access
-  - `parser.rs` - XML parsing logic for PMC content
+  - `parser/` - XML parsing modules for PMC content (refactored to module functions)
+    - `mod.rs` - Main parser module with `parse_pmc_xml()` function
+    - `author.rs` - Author extraction functions
+    - `metadata.rs` - Metadata extraction functions
+    - `reference.rs` - Reference extraction functions
+    - `section.rs` - Section parsing functions
+    - `xml_utils.rs` - XML utility functions
   - `models.rs` - Data structures for PMC articles
   - `markdown.rs` - Converter from PMC XML to Markdown format
 - `src/pubmed/query/` - Advanced query builder system with filters, date ranges, boolean logic
@@ -297,6 +303,7 @@ The WASM package provides JavaScript/TypeScript bindings for the core Rust libra
 - Async/await using tokio runtime
 - Builder pattern for search queries (`SearchQuery`)
 - Result<T> type alias for error handling
+- Module functions instead of empty structs for parsers (clean functional design)
 - Separation of metadata (PubMed) and full-text (PMC) concerns
 - ELink API integration for discovering article relationships (related articles, citations, PMC links)
 - Support for custom HTTP clients via reqwest
@@ -305,6 +312,13 @@ The WASM package provides JavaScript/TypeScript bindings for the core Rust libra
 - Structured logging with tracing for debugging and monitoring
 - Rate limiting with token bucket algorithm for NCBI API compliance
 - Configurable API keys, email, and tool identification for NCBI guidelines
+
+**Parser Design Philosophy:**
+The parsers have been refactored from empty structs with static methods to module functions, following Rust's idiomatic patterns. This eliminates unnecessary type definitions while maintaining clear module boundaries and namespacing. Key parser functions include:
+
+- `parse_article_from_xml()` - Main PubMed XML parser
+- `parse_pmc_xml()` - Main PMC XML parser
+- Module-specific extraction functions (e.g., `extract_authors()`, `extract_references()`)
 
 ### Testing
 
