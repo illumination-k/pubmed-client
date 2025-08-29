@@ -16,5 +16,5 @@ pub use models::{
     MeshHeading, MeshQualifier, MeshTerm, PmcLinks, PubMedArticle, RelatedArticles,
     SupplementalConcept,
 };
-pub use parser::PubMedXmlParser;
+pub use parser::parse_article_from_xml;
 pub use query::{ArticleType, Language, PubDate, SearchQuery};

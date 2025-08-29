@@ -5,7 +5,7 @@ use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
     Citations, DatabaseInfo, FieldInfo, LinkInfo, PmcLinks, PubMedArticle, RelatedArticles,
 };
-use crate::pubmed::parser::PubMedXmlParser;
+use crate::pubmed::parser::parse_article_from_xml;
 use crate::pubmed::responses::{EInfoResponse, ELinkResponse, ESearchResult};
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -224,7 +224,7 @@ impl PubMedClient {
         debug!("Received successful API response, parsing XML");
         let xml_text = response.text().await?;
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_text, pmid);
+        let result = parse_article_from_xml(&xml_text, pmid);
         match &result {
             Ok(article) => {
                 info!(

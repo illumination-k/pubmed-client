@@ -7,64 +7,54 @@ pub mod reference;
 pub mod section;
 pub mod xml_utils;
 
-pub use author::AuthorParser;
-pub use metadata::MetadataParser;
-pub use reference::ReferenceParser;
-pub use section::SectionParser;
+/// Parse PMC XML content into structured data
+///
+/// This function acts as a coordinator that delegates parsing tasks
+/// to specialized parser modules for better maintainability and separation of concerns.
+pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
+    // Delegate to specialized parsers for clean separation of concerns
 
-/// XML parser for PMC articles
-pub struct PmcXmlParser;
+    // Extract metadata using metadata module functions
+    let title = metadata::extract_title(xml_content);
+    let journal = metadata::extract_journal_info(xml_content);
+    let pub_date = metadata::extract_pub_date(xml_content);
+    let doi = metadata::extract_doi(xml_content);
+    let pmid = metadata::extract_pmid(xml_content);
+    let article_type = metadata::extract_article_type(xml_content);
+    let keywords = metadata::extract_keywords(xml_content);
+    let funding = metadata::extract_funding(xml_content);
+    let conflict_of_interest = metadata::extract_conflict_of_interest(xml_content);
+    let acknowledgments = metadata::extract_acknowledgments(xml_content);
+    let data_availability = metadata::extract_data_availability(xml_content);
+    let supplementary_materials = metadata::extract_supplementary_materials(xml_content);
 
-impl PmcXmlParser {
-    /// Parse PMC XML content into structured data
-    ///
-    /// This method acts as a coordinator that delegates parsing tasks
-    /// to specialized parser modules for better maintainability and separation of concerns.
-    pub fn parse(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
-        // Delegate to specialized parsers for clean separation of concerns
+    // Extract authors
+    let authors = author::extract_authors(xml_content);
 
-        // Extract metadata using MetadataParser
-        let title = MetadataParser::extract_title(xml_content);
-        let journal = MetadataParser::extract_journal_info(xml_content);
-        let pub_date = MetadataParser::extract_pub_date(xml_content);
-        let doi = MetadataParser::extract_doi(xml_content);
-        let pmid = MetadataParser::extract_pmid(xml_content);
-        let article_type = MetadataParser::extract_article_type(xml_content);
-        let keywords = MetadataParser::extract_keywords(xml_content);
-        let funding = MetadataParser::extract_funding(xml_content);
-        let conflict_of_interest = MetadataParser::extract_conflict_of_interest(xml_content);
-        let acknowledgments = MetadataParser::extract_acknowledgments(xml_content);
-        let data_availability = MetadataParser::extract_data_availability(xml_content);
-        let supplementary_materials = MetadataParser::extract_supplementary_materials(xml_content);
+    // Extract sections using section module functions
+    let sections = section::extract_sections_enhanced(xml_content);
 
-        // Extract authors using AuthorParser
-        let authors = AuthorParser::extract_authors(xml_content);
+    // Extract references using reference module functions
+    let references = reference::extract_references_detailed(xml_content);
 
-        // Extract sections using SectionParser
-        let sections = SectionParser::extract_sections_enhanced(xml_content);
-
-        // Extract references using ReferenceParser
-        let references = ReferenceParser::extract_references_detailed(xml_content);
-
-        Ok(PmcFullText {
-            pmcid: pmcid.to_string(),
-            pmid,
-            title,
-            authors,
-            journal,
-            pub_date,
-            doi,
-            sections,
-            references,
-            article_type,
-            keywords,
-            funding,
-            conflict_of_interest,
-            acknowledgments,
-            data_availability,
-            supplementary_materials,
-        })
-    }
+    Ok(PmcFullText {
+        pmcid: pmcid.to_string(),
+        pmid,
+        title,
+        authors,
+        journal,
+        pub_date,
+        doi,
+        sections,
+        references,
+        article_type,
+        keywords,
+        funding,
+        conflict_of_interest,
+        acknowledgments,
+        data_availability,
+        supplementary_materials,
+    })
 }
 
 #[cfg(test)]
@@ -116,7 +106,7 @@ mod tests {
         </article>
         "#;
 
-        let result = PmcXmlParser::parse(xml_content, "PMC123456");
+        let result = parse_pmc_xml(xml_content, "PMC123456");
         assert!(result.is_ok());
 
         let article = result.unwrap();
@@ -143,7 +133,7 @@ mod tests {
         </article>
         "#;
 
-        let result = PmcXmlParser::parse(xml_content, "PMC000000");
+        let result = parse_pmc_xml(xml_content, "PMC000000");
         assert!(result.is_ok());
 
         let article = result.unwrap();
@@ -153,8 +143,8 @@ mod tests {
 
     // Note: Most detailed tests have been moved to the individual parser modules:
     // - AuthorParser tests in author_parser.rs
-    // - SectionParser tests in section_parser.rs
-    // - ReferenceParser tests in reference_parser.rs
-    // - MetadataParser tests in metadata_parser.rs
+    // - section module functions tests in section.rs
+    // - reference module functions tests in reference.rs
+    // - metadata module functions tests in metadata.rs
     // - XmlUtils tests in xml_utils.rs
 }
