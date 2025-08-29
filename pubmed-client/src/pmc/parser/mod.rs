@@ -29,7 +29,7 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
     let supplementary_materials = metadata::extract_supplementary_materials(xml_content);
 
     // Extract authors
-    let authors = author::extract_authors(xml_content);
+    let authors = author::extract_authors(xml_content)?;
 
     // Extract sections using section module functions
     let sections = section::extract_sections_enhanced(xml_content);
