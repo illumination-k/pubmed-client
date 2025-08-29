@@ -126,7 +126,7 @@ mod tests {
     #[test]
     fn test_pmc7906746_figure_extraction() {
         println!("🔍 Starting PMC7906746 figure extraction debug test");
-        use pubmed_client_rs::pmc::parser::PmcXmlParser;
+        use pubmed_client_rs::pmc::parser::parse_pmc_xml;
         use std::fs;
 
         // Read the XML content we downloaded
@@ -139,7 +139,7 @@ mod tests {
         };
 
         // Parse using the library
-        let result = PmcXmlParser::parse(&xml_content, "PMC7906746");
+        let result = parse_pmc_xml(&xml_content, "PMC7906746");
         assert!(
             result.is_ok(),
             "Failed to parse PMC7906746 XML: {:?}",

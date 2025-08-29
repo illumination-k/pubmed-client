@@ -16,5 +16,5 @@ pub use models::{
     Affiliation, ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcFullText, Reference,
     Table,
 };
-pub use parser::PmcXmlParser;
+pub use parser::parse_pmc_xml;
 pub use tar::PmcTarClient;

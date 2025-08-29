@@ -283,14 +283,14 @@ pub mod time;
 pub use config::ClientConfig;
 pub use error::{PubMedError, Result};
 pub use pmc::{
-    models::ExtractedFigure, Affiliation, ArticleSection, Author, Figure, FundingInfo,
-    HeadingStyle, JournalInfo, MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter,
-    PmcTarClient, PmcXmlParser, Reference, ReferenceStyle, Table,
+    models::ExtractedFigure, parse_pmc_xml, Affiliation, ArticleSection, Author, Figure,
+    FundingInfo, HeadingStyle, JournalInfo, MarkdownConfig, PmcClient, PmcFullText,
+    PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Table,
 };
 pub use pubmed::{
-    Affiliation as PubMedAffiliation, ArticleType, Author as PubMedAuthor, Citations, DatabaseInfo,
-    FieldInfo, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient, RelatedArticles,
-    SearchQuery,
+    parse_article_from_xml, Affiliation as PubMedAffiliation, ArticleType, Author as PubMedAuthor,
+    Citations, DatabaseInfo, FieldInfo, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient,
+    RelatedArticles, SearchQuery,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{sleep, Duration, Instant};

@@ -3,7 +3,7 @@ use std::{path::Path, str, time::Duration};
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pmc::models::{ArticleSection, ExtractedFigure, Figure, PmcFullText};
-use crate::pmc::parser::PmcXmlParser;
+use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
 use reqwest::{Client, Response};
@@ -313,7 +313,7 @@ impl PmcTarClient {
 
         // First, fetch the XML to get figure captions
         let xml_content = self.fetch_xml(&normalized_pmcid).await?;
-        let full_text = PmcXmlParser::parse(&xml_content, &normalized_pmcid)?;
+        let full_text = parse_pmc_xml(&xml_content, &normalized_pmcid)?;
 
         // Extract the tar.gz file
         let extracted_files = self
