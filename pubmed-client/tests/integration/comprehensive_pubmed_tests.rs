@@ -2,7 +2,7 @@ use rstest::*;
 use tracing::{debug, info, warn};
 use tracing_test::traced_test;
 
-use pubmed_client_rs::pubmed::parser::PubMedXmlParser;
+use pubmed_client_rs::pubmed::parser::parse_article_from_xml;
 
 mod common;
 use common::{pubmed_xml_test_cases, PubMedXmlTestCase};
@@ -51,7 +51,7 @@ fn test_comprehensive_pubmed_parsing(#[from(xml_test_cases)] test_cases: Vec<Pub
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_content, &test_case.pmid);
+        let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
         match result {
             Ok(article) => {
@@ -148,7 +148,7 @@ fn test_pubmed_parsing_statistics(#[from(xml_test_cases)] test_cases: Vec<PubMed
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_content, &test_case.pmid);
+        let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
         if let Ok(article) = result {
             successful_parses += 1;
@@ -237,7 +237,7 @@ fn test_pubmed_article_metadata(#[from(xml_test_cases)] test_cases: Vec<PubMedXm
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_content, &test_case.pmid);
+        let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
         if let Ok(article) = result {
             // Title validation
@@ -297,7 +297,7 @@ fn test_pubmed_mesh_term_extraction(#[from(xml_test_cases)] test_cases: Vec<PubM
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_content, &test_case.pmid);
+        let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
         if let Ok(article) = result {
             if let Some(mesh_headings) = &article.mesh_headings {
@@ -416,7 +416,7 @@ fn test_pubmed_abstract_analysis(#[from(xml_test_cases)] test_cases: Vec<PubMedX
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_content, &test_case.pmid);
+        let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
         if let Ok(article) = result {
             if let Some(abstract_text) = &article.abstract_text {
@@ -496,7 +496,7 @@ fn test_pubmed_author_details(#[from(xml_test_cases)] test_cases: Vec<PubMedXmlT
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_content, &test_case.pmid);
+        let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
         if let Ok(article) = result {
             articles_analyzed += 1;
@@ -554,7 +554,7 @@ fn test_pubmed_article_types(#[from(xml_test_cases)] test_cases: Vec<PubMedXmlTe
     for test_case in test_cases.iter() {
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_content, &test_case.pmid);
+        let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
         if let Ok(article) = result {
             for article_type in &article.article_types {
@@ -588,7 +588,7 @@ fn test_pubmed_chemical_substances(#[from(xml_test_cases)] test_cases: Vec<PubMe
     for test_case in test_cases.iter().take(8) {
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PubMedXmlParser::parse_article_from_xml(&xml_content, &test_case.pmid);
+        let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
         if let Ok(article) = result {
             if let Some(chemical_list) = &article.chemical_list {

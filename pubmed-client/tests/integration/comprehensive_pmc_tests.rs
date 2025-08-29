@@ -1,7 +1,7 @@
 use rstest::*;
 use tracing::{debug, info, warn};
 
-use pubmed_client_rs::pmc::PmcXmlParser;
+use pubmed_client_rs::pmc::parse_pmc_xml;
 
 mod common;
 use common::{pmc_xml_test_cases, PmcXmlTestCase};
@@ -45,7 +45,7 @@ fn test_comprehensive_pmc_parsing(#[from(xml_test_cases)] test_cases: Vec<PmcXml
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+        let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
 
         match result {
             Ok(article) => {
@@ -122,7 +122,7 @@ fn test_pmc_parsing_statistics(#[from(xml_test_cases)] test_cases: Vec<PmcXmlTes
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+        let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
 
         if let Ok(article) = result {
             successful_parses += 1;
@@ -188,7 +188,7 @@ fn test_pmc_parsing_author_details(#[from(xml_test_cases)] test_cases: Vec<PmcXm
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+        let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
 
         if let Ok(article) = result {
             for author in &article.authors {
@@ -266,7 +266,7 @@ fn test_pmc_parsing_content_structure(#[from(xml_test_cases)] test_cases: Vec<Pm
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+        let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
 
         if let Ok(article) = result {
             let mut has_figures = false;

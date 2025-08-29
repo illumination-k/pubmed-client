@@ -4,7 +4,7 @@ use crate::cache::{create_cache, PmcCache};
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pmc::models::{ExtractedFigure, PmcFullText};
-use crate::pmc::parser::PmcXmlParser;
+use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
 use reqwest::{Client, Response};
@@ -186,7 +186,7 @@ impl PmcClient {
 
         // Fetch from API if not cached
         let xml_content = self.fetch_xml(pmcid).await?;
-        let full_text = PmcXmlParser::parse(&xml_content, &normalized_pmcid)?;
+        let full_text = parse_pmc_xml(&xml_content, &normalized_pmcid)?;
 
         // Store in cache if available
         if let Some(cache) = &self.cache {

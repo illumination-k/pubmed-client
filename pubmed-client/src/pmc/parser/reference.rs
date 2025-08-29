@@ -1,99 +1,86 @@
-use super::author::AuthorParser;
+use super::author;
 use super::xml_utils;
 use crate::pmc::models::Reference;
 
-/// Parser for extracting reference information from PMC XML content
-pub struct ReferenceParser;
+/// Extract detailed references from ref-list
+pub fn extract_references_detailed(content: &str) -> Vec<Reference> {
+    let mut references = Vec::new();
 
-impl ReferenceParser {
-    /// Extract detailed references from ref-list
-    pub fn extract_references_detailed(content: &str) -> Vec<Reference> {
-        let mut references = Vec::new();
+    if let Some(ref_start) = content.find("<ref-list") {
+        if let Some(ref_end) = content[ref_start..].find("</ref-list>") {
+            let ref_content = &content[ref_start..ref_start + ref_end];
 
-        if let Some(ref_start) = content.find("<ref-list") {
-            if let Some(ref_end) = content[ref_start..].find("</ref-list>") {
-                let ref_content = &content[ref_start..ref_start + ref_end];
+            let mut pos = 0;
+            while let Some(ref_start) = ref_content[pos..].find("<ref id=\"") {
+                let ref_start = pos + ref_start;
+                if let Some(id_end) = ref_content[ref_start + 9..].find('"') {
+                    let id = ref_content[ref_start + 9..ref_start + 9 + id_end].to_string();
 
-                let mut pos = 0;
-                while let Some(ref_start) = ref_content[pos..].find("<ref id=\"") {
-                    let ref_start = pos + ref_start;
-                    if let Some(id_end) = ref_content[ref_start + 9..].find('"') {
-                        let id = ref_content[ref_start + 9..ref_start + 9 + id_end].to_string();
+                    if let Some(ref_end) = ref_content[ref_start..].find("</ref>") {
+                        let ref_section = &ref_content[ref_start..ref_start + ref_end];
 
-                        if let Some(ref_end) = ref_content[ref_start..].find("</ref>") {
-                            let ref_section = &ref_content[ref_start..ref_start + ref_end];
-
-                            let reference = Self::parse_detailed_reference(ref_section, id);
-                            references.push(reference);
-                            pos = ref_start + ref_end;
-                        } else {
-                            break;
-                        }
+                        let reference = parse_detailed_reference(ref_section, id);
+                        references.push(reference);
+                        pos = ref_start + ref_end;
                     } else {
                         break;
                     }
+                } else {
+                    break;
                 }
             }
         }
-
-        references
     }
 
-    /// Parse detailed reference information
-    fn parse_detailed_reference(ref_content: &str, id: String) -> Reference {
-        let mut reference = Reference::new(id);
+    references
+}
 
-        // Extract title
-        reference.title =
-            xml_utils::extract_text_between(ref_content, "<article-title>", "</article-title>");
+/// Parse detailed reference information
+fn parse_detailed_reference(ref_content: &str, id: String) -> Reference {
+    let mut reference = Reference::new(id);
 
-        // Extract journal
-        reference.journal = xml_utils::extract_text_between(ref_content, "<source>", "</source>");
+    // Extract title
+    reference.title =
+        xml_utils::extract_text_between(ref_content, "<article-title>", "</article-title>");
 
-        // Extract year
-        reference.year = xml_utils::extract_text_between(ref_content, "<year>", "</year>");
+    // Extract journal
+    reference.journal = xml_utils::extract_text_between(ref_content, "<source>", "</source>");
 
-        // Extract volume
-        reference.volume = xml_utils::extract_text_between(ref_content, "<volume>", "</volume>");
+    // Extract year
+    reference.year = xml_utils::extract_text_between(ref_content, "<year>", "</year>");
 
-        // Extract issue
-        reference.issue = xml_utils::extract_text_between(ref_content, "<issue>", "</issue>");
+    // Extract volume
+    reference.volume = xml_utils::extract_text_between(ref_content, "<volume>", "</volume>");
 
-        // Extract pages
-        if let Some(fpage) = xml_utils::extract_text_between(ref_content, "<fpage>", "</fpage>") {
-            if let Some(lpage) = xml_utils::extract_text_between(ref_content, "<lpage>", "</lpage>")
-            {
-                reference.pages = Some(format!("{fpage}-{lpage}"));
-            } else {
-                reference.pages = Some(fpage);
-            }
+    // Extract issue
+    reference.issue = xml_utils::extract_text_between(ref_content, "<issue>", "</issue>");
+
+    // Extract pages
+    if let Some(fpage) = xml_utils::extract_text_between(ref_content, "<fpage>", "</fpage>") {
+        if let Some(lpage) = xml_utils::extract_text_between(ref_content, "<lpage>", "</lpage>") {
+            reference.pages = Some(format!("{fpage}-{lpage}"));
+        } else {
+            reference.pages = Some(fpage);
         }
-
-        // Extract DOI
-        reference.doi = xml_utils::extract_text_between(
-            ref_content,
-            "<pub-id pub-id-type=\"doi\">",
-            "</pub-id>",
-        );
-
-        // Extract PMID
-        reference.pmid = xml_utils::extract_text_between(
-            ref_content,
-            "<pub-id pub-id-type=\"pmid\">",
-            "</pub-id>",
-        );
-
-        // Extract authors
-        reference.authors = AuthorParser::extract_reference_authors(ref_content);
-
-        // Determine reference type
-        if ref_content.contains("<element-citation publication-type") {
-            reference.ref_type =
-                xml_utils::extract_attribute_value(ref_content, "publication-type");
-        }
-
-        reference
     }
+
+    // Extract DOI
+    reference.doi =
+        xml_utils::extract_text_between(ref_content, "<pub-id pub-id-type=\"doi\">", "</pub-id>");
+
+    // Extract PMID
+    reference.pmid =
+        xml_utils::extract_text_between(ref_content, "<pub-id pub-id-type=\"pmid\">", "</pub-id>");
+
+    // Extract authors
+    reference.authors = author::extract_reference_authors(ref_content);
+
+    // Determine reference type
+    if ref_content.contains("<element-citation publication-type") {
+        reference.ref_type = xml_utils::extract_attribute_value(ref_content, "publication-type");
+    }
+
+    reference
 }
 
 #[cfg(test)]
@@ -125,7 +112,7 @@ mod tests {
         </ref-list>
         "#;
 
-        let references = ReferenceParser::extract_references_detailed(content);
+        let references = extract_references_detailed(content);
         assert_eq!(references.len(), 1);
 
         let ref1 = &references[0];

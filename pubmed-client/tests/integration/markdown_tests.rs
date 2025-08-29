@@ -2,7 +2,7 @@ use rstest::*;
 use tracing::{debug, info, warn};
 
 use pubmed_client_rs::pmc::{
-    HeadingStyle, MarkdownConfig, PmcMarkdownConverter, PmcXmlParser, ReferenceStyle,
+    parse_pmc_xml, HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle,
 };
 
 mod common;
@@ -28,7 +28,7 @@ fn test_markdown_conversion_basic(#[from(markdown_test_cases)] test_cases: Vec<P
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+        let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
         assert!(
             result.is_ok(),
             "Failed to parse XML file: {}",
@@ -134,7 +134,7 @@ fn test_markdown_conversion_with_different_configs(
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+        let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
         assert!(
             result.is_ok(),
             "Failed to parse XML file: {}",
@@ -232,7 +232,7 @@ fn test_markdown_metadata_extraction(#[from(markdown_test_cases)] test_cases: Ve
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+        let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
         assert!(
             result.is_ok(),
             "Failed to parse XML file: {}",
@@ -327,7 +327,7 @@ fn test_markdown_content_structure(#[from(markdown_test_cases)] test_cases: Vec<
 
         let xml_content = test_case.read_xml_content_or_panic();
 
-        let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+        let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
         assert!(
             result.is_ok(),
             "Failed to parse XML file: {}",
@@ -412,7 +412,7 @@ fn test_specific_markdown_conversion(#[case] filename: &str) {
     };
 
     let xml_content = test_case.read_xml_content_or_panic();
-    let result = PmcXmlParser::parse(&xml_content, &test_case.pmcid);
+    let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
 
     assert!(
         result.is_ok(),

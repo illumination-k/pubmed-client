@@ -1,4 +1,4 @@
-use pubmed_client_rs::pmc::parser::PmcXmlParser;
+use pubmed_client_rs::pmc::parser::parse_pmc_xml;
 use std::fs;
 
 #[test]
@@ -15,7 +15,7 @@ fn test_supplementary_material_extraction_from_real_xml() {
 
         if let Ok(xml_content) = fs::read_to_string(&file_path) {
             let pmcid = file_name.replace(".xml", "");
-            let result = PmcXmlParser::parse(&xml_content, &pmcid);
+            let result = parse_pmc_xml(&xml_content, &pmcid);
 
             assert!(result.is_ok(), "Failed to parse XML from {}", file_name);
 
@@ -110,7 +110,7 @@ fn test_supplementary_material_parsing_with_mock_data() {
         </back>
     </article>"#;
 
-    let result = PmcXmlParser::parse(mock_xml, "PMC1234567");
+    let result = parse_pmc_xml(mock_xml, "PMC1234567");
     assert!(result.is_ok());
 
     let article = result.unwrap();
@@ -194,7 +194,7 @@ fn test_tar_file_variants() {
             filename
         );
 
-        let result = PmcXmlParser::parse(&mock_xml, "PMC1234567");
+        let result = parse_pmc_xml(&mock_xml, "PMC1234567");
         assert!(result.is_ok());
 
         let article = result.unwrap();
