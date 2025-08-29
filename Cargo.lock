@@ -1687,6 +1687,7 @@ dependencies = [
  "serde-wasm-bindgen",
  "serde_json",
  "tsify",
+ "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",

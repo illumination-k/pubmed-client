@@ -1,3 +1,4 @@
+pub mod convert;
 pub mod figures;
 pub mod markdown;
 pub mod search;

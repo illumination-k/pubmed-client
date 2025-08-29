@@ -45,6 +45,9 @@ enum Commands {
     },
     /// Convert PMC articles to Markdown format
     Markdown(commands::markdown::Markdown),
+    /// Convert PMID to PMCID
+    #[command(name = "pmid-to-pmcid")]
+    PmidToPmcid(Box<commands::convert::Convert>),
 }
 
 #[tokio::main]
@@ -75,6 +78,12 @@ async fn main() -> Result<()> {
             commands::figures::execute(pmcids.clone(), output_dir.clone(), &cli).await
         }
         Commands::Markdown(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::PmidToPmcid(cmd) => {
             let api_key = cli.api_key.as_deref();
             let email = cli.email.as_deref();
             let tool = &cli.tool;
