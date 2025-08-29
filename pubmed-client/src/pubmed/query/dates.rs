@@ -58,7 +58,7 @@ impl SearchQuery {
     /// // Open-ended (from date onwards)
     /// let query = SearchQuery::new()
     ///     .query("recent research")
-    ///     .published_between(2023, None);
+    ///     .published_between(2023, None::<u32>);
     /// ```
     pub fn published_between<S, E>(mut self, start: S, end: Option<E>) -> Self
     where
@@ -152,7 +152,7 @@ impl SearchQuery {
     ///
     /// let query = SearchQuery::new()
     ///     .query("updated articles")
-    ///     .modification_date_between(2023, None);
+    ///     .modification_date_between(2023, None::<u32>);
     /// ```
     pub fn modification_date_between<S, E>(mut self, start: S, end: Option<E>) -> Self
     where

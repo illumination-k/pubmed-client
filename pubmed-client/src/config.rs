@@ -259,7 +259,7 @@ impl ClientConfig {
     /// ```
     /// use pubmed_client_rs::config::ClientConfig;
     /// use pubmed_client_rs::retry::RetryConfig;
-    /// use std::time::Duration;
+    /// use pubmed_client_rs::time::Duration;
     ///
     /// let retry_config = RetryConfig::new()
     ///     .with_max_retries(5)
@@ -301,8 +301,7 @@ impl ClientConfig {
     /// use pubmed_client_rs::cache::CacheConfig;
     ///
     /// let cache_config = CacheConfig {
-    ///     memory_size: 5000,
-    ///     disk_cache_enabled: true,
+    ///     max_capacity: 5000,
     ///     ..Default::default()
     /// };
     ///
