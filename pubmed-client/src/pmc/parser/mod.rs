@@ -35,7 +35,7 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
     let sections = section::extract_sections_enhanced(xml_content);
 
     // Extract references using reference module functions
-    let references = reference::extract_references_detailed(xml_content);
+    let references = reference::extract_references_detailed(xml_content).unwrap_or_default();
 
     Ok(PmcFullText {
         pmcid: pmcid.to_string(),
