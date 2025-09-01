@@ -2,489 +2,620 @@ use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
     Affiliation, Author, ChemicalConcept, MeshHeading, MeshQualifier, MeshTerm, PubMedArticle,
 };
-use quick_xml::events::Event;
-use quick_xml::Reader;
-use std::io::BufReader;
+use quick_xml::de::from_str;
+use serde::{Deserialize, Deserializer};
 use tracing::{debug, instrument};
+
+#[derive(Debug, Deserialize)]
+#[serde(rename = "PubmedArticleSet")]
+struct PubmedArticleSet {
+    #[serde(rename = "PubmedArticle")]
+    articles: Vec<PubmedArticleXml>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PubmedArticleXml {
+    #[serde(rename = "MedlineCitation")]
+    medline_citation: MedlineCitation,
+}
+
+impl PubmedArticleXml {
+    fn into_article(self, pmid: &str) -> Result<PubMedArticle> {
+        let medline = self.medline_citation;
+        let article = medline.article;
+
+        // Extract title
+        let title = article
+            .article_title
+            .ok_or_else(|| PubMedError::ArticleNotFound {
+                pmid: pmid.to_string(),
+            })?;
+
+        // Extract authors
+        let authors = article
+            .author_list
+            .map_or(Vec::new(), |list| list.into_authors());
+
+        // Extract journal
+        let journal = article
+            .journal
+            .as_ref()
+            .and_then(|j| j.title.clone())
+            .unwrap_or_default();
+
+        // Extract publication date
+        let pub_date = article.journal.as_ref().map_or(String::new(), |j| {
+            j.journal_issue
+                .as_ref()
+                .and_then(|ji| ji.pub_date.as_ref())
+                .map_or(String::new(), |pd| pd.to_string())
+        });
+
+        // Extract DOI
+        let doi = article.elocation_ids.and_then(|ids| {
+            ids.into_iter()
+                .find(|id| id.eid_type.as_deref() == Some("doi"))
+                .map(|id| id.value)
+        });
+
+        // Extract abstract
+        let abstract_text = article.abstract_section.and_then(|s| s.to_string_opt());
+
+        // Extract article types
+        let article_types = article
+            .publication_type_list
+            .map_or(Vec::new(), |list| list.into_types());
+
+        // Extract MeSH headings
+        let mesh_headings = medline
+            .mesh_heading_list
+            .and_then(|list| list.into_headings());
+
+        // Extract keywords
+        let keywords = medline.keyword_list.and_then(|list| list.into_keywords());
+
+        // Extract chemical list
+        let chemical_list = medline.chemical_list.and_then(|list| list.into_chemicals());
+
+        let author_count = authors.len() as u32;
+
+        debug!(
+            authors_parsed = authors.len(),
+            has_abstract = abstract_text.is_some(),
+            journal = %journal,
+            mesh_terms_count = mesh_headings.as_ref().map_or(0, |h| h.len()),
+            keywords_count = keywords.as_ref().map_or(0, |k| k.len()),
+            chemicals_count = chemical_list.as_ref().map_or(0, |c| c.len()),
+            "Completed XML parsing"
+        );
+
+        Ok(PubMedArticle {
+            pmid: pmid.to_string(),
+            title,
+            authors,
+            author_count,
+            journal,
+            pub_date,
+            doi,
+            abstract_text,
+            article_types,
+            mesh_headings,
+            keywords,
+            chemical_list,
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct MedlineCitation {
+    #[serde(rename = "PMID")]
+    pmid: Option<PmidXml>,
+    #[serde(rename = "Article")]
+    article: Article,
+    #[serde(rename = "MeshHeadingList")]
+    mesh_heading_list: Option<MeshHeadingList>,
+    #[serde(rename = "ChemicalList")]
+    chemical_list: Option<ChemicalList>,
+    #[serde(rename = "KeywordList")]
+    keyword_list: Option<KeywordList>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PmidXml {
+    #[serde(rename = "$text")]
+    value: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct Article {
+    #[serde(rename = "Journal")]
+    journal: Option<Journal>,
+    #[serde(rename = "ArticleTitle")]
+    article_title: Option<String>,
+    #[serde(rename = "Abstract")]
+    abstract_section: Option<AbstractSection>,
+    #[serde(rename = "AuthorList")]
+    author_list: Option<AuthorList>,
+    #[serde(rename = "PublicationTypeList")]
+    publication_type_list: Option<PublicationTypeList>,
+    #[serde(rename = "ELocationID")]
+    elocation_ids: Option<Vec<ELocationID>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Journal {
+    #[serde(rename = "Title")]
+    title: Option<String>,
+    #[serde(rename = "JournalIssue")]
+    journal_issue: Option<JournalIssue>,
+}
+
+#[derive(Debug, Deserialize)]
+struct JournalIssue {
+    #[serde(rename = "PubDate")]
+    pub_date: Option<PubDate>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PubDate {
+    #[serde(rename = "Year")]
+    year: Option<String>,
+    #[serde(rename = "Month")]
+    month: Option<String>,
+    #[serde(rename = "Day")]
+    day: Option<String>,
+    #[serde(rename = "MedlineDate")]
+    medline_date: Option<String>,
+}
+
+impl ToString for PubDate {
+    fn to_string(&self) -> String {
+        if let Some(ref medline_date) = self.medline_date {
+            medline_date.clone()
+        } else {
+            let mut date_parts = Vec::new();
+            if let Some(ref year) = self.year {
+                date_parts.push(year.clone());
+            }
+            if let Some(ref month) = self.month {
+                date_parts.push(month.clone());
+            }
+            if let Some(ref day) = self.day {
+                date_parts.push(day.clone());
+            }
+            date_parts.join(" ")
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct AbstractSection {
+    #[serde(rename = "AbstractText", default)]
+    abstract_texts: Vec<AbstractTextElement>,
+}
+
+impl AbstractSection {
+    fn to_string_opt(self) -> Option<String> {
+        if self.abstract_texts.is_empty() {
+            None
+        } else {
+            Some(
+                self.abstract_texts
+                    .into_iter()
+                    .map(|e| e.to_string())
+                    .collect::<Vec<_>>()
+                    .join(" "),
+            )
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+enum AbstractTextElement {
+    Simple(String),
+    Structured {
+        #[serde(rename = "$text")]
+        text: String,
+        #[serde(rename = "@Label")]
+        #[allow(dead_code)]
+        label: Option<String>,
+    },
+}
+
+impl ToString for AbstractTextElement {
+    fn to_string(&self) -> String {
+        match self {
+            AbstractTextElement::Simple(text) => text.clone(),
+            AbstractTextElement::Structured { text, .. } => text.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct AuthorList {
+    #[serde(rename = "Author")]
+    authors: Option<Vec<AuthorXml>>,
+}
+
+impl AuthorList {
+    fn into_authors(self) -> Vec<Author> {
+        self.authors
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(|a| a.into_author())
+            .collect()
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct AuthorXml {
+    #[serde(rename = "LastName")]
+    last_name: Option<String>,
+    #[serde(rename = "ForeName")]
+    fore_name: Option<String>,
+    #[serde(rename = "Initials")]
+    initials: Option<String>,
+    #[serde(rename = "Suffix")]
+    suffix: Option<String>,
+    #[serde(rename = "AffiliationInfo")]
+    affiliation_info: Option<Vec<AffiliationInfo>>,
+    #[serde(rename = "Identifier")]
+    identifiers: Option<Vec<Identifier>>,
+    #[serde(rename = "CollectiveName")]
+    collective_name: Option<String>,
+}
+
+impl AuthorXml {
+    fn into_author(self) -> Option<Author> {
+        // Handle collective names
+        if let Some(collective_name) = self.collective_name {
+            return Some(Author {
+                last_name: None,
+                fore_name: None,
+                first_name: None,
+                middle_name: None,
+                initials: None,
+                suffix: None,
+                full_name: collective_name,
+                affiliations: Vec::new(),
+                orcid: None,
+                is_corresponding: false,
+                author_roles: Vec::new(),
+            });
+        }
+
+        let full_name = format_author_name(&self.last_name, &self.fore_name, &self.initials);
+
+        if full_name.trim().is_empty() || full_name == "Unknown Author" {
+            None
+        } else {
+            let affiliations = self
+                .affiliation_info
+                .unwrap_or_default()
+                .into_iter()
+                .filter_map(|info| info.affiliation.map(|text| Affiliation::from_text(&text)))
+                .collect();
+
+            let orcid = self.identifiers.and_then(|ids| {
+                ids.into_iter()
+                    .find(|id| id.source.as_deref() == Some("ORCID"))
+                    .map(|id| id.value)
+            });
+
+            Some(Author {
+                last_name: self.last_name,
+                fore_name: self.fore_name,
+                first_name: None,
+                middle_name: None,
+                initials: self.initials,
+                suffix: self.suffix,
+                full_name,
+                affiliations,
+                orcid,
+                is_corresponding: false,
+                author_roles: Vec::new(),
+            })
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct AffiliationInfo {
+    #[serde(rename = "Affiliation")]
+    affiliation: Option<String>,
+}
+
+impl Affiliation {
+    fn from_text(text: &str) -> Self {
+        let text = text.trim();
+        let email = extract_email_from_text(text);
+        let country = extract_country_from_text(text);
+
+        Affiliation {
+            institution: if text.is_empty() {
+                None
+            } else {
+                Some(text.to_string())
+            },
+            department: None,
+            address: None,
+            country,
+            email,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct Identifier {
+    #[serde(rename = "$text")]
+    value: String,
+    #[serde(rename = "@Source")]
+    source: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PublicationTypeList {
+    #[serde(rename = "PublicationType")]
+    publication_types: Option<Vec<PublicationType>>,
+}
+
+impl PublicationTypeList {
+    fn into_types(self) -> Vec<String> {
+        self.publication_types
+            .unwrap_or_default()
+            .into_iter()
+            .map(|pt| pt.to_string())
+            .collect()
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+enum PublicationType {
+    Simple(String),
+    Complex {
+        #[serde(rename = "$text")]
+        text: String,
+        #[serde(rename = "@UI")]
+        #[allow(dead_code)]
+        ui: Option<String>,
+    },
+}
+
+impl ToString for PublicationType {
+    fn to_string(&self) -> String {
+        match self {
+            PublicationType::Simple(s) => s.clone(),
+            PublicationType::Complex { text, .. } => text.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct ELocationID {
+    #[serde(rename = "$text")]
+    value: String,
+    #[serde(rename = "@EIdType")]
+    eid_type: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct MeshHeadingList {
+    #[serde(rename = "MeshHeading")]
+    mesh_headings: Option<Vec<MeshHeadingXml>>,
+}
+
+impl MeshHeadingList {
+    fn into_headings(self) -> Option<Vec<MeshHeading>> {
+        self.mesh_headings.and_then(|headings| {
+            let result: Vec<MeshHeading> = headings
+                .into_iter()
+                .filter_map(|h| h.into_heading())
+                .collect();
+            if result.is_empty() {
+                None
+            } else {
+                Some(result)
+            }
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct MeshHeadingXml {
+    #[serde(rename = "DescriptorName")]
+    descriptor_name: Option<DescriptorName>,
+    #[serde(rename = "QualifierName")]
+    qualifier_names: Option<Vec<QualifierName>>,
+}
+
+impl MeshHeadingXml {
+    fn into_heading(self) -> Option<MeshHeading> {
+        self.descriptor_name.map(|descriptor| {
+            let qualifiers = self
+                .qualifier_names
+                .unwrap_or_default()
+                .into_iter()
+                .map(|q| q.into_qualifier())
+                .collect();
+
+            MeshHeading {
+                mesh_terms: vec![MeshTerm {
+                    descriptor_name: descriptor.text,
+                    descriptor_ui: descriptor.ui.unwrap_or_default(),
+                    major_topic: descriptor.major_topic_yn,
+                    qualifiers,
+                }],
+                supplemental_concepts: Vec::new(),
+            }
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct DescriptorName {
+    #[serde(rename = "$text")]
+    text: String,
+    #[serde(rename = "@UI")]
+    ui: Option<String>,
+    #[serde(rename = "@MajorTopicYN", deserialize_with = "deserialize_bool_yn")]
+    major_topic_yn: bool,
+}
+
+#[derive(Debug, Deserialize)]
+struct QualifierName {
+    #[serde(rename = "$text")]
+    text: String,
+    #[serde(rename = "@UI")]
+    ui: Option<String>,
+    #[serde(rename = "@MajorTopicYN", deserialize_with = "deserialize_bool_yn")]
+    major_topic_yn: bool,
+}
+
+impl QualifierName {
+    fn into_qualifier(self) -> MeshQualifier {
+        MeshQualifier {
+            qualifier_name: self.text,
+            qualifier_ui: self.ui.unwrap_or_default(),
+            major_topic: self.major_topic_yn,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct ChemicalList {
+    #[serde(rename = "Chemical")]
+    chemicals: Option<Vec<ChemicalXml>>,
+}
+
+impl ChemicalList {
+    fn into_chemicals(self) -> Option<Vec<ChemicalConcept>> {
+        self.chemicals.and_then(|chemicals| {
+            let result: Vec<ChemicalConcept> = chemicals
+                .into_iter()
+                .filter_map(|c| c.into_chemical())
+                .collect();
+            if result.is_empty() {
+                None
+            } else {
+                Some(result)
+            }
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct ChemicalXml {
+    #[serde(rename = "RegistryNumber")]
+    registry_number: Option<String>,
+    #[serde(rename = "NameOfSubstance")]
+    name_of_substance: Option<NameOfSubstance>,
+}
+
+impl ChemicalXml {
+    fn into_chemical(self) -> Option<ChemicalConcept> {
+        self.name_of_substance.map(|name| ChemicalConcept {
+            name: name.text,
+            registry_number: self.registry_number.filter(|r| !r.is_empty() && r != "0"),
+            ui: name.ui,
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct NameOfSubstance {
+    #[serde(rename = "$text")]
+    text: String,
+    #[serde(rename = "@UI")]
+    ui: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct KeywordList {
+    #[serde(rename = "Keyword")]
+    keywords: Option<Vec<KeywordElement>>,
+}
+
+impl KeywordList {
+    fn into_keywords(self) -> Option<Vec<String>> {
+        self.keywords.and_then(|keywords| {
+            let result: Vec<String> = keywords.into_iter().map(|k| k.to_string()).collect();
+            if result.is_empty() {
+                None
+            } else {
+                Some(result)
+            }
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+enum KeywordElement {
+    Simple(String),
+    Complex {
+        #[serde(rename = "$text")]
+        text: String,
+        #[serde(rename = "@MajorTopicYN")]
+        #[allow(dead_code)]
+        major_topic_yn: Option<String>,
+    },
+}
+
+impl ToString for KeywordElement {
+    fn to_string(&self) -> String {
+        match self {
+            KeywordElement::Simple(s) => s.clone(),
+            KeywordElement::Complex { text, .. } => text.clone(),
+        }
+    }
+}
+
+fn deserialize_bool_yn<'de, D>(deserializer: D) -> std::result::Result<bool, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: Option<String> = Option::deserialize(deserializer)?;
+    Ok(s.map_or(false, |s| s == "Y"))
+}
 
 /// Parse article from EFetch XML response
 #[instrument(skip(xml), fields(pmid = %pmid, xml_size = xml.len()))]
 pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {
-    let mut reader = Reader::from_reader(BufReader::new(xml.as_bytes()));
-    reader.config_mut().trim_text(true);
+    // Parse the XML using quick-xml serde
+    let article_set: PubmedArticleSet = from_str(xml).map_err(|e| PubMedError::XmlParseError {
+        message: format!("Failed to deserialize XML: {}", e),
+    })?;
 
-    let mut title = String::new();
-    let mut authors: Vec<Author> = Vec::new();
-    let mut journal = String::new();
-    let mut pub_date = String::new();
-    let doi = None;
-    let mut abstract_text: Option<String> = None;
-    let mut article_types = Vec::new();
-    let mut mesh_headings: Vec<MeshHeading> = Vec::new();
-    let mut keywords: Vec<String> = Vec::new();
-    let mut chemical_list: Vec<ChemicalConcept> = Vec::new();
-
-    let mut buf = Vec::new();
-    let mut in_article_title = false;
-    let mut in_abstract = false;
-    let mut in_abstract_text = false;
-    let mut in_journal_title = false;
-    let mut in_pub_date = false;
-    let mut in_author_list = false;
-    let mut in_author = false;
-    let mut in_last_name = false;
-    let mut in_fore_name = false;
-    let mut in_initials = false;
-    let mut in_suffix = false;
-    let mut in_publication_type = false;
-    let mut in_affiliation_info = false;
-    let mut in_affiliation = false;
-    let mut in_identifier = false;
-    let mut current_author_last = String::new();
-    let mut current_author_fore = String::new();
-    let mut current_author_initials = String::new();
-    let mut current_author_suffix = String::new();
-    let mut current_author_affiliations: Vec<Affiliation> = Vec::new();
-    let mut current_affiliation_text = String::new();
-    let mut current_orcid = Option::<String>::None;
-    let mut current_identifier_source = String::new();
-
-    // MeSH parsing state
-    let mut in_mesh_heading_list = false;
-    let mut in_mesh_heading = false;
-    let mut in_descriptor_name = false;
-    let mut in_qualifier_name = false;
-    let mut current_descriptor_name = String::new();
-    let mut current_descriptor_ui = String::new();
-    let mut current_descriptor_major = false;
-    let mut current_qualifiers: Vec<MeshQualifier> = Vec::new();
-    let mut current_qualifier_name = String::new();
-    let mut current_qualifier_ui = String::new();
-    let mut current_qualifier_major = false;
-
-    // Chemical parsing state
-    let mut in_chemical_list = false;
-    let mut in_chemical = false;
-    let mut in_name_of_substance = false;
-    let mut current_chemical_name = String::new();
-    let mut current_registry_number = String::new();
-    let mut current_chemical_ui = String::new();
-
-    // Keyword parsing state
-    let mut in_keyword_list = false;
-    let mut in_keyword = false;
-
-    loop {
-        match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e)) => {
-                match e.name().as_ref() {
-                    b"ArticleTitle" => in_article_title = true,
-                    b"Abstract" => in_abstract = true,
-                    b"AbstractText" => in_abstract_text = true,
-                    b"Title" if !in_article_title => in_journal_title = true,
-                    b"PubDate" => in_pub_date = true,
-                    b"AuthorList" => in_author_list = true,
-                    b"Author" if in_author_list => {
-                        in_author = true;
-                        current_author_last.clear();
-                        current_author_fore.clear();
-                        current_author_initials.clear();
-                        current_author_suffix.clear();
-                        current_author_affiliations.clear();
-                        current_orcid = None;
-                    }
-                    b"LastName" if in_author => in_last_name = true,
-                    b"ForeName" if in_author => in_fore_name = true,
-                    b"Initials" if in_author => in_initials = true,
-                    b"Suffix" if in_author => in_suffix = true,
-                    b"AffiliationInfo" if in_author => {
-                        in_affiliation_info = true;
-                        current_affiliation_text.clear();
-                    }
-                    b"Affiliation" if in_affiliation_info => in_affiliation = true,
-                    b"Identifier" if in_author => {
-                        in_identifier = true;
-                        current_identifier_source.clear();
-                        // Check for Source attribute
-                        for attr in e.attributes().flatten() {
-                            if attr.key.as_ref() == b"Source" {
-                                current_identifier_source =
-                                    String::from_utf8_lossy(&attr.value).to_string();
-                            }
-                        }
-                    }
-                    b"PublicationType" => in_publication_type = true,
-                    b"ELocationID" => {
-                        // Check if this is a DOI
-                        for attr in e.attributes().flatten() {
-                            if attr.key.as_ref() == b"EIdType" && attr.value.as_ref() == b"doi" {
-                                // We'll capture the DOI text in the next text event
-                            }
-                        }
-                    }
-                    // MeSH parsing
-                    b"MeshHeadingList" => in_mesh_heading_list = true,
-                    b"MeshHeading" if in_mesh_heading_list => {
-                        in_mesh_heading = true;
-                        current_qualifiers.clear();
-                    }
-                    b"DescriptorName" if in_mesh_heading => {
-                        in_descriptor_name = true;
-                        // Check for MajorTopicYN attribute
-                        for attr in e.attributes().flatten() {
-                            if attr.key.as_ref() == b"MajorTopicYN" {
-                                current_descriptor_major = attr.value.as_ref() == b"Y";
-                            }
-                            if attr.key.as_ref() == b"UI" {
-                                current_descriptor_ui =
-                                    String::from_utf8_lossy(&attr.value).to_string();
-                            }
-                        }
-                    }
-                    b"QualifierName" if in_mesh_heading => {
-                        in_qualifier_name = true;
-                        // Check for MajorTopicYN attribute
-                        for attr in e.attributes().flatten() {
-                            if attr.key.as_ref() == b"MajorTopicYN" {
-                                current_qualifier_major = attr.value.as_ref() == b"Y";
-                            }
-                            if attr.key.as_ref() == b"UI" {
-                                current_qualifier_ui =
-                                    String::from_utf8_lossy(&attr.value).to_string();
-                            }
-                        }
-                    }
-                    // Chemical parsing
-                    b"ChemicalList" => in_chemical_list = true,
-                    b"Chemical" if in_chemical_list => {
-                        in_chemical = true;
-                        current_chemical_name.clear();
-                        current_registry_number.clear();
-                        current_chemical_ui.clear();
-                    }
-                    b"NameOfSubstance" if in_chemical => {
-                        in_name_of_substance = true;
-                        // Get UI attribute if available
-                        for attr in e.attributes().flatten() {
-                            if attr.key.as_ref() == b"UI" {
-                                current_chemical_ui =
-                                    String::from_utf8_lossy(&attr.value).to_string();
-                            }
-                        }
-                    }
-                    // Keyword parsing
-                    b"KeywordList" => in_keyword_list = true,
-                    b"Keyword" if in_keyword_list => in_keyword = true,
-                    _ => {}
-                }
-            }
-            Ok(Event::End(ref e)) => match e.name().as_ref() {
-                b"ArticleTitle" => in_article_title = false,
-                b"Abstract" => in_abstract = false,
-                b"AbstractText" => in_abstract_text = false,
-                b"Title" => in_journal_title = false,
-                b"PubDate" => in_pub_date = false,
-                b"AuthorList" => in_author_list = false,
-                b"Author" => {
-                    if in_author {
-                        let full_name = format_author_name(
-                            &if current_author_last.is_empty() {
-                                None
-                            } else {
-                                Some(current_author_last.clone())
-                            },
-                            &if current_author_fore.is_empty() {
-                                None
-                            } else {
-                                Some(current_author_fore.clone())
-                            },
-                            &if current_author_initials.is_empty() {
-                                None
-                            } else {
-                                Some(current_author_initials.clone())
-                            },
-                        );
-
-                        if !full_name.trim().is_empty() && full_name != "Unknown Author" {
-                            let author = Author {
-                                last_name: if current_author_last.is_empty() {
-                                    None
-                                } else {
-                                    Some(current_author_last.clone())
-                                },
-                                fore_name: if current_author_fore.is_empty() {
-                                    None
-                                } else {
-                                    Some(current_author_fore.clone())
-                                },
-                                first_name: None, // Could be extracted from fore_name if needed
-                                middle_name: None, // Could be extracted from fore_name if needed
-                                initials: if current_author_initials.is_empty() {
-                                    None
-                                } else {
-                                    Some(current_author_initials.clone())
-                                },
-                                suffix: if current_author_suffix.is_empty() {
-                                    None
-                                } else {
-                                    Some(current_author_suffix.clone())
-                                },
-                                full_name,
-                                affiliations: current_author_affiliations.clone(),
-                                orcid: current_orcid.clone(),
-                                is_corresponding: false, // TODO: Detect corresponding authors from XML
-                                author_roles: Vec::new(), // TODO: Parse author contributions if available
-                            };
-                            authors.push(author);
-                        }
-                        in_author = false;
-                    }
-                }
-                b"LastName" => in_last_name = false,
-                b"ForeName" => in_fore_name = false,
-                b"Initials" => in_initials = false,
-                b"Suffix" => in_suffix = false,
-                b"AffiliationInfo" => {
-                    if in_affiliation_info && !current_affiliation_text.is_empty() {
-                        let affiliation = parse_affiliation_text(&current_affiliation_text);
-                        current_author_affiliations.push(affiliation);
-                    }
-                    in_affiliation_info = false;
-                }
-                b"Affiliation" => in_affiliation = false,
-                b"Identifier" => {
-                    in_identifier = false;
-                    current_identifier_source.clear();
-                }
-                b"PublicationType" => in_publication_type = false,
-                // MeSH parsing
-                b"MeshHeadingList" => in_mesh_heading_list = false,
-                b"MeshHeading" => {
-                    if in_mesh_heading {
-                        // Create MeshTerm and add to headings
-                        if !current_descriptor_name.is_empty() {
-                            let mesh_term = MeshTerm {
-                                descriptor_name: current_descriptor_name.clone(),
-                                descriptor_ui: current_descriptor_ui.clone(),
-                                major_topic: current_descriptor_major,
-                                qualifiers: current_qualifiers.clone(),
-                            };
-                            mesh_headings.push(MeshHeading {
-                                mesh_terms: vec![mesh_term],
-                                supplemental_concepts: Vec::new(), // TODO: Parse supplemental concepts if needed
-                            });
-                        }
-                        current_descriptor_name.clear();
-                        current_descriptor_ui.clear();
-                        current_descriptor_major = false;
-                        in_mesh_heading = false;
-                    }
-                }
-                b"DescriptorName" => in_descriptor_name = false,
-                b"QualifierName" => {
-                    if in_qualifier_name && !current_qualifier_name.is_empty() {
-                        current_qualifiers.push(MeshQualifier {
-                            qualifier_name: current_qualifier_name.clone(),
-                            qualifier_ui: current_qualifier_ui.clone(),
-                            major_topic: current_qualifier_major,
-                        });
-                        current_qualifier_name.clear();
-                        current_qualifier_ui.clear();
-                        current_qualifier_major = false;
-                    }
-                    in_qualifier_name = false;
-                }
-                // Chemical parsing
-                b"ChemicalList" => in_chemical_list = false,
-                b"Chemical" => {
-                    if in_chemical && !current_chemical_name.is_empty() {
-                        chemical_list.push(ChemicalConcept {
-                            name: current_chemical_name.clone(),
-                            registry_number: if current_registry_number.is_empty() {
-                                None
-                            } else {
-                                Some(current_registry_number.clone())
-                            },
-                            ui: if current_chemical_ui.is_empty() {
-                                None
-                            } else {
-                                Some(current_chemical_ui.clone())
-                            },
-                        });
-                    }
-                    in_chemical = false;
-                }
-                b"NameOfSubstance" => in_name_of_substance = false,
-                // Keyword parsing
-                b"KeywordList" => in_keyword_list = false,
-                b"Keyword" => in_keyword = false,
-                _ => {}
-            },
-            Ok(Event::Text(e)) => {
-                let text = e
-                    .unescape()
-                    .map_err(|_| PubMedError::XmlParseError {
-                        message: "Failed to decode XML text".to_string(),
-                    })?
-                    .into_owned();
-
-                if in_article_title {
-                    title = text;
-                } else if in_abstract_text && in_abstract {
-                    // Handle structured abstracts with multiple AbstractText sections
-                    if let Some(existing) = abstract_text.as_mut() {
-                        if !existing.is_empty() {
-                            existing.push(' '); // Add space between sections
-                        }
-                        existing.push_str(&text);
-                    } else {
-                        abstract_text = Some(text);
-                    }
-                } else if in_journal_title && !in_article_title {
-                    journal = text;
-                } else if in_pub_date {
-                    if pub_date.is_empty() {
-                        pub_date = text;
-                    } else {
-                        pub_date.push(' ');
-                        pub_date.push_str(&text);
-                    }
-                } else if in_last_name && in_author {
-                    current_author_last = text;
-                } else if in_fore_name && in_author {
-                    current_author_fore = text;
-                } else if in_initials && in_author {
-                    current_author_initials = text;
-                } else if in_suffix && in_author {
-                    current_author_suffix = text;
-                } else if in_affiliation && in_affiliation_info {
-                    current_affiliation_text = text;
-                } else if in_identifier && in_author {
-                    if current_identifier_source == "ORCID" {
-                        current_orcid = Some(text);
-                    }
-                } else if in_publication_type {
-                    article_types.push(text);
-                } else if in_descriptor_name && in_mesh_heading {
-                    current_descriptor_name = text;
-                } else if in_qualifier_name && in_mesh_heading {
-                    current_qualifier_name = text;
-                } else if in_name_of_substance && in_chemical {
-                    current_chemical_name = text;
-                } else if in_chemical && text.trim() != current_chemical_name {
-                    // This might be RegistryNumber
-                    current_registry_number = text;
-                } else if in_keyword && in_keyword_list {
-                    keywords.push(text);
-                }
-            }
-            Ok(Event::Eof) => break,
-            Err(e) => {
-                return Err(PubMedError::XmlParseError {
-                    message: format!("XML parsing error: {e}"),
-                });
-            }
-            _ => {}
-        }
-        buf.clear();
-    }
-
-    // If no article found, return error
-    if title.is_empty() {
-        debug!("No article title found in XML, article not found");
-        return Err(PubMedError::ArticleNotFound {
+    // Find the article with the matching PMID
+    let article_xml = article_set
+        .articles
+        .into_iter()
+        .find(|a| {
+            a.medline_citation
+                .pmid
+                .as_ref()
+                .map_or(false, |p| p.value == pmid)
+        })
+        .ok_or_else(|| PubMedError::ArticleNotFound {
             pmid: pmid.to_string(),
-        });
-    }
+        })?;
 
-    debug!(
-        authors_parsed = authors.len(),
-        has_abstract = abstract_text.is_some(),
-        journal = %journal,
-        mesh_terms_count = mesh_headings.len(),
-        keywords_count = keywords.len(),
-        chemicals_count = chemical_list.len(),
-        "Completed XML parsing"
-    );
-
-    let author_count = authors.len() as u32;
-
-    Ok(PubMedArticle {
-        pmid: pmid.to_string(),
-        title,
-        authors,
-        author_count,
-        journal,
-        pub_date,
-        doi,
-        abstract_text,
-        article_types,
-        mesh_headings: if mesh_headings.is_empty() {
-            None
-        } else {
-            Some(mesh_headings)
-        },
-        keywords: if keywords.is_empty() {
-            None
-        } else {
-            Some(keywords)
-        },
-        chemical_list: if chemical_list.is_empty() {
-            None
-        } else {
-            Some(chemical_list)
-        },
-    })
-}
-
-/// Parse affiliation text into structured components
-fn parse_affiliation_text(text: &str) -> Affiliation {
-    // This is a simplified parser for affiliation text
-    // In practice, this would be more sophisticated
-    let text = text.trim();
-
-    // Extract email if present
-    let email = extract_email_from_text(text);
-
-    // Extract country (usually at the end)
-    let country = extract_country_from_text(text);
-
-    // For now, treat the whole text as institution
-    // More sophisticated parsing could identify departments, addresses, etc.
-    Affiliation {
-        institution: if text.is_empty() {
-            None
-        } else {
-            Some(text.to_string())
-        },
-        department: None, // TODO: Parse department from affiliation text
-        address: None,    // TODO: Parse address from affiliation text
-        country,
-        email,
-    }
+    article_xml.into_article(pmid)
 }
 
 /// Extract email address from affiliation text
 fn extract_email_from_text(text: &str) -> Option<String> {
-    // Simple regex-like pattern matching for email
-    let parts: Vec<&str> = text.split_whitespace().collect();
-    for part in parts {
-        if part.contains('@') && part.contains('.') {
-            // Remove punctuation that might be at the end
-            let cleaned = part.trim_end_matches(&['.', ',', ';', ')'][..]);
-            if cleaned.len() > 5 {
-                // Basic validation
-                return Some(cleaned.to_string());
-            }
-        }
-    }
-    None
+    text.split_whitespace()
+        .find(|part| part.contains('@') && part.contains('.'))
+        .map(|part| part.trim_end_matches(&['.', ',', ';', ')'][..]).to_string())
+        .filter(|email| email.len() > 5)
 }
 
-/// Extract country from affiliation text (basic implementation)
+/// Extract country from affiliation text
 fn extract_country_from_text(text: &str) -> Option<String> {
-    // Common country patterns that might appear at the end of affiliations
-    let common_countries = [
+    const COUNTRIES: &[&str] = &[
         "USA",
         "United States",
         "US",
@@ -523,16 +654,16 @@ fn extract_country_from_text(text: &str) -> Option<String> {
     ];
 
     let text_lower = text.to_lowercase();
-    for country in &common_countries {
-        if text_lower.ends_with(&country.to_lowercase()) || {
-            let country_lower = country.to_lowercase();
-            text_lower.contains(&format!(", {country_lower}"))
-        } {
-            return Some(country.to_string());
+    COUNTRIES.iter().find_map(|&country| {
+        let country_lower = country.to_lowercase();
+        if text_lower.ends_with(&country_lower)
+            || text_lower.contains(&format!(", {}", country_lower))
+        {
+            Some(country.to_string())
+        } else {
+            None
         }
-    }
-
-    None
+    })
 }
 
 /// Format an author name from components
@@ -606,15 +737,6 @@ mod tests {
             <Keyword>diabetes treatment</Keyword>
             <Keyword>insulin therapy</Keyword>
         </KeywordList>
-        <MedlineJournalInfo>
-            <MedlineTA>Test J</MedlineTA>
-        </MedlineJournalInfo>
-        <PubmedData>
-            <ArticleIdList>
-                <ArticleId IdType="pubmed">12345678</ArticleId>
-            </ArticleIdList>
-            <PublicationStatus>ppublish</PublicationStatus>
-        </PubmedData>
     </MedlineCitation>
 </PubmedArticle>
 </PubmedArticleSet>"#;
@@ -695,11 +817,13 @@ mod tests {
                         </Abstract>
                         <Journal>
                             <Title>BMJ (Clinical research ed.)</Title>
+                            <JournalIssue>
+                                <PubDate>
+                                    <Year>2020</Year>
+                                    <Month>Sep</Month>
+                                </PubDate>
+                            </JournalIssue>
                         </Journal>
-                        <PubDate>
-                            <Year>2020</Year>
-                            <Month>Sep</Month>
-                        </PubDate>
                     </Article>
                 </MedlineCitation>
             </PubmedArticle>
@@ -724,12 +848,6 @@ mod tests {
         // Verify they are properly concatenated with spaces
         assert!(abstract_text.contains("earlier versions. What is the role"));
         assert!(abstract_text.contains("covid-19? The evidence base"));
-
-        debug!(
-            abstract_length = abstract_text.len(),
-            "Parsed abstract successfully"
-        );
-        debug!(abstract = %abstract_text, "Abstract content parsed");
     }
 
     #[test]
@@ -752,15 +870,6 @@ mod tests {
                 <Title>Another Journal</Title>
             </Journal>
         </Article>
-        <MedlineJournalInfo>
-            <MedlineTA>Another J</MedlineTA>
-        </MedlineJournalInfo>
-        <PubmedData>
-            <ArticleIdList>
-                <ArticleId IdType="pubmed">87654321</ArticleId>
-            </ArticleIdList>
-            <PublicationStatus>ppublish</PublicationStatus>
-        </PubmedData>
     </MedlineCitation>
 </PubmedArticle>
 </PubmedArticleSet>"#;
@@ -773,24 +882,6 @@ mod tests {
         assert!(article.mesh_headings.is_none());
         assert!(article.chemical_list.is_none());
         assert!(article.keywords.is_none());
-    }
-
-    #[test]
-    fn test_parse_affiliation_text() {
-        let affiliation_text = "Department of Medicine, Harvard Medical School, Boston, MA, USA. john.doe@hms.harvard.edu";
-        let affiliation = parse_affiliation_text(affiliation_text);
-
-        assert!(affiliation.institution.is_some());
-        assert!(affiliation
-            .institution
-            .as_ref()
-            .unwrap()
-            .contains("Harvard Medical School"));
-        assert_eq!(
-            affiliation.email,
-            Some("john.doe@hms.harvard.edu".to_string())
-        );
-        assert_eq!(affiliation.country, Some("USA".to_string()));
     }
 
     #[test]
