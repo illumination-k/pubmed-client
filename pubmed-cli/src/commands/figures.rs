@@ -11,16 +11,27 @@ pub async fn execute(pmcids: Vec<String>, output_dir: PathBuf, cli: &Cli) -> Res
     // Initialize the PMC client
     let client = create_pmc_client(cli.api_key.as_deref(), cli.email.as_deref(), &cli.tool)?;
 
+    let mut failed_pmcids = Vec::new();
+
     // Process each PMCID
     for pmcid in &pmcids {
         info!(pmcid = %pmcid, "Processing article");
 
         if let Err(e) = process_article(&client, pmcid, &output_dir).await {
-            error!(pmcid = %pmcid, error = %e, "Error processing article");
+            error!(pmcid = %pmcid, error = %e, "Failed to process article");
+            failed_pmcids.push(pmcid.clone());
             continue;
         }
 
         info!(pmcid = %pmcid, "Successfully processed article");
+    }
+
+    if !failed_pmcids.is_empty() {
+        error!(
+            failed_count = failed_pmcids.len(),
+            failed_pmcids = ?failed_pmcids,
+            "Failed to process some PMC IDs"
+        );
     }
 
     Ok(())
@@ -31,29 +42,62 @@ async fn process_article(
     pmcid: &str,
     output_base: &Path,
 ) -> Result<()> {
-    // Create output directory for this article
+    // Prepare output directory path for this article (but don't create it yet)
     let article_dir = output_base.join(pmcid);
 
-    info!(directory = %article_dir.display(), "Creating output directory");
-    fs::create_dir_all(&article_dir).await?;
-
-    // Extract figures with captions
+    // First, try to extract figures to a temporary location
+    // We'll use the final directory path, but only create it if extraction succeeds
     info!("Extracting figures and matching with captions");
-    let figures = match client
-        .extract_figures_with_captions(pmcid, &article_dir)
-        .await
-    {
+
+    // Create a temporary directory for extraction
+    let temp_dir = output_base.join(format!(".tmp_{}", pmcid));
+
+    // Ensure temp directory is created
+    fs::create_dir_all(&temp_dir).await?;
+
+    let figures = match client.extract_figures_with_captions(pmcid, &temp_dir).await {
         Ok(figures) => figures,
         Err(e) => {
-            warn!(pmcid = %pmcid, error = %e, "Could not extract figures");
-            return Ok(()); // Continue with other articles
+            // Clean up temporary directory if extraction failed
+            if let Err(cleanup_err) = fs::remove_dir_all(&temp_dir).await {
+                warn!(
+                    pmcid = %pmcid,
+                    error = %cleanup_err,
+                    "Failed to clean up temporary directory"
+                );
+            }
+            error!(
+                pmcid = %pmcid,
+                error = %e,
+                "Failed to download TAR archive or extract figures"
+            );
+            return Err(anyhow::anyhow!(
+                "Failed to download TAR archive for PMC ID {}: {}",
+                pmcid,
+                e
+            ));
         }
     };
 
     if figures.is_empty() {
-        info!(pmcid = %pmcid, "No figures found");
+        // Clean up temporary directory if no figures found
+        if let Err(cleanup_err) = fs::remove_dir_all(&temp_dir).await {
+            warn!(
+                pmcid = %pmcid,
+                error = %cleanup_err,
+                "Failed to clean up temporary directory"
+            );
+        }
+        info!(pmcid = %pmcid, "No figures found in article");
         return Ok(());
     }
+
+    // Now that we have figures, move temp directory to final location
+    info!(directory = %article_dir.display(), "Creating output directory");
+    if article_dir.exists() {
+        fs::remove_dir_all(&article_dir).await?;
+    }
+    fs::rename(&temp_dir, &article_dir).await?;
 
     info!(pmcid = %pmcid, figure_count = figures.len(), "Found figures");
 
@@ -71,19 +115,18 @@ async fn process_article(
         // Create metadata for this figure
         let metadata = FigureMetadata {
             pmcid: pmcid.to_string(),
-            figure_id: extracted_figure.figure.id.clone(),
+            figureid: extracted_figure.figure.id.clone(),
             label: extracted_figure.figure.label.clone(),
             caption: extracted_figure.figure.caption.clone(),
-            alt_text: extracted_figure.figure.alt_text.clone(),
-            fig_type: extracted_figure.figure.fig_type.clone(),
-            original_file_path: extracted_figure.extracted_file_path.clone(),
-            file_size_bytes: extracted_figure.file_size,
-            dimensions: extracted_figure.dimensions,
-            extracted_at: chrono::Utc::now().to_rfc3339(),
         };
 
+        // Update the file path in metadata since we moved from temp to final dir
+        let temp_file_path = Path::new(&extracted_figure.extracted_file_path);
+        let file_name = temp_file_path.file_name().unwrap_or_default();
+        let updated_file_path = article_dir.join(file_name);
+
         // Copy figure to a standardized filename
-        let original_path = Path::new(&extracted_figure.extracted_file_path);
+        let original_path = &updated_file_path;
         if let (Some(extension), Some(_filename)) =
             (original_path.extension(), original_path.file_stem())
         {
@@ -95,7 +138,7 @@ async fn process_article(
             );
             let new_path = article_dir.join(&new_filename);
 
-            if let Err(e) = fs::copy(&extracted_figure.extracted_file_path, &new_path).await {
+            if let Err(e) = fs::copy(&updated_file_path, &new_path).await {
                 warn!(error = %e, "Could not copy figure");
             } else {
                 info!(filename = %new_filename, "Saved figure");
@@ -139,13 +182,7 @@ async fn process_article(
 #[derive(Serialize, Deserialize)]
 struct FigureMetadata {
     pmcid: String,
-    figure_id: String,
+    figureid: String,
     label: Option<String>,
     caption: String,
-    alt_text: Option<String>,
-    fig_type: Option<String>,
-    original_file_path: String,
-    file_size_bytes: Option<u64>,
-    dimensions: Option<(u32, u32)>,
-    extracted_at: String,
 }
