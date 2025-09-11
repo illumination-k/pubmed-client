@@ -34,14 +34,14 @@ impl Markdown {
         tokio::fs::create_dir_all(&self.output_dir).await?;
 
         for pmcid in &self.pmcids {
-            println!("Processing {}...", pmcid);
+            tracing::info!(pmcid = %pmcid, "Processing article");
 
             match self
                 .process_article(&client, pmcid, api_key, email, tool)
                 .await
             {
-                Ok(_) => println!("✓ Successfully converted {}", pmcid),
-                Err(e) => eprintln!("✗ Failed to process {}: {}", pmcid, e),
+                Ok(_) => tracing::info!(pmcid = %pmcid, "Successfully converted to markdown"),
+                Err(e) => tracing::error!(pmcid = %pmcid, error = %e, "Failed to process article"),
             }
         }
 

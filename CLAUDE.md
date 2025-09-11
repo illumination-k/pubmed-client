@@ -108,6 +108,9 @@ cargo run -p pubmed-cli -- --help
 # Example: Extract figures from PMC articles
 cargo run -p pubmed-cli -- figures PMC7906746
 
+# Example: Extract figures and save failed PMC IDs to file
+cargo run -p pubmed-cli -- figures PMC7906746 PMC123456 --failed-output failed_pmcids.txt
+
 # Example: Convert PMC to markdown
 cargo run -p pubmed-cli -- markdown PMC7906746
 
