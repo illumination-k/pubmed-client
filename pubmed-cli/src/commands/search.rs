@@ -223,7 +223,7 @@ impl Search {
         match &self.output {
             Some(path) => {
                 tokio::fs::write(path, content).await?;
-                println!("Results saved to {}", path.display());
+                tracing::info!(path = %path.display(), "Results saved to file");
             }
             None => {
                 println!("{}", content);

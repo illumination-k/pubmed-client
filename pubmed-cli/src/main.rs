@@ -42,6 +42,9 @@ enum Commands {
         /// Output directory for extracted figures
         #[arg(short, long, default_value = "./extracted_figures")]
         output_dir: PathBuf,
+        /// Path to save failed PMC IDs (if not specified, failures are logged only)
+        #[arg(short, long)]
+        failed_output: Option<PathBuf>,
     },
     /// Convert PMC articles to Markdown format
     Markdown(commands::markdown::Markdown),
@@ -61,10 +64,8 @@ async fn main() -> Result<()> {
         .with_env_filter(filter)
         .with_target(false)
         .without_time()
+        .with_writer(std::io::stderr)
         .init();
-
-    // Log startup
-    tracing::info!("PMC Tool started");
 
     // Execute command
     match &cli.command {
@@ -74,8 +75,18 @@ async fn main() -> Result<()> {
             let tool = &cli.tool;
             cmd.execute_with_config(api_key, email, tool).await
         }
-        Commands::Figures { pmcids, output_dir } => {
-            commands::figures::execute(pmcids.clone(), output_dir.clone(), &cli).await
+        Commands::Figures {
+            pmcids,
+            output_dir,
+            failed_output,
+        } => {
+            commands::figures::execute(
+                pmcids.clone(),
+                output_dir.clone(),
+                failed_output.clone(),
+                &cli,
+            )
+            .await
         }
         Commands::Markdown(cmd) => {
             let api_key = cli.api_key.as_deref();
