@@ -1636,6 +1636,7 @@ dependencies = [
  "pubmed-client-rs",
  "serde",
  "serde_json",
+ "tempfile",
  "tokio",
  "tracing",
  "tracing-subscriber",

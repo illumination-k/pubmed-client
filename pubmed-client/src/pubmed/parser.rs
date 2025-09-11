@@ -4,6 +4,8 @@ use crate::pubmed::models::{
 };
 use quick_xml::de::from_str;
 use serde::{Deserialize, Deserializer};
+use std::fmt;
+use std::result;
 use tracing::{debug, instrument};
 
 #[derive(Debug, Deserialize)]
@@ -168,9 +170,9 @@ struct PubDate {
     medline_date: Option<String>,
 }
 
-impl ToString for PubDate {
-    fn to_string(&self) -> String {
-        if let Some(ref medline_date) = self.medline_date {
+impl fmt::Display for PubDate {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let result = if let Some(ref medline_date) = self.medline_date {
             medline_date.clone()
         } else {
             let mut date_parts = Vec::new();
@@ -184,7 +186,8 @@ impl ToString for PubDate {
                 date_parts.push(day.clone());
             }
             date_parts.join(" ")
-        }
+        };
+        write!(f, "{}", result)
     }
 }
 
@@ -195,13 +198,13 @@ struct AbstractSection {
 }
 
 impl AbstractSection {
-    fn to_string_opt(self) -> Option<String> {
+    fn to_string_opt(&self) -> Option<String> {
         if self.abstract_texts.is_empty() {
             None
         } else {
             Some(
                 self.abstract_texts
-                    .into_iter()
+                    .iter()
                     .map(|e| e.to_string())
                     .collect::<Vec<_>>()
                     .join(" "),
@@ -223,11 +226,11 @@ enum AbstractTextElement {
     },
 }
 
-impl ToString for AbstractTextElement {
-    fn to_string(&self) -> String {
+impl fmt::Display for AbstractTextElement {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            AbstractTextElement::Simple(text) => text.clone(),
-            AbstractTextElement::Structured { text, .. } => text.clone(),
+            AbstractTextElement::Simple(text) => write!(f, "{}", text),
+            AbstractTextElement::Structured { text, .. } => write!(f, "{}", text),
         }
     }
 }
@@ -383,11 +386,11 @@ enum PublicationType {
     },
 }
 
-impl ToString for PublicationType {
-    fn to_string(&self) -> String {
+impl fmt::Display for PublicationType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PublicationType::Simple(s) => s.clone(),
-            PublicationType::Complex { text, .. } => text.clone(),
+            PublicationType::Simple(s) => write!(f, "{}", s),
+            PublicationType::Complex { text, .. } => write!(f, "{}", text),
         }
     }
 }
@@ -563,21 +566,21 @@ enum KeywordElement {
     },
 }
 
-impl ToString for KeywordElement {
-    fn to_string(&self) -> String {
+impl fmt::Display for KeywordElement {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            KeywordElement::Simple(s) => s.clone(),
-            KeywordElement::Complex { text, .. } => text.clone(),
+            KeywordElement::Simple(s) => write!(f, "{}", s),
+            KeywordElement::Complex { text, .. } => write!(f, "{}", text),
         }
     }
 }
 
-fn deserialize_bool_yn<'de, D>(deserializer: D) -> std::result::Result<bool, D::Error>
+fn deserialize_bool_yn<'de, D>(deserializer: D) -> result::Result<bool, D::Error>
 where
     D: Deserializer<'de>,
 {
     let s: Option<String> = Option::deserialize(deserializer)?;
-    Ok(s.map_or(false, |s| s == "Y"))
+    Ok(s.is_some_and(|s| s == "Y"))
 }
 
 /// Parse article from EFetch XML response
@@ -596,7 +599,7 @@ pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {
             a.medline_citation
                 .pmid
                 .as_ref()
-                .map_or(false, |p| p.value == pmid)
+                .is_some_and(|p| p.value == pmid)
         })
         .ok_or_else(|| PubMedError::ArticleNotFound {
             pmid: pmid.to_string(),
