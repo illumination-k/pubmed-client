@@ -1,6 +1,7 @@
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
+use tempfile::TempDir;
 use tokio::fs;
 use tracing::{error, info, warn};
 
@@ -74,23 +75,15 @@ async fn process_article(
     // We'll use the final directory path, but only create it if extraction succeeds
     info!("Extracting figures and matching with captions");
 
-    // Create a temporary directory for extraction
-    let temp_dir = output_base.join(format!(".tmp_{}", pmcid));
+    // Create a temporary directory for extraction using tempfile crate
+    // This ensures automatic cleanup on drop and avoids conflicts
+    let temp_dir_handle = TempDir::new_in(output_base)?;
+    let temp_dir = temp_dir_handle.path();
 
-    // Ensure temp directory is created
-    fs::create_dir_all(&temp_dir).await?;
-
-    let figures = match client.extract_figures_with_captions(pmcid, &temp_dir).await {
+    let figures = match client.extract_figures_with_captions(pmcid, temp_dir).await {
         Ok(figures) => figures,
         Err(e) => {
-            // Clean up temporary directory if extraction failed
-            if let Err(cleanup_err) = fs::remove_dir_all(&temp_dir).await {
-                warn!(
-                    pmcid = %pmcid,
-                    error = %cleanup_err,
-                    "Failed to clean up temporary directory"
-                );
-            }
+            // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
             error!(
                 pmcid = %pmcid,
                 error = %e,
@@ -105,14 +98,7 @@ async fn process_article(
     };
 
     if figures.is_empty() {
-        // Clean up temporary directory if no figures found
-        if let Err(cleanup_err) = fs::remove_dir_all(&temp_dir).await {
-            warn!(
-                pmcid = %pmcid,
-                error = %cleanup_err,
-                "Failed to clean up temporary directory"
-            );
-        }
+        // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
         info!(pmcid = %pmcid, "No figures found in article");
         return Ok(());
     }
@@ -122,7 +108,11 @@ async fn process_article(
     if article_dir.exists() {
         fs::remove_dir_all(&article_dir).await?;
     }
-    fs::rename(&temp_dir, &article_dir).await?;
+
+    // Move the temporary directory to the final location
+    // We need to persist the temp directory to prevent automatic cleanup
+    let temp_path = temp_dir_handle.keep();
+    fs::rename(&temp_path, &article_dir).await?;
 
     info!(pmcid = %pmcid, figure_count = figures.len(), "Found figures");
 
@@ -145,20 +135,22 @@ async fn process_article(
             caption: extracted_figure.figure.caption.clone(),
         };
 
-        // The extracted_file_path contains the temp directory path
-        // We need to find the actual file in the renamed directory
-        let temp_file_path = Path::new(&extracted_figure.extracted_file_path);
+        // The extracted_file_path contains the full path from extraction
+        // The extraction creates a PMC subdirectory inside the temp directory
+        // So we need to find the file in the moved directory structure
+        let extracted_path = Path::new(&extracted_figure.extracted_file_path);
 
-        // Get the relative path from the temp directory
-        let relative_path = if let Ok(stripped) = temp_file_path.strip_prefix(&temp_dir) {
-            stripped
-        } else {
-            // If strip_prefix fails, just use the filename
-            Path::new(temp_file_path.file_name().unwrap_or_default())
-        };
+        // Check if the file exists directly in article_dir (for flat structure)
+        let filename = extracted_path
+            .file_name()
+            .ok_or_else(|| anyhow::anyhow!("Invalid file path"))?;
 
-        // Construct the actual path in the renamed directory
-        let actual_file_path = article_dir.join(relative_path);
+        let mut actual_file_path = article_dir.join(filename);
+
+        // If not found, check in the PMC subdirectory (nested structure)
+        if !actual_file_path.exists() {
+            actual_file_path = article_dir.join(pmcid).join(filename);
+        }
 
         // Copy figure to a standardized filename
         if let (Some(extension), Some(_filename)) =

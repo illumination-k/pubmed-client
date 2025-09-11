@@ -36,3 +36,6 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Date/time
 chrono = { version = "0.4", features = ["serde"] }
+
+# Temporary files
+tempfile = "3.8"
