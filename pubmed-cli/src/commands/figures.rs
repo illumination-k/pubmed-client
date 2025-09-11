@@ -14,6 +14,9 @@ pub async fn execute(
     failed_output: Option<PathBuf>,
     cli: &Cli,
 ) -> Result<()> {
+    // Ensure output directory exists
+    fs::create_dir_all(&output_dir).await?;
+
     // Initialize the PMC client
     let client = create_pmc_client(cli.api_key.as_deref(), cli.email.as_deref(), &cli.tool)?;
 
