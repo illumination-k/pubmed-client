@@ -7,7 +7,12 @@ use tracing::{error, info, warn};
 use crate::commands::create_pmc_client;
 use crate::Cli;
 
-pub async fn execute(pmcids: Vec<String>, output_dir: PathBuf, cli: &Cli) -> Result<()> {
+pub async fn execute(
+    pmcids: Vec<String>,
+    output_dir: PathBuf,
+    failed_output: Option<PathBuf>,
+    cli: &Cli,
+) -> Result<()> {
     // Initialize the PMC client
     let client = create_pmc_client(cli.api_key.as_deref(), cli.email.as_deref(), &cli.tool)?;
 
@@ -32,6 +37,26 @@ pub async fn execute(pmcids: Vec<String>, output_dir: PathBuf, cli: &Cli) -> Res
             failed_pmcids = ?failed_pmcids,
             "Failed to process some PMC IDs"
         );
+
+        // Save failed PMC IDs to file if output path is specified
+        if let Some(failed_path) = failed_output {
+            match save_failed_pmcids(&failed_pmcids, &failed_path).await {
+                Ok(_) => {
+                    info!(
+                        path = %failed_path.display(),
+                        count = failed_pmcids.len(),
+                        "Saved failed PMC IDs to file"
+                    );
+                }
+                Err(e) => {
+                    error!(
+                        path = %failed_path.display(),
+                        error = %e,
+                        "Failed to save failed PMC IDs to file"
+                    );
+                }
+            }
+        }
     }
 
     Ok(())
@@ -120,15 +145,24 @@ async fn process_article(
             caption: extracted_figure.figure.caption.clone(),
         };
 
-        // Update the file path in metadata since we moved from temp to final dir
+        // The extracted_file_path contains the temp directory path
+        // We need to find the actual file in the renamed directory
         let temp_file_path = Path::new(&extracted_figure.extracted_file_path);
-        let file_name = temp_file_path.file_name().unwrap_or_default();
-        let updated_file_path = article_dir.join(file_name);
+
+        // Get the relative path from the temp directory
+        let relative_path = if let Ok(stripped) = temp_file_path.strip_prefix(&temp_dir) {
+            stripped
+        } else {
+            // If strip_prefix fails, just use the filename
+            Path::new(temp_file_path.file_name().unwrap_or_default())
+        };
+
+        // Construct the actual path in the renamed directory
+        let actual_file_path = article_dir.join(relative_path);
 
         // Copy figure to a standardized filename
-        let original_path = &updated_file_path;
         if let (Some(extension), Some(_filename)) =
-            (original_path.extension(), original_path.file_stem())
+            (actual_file_path.extension(), actual_file_path.file_stem())
         {
             let new_filename = format!(
                 "{}_{}.{}",
@@ -138,8 +172,13 @@ async fn process_article(
             );
             let new_path = article_dir.join(&new_filename);
 
-            if let Err(e) = fs::copy(&updated_file_path, &new_path).await {
-                warn!(error = %e, "Could not copy figure");
+            if let Err(e) = fs::copy(&actual_file_path, &new_path).await {
+                warn!(
+                    error = %e,
+                    source = %actual_file_path.display(),
+                    target = %new_path.display(),
+                    "Could not copy figure"
+                );
             } else {
                 info!(filename = %new_filename, "Saved figure");
 
@@ -185,4 +224,14 @@ struct FigureMetadata {
     figureid: String,
     label: Option<String>,
     caption: String,
+}
+
+async fn save_failed_pmcids(failed_pmcids: &[String], path: &Path) -> Result<()> {
+    // Join PMC IDs with newlines, one per line
+    let content = failed_pmcids.join("\n");
+
+    // Write to file
+    fs::write(path, content).await?;
+
+    Ok(())
 }

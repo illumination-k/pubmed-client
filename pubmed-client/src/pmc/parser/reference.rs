@@ -147,7 +147,7 @@ pub fn extract_references_detailed(content: &str) -> Result<Vec<Reference>> {
     let references = ref_list
         .refs
         .into_iter()
-        .filter_map(|r| parse_ref_to_reference(r))
+        .filter_map(parse_ref_to_reference)
         .collect();
 
     Ok(references)
