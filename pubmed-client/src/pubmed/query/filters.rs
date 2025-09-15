@@ -64,29 +64,29 @@ pub enum Language {
 impl Language {
     pub(crate) fn to_query_string(&self) -> String {
         match self {
-            Language::English => "English[lang]".to_string(),
-            Language::Japanese => "Japanese[lang]".to_string(),
-            Language::German => "German[lang]".to_string(),
-            Language::French => "French[lang]".to_string(),
-            Language::Spanish => "Spanish[lang]".to_string(),
-            Language::Italian => "Italian[lang]".to_string(),
-            Language::Chinese => "Chinese[lang]".to_string(),
-            Language::Russian => "Russian[lang]".to_string(),
-            Language::Portuguese => "Portuguese[lang]".to_string(),
-            Language::Arabic => "Arabic[lang]".to_string(),
-            Language::Dutch => "Dutch[lang]".to_string(),
-            Language::Korean => "Korean[lang]".to_string(),
-            Language::Polish => "Polish[lang]".to_string(),
-            Language::Swedish => "Swedish[lang]".to_string(),
-            Language::Danish => "Danish[lang]".to_string(),
-            Language::Norwegian => "Norwegian[lang]".to_string(),
-            Language::Finnish => "Finnish[lang]".to_string(),
-            Language::Turkish => "Turkish[lang]".to_string(),
-            Language::Hebrew => "Hebrew[lang]".to_string(),
-            Language::Czech => "Czech[lang]".to_string(),
-            Language::Hungarian => "Hungarian[lang]".to_string(),
-            Language::Greek => "Greek[lang]".to_string(),
-            Language::Other(lang) => format!("{lang}[lang]"),
+            Language::English => "English[la]".to_string(),
+            Language::Japanese => "Japanese[la]".to_string(),
+            Language::German => "German[la]".to_string(),
+            Language::French => "French[la]".to_string(),
+            Language::Spanish => "Spanish[la]".to_string(),
+            Language::Italian => "Italian[la]".to_string(),
+            Language::Chinese => "Chinese[la]".to_string(),
+            Language::Russian => "Russian[la]".to_string(),
+            Language::Portuguese => "Portuguese[la]".to_string(),
+            Language::Arabic => "Arabic[la]".to_string(),
+            Language::Dutch => "Dutch[la]".to_string(),
+            Language::Korean => "Korean[la]".to_string(),
+            Language::Polish => "Polish[la]".to_string(),
+            Language::Swedish => "Swedish[la]".to_string(),
+            Language::Danish => "Danish[la]".to_string(),
+            Language::Norwegian => "Norwegian[la]".to_string(),
+            Language::Finnish => "Finnish[la]".to_string(),
+            Language::Turkish => "Turkish[la]".to_string(),
+            Language::Hebrew => "Hebrew[la]".to_string(),
+            Language::Czech => "Czech[la]".to_string(),
+            Language::Hungarian => "Hungarian[la]".to_string(),
+            Language::Greek => "Greek[la]".to_string(),
+            Language::Other(lang) => format!("{lang}[la]"),
         }
     }
 }
@@ -118,28 +118,28 @@ mod tests {
     #[test]
     fn test_language_to_query_string() {
         let test_cases = vec![
-            (Language::English, "English[lang]"),
-            (Language::Japanese, "Japanese[lang]"),
-            (Language::German, "German[lang]"),
-            (Language::French, "French[lang]"),
-            (Language::Spanish, "Spanish[lang]"),
-            (Language::Italian, "Italian[lang]"),
-            (Language::Chinese, "Chinese[lang]"),
-            (Language::Russian, "Russian[lang]"),
-            (Language::Portuguese, "Portuguese[lang]"),
-            (Language::Arabic, "Arabic[lang]"),
-            (Language::Dutch, "Dutch[lang]"),
-            (Language::Korean, "Korean[lang]"),
-            (Language::Polish, "Polish[lang]"),
-            (Language::Swedish, "Swedish[lang]"),
-            (Language::Danish, "Danish[lang]"),
-            (Language::Norwegian, "Norwegian[lang]"),
-            (Language::Finnish, "Finnish[lang]"),
-            (Language::Turkish, "Turkish[lang]"),
-            (Language::Hebrew, "Hebrew[lang]"),
-            (Language::Czech, "Czech[lang]"),
-            (Language::Hungarian, "Hungarian[lang]"),
-            (Language::Greek, "Greek[lang]"),
+            (Language::English, "English[la]"),
+            (Language::Japanese, "Japanese[la]"),
+            (Language::German, "German[la]"),
+            (Language::French, "French[la]"),
+            (Language::Spanish, "Spanish[la]"),
+            (Language::Italian, "Italian[la]"),
+            (Language::Chinese, "Chinese[la]"),
+            (Language::Russian, "Russian[la]"),
+            (Language::Portuguese, "Portuguese[la]"),
+            (Language::Arabic, "Arabic[la]"),
+            (Language::Dutch, "Dutch[la]"),
+            (Language::Korean, "Korean[la]"),
+            (Language::Polish, "Polish[la]"),
+            (Language::Swedish, "Swedish[la]"),
+            (Language::Danish, "Danish[la]"),
+            (Language::Norwegian, "Norwegian[la]"),
+            (Language::Finnish, "Finnish[la]"),
+            (Language::Turkish, "Turkish[la]"),
+            (Language::Hebrew, "Hebrew[la]"),
+            (Language::Czech, "Czech[la]"),
+            (Language::Hungarian, "Hungarian[la]"),
+            (Language::Greek, "Greek[la]"),
         ];
 
         for (language, expected) in test_cases {
@@ -150,10 +150,10 @@ mod tests {
     #[test]
     fn test_language_other_variant() {
         let custom_lang = Language::Other("Esperanto".to_string());
-        assert_eq!(custom_lang.to_query_string(), "Esperanto[lang]");
+        assert_eq!(custom_lang.to_query_string(), "Esperanto[la]");
 
         let another_custom = Language::Other("Klingon".to_string());
-        assert_eq!(another_custom.to_query_string(), "Klingon[lang]");
+        assert_eq!(another_custom.to_query_string(), "Klingon[la]");
     }
 
     #[test]
@@ -223,16 +223,16 @@ mod tests {
     #[test]
     fn test_language_other_empty_string() {
         let empty_lang = Language::Other("".to_string());
-        assert_eq!(empty_lang.to_query_string(), "[lang]");
+        assert_eq!(empty_lang.to_query_string(), "[la]");
     }
 
     #[test]
     fn test_language_other_special_characters() {
         let special_lang = Language::Other("中文-汉语".to_string());
-        assert_eq!(special_lang.to_query_string(), "中文-汉语[lang]");
+        assert_eq!(special_lang.to_query_string(), "中文-汉语[la]");
 
         let symbol_lang = Language::Other("Lang@#$%".to_string());
-        assert_eq!(symbol_lang.to_query_string(), "Lang@#$%[lang]");
+        assert_eq!(symbol_lang.to_query_string(), "Lang@#$%[la]");
     }
 
     #[test]

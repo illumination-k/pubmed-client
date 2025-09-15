@@ -18,7 +18,7 @@ impl SearchQuery {
     ///     .title_contains("machine learning");
     /// ```
     pub fn title_contains<S: Into<String>>(mut self, title: S) -> Self {
-        self.filters.push(format!("{}[Title]", title.into()));
+        self.filters.push(format!("{}[ti]", title.into()));
         self
     }
 
@@ -37,8 +37,7 @@ impl SearchQuery {
     ///     .abstract_contains("deep learning neural networks");
     /// ```
     pub fn abstract_contains<S: Into<String>>(mut self, abstract_text: S) -> Self {
-        self.filters
-            .push(format!("{}[Abstract]", abstract_text.into()));
+        self.filters.push(format!("{}[tiab]", abstract_text.into()));
         self
     }
 
@@ -57,8 +56,7 @@ impl SearchQuery {
     ///     .title_or_abstract("CRISPR gene editing");
     /// ```
     pub fn title_or_abstract<S: Into<String>>(mut self, text: S) -> Self {
-        self.filters
-            .push(format!("{}[Title/Abstract]", text.into()));
+        self.filters.push(format!("{}[tiab]", text.into()));
         self
     }
 
@@ -78,7 +76,7 @@ impl SearchQuery {
     ///     .journal("Nature");
     /// ```
     pub fn journal<S: Into<String>>(mut self, journal: S) -> Self {
-        self.filters.push(format!("{}[Journal]", journal.into()));
+        self.filters.push(format!("{}[ta]", journal.into()));
         self
     }
 
@@ -98,10 +96,7 @@ impl SearchQuery {
     ///     .journal_abbreviation("Nat Med");
     /// ```
     pub fn journal_abbreviation<S: Into<String>>(mut self, abbreviation: S) -> Self {
-        self.filters.push(format!(
-            "{}[Journal Title Abbreviation]",
-            abbreviation.into()
-        ));
+        self.filters.push(format!("{}[ta]", abbreviation.into()));
         self
     }
 
@@ -120,8 +115,7 @@ impl SearchQuery {
     ///     .grant_number("R01AI123456");
     /// ```
     pub fn grant_number<S: Into<String>>(mut self, grant_number: S) -> Self {
-        self.filters
-            .push(format!("{}[Grant Number]", grant_number.into()));
+        self.filters.push(format!("{}[gr]", grant_number.into()));
         self
     }
 
@@ -307,37 +301,37 @@ mod tests {
     #[test]
     fn test_title_contains() {
         let query = SearchQuery::new().title_contains("machine learning");
-        assert_eq!(query.build(), "machine learning[Title]");
+        assert_eq!(query.build(), "machine learning[ti]");
     }
 
     #[test]
     fn test_abstract_contains() {
         let query = SearchQuery::new().abstract_contains("deep learning neural networks");
-        assert_eq!(query.build(), "deep learning neural networks[Abstract]");
+        assert_eq!(query.build(), "deep learning neural networks[tiab]");
     }
 
     #[test]
     fn test_title_or_abstract() {
         let query = SearchQuery::new().title_or_abstract("CRISPR gene editing");
-        assert_eq!(query.build(), "CRISPR gene editing[Title/Abstract]");
+        assert_eq!(query.build(), "CRISPR gene editing[tiab]");
     }
 
     #[test]
     fn test_journal() {
         let query = SearchQuery::new().journal("Nature");
-        assert_eq!(query.build(), "Nature[Journal]");
+        assert_eq!(query.build(), "Nature[ta]");
     }
 
     #[test]
     fn test_journal_abbreviation() {
         let query = SearchQuery::new().journal_abbreviation("Nat Med");
-        assert_eq!(query.build(), "Nat Med[Journal Title Abbreviation]");
+        assert_eq!(query.build(), "Nat Med[ta]");
     }
 
     #[test]
     fn test_grant_number() {
         let query = SearchQuery::new().grant_number("R01AI123456");
-        assert_eq!(query.build(), "R01AI123456[Grant Number]");
+        assert_eq!(query.build(), "R01AI123456[gr]");
     }
 
     #[test]
@@ -406,13 +400,13 @@ mod tests {
     #[test]
     fn test_language() {
         let query = SearchQuery::new().language(Language::English);
-        assert_eq!(query.build(), "English[lang]");
+        assert_eq!(query.build(), "English[la]");
     }
 
     #[test]
     fn test_language_other() {
         let query = SearchQuery::new().language(Language::Other("Esperanto".to_string()));
-        assert_eq!(query.build(), "Esperanto[lang]");
+        assert_eq!(query.build(), "Esperanto[la]");
     }
 
     #[test]
@@ -425,14 +419,14 @@ mod tests {
             .article_type(ArticleType::ClinicalTrial)
             .language(Language::English);
 
-        let expected = "cancer treatment AND immunotherapy[Title] AND Nature[Journal] AND free full text[sb] AND Clinical Trial[pt] AND English[lang]";
+        let expected = "cancer treatment AND immunotherapy[ti] AND Nature[ta] AND free full text[sb] AND Clinical Trial[pt] AND English[la]";
         assert_eq!(query.build(), expected);
     }
 
     #[test]
     fn test_multiple_journal_filters() {
         let query = SearchQuery::new().journal("Nature").journal("Science");
-        assert_eq!(query.build(), "Nature[Journal] AND Science[Journal]");
+        assert_eq!(query.build(), "Nature[ta] AND Science[ta]");
     }
 
     #[test]
@@ -442,7 +436,7 @@ mod tests {
             .abstract_contains("neural networks");
         assert_eq!(
             query.build(),
-            "machine learning[Title] AND neural networks[Abstract]"
+            "machine learning[ti] AND neural networks[tiab]"
         );
     }
 
@@ -480,7 +474,7 @@ mod tests {
             .isbn("978-0123456789")
             .issn("0028-0836");
 
-        let expected = "R01CA123456[Grant Number] AND 978-0123456789[ISBN] AND 0028-0836[ISSN]";
+        let expected = "R01CA123456[gr] AND 978-0123456789[ISBN] AND 0028-0836[ISSN]";
         assert_eq!(query.build(), expected);
     }
 }
