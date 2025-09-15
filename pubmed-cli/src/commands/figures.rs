@@ -8,20 +8,23 @@ use crate::commands::create_pmc_client_with_timeout;
 use crate::commands::storage::{create_storage_backend, StorageBackend};
 use crate::Cli;
 
-pub async fn execute(
-    pmcids: Vec<String>,
-    output_dir: Option<PathBuf>,
-    s3_path: Option<String>,
-    s3_region: Option<String>,
-    failed_output: Option<PathBuf>,
-    timeout_seconds: Option<u64>,
-    cli: &Cli,
-) -> Result<()> {
-    // Create the appropriate storage backend
-    let storage = create_storage_backend(output_dir, s3_path, s3_region).await?;
+pub struct FiguresOptions {
+    pub pmcids: Vec<String>,
+    pub output_dir: Option<PathBuf>,
+    pub s3_path: Option<String>,
+    pub s3_region: Option<String>,
+    pub failed_output: Option<PathBuf>,
+    pub timeout_seconds: Option<u64>,
+    pub overwrite: bool,
+}
 
-    // Initialize the PMC client with timeout (default to 120 seconds for figure extraction)
-    let timeout = timeout_seconds.unwrap_or(120);
+pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
+    // Create the appropriate storage backend
+    let storage =
+        create_storage_backend(options.output_dir, options.s3_path, options.s3_region).await?;
+
+    // Initialize the PMC client with timeout (default to 180 seconds for figure extraction)
+    let timeout = options.timeout_seconds.unwrap_or(180);
     let client = create_pmc_client_with_timeout(
         cli.api_key.as_deref(),
         cli.email.as_deref(),
@@ -32,10 +35,10 @@ pub async fn execute(
     let mut failed_pmcids = Vec::new();
 
     // Process each PMCID
-    for pmcid in &pmcids {
+    for pmcid in &options.pmcids {
         info!(pmcid = %pmcid, "Processing article");
 
-        if let Err(e) = process_article(&client, pmcid, storage.as_ref()).await {
+        if let Err(e) = process_article(&client, pmcid, storage.as_ref(), options.overwrite).await {
             error!(pmcid = %pmcid, error = %e, "Failed to process article");
             failed_pmcids.push(pmcid.clone());
             continue;
@@ -52,7 +55,7 @@ pub async fn execute(
         );
 
         // Save failed PMC IDs to file if output path is specified
-        if let Some(failed_path) = failed_output {
+        if let Some(failed_path) = options.failed_output {
             match save_failed_pmcids(&failed_pmcids, &failed_path, storage.as_ref()).await {
                 Ok(_) => {
                     info!(
@@ -79,7 +82,23 @@ async fn process_article(
     client: &pubmed_client_rs::PmcClient,
     pmcid: &str,
     storage: &dyn StorageBackend,
+    overwrite: bool,
 ) -> Result<()> {
+    // Check if metadata file already exists and skip early if overwrite is false
+    let article_dir_str = pmcid;
+    let json_filename = format!("{}_figures_metadata.json", pmcid);
+    let json_storage_path = format!("{}/{}", article_dir_str, json_filename);
+
+    if !overwrite
+        && storage
+            .file_exists(&json_storage_path)
+            .await
+            .unwrap_or(false)
+    {
+        info!(pmcid = %pmcid, "Article already processed, skipping download (use --overwrite to force)");
+        return Ok(());
+    }
+
     // Create a temporary directory for extraction using tempfile crate
     // This ensures automatic cleanup on drop and avoids conflicts
     let temp_dir_handle = TempDir::new()?;
@@ -108,7 +127,6 @@ async fn process_article(
     }
 
     // Now that we have figures, ensure the storage directory exists
-    let article_dir_str = pmcid;
     storage.ensure_directory(article_dir_str).await?;
     debug!(directory = %storage.get_full_path(article_dir_str), "Created storage directory");
 
@@ -152,7 +170,11 @@ async fn process_article(
             );
             let storage_path = format!("{}/{}", article_dir_str, new_filename);
 
-            if let Err(e) = storage.copy_file(actual_file_path, &storage_path).await {
+            // Check if figure already exists and skip if overwrite is false
+            let file_exists = storage.file_exists(&storage_path).await.unwrap_or(false);
+            if !overwrite && file_exists {
+                info!(filename = %new_filename, "Figure already exists, skipping");
+            } else if let Err(e) = storage.copy_file(actual_file_path, &storage_path).await {
                 warn!(
                     error = %e,
                     source = %actual_file_path.display(),
@@ -160,7 +182,8 @@ async fn process_article(
                     "Could not copy figure to storage"
                 );
             } else {
-                info!(filename = %new_filename, location = %storage.get_full_path(&storage_path), "Saved figure");
+                let action = if file_exists { "Overwritten" } else { "Saved" };
+                info!(filename = %new_filename, location = %storage.get_full_path(&storage_path), "{} figure", action);
 
                 let caption_preview = if extracted_figure.figure.caption.len() > 80 {
                     format!("{}...", &extracted_figure.figure.caption[..80])
@@ -178,7 +201,7 @@ async fn process_article(
                 }
 
                 if let Some(size) = extracted_figure.file_size {
-                    debug!(size_kb = size / 1024, "Figure size");
+                    debug!(size_kb = size / 1024, "Figure size (KB)");
                 }
             }
         }
@@ -186,16 +209,23 @@ async fn process_article(
         figure_metadata.push(metadata);
     }
 
-    // Save metadata as JSON to storage
-    let json_filename = format!("{}_figures_metadata.json", pmcid);
-    let json_storage_path = format!("{}/{}", article_dir_str, json_filename);
-
+    // Save metadata as JSON to storage (always save metadata if we got this far)
     let json_content = serde_json::to_string_pretty(&figure_metadata)?;
     storage
         .write_file(&json_storage_path, json_content.as_bytes())
         .await?;
 
-    debug!(filename = %json_filename, location = %storage.get_full_path(&json_storage_path), "Saved metadata");
+    let metadata_action = if storage
+        .file_exists(&json_storage_path)
+        .await
+        .unwrap_or(false)
+        && overwrite
+    {
+        "Overwritten"
+    } else {
+        "Saved"
+    };
+    debug!(filename = %json_filename, location = %storage.get_full_path(&json_storage_path), "{} metadata", metadata_action);
 
     Ok(())
 }

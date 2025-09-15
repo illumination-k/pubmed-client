@@ -54,6 +54,9 @@ enum Commands {
         /// HTTP request timeout in seconds (default: 120)
         #[arg(short, long)]
         timeout: Option<u64>,
+        /// Overwrite existing files (default: skip existing files)
+        #[arg(long)]
+        overwrite: bool,
     },
     /// Convert PMC articles to Markdown format
     Markdown(commands::markdown::Markdown),
@@ -91,17 +94,18 @@ async fn main() -> Result<()> {
             s3_region,
             failed_output,
             timeout,
+            overwrite,
         } => {
-            commands::figures::execute(
-                pmcids.clone(),
-                output_dir.clone(),
-                s3_path.clone(),
-                s3_region.clone(),
-                failed_output.clone(),
-                *timeout,
-                &cli,
-            )
-            .await
+            let options = commands::figures::FiguresOptions {
+                pmcids: pmcids.clone(),
+                output_dir: output_dir.clone(),
+                s3_path: s3_path.clone(),
+                s3_region: s3_region.clone(),
+                failed_output: failed_output.clone(),
+                timeout_seconds: *timeout,
+                overwrite: *overwrite,
+            };
+            commands::figures::execute(options, &cli).await
         }
         Commands::Markdown(cmd) => {
             let api_key = cli.api_key.as_deref();
