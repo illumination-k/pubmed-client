@@ -2,6 +2,7 @@ pub mod convert;
 pub mod figures;
 pub mod markdown;
 pub mod search;
+pub mod storage;
 
 use anyhow::Result;
 use pubmed_client_rs::{ClientConfig, PmcClient, PubMedClient};

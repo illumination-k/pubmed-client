@@ -53,6 +53,11 @@ pub enum PubMedError {
     /// IO error for file operations
     #[error("IO error: {message}")]
     IoError { message: String },
+
+    /// Search limit exceeded
+    /// This error is returned when a search query requests more results than the maximum retrievable limit.
+    #[error("Search limit exceeded: requested {requested}, maximum is {maximum}")]
+    SearchLimitExceeded { requested: usize, maximum: usize },
 }
 
 pub type Result<T> = result::Result<T, PubMedError>;
@@ -110,7 +115,8 @@ impl RetryableError for PubMedError {
             | PubMedError::PmcNotAvailableById { .. }
             | PubMedError::InvalidPmid { .. }
             | PubMedError::InvalidQuery(_)
-            | PubMedError::IoError { .. } => false,
+            | PubMedError::IoError { .. }
+            | PubMedError::SearchLimitExceeded { .. } => false,
         }
     }
 

@@ -15,7 +15,7 @@ pub struct Convert {
     pub format: String,
 
     /// Batch size for processing PMIDs (to avoid API rate limits)
-    #[arg(long, default_value = "100")]
+    #[arg(long, default_value = "350")]
     pub batch_size: usize,
 }
 

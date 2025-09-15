@@ -39,3 +39,17 @@ chrono = { version = "0.4", features = ["serde"] }
 
 # Temporary files
 tempfile = "3.8"
+
+# AWS SDK for S3 support
+aws-config = { version = "1.5", features = ["behavior-version-latest"] }
+aws-sdk-s3 = "1.60"
+
+# Async trait for storage abstraction
+async-trait = "0.1"
+
+[dev-dependencies]
+# Testing utilities
+aws-smithy-mocks-experimental = "0.2"
+aws-smithy-runtime-api = "1.7"
+tempfile = "3.8"
+tokio-test = "0.4"

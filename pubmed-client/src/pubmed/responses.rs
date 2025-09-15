@@ -9,6 +9,9 @@ pub(crate) struct ESearchResult {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct ESearchData {
+    pub count: String,
+    pub retmax: String,
+    pub retstart: String,
     pub idlist: Vec<String>,
 }
 
