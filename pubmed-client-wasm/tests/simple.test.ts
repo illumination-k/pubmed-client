@@ -83,15 +83,24 @@ describe('WASM Client Basic Tests', () => {
     it('should fetch article by PMID successfully', async () => {
       const client = WasmPubMedClient.new_for_testing()
 
-      const article = await client.fetch_article('31978945')
+      try {
+        const article = await client.fetch_article('31978945')
 
-      expect(article).toBeDefined()
-      expect(article.pmid).toBe('31978945')
-      expect(typeof article.title).toBe('string')
-      expect(Array.isArray(article.authors)).toBe(true)
-      expect(typeof article.journal).toBe('string')
-
-      client.free()
+        expect(article).toBeDefined()
+        expect(article.pmid).toBe('31978945')
+        expect(typeof article.title).toBe('string')
+        expect(Array.isArray(article.authors)).toBe(true)
+        expect(typeof article.journal).toBe('string')
+      } catch (error: any) {
+        // Skip test if API rate limited or network issues in CI
+        if (error.message?.includes('429') || error.message?.includes('Too Many Requests')) {
+          console.warn('Skipping test due to API rate limit:', error.message)
+          return
+        }
+        throw error
+      } finally {
+        client.free()
+      }
     })
 
     it('should fail with invalid PMID', async () => {
@@ -107,17 +116,26 @@ describe('WASM Client Basic Tests', () => {
     it('should check PMC availability successfully', async () => {
       const client = WasmPubMedClient.new_for_testing()
 
-      const pmcId = await client.check_pmc_availability('31978945')
+      try {
+        const pmcId = await client.check_pmc_availability('31978945')
 
-      // Can be null or a PMC ID string
-      if (pmcId !== null) {
-        expect(typeof pmcId).toBe('string')
-        // Handle potential quote formatting issues
-        const cleanPmcId = pmcId.replace(/"/g, '')
-        expect(cleanPmcId).toMatch(/^PMC\d+$/)
+        // Can be null or a PMC ID string
+        if (pmcId !== null) {
+          expect(typeof pmcId).toBe('string')
+          // Handle potential quote formatting issues
+          const cleanPmcId = pmcId.replace(/"/g, '')
+          expect(cleanPmcId).toMatch(/^PMC\d+$/)
+        }
+      } catch (error: any) {
+        // Skip test if API rate limited or network issues in CI
+        if (error.message?.includes('429') || error.message?.includes('Too Many Requests')) {
+          console.warn('Skipping PMC availability test due to API rate limit:', error.message)
+          return
+        }
+        throw error
+      } finally {
+        client.free()
       }
-
-      client.free()
     })
 
     it('should handle invalid PMID for PMC check', async () => {
