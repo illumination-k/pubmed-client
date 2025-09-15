@@ -11,7 +11,7 @@ use tracing::{debug, instrument};
 #[derive(Debug, Deserialize)]
 #[serde(rename = "PubmedArticleSet")]
 struct PubmedArticleSet {
-    #[serde(rename = "PubmedArticle")]
+    #[serde(rename = "PubmedArticle", default)]
     articles: Vec<PubmedArticleXml>,
 }
 

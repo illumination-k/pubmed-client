@@ -72,8 +72,20 @@ struct Aff {
     #[serde(rename = "@id")]
     id: Option<String>,
 
-    #[serde(rename = "$text")]
+    #[serde(rename = "$text", default)]
     text: Option<String>,
+
+    #[serde(rename = "institution", default)]
+    #[allow(dead_code)]
+    institutions: Vec<String>,
+
+    #[serde(rename = "addr-line", default)]
+    #[allow(dead_code)]
+    addr_lines: Vec<String>,
+
+    #[serde(rename = "country", default)]
+    #[allow(dead_code)]
+    countries: Vec<String>,
 }
 
 /// XML structure for element-citation or mixed-citation
@@ -96,6 +108,51 @@ struct PersonGroup {
     names: Vec<Name>,
 }
 
+/// Remove XML comments that can interfere with serde deserialization
+fn remove_xml_comments(xml: &str) -> String {
+    let mut result = String::with_capacity(xml.len());
+    let mut chars = xml.chars();
+
+    while let Some(ch) = chars.next() {
+        if ch == '<' {
+            // Look ahead to see if this is a comment
+            let peek = chars.as_str();
+            if peek.starts_with("!--") {
+                // Skip the comment start
+                chars.next(); // !
+                chars.next(); // -
+                chars.next(); // -
+
+                // Skip until we find the comment end
+                let mut found_end = false;
+                while let Some(c) = chars.next() {
+                    if c == '-' {
+                        let remaining = chars.as_str();
+                        if remaining.starts_with("->") {
+                            chars.next(); // -
+                            chars.next(); // >
+                            found_end = true;
+                            break;
+                        }
+                    }
+                }
+
+                if !found_end {
+                    // If we didn't find the end, just continue
+                    // (malformed comment, but try to be robust)
+                }
+            } else {
+                // Not a comment, include the '<'
+                result.push(ch);
+            }
+        } else {
+            result.push(ch);
+        }
+    }
+
+    result
+}
+
 /// Extract authors from PMC XML content
 pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
     // Find and extract the contrib-group section
@@ -104,8 +161,11 @@ pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
             let contrib_section =
                 &content[contrib_start..contrib_start + contrib_end + "</contrib-group>".len()];
 
+            // Remove XML comments that can cause serde deserialization issues
+            let cleaned_section = remove_xml_comments(contrib_section);
+
             // Try to deserialize the contrib-group
-            match from_str::<ContribGroup>(contrib_section) {
+            match from_str::<ContribGroup>(&cleaned_section) {
                 Ok(contrib_group) => {
                     let authors = contrib_group
                         .contribs
@@ -114,10 +174,14 @@ pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
                         .collect();
                     Ok(authors)
                 }
-                Err(e) => Err(PubMedError::XmlError(format!(
-                    "Failed to parse contrib-group XML: {}",
-                    e
-                ))),
+                Err(e) => {
+                    // Log the error but continue with empty authors rather than failing completely
+                    tracing::warn!(
+                        "Failed to parse contrib-group XML ({}), continuing with empty authors",
+                        e
+                    );
+                    Ok(Vec::new())
+                }
             }
         } else {
             Err(PubMedError::XmlError(
