@@ -51,6 +51,9 @@ enum Commands {
         /// Path to save failed PMC IDs (if not specified, failures are logged only)
         #[arg(short, long)]
         failed_output: Option<PathBuf>,
+        /// HTTP request timeout in seconds (default: 120)
+        #[arg(short, long)]
+        timeout: Option<u64>,
     },
     /// Convert PMC articles to Markdown format
     Markdown(commands::markdown::Markdown),
@@ -87,6 +90,7 @@ async fn main() -> Result<()> {
             s3_path,
             s3_region,
             failed_output,
+            timeout,
         } => {
             commands::figures::execute(
                 pmcids.clone(),
@@ -94,6 +98,7 @@ async fn main() -> Result<()> {
                 s3_path.clone(),
                 s3_region.clone(),
                 failed_output.clone(),
+                *timeout,
                 &cli,
             )
             .await

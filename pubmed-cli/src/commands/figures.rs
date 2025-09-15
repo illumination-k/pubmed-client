@@ -2,9 +2,9 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use tempfile::TempDir;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
-use crate::commands::create_pmc_client;
+use crate::commands::create_pmc_client_with_timeout;
 use crate::commands::storage::{create_storage_backend, StorageBackend};
 use crate::Cli;
 
@@ -14,13 +14,20 @@ pub async fn execute(
     s3_path: Option<String>,
     s3_region: Option<String>,
     failed_output: Option<PathBuf>,
+    timeout_seconds: Option<u64>,
     cli: &Cli,
 ) -> Result<()> {
     // Create the appropriate storage backend
     let storage = create_storage_backend(output_dir, s3_path, s3_region).await?;
 
-    // Initialize the PMC client
-    let client = create_pmc_client(cli.api_key.as_deref(), cli.email.as_deref(), &cli.tool)?;
+    // Initialize the PMC client with timeout (default to 120 seconds for figure extraction)
+    let timeout = timeout_seconds.unwrap_or(120);
+    let client = create_pmc_client_with_timeout(
+        cli.api_key.as_deref(),
+        cli.email.as_deref(),
+        &cli.tool,
+        Some(timeout),
+    )?;
 
     let mut failed_pmcids = Vec::new();
 
@@ -73,9 +80,6 @@ async fn process_article(
     pmcid: &str,
     storage: &dyn StorageBackend,
 ) -> Result<()> {
-    // First, try to extract figures to a temporary location
-    info!("Extracting figures and matching with captions");
-
     // Create a temporary directory for extraction using tempfile crate
     // This ensures automatic cleanup on drop and avoids conflicts
     let temp_dir_handle = TempDir::new()?;
@@ -100,19 +104,18 @@ async fn process_article(
 
     if figures.is_empty() {
         // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
-        info!(pmcid = %pmcid, "No figures found in article");
-        return Ok(());
+        return Err(anyhow::anyhow!("No figures found in article"));
     }
 
     // Now that we have figures, ensure the storage directory exists
     let article_dir_str = pmcid;
     storage.ensure_directory(article_dir_str).await?;
-    info!(directory = %storage.get_full_path(article_dir_str), "Created storage directory");
+    debug!(directory = %storage.get_full_path(article_dir_str), "Created storage directory");
 
     // Keep the temp directory from being auto-deleted
     let _temp_path = temp_dir_handle.keep();
 
-    info!(pmcid = %pmcid, figure_count = figures.len(), "Found figures");
+    debug!(pmcid = %pmcid, figure_count = figures.len(), "Found figures");
 
     // Process each figure
     let mut figure_metadata = Vec::new();
@@ -164,10 +167,10 @@ async fn process_article(
                 } else {
                     extracted_figure.figure.caption.clone()
                 };
-                info!(caption = %caption_preview, "Figure caption");
+                debug!(caption = %caption_preview, "Figure caption");
 
                 if let Some(dimensions) = extracted_figure.dimensions {
-                    info!(
+                    debug!(
                         width = dimensions.0,
                         height = dimensions.1,
                         "Figure dimensions"
@@ -175,7 +178,7 @@ async fn process_article(
                 }
 
                 if let Some(size) = extracted_figure.file_size {
-                    info!(size_kb = size / 1024, "Figure size");
+                    debug!(size_kb = size / 1024, "Figure size");
                 }
             }
         }
@@ -192,7 +195,7 @@ async fn process_article(
         .write_file(&json_storage_path, json_content.as_bytes())
         .await?;
 
-    info!(filename = %json_filename, location = %storage.get_full_path(&json_storage_path), "Saved metadata");
+    debug!(filename = %json_filename, location = %storage.get_full_path(&json_storage_path), "Saved metadata");
 
     Ok(())
 }
