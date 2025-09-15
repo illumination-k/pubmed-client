@@ -189,22 +189,11 @@ impl PubMedClient {
             });
         }
 
-        // Build URL with API parameters
-        let mut url = format!(
+        // Build URL - API parameters will be added by make_request
+        let url = format!(
             "{}/efetch.fcgi?db=pubmed&id={}&retmode=xml&rettype=abstract",
             self.base_url, pmid
         );
-
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        if !api_params.is_empty() {
-            for (key, value) in api_params {
-                url.push('&');
-                url.push_str(&key);
-                url.push('=');
-                url.push_str(&urlencoding::encode(&value));
-            }
-        }
 
         debug!("Making EFetch API request");
         let response = self.make_request(&url).await?;
@@ -289,22 +278,13 @@ impl PubMedClient {
             return Ok(Vec::new());
         }
 
-        let mut url = format!(
+        let url = format!(
             "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retstart={}&retmode=json",
             self.base_url,
             urlencoding::encode(query),
             limit,
             0
         );
-
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        for (key, value) in &api_params {
-            url.push('&');
-            url.push_str(key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(value));
-        }
 
         debug!("Making initial ESearch API request");
         let response = self.make_request(&url).await?;
@@ -407,17 +387,8 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self))]
     pub async fn get_database_list(&self) -> Result<Vec<String>> {
-        // Build URL with API parameters
-        let mut url = format!("{}/einfo.fcgi?retmode=json", self.base_url);
-
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
+        // Build URL - API parameters will be added by make_request
+        let url = format!("{}/einfo.fcgi?retmode=json", self.base_url);
 
         debug!("Making EInfo API request for database list");
         let response = self.make_request(&url).await?;
@@ -489,21 +460,12 @@ impl PubMedClient {
             });
         }
 
-        // Build URL with API parameters
-        let mut url = format!(
+        // Build URL - API parameters will be added by make_request
+        let url = format!(
             "{}/einfo.fcgi?db={}&retmode=json",
             self.base_url,
             urlencoding::encode(database)
         );
-
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
 
         debug!("Making EInfo API request for database details");
         let response = self.make_request(&url).await?;
@@ -794,14 +756,32 @@ impl PubMedClient {
     }
 
     /// Internal helper method for making HTTP requests with retry logic
+    /// Automatically appends API parameters (api_key, email, tool) to the URL
     async fn make_request(&self, url: &str) -> Result<Response> {
+        // Build final URL with API parameters
+        let mut final_url = url.to_string();
+        let api_params = self.config.build_api_params();
+
+        if !api_params.is_empty() {
+            // Check if URL already has query parameters
+            let separator = if url.contains('?') { '&' } else { '?' };
+            final_url.push(separator);
+
+            // Append API parameters
+            let param_strings: Vec<String> = api_params
+                .into_iter()
+                .map(|(key, value)| format!("{}={}", key, urlencoding::encode(&value)))
+                .collect();
+            final_url.push_str(&param_strings.join("&"));
+        }
+
         with_retry(
             || async {
                 self.rate_limiter.acquire().await?;
-                debug!("Making API request to: {}", url);
+                debug!("Making API request to: {}", final_url);
                 let response = self
                     .client
-                    .get(url)
+                    .get(&final_url)
                     .send()
                     .await
                     .map_err(PubMedError::from)?;
@@ -837,23 +817,14 @@ impl PubMedClient {
         let id_list: Vec<String> = pmids.iter().map(|id| id.to_string()).collect();
         let ids = id_list.join(",");
 
-        // Build URL with API parameters
-        let mut url = format!(
+        // Build URL - API parameters will be added by make_request
+        let url = format!(
             "{}/elink.fcgi?dbfrom=pubmed&db={}&id={}&linkname={}&retmode=json",
             self.base_url,
             urlencoding::encode(target_db),
             urlencoding::encode(&ids),
             urlencoding::encode(link_name)
         );
-
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
 
         debug!("Making ELink API request");
         let response = self.make_request(&url).await?;
