@@ -290,8 +290,8 @@ mod tests {
         let query = search.build_query().unwrap();
         assert!(query.contains("cancer"));
         assert!(query.contains("2020:2023[pdat]"));
-        assert!(query.contains("Smith[Author]"));
-        assert!(query.contains("Nature[Journal]"));
+        assert!(query.contains("Smith[au]"));
+        assert!(query.contains("Nature[ta]"));
         assert!(query.contains("Review[pt]"));
         assert!(query.contains("free full text[sb]"));
     }
@@ -321,7 +321,7 @@ mod tests {
 
         let query = search.build_query().unwrap();
         assert!(query.contains("gene expression"));
-        assert!(query.contains("Mus musculus[Organism]"));
+        assert!(query.contains("Mus musculus[mh]"));
     }
 
     #[test]
