@@ -93,10 +93,12 @@ describe('WASM Client Basic Tests', () => {
         expect(typeof article.journal).toBe('string')
       } catch (error: any) {
         // Skip test if API rate limited, network issues, or JSON parsing errors in CI
-        if (error.message?.includes('429') ||
-            error.message?.includes('Too Many Requests') ||
-            error.message?.includes('control character') ||
-            error.message?.includes('error decoding response body')) {
+        if (
+          error.message?.includes('429') ||
+          error.message?.includes('Too Many Requests') ||
+          error.message?.includes('control character') ||
+          error.message?.includes('error decoding response body')
+        ) {
           console.warn('Skipping test due to API issue:', error.message)
           return
         }
@@ -131,10 +133,12 @@ describe('WASM Client Basic Tests', () => {
         }
       } catch (error: any) {
         // Skip test if API rate limited, network issues, or JSON parsing errors in CI
-        if (error.message?.includes('429') ||
-            error.message?.includes('Too Many Requests') ||
-            error.message?.includes('control character') ||
-            error.message?.includes('error decoding response body')) {
+        if (
+          error.message?.includes('429') ||
+          error.message?.includes('Too Many Requests') ||
+          error.message?.includes('control character') ||
+          error.message?.includes('error decoding response body')
+        ) {
           console.warn('Skipping PMC availability test due to API issue:', error.message)
           return
         }

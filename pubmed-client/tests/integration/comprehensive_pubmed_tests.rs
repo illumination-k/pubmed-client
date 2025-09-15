@@ -121,20 +121,12 @@ fn test_comprehensive_pubmed_parsing(#[from(xml_test_cases)] test_cases: Vec<Pub
     }
 
     // Assert that most files parse successfully (at least 80%)
-    // Skip this check if most files failed to parse (likely Git LFS issues in CI)
     let success_rate = successful_parses as f64 / test_cases.len() as f64;
-    if success_rate < 0.2 {
-        warn!(
-            "Low success rate ({:.1}%), likely due to Git LFS issues in CI. Skipping success rate check.",
-            success_rate * 100.0
-        );
-    } else {
-        assert!(
-            success_rate >= 0.8,
-            "Success rate should be at least 80%, got {:.1}%",
-            success_rate * 100.0
-        );
-    }
+    assert!(
+        success_rate >= 0.8,
+        "Success rate should be at least 80%, got {:.1}%",
+        success_rate * 100.0
+    );
 }
 
 #[rstest]

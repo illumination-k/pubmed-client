@@ -274,21 +274,14 @@ mod tests {
 
                 // Test that we can read the content
                 let content = test_case.read_xml_content();
+                assert!(content.is_ok());
 
-                // Skip if content read fails (possibly due to LFS issues in CI)
                 if let Ok(xml_content) = content {
-                    // Skip empty files and LFS pointer files
-                    if !xml_content.is_empty()
-                        && !xml_content.starts_with("version https://git-lfs.github.com/spec/v1")
-                    {
-                        assert!(
-                            xml_content.contains("<PubmedArticle")
-                                || xml_content.contains("<MedlineCitation"),
-                            "XML content should contain PubmedArticle or MedlineCitation tags. File: {}, Content length: {}",
-                            test_case.filename(),
-                            xml_content.len()
-                        );
-                    }
+                    assert!(!xml_content.is_empty());
+                    assert!(
+                        xml_content.contains("<PubmedArticle")
+                            || xml_content.contains("<MedlineCitation")
+                    );
                 }
             }
         }
