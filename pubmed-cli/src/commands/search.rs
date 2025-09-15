@@ -195,7 +195,7 @@ impl Search {
 
         // Organism filter
         if let Some(ref organism) = self.organism {
-            query = query.organism(organism);
+            query = query.organism_mesh(organism);
         }
 
         // Article type and content filters

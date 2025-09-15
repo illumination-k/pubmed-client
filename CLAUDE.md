@@ -6,6 +6,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library, WebAssembly bindings for JavaScript/TypeScript environments, and a command-line interface for common operations.
 
+## Important Guidelines for PubMed Search Query Implementation
+
+**CRITICAL**: When implementing or modifying PubMed search query functionality, ALWAYS reference the official NCBI PubMed documentation:
+
+- **Primary Resource**: https://pubmed.ncbi.nlm.nih.gov/help/#using-search-field-tags
+- **E-utilities Documentation**: https://www.ncbi.nlm.nih.gov/books/NBK25499/
+
+### Search Field Tag Validation
+
+Before implementing new search field tags or modifying existing ones:
+
+1. **Verify field tags** against the official PubMed help documentation
+2. **Use correct tag syntax** - PubMed uses short form tags (e.g., `[ti]` for Title, `[au]` for Author)
+3. **Test with real API calls** when possible to ensure compatibility
+4. **Document any limitations** or special requirements for field tags
+
+### Currently Validated Field Tags
+
+The following field tags have been verified against NCBI documentation:
+
+- `[ti]` - Title
+- `[tiab]` - Title/Abstract
+- `[au]` - Author
+- `[1au]` - First Author
+- `[lastau]` - Last Author
+- `[ad]` - Affiliation
+- `[ta]` - Journal Title Abbreviation
+- `[la]` - Language
+- `[pt]` - Publication Type
+- `[mh]` - MeSH Terms
+- `[majr]` - MeSH Major Topic
+- `[sh]` - MeSH Subheading
+- `[gr]` - Grant Number
+- `[auid]` - Author Identifier (ORCID)
+- `[pdat]` - Publication Date
+- `[edat]` - Entry Date
+- `[mdat]` - Modification Date
+- `[sb]` - Subset (e.g., "free full text[sb]")
+
+### Invalid or Non-existent Tags
+
+These tags do NOT exist in PubMed and should not be used:
+
+- `[Organism]` - Use MeSH terms with `[mh]` instead
+- `[lang]` - Deprecated, use `[la]`
+- Long-form tags like `[Title]`, `[Author]`, etc. - Use short forms
+
+When in doubt, always check the official documentation before implementation.
+
 ## Workspace Structure
 
 ```
