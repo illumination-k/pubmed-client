@@ -198,18 +198,6 @@ impl PubMedClient {
         debug!("Making EFetch API request");
         let response = self.make_request(&url).await?;
 
-        if !response.status().is_success() {
-            warn!("API request failed with status: {}", response.status());
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
-
         debug!("Received successful API response, parsing XML");
         let xml_text = response.text().await?;
 
@@ -288,21 +276,6 @@ impl PubMedClient {
 
         debug!("Making initial ESearch API request");
         let response = self.make_request(&url).await?;
-
-        if !response.status().is_success() {
-            warn!(
-                "Search API request failed with status: {}",
-                response.status()
-            );
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
 
         let search_result: ESearchResult = response.json().await?;
         let total_count: usize = search_result.esearchresult.count.parse().unwrap_or(0);
@@ -393,21 +366,6 @@ impl PubMedClient {
         debug!("Making EInfo API request for database list");
         let response = self.make_request(&url).await?;
 
-        if !response.status().is_success() {
-            warn!(
-                "EInfo API request failed with status: {}",
-                response.status()
-            );
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
-
         let einfo_response: EInfoResponse = response.json().await?;
 
         let db_list = einfo_response.einfo_result.db_list.unwrap_or_default();
@@ -469,21 +427,6 @@ impl PubMedClient {
 
         debug!("Making EInfo API request for database details");
         let response = self.make_request(&url).await?;
-
-        if !response.status().is_success() {
-            warn!(
-                "EInfo API request failed with status: {}",
-                response.status()
-            );
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
 
         let einfo_response: EInfoResponse = response.json().await?;
 
@@ -775,7 +718,7 @@ impl PubMedClient {
             final_url.push_str(&param_strings.join("&"));
         }
 
-        with_retry(
+        let response = with_retry(
             || async {
                 self.rate_limiter.acquire().await?;
                 debug!("Making API request to: {}", final_url);
@@ -803,7 +746,22 @@ impl PubMedClient {
             &self.config.retry_config,
             "NCBI API request",
         )
-        .await
+        .await?;
+
+        // Check for any non-success status (client errors, etc.)
+        if !response.status().is_success() {
+            warn!("API request failed with status: {}", response.status());
+            return Err(PubMedError::ApiError {
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
+            });
+        }
+
+        Ok(response)
     }
 
     /// Internal helper method for ELink API requests
@@ -828,21 +786,6 @@ impl PubMedClient {
 
         debug!("Making ELink API request");
         let response = self.make_request(&url).await?;
-
-        if !response.status().is_success() {
-            warn!(
-                "ELink API request failed with status: {}",
-                response.status()
-            );
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
 
         let elink_response: ELinkResponse = response.json().await?;
         Ok(elink_response)
