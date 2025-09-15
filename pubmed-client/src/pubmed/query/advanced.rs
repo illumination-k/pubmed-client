@@ -18,8 +18,7 @@ impl SearchQuery {
     ///     .mesh_major_topic("Diabetes Mellitus, Type 2");
     /// ```
     pub fn mesh_major_topic<S: Into<String>>(mut self, mesh_term: S) -> Self {
-        self.filters
-            .push(format!("{}[MeSH Major Topic]", mesh_term.into()));
+        self.filters.push(format!("{}[majr]", mesh_term.into()));
         self
     }
 
@@ -38,8 +37,7 @@ impl SearchQuery {
     ///     .mesh_term("Neoplasms");
     /// ```
     pub fn mesh_term<S: Into<String>>(mut self, mesh_term: S) -> Self {
-        self.filters
-            .push(format!("{}[MeSH Terms]", mesh_term.into()));
+        self.filters.push(format!("{}[mh]", mesh_term.into()));
         self
     }
 
@@ -80,8 +78,7 @@ impl SearchQuery {
     ///     .mesh_subheading("drug therapy");
     /// ```
     pub fn mesh_subheading<S: Into<String>>(mut self, subheading: S) -> Self {
-        self.filters
-            .push(format!("{}[MeSH Subheading]", subheading.into()));
+        self.filters.push(format!("{}[sh]", subheading.into()));
         self
     }
 
@@ -101,8 +98,7 @@ impl SearchQuery {
     ///     .first_author("Smith J");
     /// ```
     pub fn first_author<S: Into<String>>(mut self, author: S) -> Self {
-        self.filters
-            .push(format!("{}[First Author]", author.into()));
+        self.filters.push(format!("{}[1au]", author.into()));
         self
     }
 
@@ -122,7 +118,7 @@ impl SearchQuery {
     ///     .last_author("Johnson M");
     /// ```
     pub fn last_author<S: Into<String>>(mut self, author: S) -> Self {
-        self.filters.push(format!("{}[Last Author]", author.into()));
+        self.filters.push(format!("{}[lastau]", author.into()));
         self
     }
 
@@ -142,7 +138,7 @@ impl SearchQuery {
     ///     .author("Williams K");
     /// ```
     pub fn author<S: Into<String>>(mut self, author: S) -> Self {
-        self.filters.push(format!("{}[Author]", author.into()));
+        self.filters.push(format!("{}[au]", author.into()));
         self
     }
 
@@ -162,8 +158,7 @@ impl SearchQuery {
     ///     .affiliation("Harvard Medical School");
     /// ```
     pub fn affiliation<S: Into<String>>(mut self, institution: S) -> Self {
-        self.filters
-            .push(format!("{}[Affiliation]", institution.into()));
+        self.filters.push(format!("{}[ad]", institution.into()));
         self
     }
 
@@ -183,12 +178,11 @@ impl SearchQuery {
     ///     .orcid("0000-0001-2345-6789");
     /// ```
     pub fn orcid<S: Into<String>>(mut self, orcid_id: S) -> Self {
-        self.filters
-            .push(format!("{}[Author - Identifier]", orcid_id.into()));
+        self.filters.push(format!("{}[auid]", orcid_id.into()));
         self
     }
 
-    /// Filter by organism (scientific or common name)
+    /// Filter by organism using MeSH terms (scientific or common name)
     ///
     /// # Arguments
     ///
@@ -202,20 +196,20 @@ impl SearchQuery {
     /// // Using scientific name
     /// let query = SearchQuery::new()
     ///     .query("gene expression")
-    ///     .organism("Mus musculus");
+    ///     .organism_mesh("Mus musculus");
     ///
     /// // Using common name
     /// let query = SearchQuery::new()
     ///     .query("metabolism")
-    ///     .organism("mouse");
+    ///     .organism_mesh("Mice");
     ///
     /// // Using bacteria
     /// let query = SearchQuery::new()
     ///     .query("antibiotic resistance")
-    ///     .organism("Escherichia coli");
+    ///     .organism_mesh("Escherichia coli");
     /// ```
-    pub fn organism<S: Into<String>>(mut self, organism: S) -> Self {
-        self.filters.push(format!("{}[Organism]", organism.into()));
+    pub fn organism_mesh<S: Into<String>>(mut self, organism: S) -> Self {
+        self.filters.push(format!("{}[mh]", organism.into()));
         self
     }
 
@@ -299,23 +293,20 @@ mod tests {
     #[test]
     fn test_mesh_term() {
         let query = SearchQuery::new().mesh_term("Neoplasms");
-        assert_eq!(query.build(), "Neoplasms[MeSH Terms]");
+        assert_eq!(query.build(), "Neoplasms[mh]");
     }
 
     #[test]
     fn test_mesh_major_topic() {
         let query = SearchQuery::new().mesh_major_topic("Diabetes Mellitus, Type 2");
-        assert_eq!(query.build(), "Diabetes Mellitus, Type 2[MeSH Major Topic]");
+        assert_eq!(query.build(), "Diabetes Mellitus, Type 2[majr]");
     }
 
     #[test]
     fn test_multiple_mesh_terms() {
         let mesh_terms = ["Neoplasms", "Antineoplastic Agents"];
         let query = SearchQuery::new().mesh_terms(&mesh_terms);
-        assert_eq!(
-            query.build(),
-            "Neoplasms[MeSH Terms] AND Antineoplastic Agents[MeSH Terms]"
-        );
+        assert_eq!(query.build(), "Neoplasms[mh] AND Antineoplastic Agents[mh]");
     }
 
     #[test]
@@ -323,52 +314,49 @@ mod tests {
         let query = SearchQuery::new()
             .mesh_term("Diabetes Mellitus")
             .mesh_subheading("drug therapy");
-        assert_eq!(
-            query.build(),
-            "Diabetes Mellitus[MeSH Terms] AND drug therapy[MeSH Subheading]"
-        );
+        assert_eq!(query.build(), "Diabetes Mellitus[mh] AND drug therapy[sh]");
     }
 
     #[test]
     fn test_first_author() {
         let query = SearchQuery::new().first_author("Smith J");
-        assert_eq!(query.build(), "Smith J[First Author]");
+        assert_eq!(query.build(), "Smith J[1au]");
     }
 
     #[test]
     fn test_last_author() {
         let query = SearchQuery::new().last_author("Johnson M");
-        assert_eq!(query.build(), "Johnson M[Last Author]");
+        assert_eq!(query.build(), "Johnson M[lastau]");
     }
 
     #[test]
     fn test_any_author() {
         let query = SearchQuery::new().author("Williams K");
-        assert_eq!(query.build(), "Williams K[Author]");
+        assert_eq!(query.build(), "Williams K[au]");
     }
 
     #[test]
     fn test_affiliation() {
         let query = SearchQuery::new().affiliation("Harvard Medical School");
-        assert_eq!(query.build(), "Harvard Medical School[Affiliation]");
+        assert_eq!(query.build(), "Harvard Medical School[ad]");
     }
 
     #[test]
     fn test_orcid() {
         let query = SearchQuery::new().orcid("0000-0001-2345-6789");
-        assert_eq!(query.build(), "0000-0001-2345-6789[Author - Identifier]");
+        assert_eq!(query.build(), "0000-0001-2345-6789[auid]");
     }
 
     #[test]
-    fn test_organism() {
-        let query = SearchQuery::new().organism("Mus musculus");
-        assert_eq!(query.build(), "Mus musculus[Organism]");
+    fn test_organism_mesh() {
+        let query = SearchQuery::new().organism_mesh("Mus musculus");
+        assert_eq!(query.build(), "Mus musculus[mh]");
     }
 
     #[test]
-    fn test_organism_with_common_name() {
-        let query = SearchQuery::new().organism("mouse");
-        assert_eq!(query.build(), "mouse[Organism]");
+    fn test_organism_mesh_with_common_name() {
+        let query = SearchQuery::new().organism_mesh("Mice");
+        assert_eq!(query.build(), "Mice[mh]");
     }
 
     #[test]
@@ -404,7 +392,8 @@ mod tests {
             .human_studies_only()
             .affiliation("Harvard");
 
-        let expected = "cancer treatment AND Neoplasms[MeSH Terms] AND Smith J[Author] AND humans[mh] AND Harvard[Affiliation]";
+        let expected =
+            "cancer treatment AND Neoplasms[mh] AND Smith J[au] AND humans[mh] AND Harvard[ad]";
         assert_eq!(query.build(), expected);
     }
 
@@ -419,25 +408,25 @@ mod tests {
     fn test_single_mesh_term_via_array() {
         let mesh_terms = ["Neoplasms"];
         let query = SearchQuery::new().mesh_terms(&mesh_terms);
-        assert_eq!(query.build(), "Neoplasms[MeSH Terms]");
+        assert_eq!(query.build(), "Neoplasms[mh]");
     }
 
     #[test]
     fn test_mesh_term_with_spaces() {
         let query = SearchQuery::new().mesh_term("Diabetes Mellitus, Type 2");
-        assert_eq!(query.build(), "Diabetes Mellitus, Type 2[MeSH Terms]");
+        assert_eq!(query.build(), "Diabetes Mellitus, Type 2[mh]");
     }
 
     #[test]
     fn test_author_with_special_characters() {
         let query = SearchQuery::new().author("O'Connor J");
-        assert_eq!(query.build(), "O'Connor J[Author]");
+        assert_eq!(query.build(), "O'Connor J[au]");
     }
 
     #[test]
     fn test_affiliation_with_special_characters() {
         let query = SearchQuery::new().affiliation("Johns Hopkins & MIT");
-        assert_eq!(query.build(), "Johns Hopkins & MIT[Affiliation]");
+        assert_eq!(query.build(), "Johns Hopkins & MIT[ad]");
     }
 
     #[test]
