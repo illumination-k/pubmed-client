@@ -17,6 +17,9 @@ impl MockServerFixtures {
                 ResponseTemplate::new(200)
                     .set_body_json(serde_json::json!({
                         "esearchresult": {
+                            "count": "1",
+                            "retmax": "1",
+                            "retstart": "0",
                             "idlist": ["12345"]
                         }
                     }))
@@ -79,6 +82,9 @@ impl MockServerFixtures {
                 ResponseTemplate::new(200)
                     .set_body_json(serde_json::json!({
                         "esearchresult": {
+                            "count": "1",
+                            "retmax": "1",
+                            "retstart": "0",
                             "idlist": ["12345"]
                         }
                     }))

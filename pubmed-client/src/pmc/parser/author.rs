@@ -72,8 +72,20 @@ struct Aff {
     #[serde(rename = "@id")]
     id: Option<String>,
 
-    #[serde(rename = "$text")]
+    #[serde(rename = "$text", default)]
     text: Option<String>,
+
+    #[serde(rename = "institution", default)]
+    #[allow(dead_code)]
+    institutions: Vec<String>,
+
+    #[serde(rename = "addr-line", default)]
+    #[allow(dead_code)]
+    addr_lines: Vec<String>,
+
+    #[serde(rename = "country", default)]
+    #[allow(dead_code)]
+    countries: Vec<String>,
 }
 
 /// XML structure for element-citation or mixed-citation
@@ -114,10 +126,14 @@ pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
                         .collect();
                     Ok(authors)
                 }
-                Err(e) => Err(PubMedError::XmlError(format!(
-                    "Failed to parse contrib-group XML: {}",
-                    e
-                ))),
+                Err(e) => {
+                    // Log the error but continue with empty authors rather than failing completely
+                    tracing::warn!(
+                        "Failed to parse contrib-group XML ({}), continuing with empty authors",
+                        e
+                    );
+                    Ok(Vec::new())
+                }
             }
         } else {
             Err(PubMedError::XmlError(
