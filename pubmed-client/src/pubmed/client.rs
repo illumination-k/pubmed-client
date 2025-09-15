@@ -273,29 +273,40 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(query = %query, limit = limit))]
     pub async fn search_articles(&self, query: &str, limit: usize) -> Result<Vec<String>> {
+        // PubMed limits: retstart cannot exceed 9998, and retmax is capped at 9999
+        // This means we can only retrieve the first 9,999 results (indices 0-9998)
+        const MAX_RETRIEVABLE: usize = 9999;
+
+        if limit > MAX_RETRIEVABLE {
+            return Err(PubMedError::SearchLimitExceeded {
+                requested: limit,
+                maximum: MAX_RETRIEVABLE,
+            });
+        }
+
         if query.trim().is_empty() {
             debug!("Empty query provided, returning empty results");
             return Ok(Vec::new());
         }
 
-        // Build URL with API parameters
         let mut url = format!(
-            "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retmode=json",
+            "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retstart={}&retmode=json",
             self.base_url,
             urlencoding::encode(query),
-            limit
+            limit,
+            0
         );
 
         // Add API parameters (API key, email, tool)
         let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
+        for (key, value) in &api_params {
             url.push('&');
-            url.push_str(&key);
+            url.push_str(key);
             url.push('=');
-            url.push_str(&urlencoding::encode(&value));
+            url.push_str(&urlencoding::encode(value));
         }
 
-        debug!("Making ESearch API request");
+        debug!("Making initial ESearch API request");
         let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
@@ -314,11 +325,16 @@ impl PubMedClient {
         }
 
         let search_result: ESearchResult = response.json().await?;
-        let pmids = search_result.esearchresult.idlist;
+        let total_count: usize = search_result.esearchresult.count.parse().unwrap_or(0);
 
-        info!(results_found = pmids.len(), "Search completed successfully");
+        if total_count >= limit {
+            warn!(
+                "Total results ({}) exceed or equal requested limit ({}). Only the first {} results can be retrieved.",
+                total_count, limit, MAX_RETRIEVABLE
+            );
+        }
 
-        Ok(pmids)
+        Ok(search_result.esearchresult.idlist)
     }
 
     /// Search and fetch multiple articles with metadata
