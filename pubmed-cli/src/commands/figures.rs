@@ -44,7 +44,7 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
             continue;
         }
 
-        info!(pmcid = %pmcid, "Successfully processed article");
+        debug!(pmcid = %pmcid, "Successfully processed article");
     }
 
     if !failed_pmcids.is_empty() {
@@ -140,7 +140,7 @@ async fn process_article(
 
     for (index, extracted_figure) in figures.iter().enumerate() {
         let figure_num = index + 1;
-        info!(
+        debug!(
             figure_number = figure_num,
             figure_id = %extracted_figure.figure.id,
             "Processing figure"
@@ -170,11 +170,8 @@ async fn process_article(
             );
             let storage_path = format!("{}/{}", article_dir_str, new_filename);
 
-            // Check if figure already exists and skip if overwrite is false
-            let file_exists = storage.file_exists(&storage_path).await.unwrap_or(false);
-            if !overwrite && file_exists {
-                info!(filename = %new_filename, "Figure already exists, skipping");
-            } else if let Err(e) = storage.copy_file(actual_file_path, &storage_path).await {
+            // Copy figure to storage
+            if let Err(e) = storage.copy_file(actual_file_path, &storage_path).await {
                 warn!(
                     error = %e,
                     source = %actual_file_path.display(),
@@ -182,15 +179,11 @@ async fn process_article(
                     "Could not copy figure to storage"
                 );
             } else {
-                let action = if file_exists { "Overwritten" } else { "Saved" };
-                info!(filename = %new_filename, location = %storage.get_full_path(&storage_path), "{} figure", action);
-
-                let caption_preview = if extracted_figure.figure.caption.len() > 80 {
-                    format!("{}...", &extracted_figure.figure.caption[..80])
-                } else {
-                    extracted_figure.figure.caption.clone()
-                };
-                debug!(caption = %caption_preview, "Figure caption");
+                info!(
+                    filename = %new_filename,
+                    location = %storage.get_full_path(&storage_path),
+                    "Saved figure"
+                );
 
                 if let Some(dimensions) = extracted_figure.dimensions {
                     debug!(
