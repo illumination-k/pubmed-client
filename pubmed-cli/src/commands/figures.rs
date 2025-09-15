@@ -2,20 +2,22 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use tempfile::TempDir;
-use tokio::fs;
 use tracing::{error, info, warn};
 
 use crate::commands::create_pmc_client;
+use crate::commands::storage::{create_storage_backend, StorageBackend};
 use crate::Cli;
 
 pub async fn execute(
     pmcids: Vec<String>,
-    output_dir: PathBuf,
+    output_dir: Option<PathBuf>,
+    s3_path: Option<String>,
+    s3_region: Option<String>,
     failed_output: Option<PathBuf>,
     cli: &Cli,
 ) -> Result<()> {
-    // Ensure output directory exists
-    fs::create_dir_all(&output_dir).await?;
+    // Create the appropriate storage backend
+    let storage = create_storage_backend(output_dir, s3_path, s3_region).await?;
 
     // Initialize the PMC client
     let client = create_pmc_client(cli.api_key.as_deref(), cli.email.as_deref(), &cli.tool)?;
@@ -26,7 +28,7 @@ pub async fn execute(
     for pmcid in &pmcids {
         info!(pmcid = %pmcid, "Processing article");
 
-        if let Err(e) = process_article(&client, pmcid, &output_dir).await {
+        if let Err(e) = process_article(&client, pmcid, storage.as_ref()).await {
             error!(pmcid = %pmcid, error = %e, "Failed to process article");
             failed_pmcids.push(pmcid.clone());
             continue;
@@ -44,7 +46,7 @@ pub async fn execute(
 
         // Save failed PMC IDs to file if output path is specified
         if let Some(failed_path) = failed_output {
-            match save_failed_pmcids(&failed_pmcids, &failed_path).await {
+            match save_failed_pmcids(&failed_pmcids, &failed_path, storage.as_ref()).await {
                 Ok(_) => {
                     info!(
                         path = %failed_path.display(),
@@ -69,18 +71,14 @@ pub async fn execute(
 async fn process_article(
     client: &pubmed_client_rs::PmcClient,
     pmcid: &str,
-    output_base: &Path,
+    storage: &dyn StorageBackend,
 ) -> Result<()> {
-    // Prepare output directory path for this article (but don't create it yet)
-    let article_dir = output_base.join(pmcid);
-
     // First, try to extract figures to a temporary location
-    // We'll use the final directory path, but only create it if extraction succeeds
     info!("Extracting figures and matching with captions");
 
     // Create a temporary directory for extraction using tempfile crate
     // This ensures automatic cleanup on drop and avoids conflicts
-    let temp_dir_handle = TempDir::new_in(output_base)?;
+    let temp_dir_handle = TempDir::new()?;
     let temp_dir = temp_dir_handle.path();
 
     let figures = match client.extract_figures_with_captions(pmcid, temp_dir).await {
@@ -106,16 +104,13 @@ async fn process_article(
         return Ok(());
     }
 
-    // Now that we have figures, move temp directory to final location
-    info!(directory = %article_dir.display(), "Creating output directory");
-    if article_dir.exists() {
-        fs::remove_dir_all(&article_dir).await?;
-    }
+    // Now that we have figures, ensure the storage directory exists
+    let article_dir_str = pmcid;
+    storage.ensure_directory(article_dir_str).await?;
+    info!(directory = %storage.get_full_path(article_dir_str), "Created storage directory");
 
-    // Move the temporary directory to the final location
-    // We need to persist the temp directory to prevent automatic cleanup
-    let temp_path = temp_dir_handle.keep();
-    fs::rename(&temp_path, &article_dir).await?;
+    // Keep the temp directory from being auto-deleted
+    let _temp_path = temp_dir_handle.keep();
 
     info!(pmcid = %pmcid, figure_count = figures.len(), "Found figures");
 
@@ -139,21 +134,8 @@ async fn process_article(
         };
 
         // The extracted_file_path contains the full path from extraction
-        // The extraction creates a PMC subdirectory inside the temp directory
-        // So we need to find the file in the moved directory structure
-        let extracted_path = Path::new(&extracted_figure.extracted_file_path);
-
-        // Check if the file exists directly in article_dir (for flat structure)
-        let filename = extracted_path
-            .file_name()
-            .ok_or_else(|| anyhow::anyhow!("Invalid file path"))?;
-
-        let mut actual_file_path = article_dir.join(filename);
-
-        // If not found, check in the PMC subdirectory (nested structure)
-        if !actual_file_path.exists() {
-            actual_file_path = article_dir.join(pmcid).join(filename);
-        }
+        // The file should be in the temp directory we created
+        let actual_file_path = Path::new(&extracted_figure.extracted_file_path);
 
         // Copy figure to a standardized filename
         if let (Some(extension), Some(_filename)) =
@@ -165,17 +147,17 @@ async fn process_article(
                 extracted_figure.figure.id,
                 extension.to_string_lossy()
             );
-            let new_path = article_dir.join(&new_filename);
+            let storage_path = format!("{}/{}", article_dir_str, new_filename);
 
-            if let Err(e) = fs::copy(&actual_file_path, &new_path).await {
+            if let Err(e) = storage.copy_file(actual_file_path, &storage_path).await {
                 warn!(
                     error = %e,
                     source = %actual_file_path.display(),
-                    target = %new_path.display(),
-                    "Could not copy figure"
+                    target = %storage_path,
+                    "Could not copy figure to storage"
                 );
             } else {
-                info!(filename = %new_filename, "Saved figure");
+                info!(filename = %new_filename, location = %storage.get_full_path(&storage_path), "Saved figure");
 
                 let caption_preview = if extracted_figure.figure.caption.len() > 80 {
                     format!("{}...", &extracted_figure.figure.caption[..80])
@@ -201,14 +183,16 @@ async fn process_article(
         figure_metadata.push(metadata);
     }
 
-    // Save metadata as JSON
+    // Save metadata as JSON to storage
     let json_filename = format!("{}_figures_metadata.json", pmcid);
-    let json_path = article_dir.join(&json_filename);
+    let json_storage_path = format!("{}/{}", article_dir_str, json_filename);
 
     let json_content = serde_json::to_string_pretty(&figure_metadata)?;
-    fs::write(&json_path, json_content).await?;
+    storage
+        .write_file(&json_storage_path, json_content.as_bytes())
+        .await?;
 
-    info!(filename = %json_filename, "Saved metadata");
+    info!(filename = %json_filename, location = %storage.get_full_path(&json_storage_path), "Saved metadata");
 
     Ok(())
 }
@@ -221,12 +205,22 @@ struct FigureMetadata {
     caption: String,
 }
 
-async fn save_failed_pmcids(failed_pmcids: &[String], path: &Path) -> Result<()> {
+async fn save_failed_pmcids(
+    failed_pmcids: &[String],
+    path: &Path,
+    storage: &dyn StorageBackend,
+) -> Result<()> {
     // Join PMC IDs with newlines, one per line
     let content = failed_pmcids.join("\n");
 
-    // Write to file
-    fs::write(path, content).await?;
+    // Get just the filename from the path
+    let filename = path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| anyhow::anyhow!("Invalid failed output path"))?;
+
+    // Write to storage
+    storage.write_file(filename, content.as_bytes()).await?;
 
     Ok(())
 }

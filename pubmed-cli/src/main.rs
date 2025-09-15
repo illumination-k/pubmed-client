@@ -39,9 +39,15 @@ enum Commands {
     Figures {
         /// PMC ID(s) to process (e.g., PMC7906746 or 7906746)
         pmcids: Vec<String>,
-        /// Output directory for extracted figures
-        #[arg(short, long, default_value = "./extracted_figures")]
-        output_dir: PathBuf,
+        /// Output directory for extracted figures (local storage)
+        #[arg(short, long, conflicts_with = "s3_path")]
+        output_dir: Option<PathBuf>,
+        /// S3 path for extracted figures (e.g., s3://bucket/prefix)
+        #[arg(long, conflicts_with = "output_dir")]
+        s3_path: Option<String>,
+        /// AWS region for S3 (optional, uses default AWS config if not specified)
+        #[arg(long, requires = "s3_path")]
+        s3_region: Option<String>,
         /// Path to save failed PMC IDs (if not specified, failures are logged only)
         #[arg(short, long)]
         failed_output: Option<PathBuf>,
@@ -78,11 +84,15 @@ async fn main() -> Result<()> {
         Commands::Figures {
             pmcids,
             output_dir,
+            s3_path,
+            s3_region,
             failed_output,
         } => {
             commands::figures::execute(
                 pmcids.clone(),
                 output_dir.clone(),
+                s3_path.clone(),
+                s3_region.clone(),
                 failed_output.clone(),
                 &cli,
             )
