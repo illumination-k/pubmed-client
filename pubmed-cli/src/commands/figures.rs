@@ -8,6 +8,23 @@ use crate::commands::create_pmc_client_with_timeout;
 use crate::commands::storage::{create_storage_backend, StorageBackend};
 use crate::Cli;
 
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FailureReason {
+    TarDownloadFailed(String),
+    NoFiguresFound,
+    DirectoryCreationFailed(String),
+    FigureCopyFailed(String),
+    MetadataSaveFailed(String),
+    Other(String),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FailedPmcId {
+    pub pmcid: String,
+    pub reason: FailureReason,
+}
+
 pub struct FiguresOptions {
     pub pmcids: Vec<String>,
     pub output_dir: Option<PathBuf>,
@@ -32,19 +49,28 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
         Some(timeout),
     )?;
 
-    let mut failed_pmcids = Vec::new();
+    let mut failed_pmcids: Vec<FailedPmcId> = Vec::new();
 
     // Process each PMCID
     for pmcid in &options.pmcids {
         info!(pmcid = %pmcid, "Processing article");
 
-        if let Err(e) = process_article(&client, pmcid, storage.as_ref(), options.overwrite).await {
-            error!(pmcid = %pmcid, error = %e, "Failed to process article");
-            failed_pmcids.push(pmcid.clone());
-            continue;
-        }
+        match process_article(&client, pmcid, storage.as_ref(), options.overwrite).await {
+            Ok(_) => {
+                debug!(pmcid = %pmcid, "Successfully processed article");
+            }
+            Err(e) => {
+                error!(pmcid = %pmcid, error = %e, "Failed to process article");
 
-        debug!(pmcid = %pmcid, "Successfully processed article");
+                // Determine the failure reason based on the error message
+                let reason = categorize_failure(&e);
+                failed_pmcids.push(FailedPmcId {
+                    pmcid: pmcid.clone(),
+                    reason,
+                });
+                continue;
+            }
+        }
     }
 
     if !failed_pmcids.is_empty() {
@@ -56,19 +82,19 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
 
         // Save failed PMC IDs to file if output path is specified
         if let Some(failed_path) = options.failed_output {
-            match save_failed_pmcids(&failed_pmcids, &failed_path, storage.as_ref()).await {
+            match save_failed_pmcids_json(&failed_pmcids, &failed_path, storage.as_ref()).await {
                 Ok(_) => {
                     info!(
                         path = %failed_path.display(),
                         count = failed_pmcids.len(),
-                        "Saved failed PMC IDs to file"
+                        "Saved failed PMC IDs to JSON file"
                     );
                 }
                 Err(e) => {
                     error!(
                         path = %failed_path.display(),
                         error = %e,
-                        "Failed to save failed PMC IDs to file"
+                        "Failed to save failed PMC IDs to JSON file"
                     );
                 }
             }
@@ -114,7 +140,7 @@ async fn process_article(
                 "Failed to download TAR archive or extract figures"
             );
             return Err(anyhow::anyhow!(
-                "Failed to download TAR archive for PMC ID {}: {}",
+                "TarDownloadFailed: Failed to download TAR archive for PMC ID {}: {}",
                 pmcid,
                 e
             ));
@@ -123,7 +149,9 @@ async fn process_article(
 
     if figures.is_empty() {
         // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
-        return Err(anyhow::anyhow!("No figures found in article"));
+        return Err(anyhow::anyhow!(
+            "NoFiguresFound: No figures found in article"
+        ));
     }
 
     // Now that we have figures, ensure the storage directory exists
@@ -231,13 +259,31 @@ struct FigureMetadata {
     caption: String,
 }
 
-async fn save_failed_pmcids(
-    failed_pmcids: &[String],
+fn categorize_failure(error: &anyhow::Error) -> FailureReason {
+    let error_str = error.to_string();
+
+    if error_str.contains("TarDownloadFailed") {
+        FailureReason::TarDownloadFailed(error_str.replace("TarDownloadFailed: ", ""))
+    } else if error_str.contains("NoFiguresFound") {
+        FailureReason::NoFiguresFound
+    } else if error_str.contains("directory") || error_str.contains("Directory") {
+        FailureReason::DirectoryCreationFailed(error_str)
+    } else if error_str.contains("copy") || error_str.contains("Copy") {
+        FailureReason::FigureCopyFailed(error_str)
+    } else if error_str.contains("metadata") || error_str.contains("Metadata") {
+        FailureReason::MetadataSaveFailed(error_str)
+    } else {
+        FailureReason::Other(error_str)
+    }
+}
+
+async fn save_failed_pmcids_json(
+    failed_pmcids: &[FailedPmcId],
     path: &Path,
     storage: &dyn StorageBackend,
 ) -> Result<()> {
-    // Join PMC IDs with newlines, one per line
-    let content = failed_pmcids.join("\n");
+    // Convert to JSON with pretty formatting
+    let json_content = serde_json::to_string_pretty(failed_pmcids)?;
 
     // Get just the filename from the path
     let filename = path
@@ -245,8 +291,17 @@ async fn save_failed_pmcids(
         .and_then(|n| n.to_str())
         .ok_or_else(|| anyhow::anyhow!("Invalid failed output path"))?;
 
+    // Ensure the filename has .json extension
+    let json_filename = if !filename.ends_with(".json") {
+        format!("{}.json", filename.trim_end_matches('.'))
+    } else {
+        filename.to_string()
+    };
+
     // Write to storage
-    storage.write_file(filename, content.as_bytes()).await?;
+    storage
+        .write_file(&json_filename, json_content.as_bytes())
+        .await?;
 
     Ok(())
 }
