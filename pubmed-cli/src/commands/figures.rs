@@ -2,39 +2,75 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use tempfile::TempDir;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
-use crate::commands::create_pmc_client;
+use crate::commands::create_pmc_client_with_timeout;
 use crate::commands::storage::{create_storage_backend, StorageBackend};
 use crate::Cli;
 
-pub async fn execute(
-    pmcids: Vec<String>,
-    output_dir: Option<PathBuf>,
-    s3_path: Option<String>,
-    s3_region: Option<String>,
-    failed_output: Option<PathBuf>,
-    cli: &Cli,
-) -> Result<()> {
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FailureReason {
+    TarDownloadFailed(String),
+    NoFiguresFound,
+    DirectoryCreationFailed(String),
+    FigureCopyFailed(String),
+    MetadataSaveFailed(String),
+    Other(String),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FailedPmcId {
+    pub pmcid: String,
+    pub reason: FailureReason,
+}
+
+pub struct FiguresOptions {
+    pub pmcids: Vec<String>,
+    pub output_dir: Option<PathBuf>,
+    pub s3_path: Option<String>,
+    pub s3_region: Option<String>,
+    pub failed_output: Option<PathBuf>,
+    pub timeout_seconds: Option<u64>,
+    pub overwrite: bool,
+}
+
+pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
     // Create the appropriate storage backend
-    let storage = create_storage_backend(output_dir, s3_path, s3_region).await?;
+    let storage =
+        create_storage_backend(options.output_dir, options.s3_path, options.s3_region).await?;
 
-    // Initialize the PMC client
-    let client = create_pmc_client(cli.api_key.as_deref(), cli.email.as_deref(), &cli.tool)?;
+    // Initialize the PMC client with timeout (default to 180 seconds for figure extraction)
+    let timeout = options.timeout_seconds.unwrap_or(180);
+    let client = create_pmc_client_with_timeout(
+        cli.api_key.as_deref(),
+        cli.email.as_deref(),
+        &cli.tool,
+        Some(timeout),
+    )?;
 
-    let mut failed_pmcids = Vec::new();
+    let mut failed_pmcids: Vec<FailedPmcId> = Vec::new();
 
     // Process each PMCID
-    for pmcid in &pmcids {
+    for pmcid in &options.pmcids {
         info!(pmcid = %pmcid, "Processing article");
 
-        if let Err(e) = process_article(&client, pmcid, storage.as_ref()).await {
-            error!(pmcid = %pmcid, error = %e, "Failed to process article");
-            failed_pmcids.push(pmcid.clone());
-            continue;
-        }
+        match process_article(&client, pmcid, storage.as_ref(), options.overwrite).await {
+            Ok(_) => {
+                debug!(pmcid = %pmcid, "Successfully processed article");
+            }
+            Err(e) => {
+                error!(pmcid = %pmcid, error = %e, "Failed to process article");
 
-        info!(pmcid = %pmcid, "Successfully processed article");
+                // Determine the failure reason based on the error message
+                let reason = categorize_failure(&e);
+                failed_pmcids.push(FailedPmcId {
+                    pmcid: pmcid.clone(),
+                    reason,
+                });
+                continue;
+            }
+        }
     }
 
     if !failed_pmcids.is_empty() {
@@ -45,20 +81,20 @@ pub async fn execute(
         );
 
         // Save failed PMC IDs to file if output path is specified
-        if let Some(failed_path) = failed_output {
-            match save_failed_pmcids(&failed_pmcids, &failed_path, storage.as_ref()).await {
+        if let Some(failed_path) = options.failed_output {
+            match save_failed_pmcids_json(&failed_pmcids, &failed_path, storage.as_ref()).await {
                 Ok(_) => {
                     info!(
                         path = %failed_path.display(),
                         count = failed_pmcids.len(),
-                        "Saved failed PMC IDs to file"
+                        "Saved failed PMC IDs to JSON file"
                     );
                 }
                 Err(e) => {
                     error!(
                         path = %failed_path.display(),
                         error = %e,
-                        "Failed to save failed PMC IDs to file"
+                        "Failed to save failed PMC IDs to JSON file"
                     );
                 }
             }
@@ -72,9 +108,22 @@ async fn process_article(
     client: &pubmed_client_rs::PmcClient,
     pmcid: &str,
     storage: &dyn StorageBackend,
+    overwrite: bool,
 ) -> Result<()> {
-    // First, try to extract figures to a temporary location
-    info!("Extracting figures and matching with captions");
+    // Check if metadata file already exists and skip early if overwrite is false
+    let article_dir_str = pmcid;
+    let json_filename = format!("{}_figures_metadata.json", pmcid);
+    let json_storage_path = format!("{}/{}", article_dir_str, json_filename);
+
+    if !overwrite
+        && storage
+            .file_exists(&json_storage_path)
+            .await
+            .unwrap_or(false)
+    {
+        info!(pmcid = %pmcid, "Article already processed, skipping download (use --overwrite to force)");
+        return Ok(());
+    }
 
     // Create a temporary directory for extraction using tempfile crate
     // This ensures automatic cleanup on drop and avoids conflicts
@@ -91,7 +140,7 @@ async fn process_article(
                 "Failed to download TAR archive or extract figures"
             );
             return Err(anyhow::anyhow!(
-                "Failed to download TAR archive for PMC ID {}: {}",
+                "TarDownloadFailed: Failed to download TAR archive for PMC ID {}: {}",
                 pmcid,
                 e
             ));
@@ -100,26 +149,26 @@ async fn process_article(
 
     if figures.is_empty() {
         // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
-        info!(pmcid = %pmcid, "No figures found in article");
-        return Ok(());
+        return Err(anyhow::anyhow!(
+            "NoFiguresFound: No figures found in article"
+        ));
     }
 
     // Now that we have figures, ensure the storage directory exists
-    let article_dir_str = pmcid;
     storage.ensure_directory(article_dir_str).await?;
-    info!(directory = %storage.get_full_path(article_dir_str), "Created storage directory");
+    debug!(directory = %storage.get_full_path(article_dir_str), "Created storage directory");
 
     // Keep the temp directory from being auto-deleted
     let _temp_path = temp_dir_handle.keep();
 
-    info!(pmcid = %pmcid, figure_count = figures.len(), "Found figures");
+    debug!(pmcid = %pmcid, figure_count = figures.len(), "Found figures");
 
     // Process each figure
     let mut figure_metadata = Vec::new();
 
     for (index, extracted_figure) in figures.iter().enumerate() {
         let figure_num = index + 1;
-        info!(
+        debug!(
             figure_number = figure_num,
             figure_id = %extracted_figure.figure.id,
             "Processing figure"
@@ -149,6 +198,7 @@ async fn process_article(
             );
             let storage_path = format!("{}/{}", article_dir_str, new_filename);
 
+            // Copy figure to storage
             if let Err(e) = storage.copy_file(actual_file_path, &storage_path).await {
                 warn!(
                     error = %e,
@@ -157,17 +207,14 @@ async fn process_article(
                     "Could not copy figure to storage"
                 );
             } else {
-                info!(filename = %new_filename, location = %storage.get_full_path(&storage_path), "Saved figure");
-
-                let caption_preview = if extracted_figure.figure.caption.len() > 80 {
-                    format!("{}...", &extracted_figure.figure.caption[..80])
-                } else {
-                    extracted_figure.figure.caption.clone()
-                };
-                info!(caption = %caption_preview, "Figure caption");
+                info!(
+                    filename = %new_filename,
+                    location = %storage.get_full_path(&storage_path),
+                    "Saved figure"
+                );
 
                 if let Some(dimensions) = extracted_figure.dimensions {
-                    info!(
+                    debug!(
                         width = dimensions.0,
                         height = dimensions.1,
                         "Figure dimensions"
@@ -175,7 +222,7 @@ async fn process_article(
                 }
 
                 if let Some(size) = extracted_figure.file_size {
-                    info!(size_kb = size / 1024, "Figure size");
+                    debug!(size_kb = size / 1024, "Figure size (KB)");
                 }
             }
         }
@@ -183,16 +230,23 @@ async fn process_article(
         figure_metadata.push(metadata);
     }
 
-    // Save metadata as JSON to storage
-    let json_filename = format!("{}_figures_metadata.json", pmcid);
-    let json_storage_path = format!("{}/{}", article_dir_str, json_filename);
-
+    // Save metadata as JSON to storage (always save metadata if we got this far)
     let json_content = serde_json::to_string_pretty(&figure_metadata)?;
     storage
         .write_file(&json_storage_path, json_content.as_bytes())
         .await?;
 
-    info!(filename = %json_filename, location = %storage.get_full_path(&json_storage_path), "Saved metadata");
+    let metadata_action = if storage
+        .file_exists(&json_storage_path)
+        .await
+        .unwrap_or(false)
+        && overwrite
+    {
+        "Overwritten"
+    } else {
+        "Saved"
+    };
+    debug!(filename = %json_filename, location = %storage.get_full_path(&json_storage_path), "{} metadata", metadata_action);
 
     Ok(())
 }
@@ -205,13 +259,31 @@ struct FigureMetadata {
     caption: String,
 }
 
-async fn save_failed_pmcids(
-    failed_pmcids: &[String],
+fn categorize_failure(error: &anyhow::Error) -> FailureReason {
+    let error_str = error.to_string();
+
+    if error_str.contains("TarDownloadFailed") {
+        FailureReason::TarDownloadFailed(error_str.replace("TarDownloadFailed: ", ""))
+    } else if error_str.contains("NoFiguresFound") {
+        FailureReason::NoFiguresFound
+    } else if error_str.contains("directory") || error_str.contains("Directory") {
+        FailureReason::DirectoryCreationFailed(error_str)
+    } else if error_str.contains("copy") || error_str.contains("Copy") {
+        FailureReason::FigureCopyFailed(error_str)
+    } else if error_str.contains("metadata") || error_str.contains("Metadata") {
+        FailureReason::MetadataSaveFailed(error_str)
+    } else {
+        FailureReason::Other(error_str)
+    }
+}
+
+async fn save_failed_pmcids_json(
+    failed_pmcids: &[FailedPmcId],
     path: &Path,
     storage: &dyn StorageBackend,
 ) -> Result<()> {
-    // Join PMC IDs with newlines, one per line
-    let content = failed_pmcids.join("\n");
+    // Convert to JSON with pretty formatting
+    let json_content = serde_json::to_string_pretty(failed_pmcids)?;
 
     // Get just the filename from the path
     let filename = path
@@ -219,8 +291,17 @@ async fn save_failed_pmcids(
         .and_then(|n| n.to_str())
         .ok_or_else(|| anyhow::anyhow!("Invalid failed output path"))?;
 
+    // Ensure the filename has .json extension
+    let json_filename = if !filename.ends_with(".json") {
+        format!("{}.json", filename.trim_end_matches('.'))
+    } else {
+        filename.to_string()
+    };
+
     // Write to storage
-    storage.write_file(filename, content.as_bytes()).await?;
+    storage
+        .write_file(&json_filename, json_content.as_bytes())
+        .await?;
 
     Ok(())
 }

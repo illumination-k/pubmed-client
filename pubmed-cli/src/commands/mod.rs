@@ -12,6 +12,15 @@ pub fn create_pmc_client(
     email: Option<&str>,
     tool: &str,
 ) -> Result<PmcClient> {
+    create_pmc_client_with_timeout(api_key, email, tool, None)
+}
+
+pub fn create_pmc_client_with_timeout(
+    api_key: Option<&str>,
+    email: Option<&str>,
+    tool: &str,
+    timeout_seconds: Option<u64>,
+) -> Result<PmcClient> {
     let mut config = ClientConfig::new().with_tool(tool);
 
     if let Some(key) = api_key {
@@ -20,6 +29,10 @@ pub fn create_pmc_client(
 
     if let Some(email) = email {
         config = config.with_email(email);
+    }
+
+    if let Some(timeout) = timeout_seconds {
+        config = config.with_timeout_seconds(timeout);
     }
 
     let pmc_client = PmcClient::with_config(config);

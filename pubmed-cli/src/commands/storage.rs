@@ -11,6 +11,7 @@ pub trait StorageBackend: Send + Sync {
     async fn write_file(&self, path: &str, content: &[u8]) -> Result<()>;
     async fn copy_file(&self, source: &Path, dest_path: &str) -> Result<()>;
     async fn ensure_directory(&self, path: &str) -> Result<()>;
+    async fn file_exists(&self, path: &str) -> Result<bool>;
     fn get_full_path(&self, relative_path: &str) -> String;
 }
 
@@ -55,6 +56,11 @@ impl StorageBackend for LocalStorage {
         fs::create_dir_all(&full_path).await?;
         debug!("Ensured directory exists: {}", full_path.display());
         Ok(())
+    }
+
+    async fn file_exists(&self, path: &str) -> Result<bool> {
+        let full_path = self.base_path.join(path);
+        Ok(full_path.exists())
     }
 
     fn get_full_path(&self, relative_path: &str) -> String {
@@ -123,6 +129,31 @@ impl StorageBackend for S3Storage {
     async fn ensure_directory(&self, _path: &str) -> Result<()> {
         // S3 doesn't have real directories, so this is a no-op
         Ok(())
+    }
+
+    async fn file_exists(&self, path: &str) -> Result<bool> {
+        let key = self.get_s3_key(path);
+
+        match self
+            .client
+            .head_object()
+            .bucket(&self.bucket)
+            .key(&key)
+            .send()
+            .await
+        {
+            Ok(_) => Ok(true),
+            Err(e) => {
+                // If it's a "Not Found" error, the file doesn't exist
+                if let aws_sdk_s3::error::SdkError::ServiceError(ref service_err) = e {
+                    if service_err.err().is_not_found() {
+                        return Ok(false);
+                    }
+                }
+                // For other errors, propagate the error
+                Err(anyhow!("Failed to check S3 object existence: {}", e))
+            }
+        }
     }
 
     fn get_full_path(&self, relative_path: &str) -> String {

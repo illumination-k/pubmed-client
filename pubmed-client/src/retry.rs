@@ -166,7 +166,7 @@ where
 
                 if attempt < config.max_retries {
                     let delay = config.calculate_delay(attempt);
-                    warn!(
+                    debug!(
                         operation = operation_name,
                         attempt = attempt + 1,
                         max_retries = config.max_retries,
