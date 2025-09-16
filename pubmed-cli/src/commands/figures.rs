@@ -1,6 +1,8 @@
 use anyhow::Result;
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 use tempfile::TempDir;
 use tracing::{debug, error, info, warn};
 
@@ -51,13 +53,36 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
 
     let mut failed_pmcids: Vec<FailedPmcId> = Vec::new();
 
+    // Create progress bars
+    let multi_progress = MultiProgress::new();
+    let total_pmcids = options.pmcids.len();
+
+    let main_pb = multi_progress.add(ProgressBar::new(total_pmcids as u64));
+    main_pb.set_style(
+        ProgressStyle::default_bar()
+            .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} articles ({msg})")
+            .unwrap()
+            .progress_chars("#>-"),
+    );
+    main_pb.set_message("Processing PMC articles");
+
     // Process each PMCID
     for pmcid in &options.pmcids {
-        info!(pmcid = %pmcid, "Processing article");
+        main_pb.set_message(format!("Processing {}", pmcid));
+        debug!(pmcid = %pmcid, "Processing article");
 
-        match process_article(&client, pmcid, storage.as_ref(), options.overwrite).await {
+        match process_article_with_progress(
+            &client,
+            pmcid,
+            storage.as_ref(),
+            options.overwrite,
+            &multi_progress,
+        )
+        .await
+        {
             Ok(_) => {
                 debug!(pmcid = %pmcid, "Successfully processed article");
+                main_pb.set_message(format!("Completed {}", pmcid));
             }
             Err(e) => {
                 error!(pmcid = %pmcid, error = %e, "Failed to process article");
@@ -68,10 +93,19 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
                     pmcid: pmcid.clone(),
                     reason,
                 });
+                main_pb.set_message(format!("Failed {}", pmcid));
                 continue;
             }
         }
+
+        main_pb.inc(1);
     }
+
+    main_pb.finish_with_message(format!(
+        "Processed {} articles ({} failed)",
+        total_pmcids,
+        failed_pmcids.len()
+    ));
 
     if !failed_pmcids.is_empty() {
         error!(
@@ -104,11 +138,12 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
     Ok(())
 }
 
-async fn process_article(
+async fn process_article_with_progress(
     client: &pubmed_client_rs::PmcClient,
     pmcid: &str,
     storage: &dyn StorageBackend,
     overwrite: bool,
+    multi_progress: &MultiProgress,
 ) -> Result<()> {
     // Check if metadata file already exists and skip early if overwrite is false
     let article_dir_str = pmcid;
@@ -130,9 +165,27 @@ async fn process_article(
     let temp_dir_handle = TempDir::new()?;
     let temp_dir = temp_dir_handle.path();
 
+    // Create progress bar for downloading
+    let download_pb = multi_progress.add(ProgressBar::new_spinner());
+    download_pb.set_style(
+        ProgressStyle::default_spinner()
+            .template("{spinner:.green} {msg}")
+            .unwrap(),
+    );
+    download_pb.enable_steady_tick(Duration::from_millis(100));
+    download_pb.set_message(format!("Downloading and extracting figures from {}", pmcid));
+
     let figures = match client.extract_figures_with_captions(pmcid, temp_dir).await {
-        Ok(figures) => figures,
+        Ok(figures) => {
+            download_pb.finish_with_message(format!(
+                "Downloaded {} figures from {}",
+                figures.len(),
+                pmcid
+            ));
+            figures
+        }
         Err(e) => {
+            download_pb.finish_with_message(format!("Failed to download {}", pmcid));
             // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
             error!(
                 pmcid = %pmcid,
@@ -163,11 +216,22 @@ async fn process_article(
 
     debug!(pmcid = %pmcid, figure_count = figures.len(), "Found figures");
 
+    // Create progress bar for figure processing
+    let figure_pb = multi_progress.add(ProgressBar::new(figures.len() as u64));
+    figure_pb.set_style(
+        ProgressStyle::default_bar()
+            .template("  {spinner:.green} Saving figures [{bar:30.cyan/blue}] {pos}/{len} {msg}")
+            .unwrap()
+            .progress_chars("#>-"),
+    );
+    figure_pb.set_message(pmcid.to_string());
+
     // Process each figure
     let mut figure_metadata = Vec::new();
 
     for (index, extracted_figure) in figures.iter().enumerate() {
         let figure_num = index + 1;
+        figure_pb.set_message(format!("{}: {}", pmcid, extracted_figure.figure.id));
         debug!(
             figure_number = figure_num,
             figure_id = %extracted_figure.figure.id,
@@ -207,7 +271,7 @@ async fn process_article(
                     "Could not copy figure to storage"
                 );
             } else {
-                info!(
+                debug!(
                     filename = %new_filename,
                     location = %storage.get_full_path(&storage_path),
                     "Saved figure"
@@ -228,7 +292,10 @@ async fn process_article(
         }
 
         figure_metadata.push(metadata);
+        figure_pb.inc(1);
     }
+
+    figure_pb.finish_with_message(format!("{}: Saved {} figures", pmcid, figures.len()));
 
     // Save metadata as JSON to storage (always save metadata if we got this far)
     let json_content = serde_json::to_string_pretty(&figure_metadata)?;
