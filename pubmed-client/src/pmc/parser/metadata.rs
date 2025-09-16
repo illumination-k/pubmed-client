@@ -133,9 +133,9 @@ pub fn extract_keywords(content: &str) -> Vec<String> {
             while let Some(kwd_start) = kwd_section[pos..].find("<kwd>") {
                 let kwd_start = pos + kwd_start + 5; // Length of "<kwd>"
                 if let Some(kwd_end) = kwd_section[kwd_start..].find("</kwd>") {
-                    let keyword = kwd_section[kwd_start..kwd_start + kwd_end]
-                        .trim()
-                        .to_string();
+                    let raw_keyword = kwd_section[kwd_start..kwd_start + kwd_end].trim();
+                    // Strip any nested XML tags from the keyword
+                    let keyword = xml_utils::strip_xml_tags(raw_keyword);
                     if !keyword.is_empty() {
                         keywords.push(keyword);
                     }
@@ -430,6 +430,23 @@ mod tests {
 
         let keywords = extract_keywords(content);
         assert_eq!(keywords, vec!["keyword1", "keyword2", "keyword3"]);
+    }
+
+    #[test]
+    fn test_extract_keywords_with_nested_tags() {
+        let content = r#"
+        <kwd-group>
+            <kwd><italic toggle="yes">Prevotella copri</italic></kwd>
+            <kwd>normal keyword</kwd>
+            <kwd><bold>important</bold> keyword</kwd>
+        </kwd-group>
+        "#;
+
+        let keywords = extract_keywords(content);
+        assert_eq!(
+            keywords,
+            vec!["Prevotella copri", "normal keyword", "important keyword"]
+        );
     }
 
     #[test]
