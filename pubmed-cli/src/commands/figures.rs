@@ -1,5 +1,4 @@
 use anyhow::{Context as _, Result};
-use chrono;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -154,8 +153,6 @@ pub struct FailedPmcId {
     pub reason: FailureReason,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_details: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub timestamp: Option<String>,
 }
 
 pub struct FiguresOptions {
@@ -222,13 +219,11 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
 
                 // Determine the failure reason based on the error
                 let (reason, error_details) = categorize_failure_from_figures_error(&e, pmcid);
-                let timestamp = chrono::Utc::now().to_rfc3339();
 
                 failed_pmcids.push(FailedPmcId {
                     pmcid: pmcid.clone(),
                     reason,
                     error_details: Some(error_details),
-                    timestamp: Some(timestamp),
                 });
                 main_pb.set_message(format!("Failed {}", pmcid));
                 continue;
@@ -245,12 +240,6 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
     ));
 
     if !failed_pmcids.is_empty() {
-        error!(
-            failed_count = failed_pmcids.len(),
-            failed_pmcids = ?failed_pmcids,
-            "Failed to process some PMC IDs"
-        );
-
         // Save failed PMC IDs to file if output path is specified
         if let Some(failed_path) = options.failed_output {
             match save_failed_pmcids_json(&failed_pmcids, &failed_path, storage.as_ref()).await {
@@ -269,6 +258,12 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
                     );
                 }
             }
+        } else {
+            error!(
+                failed_count = failed_pmcids.len(),
+                failed_pmcids = ?failed_pmcids,
+                "Failed to process some PMC IDs"
+            );
         }
     }
 
@@ -341,7 +336,7 @@ async fn process_article_with_progress(
             if error_str.contains("timeout") || error_str.contains("timed out") {
                 return Err(FiguresError::NetworkTimeout {
                     pmcid: pmcid.to_string(),
-                    timeout_seconds: 180, // Default timeout value
+                    timeout_seconds: client.get_tar_client_config().timeout.as_secs(),
                 });
             }
 
@@ -551,94 +546,6 @@ fn categorize_failure_from_figures_error(
             message: error_str.clone(),
         },
         FiguresError::Other { .. } => FailureReason::Other(error_str.clone()),
-    };
-
-    (reason, error_chain)
-}
-
-#[allow(dead_code)]
-fn categorize_failure(error: &anyhow::Error, _pmcid: &str) -> (FailureReason, String) {
-    let error_str = error.to_string();
-    let error_chain = format!("{:#}", error); // Include full error chain for debugging
-
-    // Try to downcast to our FiguresError type first
-    if let Some(figures_error) = error.downcast_ref::<FiguresError>() {
-        let reason = match figures_error {
-            FiguresError::TarDownloadFailed { .. } => {
-                let is_timeout = error_str.contains("timeout") || error_str.contains("timed out");
-                let is_network = error_str.contains("network") || error_str.contains("connection");
-                FailureReason::TarDownloadFailed {
-                    message: error_str.clone(),
-                    is_timeout,
-                    is_network_error: is_network,
-                }
-            }
-            FiguresError::NoFiguresFound { .. } => FailureReason::NoFiguresFound,
-            FiguresError::DirectoryCreationFailed { path, .. } => {
-                FailureReason::DirectoryCreationFailed(format!(
-                    "Failed to create {}: {}",
-                    path.display(),
-                    error_str
-                ))
-            }
-            FiguresError::FigureCopyFailed { figure_id, .. } => FailureReason::FigureCopyFailed {
-                figure_id: figure_id.clone(),
-                message: error_str.clone(),
-            },
-            FiguresError::MetadataSaveFailed { path, .. } => FailureReason::MetadataSaveFailed(
-                format!("Failed to save metadata to {}: {}", path, error_str),
-            ),
-            FiguresError::ExtractionFailed { .. } => {
-                FailureReason::ExtractionFailed(error_str.clone())
-            }
-            FiguresError::NetworkTimeout {
-                timeout_seconds, ..
-            } => FailureReason::NetworkTimeout {
-                timeout_seconds: *timeout_seconds,
-            },
-            FiguresError::InvalidFileFormat { details, .. } => {
-                FailureReason::InvalidFileFormat(details.clone())
-            }
-            FiguresError::StorageError { operation, .. } => FailureReason::StorageError {
-                operation: operation.clone(),
-                message: error_str.clone(),
-            },
-            FiguresError::Other { .. } => FailureReason::Other(error_str.clone()),
-        };
-        return (reason, error_chain);
-    }
-
-    // Fallback to string matching for other error types
-    let reason = if error_str.contains("timeout") || error_str.contains("timed out") {
-        FailureReason::NetworkTimeout {
-            timeout_seconds: 180,
-        } // Default timeout
-    } else if error_str.contains("network") || error_str.contains("connection") {
-        FailureReason::TarDownloadFailed {
-            message: error_str.clone(),
-            is_timeout: false,
-            is_network_error: true,
-        }
-    } else if error_str.contains("NoFiguresFound") {
-        FailureReason::NoFiguresFound
-    } else if error_str.contains("directory") || error_str.contains("Directory") {
-        FailureReason::DirectoryCreationFailed(error_str.clone())
-    } else if error_str.contains("copy") || error_str.contains("Copy") {
-        FailureReason::FigureCopyFailed {
-            figure_id: "unknown".to_string(),
-            message: error_str.clone(),
-        }
-    } else if error_str.contains("metadata") || error_str.contains("Metadata") {
-        FailureReason::MetadataSaveFailed(error_str.clone())
-    } else if error_str.contains("extract") || error_str.contains("Extract") {
-        FailureReason::ExtractionFailed(error_str.clone())
-    } else if error_str.contains("storage") || error_str.contains("Storage") {
-        FailureReason::StorageError {
-            operation: "unknown".to_string(),
-            message: error_str.clone(),
-        }
-    } else {
-        FailureReason::Other(error_str.clone())
     };
 
     (reason, error_chain)

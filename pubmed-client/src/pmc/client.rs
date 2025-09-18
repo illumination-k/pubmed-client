@@ -43,6 +43,15 @@ impl PmcClient {
         Self::with_config(config)
     }
 
+    pub fn get_pmc_config(&self) -> &ClientConfig {
+        &self.config
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn get_tar_client_config(&self) -> &ClientConfig {
+        &self.tar_client.config
+    }
+
     /// Create a new PMC client with custom configuration
     ///
     /// # Arguments
