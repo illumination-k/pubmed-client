@@ -2,7 +2,6 @@ use anyhow::{Context as _, Result};
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::io;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tempfile::TempDir;
@@ -14,7 +13,6 @@ use crate::commands::storage::{create_storage_backend, StorageBackend};
 use crate::Cli;
 
 #[derive(Error, Debug)]
-#[allow(dead_code)]
 pub enum FiguresError {
     #[error("Failed to download TAR archive for PMC ID {pmcid}: {source}")]
     TarDownloadFailed {
@@ -26,24 +24,6 @@ pub enum FiguresError {
     #[error("No figures found in article {pmcid}")]
     NoFiguresFound { pmcid: String },
 
-    #[error("Failed to create directory for {pmcid}: {source}")]
-    DirectoryCreationFailed {
-        pmcid: String,
-        path: PathBuf,
-        #[source]
-        source: io::Error,
-    },
-
-    #[error("Failed to copy figure {figure_id} for {pmcid}: {source}")]
-    FigureCopyFailed {
-        pmcid: String,
-        figure_id: String,
-        source_path: PathBuf,
-        target_path: String,
-        #[source]
-        source: anyhow::Error,
-    },
-
     #[error("Failed to save metadata for {pmcid}: {source}")]
     MetadataSaveFailed {
         pmcid: String,
@@ -52,18 +32,8 @@ pub enum FiguresError {
         source: anyhow::Error,
     },
 
-    #[error("Failed to extract figures from {pmcid}: {source}")]
-    ExtractionFailed {
-        pmcid: String,
-        #[source]
-        source: anyhow::Error,
-    },
-
     #[error("Network timeout while processing {pmcid} (timeout: {timeout_seconds}s)")]
     NetworkTimeout { pmcid: String, timeout_seconds: u64 },
-
-    #[error("Invalid file format for figure in {pmcid}: {details}")]
-    InvalidFileFormat { pmcid: String, details: String },
 
     #[error("Storage backend error for {pmcid}: {source}")]
     StorageError {
@@ -90,17 +60,10 @@ pub enum FailureReason {
         is_network_error: bool,
     },
     NoFiguresFound,
-    DirectoryCreationFailed(String),
-    FigureCopyFailed {
-        figure_id: String,
-        message: String,
-    },
     MetadataSaveFailed(String),
-    ExtractionFailed(String),
     NetworkTimeout {
         timeout_seconds: u64,
     },
-    InvalidFileFormat(String),
     StorageError {
         operation: String,
         message: String,
@@ -129,16 +92,10 @@ impl fmt::Display for FailureReason {
                 )
             }
             Self::NoFiguresFound => write!(f, "No figures found in article"),
-            Self::DirectoryCreationFailed(msg) => write!(f, "Directory creation failed: {}", msg),
-            Self::FigureCopyFailed { figure_id, message } => {
-                write!(f, "Failed to copy figure {}: {}", figure_id, message)
-            }
             Self::MetadataSaveFailed(msg) => write!(f, "Metadata save failed: {}", msg),
-            Self::ExtractionFailed(msg) => write!(f, "Extraction failed: {}", msg),
             Self::NetworkTimeout { timeout_seconds } => {
                 write!(f, "Network timeout after {} seconds", timeout_seconds)
             }
-            Self::InvalidFileFormat(msg) => write!(f, "Invalid file format: {}", msg),
             Self::StorageError { operation, message } => {
                 write!(f, "Storage error during {}: {}", operation, message)
             }
@@ -518,29 +475,14 @@ fn categorize_failure_from_figures_error(
             }
         }
         FiguresError::NoFiguresFound { .. } => FailureReason::NoFiguresFound,
-        FiguresError::DirectoryCreationFailed { path, .. } => {
-            FailureReason::DirectoryCreationFailed(format!(
-                "Failed to create {}: {}",
-                path.display(),
-                error_str
-            ))
-        }
-        FiguresError::FigureCopyFailed { figure_id, .. } => FailureReason::FigureCopyFailed {
-            figure_id: figure_id.clone(),
-            message: error_str.clone(),
-        },
         FiguresError::MetadataSaveFailed { path, .. } => FailureReason::MetadataSaveFailed(
             format!("Failed to save metadata to {}: {}", path, error_str),
         ),
-        FiguresError::ExtractionFailed { .. } => FailureReason::ExtractionFailed(error_str.clone()),
         FiguresError::NetworkTimeout {
             timeout_seconds, ..
         } => FailureReason::NetworkTimeout {
             timeout_seconds: *timeout_seconds,
         },
-        FiguresError::InvalidFileFormat { details, .. } => {
-            FailureReason::InvalidFileFormat(details.clone())
-        }
         FiguresError::StorageError { operation, .. } => FailureReason::StorageError {
             operation: operation.clone(),
             message: error_str.clone(),
