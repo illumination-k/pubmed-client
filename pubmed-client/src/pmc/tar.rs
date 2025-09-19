@@ -23,7 +23,7 @@ use {
 pub struct PmcTarClient {
     client: Client,
     rate_limiter: RateLimiter,
-    config: ClientConfig,
+    pub(crate) config: ClientConfig,
 }
 
 impl PmcTarClient {
