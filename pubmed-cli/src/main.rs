@@ -63,6 +63,23 @@ enum Commands {
     },
     /// Convert PMC articles to Markdown format
     Markdown(commands::markdown::Markdown),
+    /// Extract metadata from PMC articles and save as JSONL
+    Metadata {
+        /// PMC ID(s) to process (e.g., PMC7906746 or 7906746)
+        pmcids: Vec<String>,
+        /// Output JSONL file path (default: metadata.jsonl)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// Path to save failed PMC IDs (if not specified, failures are logged only)
+        #[arg(short, long)]
+        failed_output: Option<PathBuf>,
+        /// HTTP request timeout in seconds (default: 60)
+        #[arg(short, long)]
+        timeout: Option<u64>,
+        /// Append to existing file instead of overwriting
+        #[arg(short, long)]
+        append: bool,
+    },
     /// Convert PMID to PMCID
     #[command(name = "pmid-to-pmcid")]
     PmidToPmcid(Box<commands::convert::Convert>),
@@ -121,6 +138,22 @@ async fn main() -> Result<()> {
             let email = cli.email.as_deref();
             let tool = &cli.tool;
             cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::Metadata {
+            pmcids,
+            output,
+            failed_output,
+            timeout,
+            append,
+        } => {
+            let options = commands::metadata::MetadataOptions {
+                pmcids: pmcids.clone(),
+                output_file: output.clone(),
+                failed_output: failed_output.clone(),
+                timeout_seconds: *timeout,
+                append: *append,
+            };
+            commands::metadata::execute(options, &cli).await
         }
         Commands::PmidToPmcid(cmd) => {
             let api_key = cli.api_key.as_deref();
