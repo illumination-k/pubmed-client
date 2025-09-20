@@ -1,6 +1,7 @@
 pub mod convert;
 pub mod figures;
 pub mod markdown;
+pub mod metadata;
 pub mod search;
 pub mod storage;
 
