@@ -1,6 +1,5 @@
 """Tests for ClientConfig."""
 
-import pytest
 
 
 def test_config_creation() -> None:

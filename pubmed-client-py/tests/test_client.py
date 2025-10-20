@@ -1,6 +1,5 @@
 """Tests for PubMed and PMC clients."""
 
-import pytest
 
 
 class TestPubMedClient:
