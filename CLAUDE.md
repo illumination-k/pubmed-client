@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library, WebAssembly bindings for JavaScript/TypeScript environments, and a command-line interface for common operations.
+This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library, WebAssembly bindings for JavaScript/TypeScript environments, Python bindings via PyO3, and a command-line interface for common operations.
 
 ## Important Guidelines for PubMed Search Query Implementation
 
@@ -70,6 +70,19 @@ pubmed-client-rs/                    # Cargo workspace root
 │   ├── pkg/                         # Generated WASM package
 │   ├── tests/                       # WASM-specific TypeScript tests
 │   └── *.json, *.ts                # TypeScript/npm configuration
+├── pubmed-client-py/                # Python bindings (PyO3)
+│   ├── Cargo.toml                   # PyO3 crate configuration
+│   ├── pyproject.toml               # Python package configuration
+│   ├── src/lib.rs                   # PyO3 bindings source
+│   ├── pubmed_client.pyi            # Type stub file for IDE support
+│   ├── py.typed                     # PEP 561 type marker
+│   ├── tests/                       # Python tests (pytest)
+│   │   ├── test_config.py           # Configuration tests
+│   │   ├── test_client.py           # Client initialization tests
+│   │   ├── test_models.py           # Data model tests
+│   │   ├── test_integration.py      # Integration tests
+│   │   └── conftest.py              # Pytest fixtures
+│   └── pytest.ini                   # Pytest configuration
 ├── pubmed-cli/                      # Command-line interface
 │   ├── Cargo.toml                   # CLI crate configuration
 │   └── src/                         # CLI source code
@@ -143,6 +156,41 @@ pnpm run test:coverage  # With coverage
 
 # Publish to npm
 pnpm run publish        # wasm-pack publish --access public
+```
+
+#### Python Package Commands (from pubmed-client-py/)
+
+```bash
+# Build Python package with maturin
+uv run --with maturin maturin develop        # Development build
+uv run --with maturin maturin develop --quiet # Quiet mode
+
+# Run Python tests (all tests)
+uv run pytest                                 # Run all tests
+uv run pytest -v                              # Verbose output
+uv run pytest -m "not integration"            # Unit tests only
+uv run pytest -m integration                  # Integration tests only
+
+# Run specific test files
+uv run pytest tests/test_config.py            # Configuration tests
+uv run pytest tests/test_client.py            # Client tests
+uv run pytest tests/test_models.py            # Data model tests
+uv run pytest tests/test_integration.py       # Integration tests
+
+# Run tests with coverage
+uv run pytest --cov=pubmed_client --cov-report=html
+uv run pytest --cov=pubmed_client --cov-report=term
+
+# Type checking with mypy
+uv run mypy tests/ --strict                   # Type check tests
+uv run mypy tests/ --strict --no-error-summary # Quiet mode
+
+# Code quality checks
+uv run ruff check .                           # Linting
+uv run ruff format .                          # Formatting
+
+# Install development dependencies
+uv sync --group dev                           # Sync all dev dependencies
 ```
 
 #### CLI Commands (from workspace root)
@@ -740,6 +788,242 @@ pnpm run typecheck         # Type checking only
 - Live API tests using real PMIDs (e.g., `31978945` for COVID-19 research)
 - Error handling for invalid inputs and network failures
 - Promise-based async API validation
+
+## Python Bindings Development and Publishing
+
+The workspace includes Python bindings built with PyO3 and maturin.
+
+### Python Bindings Architecture (pubmed-client-py/)
+
+The Python package provides native Python bindings for the core Rust library:
+
+- `src/lib.rs` - PyO3 bindings entry point with Python-compatible types (1144 lines)
+- `pubmed_client.pyi` - Type stub file for IDE autocomplete and mypy support
+- `py.typed` - PEP 561 marker for type information
+- `pyproject.toml` - Python package configuration (maturin build system)
+- `pytest.ini` - Pytest configuration with test markers
+- `tests/` - Python tests using pytest
+- Configuration files: `pyproject.toml`, `.python-version`, `uv.lock`
+
+**Key Python Types:**
+
+- `Client` - Combined client with both `pubmed` and `pmc` properties
+- `PubMedClient` - Python wrapper around Rust PubMed client
+- `PmcClient` - Python wrapper around Rust PMC client
+- `ClientConfig` - Configuration with builder pattern for method chaining
+- `PubMedArticle`, `PmcFullText` - Python-friendly data structures
+- `RelatedArticles`, `PmcLinks`, `Citations` - ELink API results
+- `DatabaseInfo` - EInfo API database information
+
+**Implementation Details:**
+
+- **Blocking API**: Synchronous Python API using Tokio runtime internally
+- **GIL Release**: Uses `py.allow_threads()` for non-blocking I/O operations
+- **Runtime Management**: Creates Tokio runtime per call with `get_runtime()`
+- **Error Handling**: Converts Rust errors to Python exceptions
+- **Arc-based Sharing**: Thread-safe client cloning with `Arc<T>`
+- **Builder Pattern**: ClientConfig supports method chaining
+- **Recursive Collection**: Figures and tables collected from nested article sections
+
+### Python Testing Strategy
+
+Comprehensive test suite with 35 tests (100% passing):
+
+**Test Organization:**
+
+- `tests/test_config.py` - Configuration and builder pattern (9 tests)
+- `tests/test_client.py` - Client initialization and properties (8 tests)
+- `tests/test_models.py` - Data model validation (9 tests)
+- `tests/test_integration.py` - Live API integration tests (10 tests)
+- `tests/conftest.py` - Shared pytest fixtures and configuration
+
+**Test Markers:**
+
+- `@pytest.mark.integration` - Tests requiring network access to NCBI APIs
+- `@pytest.mark.slow` - Long-running tests
+
+**Test Fixtures:**
+
+```python
+# Available fixtures (from conftest.py)
+@pytest.fixture
+def pubmed_client() -> PubMedClient:
+    """PubMed client with conservative rate limiting."""
+
+@pytest.fixture
+def pmc_client() -> PmcClient:
+    """PMC client with conservative rate limiting."""
+
+@pytest.fixture
+def client() -> Client:
+    """Combined client with conservative rate limiting."""
+```
+
+**Running Tests:**
+
+```bash
+# Unit tests only (fast, no network)
+uv run pytest -m "not integration"
+
+# Integration tests only (requires network)
+uv run pytest -m integration
+
+# All tests
+uv run pytest
+
+# With coverage report
+uv run pytest --cov=pubmed_client --cov-report=html
+```
+
+### Type Stubs and IDE Support
+
+The Python package includes comprehensive type annotations:
+
+**Type Stub File (`pubmed_client.pyi`):**
+
+- Complete type annotations for all 18 classes
+- Full method signatures with parameter and return types
+- Proper `Optional[T]` and `list[T]` type hints
+- Docstrings for all public APIs
+
+**Benefits:**
+
+- Full IDE autocomplete (VS Code, PyCharm, etc.)
+- mypy static type checking support
+- Parameter hints and documentation
+- Return type inference
+
+**Type Checking:**
+
+```bash
+# Run mypy on test files
+uv run mypy tests/ --strict
+
+# Type check specific file
+uv run mypy tests/test_integration.py
+```
+
+**Example Usage with Types:**
+
+```python
+import pubmed_client
+
+# Type annotations work automatically
+config: pubmed_client.ClientConfig = pubmed_client.ClientConfig()
+config.with_api_key("key").with_email("user@example.com")
+
+client: pubmed_client.Client = pubmed_client.Client.with_config(config)
+articles: list[pubmed_client.PubMedArticle] = client.pubmed.search_and_fetch("covid-19", 10)
+full_text: pubmed_client.PmcFullText = client.pmc.fetch_full_text("PMC7906746")
+```
+
+### Python Package Publishing
+
+The Python package can be published to PyPI using maturin:
+
+```bash
+# From pubmed-client-py/ directory
+
+# Build wheel for current platform
+uv run --with maturin maturin build --release
+
+# Build wheels for multiple platforms (requires CI)
+uv run --with maturin maturin build --release --target universal2-apple-darwin  # macOS
+uv run --with maturin maturin build --release --target x86_64-unknown-linux-gnu # Linux
+uv run --with maturin maturin build --release --target x86_64-pc-windows-msvc   # Windows
+
+# Publish to PyPI (requires PYPI_TOKEN)
+uv run --with maturin maturin publish
+```
+
+**Package Configuration:**
+
+- Package name: `pubmed-client`
+- Module name: `pubmed_client`
+- Includes type stubs automatically via maturin
+- PEP 561 compliant (includes `py.typed`)
+- Supports Python 3.12+
+
+### Python Code Quality
+
+The Python package uses ruff for linting and formatting:
+
+```bash
+# From pubmed-client-py/ directory
+
+# Linting
+uv run ruff check .                   # Check for issues
+uv run ruff check --fix .             # Auto-fix issues
+
+# Formatting
+uv run ruff format .                  # Format code
+uv run ruff format --check .          # Check formatting
+
+# Type checking
+uv run mypy tests/ --strict           # Strict type checking
+```
+
+**Ruff Configuration:**
+
+- Line length: 100 characters
+- Target version: Python 3.12
+- Enabled rules: ALL (with selective ignores)
+- Compatible with Black formatter
+- Configured in `pyproject.toml`
+
+### Python Dependencies
+
+**Runtime Dependencies:**
+
+- None (pure PyO3 extension module)
+
+**Development Dependencies:**
+
+- `pytest>=8.0` - Testing framework
+- `pytest-cov>=6.0` - Coverage reporting
+- `mypy>=1.0` - Static type checking
+- `ruff>=0.7` - Linting and formatting
+
+**Build Dependencies:**
+
+- `maturin>=1.0,<2.0` - PyO3 build tool
+- `uv` - Fast Python package manager (recommended)
+
+### Python Binding Implementation Notes
+
+**Key Design Decisions:**
+
+1. **Synchronous API**: Used blocking API instead of async for simplicity
+   - Creates Tokio runtime per call
+   - Releases GIL during I/O with `py.allow_threads()`
+   - Easier to use from Python
+
+2. **Data Model Wrapping**: All Rust types wrapped in Python-friendly classes
+   - `#[pyclass]` for data models
+   - `#[pymethods]` for methods
+   - Properties exposed with `#[pyo3(get)]`
+
+3. **Error Handling**: Rust errors converted to Python exceptions
+   - `to_py_err()` function converts `PubMedError` to `PyException`
+   - Preserves error messages
+
+4. **Builder Pattern**: ClientConfig uses method chaining
+   - Returns `PyRefMut<Self>` to enable chaining
+   - Follows Python conventions
+
+5. **Recursive Collection**: Figures/tables collected from nested sections
+   - PMC stores figures/tables in article sections
+   - Recursive helper functions flatten the structure
+   - Returns flat list for Python convenience
+
+**PyO3 Features Used:**
+
+- Extension modules with `#[pymodule]`
+- Class definitions with `#[pyclass]`
+- Method definitions with `#[pymethods]`
+- Property access with `#[pyo3(get)]`
+- GIL management with `py.allow_threads()`
+- Type conversion with `From` trait implementations
 
 ## Test Fixtures and Data
 
