@@ -7,6 +7,7 @@ dprint = "latest"
 
 pnpm = "10"
 node = "20"
+uv = "0.8"
 
 [tasks.fmt]
 run = ["dprint fmt", "cargo fmt --all"]
@@ -75,3 +76,33 @@ run = ["cd pubmed-client && cargo test --test"]
 
 [tasks."core:publish"]
 run = ["cd pubmed-client && cargo publish"]
+
+[tasks."py:install"]
+run = ["cd pubmed-client-py && uv sync"]
+
+[tasks."py:build"]
+run = ["cd pubmed-client-py && uv run maturin build"]
+
+[tasks."py:build:release"]
+run = ["cd pubmed-client-py && uv run maturin build --release"]
+
+[tasks."py:develop"]
+run = ["cd pubmed-client-py && uv run maturin develop"]
+
+[tasks."py:test"]
+run = ["cd pubmed-client-py && uv run pytest"]
+
+[tasks."py:test:verbose"]
+run = ["cd pubmed-client-py && uv run pytest -v"]
+
+[tasks."py:lint"]
+run = ["cd pubmed-client-py && uv run ruff check"]
+
+[tasks."py:format"]
+run = ["cd pubmed-client-py && uv run ruff format"]
+
+[tasks."py:typecheck"]
+run = ["cd pubmed-client-py && uv run mypy"]
+
+[tasks."py:publish"]
+run = ["cd pubmed-client-py && uv run maturin publish"]

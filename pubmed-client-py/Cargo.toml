@@ -1,0 +1,30 @@
+[package]
+name = "pubmed-client-py"
+version.workspace = true
+authors.workspace = true
+categories = ["api-bindings", "science", "web-programming::http-client"]
+edition.workspace = true
+keywords = ["pubmed", "python", "pyo3", "biomedical", "api"]
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+description = "Python bindings for the PubMed client library"
+
+[lib]
+name = "pubmed_client"
+crate-type = ["cdylib"]
+
+[dependencies]
+pubmed-client-rs = { path = "../pubmed-client" }
+
+# PyO3 for Python bindings
+pyo3 = { version = "0.23", features = ["extension-module"] }
+
+# Re-export some core dependencies
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { version = "1.0", features = ["rt", "rt-multi-thread"] }
+
+[features]
+default = []

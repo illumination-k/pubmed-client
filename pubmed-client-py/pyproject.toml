@@ -1,0 +1,66 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "pubmed-client"
+version = "0.1.0"
+description = "Python bindings for PubMed and PMC APIs for retrieving biomedical research articles"
+authors = [
+  { name = "illumination-k" },
+]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Rust",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["pubmed", "pmc", "biomedical", "research", "api", "bioinformatics"]
+
+[project.urls]
+Homepage = "https://github.com/illumination-k/pubmed-client-rs"
+Repository = "https://github.com/illumination-k/pubmed-client-rs"
+Documentation = "https://github.com/illumination-k/pubmed-client-rs/tree/main/pubmed-client-py"
+
+[tool.maturin]
+module-name = "pubmed_client"
+features = []
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.24",
+  "mypy>=1.0",
+  "ruff>=0.7",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = []
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
