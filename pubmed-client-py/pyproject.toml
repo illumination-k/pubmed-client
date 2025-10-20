@@ -32,15 +32,11 @@ Documentation = "https://github.com/illumination-k/pubmed-client-rs/tree/main/pu
 [tool.maturin]
 module-name = "pubmed_client"
 features = []
+# Include type stub files for IDE and mypy support
+include = ["pubmed_client.pyi"]
 
 [dependency-groups]
-dev = [
-  "pytest>=8.0",
-  "pytest-asyncio>=0.24",
-  "pytest-cov>=6.0",
-  "mypy>=1.0",
-  "ruff>=0.7",
-]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "mypy>=1.0", "ruff>=0.7"]
 
 [tool.ruff]
 line-length = 100
@@ -99,6 +95,12 @@ extend-select = [
   "F", # pyflakes (https://pypi.org/project/pyflakes/)
   "W", # pycodestyle (https://pypi.org/project/pycodestyle/)
   "B", # flake8-bugbear (https://pypi.org/project/flake8-bugbear/)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+  "PLC0415", # Import should be at top-level (intentional in tests for lazy import)
+  "PLR2004", # Magic value in comparison (acceptable in tests)
 ]
 
 [tool.mypy]
