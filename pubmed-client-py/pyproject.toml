@@ -34,7 +34,7 @@ module-name = "pubmed_client"
 features = []
 
 [dependency-groups]
-dev = ["pytest>=8.0", "pytest-asyncio>=0.24", "mypy>=1.0", "ruff>=0.7"]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "mypy>=1.0", "ruff>=0.7"]
 
 [tool.ruff]
 line-length = 100
