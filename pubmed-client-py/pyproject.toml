@@ -6,9 +6,7 @@ build-backend = "maturin"
 name = "pubmed-client"
 version = "0.1.0"
 description = "Python bindings for PubMed and PMC APIs for retrieving biomedical research articles"
-authors = [
-  { name = "illumination-k" },
-]
+authors = [{ name = "illumination-k" }]
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.12"
@@ -36,26 +34,74 @@ module-name = "pubmed_client"
 features = []
 
 [dependency-groups]
-dev = [
-  "pytest>=8.0",
-  "pytest-asyncio>=0.24",
-  "mypy>=1.0",
-  "ruff>=0.7",
-]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.24", "mypy>=1.0", "ruff>=0.7"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]
-ignore = []
+select = ["ALL"]
+ignore = [
+  # basic ignore
+  "E501", # Line too long (ignored by pysen)
+  "D", # pydocstyle (https://pypi.org/project/pydocstyle/)
+  "ICN", # flake8-import-conventions (https://github.com/joaopalmeiro/flake8-import-conventions) # NOQA
+
+  # strict ignore
+  "S101", # Use of `assert` detected
+  # "T20", # flake8-print (https://pypi.org/project/flake8-print/)
+  "ANN", # flkae8-annotations (https://pypi.org/project/flake8-annotations/)
+  "INP001", # File {file} is part of an implicit namespace package. Add an `__init__.py`.
+
+  # fmt confilict ignore
+  # https://docs.astral.sh/ruff/formatter/#format-suppression
+  "W191",
+  "E111",
+  "E114",
+  "E117",
+  "D206",
+  "D300",
+  "Q000",
+  "Q001",
+  "Q002",
+  "Q003",
+  "COM812",
+  "COM819",
+  "ISC001",
+  "ISC002",
+
+  # custom ignore
+  "RET504", # Unnecessary assignment to `text` before `return` statement
+  "RUF001", # Docstring contains ambiguous `ノ` (KATAKANA LETTER NO). Did you mean `/` (SOLIDUS)?
+  "RUF002", # Docstring contains ambiguous `ノ` (KATAKANA LETTER NO). Did you mean `/` (SOLIDUS)?
+  "RUF015", # Prefer `next(...)` over single element slice
+  "TD001", # Invalid TODO tag: `FIXME`
+  "TD002", # Missing author in TODO
+  "TD003", # Missing issue link on the line following this TODO
+  "FIX001", # Line contains FIXME, consider resolving the issue
+  "FIX002", # Line contains TODO, consider resolving the issue
+  "PTH123", # open()` should be replaced by `Path.open()`
+
+  # mypy support問題
+  "UP040", # type statement
+]
+
+extend-select = [
+  "I", # isort (https://pypi.org/project/isort/)
+  "E", # pycodestyle (https://pypi.org/project/pycodestyle/)
+  "F", # pyflakes (https://pypi.org/project/pyflakes/)
+  "W", # pycodestyle (https://pypi.org/project/pycodestyle/)
+  "B", # flake8-bugbear (https://pypi.org/project/flake8-bugbear/)
+]
 
 [tool.mypy]
 python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
+check_untyped_defs = true
 disallow_untyped_defs = true
+disallow_untyped_calls = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
