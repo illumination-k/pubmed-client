@@ -1,7 +1,8 @@
-use crate::error::{PubMedError, Result};
+use crate::error::Result;
 use crate::pmc::models::{Author, Reference};
 use quick_xml::de::from_str;
 use serde::Deserialize;
+use tracing;
 
 /// XML structure for ref-list element
 #[derive(Debug, Deserialize)]
@@ -125,32 +126,143 @@ struct Name {
     given_names: Option<String>,
 }
 
-/// Extract detailed references from ref-list
+/// Extract detailed references from ref-list or alternative reference structures
 pub fn extract_references_detailed(content: &str) -> Result<Vec<Reference>> {
-    // Find ref-list content
+    // Try multiple reference extraction strategies to handle different PMC XML formats
+
+    // Strategy 1: Standard <ref-list> structure
+    if let Some(references) = try_extract_from_ref_list(content)? {
+        tracing::debug!(
+            count = references.len(),
+            "Extracted references from ref-list"
+        );
+        return Ok(references);
+    }
+
+    // Strategy 2: Alternative <references> structure
+    if let Some(references) = try_extract_from_references_tag(content)? {
+        tracing::debug!(
+            count = references.len(),
+            "Extracted references from references tag"
+        );
+        return Ok(references);
+    }
+
+    // Strategy 3: Direct <ref> tags in <back> section
+    if let Some(references) = try_extract_from_back_section(content)? {
+        tracing::debug!(
+            count = references.len(),
+            "Extracted references from back section"
+        );
+        return Ok(references);
+    }
+
+    // No references found with any strategy
+    Ok(Vec::new())
+}
+
+/// Try to extract references from standard <ref-list> structure
+fn try_extract_from_ref_list(content: &str) -> Result<Option<Vec<Reference>>> {
     let ref_list_content = if let Some(start) = content.find("<ref-list") {
         if let Some(end) = content[start..].find("</ref-list>") {
             &content[start..start + end + 11] // +11 for "</ref-list>"
         } else {
-            return Ok(Vec::new()); // No closing tag found, but not an error - just no references
+            return Ok(None);
         }
     } else {
-        return Ok(Vec::new()); // No ref-list found, but not an error - just no references
+        return Ok(None);
     };
 
     // Parse the ref-list
-    let ref_list =
-        from_str::<RefList>(ref_list_content).map_err(|e| PubMedError::XmlParseError {
-            message: format!("Failed to parse ref-list: {}", e),
-        })?;
+    match from_str::<RefList>(ref_list_content) {
+        Ok(ref_list) => {
+            let references = ref_list
+                .refs
+                .into_iter()
+                .filter_map(parse_ref_to_reference)
+                .collect();
+            Ok(Some(references))
+        }
+        Err(_) => Ok(None),
+    }
+}
 
-    let references = ref_list
-        .refs
-        .into_iter()
-        .filter_map(parse_ref_to_reference)
-        .collect();
+/// Try to extract references from alternative <references> structure
+fn try_extract_from_references_tag(content: &str) -> Result<Option<Vec<Reference>>> {
+    // Some PMC articles use <references> instead of <ref-list>
+    let references_content = if let Some(start) = content.find("<references") {
+        if let Some(end) = content[start..].find("</references>") {
+            &content[start..start + end + 13] // +13 for "</references>"
+        } else {
+            return Ok(None);
+        }
+    } else {
+        return Ok(None);
+    };
 
-    Ok(references)
+    // Try to adapt the content to ref-list format for parsing
+    let adapted_content = references_content
+        .replace("<references", "<ref-list")
+        .replace("</references>", "</ref-list>");
+
+    match from_str::<RefList>(&adapted_content) {
+        Ok(ref_list) => {
+            let references = ref_list
+                .refs
+                .into_iter()
+                .filter_map(parse_ref_to_reference)
+                .collect();
+            Ok(Some(references))
+        }
+        Err(_) => Ok(None),
+    }
+}
+
+/// Try to extract references from direct <ref> tags in <back> section
+fn try_extract_from_back_section(content: &str) -> Result<Option<Vec<Reference>>> {
+    // Extract the back section
+    let back_content = if let Some(start) = content.find("<back>") {
+        if let Some(end) = content[start..].find("</back>") {
+            &content[start..start + end + 7] // +7 for "</back>"
+        } else {
+            return Ok(None);
+        }
+    } else {
+        return Ok(None);
+    };
+
+    // Look for <ref> tags directly in the back section
+    let mut references = Vec::new();
+    let mut pos = 0;
+
+    while let Some(ref_start) = back_content[pos..].find("<ref ") {
+        let ref_start = pos + ref_start;
+        if let Some(ref_end) = back_content[ref_start..].find("</ref>") {
+            let ref_end = ref_start + ref_end + 6; // +6 for "</ref>"
+            let ref_content = &back_content[ref_start..ref_end];
+
+            // Wrap the ref in a temporary ref-list structure to reuse existing parsing
+            let wrapped_content = format!("<ref-list>{}</ref-list>", ref_content);
+
+            if let Ok(ref_list) = from_str::<RefList>(&wrapped_content) {
+                for ref_item in ref_list.refs {
+                    if let Some(reference) = parse_ref_to_reference(ref_item) {
+                        references.push(reference);
+                    }
+                }
+            }
+
+            pos = ref_end;
+        } else {
+            break;
+        }
+    }
+
+    if references.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(references))
+    }
 }
 
 /// Convert a Ref struct to a Reference model
