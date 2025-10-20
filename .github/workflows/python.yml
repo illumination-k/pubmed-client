@@ -1,0 +1,208 @@
+name: Python CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint:
+    name: Python Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.8.x"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: pubmed-client-py
+
+      - name: Install dependencies
+        working-directory: pubmed-client-py
+        run: |
+          uv sync --dev
+
+      - name: Run ruff check
+        working-directory: pubmed-client-py
+        run: |
+          uv run ruff check .
+
+      - name: Run ruff format check
+        working-directory: pubmed-client-py
+        run: |
+          uv run ruff format --check .
+
+      - name: Run mypy
+        working-directory: pubmed-client-py
+        run: |
+          uv run mypy .
+
+  test:
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.8.x"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: pubmed-client-py
+
+      - name: Install dependencies
+        working-directory: pubmed-client-py
+        run: |
+          uv sync --dev
+
+      - name: Build Python package with maturin
+        working-directory: pubmed-client-py
+        run: |
+          uv run --with maturin maturin develop
+
+      - name: Run tests
+        working-directory: pubmed-client-py
+        run: |
+          uv run pytest -v
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: pubmed-client-py/.pytest_cache/
+
+  build:
+    name: Build Python Wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.8.x"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: pubmed-client-py
+
+      - name: Install maturin
+        run: |
+          uv tool install maturin
+
+      - name: Build wheels
+        working-directory: pubmed-client-py
+        run: |
+          uvx maturin build --release
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: pubmed-client-py/target/wheels/*.whl
+          if-no-files-found: error
+
+  coverage:
+    name: Python Test Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.8.x"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: pubmed-client-py
+
+      - name: Install dependencies
+        working-directory: pubmed-client-py
+        run: |
+          uv sync --dev
+          uv add --dev pytest-cov
+
+      - name: Build Python package with maturin
+        working-directory: pubmed-client-py
+        run: |
+          uv run --with maturin maturin develop
+
+      - name: Run tests with coverage
+        working-directory: pubmed-client-py
+        run: |
+          uv run pytest --cov=pubmed_client --cov-report=xml --cov-report=html
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          file: pubmed-client-py/coverage.xml
+          flags: python
+          name: python-coverage
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload coverage HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: pubmed-client-py/htmlcov/

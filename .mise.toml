@@ -113,6 +113,36 @@ run = ["uv run ruff format"]
 dir = "pubmed-client-py"
 run = ["uv run mypy"]
 
+[tasks."py:check"]
+dir = "pubmed-client-py"
+run = [
+  "uv run ruff check .",
+  "uv run ruff format --check .",
+  "uv run mypy .",
+]
+
+[tasks."py:coverage"]
+dir = "pubmed-client-py"
+run = ["uv run pytest --cov=pubmed_client --cov-report=html --cov-report=term"]
+
+[tasks."py:coverage:open"]
+dir = "pubmed-client-py"
+run = [
+  "uv run pytest --cov=pubmed_client --cov-report=html",
+  "open htmlcov/index.html",
+]
+
+[tasks."py:clean"]
+dir = "pubmed-client-py"
+run = [
+  "rm -rf target/",
+  "rm -rf .pytest_cache/",
+  "rm -rf .mypy_cache/",
+  "rm -rf .ruff_cache/",
+  "rm -rf htmlcov/",
+  "rm -rf .coverage",
+]
+
 [tasks."py:publish"]
 dir = "pubmed-client-py"
 run = ["uv run maturin publish"]
