@@ -78,31 +78,41 @@ run = ["cd pubmed-client && cargo test --test"]
 run = ["cd pubmed-client && cargo publish"]
 
 [tasks."py:install"]
-run = ["cd pubmed-client-py && uv sync"]
+dir = "pubmed-client-py"
+run = ["uv sync"]
 
 [tasks."py:build"]
-run = ["cd pubmed-client-py && uv run maturin build"]
+dir = "pubmed-client-py"
+run = ["uv run maturin build"]
 
 [tasks."py:build:release"]
-run = ["cd pubmed-client-py && uv run maturin build --release"]
+dir = "pubmed-client-py"
+run = ["uv run maturin build --release"]
 
 [tasks."py:develop"]
-run = ["cd pubmed-client-py && uv run maturin develop"]
+dir = "pubmed-client-py"
+run = ["uv run maturin develop"]
 
 [tasks."py:test"]
-run = ["cd pubmed-client-py && uv run pytest"]
+dir = "pubmed-client-py"
+run = ["uv run pytest"]
 
 [tasks."py:test:verbose"]
-run = ["cd pubmed-client-py && uv run pytest -v"]
+dir = "pubmed-client-py"
+run = ["uv run pytest -v"]
 
 [tasks."py:lint"]
-run = ["cd pubmed-client-py && uv run ruff check"]
+dir = "pubmed-client-py"
+run = ["uv run ruff check"]
 
 [tasks."py:format"]
-run = ["cd pubmed-client-py && uv run ruff format"]
+dir = "pubmed-client-py"
+run = ["uv run ruff format"]
 
 [tasks."py:typecheck"]
-run = ["cd pubmed-client-py && uv run mypy"]
+dir = "pubmed-client-py"
+run = ["uv run mypy"]
 
 [tasks."py:publish"]
-run = ["cd pubmed-client-py && uv run maturin publish"]
+dir = "pubmed-client-py"
+run = ["uv run maturin publish"]

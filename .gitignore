@@ -32,3 +32,4 @@ build/
 .mypy_cache/
 .ruff_cache/
 *.whl
+.python-version
