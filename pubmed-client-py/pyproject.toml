@@ -32,6 +32,8 @@ Documentation = "https://github.com/illumination-k/pubmed-client-rs/tree/main/pu
 [tool.maturin]
 module-name = "pubmed_client"
 features = []
+# Include type stub files for IDE and mypy support
+include = ["pubmed_client.pyi"]
 
 [dependency-groups]
 dev = ["pytest>=8.0", "pytest-cov>=6.0", "mypy>=1.0", "ruff>=0.7"]
