@@ -38,7 +38,7 @@ uv pip install -e .
 
 ### Prerequisites
 
-- Python >= 3.8
+- Python >= 3.12
 - Rust toolchain (installed via rustup)
 - uv (for Python package management)
 - maturin (for building Python bindings)
