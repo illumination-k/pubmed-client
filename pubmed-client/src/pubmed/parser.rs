@@ -218,7 +218,7 @@ fn deserialize_abstract_text<'de, D>(deserializer: D) -> result::Result<String, 
 where
     D: Deserializer<'de>,
 {
-    use serde::de::{self, MapAccess, Visitor};
+    use serde::de::{self, IgnoredAny, MapAccess, Visitor};
 
     struct AbstractTextVisitor;
 
@@ -253,7 +253,7 @@ where
                     text = map.next_value()?;
                 } else {
                     // Skip other fields like @Label
-                    let _: serde::de::IgnoredAny = map.next_value()?;
+                    let _: IgnoredAny = map.next_value()?;
                 }
             }
             Ok(text)
@@ -882,9 +882,6 @@ mod tests {
         </PubmedArticleSet>"#;
 
         let result = parse_article_from_xml(xml, "32887691");
-        if let Err(ref e) = result {
-            eprintln!("Parse error: {:?}", e);
-        }
         assert!(result.is_ok());
 
         let article = result.unwrap();
