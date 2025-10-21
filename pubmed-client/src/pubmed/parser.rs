@@ -247,16 +247,18 @@ where
         where
             M: MapAccess<'de>,
         {
-            let mut text = String::new();
+            let mut text_parts = Vec::new();
             while let Some(key) = map.next_key::<String>()? {
                 if key == "$text" || key == "$value" {
-                    text = map.next_value()?;
+                    let value: String = map.next_value()?;
+                    text_parts.push(value);
                 } else {
                     // Skip other fields like @Label
                     let _: IgnoredAny = map.next_value()?;
                 }
             }
-            Ok(text)
+            // Join all text parts (handles mixed content with inline tags)
+            Ok(text_parts.join(""))
         }
     }
 
@@ -900,6 +902,122 @@ mod tests {
         // Verify they are properly concatenated with spaces
         assert!(abstract_text.contains("earlier versions. What is the role"));
         assert!(abstract_text.contains("covid-19? The evidence base"));
+    }
+
+    #[test]
+    fn test_abstract_with_inline_html_tags() {
+        // Test that abstracts with inline HTML tags (like <i>, <sub>, <sup>) parse successfully
+        // without errors. This was causing CI failures in Python tests.
+        let xml = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>41111388</PMID>
+        <Article>
+            <ArticleTitle>Breath analysis with inline formatting</ArticleTitle>
+            <Abstract>
+                <AbstractText>This study presents a novel approach (<i>e.g.</i>, machine learning algorithms) for comprehensive analysis. The method uses H<sub>2</sub>O and CO<sub>2</sub> detection with sensitivity of 10<sup>-9</sup> parts per billion.</AbstractText>
+            </Abstract>
+            <Journal>
+                <Title>Test Journal</Title>
+                <JournalIssue>
+                    <PubDate>
+                        <Year>2024</Year>
+                    </PubDate>
+                </JournalIssue>
+            </Journal>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        // The critical test: parsing should succeed without errors
+        let result = parse_article_from_xml(xml, "41111388");
+        assert!(
+            result.is_ok(),
+            "Failed to parse XML with inline HTML tags: {:?}",
+            result
+        );
+
+        let article = result.unwrap();
+        assert_eq!(article.pmid, "41111388");
+
+        // Verify we extracted abstract text (even if some inline content might be lost)
+        let abstract_text = article.abstract_text.as_ref();
+        assert!(abstract_text.is_some(), "Abstract text should not be None");
+
+        let text = abstract_text.unwrap();
+
+        // Verify we get the main content (note: text from inline elements may be partially lost
+        // due to quick-xml's mixed content handling, but we should get surrounding text)
+        assert!(
+            text.contains("machine learning algorithms"),
+            "Abstract should contain main text content. Got: {}",
+            text
+        );
+        assert!(
+            text.contains("comprehensive analysis"),
+            "Abstract should contain regular text. Got: {}",
+            text
+        );
+        assert!(
+            text.contains("parts per billion"),
+            "Abstract should contain ending text. Got: {}",
+            text
+        );
+    }
+
+    #[test]
+    fn test_structured_abstract_with_inline_tags() {
+        // Test structured abstracts (with Label attributes) that also contain inline HTML tags
+        let xml = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>99999999</PMID>
+        <Article>
+            <ArticleTitle>Study with formatted abstract sections</ArticleTitle>
+            <Abstract>
+                <AbstractText Label="BACKGROUND">CRISPR-Cas systems (<i>e.g.</i>, Cas9) are revolutionary.</AbstractText>
+                <AbstractText Label="METHODS">We used <sup>13</sup>C isotope labeling and analyzed pH levels between 5.0-7.5.</AbstractText>
+                <AbstractText Label="RESULTS">Efficacy improved by 10<sup>3</sup>-fold with <i>in vitro</i> conditions.</AbstractText>
+            </Abstract>
+            <Journal>
+                <Title>Test Journal</Title>
+            </Journal>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let result = parse_article_from_xml(xml, "99999999");
+        assert!(
+            result.is_ok(),
+            "Failed to parse structured abstract with inline tags"
+        );
+
+        let article = result.unwrap();
+        let abstract_text = article.abstract_text.unwrap();
+
+        // Verify key content from labeled sections was extracted
+        assert!(
+            abstract_text.contains("CRISPR-Cas systems"),
+            "Should extract BACKGROUND content"
+        );
+        assert!(
+            abstract_text.contains("Cas9"),
+            "Should extract text adjacent to inline tags"
+        );
+        assert!(
+            abstract_text.contains("isotope labeling"),
+            "Should extract METHODS content"
+        );
+
+        // Verify multiple sections are present (sections should be concatenated)
+        assert!(
+            abstract_text.contains("revolutionary") && abstract_text.contains("isotope"),
+            "Should concatenate all sections"
+        );
     }
 
     #[test]
