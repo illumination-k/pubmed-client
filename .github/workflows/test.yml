@@ -22,10 +22,12 @@ jobs:
       - name: Pull Git LFS files
         run: git lfs pull
 
-      - uses: jdx/mise-action@v2
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
 
-      - name: Install Rust components
-        run: rustup component add rustfmt clippy
+      - uses: jdx/mise-action@v2
 
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
@@ -49,10 +51,12 @@ jobs:
       - name: Pull Git LFS files
         run: git lfs pull
 
-      - uses: jdx/mise-action@v2
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
 
-      - name: Install Rust components
-        run: rustup component add rustfmt clippy
+      - uses: jdx/mise-action@v2
 
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2

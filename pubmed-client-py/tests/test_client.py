@@ -1,7 +1,6 @@
 """Tests for PubMed and PMC clients."""
 
 
-
 class TestPubMedClient:
     """Tests for PubMedClient."""
 
