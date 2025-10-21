@@ -2,12 +2,14 @@
 
 import pytest
 
+import pubmed_client
+
 
 @pytest.mark.integration
 class TestPubMedArticleModel:
     """Tests for PubMedArticle data model."""
 
-    def test_article_properties(self, pubmed_client) -> None:
+    def test_article_properties(self, pubmed_client: pubmed_client.PubMedClient) -> None:
         """Test article properties and methods."""
         article = pubmed_client.fetch_article("31978945")
 
@@ -41,7 +43,7 @@ class TestPubMedArticleModel:
 class TestAuthorModel:
     """Tests for Author data model."""
 
-    def test_author_properties(self, pubmed_client) -> None:
+    def test_author_properties(self, pubmed_client: pubmed_client.PubMedClient) -> None:
         """Test author properties."""
         article = pubmed_client.fetch_article("31978945")
         authors = article.authors()
@@ -74,7 +76,7 @@ class TestAuthorModel:
 class TestPmcFullTextModel:
     """Tests for PmcFullText data model."""
 
-    def test_full_text_properties(self, pmc_client) -> None:
+    def test_full_text_properties(self, pmc_client: pubmed_client.PmcClient) -> None:
         """Test full text properties and methods."""
         full_text = pmc_client.fetch_full_text("PMC7906746")
 
@@ -112,7 +114,7 @@ class TestPmcFullTextModel:
 class TestPmcAuthorModel:
     """Tests for PMC Author data model."""
 
-    def test_pmc_author_properties(self, pmc_client) -> None:
+    def test_pmc_author_properties(self, pmc_client: pubmed_client.PmcClient) -> None:
         """Test PMC author properties."""
         full_text = pmc_client.fetch_full_text("PMC7906746")
         authors = full_text.authors()
@@ -142,7 +144,7 @@ class TestPmcAuthorModel:
 class TestFigureModel:
     """Tests for Figure data model."""
 
-    def test_figure_properties(self, pmc_client) -> None:
+    def test_figure_properties(self, pmc_client: pubmed_client.PmcClient) -> None:
         """Test figure properties."""
         full_text = pmc_client.fetch_full_text("PMC7906746")
         figures = full_text.figures()
@@ -169,7 +171,7 @@ class TestFigureModel:
 class TestReferenceModel:
     """Tests for Reference data model."""
 
-    def test_reference_properties(self, pmc_client) -> None:
+    def test_reference_properties(self, pmc_client: pubmed_client.PmcClient) -> None:
         """Test reference properties."""
         full_text = pmc_client.fetch_full_text("PMC7906746")
         references = full_text.references()
@@ -195,7 +197,7 @@ class TestReferenceModel:
 class TestRelatedArticlesModel:
     """Tests for RelatedArticles data model."""
 
-    def test_related_articles_properties(self, pubmed_client) -> None:
+    def test_related_articles_properties(self, pubmed_client: pubmed_client.PubMedClient) -> None:
         """Test related articles properties."""
         related = pubmed_client.get_related_articles([31978945])
 
@@ -220,7 +222,7 @@ class TestRelatedArticlesModel:
 class TestPmcLinksModel:
     """Tests for PmcLinks data model."""
 
-    def test_pmc_links_properties(self, pubmed_client) -> None:
+    def test_pmc_links_properties(self, pubmed_client: pubmed_client.PubMedClient) -> None:
         """Test PMC links properties."""
         links = pubmed_client.get_pmc_links([31978945])
 
@@ -243,7 +245,7 @@ class TestPmcLinksModel:
 class TestCitationsModel:
     """Tests for Citations data model."""
 
-    def test_citations_properties(self, pubmed_client) -> None:
+    def test_citations_properties(self, pubmed_client: pubmed_client.PubMedClient) -> None:
         """Test citations properties."""
         citations = pubmed_client.get_citations([31978945])
 
