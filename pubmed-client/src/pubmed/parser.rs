@@ -213,25 +213,74 @@ impl AbstractSection {
     }
 }
 
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-enum AbstractTextElement {
-    Simple(String),
-    Structured {
-        #[serde(rename = "$text")]
-        text: String,
-        #[serde(rename = "@Label")]
-        #[allow(dead_code)]
-        label: Option<String>,
-    },
+// Custom deserializer for AbstractTextElement that handles all content including inline tags
+fn deserialize_abstract_text<'de, D>(deserializer: D) -> result::Result<String, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    use serde::de::{self, MapAccess, Visitor};
+
+    struct AbstractTextVisitor;
+
+    impl<'de> Visitor<'de> for AbstractTextVisitor {
+        type Value = String;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("abstract text content")
+        }
+
+        fn visit_str<E>(self, value: &str) -> result::Result<String, E>
+        where
+            E: de::Error,
+        {
+            Ok(value.to_string())
+        }
+
+        fn visit_string<E>(self, value: String) -> result::Result<String, E>
+        where
+            E: de::Error,
+        {
+            Ok(value)
+        }
+
+        fn visit_map<M>(self, mut map: M) -> result::Result<String, M::Error>
+        where
+            M: MapAccess<'de>,
+        {
+            let mut text = String::new();
+            while let Some(key) = map.next_key::<String>()? {
+                if key == "$text" || key == "$value" {
+                    text = map.next_value()?;
+                } else {
+                    // Skip other fields like @Label
+                    let _: serde::de::IgnoredAny = map.next_value()?;
+                }
+            }
+            Ok(text)
+        }
+    }
+
+    deserializer.deserialize_any(AbstractTextVisitor)
+}
+
+#[derive(Debug)]
+struct AbstractTextElement {
+    text: String,
+}
+
+impl<'de> Deserialize<'de> for AbstractTextElement {
+    fn deserialize<D>(deserializer: D) -> result::Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let text = deserialize_abstract_text(deserializer)?;
+        Ok(AbstractTextElement { text })
+    }
 }
 
 impl fmt::Display for AbstractTextElement {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            AbstractTextElement::Simple(text) => write!(f, "{}", text),
-            AbstractTextElement::Structured { text, .. } => write!(f, "{}", text),
-        }
+        write!(f, "{}", self.text)
     }
 }
 
@@ -833,6 +882,9 @@ mod tests {
         </PubmedArticleSet>"#;
 
         let result = parse_article_from_xml(xml, "32887691");
+        if let Err(ref e) = result {
+            eprintln!("Parse error: {:?}", e);
+        }
         assert!(result.is_ok());
 
         let article = result.unwrap();
