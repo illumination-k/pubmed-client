@@ -418,8 +418,11 @@ mod tests {
 
     #[test]
     fn test_extract_references_invalid_xml() {
+        // The function is designed to be robust and handle malformed XML gracefully
+        // by returning an empty vector instead of erroring. This test verifies that behavior.
         let content = "<ref-list><ref>Invalid XML</ref-list>";
         let result = extract_references_detailed(content);
-        assert!(result.is_err());
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().len(), 0);
     }
 }

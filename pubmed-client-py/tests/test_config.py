@@ -1,7 +1,6 @@
 """Tests for ClientConfig."""
 
 
-
 def test_config_creation() -> None:
     """Test creating a default configuration."""
     import pubmed_client
