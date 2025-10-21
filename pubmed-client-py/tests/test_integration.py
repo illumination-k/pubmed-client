@@ -10,12 +10,12 @@ import os
 
 import pytest
 
+import pubmed_client
+
 
 @pytest.fixture
-def client():
+def client() -> pubmed_client.Client:
     """Create a configured client for testing."""
-    import pubmed_client
-
     config = pubmed_client.ClientConfig()
     config.with_email("test@example.com").with_tool("pubmed-client-py-tests")
 
@@ -34,7 +34,7 @@ def client():
 class TestPubMedIntegration:
     """Integration tests for PubMed API."""
 
-    def test_fetch_article(self, client) -> None:
+    def test_fetch_article(self, client: pubmed_client.Client) -> None:
         """Test fetching a single article by PMID."""
         # PMID 31978945 - COVID-19 related article
         article = client.pubmed.fetch_article("31978945")
@@ -55,7 +55,7 @@ class TestPubMedIntegration:
         article_types = article.article_types()
         assert isinstance(article_types, list)
 
-    def test_search_and_fetch(self, client) -> None:
+    def test_search_and_fetch(self, client: pubmed_client.Client) -> None:
         """Test searching for articles and fetching metadata."""
         # Search for a small number of articles
         articles = client.pubmed.search_and_fetch("machine learning", 3)
@@ -69,25 +69,25 @@ class TestPubMedIntegration:
             assert article.title is not None
             assert isinstance(article.authors(), list)
 
-    def test_get_database_list(self, client) -> None:
+    def test_get_database_list(self, client: pubmed_client.Client) -> None:
         """Test getting list of available databases."""
-        databases = client.get_database_list()
+        databases = client.pubmed.get_database_list()
 
         assert isinstance(databases, list)
         assert len(databases) > 0
         assert "pubmed" in databases
         assert "pmc" in databases
 
-    def test_get_database_info(self, client) -> None:
+    def test_get_database_info(self, client: pubmed_client.Client) -> None:
         """Test getting detailed database information."""
-        info = client.get_database_info("pubmed")
+        info = client.pubmed.get_database_info("pubmed")
 
         assert info is not None
         assert info.name == "pubmed"
         assert info.description is not None
         assert len(info.description) > 0
 
-    def test_get_related_articles(self, client) -> None:
+    def test_get_related_articles(self, client: pubmed_client.Client) -> None:
         """Test getting related articles."""
         related = client.pubmed.get_related_articles([31978945])
 
@@ -99,7 +99,7 @@ class TestPubMedIntegration:
         # Test __len__ method
         assert len(related) == len(related.related_pmids)
 
-    def test_get_pmc_links(self, client) -> None:
+    def test_get_pmc_links(self, client: pubmed_client.Client) -> None:
         """Test getting PMC links for PMIDs."""
         links = client.pubmed.get_pmc_links([31978945])
 
@@ -110,7 +110,7 @@ class TestPubMedIntegration:
         # Test __len__ method
         assert len(links) == len(links.pmc_ids)
 
-    def test_get_citations(self, client) -> None:
+    def test_get_citations(self, client: pubmed_client.Client) -> None:
         """Test getting citing articles."""
         citations = client.pubmed.get_citations([31978945])
 
@@ -126,7 +126,7 @@ class TestPubMedIntegration:
 class TestPmcIntegration:
     """Integration tests for PMC API."""
 
-    def test_check_pmc_availability(self, client) -> None:
+    def test_check_pmc_availability(self, client: pubmed_client.Client) -> None:
         """Test checking PMC availability."""
         # PMID 31978945 has PMC full text
         pmcid = client.pmc.check_pmc_availability("31978945")
@@ -135,7 +135,7 @@ class TestPmcIntegration:
         if pmcid is not None:
             assert pmcid.startswith("PMC")
 
-    def test_fetch_full_text(self, client) -> None:
+    def test_fetch_full_text(self, client: pubmed_client.Client) -> None:
         """Test fetching PMC full text."""
         # PMC7906746 is known to exist
         full_text = client.pmc.fetch_full_text("PMC7906746")
@@ -171,19 +171,22 @@ class TestPmcIntegration:
 class TestCombinedIntegration:
     """Integration tests for combined operations."""
 
-    def test_search_with_full_text(self, client) -> None:
-        """Test searching with full text retrieval."""
+    def test_search_with_full_text(self, client: pubmed_client.Client) -> None:
+        """Test searching and fetching full text manually."""
         # Search for a small number of articles
-        results = client.search_with_full_text("CRISPR", 2)
+        articles = client.pubmed.search_and_fetch("CRISPR", 2)
 
-        assert isinstance(results, list)
-        assert len(results) <= 2
+        assert isinstance(articles, list)
+        assert len(articles) <= 2
 
-        for article, full_text in results:
+        for article in articles:
             assert article is not None
             assert article.pmid is not None
 
-            # full_text may or may not be available
-            if full_text is not None:
+            # Try to get full text for articles that have PMC versions
+            pmcid = client.pmc.check_pmc_availability(article.pmid)
+            if pmcid is not None:
+                full_text = client.pmc.fetch_full_text(pmcid)
+                assert full_text is not None
                 assert full_text.pmcid is not None
                 assert full_text.title is not None
