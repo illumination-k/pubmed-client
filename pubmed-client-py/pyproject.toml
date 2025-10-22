@@ -102,6 +102,20 @@ extend-select = [
   "PLC0415", # Import should be at top-level (intentional in tests for lazy import)
   "PLR2004", # Magic value in comparison (acceptable in tests)
 ]
+"examples/*" = [
+  "T201", # print() is expected in examples
+  "C901", # Complexity is acceptable in example scripts
+  "PLR0912", # Many branches acceptable in examples
+  "PLR0915", # Many statements acceptable in examples
+  "PLR2004", # Magic values acceptable in examples
+  "F541", # f-string without placeholders
+  "S311", # Random for non-cryptographic purposes
+  "BLE001", # Blind except acceptable in examples
+  "S110", # try-except-pass acceptable in examples
+  "S603", # subprocess without shell=True
+  "S607", # Starting process with partial path
+  "ERA001", # Commented-out code acceptable in examples
+]
 
 [tool.mypy]
 python_version = "3.12"

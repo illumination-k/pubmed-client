@@ -903,6 +903,15 @@ impl PyPubMedClient {
 
     /// Get citing articles for given PMIDs
     ///
+    /// Returns articles that cite the specified PMIDs from the PubMed database only.
+    ///
+    /// Important: Citation counts from this method may be LOWER than Google Scholar
+    /// or scite.ai because this only includes peer-reviewed articles in PubMed.
+    /// Other sources include preprints, books, and conference proceedings.
+    ///
+    /// Example: PMID 31978945 shows ~14,000 citations in PubMed vs ~23,000 in scite.ai.
+    /// This is expected - this method provides PubMed-specific citation data.
+    ///
     /// Args:
     ///     pmids: List of PubMed IDs
     ///
