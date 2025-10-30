@@ -143,6 +143,4 @@ name = "test_pmc_cache"
 path = "tests/integration/test_pmc_cache.rs"
 
 # Examples
-[[example]]
-name = "figure_extraction_complete"
-path = "../examples/figure_extraction_complete.rs"
+# (Python examples are in pubmed-client-py/examples/)
