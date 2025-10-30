@@ -9,8 +9,12 @@ pnpm = "10"
 node = "20"
 uv = "0.8"
 
+[env]
+# Use Python from pubmed-client-py venv for PyO3
+PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
+
 [tasks.fmt]
-run = ["dprint fmt", "cargo fmt --all"]
+run = ["mise fmt", "dprint fmt", "cargo fmt --all"]
 
 [tasks.lint]
 run = [
@@ -20,13 +24,19 @@ run = [
   "cargo clippy -p pubmed-client-rs --all-targets --features integration-tests -- -D warnings",
 ]
 
+[tasks."setup:test"]
+run = ["bash ./etc/setup-test.sh"]
+
 [tasks.test]
+depends = ["setup:test"]
 run = ["cargo nextest run --workspace"]
 
 [tasks."test:watch"]
+depends = ["setup:test"]
 run = ["cargo watch -x 'nextest run --workspace'"]
 
 [tasks."test:verbose"]
+depends = ["setup:test"]
 run = ["cargo nextest run --workspace --no-capture"]
 
 [tasks.build]
@@ -39,22 +49,8 @@ run = ["cargo check --workspace"]
 run = ["cargo doc --workspace --open"]
 
 [tasks.coverage]
+depends = ["setup:test"]
 run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html"]
-
-[tasks."coverage:lcov"]
-run = [
-  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --lcov --output-path coverage.lcov",
-]
-
-[tasks."coverage:json"]
-run = [
-  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --json --output-path coverage.json",
-]
-
-[tasks."coverage:open"]
-run = [
-  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --html --open",
-]
 
 [tasks."wasm:build"]
 run = ["cd pubmed-client-wasm && wasm-pack build --target web"]
