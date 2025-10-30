@@ -630,6 +630,24 @@ impl PubMedClient {
 
     /// Get citing articles for given PMIDs
     ///
+    /// This method retrieves articles that cite the specified PMIDs from the PubMed database.
+    /// The citation count returned represents only citations within the PubMed database
+    /// (peer-reviewed journal articles indexed in PubMed).
+    ///
+    /// # Important Note on Citation Counts
+    ///
+    /// The citation count from this method may be **lower** than counts from other sources like
+    /// Google Scholar, Web of Science, or scite.ai because:
+    ///
+    /// - **PubMed citations** (this method): Only includes peer-reviewed articles in PubMed
+    /// - **Google Scholar/scite.ai**: Includes preprints, books, conference proceedings, and other sources
+    ///
+    /// For example, PMID 31978945 shows:
+    /// - PubMed (this API): ~14,000 citations (PubMed database only)
+    /// - scite.ai: ~23,000 citations (broader sources)
+    ///
+    /// This is expected behavior - this method provides accurate PubMed-specific citation data.
+    ///
     /// # Arguments
     ///
     /// * `pmids` - List of PubMed IDs to find citing articles for
@@ -647,7 +665,7 @@ impl PubMedClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PubMedClient::new();
     ///     let citations = client.get_citations(&[31978945]).await?;
-    ///     println!("Found {} citing articles", citations.citing_pmids.len());
+    ///     println!("Found {} citing articles in PubMed", citations.citing_pmids.len());
     ///     Ok(())
     /// }
     /// ```
