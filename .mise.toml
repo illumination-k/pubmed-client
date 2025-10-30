@@ -2,8 +2,8 @@
 pre-commit = "latest"
 dprint = "latest"
 
-"cargo:cargo-nextest" = "latest"
-"cargo:cargo-llvm-cov" = "latest"
+# "cargo:cargo-nextest" = "latest"
+# "cargo:cargo-llvm-cov" = "latest"
 
 pnpm = "10"
 node = "20"
@@ -115,11 +115,7 @@ run = ["uv run mypy"]
 
 [tasks."py:check"]
 dir = "pubmed-client-py"
-run = [
-  "uv run ruff check .",
-  "uv run ruff format --check .",
-  "uv run mypy .",
-]
+run = ["uv run ruff check .", "uv run ruff format --check .", "uv run mypy ."]
 
 [tasks."py:coverage"]
 dir = "pubmed-client-py"
