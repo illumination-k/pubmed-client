@@ -29,7 +29,7 @@ run = [
 
 [tasks."setup:py"]
 dir = "{{ config_root }}/pubmed-client-py"
-run = ["uv sync"]
+run = ["uv venv"]
 
 [tasks."setup:test"]
 run = ["bash ./etc/setup-test.sh"]
