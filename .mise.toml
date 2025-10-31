@@ -13,6 +13,9 @@ uv = "0.8"
 # Use Python from pubmed-client-py venv for PyO3
 PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
 
+[hooks]
+postinstall = ["mise run setup"]
+
 [tasks.fmt]
 run = ["mise fmt", "dprint fmt", "cargo fmt --all"]
 
@@ -35,31 +38,24 @@ run = ["bash ./etc/setup-test.sh"]
 depends = ["setup:*"]
 
 [tasks.test]
-depends = ["setup"]
 run = ["cargo nextest run --workspace"]
 
 [tasks."test:watch"]
-depends = ["setup"]
 run = ["cargo watch -x 'nextest run --workspace'"]
 
 [tasks."test:verbose"]
-depends = ["setup"]
 run = ["cargo nextest run --workspace --no-capture"]
 
 [tasks.build]
-depends = ["setup"]
 run = ["cargo build --workspace"]
 
 [tasks.check]
-depends = ["setup"]
 run = ["cargo check --workspace"]
 
 [tasks.doc]
-depends = ["setup"]
 run = ["cargo doc --workspace --open"]
 
 [tasks.coverage]
-depends = ["setup"]
 run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html"]
 
 [tasks."wasm:build"]
@@ -83,29 +79,13 @@ run = ["cd pubmed-client && cargo test --test"]
 [tasks."core:publish"]
 run = ["cd pubmed-client && cargo publish"]
 
-[tasks."py:install"]
-dir = "pubmed-client-py"
-run = ["uv sync"]
-
 [tasks."py:build"]
 dir = "pubmed-client-py"
 run = ["uv run maturin build"]
 
-[tasks."py:build:release"]
-dir = "pubmed-client-py"
-run = ["uv run maturin build --release"]
-
-[tasks."py:develop"]
-dir = "pubmed-client-py"
-run = ["uv run maturin develop"]
-
 [tasks."py:test"]
 dir = "pubmed-client-py"
 run = ["uv run pytest"]
-
-[tasks."py:test:verbose"]
-dir = "pubmed-client-py"
-run = ["uv run pytest -v"]
 
 [tasks."py:lint"]
 dir = "pubmed-client-py"
