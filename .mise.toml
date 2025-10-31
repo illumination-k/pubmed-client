@@ -24,32 +24,42 @@ run = [
   "cargo clippy -p pubmed-client-rs --all-targets --features integration-tests -- -D warnings",
 ]
 
+[tasks."setup:py"]
+dir = "{{ config_root }}/pubmed-client-py"
+run = ["uv sync"]
+
 [tasks."setup:test"]
 run = ["bash ./etc/setup-test.sh"]
 
+[tasks.setup]
+depends = ["setup:*"]
+
 [tasks.test]
-depends = ["setup:test"]
+depends = ["setup"]
 run = ["cargo nextest run --workspace"]
 
 [tasks."test:watch"]
-depends = ["setup:test"]
+depends = ["setup"]
 run = ["cargo watch -x 'nextest run --workspace'"]
 
 [tasks."test:verbose"]
-depends = ["setup:test"]
+depends = ["setup"]
 run = ["cargo nextest run --workspace --no-capture"]
 
 [tasks.build]
+depends = ["setup"]
 run = ["cargo build --workspace"]
 
 [tasks.check]
+depends = ["setup"]
 run = ["cargo check --workspace"]
 
 [tasks.doc]
+depends = ["setup"]
 run = ["cargo doc --workspace --open"]
 
 [tasks.coverage]
-depends = ["setup:test"]
+depends = ["setup"]
 run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html"]
 
 [tasks."wasm:build"]
@@ -116,13 +126,6 @@ run = ["uv run ruff check .", "uv run ruff format --check .", "uv run mypy ."]
 [tasks."py:coverage"]
 dir = "pubmed-client-py"
 run = ["uv run pytest --cov=pubmed_client --cov-report=html --cov-report=term"]
-
-[tasks."py:coverage:open"]
-dir = "pubmed-client-py"
-run = [
-  "uv run pytest --cov=pubmed_client --cov-report=html",
-  "open htmlcov/index.html",
-]
 
 [tasks."py:clean"]
 dir = "pubmed-client-py"
