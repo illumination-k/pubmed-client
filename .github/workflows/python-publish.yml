@@ -32,12 +32,18 @@ jobs:
           # Override PYO3_PYTHON to use system Python for cross-compilation
           PYO3_PYTHON: python3
 
+      - name: Install OpenSSL development packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter --manifest-path pubmed-client-py/Cargo.toml
           manylinux: auto
+          container: off
         env:
           # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python3
