@@ -2,15 +2,22 @@
 pre-commit = "latest"
 dprint = "latest"
 
-"cargo:cargo-nextest" = "latest"
-"cargo:cargo-llvm-cov" = "latest"
+# "cargo:cargo-nextest" = "latest"
+# "cargo:cargo-llvm-cov" = "latest"
 
 pnpm = "10"
 node = "20"
 uv = "0.8"
 
+[env]
+# Use Python from pubmed-client-py venv for PyO3
+PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
+
+[hooks]
+postinstall = ["mise run setup"]
+
 [tasks.fmt]
-run = ["dprint fmt", "cargo fmt --all"]
+run = ["mise fmt", "dprint fmt", "cargo fmt --all"]
 
 [tasks.lint]
 run = [
@@ -19,6 +26,16 @@ run = [
   "cargo clippy --workspace --all-targets -- -D warnings",
   "cargo clippy -p pubmed-client-rs --all-targets --features integration-tests -- -D warnings",
 ]
+
+[tasks."setup:py"]
+dir = "{{ config_root }}/pubmed-client-py"
+run = ["uv venv"]
+
+[tasks."setup:test"]
+run = ["bash ./etc/setup-test.sh"]
+
+[tasks.setup]
+depends = ["setup:*"]
 
 [tasks.test]
 run = ["cargo nextest run --workspace"]
@@ -41,21 +58,6 @@ run = ["cargo doc --workspace --open"]
 [tasks.coverage]
 run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html"]
 
-[tasks."coverage:lcov"]
-run = [
-  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --lcov --output-path coverage.lcov",
-]
-
-[tasks."coverage:json"]
-run = [
-  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --json --output-path coverage.json",
-]
-
-[tasks."coverage:open"]
-run = [
-  "cargo llvm-cov nextest -p pubmed-client-rs --all-features --html --open",
-]
-
 [tasks."wasm:build"]
 run = ["cd pubmed-client-wasm && wasm-pack build --target web"]
 
@@ -77,29 +79,13 @@ run = ["cd pubmed-client && cargo test --test"]
 [tasks."core:publish"]
 run = ["cd pubmed-client && cargo publish"]
 
-[tasks."py:install"]
-dir = "pubmed-client-py"
-run = ["uv sync"]
-
 [tasks."py:build"]
 dir = "pubmed-client-py"
 run = ["uv run maturin build"]
 
-[tasks."py:build:release"]
-dir = "pubmed-client-py"
-run = ["uv run maturin build --release"]
-
-[tasks."py:develop"]
-dir = "pubmed-client-py"
-run = ["uv run maturin develop"]
-
 [tasks."py:test"]
 dir = "pubmed-client-py"
 run = ["uv run pytest"]
-
-[tasks."py:test:verbose"]
-dir = "pubmed-client-py"
-run = ["uv run pytest -v"]
 
 [tasks."py:lint"]
 dir = "pubmed-client-py"
@@ -115,22 +101,11 @@ run = ["uv run mypy"]
 
 [tasks."py:check"]
 dir = "pubmed-client-py"
-run = [
-  "uv run ruff check .",
-  "uv run ruff format --check .",
-  "uv run mypy .",
-]
+run = ["uv run ruff check .", "uv run ruff format --check .", "uv run mypy ."]
 
 [tasks."py:coverage"]
 dir = "pubmed-client-py"
 run = ["uv run pytest --cov=pubmed_client --cov-report=html --cov-report=term"]
-
-[tasks."py:coverage:open"]
-dir = "pubmed-client-py"
-run = [
-  "uv run pytest --cov=pubmed_client --cov-report=html",
-  "open htmlcov/index.html",
-]
 
 [tasks."py:clean"]
 dir = "pubmed-client-py"
