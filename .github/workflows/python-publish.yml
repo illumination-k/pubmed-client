@@ -21,8 +21,16 @@ jobs:
         with:
           lfs: true
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: mise
         uses: jdx/mise-action@v3
+        env:
+          # Override PYO3_PYTHON to use system Python for cross-compilation
+          PYO3_PYTHON: python3
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -31,6 +39,9 @@ jobs:
           args: --release --out dist --manifest-path pubmed-client-py/Cargo.toml
           manylinux: auto
           container: off
+        env:
+          # Ensure maturin uses system Python for cross-compilation
+          PYO3_PYTHON: python3
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -49,14 +60,25 @@ jobs:
         with:
           lfs: true
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: mise
         uses: jdx/mise-action@v3
+        env:
+          # Override PYO3_PYTHON to use system Python for cross-compilation
+          PYO3_PYTHON: python
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --manifest-path pubmed-client-py/Cargo.toml
+        env:
+          # Ensure maturin uses system Python for cross-compilation
+          PYO3_PYTHON: python
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -75,14 +97,25 @@ jobs:
         with:
           lfs: true
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: mise
         uses: jdx/mise-action@v3
+        env:
+          # Override PYO3_PYTHON to use system Python for cross-compilation
+          PYO3_PYTHON: python3
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --manifest-path pubmed-client-py/Cargo.toml
+        env:
+          # Ensure maturin uses system Python for cross-compilation
+          PYO3_PYTHON: python3
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
