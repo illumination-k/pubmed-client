@@ -21,15 +21,8 @@ jobs:
         with:
           lfs: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
+      - name: mise
+        uses: jdx/mise-action@v3
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -56,15 +49,8 @@ jobs:
         with:
           lfs: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
+      - name: mise
+        uses: jdx/mise-action@v3
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -89,15 +75,8 @@ jobs:
         with:
           lfs: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
+      - name: mise
+        uses: jdx/mise-action@v3
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -119,15 +98,8 @@ jobs:
         with:
           lfs: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
+      - name: mise
+        uses: jdx/mise-action@v3
 
       - name: Build sdist
         uses: PyO3/maturin-action@v1
@@ -150,15 +122,8 @@ jobs:
         with:
           lfs: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
+      - name: mise
+        uses: jdx/mise-action@v3
 
       - name: Download wheels
         uses: actions/download-artifact@v4
