@@ -41,6 +41,8 @@ jobs:
         env:
           # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python3
+          # Allow building with Python 3.14 using stable ABI
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -72,6 +74,8 @@ jobs:
         env:
           # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python
+          # Allow building with Python 3.14 using stable ABI
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -109,6 +113,8 @@ jobs:
         env:
           # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python3
+          # Allow building with Python 3.14 using stable ABI
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -156,7 +162,9 @@ jobs:
 
       - name: Install wheel
         run: |
-          uv pip install --system $(ls dist/*.whl)
+          # Create a venv and install the wheel
+          uv venv
+          uv pip install $(ls dist/*.whl)
         working-directory: .
 
       - name: Run tests
