@@ -36,9 +36,8 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --manifest-path pubmed-client-py/Cargo.toml
+          args: --release --out dist --find-interpreter --manifest-path pubmed-client-py/Cargo.toml
           manylinux: auto
-          container: off
         env:
           # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python3
@@ -75,7 +74,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --manifest-path pubmed-client-py/Cargo.toml
+          args: --release --out dist --find-interpreter --manifest-path pubmed-client-py/Cargo.toml
         env:
           # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python
@@ -112,7 +111,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --manifest-path pubmed-client-py/Cargo.toml
+          args: --release --out dist --find-interpreter --manifest-path pubmed-client-py/Cargo.toml
         env:
           # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python3
