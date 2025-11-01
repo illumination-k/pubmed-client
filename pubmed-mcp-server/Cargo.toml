@@ -1,0 +1,30 @@
+[package]
+name = "pubmed-mcp-server"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "MCP (Model Context Protocol) server for PubMed and PMC APIs"
+
+[dependencies]
+# Workspace dependencies
+anyhow.workspace = true
+pubmed-client = { path = "../pubmed-client", package = "pubmed-client-rs" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+# MCP Server dependencies
+rmcp = { version = "0.8", features = ["server", "transport-io"] }
+schemars = "0.8"
+tokio = { version = "1.0", features = ["full"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+rmcp = { version = "0.8", features = ["client", "transport-child-process"] }
+
+[[bin]]
+name = "pubmed-mcp-server"
+path = "src/main.rs"
