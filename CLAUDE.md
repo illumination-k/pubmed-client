@@ -8,7 +8,7 @@ This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients 
 
 ## Package Name
 
-python bindings package name: `pubmed-client-py`
+python bindings package name registered in PyPI: `pubmed-client-py`
 
 ## Important Guidelines for PubMed Search Query Implementation
 
