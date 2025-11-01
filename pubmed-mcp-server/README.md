@@ -109,7 +109,6 @@ Convert a PMC (PubMed Central) full-text article to well-formatted Markdown.
   - Examples: `"PMC7906746"` or `"7906746"`
 - `include_metadata` (boolean, optional): Include article metadata section (default: true)
   - Title, authors, journal, publication date, identifiers, keywords
-- `include_toc` (boolean, optional): Include table of contents (default: false)
 - `include_figure_captions` (boolean, optional): Include figure and table captions (default: true)
 
 **Returns:**
