@@ -111,8 +111,6 @@ Convert a PMC (PubMed Central) full-text article to well-formatted Markdown.
   - Title, authors, journal, publication date, identifiers, keywords
 - `include_toc` (boolean, optional): Include table of contents (default: false)
 - `include_figure_captions` (boolean, optional): Include figure and table captions (default: true)
-- `include_orcid_links` (boolean, optional): Include ORCID links for authors (default: true)
-- `include_identifier_links` (boolean, optional): Include clickable DOI and PMID links (default: true)
 
 **Returns:**
 
