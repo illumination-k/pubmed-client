@@ -214,6 +214,7 @@ impl AbstractSection {
 }
 
 // Custom deserializer for AbstractTextElement that handles all content including inline tags
+// Note: Inline HTML tags (<i>, <sup>, <sub>, etc.) are stripped during XML preprocessing
 fn deserialize_abstract_text<'de, D>(deserializer: D) -> result::Result<String, D::Error>
 where
     D: Deserializer<'de>,
@@ -634,13 +635,50 @@ where
     Ok(s.is_some_and(|s| s == "Y"))
 }
 
+/// Strip inline HTML-like formatting tags from XML content
+/// Handles tags like <i>, <sup>, <sub>, <b>, <u> that can appear in AbstractText and ArticleTitle
+/// These tags cause parsing issues with quick-xml's serde deserializer
+///
+/// This function is public so it can be reused by PMC parser as well
+pub(crate) fn strip_inline_html_tags(xml: &str) -> String {
+    use regex::Regex;
+    use std::sync::OnceLock;
+
+    // Regex pattern to match inline HTML tags (both opening and closing)
+    // Matches: <i>, </i>, <b>, </b>, <sup>, </sup>, <sub>, </sub>, <u>, </u>, <em>, </em>, <strong>, </strong>
+    static INLINE_TAG_REGEX: OnceLock<Regex> = OnceLock::new();
+    let re = INLINE_TAG_REGEX.get_or_init(|| {
+        Regex::new(r"</?(?:i|b|u|sup|sub|em|strong|italic|bold)>")
+            .expect("Failed to compile inline tag regex")
+    });
+
+    let cleaned = re.replace_all(xml, "");
+
+    // Log if any tags were stripped
+    if cleaned.len() != xml.len() {
+        debug!(
+            "Stripped inline HTML tags: original {} bytes -> cleaned {} bytes (removed {} bytes)",
+            xml.len(),
+            cleaned.len(),
+            xml.len() - cleaned.len()
+        );
+    }
+
+    cleaned.into_owned()
+}
+
 /// Parse article from EFetch XML response
 #[instrument(skip(xml), fields(pmid = %pmid, xml_size = xml.len()))]
 pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {
+    // Preprocess XML to remove inline HTML tags that can cause parsing issues
+    // This handles tags like <i>, <sup>, <sub>, <b> that appear in abstracts and titles
+    let cleaned_xml = strip_inline_html_tags(xml);
+
     // Parse the XML using quick-xml serde
-    let article_set: PubmedArticleSet = from_str(xml).map_err(|e| PubMedError::XmlParseError {
-        message: format!("Failed to deserialize XML: {}", e),
-    })?;
+    let article_set: PubmedArticleSet =
+        from_str(&cleaned_xml).map_err(|e| PubMedError::XmlParseError {
+            message: format!("Failed to deserialize XML: {}", e),
+        })?;
 
     // Find the article with the matching PMID
     let article_xml = article_set
@@ -1100,5 +1138,45 @@ mod tests {
             format_author_name(&Some("Johnson".to_string()), &None, &None),
             "Johnson"
         );
+    }
+
+    #[test]
+    fn test_strip_inline_html_tags() {
+        // Test stripping <sup> tags
+        let xml_with_sup = r#"<AbstractText>CO<sup>2</sup> levels</AbstractText>"#;
+        let cleaned = strip_inline_html_tags(xml_with_sup);
+        assert!(
+            !cleaned.contains("<sup>"),
+            "Cleaned XML still contains <sup>: {}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains("</sup>"),
+            "Cleaned XML still contains </sup>: {}",
+            cleaned
+        );
+        assert!(cleaned.contains("CO2 levels"));
+
+        // Test stripping <i> tags
+        let xml_with_i = r#"<AbstractText>The <i>e.g.</i> example</AbstractText>"#;
+        let cleaned = strip_inline_html_tags(xml_with_i);
+        assert!(!cleaned.contains("<i>"));
+        assert!(!cleaned.contains("</i>"));
+        assert!(cleaned.contains("e.g."));
+
+        // Test stripping <sub> tags
+        let xml_with_sub = r#"<AbstractText>H<sub>2</sub>O</AbstractText>"#;
+        let cleaned = strip_inline_html_tags(xml_with_sub);
+        assert!(!cleaned.contains("<sub>"));
+        assert!(!cleaned.contains("</sub>"));
+        assert!(cleaned.contains("H2O"));
+
+        // Test preserving other tags
+        let xml_with_mixed = r#"<Article><Title>CO<sup>2</sup> Study</Title></Article>"#;
+        let cleaned = strip_inline_html_tags(xml_with_mixed);
+        assert!(cleaned.contains("<Article>"));
+        assert!(cleaned.contains("</Article>"));
+        assert!(cleaned.contains("<Title>"));
+        assert!(!cleaned.contains("<sup>"));
     }
 }

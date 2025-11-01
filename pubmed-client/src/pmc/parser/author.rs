@@ -1,5 +1,6 @@
 use crate::error::{PubMedError, Result};
 use crate::pmc::models::{Affiliation, Author};
+use crate::pubmed::parser::strip_inline_html_tags;
 use quick_xml::de::from_str;
 use serde::Deserialize;
 
@@ -116,8 +117,9 @@ pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
             let contrib_section =
                 &content[contrib_start..contrib_start + contrib_end + "</contrib-group>".len()];
 
-            // Try to deserialize the contrib-group
-            match from_str::<ContribGroup>(contrib_section) {
+            // Try to deserialize the contrib-group (strip inline HTML tags first)
+            let cleaned_section = strip_inline_html_tags(contrib_section);
+            match from_str::<ContribGroup>(&cleaned_section) {
                 Ok(contrib_group) => {
                     let authors = contrib_group
                         .contribs
@@ -232,7 +234,8 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
             if let Some(end) = ref_content[start..].find("</element-citation>") {
                 let citation_content =
                     &ref_content[start..start + end + "</element-citation>".len()];
-                match from_str::<Citation>(citation_content) {
+                let cleaned_citation = strip_inline_html_tags(citation_content);
+                match from_str::<Citation>(&cleaned_citation) {
                     Ok(citation) => {
                         // Extract names from person-groups first
                         for person_group in citation.person_groups {
@@ -268,7 +271,8 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
         if let Some(start) = ref_content.find("<mixed-citation") {
             if let Some(end) = ref_content[start..].find("</mixed-citation>") {
                 let citation_content = &ref_content[start..start + end + "</mixed-citation>".len()];
-                match from_str::<Citation>(citation_content) {
+                let cleaned_citation = strip_inline_html_tags(citation_content);
+                match from_str::<Citation>(&cleaned_citation) {
                     Ok(citation) => {
                         // Extract names from person-groups first
                         for person_group in citation.person_groups {
