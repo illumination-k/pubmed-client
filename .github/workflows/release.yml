@@ -60,11 +60,35 @@ jobs:
             fi
           fi
 
+  test-release:
+    name: Test Before Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Run tests
+        run: cargo nextest run --all-features
+
+      - name: Check package
+        run: cargo package --allow-dirty
+
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
-    # Skip creating release when triggered by workflow_dispatch
-    if: ${{ github.event_name != 'workflow_dispatch' }}
+    # Only create release for tag-based releases after tests pass
+    needs: [test-release]
+    if: ${{ github.event_name == 'push' }}
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
@@ -86,32 +110,6 @@ jobs:
           release_name: Release ${{ steps.tag.outputs.tag }}
           draft: false
           prerelease: ${{ contains(steps.tag.outputs.tag, 'alpha') || contains(steps.tag.outputs.tag, 'beta') || contains(steps.tag.outputs.tag, 'rc') }}
-
-  test-release:
-    name: Test Before Release
-    runs-on: ubuntu-latest
-    # Run after create-release if it ran, otherwise run independently
-    needs: [create-release]
-    if: ${{ always() && !cancelled() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
-
-      - name: Run tests
-        run: cargo nextest run --all-features
-
-      - name: Check package
-        run: cargo package --allow-dirty
 
   publish-core:
     name: Publish pubmed-client to crates.io
