@@ -11,7 +11,7 @@ repository.workspace = true
 description = "Python bindings for the PubMed client library"
 
 [lib]
-name = "pubmed_client"
+name = "pubmed_client_py"
 crate-type = ["cdylib"]
 
 [dependencies]

@@ -23,6 +23,7 @@ jobs:
         run: cargo doc --all-features --no-deps
         env:
           RUSTDOCFLAGS: "-D warnings --cfg docsrs"
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
       - name: Upload docs artifact
         uses: actions/upload-artifact@v4
