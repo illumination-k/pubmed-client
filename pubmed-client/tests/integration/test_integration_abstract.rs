@@ -1,4 +1,4 @@
-use pubmed_client_rs::PubMedClient;
+use pubmed_client::PubMedClient;
 use tracing::{debug, info, warn};
 use tracing_test::traced_test;
 

@@ -1,7 +1,7 @@
 use rstest::*;
 use tracing::{debug, info, warn};
 
-use pubmed_client_rs::pmc::{
+use pubmed_client::pmc::{
     parse_pmc_xml, HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle,
 };
 
@@ -504,7 +504,7 @@ fn test_markdown_config_builder() {
 
     // Test the converter functionality instead of accessing private fields
     // We'll create a simple test article to verify the configuration is working
-    use pubmed_client_rs::pmc::models::{JournalInfo, PmcFullText};
+    use pubmed_client::pmc::models::{JournalInfo, PmcFullText};
 
     let test_article = PmcFullText {
         pmcid: "PMC123456".to_string(),
@@ -552,7 +552,7 @@ fn test_markdown_config_builder() {
 
 #[test]
 fn test_markdown_edge_cases() {
-    use pubmed_client_rs::pmc::models::{Author, JournalInfo, PmcFullText};
+    use pubmed_client::pmc::models::{Author, JournalInfo, PmcFullText};
 
     // Test with minimal article data
     let minimal_article = PmcFullText {

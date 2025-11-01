@@ -6,7 +6,7 @@ pub mod search;
 pub mod storage;
 
 use anyhow::Result;
-use pubmed_client_rs::{ClientConfig, PmcClient, PubMedClient};
+use pubmed_client::{ClientConfig, PmcClient, PubMedClient};
 
 pub fn create_pmc_client(
     api_key: Option<&str>,

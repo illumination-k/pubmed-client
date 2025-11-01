@@ -1,4 +1,4 @@
-use pubmed_client_rs::pubmed::parser::parse_article_from_xml;
+use pubmed_client::pubmed::parser::parse_article_from_xml;
 
 const TEST_XML_WITH_ABSTRACT: &str = r#"<?xml version="1.0" ?>
 <!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2025//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_250101.dtd">
@@ -120,7 +120,7 @@ fn test_parse_empty_xml() {
 
     assert!(result.is_err());
     match result {
-        Err(pubmed_client_rs::error::PubMedError::ArticleNotFound { pmid }) => {
+        Err(pubmed_client::error::PubMedError::ArticleNotFound { pmid }) => {
             assert_eq!(pmid, "12345");
         }
         _ => panic!("Expected ArticleNotFound error"),

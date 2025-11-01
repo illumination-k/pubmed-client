@@ -24,7 +24,7 @@ use tokio::time::sleep;
 use tracing::{debug, info, warn};
 use tracing_test::traced_test;
 
-use pubmed_client_rs::{ClientConfig, PubMedClient, PubMedError};
+use pubmed_client::{ClientConfig, PubMedClient, PubMedError};
 
 /// Helper function to check if we should skip network tests
 /// Based on environment variable to avoid accidental execution

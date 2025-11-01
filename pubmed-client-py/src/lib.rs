@@ -9,7 +9,7 @@ use pyo3::types::PyList;
 use std::sync::Arc;
 use tokio::runtime::Runtime;
 
-use pubmed_client_rs::{
+use ::pubmed_client::{
     config::ClientConfig, pmc, pubmed, Client, PmcClient, PmcFullText, PubMedArticle,
     PubMedClient as RustPubMedClient,
 };
@@ -28,7 +28,7 @@ fn get_runtime() -> Runtime {
 // ================================================================================================
 
 /// Convert Rust errors to Python exceptions
-fn to_py_err(err: pubmed_client_rs::error::PubMedError) -> PyErr {
+fn to_py_err(err: ::pubmed_client::error::PubMedError) -> PyErr {
     PyErr::new::<PyException, _>(format!("{}", err))
 }
 

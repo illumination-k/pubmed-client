@@ -1,5 +1,5 @@
-use pubmed_client_rs::pubmed::SearchQuery;
-use pubmed_client_rs::{ClientConfig, PubMedClient};
+use pubmed_client::pubmed::SearchQuery;
+use pubmed_client::{ClientConfig, PubMedClient};
 use tracing::info;
 
 #[tokio::test]

@@ -1,4 +1,4 @@
-use pubmed_client_rs::{PmcClient, PubMedError};
+use pubmed_client::{PmcClient, PubMedError};
 use tempfile::tempdir;
 
 #[cfg(not(target_arch = "wasm32"))]

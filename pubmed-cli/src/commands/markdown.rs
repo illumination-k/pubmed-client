@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::Args;
-use pubmed_client_rs::pmc::{MarkdownConfig, PmcMarkdownConverter};
+use pubmed_client::pmc::{MarkdownConfig, PmcMarkdownConverter};
 
 use super::create_pmc_client;
 
@@ -50,7 +50,7 @@ impl Markdown {
 
     async fn process_article(
         &self,
-        client: &pubmed_client_rs::pmc::PmcClient,
+        client: &pubmed_client::pmc::PmcClient,
         pmcid: &str,
         api_key: Option<&str>,
         email: Option<&str>,
@@ -70,14 +70,14 @@ impl Markdown {
             tokio::fs::create_dir_all(&figures_dir).await?;
 
             // Extract figures using tar client with same config
-            let mut tar_config = pubmed_client_rs::ClientConfig::new().with_tool(tool);
+            let mut tar_config = pubmed_client::ClientConfig::new().with_tool(tool);
             if let Some(key) = api_key {
                 tar_config = tar_config.with_api_key(key);
             }
             if let Some(email_addr) = email {
                 tar_config = tar_config.with_email(email_addr);
             }
-            let tar_client = pubmed_client_rs::pmc::PmcTarClient::new(tar_config);
+            let tar_client = pubmed_client::pmc::PmcTarClient::new(tar_config);
             let extracted_figures = tar_client
                 .extract_figures_with_captions(pmcid, &figures_dir)
                 .await?;

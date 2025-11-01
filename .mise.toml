@@ -12,6 +12,8 @@ uv = "0.8"
 [env]
 # Use Python from pubmed-client-py venv for PyO3
 PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
+# Allow PyO3 to work with Python 3.14 (forward compatibility)
+PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
 
 [hooks]
 postinstall = ["mise run setup"]
@@ -24,7 +26,7 @@ run = [
   "dprint check",
   "cargo fmt --all -- --check",
   "cargo clippy --workspace --all-targets -- -D warnings",
-  "cargo clippy -p pubmed-client-rs --all-targets --features integration-tests -- -D warnings",
+  "cargo clippy -p pubmed-client --all-targets --features integration-tests -- -D warnings",
 ]
 
 [tasks."setup:py"]
@@ -56,7 +58,7 @@ run = ["cargo check --workspace"]
 run = ["cargo doc --workspace --open"]
 
 [tasks.coverage]
-run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html"]
+run = ["cargo llvm-cov nextest -p pubmed-client --all-features --html"]
 
 [tasks."wasm:build"]
 run = ["cd pubmed-client-wasm && wasm-pack build --target web"]
@@ -71,7 +73,7 @@ run = ["cd pubmed-client-wasm && pnpm run build && pnpm run test"]
 run = ["cd pubmed-client-wasm && pnpm run publish"]
 
 [tasks."core:test"]
-run = ["cargo test -p pubmed-client-rs"]
+run = ["cargo test -p pubmed-client"]
 
 [tasks."core:test:integration"]
 run = ["cd pubmed-client && cargo test --test"]

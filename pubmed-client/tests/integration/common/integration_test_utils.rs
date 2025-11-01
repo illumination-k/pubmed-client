@@ -3,7 +3,7 @@
 
 #![allow(dead_code)]
 
-use pubmed_client_rs::{Client, ClientConfig, PmcClient, PubMedClient};
+use pubmed_client::{Client, ClientConfig, PmcClient, PubMedClient};
 
 /// Helper function to check if real API tests should be run
 /// Requires both the integration-tests feature and the PUBMED_REAL_API_TESTS env var

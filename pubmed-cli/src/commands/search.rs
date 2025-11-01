@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::Args;
-use pubmed_client_rs::pubmed::ArticleType;
+use pubmed_client::pubmed::ArticleType;
 use serde_json;
 
 use super::create_pubmed_client;
@@ -139,7 +139,7 @@ impl Search {
     }
 
     fn build_query(&self) -> Result<String> {
-        let mut query = pubmed_client_rs::pubmed::SearchQuery::new();
+        let mut query = pubmed_client::pubmed::SearchQuery::new();
 
         // Add main query if provided
         if let Some(ref q) = self.query {

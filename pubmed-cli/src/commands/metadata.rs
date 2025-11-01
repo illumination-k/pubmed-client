@@ -230,7 +230,7 @@ pub async fn execute(options: MetadataOptions, cli: &Cli) -> Result<()> {
 }
 
 async fn fetch_article_metadata(
-    client: &pubmed_client_rs::PmcClient,
+    client: &pubmed_client::PmcClient,
     pmcid: &str,
     multi_progress: &MultiProgress,
 ) -> Result<ArticleMetadata, MetadataError> {
@@ -316,12 +316,12 @@ struct ArticleMetadata {
     doi: Option<String>,
     title: String,
     r#abstract: Option<String>,
-    authors: Vec<pubmed_client_rs::pmc::Author>,
-    journal: Option<pubmed_client_rs::pmc::JournalInfo>,
+    authors: Vec<pubmed_client::pmc::Author>,
+    journal: Option<pubmed_client::pmc::JournalInfo>,
     publication_date: Option<String>,
     keywords: Vec<String>,
-    funding: Vec<pubmed_client_rs::pmc::FundingInfo>,
-    references: Vec<pubmed_client_rs::pmc::Reference>,
+    funding: Vec<pubmed_client::pmc::FundingInfo>,
+    references: Vec<pubmed_client::pmc::Reference>,
 }
 
 fn categorize_failure_from_metadata_error(

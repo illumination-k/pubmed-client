@@ -1,4 +1,4 @@
-use pubmed_client_rs::{Client, PubMedClient};
+use pubmed_client::{Client, PubMedClient};
 use tracing::{info, warn};
 
 #[tokio::test]
