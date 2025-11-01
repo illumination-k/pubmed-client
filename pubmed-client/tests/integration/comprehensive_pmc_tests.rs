@@ -1,7 +1,7 @@
 use rstest::*;
 use tracing::{debug, info, warn};
 
-use pubmed_client_rs::pmc::parse_pmc_xml;
+use pubmed_client::pmc::parse_pmc_xml;
 
 mod common;
 use common::{pmc_xml_test_cases, PmcXmlTestCase};

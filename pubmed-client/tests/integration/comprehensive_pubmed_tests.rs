@@ -2,7 +2,7 @@ use rstest::*;
 use tracing::{debug, info, warn};
 use tracing_test::traced_test;
 
-use pubmed_client_rs::pubmed::parser::parse_article_from_xml;
+use pubmed_client::pubmed::parser::parse_article_from_xml;
 
 mod common;
 use common::{pubmed_xml_test_cases, PubMedXmlTestCase};

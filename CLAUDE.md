@@ -92,6 +92,171 @@ git add -A
 - **Test builds and tests** after renaming operations
 - **Keep renames and content changes** in the same commit for context
 
+## Version Management and Publishing
+
+### Workspace Version Synchronization
+
+**CRITICAL**: This workspace uses a shared version number across all packages. When bumping the version for publishing, you MUST update version requirements in all dependent packages.
+
+#### Current Workspace Structure
+
+The workspace version is defined in the root `Cargo.toml`:
+
+```toml
+[workspace.package]
+version = "0.1.0" # Shared version for all packages
+```
+
+All packages use this workspace version via `version.workspace = true`.
+
+#### Internal Dependencies Require Version Specifications
+
+For crates.io publishing, all path dependencies MUST include explicit version requirements:
+
+```toml
+# ✅ CORRECT - Required for publishing to crates.io
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
+
+# ❌ WRONG - Will fail cargo package
+pubmed-client = { path = "../pubmed-client" }
+```
+
+**Why this is required:**
+
+- Cargo requires version requirements for all path dependencies when packaging for crates.io
+- During publishing, the `path` is removed and only the `version` is kept
+- This ensures published packages depend on crates.io versions, not local paths
+
+#### Version Bump Checklist
+
+When bumping the version for a new release, follow these steps:
+
+1. **Update workspace version** in root `Cargo.toml`:
+   ```toml
+   [workspace.package]
+   version = "0.2.0" # New version
+   ```
+
+2. **Update all internal dependency versions** in these files:
+   - `pubmed-cli/Cargo.toml` - Update `pubmed-client` version
+   - `pubmed-client-py/Cargo.toml` - Update `pubmed-client` version
+   - `pubmed-client-wasm/Cargo.toml` - Update `pubmed-client` version
+   - `pubmed-mcp/Cargo.toml` - Update `pubmed-client` version
+
+3. **Update Cargo.lock**:
+   ```bash
+   cargo update --workspace
+   ```
+
+4. **Verify all packages can be packaged**:
+   ```bash
+   cargo package --allow-dirty
+   ```
+
+5. **Run tests** to ensure everything works:
+   ```bash
+   cargo test --workspace
+   ```
+
+6. **Create version bump commit**:
+   ```bash
+   git add Cargo.toml pubmed-cli/Cargo.toml pubmed-client-py/Cargo.toml \
+           pubmed-client-wasm/Cargo.toml pubmed-mcp/Cargo.toml Cargo.lock
+   git commit -m "chore: Bump version to 0.2.0"
+   ```
+
+#### Example: Bumping from 0.1.0 to 0.2.0
+
+**Before:**
+
+```toml
+# Cargo.toml (root)
+[workspace.package]
+version = "0.1.0"
+
+# pubmed-cli/Cargo.toml
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
+
+# pubmed-client-py/Cargo.toml
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
+
+# pubmed-client-wasm/Cargo.toml
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
+
+# pubmed-mcp/Cargo.toml
+pubmed-client = { version = "0.1.0", path = "../pubmed-client", package = "pubmed-client" }
+```
+
+**After:**
+
+```toml
+# Cargo.toml (root)
+[workspace.package]
+version = "0.2.0"
+
+# pubmed-cli/Cargo.toml
+pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
+
+# pubmed-client-py/Cargo.toml
+pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
+
+# pubmed-client-wasm/Cargo.toml
+pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
+
+# pubmed-mcp/Cargo.toml
+pubmed-client = { version = "0.2.0", path = "../pubmed-client", package = "pubmed-client" }
+```
+
+#### Automated Version Update Script (Future Enhancement)
+
+Consider creating a script to automate version updates:
+
+```bash
+#!/bin/bash
+# scripts/bump-version.sh
+
+NEW_VERSION=$1
+if [ -z "$NEW_VERSION" ]; then
+    echo "Usage: $0 <new-version>"
+    exit 1
+fi
+
+# Update workspace version
+sed -i '' "s/^version = .*/version = \"$NEW_VERSION\"/" Cargo.toml
+
+# Update internal dependencies
+for file in pubmed-cli/Cargo.toml pubmed-client-py/Cargo.toml pubmed-client-wasm/Cargo.toml pubmed-mcp/Cargo.toml; do
+    sed -i '' "s/version = \"[^\"]*\", path = \"/version = \"$NEW_VERSION\", path = \"/" "$file"
+done
+
+# Update Cargo.lock
+cargo update --workspace
+
+echo "Version bumped to $NEW_VERSION"
+echo "Please review changes and run: cargo package --allow-dirty"
+```
+
+#### Common Errors and Solutions
+
+**Error: "dependency does not specify a version"**
+
+```
+error: all dependencies must have a version requirement specified when packaging.
+dependency `pubmed-client` does not specify a version
+```
+
+**Solution:** Add explicit version to the path dependency:
+
+```toml
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
+```
+
+**Error: Version mismatch between workspace and dependencies**
+
+If you update the workspace version but forget to update internal dependencies, the published packages will depend on the old version from crates.io.
+
+**Solution:** Always update all version references together using the checklist above.
+
 ## Important Guidelines for PubMed Search Query Implementation
 
 **CRITICAL**: When implementing or modifying PubMed search query functionality, ALWAYS reference the official NCBI PubMed documentation:
@@ -144,7 +309,7 @@ When in doubt, always check the official documentation before implementation.
 ## Workspace Structure
 
 ```
-pubmed-client-rs/                    # Cargo workspace root
+pubmed-client/                    # Cargo workspace root
 ├── Cargo.toml                       # Workspace definition
 ├── pubmed-client/                   # Core Rust library
 │   ├── Cargo.toml                   # Rust library configuration
@@ -214,7 +379,7 @@ cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-te
 cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test error_handling_tests
 
 # Run single unit test in core library
-cargo test --lib -p pubmed-client-rs pubmed::parser::tests::test_mesh_term_parsing
+cargo test --lib -p pubmed-client pubmed::parser::tests::test_mesh_term_parsing
 ```
 
 #### Core Library Commands (from pubmed-client/)
@@ -691,7 +856,7 @@ The library uses a **token bucket algorithm** for rate limiting:
 | `api_key`    | NCBI E-utilities API key   | None                           |
 | `rate_limit` | Custom requests per second | 3.0 (no key) / 10.0 (with key) |
 | `email`      | Contact email for NCBI     | None                           |
-| `tool`       | Application name for NCBI  | "pubmed-client-rs"             |
+| `tool`       | Application name for NCBI  | "pubmed-client"                |
 | `timeout`    | HTTP request timeout       | 30 seconds                     |
 | `base_url`   | Custom NCBI base URL       | Default NCBI E-utilities       |
 
@@ -1220,7 +1385,7 @@ To use the MCP server with Claude Desktop, add it to your configuration file:
 {
   "mcpServers": {
     "pubmed": {
-      "command": "/path/to/pubmed-client-rs/target/release/pubmed-mcp"
+      "command": "/path/to/pubmed-client/target/release/pubmed-mcp"
     }
   }
 }
@@ -1495,19 +1660,44 @@ The release workflow can be triggered manually for testing purposes:
 gh workflow run release.yml
 ```
 
-When triggered via workflow_dispatch:
+**Workflow Dispatch Behavior:**
 
-- **Dry-run mode**: All publish jobs run in dry-run mode (no actual publishing to crates.io)
-- **Skip GitHub release**: No GitHub release is created
-- **Run tests**: Full test suite still runs to validate the build
-- **Validate packages**: All `cargo package` checks run to ensure publishability
+When manually triggering the workflow via `workflow_dispatch`:
+
+- **Always runs in dry-run mode**: Validates packages but does NOT publish to crates.io
+- **Tests ALL packages**: Always validates all packages (core, CLI, and MCP)
+- **No inputs required**: Simply trigger the workflow - no configuration needed
+
+This ensures safe testing of the release workflow without any risk of accidental publishing.
+
+**Example:**
+
+```bash
+# Test publishing all packages (always dry-run)
+gh workflow run release.yml
+```
+
+**Important:** To actually publish to crates.io, you must create and push a version tag. workflow_dispatch is exclusively for testing and validation.
+
+**Key Differences from Tag-based Releases:**
+
+When triggered via workflow_dispatch (vs. pushing a tag):
+
+- **No GitHub release created**: Skips GitHub release creation step
+- **No version checking**: `check-version` is disabled (no git tag to compare against)
+- **All packages tested**: Always validates all packages (core, CLI, MCP) regardless of tag naming
+- **Always dry-run**: NEVER publishes to crates.io - validation only
+- **Test suite always runs**: Validates build and tests before attempting dry-run publish
 
 This allows you to:
 
-- Test the release workflow without side effects
-- Validate package configurations
-- Debug workflow issues
-- Verify version compatibility and dependencies
+- Test the complete release workflow without any risk of accidental publishing
+- Validate all package configurations before creating tags
+- Debug workflow issues in isolation
+- Verify version compatibility and dependencies across all packages
+- Ensure all workspace members can be successfully published together
+
+**To actually publish:** Create and push a version tag (e.g., `v0.1.0`). Only tag-based releases will publish to crates.io.
 
 ### Git LFS Configuration
 

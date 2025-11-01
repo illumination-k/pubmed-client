@@ -8,7 +8,7 @@ use tracing_test::traced_test;
 use wiremock::matchers::{method, path, query_param};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
-use pubmed_client_rs::{ClientConfig, PubMedClient};
+use pubmed_client::{ClientConfig, PubMedClient};
 
 /// Test PMIDs to check
 const TEST_PMIDS: &[u32] = &[31978945, 33515491, 32887691, 25760099];

@@ -10,11 +10,85 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  should-publish:
+    name: Determine packages to publish
+    runs-on: ubuntu-latest
+    outputs:
+      core: ${{ steps.check.outputs.core }}
+      cli: ${{ steps.check.outputs.cli }}
+      mcp: ${{ steps.check.outputs.mcp }}
+    steps:
+      - id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # workflow_dispatch: always publish all packages
+            echo "core=true" >> $GITHUB_OUTPUT
+            echo "cli=true" >> $GITHUB_OUTPUT
+            echo "mcp=true" >> $GITHUB_OUTPUT
+            echo "::notice::workflow_dispatch triggered - all packages will be validated (dry-run mode)"
+          else
+            # Tag-based release: check for prerelease and package-specific tags
+            IS_PRERELEASE="false"
+            if [[ "${{ github.ref }}" == *"alpha"* ]] || [[ "${{ github.ref }}" == *"beta"* ]] || [[ "${{ github.ref }}" == *"rc"* ]]; then
+              IS_PRERELEASE="true"
+            fi
+
+            if [[ "$IS_PRERELEASE" == "true" ]]; then
+              echo "core=false" >> $GITHUB_OUTPUT
+              echo "cli=false" >> $GITHUB_OUTPUT
+              echo "mcp=false" >> $GITHUB_OUTPUT
+              echo "::notice::Prerelease tag detected - skipping all package publishing"
+            else
+              # Core: always publish for non-prerelease
+              echo "core=true" >> $GITHUB_OUTPUT
+
+              # CLI: publish if tag contains 'cli'
+              if [[ "${{ github.ref }}" == *"cli"* ]]; then
+                echo "cli=true" >> $GITHUB_OUTPUT
+                echo "::notice::Tag contains 'cli' - will publish pubmed-cli"
+              else
+                echo "cli=false" >> $GITHUB_OUTPUT
+              fi
+
+              # MCP: publish if tag contains 'mcp'
+              if [[ "${{ github.ref }}" == *"mcp"* ]]; then
+                echo "mcp=true" >> $GITHUB_OUTPUT
+                echo "::notice::Tag contains 'mcp' - will publish pubmed-mcp"
+              else
+                echo "mcp=false" >> $GITHUB_OUTPUT
+              fi
+            fi
+          fi
+
+  test-release:
+    name: Test Before Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Run tests
+        run: cargo nextest run --all-features
+
+      - name: Check package
+        run: cargo package --allow-dirty
+
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
-    # Skip creating release when triggered by workflow_dispatch
-    if: ${{ github.event_name != 'workflow_dispatch' }}
+    # Only create release for tag-based releases after tests pass
+    needs: [test-release]
+    if: ${{ github.event_name == 'push' }}
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
@@ -37,73 +111,47 @@ jobs:
           draft: false
           prerelease: ${{ contains(steps.tag.outputs.tag, 'alpha') || contains(steps.tag.outputs.tag, 'beta') || contains(steps.tag.outputs.tag, 'rc') }}
 
-  test-release:
-    name: Test Before Release
-    runs-on: ubuntu-latest
-    # Run after create-release if it ran, otherwise run independently
-    needs: [create-release]
-    if: ${{ always() && !cancelled() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
-
-      - name: Run tests
-        run: cargo nextest run --all-features
-
-      - name: Check package
-        run: cargo package --allow-dirty
-
   publish-core:
     name: Publish pubmed-client to crates.io
-    needs: [create-release, test-release]
-    # Skip if prerelease tag
-    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+    needs: [should-publish, test-release]
+    if: ${{ needs.should-publish.outputs.core == 'true' }}
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-client-rs
       package-path: pubmed-client
-      check-version: true
-      # Use dry-run when triggered by workflow_dispatch for testing
+      # Skip version check for workflow_dispatch (no tag available)
+      check-version: ${{ github.event_name == 'push' }}
+      # workflow_dispatch always uses dry-run, tag-based releases publish for real
       dry-run: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
   publish-cli:
     name: Publish pubmed-cli to crates.io
-    needs: [create-release, test-release, publish-core]
-    # Skip if prerelease or tag doesn't contain 'cli'
-    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && contains(github.ref, 'cli') }}
+    needs: [should-publish, test-release]
+    if: ${{ needs.should-publish.outputs.cli == 'true' }}
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-cli
       package-path: pubmed-cli
-      check-version: true
-      # Use dry-run when triggered by workflow_dispatch for testing
+      # Skip version check for workflow_dispatch (no tag available)
+      check-version: ${{ github.event_name == 'push' }}
+      # workflow_dispatch always uses dry-run, tag-based releases publish for real
       dry-run: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
   publish-mcp:
     name: Publish pubmed-mcp to crates.io
-    needs: [create-release, test-release, publish-core]
-    # Skip if prerelease or tag doesn't contain 'mcp'
-    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && contains(github.ref, 'mcp') }}
+    needs: [should-publish, test-release]
+    if: ${{ needs.should-publish.outputs.mcp == 'true' }}
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-mcp
       package-path: pubmed-mcp
-      check-version: true
-      # Use dry-run when triggered by workflow_dispatch for testing
+      # Skip version check for workflow_dispatch (no tag available)
+      check-version: ${{ github.event_name == 'push' }}
+      # workflow_dispatch always uses dry-run, tag-based releases publish for real
       dry-run: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

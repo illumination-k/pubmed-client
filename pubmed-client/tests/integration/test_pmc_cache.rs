@@ -1,4 +1,4 @@
-use pubmed_client_rs::{cache::CacheConfig, ClientConfig, PmcClient};
+use pubmed_client::{cache::CacheConfig, ClientConfig, PmcClient};
 use std::time::Duration;
 use wiremock::{
     matchers::{method, path_regex},

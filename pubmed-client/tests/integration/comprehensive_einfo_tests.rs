@@ -8,7 +8,7 @@ use tracing_test::traced_test;
 use wiremock::matchers::{method, path, query_param};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
-use pubmed_client_rs::{ClientConfig, PubMedClient};
+use pubmed_client::{ClientConfig, PubMedClient};
 
 /// Test databases to check - using the actual database names from NCBI
 const TEST_DATABASES: &[(&str, &str)] = &[

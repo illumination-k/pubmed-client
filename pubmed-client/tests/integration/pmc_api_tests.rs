@@ -26,7 +26,7 @@ mod integration_tests {
     use tracing::{debug, info, warn};
     use tracing_test::traced_test;
 
-    use pubmed_client_rs::pmc::markdown::PmcMarkdownConverter;
+    use pubmed_client::pmc::markdown::PmcMarkdownConverter;
 
     // Import test utilities
     use crate::common::integration_test_utils::{

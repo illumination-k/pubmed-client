@@ -2,7 +2,7 @@ mod common;
 use common::get_pmc_xml_test_cases;
 use tracing::{info, warn};
 
-fn count_figures_recursive(section: &pubmed_client_rs::pmc::models::ArticleSection) -> usize {
+fn count_figures_recursive(section: &pubmed_client::pmc::models::ArticleSection) -> usize {
     let mut count = section.figures.len();
     for subsection in &section.subsections {
         count += count_figures_recursive(subsection);
@@ -10,7 +10,7 @@ fn count_figures_recursive(section: &pubmed_client_rs::pmc::models::ArticleSecti
     count
 }
 
-fn print_figures_recursive(section: &pubmed_client_rs::pmc::models::ArticleSection, indent: &str) {
+fn print_figures_recursive(section: &pubmed_client::pmc::models::ArticleSection, indent: &str) {
     for figure in &section.figures {
         println!("{}Figure ID: {}", indent, figure.id);
         println!("{}  Label: {:?}", indent, figure.label);
@@ -29,8 +29,8 @@ fn print_figures_recursive(section: &pubmed_client_rs::pmc::models::ArticleSecti
 }
 
 fn find_first_figure(
-    sections: &[pubmed_client_rs::pmc::models::ArticleSection],
-) -> Option<&pubmed_client_rs::pmc::models::Figure> {
+    sections: &[pubmed_client::pmc::models::ArticleSection],
+) -> Option<&pubmed_client::pmc::models::Figure> {
     for section in sections {
         if !section.figures.is_empty() {
             return Some(&section.figures[0]);
@@ -126,7 +126,7 @@ mod tests {
     #[test]
     fn test_pmc7906746_figure_extraction() {
         println!("🔍 Starting PMC7906746 figure extraction debug test");
-        use pubmed_client_rs::pmc::parser::parse_pmc_xml;
+        use pubmed_client::pmc::parser::parse_pmc_xml;
         use std::fs;
 
         // Read the XML content we downloaded

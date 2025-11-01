@@ -13,7 +13,7 @@ description = "MCP (Model Context Protocol) server for PubMed and PMC APIs"
 [dependencies]
 # Workspace dependencies
 anyhow.workspace = true
-pubmed-client = { path = "../pubmed-client", package = "pubmed-client-rs" }
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

@@ -30,7 +30,8 @@ Repository = "https://github.com/illumination-k/pubmed-client-rs"
 Documentation = "https://github.com/illumination-k/pubmed-client-rs/tree/main/pubmed-client-py"
 
 [tool.maturin]
-module-name = "pubmed_client"
+# Rust lib name is pubmed_client_py, but Python module name is pubmed_client
+module-name = "pubmed_client_py.pubmed_client"
 features = []
 # Include type stub files for IDE and mypy support
 include = ["pubmed_client.pyi"]
