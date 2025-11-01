@@ -4,6 +4,7 @@ use pubmed_client::Client as PubMedClient;
 use rmcp::handler::server::router::tool::ToolRouter;
 use std::sync::Arc;
 
+pub mod markdown;
 pub mod search;
 
 /// PubMed MCP Server
