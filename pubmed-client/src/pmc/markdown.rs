@@ -194,6 +194,12 @@ impl PmcMarkdownConverter {
         self
     }
 
+    /// Set whether to include figure captions
+    pub fn with_include_figure_captions(mut self, include: bool) -> Self {
+        self.config.include_figure_captions = include;
+        self
+    }
+
     /// Convert a PMC article to Markdown with optional figure paths
     pub fn convert_with_figures(
         &self,

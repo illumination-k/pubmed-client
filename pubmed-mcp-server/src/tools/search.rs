@@ -184,12 +184,23 @@ pub async fn search_pubmed(
     result.push_str(&format!("Found {} articles:\n\n", articles.len()));
 
     for (i, article) in articles.iter().enumerate() {
-        result.push_str(&format!(
-            "{}. {} (PMID: {})\n",
-            i + 1,
-            article.title,
-            article.pmid
-        ));
+        // Format article with PMC ID if available
+        if let Some(ref pmc_id) = article.pmc_id {
+            result.push_str(&format!(
+                "{}. {} (PMID: {} | PMC: {})\n",
+                i + 1,
+                article.title,
+                article.pmid,
+                pmc_id
+            ));
+        } else {
+            result.push_str(&format!(
+                "{}. {} (PMID: {})\n",
+                i + 1,
+                article.title,
+                article.pmid
+            ));
+        }
 
         // Add abstract preview if available and requested
         if include_abstract {
