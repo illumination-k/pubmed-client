@@ -1,5 +1,5 @@
 [workspace]
-members = ["pubmed-cli", "pubmed-client", "pubmed-client-py", "pubmed-client-wasm", "pubmed-mcp-server"]
+members = ["pubmed-cli", "pubmed-client", "pubmed-client-py", "pubmed-client-wasm", "pubmed-mcp"]
 resolver = "2"
 
 [workspace.package]

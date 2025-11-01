@@ -27,7 +27,7 @@ This is a Cargo workspace containing multiple packages:
 - **[pubmed-client-wasm](pubmed-client-wasm/)** - WebAssembly bindings for npm
 - **[pubmed-client-py](pubmed-client-py/)** - Python bindings via PyO3
 - **[pubmed-cli](pubmed-cli/)** - Command-line interface
-- **[pubmed-mcp-server](pubmed-mcp-server/)** - MCP server for AI assistants
+- **[pubmed-mcp](pubmed-mcp/)** - MCP server for AI assistants
 
 ## Installation
 
@@ -353,7 +353,7 @@ Add to your Claude Desktop configuration:
 {
   "mcpServers": {
     "pubmed": {
-      "command": "/path/to/pubmed-mcp-server"
+      "command": "/path/to/pubmed-mcp"
     }
   }
 }
@@ -377,7 +377,7 @@ Found 10 articles about COVID-19 vaccines:
 - Support for all PubMed field tags ([ti], [au], [ta], etc.)
 - Future: PMC full-text retrieval, citation networks
 
-For more details, see the [MCP server README](pubmed-mcp-server/README.md).
+For more details, see the [MCP server README](pubmed-mcp/README.md).
 
 ## Configuration
 
@@ -476,7 +476,7 @@ cargo build -p pubmed-client-rs     # Core library
 cargo build -p pubmed-client-wasm   # WASM bindings
 cargo build -p pubmed-client-py     # Python bindings
 cargo build -p pubmed-cli           # CLI
-cargo build -p pubmed-mcp-server    # MCP server
+cargo build -p pubmed-mcp    # MCP server
 ```
 
 ### Running Tests
@@ -489,7 +489,7 @@ cargo nextest run
 
 # Run tests for specific package
 cargo nextest run -p pubmed-client-rs
-cargo nextest run -p pubmed-mcp-server
+cargo nextest run -p pubmed-mcp
 
 # Run specific integration test suite
 cd pubmed-client && cargo test --test comprehensive_pubmed_tests

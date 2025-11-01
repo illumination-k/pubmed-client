@@ -11,10 +11,7 @@ async fn test_mcp_server_initialize() -> Result<()> {
     let client = ()
         .serve(TokioChildProcess::new(Command::new("cargo").configure(
             |cmd| {
-                cmd.arg("run")
-                    .arg("-p")
-                    .arg("pubmed-mcp-server")
-                    .arg("--quiet");
+                cmd.arg("run").arg("-p").arg("pubmed-mcp").arg("--quiet");
             },
         ))?)
         .await?;
@@ -23,7 +20,7 @@ async fn test_mcp_server_initialize() -> Result<()> {
     let peer_info = client.peer_info().expect("Peer info should be available");
 
     // Verify server info
-    assert_eq!(peer_info.server_info.name, "pubmed-mcp-server");
+    assert_eq!(peer_info.server_info.name, "pubmed-mcp");
     assert_eq!(peer_info.server_info.version, "0.1.0");
 
     Ok(())
@@ -35,10 +32,7 @@ async fn test_mcp_server_list_tools() -> Result<()> {
     let client = ()
         .serve(TokioChildProcess::new(Command::new("cargo").configure(
             |cmd| {
-                cmd.arg("run")
-                    .arg("-p")
-                    .arg("pubmed-mcp-server")
-                    .arg("--quiet");
+                cmd.arg("run").arg("-p").arg("pubmed-mcp").arg("--quiet");
             },
         ))?)
         .await?;
@@ -89,10 +83,7 @@ async fn test_mcp_server_capabilities() -> Result<()> {
     let client = ()
         .serve(TokioChildProcess::new(Command::new("cargo").configure(
             |cmd| {
-                cmd.arg("run")
-                    .arg("-p")
-                    .arg("pubmed-mcp-server")
-                    .arg("--quiet");
+                cmd.arg("run").arg("-p").arg("pubmed-mcp").arg("--quiet");
             },
         ))?)
         .await?;
@@ -101,7 +92,7 @@ async fn test_mcp_server_capabilities() -> Result<()> {
     let peer_info = client.peer_info().expect("Peer info should be available");
 
     // Verify server info
-    assert_eq!(peer_info.server_info.name, "pubmed-mcp-server");
+    assert_eq!(peer_info.server_info.name, "pubmed-mcp");
 
     // Get server capabilities through peer info
     assert!(

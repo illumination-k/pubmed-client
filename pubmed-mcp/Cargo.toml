@@ -1,9 +1,12 @@
 [package]
-name = "pubmed-mcp-server"
+name = "pubmed-mcp"
 version.workspace = true
 authors.workspace = true
+categories = ["science", "api-bindings"]
 edition.workspace = true
+keywords = ["pubmed", "mcp", "biomedical", "literature", "api"]
 license.workspace = true
+readme = "README.md"
 repository.workspace = true
 description = "MCP (Model Context Protocol) server for PubMed and PMC APIs"
 
@@ -26,5 +29,5 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 rmcp = { version = "0.8", features = ["client", "transport-child-process"] }
 
 [[bin]]
-name = "pubmed-mcp-server"
+name = "pubmed-mcp"
 path = "src/main.rs"
