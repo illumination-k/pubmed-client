@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library, WebAssembly bindings for JavaScript/TypeScript environments, Python bindings via PyO3, and a command-line interface for common operations.
+This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library, WebAssembly bindings for JavaScript/TypeScript environments, Python bindings via PyO3, a command-line interface for common operations, and a Model Context Protocol (MCP) server for AI assistant integration.
 
 ## Important Guidelines for PubMed Search Query Implementation
 
@@ -92,6 +92,12 @@ pubmed-client-rs/                    # Cargo workspace root
 │           ├── figures.rs           # Figure extraction
 │           ├── markdown.rs          # Markdown conversion
 │           └── search.rs            # PubMed search
+├── pubmed-mcp-server/               # MCP server for AI assistants
+│   ├── Cargo.toml                   # MCP server configuration
+│   ├── src/main.rs                  # MCP server implementation
+│   ├── tests/                       # Integration tests
+│   │   └── integration_test.rs      # MCP protocol tests
+│   └── README.md                    # MCP server documentation
 └── tests/                           # Shared integration tests
 ```
 
@@ -272,6 +278,25 @@ mise r wasm:build            # Build for web target
 mise r wasm:build:node       # Build for Node.js target
 mise r wasm:test             # Build and run TypeScript tests
 mise r wasm:publish          # Publish to npm
+```
+
+#### MCP Server Commands (from workspace root)
+
+```bash
+# Build MCP server
+cargo build --release -p pubmed-mcp-server
+
+# Run MCP server (stdio transport)
+cargo run -p pubmed-mcp-server
+
+# Run with debug logging
+RUST_LOG=debug cargo run -p pubmed-mcp-server
+
+# Run tests
+cargo test -p pubmed-mcp-server
+
+# Test with MCP Inspector (interactive testing tool)
+npx @modelcontextprotocol/inspector cargo run -p pubmed-mcp-server
 ```
 
 ### Code Quality
@@ -1024,6 +1049,206 @@ uv run mypy tests/ --strict           # Strict type checking
 - Property access with `#[pyo3(get)]`
 - GIL management with `py.allow_threads()`
 - Type conversion with `From` trait implementations
+
+## MCP Server for AI Assistants
+
+The workspace includes a Model Context Protocol (MCP) server that allows AI assistants like Claude to interact with PubMed and PMC APIs.
+
+### MCP Server Overview
+
+The MCP server (`pubmed-mcp-server`) provides a standardized interface for AI assistants to:
+
+- Search PubMed for biomedical literature
+- Retrieve article metadata and abstracts
+- Access full-text articles from PMC (future)
+
+**Key Features:**
+
+- Built with [rmcp](https://github.com/modelcontextprotocol/rust-sdk) - Official Rust SDK for MCP
+- Uses stdio transport for communication
+- JSON-RPC 2.0 protocol implementation
+- Automatic JSON schema generation for tool parameters
+- Integration with Claude Desktop and other MCP clients
+
+### MCP Server Architecture (pubmed-mcp-server/)
+
+```
+pubmed-mcp-server/
+├── Cargo.toml              # Package configuration
+├── src/
+│   └── main.rs             # MCP server implementation (119 lines)
+├── tests/
+│   └── integration_test.rs # MCP protocol integration tests
+└── README.md               # MCP-specific documentation
+```
+
+**Implementation Details:**
+
+- `PubMedServer` struct - Main server implementation with tool router
+- Tool definitions using `#[tool]` macro from rmcp
+- Automatic parameter validation with JSON schema
+- Structured logging to stderr (doesn't interfere with stdio protocol)
+- Protocol version: `V_2024_11_05`
+
+### Available MCP Tools
+
+#### `search_pubmed`
+
+Search PubMed for articles matching a query.
+
+**Parameters:**
+
+- `query` (string, required): Search query using PubMed syntax
+  - Examples: `"COVID-19"`, `"cancer[ti] AND therapy[tiab]"`
+  - Supports all [PubMed field tags](https://pubmed.ncbi.nlm.nih.gov/help/#using-search-field-tags)
+- `max_results` (integer, optional): Maximum number of results (default: 10, max: 100)
+
+**Returns:**
+
+- Formatted text with article titles and PMIDs
+- Article count and numbered list
+
+**Example Usage (from Claude Desktop):**
+
+```
+User: Search for recent COVID-19 vaccine research (max 5 results)
+
+Claude uses tool: search_pubmed
+  query: "COVID-19 vaccine[ti]"
+  max_results: 5
+
+Result: Found 5 articles:
+1. COVID-19 vaccine effectiveness... (PMID: 12345678)
+2. mRNA vaccines for COVID-19... (PMID: 23456789)
+...
+```
+
+### Claude Desktop Integration
+
+To use the MCP server with Claude Desktop, add it to your configuration file:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "pubmed": {
+      "command": "/path/to/pubmed-client-rs/target/release/pubmed-mcp-server"
+    }
+  }
+}
+```
+
+After restarting Claude Desktop, the server will be available with the search_pubmed tool.
+
+### MCP Server Development
+
+#### Adding New Tools
+
+To add additional MCP tools, add methods to the `PubMedServer` impl block:
+
+```rust
+#[tool(description = "Fetch full-text article from PMC")]
+async fn fetch_pmc_article(
+    &self,
+    Parameters(params): Parameters<PmcRequest>,
+) -> Result<CallToolResult, ErrorData> {
+    // Implementation using self.client.pmc
+    let article = self.client.pmc.fetch_full_text(&params.pmc_id).await
+        .map_err(|e| ErrorData { /* error conversion */ })?;
+
+    Ok(CallToolResult::success(vec![Content::text(result)]))
+}
+```
+
+The `#[tool]` macro automatically:
+
+- Registers the tool with the MCP server
+- Generates JSON schema from parameter types
+- Handles tool routing and parameter validation
+
+#### MCP Testing
+
+The MCP server includes comprehensive integration tests:
+
+```bash
+# Run MCP protocol tests
+cargo test -p pubmed-mcp-server
+
+# Test server initialization
+cargo test -p pubmed-mcp-server test_mcp_server_initialize
+
+# Test tool listing
+cargo test -p pubmed-mcp-server test_mcp_server_list_tools
+
+# Test server capabilities
+cargo test -p pubmed-mcp-server test_mcp_server_capabilities
+```
+
+**Test Coverage:**
+
+- Server initialization and peer info verification
+- Tool registration and listing
+- Server capabilities and protocol version
+- Tool execution with real PubMed API (requires network)
+
+#### MCP Inspector for Interactive Testing
+
+The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) provides an interactive UI for testing MCP servers:
+
+```bash
+# Launch MCP Inspector with the server
+npx @modelcontextprotocol/inspector cargo run -p pubmed-mcp-server
+
+# Inspector opens in browser, allowing:
+# - Interactive tool testing
+# - Parameter input with schema validation
+# - Response inspection
+# - Server capability exploration
+```
+
+### MCP Dependencies
+
+- **rmcp**: Official Rust SDK for Model Context Protocol (v0.8)
+  - Features: `server`, `transport-io` (runtime), `client`, `transport-child-process` (tests)
+- **schemars**: JSON schema generation for tool parameters (v0.8)
+- **tokio**: Async runtime with full feature set
+- **tracing-subscriber**: Structured logging to stderr
+- **pubmed-client**: Core library for PubMed/PMC API access
+
+### MCP Protocol Details
+
+**Transport**: stdio (stdin/stdout)
+
+- Server reads JSON-RPC requests from stdin
+- Server writes JSON-RPC responses to stdout
+- Logging goes to stderr to avoid protocol interference
+
+**Protocol Version**: `V_2024_11_05`
+
+**Capabilities**:
+
+- `tools`: Server provides searchable tools
+- Tool listing with `tools/list`
+- Tool execution with `tools/call`
+
+**Message Format**: JSON-RPC 2.0
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "search_pubmed",
+    "arguments": {
+      "query": "COVID-19",
+      "max_results": 10
+    }
+  }
+}
+```
 
 ## Test Fixtures and Data
 
