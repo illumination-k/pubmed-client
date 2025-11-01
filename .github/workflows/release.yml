@@ -70,7 +70,7 @@ jobs:
     if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
     uses: ./.github/workflows/publish-crates.yml
     with:
-      package: pubmed-client
+      package: pubmed-client-rs
       package-path: pubmed-client
       check-version: true
       # Use dry-run when triggered by workflow_dispatch for testing
