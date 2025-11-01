@@ -1485,6 +1485,30 @@ jobs:
 - MCP: `v1.0.0` or `mcp-v1.0.0` (tag must contain 'mcp' to publish `pubmed-mcp`)
 - Prerelease: `v1.0.0-alpha`, `v1.0.0-beta`, `v1.0.0-rc1` (creates GitHub release but skips crates.io)
 
+**Testing Releases with Workflow Dispatch:**
+
+The release workflow can be triggered manually for testing purposes:
+
+```bash
+# Trigger from GitHub UI: Actions -> Release -> Run workflow
+# Or use GitHub CLI:
+gh workflow run release.yml
+```
+
+When triggered via workflow_dispatch:
+
+- **Dry-run mode**: All publish jobs run in dry-run mode (no actual publishing to crates.io)
+- **Skip GitHub release**: No GitHub release is created
+- **Run tests**: Full test suite still runs to validate the build
+- **Validate packages**: All `cargo package` checks run to ensure publishability
+
+This allows you to:
+
+- Test the release workflow without side effects
+- Validate package configurations
+- Debug workflow issues
+- Verify version compatibility and dependencies
+
 ### Git LFS Configuration
 
 Large test data files are managed with Git LFS:

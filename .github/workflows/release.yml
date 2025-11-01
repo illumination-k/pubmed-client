@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -12,6 +13,8 @@ jobs:
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
+    # Skip creating release when triggered by workflow_dispatch
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
@@ -37,6 +40,9 @@ jobs:
   test-release:
     name: Test Before Release
     runs-on: ubuntu-latest
+    # Run after create-release if it ran, otherwise run independently
+    needs: [create-release]
+    if: ${{ always() && !cancelled() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,38 +66,44 @@ jobs:
   publish-core:
     name: Publish pubmed-client to crates.io
     needs: [create-release, test-release]
+    # Skip if prerelease tag
     if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-client
       package-path: pubmed-client
       check-version: true
-      dry-run: false
+      # Use dry-run when triggered by workflow_dispatch for testing
+      dry-run: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
   publish-cli:
     name: Publish pubmed-cli to crates.io
     needs: [create-release, test-release, publish-core]
+    # Skip if prerelease or tag doesn't contain 'cli'
     if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && contains(github.ref, 'cli') }}
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-cli
       package-path: pubmed-cli
       check-version: true
-      dry-run: false
+      # Use dry-run when triggered by workflow_dispatch for testing
+      dry-run: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
   publish-mcp:
     name: Publish pubmed-mcp to crates.io
     needs: [create-release, test-release, publish-core]
+    # Skip if prerelease or tag doesn't contain 'mcp'
     if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && contains(github.ref, 'mcp') }}
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-mcp
       package-path: pubmed-mcp
       check-version: true
-      dry-run: false
+      # Use dry-run when triggered by workflow_dispatch for testing
+      dry-run: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
