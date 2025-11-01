@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -12,6 +13,8 @@ jobs:
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
+    # Skip creating release when triggered by workflow_dispatch
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
@@ -37,6 +40,9 @@ jobs:
   test-release:
     name: Test Before Release
     runs-on: ubuntu-latest
+    # Run after create-release if it ran, otherwise run independently
+    needs: [create-release]
+    if: ${{ always() && !cancelled() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,23 +63,47 @@ jobs:
       - name: Check package
         run: cargo package --allow-dirty
 
-  publish:
-    name: Publish to crates.io
-    runs-on: ubuntu-latest
+  publish-core:
+    name: Publish pubmed-client to crates.io
     needs: [create-release, test-release]
-    if: "!contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
+    # Skip if prerelease tag
+    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+    uses: ./.github/workflows/publish-crates.yml
+    with:
+      package: pubmed-client-rs
+      package-path: pubmed-client
+      check-version: true
+      # Use dry-run when triggered by workflow_dispatch for testing
+      dry-run: ${{ github.event_name == 'workflow_dispatch' }}
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+  publish-cli:
+    name: Publish pubmed-cli to crates.io
+    needs: [create-release, test-release, publish-core]
+    # Skip if prerelease or tag doesn't contain 'cli'
+    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && contains(github.ref, 'cli') }}
+    uses: ./.github/workflows/publish-crates.yml
+    with:
+      package: pubmed-cli
+      package-path: pubmed-cli
+      check-version: true
+      # Use dry-run when triggered by workflow_dispatch for testing
+      dry-run: ${{ github.event_name == 'workflow_dispatch' }}
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Publish to crates.io
-        run: cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+  publish-mcp:
+    name: Publish pubmed-mcp to crates.io
+    needs: [create-release, test-release, publish-core]
+    # Skip if prerelease or tag doesn't contain 'mcp'
+    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && contains(github.ref, 'mcp') }}
+    uses: ./.github/workflows/publish-crates.yml
+    with:
+      package: pubmed-mcp
+      package-path: pubmed-mcp
+      check-version: true
+      # Use dry-run when triggered by workflow_dispatch for testing
+      dry-run: ${{ github.event_name == 'workflow_dispatch' }}
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

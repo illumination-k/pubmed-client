@@ -38,7 +38,7 @@ impl ServerHandler for PubMedServer {
             protocol_version: ProtocolVersion::V_2024_11_05,
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             server_info: Implementation {
-                name: "pubmed-mcp-server".to_string(),
+                name: "pubmed-mcp".to_string(),
                 version: env!("CARGO_PKG_VERSION").to_string(),
                 title: None,
                 icons: None,

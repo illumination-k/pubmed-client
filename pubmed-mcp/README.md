@@ -26,10 +26,10 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
 
 ```bash
 # From workspace root
-cargo build --release -p pubmed-mcp-server
+cargo build --release -p pubmed-mcp
 
 # The binary will be at:
-# target/release/pubmed-mcp-server
+# target/release/pubmed-mcp
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ cargo build --release -p pubmed-mcp-server
 The server communicates via standard input/output (stdio):
 
 ```bash
-cargo run -p pubmed-mcp-server
+cargo run -p pubmed-mcp
 ```
 
 ### Configuration with Claude Desktop
@@ -53,7 +53,7 @@ Add to your Claude Desktop configuration file:
 {
   "mcpServers": {
     "pubmed": {
-      "command": "/path/to/pubmed-client-rs/target/release/pubmed-mcp-server"
+      "command": "/path/to/pubmed-client-rs/target/release/pubmed-mcp"
     }
   }
 }
@@ -140,7 +140,7 @@ Get markdown for PMC7906746 with minimal formatting (no metadata or captions)
 ### Project Structure
 
 ```
-pubmed-mcp-server/
+pubmed-mcp/
 ├── Cargo.toml           # Package configuration
 ├── src/
 │   ├── main.rs          # MCP server implementation with tool router
@@ -182,8 +182,8 @@ async fn your_tool(
 Enable logging with the `RUST_LOG` environment variable:
 
 ```bash
-RUST_LOG=info cargo run -p pubmed-mcp-server
-RUST_LOG=debug cargo run -p pubmed-mcp-server  # More verbose
+RUST_LOG=info cargo run -p pubmed-mcp
+RUST_LOG=debug cargo run -p pubmed-mcp  # More verbose
 ```
 
 ## Testing
@@ -193,7 +193,7 @@ RUST_LOG=debug cargo run -p pubmed-mcp-server  # More verbose
 The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) is a useful tool for testing MCP servers:
 
 ```bash
-npx @modelcontextprotocol/inspector cargo run -p pubmed-mcp-server
+npx @modelcontextprotocol/inspector cargo run -p pubmed-mcp
 ```
 
 ## License

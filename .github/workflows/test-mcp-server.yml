@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "pubmed-mcp-server/**"
+      - "pubmed-mcp/**"
       - "pubmed-client/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -12,7 +12,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "pubmed-mcp-server/**"
+      - "pubmed-mcp/**"
       - "pubmed-client/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -34,4 +34,4 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run MCP server tests
-        run: cargo test -p pubmed-mcp-server
+        run: cargo test -p pubmed-mcp

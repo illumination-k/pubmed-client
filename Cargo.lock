@@ -2804,7 +2804,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pubmed-mcp-server"
+name = "pubmed-mcp"
 version = "0.1.0"
 dependencies = [
  "anyhow",
