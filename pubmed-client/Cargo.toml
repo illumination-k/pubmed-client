@@ -1,5 +1,5 @@
 [package]
-name = "pubmed-client-rs"
+name = "pubmed-client"
 version.workspace = true
 authors.workspace = true
 autotests = false

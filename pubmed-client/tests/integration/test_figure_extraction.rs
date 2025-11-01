@@ -1,4 +1,4 @@
-use pubmed_client_rs::{ClientConfig, PmcClient, PmcTarClient, PubMedError};
+use pubmed_client::{ClientConfig, PmcClient, PmcTarClient, PubMedError};
 use std::path::Path;
 use tempfile::tempdir;
 use tracing::info;
@@ -48,13 +48,13 @@ macro_rules! test_pmcid_figure_extraction {
                     format!("PMC{}", pmcid)
                 };
 
-                let pmc_full_text = pubmed_client_rs::pmc::parse_pmc_xml(&xml_content, &normalized_pmcid)
+                let pmc_full_text = pubmed_client::pmc::parse_pmc_xml(&xml_content, &normalized_pmcid)
                     .unwrap_or_else(|e| panic!("Failed to parse XML for {}: {}", pmcid, e));
 
                 // Collect all figures from all sections
                 let mut all_figures = Vec::new();
 
-                fn collect_figures_from_section(section: &pubmed_client_rs::ArticleSection, figures: &mut Vec<pubmed_client_rs::Figure>) {
+                fn collect_figures_from_section(section: &pubmed_client::ArticleSection, figures: &mut Vec<pubmed_client::Figure>) {
                     figures.extend(section.figures.clone());
                     for subsection in &section.subsections {
                         collect_figures_from_section(subsection, figures);
@@ -71,7 +71,7 @@ macro_rules! test_pmcid_figure_extraction {
                 // Log detailed section information for debugging
                 info!(pmcid = %pmcid, total_sections = pmc_full_text.sections.len(), "Section summary");
                 for (section_idx, section) in pmc_full_text.sections.iter().enumerate() {
-                    fn log_section_figures(section: &pubmed_client_rs::ArticleSection, pmcid: &str, section_path: String, level: usize) {
+                    fn log_section_figures(section: &pubmed_client::ArticleSection, pmcid: &str, section_path: String, level: usize) {
                         let indent = "  ".repeat(level);
                         info!(
                             pmcid = %pmcid,
@@ -268,7 +268,7 @@ async fn test_figure_matching_functions() {
     ];
 
     // Create a mock figure
-    let figure = pubmed_client_rs::Figure {
+    let figure = pubmed_client::Figure {
         id: figure_id,
         label: figure_label,
         caption: "Test figure caption".to_string(),
@@ -301,7 +301,7 @@ async fn test_figure_matching_by_label() {
     ];
 
     // Create a figure with a label that should match
-    let figure = pubmed_client_rs::Figure {
+    let figure = pubmed_client::Figure {
         id: "unknown".to_string(),
         label: Some("Figure 1".to_string()),
         caption: "Test figure caption".to_string(),
@@ -333,7 +333,7 @@ async fn test_figure_matching_by_filename() {
     ];
 
     // Create a figure with a specific filename
-    let figure = pubmed_client_rs::Figure {
+    let figure = pubmed_client::Figure {
         id: "fig_unknown".to_string(),
         label: None,
         caption: "Test figure caption".to_string(),
@@ -365,7 +365,7 @@ async fn test_figure_no_match() {
     ];
 
     // Create a figure that won't match any files
-    let figure = pubmed_client_rs::Figure {
+    let figure = pubmed_client::Figure {
         id: "nonexistent".to_string(),
         label: Some("Nonexistent Figure".to_string()),
         caption: "Test figure caption".to_string(),

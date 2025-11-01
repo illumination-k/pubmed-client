@@ -2,7 +2,7 @@
 //!
 //! This module provides JavaScript-compatible bindings for use in Node.js and browsers.
 
-use pubmed_client_rs::{config::ClientConfig, pmc::PmcFullText, pubmed::PubMedArticle, Client};
+use pubmed_client::{config::ClientConfig, pmc::PmcFullText, pubmed::PubMedArticle, Client};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
@@ -233,7 +233,7 @@ impl WasmPubMedClient {
             .map_err(|e| JsValue::from_str(&format!("Invalid full text data: {e}")))?;
 
         let full_text: PmcFullText = js_full_text.into();
-        let converter = pubmed_client_rs::pmc::PmcMarkdownConverter::new();
+        let converter = pubmed_client::pmc::PmcMarkdownConverter::new();
         Ok(converter.convert(&full_text))
     }
 }
@@ -389,8 +389,8 @@ impl From<JsFullText> for PmcFullText {
     }
 }
 
-impl From<pubmed_client_rs::pmc::Author> for JsAuthor {
-    fn from(author: pubmed_client_rs::pmc::Author) -> Self {
+impl From<pubmed_client::pmc::Author> for JsAuthor {
+    fn from(author: pubmed_client::pmc::Author) -> Self {
         // Convert affiliations to simple strings
         let affiliation_names: Vec<String> = author
             .affiliations
@@ -409,12 +409,12 @@ impl From<pubmed_client_rs::pmc::Author> for JsAuthor {
     }
 }
 
-impl From<JsAuthor> for pubmed_client_rs::pmc::Author {
+impl From<JsAuthor> for pubmed_client::pmc::Author {
     fn from(js: JsAuthor) -> Self {
         let affiliations = js
             .affiliations
             .into_iter()
-            .map(|name| pubmed_client_rs::pmc::Affiliation {
+            .map(|name| pubmed_client::pmc::Affiliation {
                 id: None,
                 institution: name,
                 department: None,
@@ -436,8 +436,8 @@ impl From<JsAuthor> for pubmed_client_rs::pmc::Author {
     }
 }
 
-impl From<pubmed_client_rs::pmc::JournalInfo> for JsJournal {
-    fn from(journal: pubmed_client_rs::pmc::JournalInfo) -> Self {
+impl From<pubmed_client::pmc::JournalInfo> for JsJournal {
+    fn from(journal: pubmed_client::pmc::JournalInfo) -> Self {
         Self {
             title: journal.title,
             abbreviation: journal.abbreviation,
@@ -448,7 +448,7 @@ impl From<pubmed_client_rs::pmc::JournalInfo> for JsJournal {
     }
 }
 
-impl From<JsJournal> for pubmed_client_rs::pmc::JournalInfo {
+impl From<JsJournal> for pubmed_client::pmc::JournalInfo {
     fn from(js: JsJournal) -> Self {
         Self {
             title: js.title,
@@ -462,8 +462,8 @@ impl From<JsJournal> for pubmed_client_rs::pmc::JournalInfo {
     }
 }
 
-impl From<pubmed_client_rs::pmc::ArticleSection> for JsSection {
-    fn from(section: pubmed_client_rs::pmc::ArticleSection) -> Self {
+impl From<pubmed_client::pmc::ArticleSection> for JsSection {
+    fn from(section: pubmed_client::pmc::ArticleSection) -> Self {
         Self {
             section_type: section.section_type,
             title: section.title,
@@ -472,7 +472,7 @@ impl From<pubmed_client_rs::pmc::ArticleSection> for JsSection {
     }
 }
 
-impl From<JsSection> for pubmed_client_rs::pmc::ArticleSection {
+impl From<JsSection> for pubmed_client::pmc::ArticleSection {
     fn from(js: JsSection) -> Self {
         Self {
             section_type: js.section_type,
@@ -486,8 +486,8 @@ impl From<JsSection> for pubmed_client_rs::pmc::ArticleSection {
     }
 }
 
-impl From<pubmed_client_rs::pmc::Reference> for JsReference {
-    fn from(reference: pubmed_client_rs::pmc::Reference) -> Self {
+impl From<pubmed_client::pmc::Reference> for JsReference {
+    fn from(reference: pubmed_client::pmc::Reference) -> Self {
         // Convert Author structs to simple strings
         let author_names: Vec<String> = reference
             .authors
@@ -507,13 +507,13 @@ impl From<pubmed_client_rs::pmc::Reference> for JsReference {
     }
 }
 
-impl From<JsReference> for pubmed_client_rs::pmc::Reference {
+impl From<JsReference> for pubmed_client::pmc::Reference {
     fn from(js: JsReference) -> Self {
         // Convert simple strings back to Author structs
-        let authors: Vec<pubmed_client_rs::pmc::Author> = js
+        let authors: Vec<pubmed_client::pmc::Author> = js
             .authors
             .into_iter()
-            .map(|name| pubmed_client_rs::pmc::Author {
+            .map(|name| pubmed_client::pmc::Author {
                 given_names: None,
                 surname: None,
                 full_name: name,

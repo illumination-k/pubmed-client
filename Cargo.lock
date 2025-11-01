@@ -2724,7 +2724,7 @@ dependencies = [
  "aws-smithy-runtime-api",
  "clap 4.5.40",
  "indicatif 0.17.11",
- "pubmed-client-rs",
+ "pubmed-client",
  "serde",
  "serde_json",
  "tempfile",
@@ -2737,19 +2737,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pubmed-client-py"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "pubmed-client-rs",
- "pyo3",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
-name = "pubmed-client-rs"
+name = "pubmed-client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -2784,6 +2772,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "pubmed-client-py"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "pubmed-client",
+ "pyo3",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
 name = "pubmed-client-wasm"
 version = "0.1.0"
 dependencies = [
@@ -2791,7 +2791,7 @@ dependencies = [
  "console_error_panic_hook",
  "getrandom 0.2.16",
  "js-sys",
- "pubmed-client-rs",
+ "pubmed-client",
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
@@ -2808,7 +2808,7 @@ name = "pubmed-mcp"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "pubmed-client-rs",
+ "pubmed-client",
  "rmcp",
  "schemars 0.8.22",
  "serde",

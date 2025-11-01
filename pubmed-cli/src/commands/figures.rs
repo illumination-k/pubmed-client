@@ -228,7 +228,7 @@ pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
 }
 
 async fn process_article_with_progress(
-    client: &pubmed_client_rs::PmcClient,
+    client: &pubmed_client::PmcClient,
     pmcid: &str,
     storage: &dyn StorageBackend,
     overwrite: bool,

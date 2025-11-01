@@ -2,8 +2,8 @@
 //!
 //! Tests the retry mechanism against simulated network failures and transient errors.
 
-use pubmed_client_rs::retry::RetryConfig;
-use pubmed_client_rs::{ClientConfig, PubMedClient, PubMedError};
+use pubmed_client::retry::RetryConfig;
+use pubmed_client::{ClientConfig, PubMedClient, PubMedError};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::{Duration, Instant};

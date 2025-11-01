@@ -1,4 +1,4 @@
-use pubmed_client_rs::{ClientConfig, PubMedClient, PubMedError};
+use pubmed_client::{ClientConfig, PubMedClient, PubMedError};
 use tracing_test::traced_test;
 use wiremock::matchers::{method, path_regex};
 use wiremock::{Mock, MockServer, ResponseTemplate};

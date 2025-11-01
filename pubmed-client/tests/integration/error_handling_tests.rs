@@ -16,11 +16,11 @@ mod common;
 
 #[cfg(feature = "integration-tests")]
 mod integration_tests {
-    use pubmed_client_rs::time::{sleep, Duration};
+    use pubmed_client::time::{sleep, Duration};
     use tracing::{debug, info, warn};
     use tracing_test::traced_test;
 
-    use pubmed_client_rs::{ClientConfig, PubMedClient, PubMedError};
+    use pubmed_client::{ClientConfig, PubMedClient, PubMedError};
 
     // Import test utilities
     use crate::common::integration_test_utils::{

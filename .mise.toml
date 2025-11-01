@@ -24,7 +24,7 @@ run = [
   "dprint check",
   "cargo fmt --all -- --check",
   "cargo clippy --workspace --all-targets -- -D warnings",
-  "cargo clippy -p pubmed-client-rs --all-targets --features integration-tests -- -D warnings",
+  "cargo clippy -p pubmed-client --all-targets --features integration-tests -- -D warnings",
 ]
 
 [tasks."setup:py"]
@@ -56,7 +56,7 @@ run = ["cargo check --workspace"]
 run = ["cargo doc --workspace --open"]
 
 [tasks.coverage]
-run = ["cargo llvm-cov nextest -p pubmed-client-rs --all-features --html"]
+run = ["cargo llvm-cov nextest -p pubmed-client --all-features --html"]
 
 [tasks."wasm:build"]
 run = ["cd pubmed-client-wasm && wasm-pack build --target web"]
@@ -71,7 +71,7 @@ run = ["cd pubmed-client-wasm && pnpm run build && pnpm run test"]
 run = ["cd pubmed-client-wasm && pnpm run publish"]
 
 [tasks."core:test"]
-run = ["cargo test -p pubmed-client-rs"]
+run = ["cargo test -p pubmed-client"]
 
 [tasks."core:test:integration"]
 run = ["cd pubmed-client && cargo test --test"]

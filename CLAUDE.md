@@ -115,10 +115,10 @@ For crates.io publishing, all path dependencies MUST include explicit version re
 
 ```toml
 # ✅ CORRECT - Required for publishing to crates.io
-pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
 
 # ❌ WRONG - Will fail cargo package
-pubmed-client-rs = { path = "../pubmed-client" }
+pubmed-client = { path = "../pubmed-client" }
 ```
 
 **Why this is required:**
@@ -138,9 +138,9 @@ When bumping the version for a new release, follow these steps:
    ```
 
 2. **Update all internal dependency versions** in these files:
-   - `pubmed-cli/Cargo.toml` - Update `pubmed-client-rs` version
-   - `pubmed-client-py/Cargo.toml` - Update `pubmed-client-rs` version
-   - `pubmed-client-wasm/Cargo.toml` - Update `pubmed-client-rs` version
+   - `pubmed-cli/Cargo.toml` - Update `pubmed-client` version
+   - `pubmed-client-py/Cargo.toml` - Update `pubmed-client` version
+   - `pubmed-client-wasm/Cargo.toml` - Update `pubmed-client` version
    - `pubmed-mcp/Cargo.toml` - Update `pubmed-client` version
 
 3. **Update Cargo.lock**:
@@ -175,16 +175,16 @@ When bumping the version for a new release, follow these steps:
 version = "0.1.0"
 
 # pubmed-cli/Cargo.toml
-pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
 
 # pubmed-client-py/Cargo.toml
-pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
 
 # pubmed-client-wasm/Cargo.toml
-pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
 
 # pubmed-mcp/Cargo.toml
-pubmed-client = { version = "0.1.0", path = "../pubmed-client", package = "pubmed-client-rs" }
+pubmed-client = { version = "0.1.0", path = "../pubmed-client", package = "pubmed-client" }
 ```
 
 **After:**
@@ -195,16 +195,16 @@ pubmed-client = { version = "0.1.0", path = "../pubmed-client", package = "pubme
 version = "0.2.0"
 
 # pubmed-cli/Cargo.toml
-pubmed-client-rs = { version = "0.2.0", path = "../pubmed-client" }
+pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
 
 # pubmed-client-py/Cargo.toml
-pubmed-client-rs = { version = "0.2.0", path = "../pubmed-client" }
+pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
 
 # pubmed-client-wasm/Cargo.toml
-pubmed-client-rs = { version = "0.2.0", path = "../pubmed-client" }
+pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
 
 # pubmed-mcp/Cargo.toml
-pubmed-client = { version = "0.2.0", path = "../pubmed-client", package = "pubmed-client-rs" }
+pubmed-client = { version = "0.2.0", path = "../pubmed-client", package = "pubmed-client" }
 ```
 
 #### Automated Version Update Script (Future Enhancement)
@@ -242,13 +242,13 @@ echo "Please review changes and run: cargo package --allow-dirty"
 
 ```
 error: all dependencies must have a version requirement specified when packaging.
-dependency `pubmed-client-rs` does not specify a version
+dependency `pubmed-client` does not specify a version
 ```
 
 **Solution:** Add explicit version to the path dependency:
 
 ```toml
-pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
 ```
 
 **Error: Version mismatch between workspace and dependencies**
@@ -309,7 +309,7 @@ When in doubt, always check the official documentation before implementation.
 ## Workspace Structure
 
 ```
-pubmed-client-rs/                    # Cargo workspace root
+pubmed-client/                    # Cargo workspace root
 ├── Cargo.toml                       # Workspace definition
 ├── pubmed-client/                   # Core Rust library
 │   ├── Cargo.toml                   # Rust library configuration
@@ -379,7 +379,7 @@ cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-te
 cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test error_handling_tests
 
 # Run single unit test in core library
-cargo test --lib -p pubmed-client-rs pubmed::parser::tests::test_mesh_term_parsing
+cargo test --lib -p pubmed-client pubmed::parser::tests::test_mesh_term_parsing
 ```
 
 #### Core Library Commands (from pubmed-client/)
@@ -856,7 +856,7 @@ The library uses a **token bucket algorithm** for rate limiting:
 | `api_key`    | NCBI E-utilities API key   | None                           |
 | `rate_limit` | Custom requests per second | 3.0 (no key) / 10.0 (with key) |
 | `email`      | Contact email for NCBI     | None                           |
-| `tool`       | Application name for NCBI  | "pubmed-client-rs"             |
+| `tool`       | Application name for NCBI  | "pubmed-client"                |
 | `timeout`    | HTTP request timeout       | 30 seconds                     |
 | `base_url`   | Custom NCBI base URL       | Default NCBI E-utilities       |
 
@@ -1385,7 +1385,7 @@ To use the MCP server with Claude Desktop, add it to your configuration file:
 {
   "mcpServers": {
     "pubmed": {
-      "command": "/path/to/pubmed-client-rs/target/release/pubmed-mcp"
+      "command": "/path/to/pubmed-client/target/release/pubmed-mcp"
     }
   }
 }
