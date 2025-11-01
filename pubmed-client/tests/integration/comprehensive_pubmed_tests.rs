@@ -645,3 +645,87 @@ fn test_pubmed_chemical_substances(#[from(xml_test_cases)] test_cases: Vec<PubMe
         "Chemical substances summary"
     );
 }
+
+#[rstest]
+#[traced_test]
+fn test_pmc_id_extraction(#[from(xml_test_cases)] test_cases: Vec<PubMedXmlTestCase>) {
+    // Known PMC IDs from test data
+    let expected_pmc_ids = [
+        ("29540945", Some("PMC5844442")),
+        ("34567890", Some("PMC8454462")),
+        ("26846451", Some("PMC4892867")),
+        ("31978945", Some("PMC7092803")),
+        ("33515491", Some("PMC7906746")),
+        // Articles without PMC IDs
+        ("25760099", None),
+        ("27350240", None),
+    ];
+
+    let mut pmc_ids_found = 0;
+    let mut pmc_ids_expected = 0;
+
+    for test_case in &test_cases {
+        info!(filename = test_case.filename(), "Testing PMC ID extraction");
+
+        let xml_content = test_case.read_xml_content_or_panic();
+        let article = parse_article_from_xml(&xml_content, &test_case.pmid)
+            .expect("Failed to parse article XML");
+
+        // Find expected PMC ID for this PMID
+        let expected_pmc = expected_pmc_ids
+            .iter()
+            .find(|(pmid, _)| *pmid == test_case.pmid)
+            .map(|(_, pmc)| *pmc);
+
+        if let Some(Some(expected_pmc_id)) = expected_pmc {
+            pmc_ids_expected += 1;
+
+            if let Some(ref actual_pmc_id) = article.pmc_id {
+                pmc_ids_found += 1;
+                assert_eq!(
+                    actual_pmc_id, expected_pmc_id,
+                    "PMC ID should match for PMID {}",
+                    test_case.pmid
+                );
+                info!(
+                    pmid = %test_case.pmid,
+                    pmc_id = %actual_pmc_id,
+                    "PMC ID extracted successfully"
+                );
+            } else {
+                warn!(
+                    pmid = %test_case.pmid,
+                    expected_pmc = %expected_pmc_id,
+                    "PMC ID not found but was expected"
+                );
+            }
+        } else if let Some(None) = expected_pmc {
+            // This article should NOT have a PMC ID
+            if let Some(ref pmc_id) = article.pmc_id {
+                warn!(
+                    pmid = %test_case.pmid,
+                    pmc_id = %pmc_id,
+                    "PMC ID found but was not expected"
+                );
+            }
+        }
+    }
+
+    info!(
+        pmc_ids_found = pmc_ids_found,
+        pmc_ids_expected = pmc_ids_expected,
+        "PMC ID extraction summary"
+    );
+
+    // Assert that we found at least some PMC IDs
+    assert!(
+        pmc_ids_found > 0,
+        "Should have extracted at least one PMC ID"
+    );
+
+    // Assert that we found most of the expected PMC IDs (allowing for some flexibility)
+    assert!(
+        pmc_ids_found >= (pmc_ids_expected * 80 / 100),
+        "Should have extracted at least 80% of expected PMC IDs"
+    );
+}

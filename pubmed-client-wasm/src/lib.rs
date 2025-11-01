@@ -250,6 +250,7 @@ pub struct JsArticle {
     pub pub_date: String,
     pub abstract_text: Option<String>,
     pub doi: Option<String>,
+    pub pmc_id: Option<String>,
     pub article_types: Vec<String>,
 }
 
@@ -270,6 +271,7 @@ impl From<PubMedArticle> for JsArticle {
             pub_date: article.pub_date,
             abstract_text: article.abstract_text,
             doi: article.doi,
+            pmc_id: article.pmc_id,
             article_types: article.article_types,
         }
     }

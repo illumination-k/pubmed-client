@@ -148,6 +148,8 @@ struct PyPubMedArticle {
     #[pyo3(get)]
     doi: Option<String>,
     #[pyo3(get)]
+    pmc_id: Option<String>,
+    #[pyo3(get)]
     abstract_text: Option<String>,
     #[pyo3(get)]
     author_count: u32,
@@ -162,6 +164,7 @@ impl From<PubMedArticle> for PyPubMedArticle {
             journal: article.journal.clone(),
             pub_date: article.pub_date.clone(),
             doi: article.doi.clone(),
+            pmc_id: article.pmc_id.clone(),
             abstract_text: article.abstract_text.clone(),
             author_count: article.author_count,
             inner: Arc::new(article),

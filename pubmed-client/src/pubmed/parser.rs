@@ -16,15 +16,52 @@ struct PubmedArticleSet {
 }
 
 #[derive(Debug, Deserialize)]
+struct ArticleId {
+    #[serde(rename = "@IdType")]
+    id_type: String,
+    #[serde(rename = "$text")]
+    value: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct ArticleIdList {
+    #[serde(rename = "ArticleId", default)]
+    ids: Vec<ArticleId>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PubmedData {
+    #[serde(rename = "ArticleIdList")]
+    article_id_list: Option<ArticleIdList>,
+}
+
+#[derive(Debug, Deserialize)]
 struct PubmedArticleXml {
     #[serde(rename = "MedlineCitation")]
     medline_citation: MedlineCitation,
+    #[serde(rename = "PubmedData")]
+    pubmed_data: Option<PubmedData>,
 }
 
 impl PubmedArticleXml {
+    /// Extract PMC ID from PubmedData ArticleIdList
+    fn extract_pmc_id(pubmed_data: &Option<PubmedData>) -> Option<String> {
+        pubmed_data
+            .as_ref()?
+            .article_id_list
+            .as_ref()?
+            .ids
+            .iter()
+            .find(|id| id.id_type.to_lowercase() == "pmc")
+            .map(|id| id.value.clone())
+    }
+
     fn into_article(self, pmid: &str) -> Result<PubMedArticle> {
         let medline = self.medline_citation;
         let article = medline.article;
+
+        // Extract PMC ID from PubmedData
+        let pmc_id = Self::extract_pmc_id(&self.pubmed_data);
 
         // Extract title
         let title = article
@@ -99,6 +136,7 @@ impl PubmedArticleXml {
             journal,
             pub_date,
             doi,
+            pmc_id,
             abstract_text,
             article_types,
             mesh_headings,

@@ -19,6 +19,16 @@ impl PubMedServer {
     ) -> Result<CallToolResult, ErrorData> {
         tools::search::search_pubmed(self, params).await
     }
+
+    #[tool(
+        description = "Get markdown formatted content from a PMC (PubMed Central) article. Returns the full article text in well-formatted markdown including metadata, sections, references, and additional information like funding and acknowledgments."
+    )]
+    async fn get_pmc_markdown(
+        &self,
+        params: Parameters<tools::markdown::MarkdownRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::markdown::get_pmc_markdown(self, params).await
+    }
 }
 
 #[tool_handler]

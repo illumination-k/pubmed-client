@@ -12,6 +12,10 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - Filter by study type (RCT, meta-analysis, systematic review, etc.)
   - Filter by text availability (open access, free full text, PMC full text)
   - Support for all PubMed field tags and boolean operators
+- **PMC Markdown Conversion**: Convert PMC full-text articles to well-formatted markdown
+  - Configurable metadata, table of contents, and figure captions
+  - Proper handling of references, funding information, and acknowledgments
+  - Clean HTML entity decoding and content formatting
 - **Modular Architecture**: Tools organized in separate modules for maintainability
 - Built with [rmcp](https://github.com/modelcontextprotocol/rust-sdk) - the official Rust SDK for MCP
 - Uses stdio transport for communication
@@ -95,6 +99,42 @@ Search for free full text meta-analyses on cancer immunotherapy
 
 For detailed examples and filter combinations, see [SEARCH_FILTERS.md](SEARCH_FILTERS.md).
 
+#### `get_pmc_markdown`
+
+Convert a PMC (PubMed Central) full-text article to well-formatted Markdown.
+
+**Parameters:**
+
+- `pmc_id` (string, required): PMC ID with or without "PMC" prefix
+  - Examples: `"PMC7906746"` or `"7906746"`
+- `include_metadata` (boolean, optional): Include article metadata section (default: true)
+  - Title, authors, journal, publication date, identifiers, keywords
+- `include_figure_captions` (boolean, optional): Include figure and table captions (default: true)
+
+**Returns:**
+
+Well-formatted Markdown document containing:
+
+- Article metadata (title, authors, journal, identifiers)
+- Full article text organized by sections
+- References with DOI/PMID links
+- Funding information, acknowledgments, and data availability statements
+- Figure and table captions
+
+**Examples:**
+
+```
+Get markdown for PMC article PMC7906746 with all metadata
+```
+
+```
+Get markdown for PMC article 7906746 without table of contents
+```
+
+```
+Get markdown for PMC7906746 with minimal formatting (no metadata or captions)
+```
+
 ## Development
 
 ### Project Structure
@@ -106,7 +146,8 @@ pubmed-mcp-server/
 │   ├── main.rs          # MCP server implementation with tool router
 │   └── tools/           # Tools module
 │       ├── mod.rs       # PubMedServer definition
-│       └── search.rs    # Search tool implementation
+│       ├── search.rs    # Search tool implementation
+│       └── markdown.rs  # Markdown conversion tool
 ├── tests/
 │   └── integration_test.rs  # Integration tests
 ├── README.md            # This file
