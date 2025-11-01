@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients with multiple language bindings. The workspace includes a core Rust library, WebAssembly bindings for JavaScript/TypeScript environments, Python bindings via PyO3, a command-line interface for common operations, and a Model Context Protocol (MCP) server for AI assistant integration.
 
+## Package Name
+
+python bindings package name registered in PyPI: `pubmed-client-py`
+
 ## Important Guidelines for PubMed Search Query Implementation
 
 **CRITICAL**: When implementing or modifying PubMed search query functionality, ALWAYS reference the official NCBI PubMed documentation:
