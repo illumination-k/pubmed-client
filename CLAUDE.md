@@ -1660,28 +1660,24 @@ The release workflow can be triggered manually for testing purposes:
 gh workflow run release.yml
 ```
 
-**Workflow Dispatch Inputs:**
+**Workflow Dispatch Behavior:**
 
-When manually triggering the workflow, you can customize the behavior with this input:
+When manually triggering the workflow via `workflow_dispatch`:
 
-- **dry-run** (default: `true`): Control whether to actually publish to crates.io
-  - `true` - Perform dry-run (validate but don't publish)
-  - `false` - Actually publish to crates.io (requires CRATES_IO_TOKEN)
+- **Always runs in dry-run mode**: Validates packages but does NOT publish to crates.io
+- **Tests ALL packages**: Always validates all packages (core, CLI, and MCP)
+- **No inputs required**: Simply trigger the workflow - no configuration needed
 
-**Important:** workflow_dispatch always tests ALL packages (core, CLI, and MCP). There is no option to selectively test individual packages - this simplifies the workflow and ensures comprehensive testing.
+This ensures safe testing of the release workflow without any risk of accidental publishing.
 
-**Examples:**
+**Example:**
 
 ```bash
-# Test publishing all packages (dry-run, default)
+# Test publishing all packages (always dry-run)
 gh workflow run release.yml
-
-# Test publishing all packages (dry-run, explicit)
-gh workflow run release.yml -f dry-run=true
-
-# Actually publish all packages (WARNING: will publish to crates.io!)
-gh workflow run release.yml -f dry-run=false
 ```
+
+**Important:** To actually publish to crates.io, you must create and push a version tag. workflow_dispatch is exclusively for testing and validation.
 
 **Key Differences from Tag-based Releases:**
 
@@ -1690,16 +1686,18 @@ When triggered via workflow_dispatch (vs. pushing a tag):
 - **No GitHub release created**: Skips GitHub release creation step
 - **No version checking**: `check-version` is disabled (no git tag to compare against)
 - **All packages tested**: Always validates all packages (core, CLI, MCP) regardless of tag naming
-- **Dry-run by default**: Prevents accidental publishing during testing
-- **Test suite always runs**: Validates build and tests before attempting publish
+- **Always dry-run**: NEVER publishes to crates.io - validation only
+- **Test suite always runs**: Validates build and tests before attempting dry-run publish
 
 This allows you to:
 
-- Test the complete release workflow without side effects (default dry-run)
+- Test the complete release workflow without any risk of accidental publishing
 - Validate all package configurations before creating tags
 - Debug workflow issues in isolation
 - Verify version compatibility and dependencies across all packages
 - Ensure all workspace members can be successfully published together
+
+**To actually publish:** Create and push a version tag (e.g., `v0.1.0`). Only tag-based releases will publish to crates.io.
 
 ### Git LFS Configuration
 
