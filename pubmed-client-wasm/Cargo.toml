@@ -14,7 +14,7 @@ description = "WebAssembly bindings for the PubMed client library"
 crate-type = ["cdylib"]
 
 [dependencies]
-pubmed-client-rs = { path = "../pubmed-client" }
+pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
 
 # WASM-specific dependencies
 console_error_panic_hook = "0.1"

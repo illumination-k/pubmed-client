@@ -15,7 +15,7 @@ path = "src/main.rs"
 
 [dependencies]
 # Core library
-pubmed-client-rs = { path = "../pubmed-client" }
+pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
 
 # CLI framework
 clap = { version = "4.0", features = ["derive", "env", "string"] }

@@ -15,7 +15,7 @@ name = "pubmed_client"
 crate-type = ["cdylib"]
 
 [dependencies]
-pubmed-client-rs = { path = "../pubmed-client" }
+pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
 
 # PyO3 for Python bindings
 pyo3 = { version = "0.23", features = ["extension-module"] }
