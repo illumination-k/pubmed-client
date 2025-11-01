@@ -96,7 +96,7 @@ pubmed-client-rs/                    # Cargo workspace root
 │           ├── figures.rs           # Figure extraction
 │           ├── markdown.rs          # Markdown conversion
 │           └── search.rs            # PubMed search
-├── pubmed-mcp-server/               # MCP server for AI assistants
+├── pubmed-mcp/               # MCP server for AI assistants
 │   ├── Cargo.toml                   # MCP server configuration
 │   ├── src/main.rs                  # MCP server implementation
 │   ├── tests/                       # Integration tests
@@ -288,19 +288,19 @@ mise r wasm:publish          # Publish to npm
 
 ```bash
 # Build MCP server
-cargo build --release -p pubmed-mcp-server
+cargo build --release -p pubmed-mcp
 
 # Run MCP server (stdio transport)
-cargo run -p pubmed-mcp-server
+cargo run -p pubmed-mcp
 
 # Run with debug logging
-RUST_LOG=debug cargo run -p pubmed-mcp-server
+RUST_LOG=debug cargo run -p pubmed-mcp
 
 # Run tests
-cargo test -p pubmed-mcp-server
+cargo test -p pubmed-mcp
 
 # Test with MCP Inspector (interactive testing tool)
-npx @modelcontextprotocol/inspector cargo run -p pubmed-mcp-server
+npx @modelcontextprotocol/inspector cargo run -p pubmed-mcp
 ```
 
 ### Code Quality
@@ -1060,7 +1060,7 @@ The workspace includes a Model Context Protocol (MCP) server that allows AI assi
 
 ### MCP Server Overview
 
-The MCP server (`pubmed-mcp-server`) provides a standardized interface for AI assistants to:
+The MCP server (`pubmed-mcp`) provides a standardized interface for AI assistants to:
 
 - Search PubMed for biomedical literature
 - Retrieve article metadata and abstracts
@@ -1074,10 +1074,10 @@ The MCP server (`pubmed-mcp-server`) provides a standardized interface for AI as
 - Automatic JSON schema generation for tool parameters
 - Integration with Claude Desktop and other MCP clients
 
-### MCP Server Architecture (pubmed-mcp-server/)
+### MCP Server Architecture (pubmed-mcp/)
 
 ```
-pubmed-mcp-server/
+pubmed-mcp/
 ├── Cargo.toml              # Package configuration
 ├── src/
 │   └── main.rs             # MCP server implementation (119 lines)
@@ -1138,7 +1138,7 @@ To use the MCP server with Claude Desktop, add it to your configuration file:
 {
   "mcpServers": {
     "pubmed": {
-      "command": "/path/to/pubmed-client-rs/target/release/pubmed-mcp-server"
+      "command": "/path/to/pubmed-client-rs/target/release/pubmed-mcp"
     }
   }
 }
@@ -1178,16 +1178,16 @@ The MCP server includes comprehensive integration tests:
 
 ```bash
 # Run MCP protocol tests
-cargo test -p pubmed-mcp-server
+cargo test -p pubmed-mcp
 
 # Test server initialization
-cargo test -p pubmed-mcp-server test_mcp_server_initialize
+cargo test -p pubmed-mcp test_mcp_server_initialize
 
 # Test tool listing
-cargo test -p pubmed-mcp-server test_mcp_server_list_tools
+cargo test -p pubmed-mcp test_mcp_server_list_tools
 
 # Test server capabilities
-cargo test -p pubmed-mcp-server test_mcp_server_capabilities
+cargo test -p pubmed-mcp test_mcp_server_capabilities
 ```
 
 **Test Coverage:**
@@ -1203,7 +1203,7 @@ The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) provides 
 
 ```bash
 # Launch MCP Inspector with the server
-npx @modelcontextprotocol/inspector cargo run -p pubmed-mcp-server
+npx @modelcontextprotocol/inspector cargo run -p pubmed-mcp
 
 # Inspector opens in browser, allowing:
 # - Interactive tool testing
