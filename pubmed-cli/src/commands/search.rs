@@ -205,7 +205,7 @@ impl Search {
         }
 
         if self.open_access {
-            query = query.open_access_only();
+            query = query.free_full_text_only();
         }
 
         // Other identifiers

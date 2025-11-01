@@ -1,76 +1,23 @@
 use anyhow::Result;
 use rmcp::{
-    handler::server::{router::tool::ToolRouter, wrapper::Parameters},
-    model::*,
-    schemars, tool, tool_handler, tool_router,
-    transport::stdio,
-    ServerHandler, ServiceExt,
+    handler::server::wrapper::Parameters, model::*, tool, tool_handler, tool_router,
+    transport::stdio, ServerHandler, ServiceExt,
 };
-use serde::Deserialize;
-use std::{borrow::Cow, sync::Arc};
 use tracing::info;
 
-use pubmed_client::Client as PubMedClient;
-
-/// PubMed MCP Server
-#[derive(Clone)]
-struct PubMedServer {
-    client: Arc<PubMedClient>,
-    tool_router: ToolRouter<Self>,
-}
-
-/// Search request parameters
-#[derive(Debug, Deserialize, schemars::JsonSchema)]
-struct SearchRequest {
-    #[schemars(description = "Search query (e.g., 'COVID-19', 'cancer[ti]')")]
-    query: String,
-    #[schemars(description = "Maximum number of results (default: 10)")]
-    max_results: Option<usize>,
-}
+mod tools;
+use tools::PubMedServer;
 
 #[tool_router]
 impl PubMedServer {
-    fn new() -> Self {
-        let client = PubMedClient::new();
-        Self {
-            client: Arc::new(client),
-            tool_router: Self::tool_router(),
-        }
-    }
-
-    #[tool(description = "Search PubMed for articles")]
+    #[tool(
+        description = "Search PubMed for articles with filters (study type: randomized_controlled_trial, clinical_trial, meta_analysis, systematic_review, review, observational_study, case_report; text availability: free_full_text, full_text, pmc_only; date range: start_year and end_year for publication date filtering)"
+    )]
     async fn search_pubmed(
         &self,
-        Parameters(params): Parameters<SearchRequest>,
+        params: Parameters<tools::search::SearchRequest>,
     ) -> Result<CallToolResult, ErrorData> {
-        let max = params.max_results.unwrap_or(10).min(100);
-
-        info!(query = %params.query, max_results = max, "Searching PubMed");
-
-        let articles = self
-            .client
-            .pubmed
-            .search_and_fetch(&params.query, max)
-            .await
-            .map_err(|e| ErrorData {
-                code: ErrorCode(-32603),
-                message: Cow::from(format!("Search failed: {}", e)),
-                data: None,
-            })?;
-
-        let mut result = String::new();
-        result.push_str(&format!("Found {} articles:\n\n", articles.len()));
-
-        for (i, article) in articles.iter().enumerate() {
-            result.push_str(&format!(
-                "{}. {} (PMID: {})\n",
-                i + 1,
-                article.title,
-                article.pmid
-            ));
-        }
-
-        Ok(CallToolResult::success(vec![Content::text(result)]))
+        tools::search::search_pubmed(self, params).await
     }
 }
 

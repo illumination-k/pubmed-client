@@ -157,7 +157,9 @@ impl SearchQuery {
         self
     }
 
-    /// Filter to open access articles only
+    /// Filter to articles with free full text only
+    ///
+    /// Includes PMC, Bookshelf, and publishers' websites.
     ///
     /// # Example
     ///
@@ -166,30 +168,14 @@ impl SearchQuery {
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer")
-    ///     .open_access_only();
+    ///     .free_full_text_only();
     /// ```
-    pub fn open_access_only(mut self) -> Self {
+    pub fn free_full_text_only(mut self) -> Self {
         self.filters.push("free full text[sb]".to_string());
         self
     }
 
-    /// Filter to articles with free full text
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
-    ///
-    /// let query = SearchQuery::new()
-    ///     .query("diabetes")
-    ///     .free_full_text();
-    /// ```
-    pub fn free_full_text(mut self) -> Self {
-        self.filters.push("free full text[sb]".to_string());
-        self
-    }
-
-    /// Filter to articles with any full text (including subscription-based)
+    /// Filter to articles with full text links (including subscription-based)
     ///
     /// # Example
     ///
@@ -198,10 +184,26 @@ impl SearchQuery {
     ///
     /// let query = SearchQuery::new()
     ///     .query("machine learning")
-    ///     .has_full_text();
+    ///     .full_text_only();
     /// ```
-    pub fn has_full_text(mut self) -> Self {
+    pub fn full_text_only(mut self) -> Self {
         self.filters.push("full text[sb]".to_string());
+        self
+    }
+
+    /// Filter to articles with PMC full text only
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::SearchQuery;
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("diabetes")
+    ///     .pmc_only();
+    /// ```
+    pub fn pmc_only(mut self) -> Self {
+        self.filters.push("pmc[sb]".to_string());
         self
     }
 
@@ -347,21 +349,21 @@ mod tests {
     }
 
     #[test]
-    fn test_open_access_only() {
-        let query = SearchQuery::new().open_access_only();
+    fn test_free_full_text_only() {
+        let query = SearchQuery::new().free_full_text_only();
         assert_eq!(query.build(), "free full text[sb]");
     }
 
     #[test]
-    fn test_free_full_text() {
-        let query = SearchQuery::new().free_full_text();
-        assert_eq!(query.build(), "free full text[sb]");
-    }
-
-    #[test]
-    fn test_has_full_text() {
-        let query = SearchQuery::new().has_full_text();
+    fn test_full_text_only() {
+        let query = SearchQuery::new().full_text_only();
         assert_eq!(query.build(), "full text[sb]");
+    }
+
+    #[test]
+    fn test_pmc_only() {
+        let query = SearchQuery::new().pmc_only();
+        assert_eq!(query.build(), "pmc[sb]");
     }
 
     #[test]
@@ -415,7 +417,7 @@ mod tests {
             .query("cancer treatment")
             .title_contains("immunotherapy")
             .journal("Nature")
-            .free_full_text()
+            .free_full_text_only()
             .article_type(ArticleType::ClinicalTrial)
             .language(Language::English);
 
@@ -445,11 +447,12 @@ mod tests {
         let query = SearchQuery::new()
             .query("research")
             .has_abstract()
-            .has_full_text()
-            .free_full_text();
+            .full_text_only()
+            .free_full_text_only()
+            .pmc_only();
         assert_eq!(
             query.build(),
-            "research AND hasabstract AND full text[sb] AND free full text[sb]"
+            "research AND hasabstract AND full text[sb] AND free full text[sb] AND pmc[sb]"
         );
     }
 
