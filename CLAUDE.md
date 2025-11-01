@@ -92,6 +92,171 @@ git add -A
 - **Test builds and tests** after renaming operations
 - **Keep renames and content changes** in the same commit for context
 
+## Version Management and Publishing
+
+### Workspace Version Synchronization
+
+**CRITICAL**: This workspace uses a shared version number across all packages. When bumping the version for publishing, you MUST update version requirements in all dependent packages.
+
+#### Current Workspace Structure
+
+The workspace version is defined in the root `Cargo.toml`:
+
+```toml
+[workspace.package]
+version = "0.1.0" # Shared version for all packages
+```
+
+All packages use this workspace version via `version.workspace = true`.
+
+#### Internal Dependencies Require Version Specifications
+
+For crates.io publishing, all path dependencies MUST include explicit version requirements:
+
+```toml
+# ✅ CORRECT - Required for publishing to crates.io
+pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+
+# ❌ WRONG - Will fail cargo package
+pubmed-client-rs = { path = "../pubmed-client" }
+```
+
+**Why this is required:**
+
+- Cargo requires version requirements for all path dependencies when packaging for crates.io
+- During publishing, the `path` is removed and only the `version` is kept
+- This ensures published packages depend on crates.io versions, not local paths
+
+#### Version Bump Checklist
+
+When bumping the version for a new release, follow these steps:
+
+1. **Update workspace version** in root `Cargo.toml`:
+   ```toml
+   [workspace.package]
+   version = "0.2.0" # New version
+   ```
+
+2. **Update all internal dependency versions** in these files:
+   - `pubmed-cli/Cargo.toml` - Update `pubmed-client-rs` version
+   - `pubmed-client-py/Cargo.toml` - Update `pubmed-client-rs` version
+   - `pubmed-client-wasm/Cargo.toml` - Update `pubmed-client-rs` version
+   - `pubmed-mcp/Cargo.toml` - Update `pubmed-client` version
+
+3. **Update Cargo.lock**:
+   ```bash
+   cargo update --workspace
+   ```
+
+4. **Verify all packages can be packaged**:
+   ```bash
+   cargo package --allow-dirty
+   ```
+
+5. **Run tests** to ensure everything works:
+   ```bash
+   cargo test --workspace
+   ```
+
+6. **Create version bump commit**:
+   ```bash
+   git add Cargo.toml pubmed-cli/Cargo.toml pubmed-client-py/Cargo.toml \
+           pubmed-client-wasm/Cargo.toml pubmed-mcp/Cargo.toml Cargo.lock
+   git commit -m "chore: Bump version to 0.2.0"
+   ```
+
+#### Example: Bumping from 0.1.0 to 0.2.0
+
+**Before:**
+
+```toml
+# Cargo.toml (root)
+[workspace.package]
+version = "0.1.0"
+
+# pubmed-cli/Cargo.toml
+pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+
+# pubmed-client-py/Cargo.toml
+pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+
+# pubmed-client-wasm/Cargo.toml
+pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+
+# pubmed-mcp/Cargo.toml
+pubmed-client = { version = "0.1.0", path = "../pubmed-client", package = "pubmed-client-rs" }
+```
+
+**After:**
+
+```toml
+# Cargo.toml (root)
+[workspace.package]
+version = "0.2.0"
+
+# pubmed-cli/Cargo.toml
+pubmed-client-rs = { version = "0.2.0", path = "../pubmed-client" }
+
+# pubmed-client-py/Cargo.toml
+pubmed-client-rs = { version = "0.2.0", path = "../pubmed-client" }
+
+# pubmed-client-wasm/Cargo.toml
+pubmed-client-rs = { version = "0.2.0", path = "../pubmed-client" }
+
+# pubmed-mcp/Cargo.toml
+pubmed-client = { version = "0.2.0", path = "../pubmed-client", package = "pubmed-client-rs" }
+```
+
+#### Automated Version Update Script (Future Enhancement)
+
+Consider creating a script to automate version updates:
+
+```bash
+#!/bin/bash
+# scripts/bump-version.sh
+
+NEW_VERSION=$1
+if [ -z "$NEW_VERSION" ]; then
+    echo "Usage: $0 <new-version>"
+    exit 1
+fi
+
+# Update workspace version
+sed -i '' "s/^version = .*/version = \"$NEW_VERSION\"/" Cargo.toml
+
+# Update internal dependencies
+for file in pubmed-cli/Cargo.toml pubmed-client-py/Cargo.toml pubmed-client-wasm/Cargo.toml pubmed-mcp/Cargo.toml; do
+    sed -i '' "s/version = \"[^\"]*\", path = \"/version = \"$NEW_VERSION\", path = \"/" "$file"
+done
+
+# Update Cargo.lock
+cargo update --workspace
+
+echo "Version bumped to $NEW_VERSION"
+echo "Please review changes and run: cargo package --allow-dirty"
+```
+
+#### Common Errors and Solutions
+
+**Error: "dependency does not specify a version"**
+
+```
+error: all dependencies must have a version requirement specified when packaging.
+dependency `pubmed-client-rs` does not specify a version
+```
+
+**Solution:** Add explicit version to the path dependency:
+
+```toml
+pubmed-client-rs = { version = "0.1.0", path = "../pubmed-client" }
+```
+
+**Error: Version mismatch between workspace and dependencies**
+
+If you update the workspace version but forget to update internal dependencies, the published packages will depend on the old version from crates.io.
+
+**Solution:** Always update all version references together using the checklist above.
+
 ## Important Guidelines for PubMed Search Query Implementation
 
 **CRITICAL**: When implementing or modifying PubMed search query functionality, ALWAYS reference the official NCBI PubMed documentation:
