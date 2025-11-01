@@ -1660,19 +1660,46 @@ The release workflow can be triggered manually for testing purposes:
 gh workflow run release.yml
 ```
 
-When triggered via workflow_dispatch:
+**Workflow Dispatch Inputs:**
 
-- **Dry-run mode**: All publish jobs run in dry-run mode (no actual publishing to crates.io)
-- **Skip GitHub release**: No GitHub release is created
-- **Run tests**: Full test suite still runs to validate the build
-- **Validate packages**: All `cargo package` checks run to ensure publishability
+When manually triggering the workflow, you can customize the behavior with this input:
+
+- **dry-run** (default: `true`): Control whether to actually publish to crates.io
+  - `true` - Perform dry-run (validate but don't publish)
+  - `false` - Actually publish to crates.io (requires CRATES_IO_TOKEN)
+
+**Important:** workflow_dispatch always tests ALL packages (core, CLI, and MCP). There is no option to selectively test individual packages - this simplifies the workflow and ensures comprehensive testing.
+
+**Examples:**
+
+```bash
+# Test publishing all packages (dry-run, default)
+gh workflow run release.yml
+
+# Test publishing all packages (dry-run, explicit)
+gh workflow run release.yml -f dry-run=true
+
+# Actually publish all packages (WARNING: will publish to crates.io!)
+gh workflow run release.yml -f dry-run=false
+```
+
+**Key Differences from Tag-based Releases:**
+
+When triggered via workflow_dispatch (vs. pushing a tag):
+
+- **No GitHub release created**: Skips GitHub release creation step
+- **No version checking**: `check-version` is disabled (no git tag to compare against)
+- **All packages tested**: Always validates all packages (core, CLI, MCP) regardless of tag naming
+- **Dry-run by default**: Prevents accidental publishing during testing
+- **Test suite always runs**: Validates build and tests before attempting publish
 
 This allows you to:
 
-- Test the release workflow without side effects
-- Validate package configurations
-- Debug workflow issues
-- Verify version compatibility and dependencies
+- Test the complete release workflow without side effects (default dry-run)
+- Validate all package configurations before creating tags
+- Debug workflow issues in isolation
+- Verify version compatibility and dependencies across all packages
+- Ensure all workspace members can be successfully published together
 
 ### Git LFS Configuration
 
