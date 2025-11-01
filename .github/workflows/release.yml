@@ -115,7 +115,7 @@ jobs:
 
   publish-core:
     name: Publish pubmed-client to crates.io
-    needs: [should-publish, create-release, test-release]
+    needs: [should-publish, test-release]
     if: ${{ needs.should-publish.outputs.core == 'true' }}
     uses: ./.github/workflows/publish-crates.yml
     with:
@@ -130,7 +130,7 @@ jobs:
 
   publish-cli:
     name: Publish pubmed-cli to crates.io
-    needs: [should-publish, create-release, test-release]
+    needs: [should-publish, test-release, publish-core]
     if: ${{ needs.should-publish.outputs.cli == 'true' }}
     uses: ./.github/workflows/publish-crates.yml
     with:
@@ -145,7 +145,7 @@ jobs:
 
   publish-mcp:
     name: Publish pubmed-mcp to crates.io
-    needs: [should-publish, create-release, test-release]
+    needs: [should-publish, test-release, publish-core]
     if: ${{ needs.should-publish.outputs.mcp == 'true' }}
     uses: ./.github/workflows/publish-crates.yml
     with:
