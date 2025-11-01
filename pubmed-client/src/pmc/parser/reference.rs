@@ -1,5 +1,6 @@
 use crate::error::Result;
 use crate::pmc::models::{Author, Reference};
+use crate::pubmed::parser::strip_inline_html_tags;
 use quick_xml::de::from_str;
 use serde::Deserialize;
 use tracing;
@@ -173,8 +174,9 @@ fn try_extract_from_ref_list(content: &str) -> Result<Option<Vec<Reference>>> {
         return Ok(None);
     };
 
-    // Parse the ref-list
-    match from_str::<RefList>(ref_list_content) {
+    // Parse the ref-list (strip inline HTML tags first)
+    let cleaned_content = strip_inline_html_tags(ref_list_content);
+    match from_str::<RefList>(&cleaned_content) {
         Ok(ref_list) => {
             let references = ref_list
                 .refs
@@ -205,7 +207,8 @@ fn try_extract_from_references_tag(content: &str) -> Result<Option<Vec<Reference
         .replace("<references", "<ref-list")
         .replace("</references>", "</ref-list>");
 
-    match from_str::<RefList>(&adapted_content) {
+    let cleaned_adapted = strip_inline_html_tags(&adapted_content);
+    match from_str::<RefList>(&cleaned_adapted) {
         Ok(ref_list) => {
             let references = ref_list
                 .refs
@@ -243,8 +246,9 @@ fn try_extract_from_back_section(content: &str) -> Result<Option<Vec<Reference>>
 
             // Wrap the ref in a temporary ref-list structure to reuse existing parsing
             let wrapped_content = format!("<ref-list>{}</ref-list>", ref_content);
+            let cleaned_wrapped = strip_inline_html_tags(&wrapped_content);
 
-            if let Ok(ref_list) = from_str::<RefList>(&wrapped_content) {
+            if let Ok(ref_list) = from_str::<RefList>(&cleaned_wrapped) {
                 for ref_item in ref_list.refs {
                     if let Some(reference) = parse_ref_to_reference(ref_item) {
                         references.push(reference);

@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::str::Chars;
 
 use serde::{Deserialize, Serialize};
 
@@ -607,7 +608,7 @@ impl Author {
     /// # Returns
     ///
     /// Iterator over characters
-    pub fn chars(&self) -> std::str::Chars {
+    pub fn chars(&self) -> Chars<'_> {
         self.full_name.chars()
     }
 }

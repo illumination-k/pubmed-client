@@ -3,8 +3,8 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "pubmed-client"
-version = "0.1.0"
+name = "pubmed-client-py"
+version = "0.0.1"
 description = "Python bindings for PubMed and PMC APIs for retrieving biomedical research articles"
 authors = [{ name = "illumination-k" }]
 readme = "README.md"
