@@ -16,17 +16,8 @@ pub struct MarkdownRequest {
     #[schemars(description = "Include metadata section (default: true)")]
     pub include_metadata: Option<bool>,
 
-    #[schemars(description = "Include table of contents (default: false)")]
-    pub include_toc: Option<bool>,
-
     #[schemars(description = "Include figure captions (default: true)")]
     pub include_figure_captions: Option<bool>,
-
-    #[schemars(description = "Include ORCID links for authors (default: true)")]
-    pub include_orcid_links: Option<bool>,
-
-    #[schemars(description = "Include DOI and PMID links (default: true)")]
-    pub include_identifier_links: Option<bool>,
 }
 
 /// Get markdown formatted content from a PMC article
@@ -58,11 +49,7 @@ pub async fn get_pmc_markdown(
     // Build markdown converter with configuration
     let converter = PmcMarkdownConverter::new()
         .with_include_metadata(params.include_metadata.unwrap_or(true))
-        .with_include_toc(params.include_toc.unwrap_or(false))
-        .with_include_orcid_links(params.include_orcid_links.unwrap_or(true))
-        .with_include_figure_captions(params.include_figure_captions.unwrap_or(true))
-        .with_include_identifier_links(params.include_identifier_links.unwrap_or(true));
-
+        .with_include_figure_captions(params.include_figure_captions.unwrap_or(true));
     info!(
         pmc_id = %pmc_id,
         title = %article.title,

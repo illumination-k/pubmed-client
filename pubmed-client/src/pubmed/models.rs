@@ -62,6 +62,8 @@ pub struct PubMedArticle {
     pub pub_date: String,
     /// DOI (Digital Object Identifier)
     pub doi: Option<String>,
+    /// PMC ID if available (with PMC prefix, e.g., "PMC7092803")
+    pub pmc_id: Option<String>,
     /// Abstract text (if available)
     pub abstract_text: Option<String>,
     /// Article types (e.g., "Clinical Trial", "Review", etc.)
@@ -680,6 +682,7 @@ mod tests {
             journal: "Test Journal".to_string(),
             pub_date: "2023".to_string(),
             doi: None,
+            pmc_id: None,
             abstract_text: None,
             article_types: vec![],
             mesh_headings: Some(vec![
@@ -793,6 +796,7 @@ mod tests {
             journal: "Test".to_string(),
             pub_date: "2023".to_string(),
             doi: None,
+            pmc_id: None,
             abstract_text: None,
             article_types: vec![],
             mesh_headings: None,

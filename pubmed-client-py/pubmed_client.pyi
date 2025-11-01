@@ -30,6 +30,7 @@ class PubMedArticle:
     journal: str
     pub_date: str
     doi: str | None
+    pmc_id: str | None
     abstract_text: str | None
     author_count: int
 
