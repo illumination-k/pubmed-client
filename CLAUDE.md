@@ -10,6 +10,88 @@ This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients 
 
 python bindings package name registered in PyPI: `pubmed-client-py`
 
+## Important Guidelines for Git Operations
+
+### File and Directory Renaming
+
+**CRITICAL**: When renaming files or directories in this git repository, ALWAYS use `git mv` instead of shell commands like `mv`, `rename`, or file system operations.
+
+#### Why use `git mv`?
+
+1. **Preserves Git History**: Git properly tracks the rename, allowing `git log --follow` to show the complete file history
+2. **Clean Commit Diffs**: Shows as `renamed:` instead of delete + add, making code review easier
+3. **Maintains Blame Information**: File annotations and blame history follow through the rename
+4. **Automatic Staging**: The rename is automatically staged for commit
+
+#### Correct Renaming Process:
+
+```bash
+# ✅ CORRECT - Use git mv to rename files/directories
+git mv old-name new-name
+
+# Then update references in code and documentation
+sed -i '' 's/old-name/new-name/g' affected-files
+
+# Stage all changes together
+git add -A
+
+# Verify git recognizes the rename
+git status  # Should show "renamed: old-name -> new-name"
+```
+
+#### Incorrect Renaming Process:
+
+```bash
+# ❌ WRONG - Do NOT use shell mv command
+mv old-name new-name  # Breaks git history tracking!
+
+# ❌ WRONG - Do NOT manually delete and recreate
+rm -rf old-name
+mkdir new-name  # Git sees this as delete + add, not rename
+```
+
+#### If You Accidentally Used mv:
+
+If you've already renamed files/directories using `mv`, here's how to recover:
+
+```bash
+# 1. Restore to original state
+git restore .
+rm -rf new-name  # Remove manually created directory
+
+# 2. Use git mv properly
+git mv old-name new-name
+
+# 3. Re-apply your content changes
+# (edit files, update references, etc.)
+
+# 4. Stage everything
+git add -A
+```
+
+#### Examples in This Project:
+
+- **Package Rename**: When renaming `pubmed-mcp-server` to `pubmed-mcp`:
+  ```bash
+  git mv pubmed-mcp-server pubmed-mcp
+  # Then update Cargo.toml, documentation, etc.
+  git add -A
+  ```
+
+- **File Rename**: When renaming source files:
+  ```bash
+  git mv src/old_module.rs src/new_module.rs
+  # Update imports and references
+  git add -A
+  ```
+
+### General Git Best Practices
+
+- **Always check `git status`** before and after operations
+- **Use `git diff --cached`** to review staged changes before committing
+- **Test builds and tests** after renaming operations
+- **Keep renames and content changes** in the same commit for context
+
 ## Important Guidelines for PubMed Search Query Implementation
 
 **CRITICAL**: When implementing or modifying PubMed search query functionality, ALWAYS reference the official NCBI PubMed documentation:
@@ -1343,13 +1425,65 @@ The project uses comprehensive GitHub Actions workflows for continuous integrati
 
 - **Create Release**: GitHub release creation on version tags
 - **Test Before Release**: Full test suite validation
-- **Publish to crates.io**: Automated publishing (stable releases only)
+- **Publish to crates.io**: Automated publishing using reusable workflow (stable releases only)
+  - **publish-core**: Publishes `pubmed-client` (always runs for non-prerelease tags)
+  - **publish-cli**: Publishes `pubmed-cli` (only if tag contains 'cli')
+  - **publish-mcp**: Publishes `pubmed-mcp` (only if tag contains 'mcp')
 
 **Features:**
 
 - Automatic prerelease detection (alpha/beta/rc tags)
 - Package validation before publishing
 - Secure token-based crates.io publishing
+- Uses reusable workflow for consistent publishing logic
+- Dependency ordering (CLI and MCP depend on core library)
+- Tag-based selective publishing
+
+#### Reusable Publish Workflow (`.github/workflows/publish-crates.yml`)
+
+A reusable workflow for publishing Rust packages to crates.io. This workflow can be called from other workflows to standardize the publishing process.
+
+**Inputs:**
+
+- `package` (required): Package name to publish (e.g., `pubmed-client`, `pubmed-cli`)
+- `package-path` (optional): Path to the package directory (defaults to package name)
+- `dry-run` (optional): Perform a dry run without actually publishing (default: `false`)
+- `check-version` (optional): Check if Cargo.toml version matches git tag (default: `true`)
+
+**Secrets:**
+
+- `CRATES_IO_TOKEN` (required): Token for publishing to crates.io
+
+**Features:**
+
+- Automatic version validation against git tags
+- Package validation with `cargo package`
+- Support for dry-run mode for testing
+- Automatic generation of publish summary with crates.io link
+- Flexible package path configuration
+- Proper dependency caching with package-specific keys
+
+**Example Usage:**
+
+```yaml
+jobs:
+  publish-package:
+    uses: ./.github/workflows/publish-crates.yml
+    with:
+      package: pubmed-client
+      package-path: pubmed-client
+      check-version: true
+      dry-run: false
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+```
+
+**Tag Naming Conventions:**
+
+- Core library: `v1.0.0` (will publish `pubmed-client`)
+- CLI: `v1.0.0` or `cli-v1.0.0` (tag must contain 'cli' to publish `pubmed-cli`)
+- MCP: `v1.0.0` or `mcp-v1.0.0` (tag must contain 'mcp' to publish `pubmed-mcp`)
+- Prerelease: `v1.0.0-alpha`, `v1.0.0-beta`, `v1.0.0-rc1` (creates GitHub release but skips crates.io)
 
 ### Git LFS Configuration
 

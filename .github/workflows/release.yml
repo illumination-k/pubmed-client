@@ -57,23 +57,41 @@ jobs:
       - name: Check package
         run: cargo package --allow-dirty
 
-  publish:
-    name: Publish to crates.io
-    runs-on: ubuntu-latest
+  publish-core:
+    name: Publish pubmed-client to crates.io
     needs: [create-release, test-release]
-    if: "!contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
+    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+    uses: ./.github/workflows/publish-crates.yml
+    with:
+      package: pubmed-client
+      package-path: pubmed-client
+      check-version: true
+      dry-run: false
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+  publish-cli:
+    name: Publish pubmed-cli to crates.io
+    needs: [create-release, test-release, publish-core]
+    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && contains(github.ref, 'cli') }}
+    uses: ./.github/workflows/publish-crates.yml
+    with:
+      package: pubmed-cli
+      package-path: pubmed-cli
+      check-version: true
+      dry-run: false
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
 
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Publish to crates.io
-        run: cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+  publish-mcp:
+    name: Publish pubmed-mcp to crates.io
+    needs: [create-release, test-release, publish-core]
+    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && contains(github.ref, 'mcp') }}
+    uses: ./.github/workflows/publish-crates.yml
+    with:
+      package: pubmed-mcp
+      package-path: pubmed-mcp
+      check-version: true
+      dry-run: false
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
