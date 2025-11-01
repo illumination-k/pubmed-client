@@ -3,8 +3,22 @@ name: Python CI
 on:
   push:
     branches: [main]
+    paths:
+      - "pubmed-client-py/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/python.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "pubmed-client-py/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/python.yml"
 
 env:
   CARGO_TERM_COLOR: always
