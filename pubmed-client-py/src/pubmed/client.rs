@@ -45,6 +45,31 @@ impl PyPubMedClient {
         }
     }
 
+    /// Search for articles and return PMIDs only
+    ///
+    /// This method returns only the list of PMIDs matching the query,
+    /// which is faster than fetching full article metadata.
+    ///
+    /// Args:
+    ///     query: Search query string (supports PubMed search syntax)
+    ///     limit: Maximum number of PMIDs to return
+    ///
+    /// Returns:
+    ///     List of PMIDs as strings
+    ///
+    /// Examples:
+    ///     >>> client = PubMedClient()
+    ///     >>> pmids = client.search_articles("covid-19", 100)
+    ///     >>> pmids = client.search_articles("cancer[ti] AND therapy[tiab]", 50)
+    fn search_articles(&self, py: Python, query: String, limit: usize) -> PyResult<Vec<String>> {
+        let client = self.client.clone();
+        py.allow_threads(|| {
+            let rt = get_runtime();
+            rt.block_on(client.search_articles(&query, limit))
+                .map_err(to_py_err)
+        })
+    }
+
     /// Search for articles and fetch their metadata
     ///
     /// Args:
