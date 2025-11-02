@@ -53,8 +53,8 @@ while IFS= read -r line; do
                 while IFS= read -r file; do
                     total=$((total + 1))
 
-                    # Check if file is LFS pointer
-                    if head -n 1 "$file" 2>/dev/null | grep -q "^version https://git-lfs.github.com/spec/v1"; then
+                    # Check if file is LFS pointer in Git repository (not working directory)
+                    if git cat-file -p HEAD:"$file" 2>/dev/null | head -n 1 | grep -q "^version https://git-lfs.github.com/spec/v1"; then
                         echo "✓ $file"
                         ok=$((ok + 1))
                     else
