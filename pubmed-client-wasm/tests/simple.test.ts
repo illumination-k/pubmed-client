@@ -146,8 +146,9 @@ describe('WASM Client Basic Tests', () => {
       try {
         const pmcId = await client.check_pmc_availability('31978945')
 
-        // Can be null or a PMC ID string
-        if (pmcId !== null) {
+        // Can be null, undefined, or a PMC ID string
+        // Using != null checks for both null and undefined
+        if (pmcId != null) {
           expect(typeof pmcId).toBe('string')
           // Handle potential quote formatting issues
           const cleanPmcId = pmcId.replace(/"/g, '')
