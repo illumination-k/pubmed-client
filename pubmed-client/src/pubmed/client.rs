@@ -278,7 +278,21 @@ impl PubMedClient {
         let response = self.make_request(&url).await?;
 
         let search_result: ESearchResult = response.json().await?;
-        let total_count: usize = search_result.esearchresult.count.parse().unwrap_or(0);
+
+        // Check for API error response (NCBI sometimes returns 200 OK with ERROR field)
+        if let Some(error_msg) = &search_result.esearchresult.error {
+            return Err(PubMedError::ApiError {
+                status: 200,
+                message: format!("NCBI ESearch API error: {}", error_msg),
+            });
+        }
+
+        let total_count: usize = search_result
+            .esearchresult
+            .count
+            .as_ref()
+            .and_then(|c| c.parse().ok())
+            .unwrap_or(0);
 
         if total_count >= limit {
             warn!(
