@@ -165,6 +165,25 @@ class TestPmcIntegration:
         references = full_text.references()
         assert isinstance(references, list)
 
+    def test_to_markdown(self, client: pubmed_client.Client) -> None:
+        """Test converting PMC full text to Markdown."""
+        # PMC7906746 is known to exist
+        full_text = client.pmc.fetch_full_text("PMC7906746")
+
+        assert full_text is not None
+
+        # Convert to markdown
+        markdown = full_text.to_markdown()
+
+        # Verify markdown is a non-empty string
+        assert isinstance(markdown, str)
+        assert len(markdown) > 0
+
+        # Check for expected markdown elements
+        assert "#" in markdown  # Should have markdown headers
+        assert full_text.title in markdown  # Title should be in markdown
+        assert full_text.pmcid in markdown  # PMC ID should be in markdown
+
 
 @pytest.mark.integration
 @pytest.mark.slow
