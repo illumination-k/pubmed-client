@@ -10,6 +10,52 @@ This is a Rust workspace containing PubMed and PMC (PubMed Central) API clients 
 
 python bindings package name registered in PyPI: `pubmed-client-py`
 
+## Workspace Structure
+
+```
+pubmed-client/                    # Cargo workspace root
+├── Cargo.toml                       # Workspace definition
+├── pubmed-client/                   # Core Rust library
+│   ├── Cargo.toml                   # Rust library configuration
+│   └── src/                         # Core library source code
+├── pubmed-client-wasm/              # WASM bindings for npm
+│   ├── Cargo.toml                   # WASM crate configuration
+│   ├── package.json                 # npm package configuration
+│   ├── src/lib.rs                   # WASM bindings source
+│   ├── pkg/                         # Generated WASM package
+│   ├── tests/                       # WASM-specific TypeScript tests
+│   └── *.json, *.ts                # TypeScript/npm configuration
+├── pubmed-client-py/                # Python bindings (PyO3)
+│   ├── Cargo.toml                   # PyO3 crate configuration
+│   ├── pyproject.toml               # Python package configuration
+│   ├── src/lib.rs                   # PyO3 bindings source
+│   ├── pubmed_client.pyi            # Type stub file for IDE support
+│   ├── py.typed                     # PEP 561 type marker
+│   ├── tests/                       # Python tests (pytest)
+│   │   ├── test_config.py           # Configuration tests
+│   │   ├── test_client.py           # Client initialization tests
+│   │   ├── test_models.py           # Data model tests
+│   │   ├── test_integration.py      # Integration tests
+│   │   └── conftest.py              # Pytest fixtures
+│   └── pytest.ini                   # Pytest configuration
+├── pubmed-cli/                      # Command-line interface
+│   ├── Cargo.toml                   # CLI crate configuration
+│   └── src/                         # CLI source code
+│       ├── main.rs                  # CLI entry point
+│       └── commands/                # CLI subcommands
+│           ├── convert.rs           # PMID to PMCID conversion
+│           ├── figures.rs           # Figure extraction
+│           ├── markdown.rs          # Markdown conversion
+│           └── search.rs            # PubMed search
+├── pubmed-mcp/               # MCP server for AI assistants
+│   ├── Cargo.toml                   # MCP server configuration
+│   ├── src/main.rs                  # MCP server implementation
+│   ├── tests/                       # Integration tests
+│   │   └── integration_test.rs      # MCP protocol tests
+│   └── README.md                    # MCP server documentation
+└── tests/                           # Shared integration tests
+```
+
 ## Important Guidelines for Git Operations
 
 ### File and Directory Renaming
@@ -44,46 +90,7 @@ git status  # Should show "renamed: old-name -> new-name"
 ```bash
 # ❌ WRONG - Do NOT use shell mv command
 mv old-name new-name  # Breaks git history tracking!
-
-# ❌ WRONG - Do NOT manually delete and recreate
-rm -rf old-name
-mkdir new-name  # Git sees this as delete + add, not rename
 ```
-
-#### If You Accidentally Used mv:
-
-If you've already renamed files/directories using `mv`, here's how to recover:
-
-```bash
-# 1. Restore to original state
-git restore .
-rm -rf new-name  # Remove manually created directory
-
-# 2. Use git mv properly
-git mv old-name new-name
-
-# 3. Re-apply your content changes
-# (edit files, update references, etc.)
-
-# 4. Stage everything
-git add -A
-```
-
-#### Examples in This Project:
-
-- **Package Rename**: When renaming `pubmed-mcp-server` to `pubmed-mcp`:
-  ```bash
-  git mv pubmed-mcp-server pubmed-mcp
-  # Then update Cargo.toml, documentation, etc.
-  git add -A
-  ```
-
-- **File Rename**: When renaming source files:
-  ```bash
-  git mv src/old_module.rs src/new_module.rs
-  # Update imports and references
-  git add -A
-  ```
 
 ### General Git Best Practices
 
@@ -91,171 +98,6 @@ git add -A
 - **Use `git diff --cached`** to review staged changes before committing
 - **Test builds and tests** after renaming operations
 - **Keep renames and content changes** in the same commit for context
-
-## Version Management and Publishing
-
-### Workspace Version Synchronization
-
-**CRITICAL**: This workspace uses a shared version number across all packages. When bumping the version for publishing, you MUST update version requirements in all dependent packages.
-
-#### Current Workspace Structure
-
-The workspace version is defined in the root `Cargo.toml`:
-
-```toml
-[workspace.package]
-version = "0.1.0" # Shared version for all packages
-```
-
-All packages use this workspace version via `version.workspace = true`.
-
-#### Internal Dependencies Require Version Specifications
-
-For crates.io publishing, all path dependencies MUST include explicit version requirements:
-
-```toml
-# ✅ CORRECT - Required for publishing to crates.io
-pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
-
-# ❌ WRONG - Will fail cargo package
-pubmed-client = { path = "../pubmed-client" }
-```
-
-**Why this is required:**
-
-- Cargo requires version requirements for all path dependencies when packaging for crates.io
-- During publishing, the `path` is removed and only the `version` is kept
-- This ensures published packages depend on crates.io versions, not local paths
-
-#### Version Bump Checklist
-
-When bumping the version for a new release, follow these steps:
-
-1. **Update workspace version** in root `Cargo.toml`:
-   ```toml
-   [workspace.package]
-   version = "0.2.0" # New version
-   ```
-
-2. **Update all internal dependency versions** in these files:
-   - `pubmed-cli/Cargo.toml` - Update `pubmed-client` version
-   - `pubmed-client-py/Cargo.toml` - Update `pubmed-client` version
-   - `pubmed-client-wasm/Cargo.toml` - Update `pubmed-client` version
-   - `pubmed-mcp/Cargo.toml` - Update `pubmed-client` version
-
-3. **Update Cargo.lock**:
-   ```bash
-   cargo update --workspace
-   ```
-
-4. **Verify all packages can be packaged**:
-   ```bash
-   cargo package --allow-dirty
-   ```
-
-5. **Run tests** to ensure everything works:
-   ```bash
-   cargo test --workspace
-   ```
-
-6. **Create version bump commit**:
-   ```bash
-   git add Cargo.toml pubmed-cli/Cargo.toml pubmed-client-py/Cargo.toml \
-           pubmed-client-wasm/Cargo.toml pubmed-mcp/Cargo.toml Cargo.lock
-   git commit -m "chore: Bump version to 0.2.0"
-   ```
-
-#### Example: Bumping from 0.1.0 to 0.2.0
-
-**Before:**
-
-```toml
-# Cargo.toml (root)
-[workspace.package]
-version = "0.1.0"
-
-# pubmed-cli/Cargo.toml
-pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
-
-# pubmed-client-py/Cargo.toml
-pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
-
-# pubmed-client-wasm/Cargo.toml
-pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
-
-# pubmed-mcp/Cargo.toml
-pubmed-client = { version = "0.1.0", path = "../pubmed-client", package = "pubmed-client" }
-```
-
-**After:**
-
-```toml
-# Cargo.toml (root)
-[workspace.package]
-version = "0.2.0"
-
-# pubmed-cli/Cargo.toml
-pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
-
-# pubmed-client-py/Cargo.toml
-pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
-
-# pubmed-client-wasm/Cargo.toml
-pubmed-client = { version = "0.2.0", path = "../pubmed-client" }
-
-# pubmed-mcp/Cargo.toml
-pubmed-client = { version = "0.2.0", path = "../pubmed-client", package = "pubmed-client" }
-```
-
-#### Automated Version Update Script (Future Enhancement)
-
-Consider creating a script to automate version updates:
-
-```bash
-#!/bin/bash
-# scripts/bump-version.sh
-
-NEW_VERSION=$1
-if [ -z "$NEW_VERSION" ]; then
-    echo "Usage: $0 <new-version>"
-    exit 1
-fi
-
-# Update workspace version
-sed -i '' "s/^version = .*/version = \"$NEW_VERSION\"/" Cargo.toml
-
-# Update internal dependencies
-for file in pubmed-cli/Cargo.toml pubmed-client-py/Cargo.toml pubmed-client-wasm/Cargo.toml pubmed-mcp/Cargo.toml; do
-    sed -i '' "s/version = \"[^\"]*\", path = \"/version = \"$NEW_VERSION\", path = \"/" "$file"
-done
-
-# Update Cargo.lock
-cargo update --workspace
-
-echo "Version bumped to $NEW_VERSION"
-echo "Please review changes and run: cargo package --allow-dirty"
-```
-
-#### Common Errors and Solutions
-
-**Error: "dependency does not specify a version"**
-
-```
-error: all dependencies must have a version requirement specified when packaging.
-dependency `pubmed-client` does not specify a version
-```
-
-**Solution:** Add explicit version to the path dependency:
-
-```toml
-pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
-```
-
-**Error: Version mismatch between workspace and dependencies**
-
-If you update the workspace version but forget to update internal dependencies, the published packages will depend on the old version from crates.io.
-
-**Solution:** Always update all version references together using the checklist above.
 
 ## Important Guidelines for PubMed Search Query Implementation
 
@@ -305,52 +147,6 @@ These tags do NOT exist in PubMed and should not be used:
 - Long-form tags like `[Title]`, `[Author]`, etc. - Use short forms
 
 When in doubt, always check the official documentation before implementation.
-
-## Workspace Structure
-
-```
-pubmed-client/                    # Cargo workspace root
-├── Cargo.toml                       # Workspace definition
-├── pubmed-client/                   # Core Rust library
-│   ├── Cargo.toml                   # Rust library configuration
-│   └── src/                         # Core library source code
-├── pubmed-client-wasm/              # WASM bindings for npm
-│   ├── Cargo.toml                   # WASM crate configuration
-│   ├── package.json                 # npm package configuration
-│   ├── src/lib.rs                   # WASM bindings source
-│   ├── pkg/                         # Generated WASM package
-│   ├── tests/                       # WASM-specific TypeScript tests
-│   └── *.json, *.ts                # TypeScript/npm configuration
-├── pubmed-client-py/                # Python bindings (PyO3)
-│   ├── Cargo.toml                   # PyO3 crate configuration
-│   ├── pyproject.toml               # Python package configuration
-│   ├── src/lib.rs                   # PyO3 bindings source
-│   ├── pubmed_client.pyi            # Type stub file for IDE support
-│   ├── py.typed                     # PEP 561 type marker
-│   ├── tests/                       # Python tests (pytest)
-│   │   ├── test_config.py           # Configuration tests
-│   │   ├── test_client.py           # Client initialization tests
-│   │   ├── test_models.py           # Data model tests
-│   │   ├── test_integration.py      # Integration tests
-│   │   └── conftest.py              # Pytest fixtures
-│   └── pytest.ini                   # Pytest configuration
-├── pubmed-cli/                      # Command-line interface
-│   ├── Cargo.toml                   # CLI crate configuration
-│   └── src/                         # CLI source code
-│       ├── main.rs                  # CLI entry point
-│       └── commands/                # CLI subcommands
-│           ├── convert.rs           # PMID to PMCID conversion
-│           ├── figures.rs           # Figure extraction
-│           ├── markdown.rs          # Markdown conversion
-│           └── search.rs            # PubMed search
-├── pubmed-mcp/               # MCP server for AI assistants
-│   ├── Cargo.toml                   # MCP server configuration
-│   ├── src/main.rs                  # MCP server implementation
-│   ├── tests/                       # Integration tests
-│   │   └── integration_test.rs      # MCP protocol tests
-│   └── README.md                    # MCP server documentation
-└── tests/                           # Shared integration tests
-```
 
 ## Commands
 
@@ -453,47 +249,24 @@ uv sync --group dev                           # Sync all dev dependencies
 #### CLI Commands (from workspace root)
 
 ```bash
-# Run CLI with cargo from workspace root
+# Help and basic usage
+cargo run -p pubmed-cli -- --help
 cargo run -p pubmed-cli -- <COMMAND>
 
-# Example: Get help
-cargo run -p pubmed-cli -- --help
+# Extract figures from PMC articles
+cargo run -p pubmed-cli -- figures PMC7906746 [PMC123456...] [--failed-output failed.txt]
 
-# Example: Extract figures from PMC articles
-cargo run -p pubmed-cli -- figures PMC7906746
-
-# Example: Extract figures and save failed PMC IDs to file
-cargo run -p pubmed-cli -- figures PMC7906746 PMC123456 --failed-output failed_pmcids.txt
-
-# Example: Convert PMC to markdown
+# Convert PMC to markdown
 cargo run -p pubmed-cli -- markdown PMC7906746
 
-# Example: Convert PMID to PMCID (JSON format)
-cargo run -p pubmed-cli -- pmid-to-pmcid 31978945
+# Convert PMID to PMCID (supports --format json|csv|txt, --batch-size N)
+cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 [33515491...] [--format csv] [--batch-size 50]
 
-# Example: Convert PMID to PMCID (CSV format)
-cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 --format csv
+# With API key, email, and tool name
+cargo run -p pubmed-cli -- --api-key KEY --email you@example.com --tool MyApp <COMMAND>
 
-# Example: Convert PMID to PMCID (TXT format - PMCIDs only)
-cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 --format txt
-
-# Example: Convert multiple PMIDs
-cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 33515491
-
-# Example: Convert many PMIDs with custom batch size (to avoid API errors)
-cargo run -p pubmed-cli -- pmid-to-pmcid 31978945 33515491 25760099 --batch-size 50
-
-# Example: Process large list with smaller batches
-cargo run -p pubmed-cli -- pmid-to-pmcid $(cat pmids.txt) --batch-size 25
-
-# Debug CLI with verbose logging
-RUST_LOG=debug cargo run -p pubmed-cli -- pmid-to-pmcid 31978945
-
-# Use API key for higher rate limits
-cargo run -p pubmed-cli -- --api-key YOUR_API_KEY pmid-to-pmcid 31978945
-
-# Specify email and tool name
-cargo run -p pubmed-cli -- --email you@example.com --tool MyApp pmid-to-pmcid 31978945
+# Debug logging
+RUST_LOG=debug cargo run -p pubmed-cli -- <COMMAND>
 ```
 
 #### mise Commands (if available)
@@ -734,259 +507,17 @@ The parsers have been refactored from empty structs with static methods to modul
 
 ### Logging & Debugging
 
-The library uses `tracing` for structured logging. Key instrumentation points include:
-
-- API requests to NCBI E-utilities (ESearch, EFetch)
-- XML parsing operations with performance metrics
-- Article retrieval with metadata extraction
-- Error conditions with context
-
-Enable logging in your application:
+**CRITICAL**: DO NOT use `println!` or `eprintln!` in production code. Use `tracing` macros instead.
 
 ```rust
-use tracing_subscriber;
-
-// Initialize tracing subscriber
-tracing_subscriber::fmt::init();
-
-// Library operations will now produce structured logs
-let client = pubmed_client_rs::PubMedClient::new();
-let article = client.fetch_article("31978945").await?;
-```
-
-Log levels and structured fields:
-
-- `INFO`: High-level operations (article fetched, search completed)
-- `DEBUG`: Detailed operations (API requests, XML parsing steps)
-- `WARN`: Error conditions and fallbacks
-- Structured fields: `pmid`, `title`, `authors_count`, `has_abstract`, `abstract_length`
-
-#### Logging Guidelines
-
-**DO NOT use `println!` or `eprintln!` in production code.** This project uses structured logging with the `tracing` crate for better observability and debugging.
-
-**Allowed uses of `println!`:**
-
-- Documentation examples in doc comments (`///` or `//!`)
-- Code examples in README files
-- Demo applications or example code
-
-**Instead of print statements, use appropriate tracing macros:**
-
-```rust
-// ❌ AVOID - Don't use println! in library code
+// ❌ AVOID
 println!("Processing article {}", pmid);
-println!("Found {} results", count);
-eprintln!("Error: {}", error);
 
 // ✅ PREFER - Use structured tracing
 info!(pmid = %pmid, "Processing article");
-info!(result_count = count, "Search completed");
-warn!(error = %error, "Operation failed");
 ```
 
-**Structured logging benefits:**
-
-- Machine-readable logs for monitoring and analysis
-- Consistent format across the entire codebase
-- Better integration with observability tools
-- Filterable and searchable log fields
-- Performance benefits over string formatting
-
-## Rate Limiting & NCBI API Compliance
-
-This library implements automatic rate limiting to ensure compliance with NCBI E-utilities usage guidelines.
-
-### NCBI Rate Limits
-
-- **Without API key**: Maximum 3 requests per second
-- **With API key**: Maximum 10 requests per second
-- **Consequences**: Violations can result in IP blocking
-
-### Configuration
-
-#### Basic Usage (Default Rate Limiting)
-
-```rust
-use pubmed_client_rs::PubMedClient;
-
-// Uses default rate limiting (3 req/sec, no API key)
-let client = PubMedClient::new();
-```
-
-#### With API Key (Recommended for Production)
-
-```rust
-use pubmed_client_rs::{PubMedClient, ClientConfig};
-
-let config = ClientConfig::new()
-    .with_api_key("your_ncbi_api_key_here")
-    .with_email("your.email@institution.edu")
-    .with_tool("YourApplicationName");
-
-let client = PubMedClient::with_config(config);
-```
-
-#### Custom Rate Limiting
-
-```rust
-use pubmed_client_rs::{PubMedClient, ClientConfig};
-
-// Custom rate limit (e.g., for testing or special cases)
-let config = ClientConfig::new()
-    .with_rate_limit(5.0) // 5 requests per second
-    .with_api_key("your_key");
-
-let client = PubMedClient::with_config(config);
-```
-
-### How It Works
-
-The library uses a **token bucket algorithm** for rate limiting:
-
-1. **Token Bucket**: Each client has a bucket with a limited number of tokens
-2. **Token Consumption**: Each API request consumes one token
-3. **Token Refill**: Tokens are automatically refilled at the configured rate
-4. **Automatic Waiting**: When no tokens are available, requests automatically wait
-
-### Configuration Options
-
-| Option       | Description                | Default                        |
-| ------------ | -------------------------- | ------------------------------ |
-| `api_key`    | NCBI E-utilities API key   | None                           |
-| `rate_limit` | Custom requests per second | 3.0 (no key) / 10.0 (with key) |
-| `email`      | Contact email for NCBI     | None                           |
-| `tool`       | Application name for NCBI  | "pubmed-client"                |
-| `timeout`    | HTTP request timeout       | 30 seconds                     |
-| `base_url`   | Custom NCBI base URL       | Default NCBI E-utilities       |
-
-### Rate Limiting Examples
-
-#### Sequential Requests (Automatically Rate Limited)
-
-```rust
-use pubmed_client_rs::PubMedClient;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = PubMedClient::new();
-
-    // These requests will be automatically rate limited to 3/second
-    for pmid in ["31978945", "33515491", "32887691"] {
-        let article = client.fetch_article(pmid).await?;
-        println!("Title: {}", article.title);
-    }
-
-    Ok(())
-}
-```
-
-#### Concurrent Requests (Shared Rate Limiting)
-
-```rust
-use pubmed_client_rs::{PubMedClient, ClientConfig};
-use tokio::task::JoinSet;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config = ClientConfig::new()
-        .with_api_key("your_key")  // 10 req/sec with API key
-        .with_email("you@example.com");
-
-    let client = PubMedClient::with_config(config);
-    let mut tasks = JoinSet::new();
-
-    // Spawn concurrent tasks - rate limiting is automatically coordinated
-    for pmid in ["31978945", "33515491", "32887691"] {
-        let client = client.clone();
-        let pmid = pmid.to_string();
-        tasks.spawn(async move {
-            client.fetch_article(&pmid).await
-        });
-    }
-
-    // All tasks respect the shared rate limit
-    while let Some(result) = tasks.join_next().await {
-        match result? {
-            Ok(article) => println!("Fetched: {}", article.title),
-            Err(e) => eprintln!("Error: {}", e),
-        }
-    }
-
-    Ok(())
-}
-```
-
-### Getting an NCBI API Key
-
-1. Visit [NCBI API Keys](https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/)
-2. Create an NCBI account if you don't have one
-3. Generate an API key in your account settings
-4. Use the key in your application configuration
-
-### Testing Rate Limiting
-
-#### Mock Rate Limiting Tests (Default)
-
-```bash
-# Run mocked rate limiting tests (default, no network calls)
-cargo test test_rate_limiting -- --nocapture
-
-# Test with custom rate limits
-RUST_LOG=debug cargo test test_rate_limiter_basic_functionality -- --nocapture
-
-# Run all mocked rate limiting tests
-cargo test --test test_rate_limiting_mocked -- --nocapture
-```
-
-#### Real API Rate Limiting Tests (Optional)
-
-⚠️ **Warning**: These tests make actual network calls to NCBI APIs and are NOT run by default.
-
-```bash
-# Enable real API tests (requires internet connection)
-export PUBMED_REAL_API_TESTS=1
-
-# Run real API rate limiting tests
-cargo test --test test_real_api_rate_limiting -- --nocapture
-
-# Run with debug logging to see rate limiting behavior
-RUST_LOG=debug cargo test --test test_real_api_rate_limiting -- --nocapture
-
-# Test with API key (optional, set your NCBI API key)
-export NCBI_API_KEY="your_api_key_here"
-RUST_LOG=debug cargo test test_real_api_with_api_key -- --nocapture
-```
-
-**Real API Test Features:**
-
-- Tests actual rate limiting with NCBI E-utilities
-- Verifies 3 req/sec limit without API key, 10 req/sec with API key
-- Tests concurrent request handling
-- Validates end-to-end search and fetch workflows
-- Tests server-side rate limit responses (429 errors)
-
-**Real API Test Safety:**
-
-- Conservative rate limits to avoid overwhelming NCBI servers
-- Proper email and tool identification in requests
-- Graceful handling of network errors and timeouts
-- Respectful delays between requests
-
-### Monitoring Rate Limits
-
-Enable tracing to monitor rate limiting behavior:
-
-```rust
-use tracing_subscriber;
-
-// Initialize logging
-tracing_subscriber::fmt::init();
-
-// Rate limiting events will be logged
-let client = PubMedClient::new();
-// Logs: "Need to wait for token", "Token acquired", etc.
-```
+Allowed uses of `println!`: Documentation examples, README code samples, demo applications only.
 
 ## NCBI E-utilities API Support
 
@@ -1103,203 +634,41 @@ The Python package provides native Python bindings for the core Rust library:
 
 ### Python Testing Strategy
 
-Comprehensive test suite with 35 tests (100% passing):
-
-**Test Organization:**
-
-- `tests/test_config.py` - Configuration and builder pattern (9 tests)
-- `tests/test_client.py` - Client initialization and properties (8 tests)
-- `tests/test_models.py` - Data model validation (9 tests)
-- `tests/test_integration.py` - Live API integration tests (10 tests)
-- `tests/conftest.py` - Shared pytest fixtures and configuration
-
-**Test Markers:**
-
-- `@pytest.mark.integration` - Tests requiring network access to NCBI APIs
-- `@pytest.mark.slow` - Long-running tests
-
-**Test Fixtures:**
-
-```python
-# Available fixtures (from conftest.py)
-@pytest.fixture
-def pubmed_client() -> PubMedClient:
-    """PubMed client with conservative rate limiting."""
-
-@pytest.fixture
-def pmc_client() -> PmcClient:
-    """PMC client with conservative rate limiting."""
-
-@pytest.fixture
-def client() -> Client:
-    """Combined client with conservative rate limiting."""
-```
+Comprehensive test suite with 35 tests across config, client, models, and integration tests.
 
 **Running Tests:**
 
 ```bash
-# Unit tests only (fast, no network)
-uv run pytest -m "not integration"
-
-# Integration tests only (requires network)
-uv run pytest -m integration
-
-# All tests
-uv run pytest
-
-# With coverage report
-uv run pytest --cov=pubmed_client --cov-report=html
+uv run pytest                              # All tests
+uv run pytest -m "not integration"         # Unit tests only
+uv run pytest -m integration               # Integration tests only
+uv run pytest --cov=pubmed_client --cov-report=html  # With coverage
 ```
 
 ### Type Stubs and IDE Support
 
-The Python package includes comprehensive type annotations:
-
-**Type Stub File (`pubmed_client.pyi`):**
-
-- Complete type annotations for all 18 classes
-- Full method signatures with parameter and return types
-- Proper `Optional[T]` and `list[T]` type hints
-- Docstrings for all public APIs
-
-**Benefits:**
-
-- Full IDE autocomplete (VS Code, PyCharm, etc.)
-- mypy static type checking support
-- Parameter hints and documentation
-- Return type inference
-
-**Type Checking:**
+The Python package includes comprehensive type annotations (`pubmed_client.pyi`) with full IDE autocomplete and mypy support.
 
 ```bash
-# Run mypy on test files
-uv run mypy tests/ --strict
-
-# Type check specific file
-uv run mypy tests/test_integration.py
-```
-
-**Example Usage with Types:**
-
-```python
-import pubmed_client
-
-# Type annotations work automatically
-config: pubmed_client.ClientConfig = pubmed_client.ClientConfig()
-config.with_api_key("key").with_email("user@example.com")
-
-client: pubmed_client.Client = pubmed_client.Client.with_config(config)
-articles: list[pubmed_client.PubMedArticle] = client.pubmed.search_and_fetch("covid-19", 10)
-full_text: pubmed_client.PmcFullText = client.pmc.fetch_full_text("PMC7906746")
+uv run mypy tests/ --strict  # Type checking
 ```
 
 ### Python Package Publishing
 
-The Python package can be published to PyPI using maturin:
-
 ```bash
-# From pubmed-client-py/ directory
-
-# Build wheel for current platform
+# Build and publish to PyPI (from pubmed-client-py/)
 uv run --with maturin maturin build --release
-
-# Build wheels for multiple platforms (requires CI)
-uv run --with maturin maturin build --release --target universal2-apple-darwin  # macOS
-uv run --with maturin maturin build --release --target x86_64-unknown-linux-gnu # Linux
-uv run --with maturin maturin build --release --target x86_64-pc-windows-msvc   # Windows
-
-# Publish to PyPI (requires PYPI_TOKEN)
-uv run --with maturin maturin publish
+uv run --with maturin maturin publish  # Requires PYPI_TOKEN
 ```
-
-**Package Configuration:**
-
-- Package name: `pubmed-client`
-- Module name: `pubmed_client`
-- Includes type stubs automatically via maturin
-- PEP 561 compliant (includes `py.typed`)
-- Supports Python 3.12+
 
 ### Python Code Quality
 
-The Python package uses ruff for linting and formatting:
-
 ```bash
-# From pubmed-client-py/ directory
-
-# Linting
-uv run ruff check .                   # Check for issues
-uv run ruff check --fix .             # Auto-fix issues
-
-# Formatting
-uv run ruff format .                  # Format code
-uv run ruff format --check .          # Check formatting
-
-# Type checking
-uv run mypy tests/ --strict           # Strict type checking
+# Linting and formatting (from pubmed-client-py/)
+uv run ruff check .        # Linting
+uv run ruff format .       # Formatting
+uv run mypy tests/ --strict  # Type checking
 ```
-
-**Ruff Configuration:**
-
-- Line length: 100 characters
-- Target version: Python 3.12
-- Enabled rules: ALL (with selective ignores)
-- Compatible with Black formatter
-- Configured in `pyproject.toml`
-
-### Python Dependencies
-
-**Runtime Dependencies:**
-
-- None (pure PyO3 extension module)
-
-**Development Dependencies:**
-
-- `pytest>=8.0` - Testing framework
-- `pytest-cov>=6.0` - Coverage reporting
-- `mypy>=1.0` - Static type checking
-- `ruff>=0.7` - Linting and formatting
-
-**Build Dependencies:**
-
-- `maturin>=1.0,<2.0` - PyO3 build tool
-- `uv` - Fast Python package manager (recommended)
-
-### Python Binding Implementation Notes
-
-**Key Design Decisions:**
-
-1. **Synchronous API**: Used blocking API instead of async for simplicity
-   - Creates Tokio runtime per call
-   - Releases GIL during I/O with `py.allow_threads()`
-   - Easier to use from Python
-
-2. **Data Model Wrapping**: All Rust types wrapped in Python-friendly classes
-   - `#[pyclass]` for data models
-   - `#[pymethods]` for methods
-   - Properties exposed with `#[pyo3(get)]`
-
-3. **Error Handling**: Rust errors converted to Python exceptions
-   - `to_py_err()` function converts `PubMedError` to `PyException`
-   - Preserves error messages
-
-4. **Builder Pattern**: ClientConfig uses method chaining
-   - Returns `PyRefMut<Self>` to enable chaining
-   - Follows Python conventions
-
-5. **Recursive Collection**: Figures/tables collected from nested sections
-   - PMC stores figures/tables in article sections
-   - Recursive helper functions flatten the structure
-   - Returns flat list for Python convenience
-
-**PyO3 Features Used:**
-
-- Extension modules with `#[pymodule]`
-- Class definitions with `#[pyclass]`
-- Method definitions with `#[pymethods]`
-- Property access with `#[pyo3(get)]`
-- GIL management with `py.allow_threads()`
-- Type conversion with `From` trait implementations
 
 ## MCP Server for AI Assistants
 
@@ -1549,188 +918,3 @@ The test suites provide extensive coverage of XML parsing and content analysis:
   - Article type distribution
 
 Both test suites include statistical analysis and success rate validation to ensure robust parsing across diverse article types and content structures.
-
-## GitHub Actions CI/CD
-
-The project uses comprehensive GitHub Actions workflows for continuous integration and deployment.
-
-### Workflows
-
-#### Test Workflow (`.github/workflows/test.yml`)
-
-**Jobs:**
-
-- **Lint and Format**: Code quality checks (rustfmt, dprint, clippy, docs)
-- **Test Suite**: Cross-platform testing (Ubuntu, Windows, macOS) with Rust stable/beta
-- **Code Coverage**: Coverage reporting with Codecov integration
-
-**Key Features:**
-
-- Git LFS support for test fixtures
-- Excludes real API tests from regular CI (network-dependent)
-- Matrix testing with reduced beta combinations for efficiency
-- Comprehensive integration test coverage
-
-#### Documentation Workflow (`.github/workflows/docs.yml`)
-
-**Jobs:**
-
-- **Build Documentation**: Generate rustdoc with all features
-- **Deploy Documentation**: Auto-deploy to GitHub Pages (main branch only)
-
-**Features:**
-
-- Documentation warnings as errors (`RUSTDOCFLAGS`)
-- GitHub Pages integration
-- Artifact upload for PR previews
-
-#### Release Workflow (`.github/workflows/release.yml`)
-
-**Jobs:**
-
-- **Create Release**: GitHub release creation on version tags
-- **Test Before Release**: Full test suite validation
-- **Publish to crates.io**: Automated publishing using reusable workflow (stable releases only)
-  - **publish-core**: Publishes `pubmed-client` (always runs for non-prerelease tags)
-  - **publish-cli**: Publishes `pubmed-cli` (only if tag contains 'cli')
-  - **publish-mcp**: Publishes `pubmed-mcp` (only if tag contains 'mcp')
-
-**Features:**
-
-- Automatic prerelease detection (alpha/beta/rc tags)
-- Package validation before publishing
-- Secure token-based crates.io publishing
-- Uses reusable workflow for consistent publishing logic
-- Dependency ordering (CLI and MCP depend on core library)
-- Tag-based selective publishing
-
-#### Reusable Publish Workflow (`.github/workflows/publish-crates.yml`)
-
-A reusable workflow for publishing Rust packages to crates.io. This workflow can be called from other workflows to standardize the publishing process.
-
-**Inputs:**
-
-- `package` (required): Package name to publish (e.g., `pubmed-client`, `pubmed-cli`)
-- `package-path` (optional): Path to the package directory (defaults to package name)
-- `dry-run` (optional): Perform a dry run without actually publishing (default: `false`)
-- `check-version` (optional): Check if Cargo.toml version matches git tag (default: `true`)
-
-**Secrets:**
-
-- `CRATES_IO_TOKEN` (required): Token for publishing to crates.io
-
-**Features:**
-
-- Automatic version validation against git tags
-- Package validation with `cargo package`
-- Support for dry-run mode for testing
-- Automatic generation of publish summary with crates.io link
-- Flexible package path configuration
-- Proper dependency caching with package-specific keys
-
-**Example Usage:**
-
-```yaml
-jobs:
-  publish-package:
-    uses: ./.github/workflows/publish-crates.yml
-    with:
-      package: pubmed-client
-      package-path: pubmed-client
-      check-version: true
-      dry-run: false
-    secrets:
-      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
-```
-
-**Tag Naming Conventions:**
-
-- Core library: `v1.0.0` (will publish `pubmed-client`)
-- CLI: `v1.0.0` or `cli-v1.0.0` (tag must contain 'cli' to publish `pubmed-cli`)
-- MCP: `v1.0.0` or `mcp-v1.0.0` (tag must contain 'mcp' to publish `pubmed-mcp`)
-- Prerelease: `v1.0.0-alpha`, `v1.0.0-beta`, `v1.0.0-rc1` (creates GitHub release but skips crates.io)
-
-**Testing Releases with Workflow Dispatch:**
-
-The release workflow can be triggered manually for testing purposes:
-
-```bash
-# Trigger from GitHub UI: Actions -> Release -> Run workflow
-# Or use GitHub CLI:
-gh workflow run release.yml
-```
-
-**Workflow Dispatch Behavior:**
-
-When manually triggering the workflow via `workflow_dispatch`:
-
-- **Always runs in dry-run mode**: Validates packages but does NOT publish to crates.io
-- **Tests ALL packages**: Always validates all packages (core, CLI, and MCP)
-- **No inputs required**: Simply trigger the workflow - no configuration needed
-
-This ensures safe testing of the release workflow without any risk of accidental publishing.
-
-**Example:**
-
-```bash
-# Test publishing all packages (always dry-run)
-gh workflow run release.yml
-```
-
-**Important:** To actually publish to crates.io, you must create and push a version tag. workflow_dispatch is exclusively for testing and validation.
-
-**Key Differences from Tag-based Releases:**
-
-When triggered via workflow_dispatch (vs. pushing a tag):
-
-- **No GitHub release created**: Skips GitHub release creation step
-- **No version checking**: `check-version` is disabled (no git tag to compare against)
-- **All packages tested**: Always validates all packages (core, CLI, MCP) regardless of tag naming
-- **Always dry-run**: NEVER publishes to crates.io - validation only
-- **Test suite always runs**: Validates build and tests before attempting dry-run publish
-
-This allows you to:
-
-- Test the complete release workflow without any risk of accidental publishing
-- Validate all package configurations before creating tags
-- Debug workflow issues in isolation
-- Verify version compatibility and dependencies across all packages
-- Ensure all workspace members can be successfully published together
-
-**To actually publish:** Create and push a version tag (e.g., `v0.1.0`). Only tag-based releases will publish to crates.io.
-
-### Git LFS Configuration
-
-Large test data files are managed with Git LFS:
-
-```gitattributes
-# Track all test data files with Git LFS
-tests/integration/test_data/**/*.xml filter=lfs diff=lfs merge=lfs -text
-tests/integration/test_data/**/*.json filter=lfs diff=lfs merge=lfs -text
-```
-
-**Benefits:**
-
-- Keeps repository lightweight
-- Efficient CI/CD with large fixtures
-- Proper version control for binary-like test data
-
-### Running Real API Tests in CI
-
-Real API tests are opt-in to avoid overwhelming NCBI servers:
-
-```bash
-# Automatically runs on main branch pushes
-git push origin main
-
-# Or add label "test-real-api" to PR
-gh pr edit --add-label "test-real-api"
-```
-
-### Coverage Integration
-
-Code coverage is automatically generated and uploaded to Codecov:
-
-- Excludes real API tests from coverage (network-dependent)
-- Requires `CODECOV_TOKEN` secret in repository settings
-- Generates LCOV format for broad tool compatibility
