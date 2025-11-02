@@ -72,7 +72,11 @@ class TestPubMedIntegration:
         except Exception as e:
             # Skip test on transient API parsing errors or rate limiting
             error_msg = str(e)
-            if "missing field" in error_msg or "429" in error_msg or "Too Many Requests" in error_msg:
+            if (
+                "missing field" in error_msg
+                or "429" in error_msg
+                or "Too Many Requests" in error_msg
+            ):
                 pytest.skip(f"Skipping due to transient API issue: {error_msg}")
             raise
 
@@ -218,6 +222,10 @@ class TestCombinedIntegration:
         except Exception as e:
             # Skip test on transient API parsing errors or rate limiting
             error_msg = str(e)
-            if "missing field" in error_msg or "429" in error_msg or "Too Many Requests" in error_msg:
+            if (
+                "missing field" in error_msg
+                or "429" in error_msg
+                or "Too Many Requests" in error_msg
+            ):
                 pytest.skip(f"Skipping due to transient API issue: {error_msg}")
             raise
