@@ -23,6 +23,7 @@ run = ["mise fmt", "dprint fmt", "cargo fmt --all"]
 
 [tasks.lint]
 run = [
+  "./etc/check_lfs_tracking.sh",
   "dprint check",
   "cargo fmt --all -- --check",
   "cargo clippy --workspace --all-targets -- -D warnings",
