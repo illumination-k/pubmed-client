@@ -10,8 +10,9 @@ use std::sync::Arc;
 use tokio::runtime::Runtime;
 
 use ::pubmed_client::{
-    config::ClientConfig, pmc, pubmed, Client, PmcClient, PmcFullText, PubMedArticle,
-    PubMedClient as RustPubMedClient,
+    config::ClientConfig,
+    pmc::{self, markdown::PmcMarkdownConverter},
+    pubmed, Client, PmcClient, PmcFullText, PubMedArticle, PubMedClient as RustPubMedClient,
 };
 
 // ================================================================================================
@@ -684,6 +685,20 @@ impl PyPmcFullText {
             list.append(py_reference)?;
         }
         Ok(list.into())
+    }
+
+    /// Convert the article to Markdown format
+    ///
+    /// Returns:
+    ///     A Markdown-formatted string representation of the article
+    ///
+    /// Example:
+    ///     >>> full_text = client.pmc.fetch_full_text("PMC7906746")
+    ///     >>> markdown = full_text.to_markdown()
+    ///     >>> print(markdown)
+    fn to_markdown(&self) -> String {
+        let converter = PmcMarkdownConverter::new();
+        converter.convert(&self.inner)
     }
 
     fn __repr__(&self) -> String {
