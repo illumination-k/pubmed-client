@@ -7,9 +7,15 @@ pub(crate) struct ESearchResult {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct ESearchData {
-    pub count: String,
-    pub retmax: String,
-    pub retstart: String,
+    #[serde(default, rename = "ERROR")]
+    pub error: Option<String>,
+    #[serde(default)]
+    pub count: Option<String>,
+    #[serde(default)]
+    pub retmax: Option<String>,
+    #[serde(default)]
+    pub retstart: Option<String>,
+    #[serde(default)]
     pub idlist: Vec<String>,
 }
 
