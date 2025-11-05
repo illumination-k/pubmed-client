@@ -33,3 +33,6 @@ build/
 .ruff_cache/
 *.whl
 .python-version
+
+# speckit
+specs/
