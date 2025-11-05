@@ -18,10 +18,13 @@ PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
 [hooks]
 postinstall = ["mise run setup"]
 
-[tasks.fmt]
+[tasks."fmt:root"]
 run = ["mise fmt", "dprint fmt", "cargo fmt --all"]
 
-[tasks.lint]
+[tasks.fmt]
+depends = ["fmt:root", "py:format"]
+
+[tasks."lint:root"]
 run = [
   "./etc/check_lfs_tracking.sh",
   "dprint check",
@@ -29,6 +32,12 @@ run = [
   "cargo clippy --workspace --all-targets -- -D warnings",
   "cargo clippy -p pubmed-client --all-targets --features integration-tests -- -D warnings",
 ]
+
+[tasks.lint]
+depends = ["lint:root", "py:check"]
+
+[tasks."setup:pre-commit"]
+run = ["pre-commit install --install-hooks"]
 
 [tasks."setup:py"]
 dir = "{{ config_root }}/pubmed-client-py"
@@ -88,27 +97,28 @@ run = ["uv run maturin build"]
 
 [tasks."py:test"]
 dir = "pubmed-client-py"
-run = ["uv run pytest"]
+run = ["uv run --frozen pytest"]
 
 [tasks."py:lint"]
 dir = "pubmed-client-py"
-run = ["uv run ruff check"]
+run = ["uv run --frozen ruff check"]
 
 [tasks."py:format"]
 dir = "pubmed-client-py"
-run = ["uv run ruff format"]
+run = ["uv run --frozen ruff format"]
 
 [tasks."py:typecheck"]
 dir = "pubmed-client-py"
-run = ["uv run mypy"]
+run = ["uv run --frozen mypy ."]
 
 [tasks."py:check"]
-dir = "pubmed-client-py"
-run = ["uv run ruff check .", "uv run ruff format --check .", "uv run mypy ."]
+depends = ["py:lint", "py:typecheck"]
 
 [tasks."py:coverage"]
 dir = "pubmed-client-py"
-run = ["uv run pytest --cov=pubmed_client --cov-report=html --cov-report=term"]
+run = [
+  "uv run --frozen pytest --cov=pubmed_client --cov-report=html --cov-report=term",
+]
 
 [tasks."py:clean"]
 dir = "pubmed-client-py"
