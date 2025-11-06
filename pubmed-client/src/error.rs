@@ -153,3 +153,273 @@ impl RetryableError for PubMedError {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Tests for non-retryable errors
+
+    #[test]
+    fn test_json_error_not_retryable() {
+        let json_err = serde_json::from_str::<serde_json::Value>("invalid json").unwrap_err();
+        let err = PubMedError::JsonError(json_err);
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Invalid JSON response");
+    }
+
+    #[test]
+    fn test_xml_error_not_retryable() {
+        let err = PubMedError::XmlError("Invalid XML format".to_string());
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Invalid XML response");
+    }
+
+    #[test]
+    fn test_xml_parse_error_not_retryable() {
+        let err = PubMedError::XmlParseError {
+            message: "Failed to parse element".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Invalid XML response");
+    }
+
+    #[test]
+    fn test_article_not_found_not_retryable() {
+        let err = PubMedError::ArticleNotFound {
+            pmid: "12345".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Article does not exist");
+        assert!(format!("{}", err).contains("12345"));
+    }
+
+    #[test]
+    fn test_pmc_not_available_not_retryable() {
+        let err = PubMedError::PmcNotAvailable {
+            pmid: "67890".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Content not available");
+        assert!(format!("{}", err).contains("67890"));
+    }
+
+    #[test]
+    fn test_pmc_not_available_by_id_not_retryable() {
+        let err = PubMedError::PmcNotAvailableById {
+            pmcid: "PMC123456".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Content not available");
+        assert!(format!("{}", err).contains("PMC123456"));
+    }
+
+    #[test]
+    fn test_invalid_pmid_not_retryable() {
+        let err = PubMedError::InvalidPmid {
+            pmid: "invalid".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Invalid input");
+        assert!(format!("{}", err).contains("invalid"));
+    }
+
+    #[test]
+    fn test_invalid_query_not_retryable() {
+        let err = PubMedError::InvalidQuery("Empty query string".to_string());
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Invalid query");
+        assert!(format!("{}", err).contains("Empty query"));
+    }
+
+    #[test]
+    fn test_io_error_not_retryable() {
+        let err = PubMedError::IoError {
+            message: "File not found".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "File system error");
+        assert!(format!("{}", err).contains("File not found"));
+    }
+
+    #[test]
+    fn test_search_limit_exceeded_not_retryable() {
+        let err = PubMedError::SearchLimitExceeded {
+            requested: 15000,
+            maximum: 10000,
+        };
+
+        assert!(!err.is_retryable());
+        assert!(format!("{}", err).contains("15000"));
+        assert!(format!("{}", err).contains("10000"));
+    }
+
+    // Tests for retryable errors
+
+    #[test]
+    fn test_rate_limit_exceeded_is_retryable() {
+        let err = PubMedError::RateLimitExceeded;
+
+        assert!(err.is_retryable());
+        assert_eq!(err.retry_reason(), "Rate limit exceeded");
+    }
+
+    #[test]
+    fn test_api_error_429_is_retryable() {
+        let err = PubMedError::ApiError {
+            status: 429,
+            message: "Too Many Requests".to_string(),
+        };
+
+        assert!(err.is_retryable());
+        assert_eq!(err.retry_reason(), "Rate limit exceeded");
+        assert!(format!("{}", err).contains("429"));
+    }
+
+    #[test]
+    fn test_api_error_500_is_retryable() {
+        let err = PubMedError::ApiError {
+            status: 500,
+            message: "Internal Server Error".to_string(),
+        };
+
+        assert!(err.is_retryable());
+        assert_eq!(err.retry_reason(), "Server error");
+    }
+
+    #[test]
+    fn test_api_error_503_is_retryable() {
+        let err = PubMedError::ApiError {
+            status: 503,
+            message: "Service Unavailable".to_string(),
+        };
+
+        assert!(err.is_retryable());
+        assert_eq!(err.retry_reason(), "Server error");
+    }
+
+    #[test]
+    fn test_api_error_temporarily_unavailable_is_retryable() {
+        let err = PubMedError::ApiError {
+            status: 400,
+            message: "Service temporarily unavailable".to_string(),
+        };
+
+        assert!(err.is_retryable());
+        assert_eq!(err.retry_reason(), "Temporary API error");
+    }
+
+    #[test]
+    fn test_api_error_timeout_message_is_retryable() {
+        let err = PubMedError::ApiError {
+            status: 408,
+            message: "Request timeout".to_string(),
+        };
+
+        assert!(err.is_retryable());
+        assert_eq!(err.retry_reason(), "Temporary API error");
+    }
+
+    #[test]
+    fn test_api_error_connection_message_is_retryable() {
+        let err = PubMedError::ApiError {
+            status: 400,
+            message: "Connection reset by peer".to_string(),
+        };
+
+        assert!(err.is_retryable());
+        assert_eq!(err.retry_reason(), "Temporary API error");
+    }
+
+    #[test]
+    fn test_api_error_404_not_retryable() {
+        let err = PubMedError::ApiError {
+            status: 404,
+            message: "Not Found".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+    }
+
+    #[test]
+    fn test_api_error_400_not_retryable() {
+        let err = PubMedError::ApiError {
+            status: 400,
+            message: "Bad Request".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+    }
+
+    // Tests for error display formatting
+
+    #[test]
+    fn test_error_display_messages() {
+        let test_cases = vec![
+            (
+                PubMedError::XmlError("test".to_string()),
+                "XML parsing failed: test",
+            ),
+            (
+                PubMedError::XmlParseError {
+                    message: "test error".to_string(),
+                },
+                "XML parsing error: test error",
+            ),
+            (
+                PubMedError::InvalidQuery("bad query".to_string()),
+                "Invalid query: bad query",
+            ),
+            (
+                PubMedError::RateLimitExceeded,
+                "API rate limit exceeded",
+            ),
+        ];
+
+        for (error, expected_message) in test_cases {
+            assert_eq!(format!("{}", error), expected_message);
+        }
+    }
+
+    #[test]
+    fn test_error_display_with_fields() {
+        let err = PubMedError::ArticleNotFound {
+            pmid: "12345".to_string(),
+        };
+        let display = format!("{}", err);
+        assert!(display.contains("Article not found"));
+        assert!(display.contains("12345"));
+
+        let err = PubMedError::ApiError {
+            status: 500,
+            message: "Server Error".to_string(),
+        };
+        let display = format!("{}", err);
+        assert!(display.contains("500"));
+        assert!(display.contains("Server Error"));
+    }
+
+    #[test]
+    fn test_result_type_alias() {
+        // Test that Result<T> type alias works correctly
+        fn returns_ok() -> Result<String> {
+            Ok("success".to_string())
+        }
+
+        fn returns_err() -> Result<String> {
+            Err(PubMedError::RateLimitExceeded)
+        }
+
+        assert!(returns_ok().is_ok());
+        assert!(returns_err().is_err());
+    }
+}
