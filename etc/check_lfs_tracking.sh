@@ -7,8 +7,9 @@ set -euo pipefail
 
 # Check git-lfs installation
 if ! command -v git-lfs &> /dev/null; then
-    echo "Error: git-lfs is not installed"
-    exit 1
+    echo "Warning: git-lfs is not installed, skipping LFS tracking check"
+    echo "Note: This check will run in CI/CD environments where git-lfs is available"
+    exit 0
 fi
 
 # Get repository root
