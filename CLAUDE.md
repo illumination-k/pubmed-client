@@ -918,3 +918,12 @@ The test suites provide extensive coverage of XML parsing and content analysis:
   - Article type distribution
 
 Both test suites include statistical analysis and success rate validation to ensure robust parsing across diverse article types and content structures.
+
+## Active Technologies
+
+- Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.21+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-query-builder-python)
+- N/A (stateless query builder)\ (001-query-builder-python)
+
+## Recent Changes
+
+- 001-query-builder-python: Added Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.21+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\
