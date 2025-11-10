@@ -626,6 +626,40 @@ When contributing, please:
 - Update documentation as needed
 - Ensure all CI checks pass
 
+## Related Projects
+
+There are several excellent PubMed and NCBI E-utilities client libraries available in different programming languages:
+
+### Python
+
+- **[biocommons/eutils](https://github.com/biocommons/eutils)** - A comprehensive Python package for simplified searching, fetching, and parsing records from NCBI using their E-utilities interface. Features automatic request throttling (3/10 req/sec without/with API key) and promise-based piping.
+
+- **[gijswobben/pymed](https://github.com/gijswobben/pymed)** - PyMed provides access to PubMed through the PubMed API in a consistent, readable and performant way. Available on [PyPI](https://pypi.org/project/pymed/).
+
+- **[metapub/metapub](https://github.com/metapub/metapub)** - Python toolkit for NCBI metadata (via eutils) and PubMed article text mining. Provides abstraction layers over Medgen, PubMed, ClinVar, and CrossRef for building scholarly paper libraries.
+
+- **[krassowski/easy-entrez](https://github.com/krassowski/easy-entrez)** - Retrieve PubMed articles, text-mining annotations, or molecular data from >35 Entrez databases via easy-to-use Python package built on top of Entrez E-utilities API.
+
+### JavaScript/TypeScript
+
+- **[linjoey/ncbi-eutils](https://github.com/linjoey/ncbi-eutils)** - NCBI E-utilities client for Node.js and the browser. Uses ES6 promises to support "piping" to combine successive E-utility calls (e.g., piping esearch results to elink, then to esummary).
+
+- **[node-ncbi](https://www.npmjs.com/package/node-ncbi)** - A Node.js wrapper for the NCBI eUtils API that allows searching PubMed or other databases with results returned as JavaScript objects.
+
+### Go
+
+- **[biogo/ncbi](https://github.com/biogo/ncbi)** - Package entrez provides support for interaction with the NCBI Entrez Utility Programs (E-utilities). Part of the biogo bioinformatics library collection.
+
+### PHP
+
+- **[jorgetutor/ncbi](https://github.com/jorgetutor/ncbi)** - Provides an implementation of the Guzzle library to query NCBI E-Utils service.
+
+### Rust
+
+- **[pubmed crate](https://crates.io/crates/pubmed)** - A Rust crate that implements reading publications from the PubMed API.
+
+All of these libraries interact with the [NCBI E-utilities](https://www.ncbi.nlm.nih.gov/books/NBK25501/), which provide the public API to the NCBI Entrez system for accessing PubMed, PMC, Gene, and other databases.
+
 ## Acknowledgments
 
 This project relies on NCBI's excellent E-utilities API. Please cite NCBI appropriately when using this library in research:
