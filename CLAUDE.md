@@ -758,8 +758,9 @@ uv run python -c "from pubmed_client import YourClass; print(YourClass)"
 ```
 
 If the class is in the .so but not in the package:
+
 - Check `__all__` list in type stubs
-- Verify __init__.py has `from .pubmed_client import *`
+- Verify **init**.py has `from .pubmed_client import *`
 - Try uninstalling and reinstalling: `uv pip uninstall pubmed-client-py && uv run --with maturin maturin develop`
 
 ### Python Testing Strategy
