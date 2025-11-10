@@ -49,7 +49,8 @@ def test_terms_none_filtered_silently() -> None:
     """Test that None values in terms() list are silently filtered."""
     from pubmed_client import SearchQuery
 
-    query = SearchQuery().terms([None, "covid-19", None, "vaccine"])
+    terms: list[str | None] = [None, "covid-19", None, "vaccine"]
+    query = SearchQuery().terms(terms)
     assert query.build() == "covid-19 vaccine"
 
 

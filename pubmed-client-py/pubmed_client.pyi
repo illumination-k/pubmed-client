@@ -184,7 +184,7 @@ class SearchQuery:
     def query(self, term: str | None) -> SearchQuery:
         ...
 
-    def terms(self, terms: list[str] | None) -> SearchQuery:
+    def terms(self, terms: list[str | None] | None) -> SearchQuery:
         ...
 
     def limit(self, limit: int | None) -> SearchQuery:
