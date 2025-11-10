@@ -5,7 +5,6 @@
   "yaml": {},
   "excludes": [
     "**/*-lock.json",
-    "tests/integration/test_data/**",
     "pubmed-client/tests/integration/test_data/**",
     "tmp_*/**",
     "specs/**"
