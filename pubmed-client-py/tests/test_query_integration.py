@@ -4,7 +4,6 @@ These tests verify end-to-end query construction scenarios that match
 real-world usage patterns.
 """
 
-import pytest
 
 
 def test_build_query_for_pubmed_search() -> None:
