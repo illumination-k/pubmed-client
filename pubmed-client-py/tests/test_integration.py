@@ -55,6 +55,35 @@ class TestPubMedIntegration:
         article_types = article.article_types()
         assert isinstance(article_types, list)
 
+    def test_search_articles(self, client: pubmed_client.Client) -> None:
+        """Test searching for articles and getting PMIDs only."""
+        try:
+            # Search for a small number of PMIDs
+            pmids = client.pubmed.search_articles("covid-19", 5)
+
+            assert isinstance(pmids, list)
+            assert len(pmids) <= 5
+
+            # All results should be strings (PMIDs)
+            for pmid in pmids:
+                assert isinstance(pmid, str)
+                assert pmid.isdigit()  # PMIDs are numeric strings
+
+            # Test with field-specific query
+            pmids_with_filter = client.pubmed.search_articles("cancer[ti]", 3)
+            assert isinstance(pmids_with_filter, list)
+            assert len(pmids_with_filter) <= 3
+        except Exception as e:
+            # Skip test on transient API errors or rate limiting
+            error_msg = str(e)
+            if (
+                "429" in error_msg
+                or "Too Many Requests" in error_msg
+                or "rate limit" in error_msg.lower()
+            ):
+                pytest.skip(f"Skipping due to transient API issue: {error_msg}")
+            raise
+
     def test_search_and_fetch(self, client: pubmed_client.Client) -> None:
         """Test searching for articles and fetching metadata."""
         try:
