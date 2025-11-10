@@ -9,6 +9,8 @@ pnpm = "10"
 node = "20"
 uv = "0.8"
 
+shfmt = "3"
+
 [env]
 # Use Python from pubmed-client-py venv for PyO3
 PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
@@ -23,9 +25,13 @@ description = "Format Rust code at workspace root using mise, dprint, and cargo 
 env = { RUST_LOG = "warn" }
 run = ["mise fmt", "dprint fmt", "cargo fmt --all"]
 
+[tasks."fmt:sh"]
+description = "Format shell scripts with shfmt"
+run = ["shfmt -w ./**/*.sh"]
+
 [tasks.fmt]
 description = "Format all code (Rust + Python)"
-depends = ["fmt:root", "py:format"]
+depends = ["fmt:root", "py:format", "fmt:sh"]
 
 [tasks."lint:root"]
 description = "Lint Rust code with dprint, cargo fmt, and clippy"

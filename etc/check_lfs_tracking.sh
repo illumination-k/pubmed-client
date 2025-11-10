@@ -6,9 +6,9 @@
 set -euo pipefail
 
 # Check git-lfs installation
-if ! command -v git-lfs &> /dev/null; then
-    echo "Error: git-lfs is not installed"
-    exit 1
+if ! command -v git-lfs &>/dev/null; then
+	echo "Error: git-lfs is not installed"
+	exit 1
 fi
 
 # Get repository root
@@ -16,8 +16,8 @@ cd "$(git rev-parse --show-toplevel)"
 
 # Check .gitattributes exists
 if [[ ! -f .gitattributes ]]; then
-    echo "Error: .gitattributes not found"
-    exit 1
+	echo "Error: .gitattributes not found"
+	exit 1
 fi
 
 echo "=== Git LFS Tracking Check ==="
@@ -35,37 +35,37 @@ ng=0
 
 # Check each pattern
 while IFS= read -r line; do
-    # Skip comments and empty lines
-    [[ "$line" =~ ^[[:space:]]*# ]] && continue
-    [[ -z "$line" ]] && continue
+	# Skip comments and empty lines
+	[[ "$line" =~ ^[[:space:]]*# ]] && continue
+	[[ -z "$line" ]] && continue
 
-    # Get pattern if line contains filter=lfs
-    if [[ "$line" =~ filter=lfs ]]; then
-        pattern=$(echo "$line" | awk '{print $1}')
+	# Get pattern if line contains filter=lfs
+	if [[ "$line" =~ filter=lfs ]]; then
+		pattern=$(echo "$line" | awk '{print $1}')
 
-        # Extract directory and extension from pattern like "dir/**/*.ext"
-        if [[ "$pattern" == *"/**/"* ]]; then
-            dir="${pattern%%/**/*}"
-            ext="${pattern##*.}"
+		# Extract directory and extension from pattern like "dir/**/*.ext"
+		if [[ "$pattern" == *"/**/"* ]]; then
+			dir="${pattern%%/**/*}"
+			ext="${pattern##*.}"
 
-            # Find files
-            if [[ -d "$dir" ]]; then
-                while IFS= read -r file; do
-                    total=$((total + 1))
+			# Find files
+			if [[ -d "$dir" ]]; then
+				while IFS= read -r file; do
+					total=$((total + 1))
 
-                    # Check if file is LFS pointer in Git repository (not working directory)
-                    if git cat-file -p HEAD:"$file" 2>/dev/null | head -n 1 | grep -q "^version https://git-lfs.github.com/spec/v1"; then
-                        echo "✓ $file"
-                        ok=$((ok + 1))
-                    else
-                        echo "✗ $file"
-                        ng=$((ng + 1))
-                    fi
-                done < <(find "$dir" -type f -name "*.$ext")
-            fi
-        fi
-    fi
-done < .gitattributes
+					# Check if file is LFS pointer in Git repository (not working directory)
+					if git cat-file -p HEAD:"$file" 2>/dev/null | head -n 1 | grep -q "^version https://git-lfs.github.com/spec/v1"; then
+						echo "✓ $file"
+						ok=$((ok + 1))
+					else
+						echo "✗ $file"
+						ng=$((ng + 1))
+					fi
+				done < <(find "$dir" -type f -name "*.$ext")
+			fi
+		fi
+	fi
+done <.gitattributes
 
 # Summary
 echo
