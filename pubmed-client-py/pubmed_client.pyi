@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 __version__: str
 
 # ================================================================================================
@@ -171,6 +173,17 @@ class Client:
     @staticmethod
     def with_config(config: ClientConfig) -> Client: ...
 
+# ================================================================================================
+# Query Builder
+# ================================================================================================
+
+class SearchQuery:
+    def __init__(self) -> None: ...
+    def query(self, term: str | None) -> SearchQuery: ...
+    def terms(self, terms: Sequence[str | None] | None) -> SearchQuery: ...
+    def limit(self, limit: int | None) -> SearchQuery: ...
+    def build(self) -> str: ...
+
 __all__ = [
     "Affiliation",
     "ArticleSection",
@@ -189,5 +202,6 @@ __all__ = [
     "PubMedClient",
     "Reference",
     "RelatedArticles",
+    "SearchQuery",
     "Table",
 ]
