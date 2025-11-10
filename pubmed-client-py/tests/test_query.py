@@ -96,14 +96,12 @@ def test_limit_zero_raises_valueerror() -> None:
 
 
 def test_limit_negative_raises_valueerror() -> None:
-    """Test that negative limits raise ValueError."""
+    """Test that negative limits are rejected by PyO3 type system."""
     from pubmed_client import SearchQuery
 
-    with pytest.raises(ValueError, match="Limit must be greater than 0"):
+    # PyO3 rejects negative values for usize parameters before our validation runs
+    with pytest.raises(OverflowError, match="can't convert negative int to unsigned"):
         SearchQuery().query("cancer").limit(-1)
-
-    with pytest.raises(ValueError, match="Limit must be greater than 0"):
-        SearchQuery().query("cancer").limit(-100)
 
 
 def test_limit_exceeds_10000_raises_valueerror() -> None:

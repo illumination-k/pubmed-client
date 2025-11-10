@@ -158,15 +158,3 @@ impl PySearchQuery {
         "SearchQuery()".to_string()
     }
 }
-
-// Temporary test class to debug module registration
-#[pyclass(name = "TestQuery")]
-pub struct PyTestQuery {}
-
-#[pymethods]
-impl PyTestQuery {
-    #[new]
-    fn new() -> Self {
-        PyTestQuery {}
-    }
-}
