@@ -84,12 +84,10 @@ impl PySearchQuery {
     #[pyo3(signature = (terms=None))]
     fn terms(mut slf: PyRefMut<Self>, terms: Option<Vec<Option<String>>>) -> PyRefMut<Self> {
         if let Some(term_list) = terms {
-            for term_opt in term_list {
-                if let Some(t) = term_opt {
-                    let trimmed = t.trim();
-                    if !trimmed.is_empty() {
-                        slf.inner = slf.inner.clone().query(trimmed);
-                    }
+            for t in term_list.into_iter().flatten() {
+                let trimmed = t.trim();
+                if !trimmed.is_empty() {
+                    slf.inner = slf.inner.clone().query(trimmed);
                 }
             }
         }
