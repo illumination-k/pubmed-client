@@ -1,0 +1,83 @@
+name: LFS Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lfs-tracking-check:
+    name: Verify LFS Tracking
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false # Don't pull LFS files, we only check pointers
+          fetch-depth: 0 # Fetch all history for comprehensive checking
+
+      - name: Install Git LFS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+
+      - name: Check LFS tracking
+        run: |
+          chmod +x etc/check_lfs_tracking.sh
+          ./etc/check_lfs_tracking.sh
+
+  large-files-check:
+    name: Check for Large Files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+          fetch-depth: 0
+
+      - name: Find large files in repository
+        run: |
+          echo "=== Checking for large files (>1MB) in Git history ==="
+          echo
+
+          # Find files larger than 1MB in the current commit
+          large_files=$(find . -type f -size +1M \
+            -not -path "./.git/*" \
+            -not -path "./target/*" \
+            -not -path "./pubmed-client-wasm/node_modules/*" \
+            -not -path "./pubmed-client-wasm/pkg/*" \
+            -not -path "./pubmed-client-py/.venv/*" \
+            -not -path "./.mise/*" \
+            2>/dev/null || true)
+
+          if [ -n "$large_files" ]; then
+            echo "Found large files in working directory:"
+            echo "$large_files" | while read -r file; do
+              size=$(du -h "$file" | cut -f1)
+
+              # Check if file is tracked by LFS
+              if git check-attr filter "$file" | grep -q "filter: lfs"; then
+                echo "✓ $file ($size) - Tracked by LFS"
+              else
+                echo "✗ $file ($size) - NOT tracked by LFS"
+                echo "  Consider adding this pattern to .gitattributes"
+              fi
+            done
+
+            # Check if any non-LFS large files exist
+            non_lfs_large_files=$(echo "$large_files" | while read -r file; do
+              if ! git check-attr filter "$file" | grep -q "filter: lfs"; then
+                echo "$file"
+              fi
+            done)
+
+            if [ -n "$non_lfs_large_files" ]; then
+              echo
+              echo "ERROR: Found large files not tracked by LFS!"
+              echo "Please add appropriate patterns to .gitattributes"
+              exit 1
+            fi
+          else
+            echo "No large files found in working directory (>100KB)"
+          fi
