@@ -23,6 +23,7 @@ Follow-up TODOs: None
 The core Rust library serves as the single source of truth for all functionality. Every feature MUST be accessible through language bindings while maintaining language-idiomatic patterns.
 
 **Non-negotiable rules:**
+
 - Core library (pubmed-client) contains all business logic and API implementations
 - Language bindings (WASM, Python) provide idiomatic wrappers without reimplementing logic
 - Each binding MUST maintain language conventions (async/Promise for WASM, blocking with GIL release for Python)
@@ -36,6 +37,7 @@ The core Rust library serves as the single source of truth for all functionality
 Multi-layer testing is mandatory for all features. Tests MUST exist at all appropriate levels before code is considered complete.
 
 **Non-negotiable rules:**
+
 - **Unit tests**: Alongside source code in module files
 - **Integration tests**: Real XML fixtures from NCBI APIs in `tests/integration/test_data/`
 - **Binding tests**: Language-specific tests (TypeScript/Vitest for WASM, pytest for Python)
@@ -51,6 +53,7 @@ Multi-layer testing is mandatory for all features. Tests MUST exist at all appro
 Strong typing and explicit error handling are fundamental. APIs MUST use Rust's type system to prevent misuse and provide clear contracts.
 
 **Non-negotiable rules:**
+
 - All public functions return `Result<T, Error>` for fallible operations
 - Use newtype patterns where appropriate (e.g., PMID, PMCID wrappers)
 - Builder pattern for complex constructions (SearchQuery with method chaining)
@@ -65,6 +68,7 @@ Strong typing and explicit error handling are fundamental. APIs MUST use Rust's 
 All interactions with NCBI E-utilities MUST comply with NCBI guidelines and rate limits.
 
 **Non-negotiable rules:**
+
 - **Rate limiting**: 3 requests/second without API key, 10 requests/second with API key
 - **Token bucket algorithm**: Implemented with tokio-util for accurate rate limiting
 - **Retry logic**: Exponential backoff for transient failures (network, 5xx, 429)
@@ -79,6 +83,7 @@ All interactions with NCBI E-utilities MUST comply with NCBI guidelines and rate
 Production code MUST use structured logging. Debug information must be traceable without polluting standard output.
 
 **Non-negotiable rules:**
+
 - **Use `tracing` crate**: All logging via tracing macros (info!, debug!, error!, trace!)
 - **NEVER use println!/eprintln!** in production code (exceptions: documentation examples, demo apps only)
 - **Structured context**: Include relevant fields (pmid, query, operation) in log events
@@ -92,6 +97,7 @@ Production code MUST use structured logging. Debug information must be traceable
 Parsers MUST use idiomatic Rust patterns: module functions over empty structs.
 
 **Non-negotiable rules:**
+
 - Use module functions (e.g., `parse_article_from_xml()`) not empty structs with static methods
 - Clear separation: parsers in `parser.rs` or `parser/` module directories
 - XML utilities isolated in dedicated modules
@@ -105,16 +111,19 @@ Parsers MUST use idiomatic Rust patterns: module functions over empty structs.
 ### Code Quality Requirements
 
 **Rust**:
+
 - **Formatting**: `cargo fmt` + `dprint` (enforced)
 - **Linting**: `cargo clippy` with strict lints
 - **Type checking**: All code MUST pass `cargo check` without warnings
 
 **Python (pubmed-client-py/)**:
+
 - **Formatting**: `ruff format` (enforced)
 - **Linting**: `ruff check` (enforced)
 - **Type checking**: `mypy --strict` on tests (enforced)
 
 **TypeScript (pubmed-client-wasm/)**:
+
 - **Formatting**: Biome formatter (enforced)
 - **Linting**: Biome linter (enforced)
 - **Type checking**: TypeScript strict mode enabled
@@ -139,11 +148,13 @@ Parsers MUST use idiomatic Rust patterns: module functions over empty structs.
 ### Git Operations
 
 **File and Directory Renaming**:
+
 - **ALWAYS use `git mv`** for renaming files/directories
 - NEVER use shell `mv` command (breaks git history tracking)
 - Verify renames with `git status` (should show "renamed:")
 
 **Commit Practices**:
+
 - **Test before committing**: All tests MUST pass
 - **Conventional commits**: Use conventional commit format
 - **Atomic commits**: One logical change per commit
@@ -152,6 +163,7 @@ Parsers MUST use idiomatic Rust patterns: module functions over empty structs.
 ### Build & Test Workflow
 
 **Workspace Commands** (from repository root):
+
 ```bash
 cargo build              # Build all workspace members
 cargo test               # Test all workspace members
@@ -160,6 +172,7 @@ mise run coverage:open   # Generate and view coverage
 ```
 
 **Package-Specific Commands**:
+
 ```bash
 # Core library (pubmed-client/)
 cargo test --lib                                    # Unit tests
@@ -185,6 +198,7 @@ cargo run -p pubmed-mcp                             # Run MCP server
 ### Multi-Language Coordination
 
 When adding features:
+
 1. **Core first**: Implement in pubmed-client/ with Rust tests
 2. **Bindings second**: Add to WASM and Python with language-specific tests
 3. **CLI/MCP third**: Expose via command-line tools if appropriate
@@ -195,6 +209,7 @@ When adding features:
 ### Amendment Process
 
 This constitution supersedes all other development practices and guidelines. Amendments require:
+
 1. **Documentation**: Proposed changes documented with rationale
 2. **Version bump**: Semantic versioning (MAJOR: breaking governance, MINOR: new principle/section, PATCH: clarifications)
 3. **Template sync**: All dependent templates updated (plan, spec, tasks, commands)
@@ -203,6 +218,7 @@ This constitution supersedes all other development practices and guidelines. Ame
 ### Compliance & Review
 
 **All code reviews MUST verify**:
+
 - Tests exist and pass at all appropriate levels
 - Tracing used instead of println! in production code
 - Type safety maintained (no unsafe without explicit justification)
@@ -211,10 +227,12 @@ This constitution supersedes all other development practices and guidelines. Ame
 - Documentation updated
 
 **Complexity Justification**:
+
 - Any deviation from constitutional principles MUST be explicitly justified in implementation plans
 - Alternative simpler approaches MUST be documented and reasons for rejection explained
 
 **Runtime Guidance**:
+
 - Developers and AI assistants MUST consult `CLAUDE.md` for implementation patterns, commands, architecture details, and critical guidelines
 - `CLAUDE.md` provides operational guidance; this constitution provides governing principles
 
