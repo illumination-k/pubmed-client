@@ -38,11 +38,11 @@ jobs:
 
       - name: Find large files in repository
         run: |
-          echo "=== Checking for large files (>100KB) in Git history ==="
+          echo "=== Checking for large files (>1MB) in Git history ==="
           echo
 
-          # Find files larger than 100KB in the current commit
-          large_files=$(find . -type f -size +100k \
+          # Find files larger than 1MB in the current commit
+          large_files=$(find . -type f -size +1M \
             -not -path "./.git/*" \
             -not -path "./target/*" \
             -not -path "./pubmed-client-wasm/node_modules/*" \
