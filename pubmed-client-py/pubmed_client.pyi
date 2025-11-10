@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 __version__: str
 
 # ================================================================================================
@@ -176,22 +178,11 @@ class Client:
 # ================================================================================================
 
 class SearchQuery:
-
-
-    def __init__(self) -> None:
-        ...
-
-    def query(self, term: str | None) -> SearchQuery:
-        ...
-
-    def terms(self, terms: list[str | None] | None) -> SearchQuery:
-        ...
-
-    def limit(self, limit: int | None) -> SearchQuery:
-        ...
-
-    def build(self) -> str:
-        ...
+    def __init__(self) -> None: ...
+    def query(self, term: str | None) -> SearchQuery: ...
+    def terms(self, terms: Sequence[str | None] | None) -> SearchQuery: ...
+    def limit(self, limit: int | None) -> SearchQuery: ...
+    def build(self) -> str: ...
 
 __all__ = [
     "Affiliation",

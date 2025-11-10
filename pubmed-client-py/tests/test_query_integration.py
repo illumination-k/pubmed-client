@@ -5,7 +5,6 @@ real-world usage patterns.
 """
 
 
-
 def test_build_query_for_pubmed_search() -> None:
     """Test building a query suitable for PubMed search."""
     from pubmed_client import SearchQuery
