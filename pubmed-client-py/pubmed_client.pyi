@@ -171,6 +171,106 @@ class Client:
     @staticmethod
     def with_config(config: ClientConfig) -> Client: ...
 
+# ================================================================================================
+# Query Builder
+# ================================================================================================
+
+class SearchQuery:
+    """
+    Builder for constructing PubMed search queries.
+
+    Provides a fluent API for building queries programmatically instead of
+    writing raw query strings. Supports method chaining for clean query construction.
+
+    Examples:
+        >>> query = SearchQuery().query("covid-19").limit(10)
+        >>> query_string = query.build()
+        >>> print(query_string)
+        covid-19
+    """
+
+    def __init__(self) -> None:
+        """Create a new empty search query builder."""
+        ...
+
+    def query(self, term: str | None) -> SearchQuery:
+        """
+        Add a search term to the query.
+
+        Terms are accumulated (not replaced) and will be space-separated in the final query.
+        None and empty strings are silently filtered out.
+
+        Args:
+            term: Search term string. None and empty strings are silently filtered.
+
+        Returns:
+            Self for method chaining.
+
+        Example:
+            >>> query = SearchQuery().query("covid-19").query("treatment")
+            >>> query.build()
+            'covid-19 treatment'
+        """
+        ...
+
+    def terms(self, terms: list[str] | None) -> SearchQuery:
+        """
+        Add multiple search terms to the query.
+
+        Each term is processed like query(). None items and empty strings are filtered.
+
+        Args:
+            terms: List of search term strings. None items and empty strings are filtered.
+
+        Returns:
+            Self for method chaining.
+
+        Example:
+            >>> query = SearchQuery().terms(["covid-19", "vaccine", "efficacy"])
+            >>> query.build()
+            'covid-19 vaccine efficacy'
+        """
+        ...
+
+    def limit(self, limit: int | None) -> SearchQuery:
+        """
+        Set the maximum number of results to return.
+
+        Validates that limit is >0 and ≤10,000. None is treated as "use default" (20).
+
+        Args:
+            limit: Maximum number of results. None means use default (20).
+
+        Returns:
+            Self for method chaining.
+
+        Raises:
+            ValueError: If limit <= 0 or limit > 10,000.
+
+        Example:
+            >>> query = SearchQuery().query("cancer").limit(50)
+        """
+        ...
+
+    def build(self) -> str:
+        """
+        Build the final PubMed query string.
+
+        Terms are joined with space separators (PubMed's default OR logic).
+
+        Returns:
+            Query string for PubMed E-utilities API.
+
+        Raises:
+            ValueError: If no search terms have been added.
+
+        Example:
+            >>> query = SearchQuery().query("covid-19").query("treatment")
+            >>> query.build()
+            'covid-19 treatment'
+        """
+        ...
+
 __all__ = [
     "Affiliation",
     "ArticleSection",
@@ -189,5 +289,6 @@ __all__ = [
     "PubMedClient",
     "Reference",
     "RelatedArticles",
+    "SearchQuery",
     "Table",
 ]
