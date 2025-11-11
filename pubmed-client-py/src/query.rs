@@ -35,7 +35,6 @@ fn validate_year(year: u32) -> PyResult<()> {
 ///
 /// # Errors
 /// Returns `PyValueError` if the article type is not recognized
-#[allow(dead_code)] // Will be used in Phase 4 for article type filtering
 fn str_to_article_type(s: &str) -> PyResult<ArticleType> {
     let normalized = s.trim().to_lowercase();
 
@@ -322,6 +321,69 @@ impl PySearchQuery {
     fn published_before(mut slf: PyRefMut<Self>, year: u32) -> PyResult<PyRefMut<Self>> {
         validate_year(year)?;
         slf.inner = slf.inner.clone().published_before(year);
+        Ok(slf)
+    }
+
+    // ============================================================================================
+    // Article Type Filtering Methods (User Story 2)
+    // ============================================================================================
+
+    /// Filter by a single article type
+    ///
+    /// Args:
+    ///     type_name: Article type name (case-insensitive)
+    ///         Supported types: "Clinical Trial", "Review", "Systematic Review",
+    ///         "Meta-Analysis", "Case Reports", "Randomized Controlled Trial" (or "RCT"),
+    ///         "Observational Study"
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Raises:
+    ///     ValueError: If article type is not recognized
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").article_type("Clinical Trial")
+    ///     >>> query.build()
+    ///     'cancer AND Clinical Trial[pt]'
+    fn article_type(mut slf: PyRefMut<Self>, type_name: String) -> PyResult<PyRefMut<Self>> {
+        let article_type = str_to_article_type(&type_name)?;
+        slf.inner = slf.inner.clone().article_type(article_type);
+        Ok(slf)
+    }
+
+    /// Filter by multiple article types (OR logic)
+    ///
+    /// When multiple types are provided, they are combined with OR logic.
+    /// Empty list is silently ignored (no filter added).
+    ///
+    /// Args:
+    ///     types: List of article type names (case-insensitive)
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Raises:
+    ///     ValueError: If any article type is not recognized
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("treatment").article_types(["RCT", "Meta-Analysis"])
+    ///     >>> query.build()
+    ///     'treatment AND (Randomized Controlled Trial[pt] OR Meta-Analysis[pt])'
+    fn article_types(mut slf: PyRefMut<Self>, types: Vec<String>) -> PyResult<PyRefMut<Self>> {
+        if types.is_empty() {
+            // Empty list is silently ignored
+            return Ok(slf);
+        }
+
+        // Convert all string types to ArticleType enums
+        let article_types: Result<Vec<ArticleType>, PyErr> =
+            types.iter().map(|s| str_to_article_type(s)).collect();
+
+        let article_types = article_types?;
+
+        // Call the Rust method with the converted types
+        slf.inner = slf.inner.clone().article_types(&article_types);
         Ok(slf)
     }
 }

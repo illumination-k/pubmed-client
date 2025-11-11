@@ -111,3 +111,30 @@ def test_date_filtering_integration() -> None:
     result2 = query2.build()
     assert "cancer treatment" in result2
     assert "2015:3000[pdat]" in result2
+
+
+def test_article_type_filtering_integration() -> None:
+    """Test integration of article type filtering with search terms."""
+    from pubmed_client import SearchQuery
+
+    # Test single article type filter
+    query = SearchQuery().query("covid-19").article_type("Review").limit(10)
+
+    result = query.build()
+
+    # Verify search term and filter are present
+    assert "covid-19" in result
+    assert "Review[pt]" in result
+
+    # Test multiple article types with OR logic
+    query2 = (
+        SearchQuery()
+        .query("cancer therapy")
+        .article_types(["Clinical Trial", "Meta-Analysis"])
+    )
+
+    result2 = query2.build()
+    assert "cancer therapy" in result2
+    assert "Clinical Trial[pt]" in result2
+    assert "Meta-Analysis[pt]" in result2
+    assert " OR " in result2

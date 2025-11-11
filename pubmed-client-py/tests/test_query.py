@@ -245,3 +245,78 @@ def test_invalid_date_range_raises_valueerror() -> None:
 
     with pytest.raises(ValueError, match=r"Start year.*must be.*end year"):
         SearchQuery().query("topic").published_between(2024, 2020)
+
+
+# ================================================================================================
+# Article Type Filtering Tests (User Story 2)
+# ================================================================================================
+
+
+def test_article_type_single() -> None:
+    """Test that article_type() with valid type generates correct filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("cancer").article_type("Clinical Trial")
+    result = query.build()
+    assert "Clinical Trial[pt]" in result
+    assert "cancer" in result
+
+
+def test_article_type_case_insensitive() -> None:
+    """Test that article_type() handles case-insensitive input."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("diabetes").article_type("clinical trial")
+    result = query.build()
+    assert "Clinical Trial[pt]" in result
+
+
+def test_article_types_multiple() -> None:
+    """Test that article_types() with multiple types generates OR combination."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("treatment").article_types(["RCT", "Meta-Analysis"])
+    result = query.build()
+    # Should contain OR combination
+    assert "Randomized Controlled Trial[pt]" in result
+    assert "Meta-Analysis[pt]" in result
+    assert " OR " in result
+
+
+def test_article_types_empty_list() -> None:
+    """Test that article_types() with empty list is ignored."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("research").article_types([])
+    result = query.build()
+    # Should just have the search term, no article type filter
+    assert result == "research"
+
+
+@pytest.mark.parametrize(
+    "article_type_name,expected_tag",
+    [
+        ("Clinical Trial", "Clinical Trial[pt]"),
+        ("Review", "Review[pt]"),
+        ("Systematic Review", "Systematic Review[pt]"),
+        ("Meta-Analysis", "Meta-Analysis[pt]"),
+        ("Case Reports", "Case Reports[pt]"),
+        ("Randomized Controlled Trial", "Randomized Controlled Trial[pt]"),
+        ("Observational Study", "Observational Study[pt]"),
+    ],
+)
+def test_all_article_types_supported(article_type_name: str, expected_tag: str) -> None:
+    """Test that all 7 supported article types work correctly."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("topic").article_type(article_type_name)
+    result = query.build()
+    assert expected_tag in result
+
+
+def test_invalid_article_type_raises_valueerror() -> None:
+    """Test that invalid article type raises ValueError with helpful message."""
+    from pubmed_client import SearchQuery
+
+    with pytest.raises(ValueError, match=r"Invalid article type.*Supported types"):
+        SearchQuery().query("topic").article_type("Invalid Type")
