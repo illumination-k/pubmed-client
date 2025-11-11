@@ -379,10 +379,7 @@ mod tests {
                 PubMedError::InvalidQuery("bad query".to_string()),
                 "Invalid query: bad query",
             ),
-            (
-                PubMedError::RateLimitExceeded,
-                "API rate limit exceeded",
-            ),
+            (PubMedError::RateLimitExceeded, "API rate limit exceeded"),
         ];
 
         for (error, expected_message) in test_cases {
