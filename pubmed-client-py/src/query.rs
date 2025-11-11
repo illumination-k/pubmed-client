@@ -206,11 +206,6 @@ impl PySearchQuery {
         "SearchQuery()".to_string()
     }
 
-    /// Test method to verify method exports work
-    fn test_method(&self) -> String {
-        "test".to_string()
-    }
-
     // ============================================================================================
     // Date Filtering Methods (User Story 1)
     // ============================================================================================

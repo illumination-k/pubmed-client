@@ -636,6 +636,39 @@ The Python package provides native Python bindings for the core Rust library:
 
 **CRITICAL**: When developing Python bindings with maturin and PyO3, follow these best practices:
 
+#### Known Issue: Maturin Develop Caching Problem
+
+**⚠️ IMPORTANT**: `maturin develop` has a known issue where new PyO3 methods may not be properly exported to Python, even after clean rebuilds. This is documented in [PyO3/maturin#381](https://github.com/PyO3/maturin/issues/381).
+
+**Symptoms:**
+
+- New `#[pymethods]` functions compile without errors
+- Methods don't appear in Python's `dir(object)`
+- `hasattr()` returns `False` for new methods
+- `cargo clean` and rebuild doesn't fix the issue
+
+**Solution:**
+Use `maturin build` + `pip install` instead of `maturin develop`:
+
+```bash
+# From pubmed-client-py/ directory
+cargo clean -p pubmed-client-py
+uv run --with maturin --with patchelf maturin build --release
+uv pip install target/wheels/pubmed_client_py-*.whl --force-reinstall
+```
+
+**When to use this approach:**
+
+- Adding new methods to existing `#[pymethods]` blocks
+- Methods appear in source code but not in Python
+- After extensive debugging with `maturin develop`
+
+**When `maturin develop` is safe:**
+
+- Making changes to existing method implementations
+- Adding entirely new classes (not methods to existing classes)
+- Working on Rust-only changes
+
 #### Module Registration
 
 1. **Always add new #[pyclass] types to the #[pymodule] function:**
