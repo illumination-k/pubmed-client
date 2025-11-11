@@ -386,4 +386,58 @@ impl PySearchQuery {
         slf.inner = slf.inner.clone().article_types(&article_types);
         Ok(slf)
     }
+
+    // ============================================================================================
+    // Open Access Filtering Methods (User Story 3)
+    // ============================================================================================
+
+    /// Filter to articles with free full text (open access)
+    ///
+    /// This includes articles that are freely available from PubMed Central
+    /// and other open access sources.
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").free_full_text_only()
+    ///     >>> query.build()
+    ///     'cancer AND free full text[sb]'
+    fn free_full_text_only(mut slf: PyRefMut<Self>) -> PyRefMut<Self> {
+        slf.inner = slf.inner.clone().free_full_text_only();
+        slf
+    }
+
+    /// Filter to articles with full text links
+    ///
+    /// This includes both free full text and subscription-based full text articles.
+    /// Use free_full_text_only() if you only want open access articles.
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("diabetes").full_text_only()
+    ///     >>> query.build()
+    ///     'diabetes AND full text[sb]'
+    fn full_text_only(mut slf: PyRefMut<Self>) -> PyRefMut<Self> {
+        slf.inner = slf.inner.clone().full_text_only();
+        slf
+    }
+
+    /// Filter to articles with PMC full text
+    ///
+    /// This filters to articles that have full text available in PubMed Central (PMC).
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("genomics").pmc_only()
+    ///     >>> query.build()
+    ///     'genomics AND pmc[sb]'
+    fn pmc_only(mut slf: PyRefMut<Self>) -> PyRefMut<Self> {
+        slf.inner = slf.inner.clone().pmc_only();
+        slf
+    }
 }

@@ -128,9 +128,7 @@ def test_article_type_filtering_integration() -> None:
 
     # Test multiple article types with OR logic
     query2 = (
-        SearchQuery()
-        .query("cancer therapy")
-        .article_types(["Clinical Trial", "Meta-Analysis"])
+        SearchQuery().query("cancer therapy").article_types(["Clinical Trial", "Meta-Analysis"])
     )
 
     result2 = query2.build()
@@ -138,3 +136,37 @@ def test_article_type_filtering_integration() -> None:
     assert "Clinical Trial[pt]" in result2
     assert "Meta-Analysis[pt]" in result2
     assert " OR " in result2
+
+
+def test_open_access_filtering_integration() -> None:
+    """Test integration of open access filtering with other filters."""
+    from pubmed_client import SearchQuery
+
+    # Test free full text filter
+    query = SearchQuery().query("machine learning").free_full_text_only().limit(5)
+
+    result = query.build()
+
+    assert "machine learning" in result
+    assert "free full text[sb]" in result
+
+    # Test combining multiple filter types
+    query2 = (
+        SearchQuery()
+        .query("alzheimer disease")
+        .published_in_year(2023)
+        .article_type("Clinical Trial")
+        .free_full_text_only()
+    )
+
+    result2 = query2.build()
+    assert "alzheimer disease" in result2
+    assert "2023[pdat]" in result2
+    assert "Clinical Trial[pt]" in result2
+    assert "free full text[sb]" in result2
+
+    # Test PMC-only filter
+    query3 = SearchQuery().query("genomics").pmc_only()
+    result3 = query3.build()
+    assert "genomics" in result3
+    assert "pmc[sb]" in result3

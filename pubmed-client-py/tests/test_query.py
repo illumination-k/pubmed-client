@@ -320,3 +320,67 @@ def test_invalid_article_type_raises_valueerror() -> None:
 
     with pytest.raises(ValueError, match=r"Invalid article type.*Supported types"):
         SearchQuery().query("topic").article_type("Invalid Type")
+
+
+# ================================================================================================
+# Open Access Filtering Tests (User Story 3)
+# ================================================================================================
+
+
+def test_free_full_text_only() -> None:
+    """Test that free_full_text_only() adds free full text filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("cancer").free_full_text_only()
+    result = query.build()
+    assert "cancer" in result
+    assert "free full text[sb]" in result
+
+
+def test_full_text_only() -> None:
+    """Test that full_text_only() adds full text filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("diabetes").full_text_only()
+    result = query.build()
+    assert "diabetes" in result
+    assert "full text[sb]" in result
+
+
+def test_pmc_only() -> None:
+    """Test that pmc_only() adds PMC filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("treatment").pmc_only()
+    result = query.build()
+    assert "treatment" in result
+    assert "pmc[sb]" in result
+
+
+def test_multiple_access_filters_can_be_combined() -> None:
+    """Test that multiple access filters can be combined (though unusual)."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("research").free_full_text_only().pmc_only()
+    result = query.build()
+    assert "research" in result
+    assert "free full text[sb]" in result
+    assert "pmc[sb]" in result
+
+
+def test_access_filters_with_other_filters() -> None:
+    """Test that access filters work with date and article type filters."""
+    from pubmed_client import SearchQuery
+
+    query = (
+        SearchQuery()
+        .query("covid-19")
+        .published_in_year(2024)
+        .article_type("Review")
+        .free_full_text_only()
+    )
+    result = query.build()
+    assert "covid-19" in result
+    assert "2024[pdat]" in result
+    assert "Review[pt]" in result
+    assert "free full text[sb]" in result
