@@ -636,6 +636,39 @@ The Python package provides native Python bindings for the core Rust library:
 
 **CRITICAL**: When developing Python bindings with maturin and PyO3, follow these best practices:
 
+#### Known Issue: Maturin Develop Caching Problem
+
+**⚠️ IMPORTANT**: `maturin develop` has a known issue where new PyO3 methods may not be properly exported to Python, even after clean rebuilds. This is documented in [PyO3/maturin#381](https://github.com/PyO3/maturin/issues/381).
+
+**Symptoms:**
+
+- New `#[pymethods]` functions compile without errors
+- Methods don't appear in Python's `dir(object)`
+- `hasattr()` returns `False` for new methods
+- `cargo clean` and rebuild doesn't fix the issue
+
+**Solution:**
+Use `maturin build` + `pip install` instead of `maturin develop`:
+
+```bash
+# From pubmed-client-py/ directory
+cargo clean -p pubmed-client-py
+uv run --with maturin --with patchelf maturin build --release
+uv pip install target/wheels/pubmed_client_py-*.whl --force-reinstall
+```
+
+**When to use this approach:**
+
+- Adding new methods to existing `#[pymethods]` blocks
+- Methods appear in source code but not in Python
+- After extensive debugging with `maturin develop`
+
+**When `maturin develop` is safe:**
+
+- Making changes to existing method implementations
+- Adding entirely new classes (not methods to existing classes)
+- Working on Rust-only changes
+
 #### Module Registration
 
 1. **Always add new #[pyclass] types to the #[pymodule] function:**
@@ -1051,6 +1084,9 @@ The test suites provide extensive coverage of XML parsing and content analysis:
 Both test suites include statistical analysis and success rate validation to ensure robust parsing across diverse article types and content structures.
 
 ## Active Technologies
+
+- Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.23+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-search-filters-python)
+- N/A (stateless query builder)\ (001-search-filters-python)
 
 - Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.21+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-query-builder-python)
 - N/A (stateless query builder)\ (001-query-builder-python)

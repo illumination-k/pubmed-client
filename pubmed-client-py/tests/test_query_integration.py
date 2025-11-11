@@ -87,3 +87,86 @@ def test_conditional_query_building() -> None:
 
     query4 = SearchQuery().terms(terms).query(optional_term)
     assert query4.build() == "cancer"  # None filtered out
+
+
+def test_date_filtering_integration() -> None:
+    """Test integration of date filtering with search terms."""
+    from pubmed_client import SearchQuery
+
+    # Test recent research query with date filter
+    query = SearchQuery().query("covid-19").query("vaccine").published_between(2020, 2024).limit(50)
+
+    result = query.build()
+
+    # Verify search terms are present
+    assert "covid-19" in result
+    assert "vaccine" in result
+
+    # Verify date filter is present
+    assert "2020:2024[pdat]" in result
+
+    # Test combining multiple date filter types
+    query2 = SearchQuery().query("cancer treatment").published_after(2015)
+
+    result2 = query2.build()
+    assert "cancer treatment" in result2
+    assert "2015:3000[pdat]" in result2
+
+
+def test_article_type_filtering_integration() -> None:
+    """Test integration of article type filtering with search terms."""
+    from pubmed_client import SearchQuery
+
+    # Test single article type filter
+    query = SearchQuery().query("covid-19").article_type("Review").limit(10)
+
+    result = query.build()
+
+    # Verify search term and filter are present
+    assert "covid-19" in result
+    assert "Review[pt]" in result
+
+    # Test multiple article types with OR logic
+    query2 = (
+        SearchQuery().query("cancer therapy").article_types(["Clinical Trial", "Meta-Analysis"])
+    )
+
+    result2 = query2.build()
+    assert "cancer therapy" in result2
+    assert "Clinical Trial[pt]" in result2
+    assert "Meta-Analysis[pt]" in result2
+    assert " OR " in result2
+
+
+def test_open_access_filtering_integration() -> None:
+    """Test integration of open access filtering with other filters."""
+    from pubmed_client import SearchQuery
+
+    # Test free full text filter
+    query = SearchQuery().query("machine learning").free_full_text_only().limit(5)
+
+    result = query.build()
+
+    assert "machine learning" in result
+    assert "free full text[sb]" in result
+
+    # Test combining multiple filter types
+    query2 = (
+        SearchQuery()
+        .query("alzheimer disease")
+        .published_in_year(2023)
+        .article_type("Clinical Trial")
+        .free_full_text_only()
+    )
+
+    result2 = query2.build()
+    assert "alzheimer disease" in result2
+    assert "2023[pdat]" in result2
+    assert "Clinical Trial[pt]" in result2
+    assert "free full text[sb]" in result2
+
+    # Test PMC-only filter
+    query3 = SearchQuery().query("genomics").pmc_only()
+    result3 = query3.build()
+    assert "genomics" in result3
+    assert "pmc[sb]" in result3

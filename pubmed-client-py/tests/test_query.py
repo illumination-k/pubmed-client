@@ -173,3 +173,214 @@ def test_method_chaining_returns_self() -> None:
         SearchQuery().query("covid-19").query("vaccine").terms(["efficacy", "safety"]).limit(50)
     )
     assert final_query.build() == "covid-19 vaccine efficacy safety"
+
+
+# ================================================================================================
+# Date Filtering Tests (User Story 1)
+# ================================================================================================
+
+
+def test_published_in_year() -> None:
+    """Test that published_in_year() generates correct date filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("covid-19").published_in_year(2024)
+    result = query.build()
+    assert "2024[pdat]" in result
+    assert "covid-19" in result
+
+
+def test_published_between_with_both_years() -> None:
+    """Test that published_between() with both years generates correct date range filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("cancer").published_between(2020, 2023)
+    result = query.build()
+    assert "2020:2023[pdat]" in result
+    assert "cancer" in result
+
+
+def test_published_between_with_none_end_year() -> None:
+    """Test that published_between() with None end_year uses 3000 as upper bound."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("diabetes").published_between(2020, None)
+    result = query.build()
+    assert "2020:3000[pdat]" in result
+    assert "diabetes" in result
+
+
+def test_published_after() -> None:
+    """Test that published_after() generates correct open-ended date range."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("treatment").published_after(2020)
+    result = query.build()
+    assert "2020:3000[pdat]" in result
+    assert "treatment" in result
+
+
+def test_published_before() -> None:
+    """Test that published_before() generates correct upper-bounded date range."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("epidemiology").published_before(2020)
+    result = query.build()
+    assert "1900:2020[pdat]" in result
+    assert "epidemiology" in result
+
+
+@pytest.mark.parametrize("invalid_year", [999, 1799, 3001, 5000])
+def test_invalid_years_raise_valueerror(invalid_year: int) -> None:
+    """Test that years outside 1800-3000 range raise ValueError."""
+    from pubmed_client import SearchQuery
+
+    with pytest.raises(ValueError, match="Year must be between 1800 and 3000"):
+        SearchQuery().query("topic").published_in_year(invalid_year)
+
+
+def test_invalid_date_range_raises_valueerror() -> None:
+    """Test that start_year > end_year raises ValueError."""
+    from pubmed_client import SearchQuery
+
+    with pytest.raises(ValueError, match=r"Start year.*must be.*end year"):
+        SearchQuery().query("topic").published_between(2024, 2020)
+
+
+# ================================================================================================
+# Article Type Filtering Tests (User Story 2)
+# ================================================================================================
+
+
+def test_article_type_single() -> None:
+    """Test that article_type() with valid type generates correct filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("cancer").article_type("Clinical Trial")
+    result = query.build()
+    assert "Clinical Trial[pt]" in result
+    assert "cancer" in result
+
+
+def test_article_type_case_insensitive() -> None:
+    """Test that article_type() handles case-insensitive input."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("diabetes").article_type("clinical trial")
+    result = query.build()
+    assert "Clinical Trial[pt]" in result
+
+
+def test_article_types_multiple() -> None:
+    """Test that article_types() with multiple types generates OR combination."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("treatment").article_types(["RCT", "Meta-Analysis"])
+    result = query.build()
+    # Should contain OR combination
+    assert "Randomized Controlled Trial[pt]" in result
+    assert "Meta-Analysis[pt]" in result
+    assert " OR " in result
+
+
+def test_article_types_empty_list() -> None:
+    """Test that article_types() with empty list is ignored."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("research").article_types([])
+    result = query.build()
+    # Should just have the search term, no article type filter
+    assert result == "research"
+
+
+@pytest.mark.parametrize(
+    ("article_type_name", "expected_tag"),
+    [
+        ("Clinical Trial", "Clinical Trial[pt]"),
+        ("Review", "Review[pt]"),
+        ("Systematic Review", "Systematic Review[pt]"),
+        ("Meta-Analysis", "Meta-Analysis[pt]"),
+        ("Case Reports", "Case Reports[pt]"),
+        ("Randomized Controlled Trial", "Randomized Controlled Trial[pt]"),
+        ("Observational Study", "Observational Study[pt]"),
+    ],
+)
+def test_all_article_types_supported(article_type_name: str, expected_tag: str) -> None:
+    """Test that all 7 supported article types work correctly."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("topic").article_type(article_type_name)
+    result = query.build()
+    assert expected_tag in result
+
+
+def test_invalid_article_type_raises_valueerror() -> None:
+    """Test that invalid article type raises ValueError with helpful message."""
+    from pubmed_client import SearchQuery
+
+    with pytest.raises(ValueError, match=r"Invalid article type.*Supported types"):
+        SearchQuery().query("topic").article_type("Invalid Type")
+
+
+# ================================================================================================
+# Open Access Filtering Tests (User Story 3)
+# ================================================================================================
+
+
+def test_free_full_text_only() -> None:
+    """Test that free_full_text_only() adds free full text filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("cancer").free_full_text_only()
+    result = query.build()
+    assert "cancer" in result
+    assert "free full text[sb]" in result
+
+
+def test_full_text_only() -> None:
+    """Test that full_text_only() adds full text filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("diabetes").full_text_only()
+    result = query.build()
+    assert "diabetes" in result
+    assert "full text[sb]" in result
+
+
+def test_pmc_only() -> None:
+    """Test that pmc_only() adds PMC filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("treatment").pmc_only()
+    result = query.build()
+    assert "treatment" in result
+    assert "pmc[sb]" in result
+
+
+def test_multiple_access_filters_can_be_combined() -> None:
+    """Test that multiple access filters can be combined (though unusual)."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("research").free_full_text_only().pmc_only()
+    result = query.build()
+    assert "research" in result
+    assert "free full text[sb]" in result
+    assert "pmc[sb]" in result
+
+
+def test_access_filters_with_other_filters() -> None:
+    """Test that access filters work with date and article type filters."""
+    from pubmed_client import SearchQuery
+
+    query = (
+        SearchQuery()
+        .query("covid-19")
+        .published_in_year(2024)
+        .article_type("Review")
+        .free_full_text_only()
+    )
+    result = query.build()
+    assert "covid-19" in result
+    assert "2024[pdat]" in result
+    assert "Review[pt]" in result
+    assert "free full text[sb]" in result
