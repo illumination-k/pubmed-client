@@ -294,7 +294,7 @@ def test_article_types_empty_list() -> None:
 
 
 @pytest.mark.parametrize(
-    "article_type_name,expected_tag",
+    ("article_type_name", "expected_tag"),
     [
         ("Clinical Trial", "Clinical Trial[pt]"),
         ("Review", "Review[pt]"),
