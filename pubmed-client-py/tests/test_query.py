@@ -243,5 +243,5 @@ def test_invalid_date_range_raises_valueerror() -> None:
     """Test that start_year > end_year raises ValueError."""
     from pubmed_client import SearchQuery
 
-    with pytest.raises(ValueError, match="Start year.*must be.*end year"):
+    with pytest.raises(ValueError, match=r"Start year.*must be.*end year"):
         SearchQuery().query("topic").published_between(2024, 2020)
