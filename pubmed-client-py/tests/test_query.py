@@ -173,3 +173,75 @@ def test_method_chaining_returns_self() -> None:
         SearchQuery().query("covid-19").query("vaccine").terms(["efficacy", "safety"]).limit(50)
     )
     assert final_query.build() == "covid-19 vaccine efficacy safety"
+
+
+# ================================================================================================
+# Date Filtering Tests (User Story 1)
+# ================================================================================================
+
+
+def test_published_in_year() -> None:
+    """Test that published_in_year() generates correct date filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("covid-19").published_in_year(2024)
+    result = query.build()
+    assert "2024[pdat]" in result
+    assert "covid-19" in result
+
+
+def test_published_between_with_both_years() -> None:
+    """Test that published_between() with both years generates correct date range filter."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("cancer").published_between(2020, 2023)
+    result = query.build()
+    assert "2020:2023[pdat]" in result
+    assert "cancer" in result
+
+
+def test_published_between_with_none_end_year() -> None:
+    """Test that published_between() with None end_year uses 3000 as upper bound."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("diabetes").published_between(2020, None)
+    result = query.build()
+    assert "2020:3000[pdat]" in result
+    assert "diabetes" in result
+
+
+def test_published_after() -> None:
+    """Test that published_after() generates correct open-ended date range."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("treatment").published_after(2020)
+    result = query.build()
+    assert "2020:3000[pdat]" in result
+    assert "treatment" in result
+
+
+def test_published_before() -> None:
+    """Test that published_before() generates correct upper-bounded date range."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("epidemiology").published_before(2020)
+    result = query.build()
+    assert "1900:2020[pdat]" in result
+    assert "epidemiology" in result
+
+
+@pytest.mark.parametrize("invalid_year", [999, 1799, 3001, 5000])
+def test_invalid_years_raise_valueerror(invalid_year: int) -> None:
+    """Test that years outside 1800-3000 range raise ValueError."""
+    from pubmed_client import SearchQuery
+
+    with pytest.raises(ValueError, match="Year must be between 1800 and 3000"):
+        SearchQuery().query("topic").published_in_year(invalid_year)
+
+
+def test_invalid_date_range_raises_valueerror() -> None:
+    """Test that start_year > end_year raises ValueError."""
+    from pubmed_client import SearchQuery
+
+    with pytest.raises(ValueError, match="Start year.*must be.*end year"):
+        SearchQuery().query("topic").published_between(2024, 2020)

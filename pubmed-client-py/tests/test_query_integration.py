@@ -87,3 +87,27 @@ def test_conditional_query_building() -> None:
 
     query4 = SearchQuery().terms(terms).query(optional_term)
     assert query4.build() == "cancer"  # None filtered out
+
+
+def test_date_filtering_integration() -> None:
+    """Test integration of date filtering with search terms."""
+    from pubmed_client import SearchQuery
+
+    # Test recent research query with date filter
+    query = SearchQuery().query("covid-19").query("vaccine").published_between(2020, 2024).limit(50)
+
+    result = query.build()
+
+    # Verify search terms are present
+    assert "covid-19" in result
+    assert "vaccine" in result
+
+    # Verify date filter is present
+    assert "2020:2024[pdat]" in result
+
+    # Test combining multiple date filter types
+    query2 = SearchQuery().query("cancer treatment").published_after(2015)
+
+    result2 = query2.build()
+    assert "cancer treatment" in result2
+    assert "2015:3000[pdat]" in result2
