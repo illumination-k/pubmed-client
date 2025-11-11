@@ -9,6 +9,7 @@ mod client;
 mod config;
 mod pmc;
 mod pubmed;
+mod query;
 mod utils;
 
 // Re-export main types for convenience
@@ -22,6 +23,7 @@ pub use pubmed::{
     PyAffiliation, PyAuthor, PyCitations, PyDatabaseInfo, PyPmcLinks, PyPubMedArticle,
     PyPubMedClient, PyRelatedArticles,
 };
+pub use query::PySearchQuery;
 
 // ================================================================================================
 // Module Definition
@@ -74,6 +76,9 @@ fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyPubMedClient>()?;
     m.add_class::<PyPmcClient>()?;
     m.add_class::<PyClient>()?;
+
+    // Add query builder
+    m.add_class::<PySearchQuery>()?;
 
     Ok(())
 }

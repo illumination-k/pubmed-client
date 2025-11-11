@@ -6,7 +6,8 @@
   "excludes": [
     "**/*-lock.json",
     "**/test_data/**",
-    "tmp_*/**"
+    "tmp_*/**",
+    "specs/**"
   ],
   "plugins": [
     "https://plugins.dprint.dev/json-0.20.0.wasm",

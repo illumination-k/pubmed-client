@@ -102,6 +102,8 @@ extend-select = [
 "tests/*" = [
   "PLC0415", # Import should be at top-level (intentional in tests for lazy import)
   "PLR2004", # Magic value in comparison (acceptable in tests)
+  "FBT001", # Boolean positional arguments acceptable in test helpers
+  "FBT002", # Boolean default arguments acceptable in test helpers
 ]
 "examples/*" = [
   "T201", # print() is expected in examples

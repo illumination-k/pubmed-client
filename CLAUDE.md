@@ -632,6 +632,137 @@ The Python package provides native Python bindings for the core Rust library:
 - **Builder Pattern**: ClientConfig supports method chaining
 - **Recursive Collection**: Figures and tables collected from nested article sections
 
+### Maturin Best Practices for PyO3 Development
+
+**CRITICAL**: When developing Python bindings with maturin and PyO3, follow these best practices:
+
+#### Module Registration
+
+1. **Always add new #[pyclass] types to the #[pymodule] function:**
+   ```rust
+   #[pymodule]
+   fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
+       // Add ALL pyclass types here
+       m.add_class::<PyYourNewClass>()?;
+       Ok(())
+   }
+   ```
+
+2. **Keep #[pyclass] and #[pymethods] in the same file:**
+   - PyO3 requires both to be in the same Rust module
+   - Splitting them across files will cause silent export failures
+
+3. **Verify module exports after adding new classes:**
+   ```bash
+   # Rebuild with maturin
+   uv run --with maturin maturin develop
+
+   # Test that class is accessible
+   uv run python -c "from pubmed_client import YourNewClass; print('Success!')"
+
+   # Or inspect the module
+   uv run python -c "import pubmed_client; print('YourNewClass' in dir(pubmed_client))"
+   ```
+
+#### Build and Testing Workflow
+
+1. **Always rebuild after Rust changes:**
+   ```bash
+   # Development build (faster, with debug symbols)
+   uv run --with maturin maturin develop
+
+   # Release build (optimized)
+   uv run --with maturin maturin develop --release
+   ```
+
+2. **Clean builds when troubleshooting:**
+   ```bash
+   # Clean Rust artifacts
+   cargo clean -p pubmed-client-py
+
+   # Rebuild
+   uv run --with maturin maturin develop
+   ```
+
+3. **Test immediately after adding new bindings:**
+   ```bash
+   # Run specific test file
+   uv run pytest tests/test_your_feature.py -v
+
+   # Run all tests
+   uv run pytest
+   ```
+
+#### Type Stubs (.pyi files)
+
+1. **Keep type stubs in sync with Rust implementation:**
+   - Update `pubmed_client.pyi` when adding new classes or methods
+   - Add new class names to `__all__` list in the stub file
+
+2. **Use covariant types for collections:**
+   ```python
+   from collections.abc import Sequence
+
+   # ✅ Good - accepts both list[str] and list[str | None]
+   def terms(self, terms: Sequence[str | None] | None) -> SearchQuery: ...
+
+   # ❌ Bad - list is invariant, only accepts exact type
+   def terms(self, terms: list[str | None] | None) -> SearchQuery: ...
+   ```
+
+3. **Remove docstrings from .pyi files:**
+   - Type stub files should only contain type signatures
+   - Docstrings belong in the Rust source code
+
+#### Common Pitfalls
+
+1. **Module name confusion:**
+   - The `module-name` in `pyproject.toml` creates a nested structure
+   - For `module-name = "pubmed_client_py.pubmed_client"`:
+     - The .so file is `pubmed_client.cpython-312-*.so`
+     - Python imports via `from pubmed_client import Class`
+
+2. **Type mismatches:**
+   - Python int → Rust usize: Negative values cause OverflowError
+   - Use appropriate error handling in tests
+   - PyO3 type validation happens before your Rust code runs
+
+3. **Silent export failures:**
+   - If a class compiles but doesn't export, check:
+     - Is it in `m.add_class::<YourClass>()?`?
+     - Are #[pyclass] and #[pymethods] in the same file?
+     - Did you rebuild with maturin develop?
+
+4. **Cache issues:**
+   - Python caches imported modules
+   - Restart Python interpreter after rebuilding
+   - Or use `importlib.reload()` for iterative development
+
+#### Debugging Import Issues
+
+If a class doesn't appear in Python after adding it:
+
+```bash
+# 1. Check if it's in the compiled .so module
+uv run python << 'EOF'
+import pubmed_client.pubmed_client as so
+print("YourClass" in dir(so))
+print(so.__all__ if hasattr(so, "__all__") else "No __all__")
+EOF
+
+# 2. Check if it's exported from the package
+uv run python -c "import pubmed_client; print('YourClass' in dir(pubmed_client))"
+
+# 3. Try direct import
+uv run python -c "from pubmed_client import YourClass; print(YourClass)"
+```
+
+If the class is in the .so but not in the package:
+
+- Check `__all__` list in type stubs
+- Verify **init**.py has `from .pubmed_client import *`
+- Try uninstalling and reinstalling: `uv pip uninstall pubmed-client-py && uv run --with maturin maturin develop`
+
 ### Python Testing Strategy
 
 Comprehensive test suite with 35 tests across config, client, models, and integration tests.
@@ -918,3 +1049,12 @@ The test suites provide extensive coverage of XML parsing and content analysis:
   - Article type distribution
 
 Both test suites include statistical analysis and success rate validation to ensure robust parsing across diverse article types and content structures.
+
+## Active Technologies
+
+- Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.21+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-query-builder-python)
+- N/A (stateless query builder)\ (001-query-builder-python)
+
+## Recent Changes
+
+- 001-query-builder-python: Added Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.21+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\

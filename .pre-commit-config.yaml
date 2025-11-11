@@ -10,7 +10,8 @@ repos:
         exclude: "^tests/integration/test_data/"
       - id: check-merge-conflict
       - id: check-added-large-files
-        args: ["--maxkb=1000"]
+        args: ["--maxkb=100", "--enforce-all"]
+        exclude: "^pubmed-client/tests/integration/test_data/.*\\.(xml|json)$"
       - id: mixed-line-ending
 
   - repo: local

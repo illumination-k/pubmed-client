@@ -9,6 +9,8 @@ pnpm = "10"
 node = "20"
 uv = "0.8"
 
+shfmt = "3"
+
 [env]
 # Use Python from pubmed-client-py venv for PyO3
 PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
@@ -19,14 +21,21 @@ PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
 postinstall = ["mise run setup"]
 
 [tasks."fmt:root"]
+description = "Format Rust code at workspace root using mise, dprint, and cargo fmt"
+env = { RUST_LOG = "warn" }
 run = ["mise fmt", "dprint fmt", "cargo fmt --all"]
 
+[tasks."fmt:sh"]
+description = "Format shell scripts with shfmt"
+run = ["shfmt -w ./**/*.sh"]
+
 [tasks.fmt]
-depends = ["fmt:root", "py:format"]
+description = "Format all code (Rust + Python)"
+depends = ["fmt:root", "py:format", "fmt:sh"]
 
 [tasks."lint:root"]
+description = "Lint Rust code with dprint, cargo fmt, and clippy"
 run = [
-  "./etc/check_lfs_tracking.sh",
   "dprint check",
   "cargo fmt --all -- --check",
   "cargo clippy --workspace --all-targets -- -D warnings",
@@ -34,93 +43,93 @@ run = [
 ]
 
 [tasks.lint]
-depends = ["lint:root", "py:check"]
+description = "Lint all code (Rust + Python)"
+depends = ["lint:root", "py:lint"]
 
 [tasks."setup:pre-commit"]
+description = "Install pre-commit hooks"
 run = ["pre-commit install --install-hooks"]
 
 [tasks."setup:py"]
+description = "Create Python virtual environment for PyO3 bindings"
 dir = "{{ config_root }}/pubmed-client-py"
 run = ["uv venv"]
 
 [tasks."setup:test"]
+description = "Setup test environment by running setup script"
 run = ["bash ./etc/setup-test.sh"]
 
 [tasks.setup]
+description = "Run all setup tasks (pre-commit, Python venv, test setup)"
 depends = ["setup:*"]
 
 [tasks.test]
+description = "Run tests for entire workspace using nextest"
 run = ["cargo nextest run --workspace"]
 
-[tasks."test:watch"]
-run = ["cargo watch -x 'nextest run --workspace'"]
-
-[tasks."test:verbose"]
-run = ["cargo nextest run --workspace --no-capture"]
-
 [tasks.build]
+description = "Build entire workspace"
 run = ["cargo build --workspace"]
 
 [tasks.check]
+description = "Check entire workspace without building"
 run = ["cargo check --workspace"]
 
-[tasks.doc]
-run = ["cargo doc --workspace --open"]
-
 [tasks.coverage]
+description = "Generate HTML coverage report for core library"
 run = ["cargo llvm-cov nextest -p pubmed-client --all-features --html"]
 
 [tasks."wasm:build"]
+description = "Build WASM package for web target"
 run = ["cd pubmed-client-wasm && wasm-pack build --target web"]
 
 [tasks."wasm:build:node"]
+description = "Build WASM package for Node.js target"
 run = ["cd pubmed-client-wasm && wasm-pack build --target nodejs"]
 
 [tasks."wasm:test"]
+description = "Build and test WASM package with TypeScript tests"
 run = ["cd pubmed-client-wasm && pnpm run build && pnpm run test"]
 
-[tasks."wasm:publish"]
-run = ["cd pubmed-client-wasm && pnpm run publish"]
-
 [tasks."core:test"]
+description = "Run tests for core Rust library only"
 run = ["cargo test -p pubmed-client"]
 
 [tasks."core:test:integration"]
+description = "Run integration tests for core library"
 run = ["cd pubmed-client && cargo test --test"]
 
-[tasks."core:publish"]
-run = ["cd pubmed-client && cargo publish"]
-
 [tasks."py:build"]
+description = "Build Python package with maturin"
 dir = "pubmed-client-py"
 run = ["uv run maturin build"]
 
 [tasks."py:test"]
+description = "Run Python tests with pytest"
 dir = "pubmed-client-py"
 run = ["uv run --frozen pytest"]
 
 [tasks."py:lint"]
+description = "Lint Python code with ruff and mypy"
+env = { RUST_LOG = "warn" }
 dir = "pubmed-client-py"
-run = ["uv run --frozen ruff check"]
+run = ["uv run --frozen ruff check", "uv run --frozen mypy ."]
 
 [tasks."py:format"]
+description = "Format Python code with ruff"
+env = { RUST_LOG = "warn" }
 dir = "pubmed-client-py"
 run = ["uv run --frozen ruff format"]
 
-[tasks."py:typecheck"]
-dir = "pubmed-client-py"
-run = ["uv run --frozen mypy ."]
-
-[tasks."py:check"]
-depends = ["py:lint", "py:typecheck"]
-
 [tasks."py:coverage"]
+description = "Generate Python coverage report with HTML and terminal output"
 dir = "pubmed-client-py"
 run = [
   "uv run --frozen pytest --cov=pubmed_client --cov-report=html --cov-report=term",
 ]
 
 [tasks."py:clean"]
+description = "Clean Python build artifacts and cache directories"
 dir = "pubmed-client-py"
 run = [
   "rm -rf target/",
@@ -130,7 +139,3 @@ run = [
   "rm -rf htmlcov/",
   "rm -rf .coverage",
 ]
-
-[tasks."py:publish"]
-dir = "pubmed-client-py"
-run = ["uv run maturin publish"]

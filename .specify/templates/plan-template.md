@@ -31,7 +31,43 @@
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-[Gates determined based on constitution file]
+**I. Multi-Language API Client Design**
+
+- [ ] Core logic implemented in Rust (pubmed-client/)
+- [ ] Language bindings maintain idiomatic patterns (async for WASM, blocking for Python)
+- [ ] No business logic duplication across bindings
+
+**II. Testing Excellence** (NON-NEGOTIABLE)
+
+- [ ] Unit tests planned alongside implementation
+- [ ] Integration tests with real XML fixtures or API responses
+- [ ] Binding-specific tests (vitest for WASM, pytest for Python)
+- [ ] Coverage tracking configured
+
+**III. Type Safety & API Design**
+
+- [ ] Public APIs return Result<T, Error> for fallible operations
+- [ ] Builder patterns used for complex types
+- [ ] Type stubs planned for Python (.pyi files)
+- [ ] No empty structs with static methods
+
+**IV. NCBI API Compliance**
+
+- [ ] Rate limiting respected (existing RateLimiter used)
+- [ ] Retry logic for transient failures
+- [ ] Search field tags validated against NCBI documentation
+- [ ] API key/email/tool configuration supported
+
+**V. Structured Logging & Observability**
+
+- [ ] Tracing macros used (not println!)
+- [ ] Structured context in log events
+- [ ] RUST_LOG support planned
+
+**VI. Parser Design Philosophy**
+
+- [ ] Module functions (not empty structs) for parsing
+- [ ] Real XML fixtures for parser testing
 
 ## Project Structure
 

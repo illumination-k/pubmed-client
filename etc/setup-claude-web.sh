@@ -16,5 +16,9 @@ curl https://mise.run | sh
 export PATH="$HOME/.local/bin:$PATH"
 eval "$(~/.local/bin/mise activate bash)"
 
+mise settings experimental=true
+
 mise trust
+mise trust pubmed-client/.mise.toml
+
 mise install
