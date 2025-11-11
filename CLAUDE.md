@@ -1052,6 +1052,9 @@ Both test suites include statistical analysis and success rate validation to ens
 
 ## Active Technologies
 
+- Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.23+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-search-filters-python)
+- N/A (stateless query builder)\ (001-search-filters-python)
+
 - Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.21+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-query-builder-python)
 - N/A (stateless query builder)\ (001-query-builder-python)
 
