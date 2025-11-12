@@ -43,7 +43,16 @@
     }
   },
   "files": {
-    "includes": ["tests/**/*.ts", "tests/**/*.js", "*.ts", "*.js", "*.json"],
+    "includes": [
+      "**",
+      "!**/pkg",
+      "!**/target",
+      "!**/node_modules",
+      "!**/*.wasm",
+      "!**/pnpm-lock.yaml",
+      "!**/Cargo.lock",
+      "!**/src"
+    ],
     "ignoreUnknown": false
   },
   "overrides": [
