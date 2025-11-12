@@ -8,9 +8,44 @@ use std::sync::Arc;
 use pubmed_client::PubMedClient as RustPubMedClient;
 
 use crate::config::PyClientConfig;
+use crate::query::PySearchQuery;
 use crate::utils::{get_runtime, to_py_err};
 
 use super::models::{PyCitations, PyDatabaseInfo, PyPmcLinks, PyPubMedArticle, PyRelatedArticles};
+
+// ================================================================================================
+// Query Input Type for Union[str, SearchQuery]
+// ================================================================================================
+
+/// Enum to handle Python's Union[str, SearchQuery] type
+#[derive(FromPyObject)]
+enum QueryInput {
+    /// String query (e.g., "covid-19")
+    String(String),
+    /// SearchQuery object
+    SearchQuery(PySearchQuery),
+}
+
+impl QueryInput {
+    /// Convert QueryInput to a query string
+    fn to_query_string(&self) -> PyResult<String> {
+        match self {
+            QueryInput::String(s) => Ok(s.clone()),
+            QueryInput::SearchQuery(q) => Ok(q.inner.build()),
+        }
+    }
+
+    /// Get the limit from QueryInput
+    ///
+    /// - For String input: returns the provided default limit
+    /// - For SearchQuery input: returns the query's limit
+    fn get_limit(&self, default_limit: usize) -> usize {
+        match self {
+            QueryInput::String(_) => default_limit,
+            QueryInput::SearchQuery(q) => q.inner.get_limit(),
+        }
+    }
+}
 
 // ================================================================================================
 // Client Implementation
@@ -51,21 +86,33 @@ impl PyPubMedClient {
     /// which is faster than fetching full article metadata.
     ///
     /// Args:
-    ///     query: Search query string (supports PubMed search syntax)
-    ///     limit: Maximum number of PMIDs to return
+    ///     query: Search query (either a string or SearchQuery object)
+    ///     limit: Maximum number of PMIDs to return (ignored if query is SearchQuery)
     ///
     /// Returns:
     ///     List of PMIDs as strings
     ///
     /// Examples:
     ///     >>> client = PubMedClient()
+    ///     >>> # Using string query
     ///     >>> pmids = client.search_articles("covid-19", 100)
     ///     >>> pmids = client.search_articles("cancer[ti] AND therapy[tiab]", 50)
-    fn search_articles(&self, py: Python, query: String, limit: usize) -> PyResult<Vec<String>> {
+    ///     >>> # Using SearchQuery object
+    ///     >>> query = SearchQuery().query("covid-19").limit(100)
+    ///     >>> pmids = client.search_articles(query, 0)  # limit parameter ignored
+    fn search_articles(
+        &self,
+        py: Python,
+        query: QueryInput,
+        limit: usize,
+    ) -> PyResult<Vec<String>> {
         let client = self.client.clone();
+        let query_string = query.to_query_string()?;
+        let actual_limit = query.get_limit(limit);
+
         py.allow_threads(|| {
             let rt = get_runtime();
-            rt.block_on(client.search_articles(&query, limit))
+            rt.block_on(client.search_articles(&query_string, actual_limit))
                 .map_err(to_py_err)
         })
     }
@@ -73,22 +120,33 @@ impl PyPubMedClient {
     /// Search for articles and fetch their metadata
     ///
     /// Args:
-    ///     query: Search query string
-    ///     limit: Maximum number of articles to return
+    ///     query: Search query (either a string or SearchQuery object)
+    ///     limit: Maximum number of articles to return (ignored if query is SearchQuery)
     ///
     /// Returns:
     ///     List of PubMedArticle objects
+    ///
+    /// Examples:
+    ///     >>> client = PubMedClient()
+    ///     >>> # Using string query
+    ///     >>> articles = client.search_and_fetch("covid-19", 10)
+    ///     >>> # Using SearchQuery object
+    ///     >>> query = SearchQuery().query("cancer").published_after(2020).limit(50)
+    ///     >>> articles = client.search_and_fetch(query, 0)  # limit parameter ignored
     fn search_and_fetch(
         &self,
         py: Python,
-        query: String,
+        query: QueryInput,
         limit: usize,
     ) -> PyResult<Vec<PyPubMedArticle>> {
         let client = self.client.clone();
+        let query_string = query.to_query_string()?;
+        let actual_limit = query.get_limit(limit);
+
         py.allow_threads(|| {
             let rt = get_runtime();
             let articles = rt
-                .block_on(client.search_and_fetch(&query, limit))
+                .block_on(client.search_and_fetch(&query_string, actual_limit))
                 .map_err(to_py_err)?;
             Ok(articles.into_iter().map(PyPubMedArticle::from).collect())
         })

@@ -200,6 +200,24 @@ impl PySearchQuery {
         Ok(query_string)
     }
 
+    /// Get the limit for this query
+    ///
+    /// Returns the configured limit or the default of 20 if not set.
+    ///
+    /// Returns:
+    ///     int: Maximum number of results (default: 20)
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").limit(100)
+    ///     >>> query.get_limit()
+    ///     100
+    ///     >>> query2 = SearchQuery().query("diabetes")
+    ///     >>> query2.get_limit()
+    ///     20
+    fn get_limit(&self) -> usize {
+        self.inner.get_limit()
+    }
+
     /// String representation for debugging
     fn __repr__(&self) -> String {
         "SearchQuery()".to_string()
