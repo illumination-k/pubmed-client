@@ -80,6 +80,10 @@ pub struct Search {
     #[arg(long)]
     open_access: bool,
 
+    /// Include only PMC articles
+    #[arg(long)]
+    pmc_only: bool,
+
     // Other identifiers
     /// Filter by grant number
     #[arg(long)]
@@ -208,6 +212,10 @@ impl Search {
             query = query.free_full_text_only();
         }
 
+        if self.pmc_only {
+            query = query.pmc_only();
+        }
+
         // Other identifiers
         if let Some(ref grant_number) = self.grant_number {
             query = query.grant_number(grant_number);
@@ -257,6 +265,7 @@ mod tests {
             organism: None,
             article_type: None,
             open_access: false,
+            pmc_only: false,
             grant_number: None,
         };
 
@@ -284,6 +293,7 @@ mod tests {
             organism: None,
             article_type: Some(ArticleTypeArg::Review),
             open_access: true,
+            pmc_only: false,
             grant_number: None,
         };
 
@@ -316,6 +326,7 @@ mod tests {
             organism: Some("Mus musculus".to_string()),
             article_type: None,
             open_access: false,
+            pmc_only: false,
             grant_number: None,
         };
 
@@ -353,6 +364,7 @@ mod tests {
             organism: None,
             article_type: None,
             open_access: false,
+            pmc_only: false,
             grant_number: None,
         };
 
@@ -360,5 +372,34 @@ mod tests {
         // but we can verify that the search struct is properly constructed
         assert!(search.ids_only);
         assert_eq!(search.query, Some("test".to_string()));
+    }
+
+    #[test]
+    fn test_pmc_only_flag() {
+        let search = Search {
+            query: Some("diabetes".to_string()),
+            limit: 10,
+            output: None,
+            ids_only: false,
+            from_year: None,
+            to_year: None,
+            year: None,
+            author: None,
+            first_author: None,
+            last_author: None,
+            journal: None,
+            journal_abbrev: None,
+            mesh_term: None,
+            mesh_major: None,
+            organism: None,
+            article_type: None,
+            open_access: false,
+            pmc_only: true,
+            grant_number: None,
+        };
+
+        let query = search.build_query().unwrap();
+        assert!(query.contains("diabetes"));
+        assert!(query.contains("pmc[sb]"));
     }
 }
