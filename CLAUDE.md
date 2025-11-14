@@ -796,6 +796,50 @@ If the class is in the .so but not in the package:
 - Verify **init**.py has `from .pubmed_client import *`
 - Try uninstalling and reinstalling: `uv pip uninstall pubmed-client-py && uv run --with maturin maturin develop`
 
+### Stub Generation Workflow (MVP)
+
+**See**: [pubmed-client-py/STUB_GENERATION_MVP.md](pubmed-client-py/STUB_GENERATION_MVP.md) for full documentation
+
+The project uses **semi-automated stub generation** via runtime introspection to catch missing classes/methods.
+
+#### Quick Verification
+
+After adding new PyO3 classes or methods:
+
+```bash
+# From pubmed-client-py/
+./scripts/generate_stubs.sh
+
+# Compare with manual stub file
+diff pubmed_client.pyi pubmed_client_auto.pyi
+```
+
+This generates `pubmed_client_auto.pyi` with all classes/methods (but without type annotations).
+
+#### When Adding New Methods
+
+1. **Add Rust implementation** with `#[pyclass]`/`#[pymethods]`
+2. **Register in `#[pymodule]`** function (in `src/lib.rs`)
+3. **Run**: `./scripts/generate_stubs.sh`
+4. **Compare**: Check diff for missing methods
+5. **Update `pubmed_client.pyi`** with type annotations
+6. **Verify**: `uv run mypy tests/ --strict`
+7. **Test**: `uv run --with maturin maturin develop && uv run pytest`
+
+#### What the Script Does
+
+✅ Extracts: All classes, methods, docstrings, `__all__` list
+❌ Missing: Type annotations, property fields, complex types
+
+#### Why This Approach?
+
+- **No code changes** - works with current PyO3 0.23
+- **Immediate value** - catches missing classes/methods
+- **Low overhead** - runs in seconds
+- **Future-proof** - can upgrade to full automation when PyO3 0.26 is adopted
+
+For full research on alternatives (pyo3-stub-gen, mypy stubgen, etc.), see [STUB_GENERATION_RESEARCH.md](pubmed-client-py/STUB_GENERATION_RESEARCH.md).
+
 ### Python Testing Strategy
 
 Comprehensive test suite with 35 tests across config, client, models, and integration tests.
