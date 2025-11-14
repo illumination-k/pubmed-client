@@ -17,3 +17,7 @@ serde_json = "1.0"
 thiserror = "1.0"
 tracing = "0.1"
 urlencoding = "2.1"
+
+# Stub generation for PyO3
+pyo3-stub-gen = "0.17"
+pyo3-stub-gen-derive = "0.17"

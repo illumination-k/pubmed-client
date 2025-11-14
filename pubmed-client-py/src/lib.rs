@@ -4,6 +4,10 @@
 
 use pyo3::prelude::*;
 
+// Stub generation support (only when stub-gen feature is enabled)
+#[cfg(feature = "stub-gen")]
+use pyo3_stub_gen::{define_stub_info_gatherer, derive::*};
+
 // Module declarations
 mod client;
 mod config;
@@ -82,3 +86,10 @@ fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     Ok(())
 }
+
+// ================================================================================================
+// Stub Generation Support
+// ================================================================================================
+
+#[cfg(feature = "stub-gen")]
+define_stub_info_gatherer!(stub_info);

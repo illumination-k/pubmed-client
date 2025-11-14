@@ -840,6 +840,24 @@ This generates `pubmed_client_auto.pyi` with all classes/methods (but without ty
 
 For full research on alternatives (pyo3-stub-gen, mypy stubgen, etc.), see [STUB_GENERATION_RESEARCH.md](pubmed-client-py/STUB_GENERATION_RESEARCH.md).
 
+#### PyO3 0.26 Upgrade
+
+**IMPORTANT**: The project has been upgraded to PyO3 0.26 (from 0.23) to enable future full automation with pyo3-stub-gen.
+
+**Infrastructure ready**:
+- pyo3-stub-gen 0.17 dependencies added
+- Stub generation binary: `src/bin/stub_gen.rs`
+- Feature flag: `stub-gen`
+- Pilot annotation: `ClientConfig` class
+
+**Current approach**: Semi-automated (runtime introspection) via `scripts/generate_stubs.sh`
+
+**Future path**: Annotate remaining 22 classes with `gen_stub_pyclass`/`gen_stub_pymethods` for full automation
+
+See: [pubmed-client-py/AUTOMATION_UPGRADE.md](pubmed-client-py/AUTOMATION_UPGRADE.md) for upgrade details
+
+**Known deprecation**: PyO3 0.26 deprecates `Python::allow_threads()` in favor of `Python::detach()` (27 instances, non-critical)
+
 ### Python Testing Strategy
 
 Comprehensive test suite with 35 tests across config, client, models, and integration tests.
@@ -1129,12 +1147,13 @@ Both test suites include statistical analysis and success rate validation to ens
 
 ## Active Technologies
 
-- Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.23+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-search-filters-python)
+- Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.26+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-search-filters-python)
 - N/A (stateless query builder)\ (001-search-filters-python)
 
-- Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.21+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-query-builder-python)
+- Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.26+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\ (001-query-builder-python)
 - N/A (stateless query builder)\ (001-query-builder-python)
 
 ## Recent Changes
 
-- 001-query-builder-python: Added Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.21+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\
+- 2025-11-14: Upgraded PyO3 to 0.26, added pyo3-stub-gen infrastructure for future full automation
+- 001-query-builder-python: Added Python 3.12+ (bindings), Rust 1.75+ (core library)\ + PyO3 0.26+ (Rust-Python bindings), maturin 1.x (build system), pubmed-client-rs (core Rust library)\
