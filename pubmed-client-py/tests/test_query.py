@@ -384,3 +384,254 @@ def test_access_filters_with_other_filters() -> None:
     assert "2024[pdat]" in result
     assert "Review[pt]" in result
     assert "free full text[sb]" in result
+
+
+# ================================================================================================
+# Boolean Logic Tests (User Story 4 - AND, OR, NOT operations)
+# ================================================================================================
+
+
+def test_and_operation() -> None:
+    """Test that and_() combines two queries with AND logic."""
+    from pubmed_client import SearchQuery
+
+    q1 = SearchQuery().query("covid-19")
+    q2 = SearchQuery().query("vaccine")
+    combined = q1.and_(q2)
+    assert combined.build() == "(covid-19) AND (vaccine)"
+
+
+def test_or_operation() -> None:
+    """Test that or_() combines two queries with OR logic."""
+    from pubmed_client import SearchQuery
+
+    q1 = SearchQuery().query("diabetes")
+    q2 = SearchQuery().query("hypertension")
+    combined = q1.or_(q2)
+    assert combined.build() == "(diabetes) OR (hypertension)"
+
+
+def test_negate_operation() -> None:
+    """Test that negate() wraps query with NOT logic."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("cancer").negate()
+    assert query.build() == "NOT (cancer)"
+
+
+def test_exclude_operation() -> None:
+    """Test that exclude() filters out unwanted results."""
+    from pubmed_client import SearchQuery
+
+    base = SearchQuery().query("cancer treatment")
+    exclude = SearchQuery().query("animal studies")
+    filtered = base.exclude(exclude)
+    assert filtered.build() == "(cancer treatment) NOT (animal studies)"
+
+
+def test_group_operation() -> None:
+    """Test that group() wraps query in parentheses."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().query("cancer").group()
+    assert query.build() == "(cancer)"
+
+
+def test_complex_boolean_chain() -> None:
+    """Test complex chaining of boolean operations."""
+    from pubmed_client import SearchQuery
+
+    ai_query = SearchQuery().query("machine learning")
+    medicine_query = SearchQuery().query("medicine")
+    exclude_query = SearchQuery().query("veterinary")
+
+    final_query = ai_query.and_(medicine_query).exclude(exclude_query).group()
+
+    assert final_query.build() == "(((machine learning) AND (medicine)) NOT (veterinary))"
+
+
+def test_and_with_empty_first_query() -> None:
+    """Test that and_() with empty first query returns the second query."""
+    from pubmed_client import SearchQuery
+
+    q1 = SearchQuery()
+    q2 = SearchQuery().query("test")
+    combined = q1.and_(q2)
+    assert combined.build() == "test"
+
+
+def test_or_with_empty_second_query() -> None:
+    """Test that or_() with empty second query returns the first query."""
+    from pubmed_client import SearchQuery
+
+    q1 = SearchQuery().query("test")
+    q2 = SearchQuery()
+    combined = q1.or_(q2)
+    assert combined.build() == "test"
+
+
+def test_negate_empty_query() -> None:
+    """Test that negating an empty query produces empty result."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().negate()
+    # Empty query still raises ValueError
+    with pytest.raises(ValueError, match="Cannot build query"):
+        query.build()
+
+
+def test_exclude_with_empty_base() -> None:
+    """Test that excluding from empty base returns empty."""
+    from pubmed_client import SearchQuery
+
+    base = SearchQuery()
+    exclude = SearchQuery().query("test")
+    filtered = base.exclude(exclude)
+    # Empty query still raises ValueError
+    with pytest.raises(ValueError, match="Cannot build query"):
+        filtered.build()
+
+
+def test_exclude_with_empty_excluded() -> None:
+    """Test that excluding empty query returns base unchanged."""
+    from pubmed_client import SearchQuery
+
+    base = SearchQuery().query("test")
+    exclude = SearchQuery()
+    filtered = base.exclude(exclude)
+    assert filtered.build() == "test"
+
+
+def test_group_empty_query() -> None:
+    """Test that grouping empty query produces empty result."""
+    from pubmed_client import SearchQuery
+
+    query = SearchQuery().group()
+    # Empty query still raises ValueError
+    with pytest.raises(ValueError, match="Cannot build query"):
+        query.build()
+
+
+def test_deep_boolean_nesting() -> None:
+    """Test deeply nested boolean operations."""
+    from pubmed_client import SearchQuery
+
+    q1 = SearchQuery().query("a")
+    q2 = SearchQuery().query("b")
+    q3 = SearchQuery().query("c")
+    q4 = SearchQuery().query("d")
+
+    nested = q1.and_(q2).or_(q3.and_(q4))
+    assert nested.build() == "((a) AND (b)) OR ((c) AND (d))"
+
+
+def test_boolean_operations_preserve_limit() -> None:
+    """Test that boolean operations preserve the higher limit."""
+    from pubmed_client import SearchQuery
+
+    q1 = SearchQuery().query("covid").limit(10)
+    q2 = SearchQuery().query("vaccine").limit(50)
+    combined = q1.and_(q2)
+
+    # Should use higher limit (50)
+    assert combined.get_limit() == 50
+
+
+def test_and_multiple_operations() -> None:
+    """Test chaining multiple AND operations."""
+    from pubmed_client import SearchQuery
+
+    result = (
+        SearchQuery()
+        .query("cancer")
+        .and_(SearchQuery().query("treatment"))
+        .and_(SearchQuery().query("outcomes"))
+    )
+    assert result.build() == "((cancer) AND (treatment)) AND (outcomes)"
+
+
+def test_or_multiple_operations() -> None:
+    """Test chaining multiple OR operations."""
+    from pubmed_client import SearchQuery
+
+    result = (
+        SearchQuery()
+        .query("cancer")
+        .or_(SearchQuery().query("tumor"))
+        .or_(SearchQuery().query("oncology"))
+    )
+    assert result.build() == "((cancer) OR (tumor)) OR (oncology)"
+
+
+def test_mixed_boolean_operations() -> None:
+    """Test mixing AND and OR operations."""
+    from pubmed_client import SearchQuery
+
+    # (covid OR sars) AND vaccine
+    covid_or_sars = SearchQuery().query("covid").or_(SearchQuery().query("sars"))
+    result = covid_or_sars.and_(SearchQuery().query("vaccine"))
+
+    assert result.build() == "((covid) OR (sars)) AND (vaccine)"
+
+
+def test_exclude_multiple_terms() -> None:
+    """Test excluding multiple terms sequentially."""
+    from pubmed_client import SearchQuery
+
+    result = (
+        SearchQuery()
+        .query("therapy")
+        .exclude(SearchQuery().query("animal studies"))
+        .exclude(SearchQuery().query("in vitro"))
+    )
+    # Each exclude wraps the previous result
+    assert result.build() == "((therapy) NOT (animal studies)) NOT (in vitro)"
+
+
+def test_boolean_with_filters() -> None:
+    """Test boolean operations combined with date and type filters."""
+    from pubmed_client import SearchQuery
+
+    q1 = SearchQuery().query("covid-19").published_in_year(2024)
+    q2 = SearchQuery().query("vaccine").article_type("Clinical Trial")
+
+    result = q1.and_(q2)
+    built = result.build()
+
+    # Should contain both queries and their filters
+    assert "covid-19" in built
+    assert "vaccine" in built
+    assert "2024[pdat]" in built
+    assert "Clinical Trial[pt]" in built
+    assert " AND " in built
+
+
+def test_complex_real_world_query() -> None:
+    """Test a complex real-world research query."""
+    from pubmed_client import SearchQuery
+
+    # Find recent clinical trials for COVID-19 treatments, excluding animal studies
+    covid_query = SearchQuery().query("covid-19").query("treatment").published_after(2020)
+    clinical_trials = SearchQuery().article_type("Clinical Trial")
+    animal_studies = SearchQuery().query("animal studies")
+
+    result = covid_query.and_(clinical_trials).exclude(animal_studies)
+
+    built = result.build()
+    assert "covid-19" in built
+    assert "treatment" in built
+    assert "2020:3000[pdat]" in built
+    assert "Clinical Trial[pt]" in built
+    assert "animal studies" in built
+    assert " NOT " in built
+
+
+def test_precedence_control_with_group() -> None:
+    """Test controlling operator precedence with group()."""
+    from pubmed_client import SearchQuery
+
+    q1 = SearchQuery().query("a").or_(SearchQuery().query("b")).group()
+    q2 = SearchQuery().query("c").or_(SearchQuery().query("d")).group()
+    result = q1.and_(q2)
+
+    assert result.build() == "(((a) OR (b))) AND (((c) OR (d)))"
