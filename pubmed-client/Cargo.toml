@@ -142,5 +142,10 @@ path = "tests/integration/error_handling_tests.rs"
 name = "test_pmc_cache"
 path = "tests/integration/test_pmc_cache.rs"
 
+# Parser coverage tests
+[[test]]
+name = "test_parser_coverage"
+path = "tests/integration/test_parser_coverage.rs"
+
 # Examples
 # (Python examples are in pubmed-client-py/examples/)
