@@ -1,6 +1,96 @@
 # Maturin Best Practices for PyO3 Development
 
-## Known Issue: Maturin Develop Caching Problem
+## ⚠️ CRITICAL Issue #1: UV + Maturin Package Manager Conflict
+
+**THE MOST SEVERE ISSUE** - UV and maturin have an incompatibility that causes freshly built code to never load in Python.
+
+**Issue Reference**: [PyO3/maturin#2314](https://github.com/PyO3/maturin/issues/2314)
+
+### The Problem
+
+> "uv might reinstall the package at any point (e.g. when the pyproject.toml was edited), leading to a bit of a 'war' between uv and maturin develop in changing the rust binaries."
+
+**What Happens**:
+
+1. You run `uv run --with maturin maturin develop` - maturin builds fresh .so file and installs it
+2. You run `uv run python -c "..."` to test - uv automatically reinstalls from its cache, overwriting the fresh build
+3. Python loads the old cached code instead of your new code
+
+### Symptoms
+
+- Code compiles successfully without errors
+- New methods/classes don't appear in Python despite being in source
+- `hasattr(obj, 'new_method')` returns `False`
+- Even test code changes don't take effect
+- `cargo clean` + rebuild doesn't fix it
+- Watch for this output pattern:
+  ```
+  uv run python -c "..."
+  # Output shows:
+  # Uninstalled 1 package in 1ms
+  # Installed 1 package in 2ms  # ⚠️ UV REINSTALLING OLD CODE!
+  ```
+
+### THE SOLUTION - Never Mix `maturin develop` with `uv run`
+
+```bash
+# ✅ CORRECT WORKFLOW (from Python package directory)
+
+# Step 1: Remove old venv (if troubleshooting)
+rm -rf .venv && uv venv
+
+# Step 2: Build wheel (NOT develop)
+uv run --with maturin --with patchelf maturin build --release
+
+# Step 3: Install wheel with uv pip (not uv run)
+uv pip install ../target/wheels/<package>-*.whl --force-reinstall
+
+# Step 4: Test using venv Python DIRECTLY (not uv run!)
+.venv/bin/python -c "from your_module import YourClass"
+.venv/bin/python -m pytest tests/
+
+# ❌ BROKEN WORKFLOW - DO NOT DO THIS:
+maturin develop
+uv run python  # This reinstalls from cache, wiping out your fresh build!
+```
+
+### Debugging Checklist When Code Doesn't Load
+
+1. **Check binary contents**:
+   ```bash
+   strings .venv/lib/python*/site-packages/your_module/*.so | grep "your_new_method"
+   ```
+
+2. **Check file timestamps**:
+   ```bash
+   ls -lh .venv/lib/python*/site-packages/your_module/*.so
+   ls -lh src/your_modified_file.rs
+   # If .so is older than source, it wasn't updated!
+   ```
+
+3. **Check where Python is loading from**:
+   ```bash
+   .venv/bin/python -c "import your_module; print(your_module.__file__)"
+   ```
+
+4. **Nuclear option - fresh venv**:
+   ```bash
+   rm -rf .venv
+   uv venv
+   uv run --with maturin maturin build --release
+   uv pip install ../target/wheels/*.whl
+   .venv/bin/python  # Test with venv Python directly
+   ```
+
+### Key Rules
+
+- ✅ Use `maturin build` + `uv pip install` + `.venv/bin/python`
+- ❌ Never use `uv run python` after maturin operations
+- ✅ Check binary contents and timestamps when debugging
+- ❌ Don't trust that `--force-reinstall` actually reinstalls with uv
+- ✅ Use fresh venv when in doubt
+
+## Known Issue #2: Maturin Develop Caching Problem
 
 **⚠️ CRITICAL**: `maturin develop` has a known issue where new PyO3 methods may not be properly exported to Python, even after clean rebuilds.
 

@@ -4,13 +4,14 @@ Verify that PyO3 classes are properly registered in the #[pymodule] function.
 This script searches for #[pyclass] definitions and checks if they're added to the module.
 """
 
+from __future__ import annotations
+
 import re
 import sys
 from pathlib import Path
-from typing import Set, List, Tuple
 
 
-def extract_pyclass_names(file_path: Path) -> Set[str]:
+def extract_pyclass_names(file_path: Path) -> set[str]:
     """
     Extract all #[pyclass] names from a Rust file.
 
@@ -36,7 +37,7 @@ def extract_pyclass_names(file_path: Path) -> Set[str]:
     return {match.group(1) for match in matches}
 
 
-def extract_module_additions(file_path: Path) -> Set[str]:
+def extract_module_additions(file_path: Path) -> set[str]:
     """
     Extract all m.add_class::<Type>()? calls from the #[pymodule] function.
 
@@ -55,7 +56,7 @@ def extract_module_additions(file_path: Path) -> Set[str]:
     return {match.group(1) for match in matches}
 
 
-def check_module_registration(src_dir: Path) -> Tuple[Set[str], Set[str], Set[str]]:
+def check_module_registration(src_dir: Path) -> tuple[set[str], set[str], set[str]]:
     """
     Check all Rust files for unregistered #[pyclass] types.
 
@@ -85,7 +86,7 @@ def check_module_registration(src_dir: Path) -> Tuple[Set[str], Set[str], Set[st
     return all_pyclass_names, all_registered_names, unregistered
 
 
-def main():
+def main() -> None:
     """Main verification workflow."""
     print("🔍 PyO3 Module Registration Verifier")
     print("=" * 60)

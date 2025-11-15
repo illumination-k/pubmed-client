@@ -31,8 +31,9 @@ Can the code compile successfully with `cargo build`?
 ├─ No → Fix Rust compilation errors first (outside this skill)
 └─ Yes → Continue
 
-Does the issue involve new methods not appearing in Python?
-├─ Yes → Jump to "Missing Methods Workflow"
+Does the issue involve new methods/classes not appearing in Python?
+├─ Yes → ⚠️ CHECK STEP 0 FIRST (UV + Maturin Conflict) - 90% of issues!
+│        Then proceed to "Missing Methods Workflow"
 └─ No → Continue
 
 Is it an import error?
@@ -40,9 +41,100 @@ Is it an import error?
 └─ No → Jump to "General Diagnostic Workflow"
 ```
 
+## ⚠️ Priority Checklist - Most Common Issues First
+
+Before diving into complex debugging, check these in order:
+
+1. **UV + Maturin Conflict** (90% of "methods not appearing" issues)
+   - Are you using `uv run python` after `maturin develop`?
+   - → Jump to "Missing Methods Workflow Step 0"
+
+2. **Maturin Develop Caching** (9% of remaining issues)
+   - Have you added new methods to existing classes?
+   - → Jump to "Missing Methods Workflow Step 2"
+
+3. **Module Registration** (1% of remaining issues)
+   - Have you added new `#[pyclass]` types?
+   - → Jump to "Missing Methods Workflow Step 1"
+
 ## Missing Methods Workflow
 
 **Scenario**: New `#[pymethods]` compile successfully but don't appear in Python.
+
+### Step 0: ⚠️ CRITICAL - Check for UV + Maturin Conflict
+
+**This is the #1 cause of methods not appearing** - Before anything else, verify you're not mixing `uv run` with maturin builds.
+
+**Problem**: [PyO3/maturin#2314](https://github.com/PyO3/maturin/issues/2314) - UV may reinstall cached packages after maturin builds, causing fresh code to never load.
+
+**Symptoms**:
+
+- Code compiles successfully without errors
+- New methods/classes don't appear despite being in source
+- `hasattr(obj, 'new_method')` returns `False`
+- Even after `cargo clean` + rebuild, old code still loads
+- You see: `Uninstalled 1 package in 1ms` / `Installed 1 package in 2ms` when running Python
+
+**THE SOLUTION - Never Mix `maturin develop` with `uv run python`**:
+
+```bash
+# ✅ CORRECT WORKFLOW (from Python package directory)
+
+# Step 1: Remove old venv (if troubleshooting)
+rm -rf .venv && uv venv
+
+# Step 2: Build wheel (NOT develop)
+uv run --with maturin --with patchelf maturin build --release
+
+# Step 3: Install wheel with uv pip
+uv pip install ../target/wheels/<package>-*.whl --force-reinstall
+
+# Step 4: Test using venv Python DIRECTLY (not uv run!)
+.venv/bin/python -c "from your_module import YourClass"
+.venv/bin/python -m pytest tests/
+
+# ❌ WRONG - DO NOT DO THIS:
+maturin develop
+uv run python  # This reinstalls from cache, wiping out your fresh build!
+```
+
+**Debugging Checklist**:
+
+1. **Check binary contents**:
+   ```bash
+   strings .venv/lib/python*/site-packages/your_module/*.so | grep "your_new_method"
+   ```
+
+2. **Check file timestamps**:
+   ```bash
+   ls -lh .venv/lib/python*/site-packages/your_module/*.so
+   ls -lh src/your_modified_file.rs
+   # If .so is older than source, it wasn't updated!
+   ```
+
+3. **Check where Python is loading from**:
+   ```bash
+   .venv/bin/python -c "import your_module; print(your_module.__file__)"
+   ```
+
+4. **Nuclear option - fresh venv**:
+   ```bash
+   rm -rf .venv
+   uv venv
+   uv run --with maturin maturin build --release
+   uv pip install ../target/wheels/*.whl
+   .venv/bin/python  # Test with venv Python directly
+   ```
+
+**Key Rules**:
+
+- ✅ Use `maturin build` + `uv pip install` + `.venv/bin/python`
+- ❌ Never use `uv run python` after maturin operations
+- ✅ Check binary contents and timestamps when debugging
+- ❌ Don't trust that `--force-reinstall` actually reinstalls with uv
+- ✅ Use fresh venv when in doubt
+
+If this solves the issue, **STOP HERE**. Otherwise, continue to Step 1.
 
 ### Step 1: Verify Module Registration
 

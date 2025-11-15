@@ -8,5 +8,6 @@ pub mod models;
 // Re-export public types
 pub use client::PyPmcClient;
 pub use models::{
-    PyArticleSection, PyFigure, PyPmcAffiliation, PyPmcAuthor, PyPmcFullText, PyReference, PyTable,
+    PyArticleSection, PyExtractedFigure, PyFigure, PyPmcAffiliation, PyPmcAuthor, PyPmcFullText,
+    PyReference, PyTable,
 };

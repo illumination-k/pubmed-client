@@ -4,20 +4,22 @@ Diagnostic script for maturin and PyO3 development issues.
 This script checks common problems with module exports and builds.
 """
 
-import sys
+from __future__ import annotations
+
 import importlib
 import subprocess
+import sys
 from pathlib import Path
 
 
-def print_header(title):
+def print_header(title: str) -> None:
     """Print a formatted section header."""
     print(f"\n{'=' * 60}")
     print(f"  {title}")
     print('=' * 60)
 
 
-def check_module_exports(module_name, expected_classes=None):
+def check_module_exports(module_name: str, expected_classes: list[str] | None = None) -> bool:
     """
     Check if a Python module exports expected classes.
 
@@ -53,7 +55,7 @@ def check_module_exports(module_name, expected_classes=None):
 
         # Check for expected classes
         if expected_classes:
-            print(f"\n🔍 Checking for expected classes:")
+            print("\n🔍 Checking for expected classes:")
             for cls in expected_classes:
                 if hasattr(module, cls):
                     print(f"   ✅ {cls} found")
@@ -63,7 +65,7 @@ def check_module_exports(module_name, expected_classes=None):
                     # Try direct import
                     try:
                         exec(f"from {module_name} import {cls}")
-                        print(f"      (But direct import works!)")
+                        print("      (But direct import works!)")
                     except ImportError as e:
                         print(f"      (Direct import also fails: {e})")
 
@@ -74,7 +76,7 @@ def check_module_exports(module_name, expected_classes=None):
         return False
 
 
-def check_build_artifacts():
+def check_build_artifacts() -> bool:
     """Check for compiled build artifacts."""
     print_header("Checking Build Artifacts")
 
@@ -108,12 +110,12 @@ def check_build_artifacts():
     return True
 
 
-def run_cargo_clean():
+def run_cargo_clean() -> bool:
     """Run cargo clean for the package."""
     print_header("Running cargo clean")
 
     try:
-        result = subprocess.run(
+        subprocess.run(
             ["cargo", "clean"],
             capture_output=True,
             text=True,
@@ -130,7 +132,7 @@ def run_cargo_clean():
         return False
 
 
-def suggest_rebuild_steps(package_name=None):
+def suggest_rebuild_steps(package_name: str | None = None) -> None:
     """Suggest steps to rebuild with maturin."""
     print_header("Suggested Rebuild Steps")
 
@@ -153,7 +155,7 @@ def suggest_rebuild_steps(package_name=None):
     print("   verify that the class is registered in the #[pymodule] function.")
 
 
-def main():
+def main() -> None:
     """Main diagnostic workflow."""
     print("🔍 Maturin + PyO3 Diagnostic Tool")
     print("=" * 60)

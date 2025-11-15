@@ -8,7 +8,7 @@ use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
 use pubmed_client::pmc::{self, markdown::PmcMarkdownConverter};
-use pubmed_client::PmcFullText;
+use pubmed_client::{ExtractedFigure, PmcFullText};
 
 // ================================================================================================
 // PMC Data Models
@@ -143,6 +143,50 @@ impl From<&pmc::Figure> for PyFigure {
 impl PyFigure {
     fn __repr__(&self) -> String {
         format!("Figure(id='{}', label={:?})", self.id, self.label)
+    }
+}
+
+/// Python wrapper for ExtractedFigure
+///
+/// Represents a figure that has been extracted from a PMC tar.gz archive,
+/// combining XML metadata with actual file information.
+#[gen_stub_pyclass]
+#[pyclass(name = "ExtractedFigure")]
+#[derive(Clone)]
+pub struct PyExtractedFigure {
+    /// Figure metadata from XML (caption, label, etc.)
+    #[pyo3(get)]
+    pub figure: PyFigure,
+    /// Actual file path where the figure was extracted
+    #[pyo3(get)]
+    pub extracted_file_path: String,
+    /// File size in bytes
+    #[pyo3(get)]
+    pub file_size: Option<u64>,
+    /// Image dimensions as (width, height) tuple if available
+    #[pyo3(get)]
+    pub dimensions: Option<(u32, u32)>,
+}
+
+impl From<&ExtractedFigure> for PyExtractedFigure {
+    fn from(extracted: &ExtractedFigure) -> Self {
+        PyExtractedFigure {
+            figure: PyFigure::from(&extracted.figure),
+            extracted_file_path: extracted.extracted_file_path.clone(),
+            file_size: extracted.file_size,
+            dimensions: extracted.dimensions,
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyExtractedFigure {
+    fn __repr__(&self) -> String {
+        format!(
+            "ExtractedFigure(id='{}', file='{}', size={:?})",
+            self.figure.id, self.extracted_file_path, self.file_size
+        )
     }
 }
 
