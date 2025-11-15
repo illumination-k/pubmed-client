@@ -3,6 +3,7 @@
 //! This module provides Python bindings for the Rust-based PubMed client library.
 
 use pyo3::prelude::*;
+use pyo3_stub_gen::define_stub_info_gatherer;
 
 // Module declarations
 mod client;
@@ -82,3 +83,9 @@ fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     Ok(())
 }
+
+// ================================================================================================
+// Stub Generation Support
+// ================================================================================================
+
+define_stub_info_gatherer!(stub_info);

@@ -3,6 +3,7 @@
 //! This module provides Python wrappers for the PMC client.
 
 use pyo3::prelude::*;
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
 use pubmed_client::PmcClient;
@@ -22,11 +23,13 @@ use super::models::PyPmcFullText;
 ///     >>> client = PmcClient()
 ///     >>> full_text = client.fetch_full_text("PMC7906746")
 ///     >>> pmcid = client.check_pmc_availability("31978945")
+#[gen_stub_pyclass]
 #[pyclass(name = "PmcClient")]
 pub struct PyPmcClient {
     pub client: Arc<PmcClient>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyPmcClient {
     /// Create a new PMC client with default configuration

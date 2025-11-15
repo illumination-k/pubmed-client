@@ -3,6 +3,8 @@
 //! This module provides Python wrappers for the PubMed client.
 
 use pyo3::prelude::*;
+use pyo3_stub_gen::PyStubType;
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
 use pubmed_client::PubMedClient as RustPubMedClient;
@@ -18,6 +20,7 @@ use super::models::{PyCitations, PyDatabaseInfo, PyPmcLinks, PyPubMedArticle, Py
 // ================================================================================================
 
 /// Enum to handle Python's Union[str, SearchQuery] type
+/// This is an internal type and not exposed to Python
 #[derive(FromPyObject)]
 enum QueryInput {
     /// String query (e.g., "covid-19")
@@ -47,6 +50,13 @@ impl QueryInput {
     }
 }
 
+// Implement PyStubType for QueryInput to represent it as str | SearchQuery in stubs
+impl PyStubType for QueryInput {
+    fn type_output() -> pyo3_stub_gen::TypeInfo {
+        pyo3_stub_gen::TypeInfo::builtin("str | SearchQuery")
+    }
+}
+
 // ================================================================================================
 // Client Implementation
 // ================================================================================================
@@ -57,11 +67,13 @@ impl QueryInput {
 ///     >>> client = PubMedClient()
 ///     >>> articles = client.search_and_fetch("covid-19", 10)
 ///     >>> article = client.fetch_article("31978945")
+#[gen_stub_pyclass]
 #[pyclass(name = "PubMedClient")]
 pub struct PyPubMedClient {
     pub client: Arc<RustPubMedClient>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyPubMedClient {
     /// Create a new PubMed client with default configuration
@@ -100,6 +112,8 @@ impl PyPubMedClient {
     ///     >>> # Using SearchQuery object
     ///     >>> query = SearchQuery().query("covid-19").limit(100)
     ///     >>> pmids = client.search_articles(query, 0)  # limit parameter ignored
+    #[pyo3(signature = (query, limit))]
+    #[pyo3(text_signature = "(query: str | SearchQuery, limit: int) -> list[str]")]
     fn search_articles(
         &self,
         py: Python,
@@ -133,6 +147,8 @@ impl PyPubMedClient {
     ///     >>> # Using SearchQuery object
     ///     >>> query = SearchQuery().query("cancer").published_after(2020).limit(50)
     ///     >>> articles = client.search_and_fetch(query, 0)  # limit parameter ignored
+    #[pyo3(signature = (query, limit))]
+    #[pyo3(text_signature = "(query: str | SearchQuery, limit: int) -> list[PubMedArticle]")]
     fn search_and_fetch(
         &self,
         py: Python,

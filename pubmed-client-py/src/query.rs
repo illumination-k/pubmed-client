@@ -6,6 +6,7 @@ use pubmed_client::pubmed::ArticleType;
 use pubmed_client::pubmed::SearchQuery;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 
 // ================================================================================================
 // Helper Functions
@@ -66,12 +67,14 @@ fn str_to_article_type(s: &str) -> PyResult<ArticleType> {
 ///     >>> query_string = query.build()
 ///     >>> print(query_string)
 ///     covid-19
+#[gen_stub_pyclass]
 #[pyclass(name = "SearchQuery")]
 #[derive(Clone)]
 pub struct PySearchQuery {
     pub inner: SearchQuery,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PySearchQuery {
     /// Create a new empty search query builder

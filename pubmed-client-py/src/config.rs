@@ -4,6 +4,7 @@
 
 use pubmed_client::config::ClientConfig;
 use pyo3::prelude::*;
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 
 // ================================================================================================
 // Configuration
@@ -17,12 +18,14 @@ use pyo3::prelude::*;
 ///     >>> config = ClientConfig()
 ///     >>> config.with_api_key("your_api_key").with_email("you@example.com")
 ///     >>> client = Client.with_config(config)
+#[gen_stub_pyclass]
 #[pyclass(name = "ClientConfig")]
 #[derive(Clone)]
 pub struct PyClientConfig {
     pub inner: ClientConfig,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyClientConfig {
     /// Create a new configuration with default settings

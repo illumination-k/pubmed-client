@@ -4,6 +4,7 @@
 
 use pyo3::prelude::*;
 use pyo3::types::PyList;
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
 use pubmed_client::pmc::{self, markdown::PmcMarkdownConverter};
@@ -14,6 +15,7 @@ use pubmed_client::PmcFullText;
 // ================================================================================================
 
 /// Python wrapper for PMC Affiliation
+#[gen_stub_pyclass]
 #[pyclass(name = "PmcAffiliation")]
 #[derive(Clone)]
 pub struct PyPmcAffiliation {
@@ -41,6 +43,7 @@ impl From<&pmc::Affiliation> for PyPmcAffiliation {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyPmcAffiliation {
     fn __repr__(&self) -> String {
@@ -49,6 +52,7 @@ impl PyPmcAffiliation {
 }
 
 /// Python wrapper for PMC Author
+#[gen_stub_pyclass]
 #[pyclass(name = "PmcAuthor")]
 #[derive(Clone)]
 pub struct PyPmcAuthor {
@@ -81,6 +85,7 @@ impl From<&pmc::Author> for PyPmcAuthor {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyPmcAuthor {
     /// Get list of affiliations
@@ -99,6 +104,7 @@ impl PyPmcAuthor {
 }
 
 /// Python wrapper for Figure
+#[gen_stub_pyclass]
 #[pyclass(name = "Figure")]
 #[derive(Clone)]
 pub struct PyFigure {
@@ -132,6 +138,7 @@ impl From<&pmc::Figure> for PyFigure {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyFigure {
     fn __repr__(&self) -> String {
@@ -140,6 +147,7 @@ impl PyFigure {
 }
 
 /// Python wrapper for Table
+#[gen_stub_pyclass]
 #[pyclass(name = "Table")]
 #[derive(Clone)]
 pub struct PyTable {
@@ -161,6 +169,7 @@ impl From<&pmc::Table> for PyTable {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyTable {
     fn __repr__(&self) -> String {
@@ -169,6 +178,7 @@ impl PyTable {
 }
 
 /// Python wrapper for Reference
+#[gen_stub_pyclass]
 #[pyclass(name = "Reference")]
 #[derive(Clone)]
 pub struct PyReference {
@@ -199,6 +209,7 @@ impl From<&pmc::Reference> for PyReference {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyReference {
     fn __repr__(&self) -> String {
@@ -207,6 +218,7 @@ impl PyReference {
 }
 
 /// Python wrapper for ArticleSection
+#[gen_stub_pyclass]
 #[pyclass(name = "ArticleSection")]
 #[derive(Clone)]
 pub struct PyArticleSection {
@@ -228,6 +240,7 @@ impl From<&pmc::ArticleSection> for PyArticleSection {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyArticleSection {
     fn __repr__(&self) -> String {
@@ -236,6 +249,7 @@ impl PyArticleSection {
 }
 
 /// Python wrapper for PmcFullText
+#[gen_stub_pyclass]
 #[pyclass(name = "PmcFullText")]
 #[derive(Clone)]
 pub struct PyPmcFullText {
@@ -262,6 +276,7 @@ impl From<PmcFullText> for PyPmcFullText {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyPmcFullText {
     /// Get list of authors
