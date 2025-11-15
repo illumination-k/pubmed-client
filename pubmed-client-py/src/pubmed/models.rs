@@ -4,6 +4,7 @@
 
 use pyo3::prelude::*;
 use pyo3::types::PyList;
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
 use pubmed_client::{pubmed, PubMedArticle};
@@ -13,6 +14,7 @@ use pubmed_client::{pubmed, PubMedArticle};
 // ================================================================================================
 
 /// Python wrapper for Author affiliation
+#[gen_stub_pyclass]
 #[pyclass(name = "Affiliation")]
 #[derive(Clone)]
 pub struct PyAffiliation {
@@ -40,6 +42,7 @@ impl From<&pubmed::Affiliation> for PyAffiliation {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyAffiliation {
     fn __repr__(&self) -> String {
@@ -51,6 +54,7 @@ impl PyAffiliation {
 }
 
 /// Python wrapper for Author
+#[gen_stub_pyclass]
 #[pyclass(name = "Author")]
 #[derive(Clone)]
 pub struct PyAuthor {
@@ -92,6 +96,7 @@ impl From<&pubmed::Author> for PyAuthor {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyAuthor {
     /// Get list of affiliations
@@ -110,6 +115,7 @@ impl PyAuthor {
 }
 
 /// Python wrapper for PubMedArticle
+#[gen_stub_pyclass]
 #[pyclass(name = "PubMedArticle")]
 #[derive(Clone)]
 pub struct PyPubMedArticle {
@@ -148,6 +154,7 @@ impl From<PubMedArticle> for PyPubMedArticle {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyPubMedArticle {
     /// Get list of authors
@@ -186,6 +193,7 @@ impl PyPubMedArticle {
 }
 
 /// Python wrapper for RelatedArticles
+#[gen_stub_pyclass]
 #[pyclass(name = "RelatedArticles")]
 #[derive(Clone)]
 pub struct PyRelatedArticles {
@@ -207,6 +215,7 @@ impl From<pubmed::RelatedArticles> for PyRelatedArticles {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyRelatedArticles {
     fn __repr__(&self) -> String {
@@ -223,6 +232,7 @@ impl PyRelatedArticles {
 }
 
 /// Python wrapper for PmcLinks
+#[gen_stub_pyclass]
 #[pyclass(name = "PmcLinks")]
 #[derive(Clone)]
 pub struct PyPmcLinks {
@@ -241,6 +251,7 @@ impl From<pubmed::PmcLinks> for PyPmcLinks {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyPmcLinks {
     fn __repr__(&self) -> String {
@@ -257,6 +268,7 @@ impl PyPmcLinks {
 }
 
 /// Python wrapper for Citations
+#[gen_stub_pyclass]
 #[pyclass(name = "Citations")]
 #[derive(Clone)]
 pub struct PyCitations {
@@ -275,6 +287,7 @@ impl From<pubmed::Citations> for PyCitations {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyCitations {
     fn __repr__(&self) -> String {
@@ -291,6 +304,7 @@ impl PyCitations {
 }
 
 /// Python wrapper for DatabaseInfo
+#[gen_stub_pyclass]
 #[pyclass(name = "DatabaseInfo")]
 #[derive(Clone)]
 pub struct PyDatabaseInfo {
@@ -321,6 +335,7 @@ impl From<pubmed::DatabaseInfo> for PyDatabaseInfo {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyDatabaseInfo {
     fn __repr__(&self) -> String {

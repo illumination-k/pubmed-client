@@ -3,6 +3,7 @@
 //! This module provides the main Python client that combines both PubMed and PMC functionality.
 
 use pyo3::prelude::*;
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
 use pubmed_client::Client;
@@ -31,11 +32,13 @@ use crate::utils::{get_runtime, to_py_err};
 ///     >>> full_text = client.pmc.fetch_full_text("PMC7906746")
 ///     >>> # Search with full text
 ///     >>> results = client.search_with_full_text("covid-19", 5)
+#[gen_stub_pyclass]
 #[pyclass(name = "Client")]
 pub struct PyClient {
     pub client: Arc<Client>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyClient {
     /// Create a new combined client with default configuration

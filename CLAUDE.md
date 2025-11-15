@@ -726,26 +726,74 @@ uv pip install target/wheels/pubmed_client_py-*.whl --force-reinstall
    uv run pytest
    ```
 
-#### Type Stubs (.pyi files)
+#### Type Stubs (.pyi files) - Automatic Generation
 
-1. **Keep type stubs in sync with Rust implementation:**
-   - Update `pubmed_client.pyi` when adding new classes or methods
-   - Add new class names to `__all__` list in the stub file
+**IMPORTANT**: Type stubs are now automatically generated using `pyo3-stub-gen`. DO NOT manually edit `pubmed_client.pyi`.
 
-2. **Use covariant types for collections:**
-   ```python
-   from collections.abc import Sequence
+**Stub Generation Workflow:**
 
-   # ✅ Good - accepts both list[str] and list[str | None]
-   def terms(self, terms: Sequence[str | None] | None) -> SearchQuery: ...
+1. **Add pyo3-stub-gen macros to PyO3 code:**
+   ```rust
+   use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 
-   # ❌ Bad - list is invariant, only accepts exact type
-   def terms(self, terms: list[str | None] | None) -> SearchQuery: ...
+   #[gen_stub_pyclass]
+   #[pyclass(name = "YourClass")]
+   pub struct PyYourClass {
+       // fields
+   }
+
+   #[gen_stub_pymethods]
+   #[pymethods]
+   impl PyYourClass {
+       // methods
+   }
    ```
 
-3. **Remove docstrings from .pyi files:**
-   - Type stub files should only contain type signatures
-   - Docstrings belong in the Rust source code
+2. **Generate stubs after making changes:**
+   ```bash
+   # From pubmed-client-py/ directory
+   cargo run --bin stub_gen
+
+   # Copy generated stub to the correct location
+   cp pubmed_client_py/pubmed_client.pyi pubmed_client.pyi
+   ```
+
+3. **Test type checking:**
+   ```bash
+   uv run mypy tests/ --strict
+   ```
+
+**Handling Complex Types:**
+
+For types that don't automatically work with pyo3-stub-gen (like `FromPyObject` enums), implement `PyStubType`:
+
+```rust
+use pyo3_stub_gen::PyStubType;
+
+enum QueryInput {
+    String(String),
+    SearchQuery(PySearchQuery),
+}
+
+impl PyStubType for QueryInput {
+    fn type_output() -> pyo3_stub_gen::TypeInfo {
+        pyo3_stub_gen::TypeInfo::builtin("str | SearchQuery")
+    }
+}
+```
+
+**Dependencies:**
+
+- `pyo3-stub-gen = "0.9"` - Stub generation library
+- `pyo3-stub-gen-derive = "0.9"` - Procedural macros
+- Crate type: `["cdylib", "rlib"]` - Required for binary support
+
+**Generated Stub Features:**
+
+- Automatic type inference from Rust types
+- Documentation strings from Rust doc comments
+- Property and method signatures
+- Support for generics, optionals, and unions
 
 #### Common Pitfalls
 
