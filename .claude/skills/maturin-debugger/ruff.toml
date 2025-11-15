@@ -1,0 +1,5 @@
+# Allow print statements in diagnostic scripts - they're meant to output to console
+lint.ignore = ["T201"]
+
+# Allow subprocess calls in diagnostic scripts
+lint.extend-ignore = ["S603", "S607"]

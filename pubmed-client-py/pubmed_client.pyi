@@ -196,6 +196,24 @@ class Figure:
     file_name: typing.Optional[builtins.str]
     def __repr__(self) -> builtins.str: ...
 
+class ExtractedFigure:
+    r"""
+    Python wrapper for ExtractedFigure
+
+    Represents a figure that has been extracted from a PMC tar.gz archive,
+    combining XML metadata with actual file information.
+    """
+
+    figure: Figure
+    r"""Figure metadata from XML (caption, label, etc.)"""
+    extracted_file_path: builtins.str
+    r"""Actual file path where the figure was extracted"""
+    file_size: typing.Optional[builtins.int]
+    r"""File size in bytes"""
+    dimensions: typing.Optional[tuple[builtins.int, builtins.int]]
+    r"""Image dimensions as (width, height) tuple if available"""
+    def __repr__(self) -> builtins.str: ...
+
 class PmcAffiliation:
     r"""
     Python wrapper for PMC Affiliation
@@ -262,6 +280,53 @@ class PmcClient:
 
         Returns:
             PMC ID if available, None otherwise
+        """
+    def download_and_extract_tar(
+        self, pmcid: builtins.str, output_dir: builtins.str
+    ) -> builtins.list[builtins.str]:
+        r"""
+        Download and extract PMC tar.gz archive
+
+        Downloads the tar.gz file for the specified PMC ID and extracts all files
+        to the output directory.
+
+        Args:
+            pmcid: PMC ID (e.g., "PMC7906746" or "7906746")
+            output_dir: Directory path where files should be extracted
+
+        Returns:
+            List of extracted file paths
+
+        Example:
+            >>> client = PmcClient()
+            >>> files = client.download_and_extract_tar("PMC7906746", "./output")
+            >>> for file in files:
+            ...     print(file)
+        """
+    def extract_figures_with_captions(
+        self, pmcid: builtins.str, output_dir: builtins.str
+    ) -> builtins.list[ExtractedFigure]:
+        r"""
+        Extract figures with captions from PMC article
+
+        Downloads the tar.gz file for the specified PMC ID, extracts all files,
+        and matches figures with their captions from the XML metadata.
+
+        Args:
+            pmcid: PMC ID (e.g., "PMC7906746" or "7906746")
+            output_dir: Directory path where files should be extracted
+
+        Returns:
+            List of ExtractedFigure objects containing metadata and file information
+
+        Example:
+            >>> client = PmcClient()
+            >>> figures = client.extract_figures_with_captions("PMC7906746", "./output")
+            >>> for fig in figures:
+            ...     print(f"{fig.figure.id}: {fig.extracted_file_path}")
+            ...     print(f"  Caption: {fig.figure.caption}")
+            ...     print(f"  Size: {fig.file_size} bytes")
+            ...     print(f"  Dimensions: {fig.dimensions}")
         """
     def __repr__(self) -> builtins.str: ...
 

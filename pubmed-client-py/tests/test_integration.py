@@ -7,6 +7,8 @@ Set NCBI_API_KEY environment variable to use an API key for higher rate limits.
 """
 
 import os
+import tempfile
+from pathlib import Path
 
 import pytest
 
@@ -223,6 +225,116 @@ class TestPmcIntegration:
         assert "#" in markdown  # Should have markdown headers
         assert full_text.title in markdown  # Title should be in markdown
         assert full_text.pmcid in markdown  # PMC ID should be in markdown
+
+    def test_download_and_extract_tar(self, client: pubmed_client.Client) -> None:
+        """Test downloading and extracting PMC tar.gz archive."""
+        # Use PMC7906746 which is known to exist and have figures
+        pmcid = "PMC7906746"
+
+        # Create temporary directory for extraction
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = str(Path(temp_dir) / pmcid)
+
+            # Download and extract tar.gz
+            files = client.pmc.download_and_extract_tar(pmcid, output_dir)
+
+            # Verify files were extracted
+            assert isinstance(files, list)
+            assert len(files) > 0
+
+            # Verify at least one file exists and is in the output directory
+            for file_path in files:
+                assert isinstance(file_path, str)
+                assert len(file_path) > 0
+                # File path should be within output directory
+                assert output_dir in file_path or Path(file_path).is_absolute()
+
+            # Verify output directory was created
+            assert Path(output_dir).exists()
+            assert Path(output_dir).is_dir()
+
+            # Verify at least some files are accessible
+            file_count = 0
+            for file_path in files:
+                if Path(file_path).exists():
+                    file_count += 1
+            assert file_count > 0, "No extracted files found on disk"
+
+    def test_download_and_extract_tar_without_pmc_prefix(
+        self, client: pubmed_client.Client
+    ) -> None:
+        """Test downloading tar.gz with PMCID without 'PMC' prefix."""
+        # Use just the numeric part
+        pmcid = "7906746"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = str(Path(temp_dir) / f"PMC{pmcid}")
+
+            files = client.pmc.download_and_extract_tar(pmcid, output_dir)
+
+            assert isinstance(files, list)
+            assert len(files) > 0
+
+    def test_extract_figures_with_captions(self, client: pubmed_client.Client) -> None:
+        """Test extracting figures with their captions from PMC article."""
+        # PMC7906746 is known to have figures
+        pmcid = "PMC7906746"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = str(Path(temp_dir) / pmcid)
+
+            # Extract figures with captions
+            figures = client.pmc.extract_figures_with_captions(pmcid, output_dir)
+
+            # Verify we got ExtractedFigure objects
+            assert isinstance(figures, list)
+
+            if len(figures) > 0:
+                # Check first figure has all expected fields
+                fig = figures[0]
+
+                # Check that we have the figure metadata
+                assert hasattr(fig, "figure")
+                assert hasattr(fig.figure, "id")
+                assert hasattr(fig.figure, "caption")
+                assert isinstance(fig.figure.id, str)
+                assert isinstance(fig.figure.caption, str)
+
+                # Check that we have the extracted file path
+                assert hasattr(fig, "extracted_file_path")
+                assert isinstance(fig.extracted_file_path, str)
+                assert len(fig.extracted_file_path) > 0
+
+                # File should exist
+                assert Path(fig.extracted_file_path).exists()
+
+                # Check optional fields exist
+                assert hasattr(fig, "file_size")
+                assert hasattr(fig, "dimensions")
+
+                # If file_size is available, it should be > 0
+                if fig.file_size is not None:
+                    assert fig.file_size > 0
+
+                # If dimensions are available, they should be valid
+                if fig.dimensions is not None:
+                    width, height = fig.dimensions
+                    assert isinstance(width, int)
+                    assert isinstance(height, int)
+                    assert width > 0
+                    assert height > 0
+
+    def test_extract_figures_with_captions_invalid_pmcid(
+        self, client: pubmed_client.Client
+    ) -> None:
+        """Test extracting figures with invalid PMCID raises appropriate error."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = str(Path(temp_dir) / "invalid")
+
+            # Use an invalid PMCID that should not exist
+            # Should raise an error (likely PmcNotAvailableById or network error)
+            with pytest.raises(Exception, match=r"PMC.*not available|error|Error|not found"):
+                client.pmc.extract_figures_with_captions("PMC99999999999", output_dir)
 
 
 @pytest.mark.integration
