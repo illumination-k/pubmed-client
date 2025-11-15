@@ -84,7 +84,7 @@ impl From<&pmc::Author> for PyPmcAuthor {
 #[pymethods]
 impl PyPmcAuthor {
     /// Get list of affiliations
-    fn affiliations(&self, py: Python) -> PyResult<PyObject> {
+    fn affiliations(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         for affiliation in &self.inner.affiliations {
             let py_affiliation = PyPmcAffiliation::from(affiliation);
@@ -265,7 +265,7 @@ impl From<PmcFullText> for PyPmcFullText {
 #[pymethods]
 impl PyPmcFullText {
     /// Get list of authors
-    fn authors(&self, py: Python) -> PyResult<PyObject> {
+    fn authors(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         for author in &self.inner.authors {
             let py_author = PyPmcAuthor::from(author);
@@ -275,7 +275,7 @@ impl PyPmcFullText {
     }
 
     /// Get list of sections
-    fn sections(&self, py: Python) -> PyResult<PyObject> {
+    fn sections(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         for section in &self.inner.sections {
             let py_section = PyArticleSection::from(section);
@@ -285,7 +285,7 @@ impl PyPmcFullText {
     }
 
     /// Get list of all figures from all sections
-    fn figures(&self, py: Python) -> PyResult<PyObject> {
+    fn figures(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         // Collect figures from all sections recursively
         fn collect_figures(section: &pmc::ArticleSection, figures: &mut Vec<pmc::Figure>) {
@@ -308,7 +308,7 @@ impl PyPmcFullText {
     }
 
     /// Get list of all tables from all sections
-    fn tables(&self, py: Python) -> PyResult<PyObject> {
+    fn tables(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         // Collect tables from all sections recursively
         fn collect_tables(section: &pmc::ArticleSection, tables: &mut Vec<pmc::Table>) {
@@ -331,7 +331,7 @@ impl PyPmcFullText {
     }
 
     /// Get list of references
-    fn references(&self, py: Python) -> PyResult<PyObject> {
+    fn references(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         for reference in &self.inner.references {
             let py_reference = PyReference::from(reference);
