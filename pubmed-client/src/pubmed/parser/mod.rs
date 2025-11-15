@@ -15,7 +15,7 @@
 //! # Public API
 //!
 //! The main entry point is [`parse_article_from_xml`], which takes a PubMed EFetch
-//! XML response and returns a [`PubMedArticle`](crate::pubmed::models::PubMedArticle).
+//! XML response and returns a [`PubMedArticle`].
 
 mod converters;
 mod deserializers;
