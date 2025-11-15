@@ -795,6 +795,17 @@ impl PyStubType for QueryInput {
 - Property and method signatures
 - Support for generics, optionals, and unions
 
+**Linter Configuration:**
+
+The generated stub file is excluded from ruff checking in `pyproject.toml`:
+
+```toml
+[tool.ruff]
+exclude = ["pubmed_client.pyi"]
+```
+
+This prevents linting errors on automatically generated code.
+
 #### Common Pitfalls
 
 1. **Module name confusion:**

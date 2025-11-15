@@ -42,6 +42,8 @@ dev = ["pytest>=8.0", "pytest-cov>=6.0", "mypy>=1.0", "ruff>=0.7"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# Exclude automatically generated files
+exclude = ["pubmed_client.pyi"]
 
 [tool.ruff.lint]
 select = ["ALL"]

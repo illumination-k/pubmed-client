@@ -8,6 +8,7 @@ class Affiliation:
     r"""
     Python wrapper for Author affiliation
     """
+
     institution: typing.Optional[builtins.str]
     department: typing.Optional[builtins.str]
     address: typing.Optional[builtins.str]
@@ -19,6 +20,7 @@ class ArticleSection:
     r"""
     Python wrapper for ArticleSection
     """
+
     title: typing.Optional[builtins.str]
     content: builtins.str
     section_type: typing.Optional[builtins.str]
@@ -28,6 +30,7 @@ class Author:
     r"""
     Python wrapper for Author
     """
+
     last_name: typing.Optional[builtins.str]
     fore_name: typing.Optional[builtins.str]
     first_name: typing.Optional[builtins.str]
@@ -47,6 +50,7 @@ class Citations:
     r"""
     Python wrapper for Citations
     """
+
     source_pmids: builtins.list[builtins.int]
     citing_pmids: builtins.list[builtins.int]
     def __repr__(self) -> builtins.str: ...
@@ -68,6 +72,7 @@ class Client:
         >>> # Search with full text
         >>> results = client.search_with_full_text("covid-19", 5)
     """
+
     pubmed: PubMedClient
     r"""
     Get PubMed client for metadata operations
@@ -81,11 +86,13 @@ class Client:
         Create a new combined client with default configuration
         """
     @staticmethod
-    def with_config(config:ClientConfig) -> Client:
+    def with_config(config: ClientConfig) -> Client:
         r"""
         Create a new combined client with custom configuration
         """
-    def search_with_full_text(self, query:builtins.str, limit:builtins.int) -> builtins.list[tuple[PubMedArticle, typing.Optional[PmcFullText]]]:
+    def search_with_full_text(
+        self, query: builtins.str, limit: builtins.int
+    ) -> builtins.list[tuple[PubMedArticle, typing.Optional[PmcFullText]]]:
         r"""
         Search for articles and attempt to fetch full text for each
 
@@ -103,19 +110,19 @@ class Client:
         r"""
         Get list of all available NCBI databases
         """
-    def get_database_info(self, database:builtins.str) -> DatabaseInfo:
+    def get_database_info(self, database: builtins.str) -> DatabaseInfo:
         r"""
         Get detailed information about a specific database
         """
-    def get_related_articles(self, pmids:typing.Sequence[builtins.int]) -> RelatedArticles:
+    def get_related_articles(self, pmids: typing.Sequence[builtins.int]) -> RelatedArticles:
         r"""
         Get related articles for given PMIDs
         """
-    def get_pmc_links(self, pmids:typing.Sequence[builtins.int]) -> PmcLinks:
+    def get_pmc_links(self, pmids: typing.Sequence[builtins.int]) -> PmcLinks:
         r"""
         Get PMC links for given PMIDs
         """
-    def get_citations(self, pmids:typing.Sequence[builtins.int]) -> Citations:
+    def get_citations(self, pmids: typing.Sequence[builtins.int]) -> Citations:
         r"""
         Get citing articles for given PMIDs
         """
@@ -136,23 +143,23 @@ class ClientConfig:
         r"""
         Create a new configuration with default settings
         """
-    def with_api_key(self, api_key:builtins.str) -> ClientConfig:
+    def with_api_key(self, api_key: builtins.str) -> ClientConfig:
         r"""
         Set the NCBI API key for increased rate limits (10 req/sec instead of 3)
         """
-    def with_email(self, email:builtins.str) -> ClientConfig:
+    def with_email(self, email: builtins.str) -> ClientConfig:
         r"""
         Set the email address for identification (recommended by NCBI)
         """
-    def with_tool(self, tool:builtins.str) -> ClientConfig:
+    def with_tool(self, tool: builtins.str) -> ClientConfig:
         r"""
         Set the tool name for identification (default: "pubmed-client-py")
         """
-    def with_rate_limit(self, rate_limit:builtins.float) -> ClientConfig:
+    def with_rate_limit(self, rate_limit: builtins.float) -> ClientConfig:
         r"""
         Set custom rate limit in requests per second
         """
-    def with_timeout_seconds(self, timeout_seconds:builtins.int) -> ClientConfig:
+    def with_timeout_seconds(self, timeout_seconds: builtins.int) -> ClientConfig:
         r"""
         Set HTTP request timeout in seconds
         """
@@ -166,6 +173,7 @@ class DatabaseInfo:
     r"""
     Python wrapper for DatabaseInfo
     """
+
     name: builtins.str
     menu_name: builtins.str
     description: builtins.str
@@ -178,6 +186,7 @@ class Figure:
     r"""
     Python wrapper for Figure
     """
+
     id: builtins.str
     label: typing.Optional[builtins.str]
     caption: builtins.str
@@ -191,6 +200,7 @@ class PmcAffiliation:
     r"""
     Python wrapper for PMC Affiliation
     """
+
     id: typing.Optional[builtins.str]
     institution: builtins.str
     department: typing.Optional[builtins.str]
@@ -202,6 +212,7 @@ class PmcAuthor:
     r"""
     Python wrapper for PMC Author
     """
+
     given_names: typing.Optional[builtins.str]
     surname: typing.Optional[builtins.str]
     full_name: builtins.str
@@ -228,11 +239,11 @@ class PmcClient:
         Create a new PMC client with default configuration
         """
     @staticmethod
-    def with_config(config:ClientConfig) -> PmcClient:
+    def with_config(config: ClientConfig) -> PmcClient:
         r"""
         Create a new PMC client with custom configuration
         """
-    def fetch_full_text(self, pmcid:builtins.str) -> PmcFullText:
+    def fetch_full_text(self, pmcid: builtins.str) -> PmcFullText:
         r"""
         Fetch full text article from PMC
 
@@ -242,7 +253,7 @@ class PmcClient:
         Returns:
             PmcFullText object containing structured article content
         """
-    def check_pmc_availability(self, pmid:builtins.str) -> typing.Optional[builtins.str]:
+    def check_pmc_availability(self, pmid: builtins.str) -> typing.Optional[builtins.str]:
         r"""
         Check if PMC full text is available for a PMID
 
@@ -258,6 +269,7 @@ class PmcFullText:
     r"""
     Python wrapper for PmcFullText
     """
+
     pmcid: builtins.str
     pmid: typing.Optional[builtins.str]
     title: builtins.str
@@ -300,6 +312,7 @@ class PmcLinks:
     r"""
     Python wrapper for PmcLinks
     """
+
     source_pmids: builtins.list[builtins.int]
     pmc_ids: builtins.list[builtins.str]
     def __repr__(self) -> builtins.str: ...
@@ -309,6 +322,7 @@ class PubMedArticle:
     r"""
     Python wrapper for PubMedArticle
     """
+
     pmid: builtins.str
     title: builtins.str
     journal: builtins.str
@@ -345,11 +359,13 @@ class PubMedClient:
         Create a new PubMed client with default configuration
         """
     @staticmethod
-    def with_config(config:ClientConfig) -> PubMedClient:
+    def with_config(config: ClientConfig) -> PubMedClient:
         r"""
         Create a new PubMed client with custom configuration
         """
-    def search_articles(self, query:builtins.str | SearchQuery, limit:builtins.int) -> builtins.list[builtins.str]:
+    def search_articles(
+        self, query: builtins.str | SearchQuery, limit: builtins.int
+    ) -> builtins.list[builtins.str]:
         r"""
         Search for articles and return PMIDs only
 
@@ -372,7 +388,9 @@ class PubMedClient:
             >>> query = SearchQuery().query("covid-19").limit(100)
             >>> pmids = client.search_articles(query, 0)  # limit parameter ignored
         """
-    def search_and_fetch(self, query:builtins.str | SearchQuery, limit:builtins.int) -> builtins.list[PubMedArticle]:
+    def search_and_fetch(
+        self, query: builtins.str | SearchQuery, limit: builtins.int
+    ) -> builtins.list[PubMedArticle]:
         r"""
         Search for articles and fetch their metadata
 
@@ -391,7 +409,7 @@ class PubMedClient:
             >>> query = SearchQuery().query("cancer").published_after(2020).limit(50)
             >>> articles = client.search_and_fetch(query, 0)  # limit parameter ignored
         """
-    def fetch_article(self, pmid:builtins.str) -> PubMedArticle:
+    def fetch_article(self, pmid: builtins.str) -> PubMedArticle:
         r"""
         Fetch a single article by PMID
 
@@ -408,7 +426,7 @@ class PubMedClient:
         Returns:
             List of database names
         """
-    def get_database_info(self, database:builtins.str) -> DatabaseInfo:
+    def get_database_info(self, database: builtins.str) -> DatabaseInfo:
         r"""
         Get detailed information about a specific database
 
@@ -418,7 +436,7 @@ class PubMedClient:
         Returns:
             DatabaseInfo object
         """
-    def get_related_articles(self, pmids:typing.Sequence[builtins.int]) -> RelatedArticles:
+    def get_related_articles(self, pmids: typing.Sequence[builtins.int]) -> RelatedArticles:
         r"""
         Get related articles for given PMIDs
 
@@ -428,7 +446,7 @@ class PubMedClient:
         Returns:
             RelatedArticles object
         """
-    def get_pmc_links(self, pmids:typing.Sequence[builtins.int]) -> PmcLinks:
+    def get_pmc_links(self, pmids: typing.Sequence[builtins.int]) -> PmcLinks:
         r"""
         Get PMC links for given PMIDs (full-text availability)
 
@@ -438,7 +456,7 @@ class PubMedClient:
         Returns:
             PmcLinks object containing available PMC IDs
         """
-    def get_citations(self, pmids:typing.Sequence[builtins.int]) -> Citations:
+    def get_citations(self, pmids: typing.Sequence[builtins.int]) -> Citations:
         r"""
         Get citing articles for given PMIDs
 
@@ -463,6 +481,7 @@ class Reference:
     r"""
     Python wrapper for Reference
     """
+
     id: builtins.str
     title: typing.Optional[builtins.str]
     journal: typing.Optional[builtins.str]
@@ -475,6 +494,7 @@ class RelatedArticles:
     r"""
     Python wrapper for RelatedArticles
     """
+
     source_pmids: builtins.list[builtins.int]
     related_pmids: builtins.list[builtins.int]
     link_type: builtins.str
@@ -503,7 +523,7 @@ class SearchQuery:
         Example:
             >>> query = SearchQuery()
         """
-    def query(self, term:typing.Optional[builtins.str]=None) -> SearchQuery:
+    def query(self, term: typing.Optional[builtins.str] = None) -> SearchQuery:
         r"""
         Add a search term to the query
 
@@ -521,7 +541,9 @@ class SearchQuery:
             >>> query.build()
             'covid-19 treatment'
         """
-    def terms(self, terms:typing.Optional[typing.Sequence[typing.Optional[builtins.str]]]=None) -> SearchQuery:
+    def terms(
+        self, terms: typing.Optional[typing.Sequence[typing.Optional[builtins.str]]] = None
+    ) -> SearchQuery:
         r"""
         Add multiple search terms at once
 
@@ -538,7 +560,7 @@ class SearchQuery:
             >>> query.build()
             'covid-19 vaccine efficacy'
         """
-    def limit(self, limit:typing.Optional[builtins.int]=None) -> SearchQuery:
+    def limit(self, limit: typing.Optional[builtins.int] = None) -> SearchQuery:
         r"""
         Set the maximum number of results to return
 
@@ -594,7 +616,7 @@ class SearchQuery:
         r"""
         String representation for debugging
         """
-    def published_in_year(self, year:builtins.int) -> SearchQuery:
+    def published_in_year(self, year: builtins.int) -> SearchQuery:
         r"""
         Filter to articles published in a specific year
 
@@ -612,7 +634,9 @@ class SearchQuery:
             >>> query.build()
             'covid-19 AND 2024[pdat]'
         """
-    def published_between(self, start_year:builtins.int, end_year:typing.Optional[builtins.int]=None) -> SearchQuery:
+    def published_between(
+        self, start_year: builtins.int, end_year: typing.Optional[builtins.int] = None
+    ) -> SearchQuery:
         r"""
         Filter by publication date range
 
@@ -640,7 +664,7 @@ class SearchQuery:
             >>> query.build()
             'treatment AND 2020:3000[pdat]'
         """
-    def published_after(self, year:builtins.int) -> SearchQuery:
+    def published_after(self, year: builtins.int) -> SearchQuery:
         r"""
         Filter to articles published after a specific year
 
@@ -660,7 +684,7 @@ class SearchQuery:
             >>> query.build()
             'crispr AND 2020:3000[pdat]'
         """
-    def published_before(self, year:builtins.int) -> SearchQuery:
+    def published_before(self, year: builtins.int) -> SearchQuery:
         r"""
         Filter to articles published before a specific year
 
@@ -680,7 +704,7 @@ class SearchQuery:
             >>> query.build()
             'genome AND 1900:2020[pdat]'
         """
-    def article_type(self, type_name:builtins.str) -> SearchQuery:
+    def article_type(self, type_name: builtins.str) -> SearchQuery:
         r"""
         Filter by a single article type
 
@@ -701,7 +725,7 @@ class SearchQuery:
             >>> query.build()
             'cancer AND Clinical Trial[pt]'
         """
-    def article_types(self, types:typing.Sequence[builtins.str]) -> SearchQuery:
+    def article_types(self, types: typing.Sequence[builtins.str]) -> SearchQuery:
         r"""
         Filter by multiple article types (OR logic)
 
@@ -771,6 +795,7 @@ class Table:
     r"""
     Python wrapper for Table
     """
+
     id: builtins.str
     label: typing.Optional[builtins.str]
     caption: builtins.str
