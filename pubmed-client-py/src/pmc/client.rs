@@ -54,7 +54,7 @@ impl PyPmcClient {
     ///     PmcFullText object containing structured article content
     fn fetch_full_text(&self, py: Python, pmcid: String) -> PyResult<PyPmcFullText> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let full_text = rt
                 .block_on(client.fetch_full_text(&pmcid))
@@ -72,7 +72,7 @@ impl PyPmcClient {
     ///     PMC ID if available, None otherwise
     fn check_pmc_availability(&self, py: Python, pmid: String) -> PyResult<Option<String>> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             rt.block_on(client.check_pmc_availability(&pmid))
                 .map_err(to_py_err)

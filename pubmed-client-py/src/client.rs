@@ -88,7 +88,7 @@ impl PyClient {
         limit: usize,
     ) -> PyResult<Vec<(PyPubMedArticle, Option<PyPmcFullText>)>> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let results = rt
                 .block_on(client.search_with_full_text(&query, limit))
@@ -109,7 +109,7 @@ impl PyClient {
     /// Get list of all available NCBI databases
     fn get_database_list(&self, py: Python) -> PyResult<Vec<String>> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             rt.block_on(client.get_database_list()).map_err(to_py_err)
         })
@@ -118,7 +118,7 @@ impl PyClient {
     /// Get detailed information about a specific database
     fn get_database_info(&self, py: Python, database: String) -> PyResult<PyDatabaseInfo> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let info = rt
                 .block_on(client.get_database_info(&database))
@@ -130,7 +130,7 @@ impl PyClient {
     /// Get related articles for given PMIDs
     fn get_related_articles(&self, py: Python, pmids: Vec<u32>) -> PyResult<PyRelatedArticles> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let related = rt
                 .block_on(client.get_related_articles(&pmids))
@@ -142,7 +142,7 @@ impl PyClient {
     /// Get PMC links for given PMIDs
     fn get_pmc_links(&self, py: Python, pmids: Vec<u32>) -> PyResult<PyPmcLinks> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let links = rt
                 .block_on(client.get_pmc_links(&pmids))
@@ -154,7 +154,7 @@ impl PyClient {
     /// Get citing articles for given PMIDs
     fn get_citations(&self, py: Python, pmids: Vec<u32>) -> PyResult<PyCitations> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let citations = rt
                 .block_on(client.get_citations(&pmids))

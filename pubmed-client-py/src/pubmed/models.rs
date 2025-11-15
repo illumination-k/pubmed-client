@@ -95,7 +95,7 @@ impl From<&pubmed::Author> for PyAuthor {
 #[pymethods]
 impl PyAuthor {
     /// Get list of affiliations
-    fn affiliations(&self, py: Python) -> PyResult<PyObject> {
+    fn affiliations(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         for affiliation in &self.inner.affiliations {
             let py_affiliation = PyAffiliation::from(affiliation);
@@ -151,7 +151,7 @@ impl From<PubMedArticle> for PyPubMedArticle {
 #[pymethods]
 impl PyPubMedArticle {
     /// Get list of authors
-    fn authors(&self, py: Python) -> PyResult<PyObject> {
+    fn authors(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         for author in &self.inner.authors {
             let py_author = PyAuthor::from(author);
@@ -161,13 +161,13 @@ impl PyPubMedArticle {
     }
 
     /// Get article types
-    fn article_types(&self, py: Python) -> PyResult<PyObject> {
+    fn article_types(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::new(py, &self.inner.article_types)?;
         Ok(list.into())
     }
 
     /// Get keywords
-    fn keywords(&self, py: Python) -> PyResult<PyObject> {
+    fn keywords(&self, py: Python) -> PyResult<Py<PyAny>> {
         match &self.inner.keywords {
             Some(keywords) => {
                 let list = PyList::new(py, keywords)?;

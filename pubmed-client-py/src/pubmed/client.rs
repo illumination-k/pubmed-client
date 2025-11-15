@@ -110,7 +110,7 @@ impl PyPubMedClient {
         let query_string = query.to_query_string()?;
         let actual_limit = query.get_limit(limit);
 
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             rt.block_on(client.search_articles(&query_string, actual_limit))
                 .map_err(to_py_err)
@@ -143,7 +143,7 @@ impl PyPubMedClient {
         let query_string = query.to_query_string()?;
         let actual_limit = query.get_limit(limit);
 
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let articles = rt
                 .block_on(client.search_and_fetch(&query_string, actual_limit))
@@ -161,7 +161,7 @@ impl PyPubMedClient {
     ///     PubMedArticle object
     fn fetch_article(&self, py: Python, pmid: String) -> PyResult<PyPubMedArticle> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let article = rt
                 .block_on(client.fetch_article(&pmid))
@@ -176,7 +176,7 @@ impl PyPubMedClient {
     ///     List of database names
     fn get_database_list(&self, py: Python) -> PyResult<Vec<String>> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             rt.block_on(client.get_database_list()).map_err(to_py_err)
         })
@@ -191,7 +191,7 @@ impl PyPubMedClient {
     ///     DatabaseInfo object
     fn get_database_info(&self, py: Python, database: String) -> PyResult<PyDatabaseInfo> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let info = rt
                 .block_on(client.get_database_info(&database))
@@ -209,7 +209,7 @@ impl PyPubMedClient {
     ///     RelatedArticles object
     fn get_related_articles(&self, py: Python, pmids: Vec<u32>) -> PyResult<PyRelatedArticles> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let related = rt
                 .block_on(client.get_related_articles(&pmids))
@@ -227,7 +227,7 @@ impl PyPubMedClient {
     ///     PmcLinks object containing available PMC IDs
     fn get_pmc_links(&self, py: Python, pmids: Vec<u32>) -> PyResult<PyPmcLinks> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let links = rt
                 .block_on(client.get_pmc_links(&pmids))
@@ -254,7 +254,7 @@ impl PyPubMedClient {
     ///     Citations object containing citing article PMIDs
     fn get_citations(&self, py: Python, pmids: Vec<u32>) -> PyResult<PyCitations> {
         let client = self.client.clone();
-        py.allow_threads(|| {
+        py.detach(|| {
             let rt = get_runtime();
             let citations = rt
                 .block_on(client.get_citations(&pmids))
