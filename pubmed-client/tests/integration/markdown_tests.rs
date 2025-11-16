@@ -586,7 +586,9 @@ fn test_markdown_edge_cases() {
         pmcid: "PMC111111".to_string(),
         pmid: Some("12345".to_string()),
         title: "Article with <em>HTML</em> & Special Characters".to_string(),
-        authors: vec![Author::new("Dr. John O'Reilly & Associates".to_string())],
+        authors: vec![Author::from_full_name(
+            "Dr. John O'Reilly & Associates".to_string(),
+        )],
         journal: JournalInfo::new("Special Characters Journal".to_string()),
         pub_date: "2023".to_string(),
         doi: Some("10.1000/test<>special".to_string()),

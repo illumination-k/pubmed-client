@@ -132,17 +132,16 @@ impl AuthorXml {
         // Handle collective names
         if let Some(collective_name) = self.collective_name {
             return Some(Author {
-                last_name: None,
-                fore_name: None,
-                first_name: None,
-                middle_name: None,
+                surname: None,
+                given_names: None,
                 initials: None,
                 suffix: None,
                 full_name: collective_name,
                 affiliations: Vec::new(),
                 orcid: None,
+                email: None,
                 is_corresponding: false,
-                author_roles: Vec::new(),
+                roles: Vec::new(),
             });
         }
 
@@ -151,12 +150,34 @@ impl AuthorXml {
         if full_name.trim().is_empty() || full_name == "Unknown Author" {
             None
         } else {
-            let affiliations = self
+            // Extract affiliations and email from affiliation info
+            let (affiliations, email) = self
                 .affiliation_info
                 .unwrap_or_default()
                 .into_iter()
-                .filter_map(|info| info.affiliation.map(|text| Affiliation::from_text(&text)))
-                .collect();
+                .filter_map(|info| info.affiliation)
+                .fold((Vec::new(), None), |(mut affs, mut email_acc), text| {
+                    let email = extract_email_from_text(&text);
+                    let country = extract_country_from_text(&text);
+
+                    // Use first email found
+                    if email_acc.is_none() && email.is_some() {
+                        email_acc = email.clone();
+                    }
+
+                    affs.push(Affiliation {
+                        id: None,
+                        institution: if text.is_empty() {
+                            None
+                        } else {
+                            Some(text.to_string())
+                        },
+                        department: None,
+                        address: None,
+                        country,
+                    });
+                    (affs, email_acc)
+                });
 
             let orcid = self.identifiers.and_then(|ids| {
                 ids.into_iter()
@@ -165,39 +186,17 @@ impl AuthorXml {
             });
 
             Some(Author {
-                last_name: self.last_name,
-                fore_name: self.fore_name,
-                first_name: None,
-                middle_name: None,
+                surname: self.last_name,
+                given_names: self.fore_name,
                 initials: self.initials,
                 suffix: self.suffix,
                 full_name,
                 affiliations,
                 orcid,
+                email,
                 is_corresponding: false,
-                author_roles: Vec::new(),
+                roles: Vec::new(),
             })
-        }
-    }
-}
-
-impl Affiliation {
-    /// Create affiliation from text, extracting email and country
-    pub(super) fn from_text(text: &str) -> Self {
-        let text = text.trim();
-        let email = extract_email_from_text(text);
-        let country = extract_country_from_text(text);
-
-        Affiliation {
-            institution: if text.is_empty() {
-                None
-            } else {
-                Some(text.to_string())
-            },
-            department: None,
-            address: None,
-            country,
-            email,
         }
     }
 }

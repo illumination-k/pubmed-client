@@ -1,40 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-/// Represents an author with detailed information
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Author {
-    /// Given names (first name, middle names)
-    pub given_names: Option<String>,
-    /// Surname (last name)
-    pub surname: Option<String>,
-    /// Full name (formatted)
-    pub full_name: String,
-    /// Affiliations
-    pub affiliations: Vec<Affiliation>,
-    /// ORCID ID
-    pub orcid: Option<String>,
-    /// Email address
-    pub email: Option<String>,
-    /// Author roles/contributions
-    pub roles: Vec<String>,
-    /// Corresponding author flag
-    pub is_corresponding: bool,
-}
-
-/// Represents an institutional affiliation
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Affiliation {
-    /// Affiliation ID
-    pub id: Option<String>,
-    /// Institution name
-    pub institution: String,
-    /// Department
-    pub department: Option<String>,
-    /// Address
-    pub address: Option<String>,
-    /// Country
-    pub country: Option<String>,
-}
+// Re-export common types
+pub use crate::common::{Affiliation, Author};
 
 /// Represents journal information
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -513,56 +480,6 @@ impl Reference {
     }
 }
 
-impl Author {
-    /// Create a new Author instance
-    pub fn new(full_name: String) -> Self {
-        Self {
-            given_names: None,
-            surname: None,
-            full_name,
-            affiliations: Vec::new(),
-            orcid: None,
-            email: None,
-            roles: Vec::new(),
-            is_corresponding: false,
-        }
-    }
-
-    /// Create an author with separated names
-    pub fn with_names(given_names: Option<String>, surname: Option<String>) -> Self {
-        let full_name = match (&given_names, &surname) {
-            (Some(given), Some(sur)) => format!("{given} {sur}"),
-            (Some(given), None) => given.clone(),
-            (None, Some(sur)) => sur.clone(),
-            (None, None) => "Unknown Author".to_string(),
-        };
-
-        Self {
-            given_names,
-            surname,
-            full_name,
-            affiliations: Vec::new(),
-            orcid: None,
-            email: None,
-            roles: Vec::new(),
-            is_corresponding: false,
-        }
-    }
-}
-
-impl Affiliation {
-    /// Create a new Affiliation instance
-    pub fn new(institution: String) -> Self {
-        Self {
-            id: None,
-            institution,
-            department: None,
-            address: None,
-            country: None,
-        }
-    }
-}
-
 impl JournalInfo {
     /// Create a new JournalInfo instance
     pub fn new(title: String) -> Self {
@@ -644,8 +561,8 @@ mod tests {
     fn test_reference_formatting() {
         let mut reference = Reference::new("ref1".to_string());
         reference.authors = vec![
-            Author::new("Smith, J.".to_string()),
-            Author::new("Doe, A.".to_string()),
+            Author::from_full_name("Smith, J.".to_string()),
+            Author::from_full_name("Doe, A.".to_string()),
         ];
         reference.title = Some("Test Article".to_string());
         reference.journal = Some("Test Journal".to_string());

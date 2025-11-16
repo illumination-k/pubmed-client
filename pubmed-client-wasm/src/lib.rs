@@ -395,7 +395,7 @@ impl From<pubmed_client::pmc::Author> for JsAuthor {
         let affiliation_names: Vec<String> = author
             .affiliations
             .into_iter()
-            .map(|a| a.institution)
+            .filter_map(|a| a.institution)
             .collect();
 
         Self {
@@ -416,7 +416,7 @@ impl From<JsAuthor> for pubmed_client::pmc::Author {
             .into_iter()
             .map(|name| pubmed_client::pmc::Affiliation {
                 id: None,
-                institution: name,
+                institution: Some(name),
                 department: None,
                 address: None,
                 country: None,
@@ -426,6 +426,8 @@ impl From<JsAuthor> for pubmed_client::pmc::Author {
         Self {
             given_names: js.given_names,
             surname: js.surname,
+            initials: None,
+            suffix: None,
             full_name: js.full_name,
             affiliations,
             orcid: None,
@@ -516,6 +518,8 @@ impl From<JsReference> for pubmed_client::pmc::Reference {
             .map(|name| pubmed_client::pmc::Author {
                 given_names: None,
                 surname: None,
+                initials: None,
+                suffix: None,
                 full_name: name,
                 affiliations: Vec::new(),
                 orcid: None,
