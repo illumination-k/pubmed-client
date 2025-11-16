@@ -4,11 +4,11 @@ These tests verify end-to-end query construction scenarios that match
 real-world usage patterns.
 """
 
+from pubmed_client import SearchQuery
+
 
 def test_build_query_for_pubmed_search() -> None:
     """Test building a query suitable for PubMed search."""
-    from pubmed_client import SearchQuery
-
     # Simulate building a query for a literature review
     query = (
         SearchQuery().query("machine learning").query("healthcare").query("diagnosis").limit(100)
@@ -27,8 +27,6 @@ def test_build_query_for_pubmed_search() -> None:
 
 def test_complex_query_construction() -> None:
     """Test constructing a complex query with multiple term additions."""
-    from pubmed_client import SearchQuery
-
     # Simulate a researcher building a comprehensive search query
     base_terms = ["covid-19", "sars-cov-2"]
     treatment_terms = ["treatment", "therapy", "intervention"]
@@ -50,8 +48,6 @@ def test_complex_query_construction() -> None:
 
 def test_conditional_query_building() -> None:
     """Test building queries with conditional term addition."""
-    from pubmed_client import SearchQuery
-
     # Simulate dynamic query building based on user preferences
     def build_research_query(
         base_term: str,
@@ -91,8 +87,6 @@ def test_conditional_query_building() -> None:
 
 def test_date_filtering_integration() -> None:
     """Test integration of date filtering with search terms."""
-    from pubmed_client import SearchQuery
-
     # Test recent research query with date filter
     query = SearchQuery().query("covid-19").query("vaccine").published_between(2020, 2024).limit(50)
 
@@ -115,8 +109,6 @@ def test_date_filtering_integration() -> None:
 
 def test_article_type_filtering_integration() -> None:
     """Test integration of article type filtering with search terms."""
-    from pubmed_client import SearchQuery
-
     # Test single article type filter
     query = SearchQuery().query("covid-19").article_type("Review").limit(10)
 
@@ -140,8 +132,6 @@ def test_article_type_filtering_integration() -> None:
 
 def test_open_access_filtering_integration() -> None:
     """Test integration of open access filtering with other filters."""
-    from pubmed_client import SearchQuery
-
     # Test free full text filter
     query = SearchQuery().query("machine learning").free_full_text_only().limit(5)
 
