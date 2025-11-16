@@ -37,7 +37,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-pubmed-client-rs = "0.1.0"
+pubmed-client = "0.1.0"
 ```
 
 ### JavaScript/TypeScript (WASM)
@@ -69,7 +69,7 @@ cargo install pubmed-cli
 #### Using the Unified Client
 
 ```rust
-use pubmed_client_rs::Client;
+use pubmed_client::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -105,7 +105,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 #### Advanced Search with Filters
 
 ```rust
-use pubmed_client_rs::{Client, pubmed::SearchQuery};
+use pubmed_client::{Client, pubmed::SearchQuery};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -129,7 +129,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 #### Discovering Related Articles
 
 ```rust
-use pubmed_client_rs::Client;
+use pubmed_client::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -224,7 +224,7 @@ pubmed-cli markdown PMC7906746 > article.md
 ### Converting PMC Articles to Markdown
 
 ```rust
-use pubmed_client_rs::{Client, pmc::PmcMarkdownConverter, pmc::HeadingStyle, pmc::ReferenceStyle};
+use pubmed_client::{Client, pmc::PmcMarkdownConverter, pmc::HeadingStyle, pmc::ReferenceStyle};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -257,7 +257,7 @@ Medical Subject Headings (MeSH) terms provide standardized vocabulary for biomed
 #### Searching with MeSH Terms
 
 ```rust
-use pubmed_client_rs::{Client, pubmed::SearchQuery};
+use pubmed_client::{Client, pubmed::SearchQuery};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -287,7 +287,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 #### Extracting MeSH Information
 
 ```rust
-use pubmed_client_rs::Client;
+use pubmed_client::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -322,7 +322,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 #### Comparing Articles by MeSH Terms
 
 ```rust
-use pubmed_client_rs::Client;
+use pubmed_client::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -386,7 +386,7 @@ For more details, see the [MCP server README](pubmed-mcp/README.md).
 The client automatically handles rate limiting according to NCBI guidelines:
 
 ```rust
-use pubmed_client_rs::{Client, ClientConfig};
+use pubmed_client::{Client, ClientConfig};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -410,7 +410,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 The client includes automatic retry logic with exponential backoff for handling transient failures:
 
 ```rust
-use pubmed_client_rs::{Client, ClientConfig, retry::RetryConfig};
+use pubmed_client::{Client, ClientConfig, retry::RetryConfig};
 use std::time::Duration;
 
 #[tokio::main]
@@ -472,11 +472,11 @@ cargo build
 cargo test
 
 # Build specific package
-cargo build -p pubmed-client-rs     # Core library
+cargo build -p pubmed-client        # Core library
 cargo build -p pubmed-client-wasm   # WASM bindings
 cargo build -p pubmed-client-py     # Python bindings
 cargo build -p pubmed-cli           # CLI
-cargo build -p pubmed-mcp    # MCP server
+cargo build -p pubmed-mcp           # MCP server
 ```
 
 ### Running Tests
@@ -488,7 +488,7 @@ This project uses [nextest](https://nexte.st/) for Rust tests:
 cargo nextest run
 
 # Run tests for specific package
-cargo nextest run -p pubmed-client-rs
+cargo nextest run -p pubmed-client
 cargo nextest run -p pubmed-mcp
 
 # Run specific integration test suite
@@ -576,9 +576,9 @@ mise run doc
 
 Online documentation is available at:
 
-- **Core library**: [docs.rs/pubmed-client-rs](https://docs.rs/pubmed-client-rs)
+- **Core library**: [docs.rs/pubmed-client](https://docs.rs/pubmed-client)
 - **WASM package**: [npm package](https://www.npmjs.com/package/pubmed-client-wasm)
-- **Python package**: [PyPI](https://pypi.org/project/pubmed-client)
+- **Python package**: [PyPI](https://pypi.org/project/pubmed-client-py)
 
 ## API Coverage
 
@@ -596,7 +596,7 @@ See [CLAUDE.md](CLAUDE.md) for implementation details and API design patterns.
 
 The repository includes comprehensive examples:
 
-- **[Rust examples](pubmed-client/examples/)** - Core library usage
+- **[Rust examples](examples/)** - Core library usage
 - **[WASM examples](pubmed-client-wasm/tests/)** - TypeScript integration
 - **[Python examples](pubmed-client-py/examples/)** - Python usage patterns
 - **[CLI usage](pubmed-cli/README.md)** - Command-line examples
