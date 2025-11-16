@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 /// Represents an author's institutional affiliation
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Affiliation {
+    /// Affiliation ID (optional, from PMC)
+    pub id: Option<String>,
     /// Institution name (e.g., "Harvard Medical School")
     pub institution: Option<String>,
     /// Department or division (e.g., "Department of Medicine")
@@ -14,22 +16,16 @@ pub struct Affiliation {
     pub address: Option<String>,
     /// Country
     pub country: Option<String>,
-    /// Email address associated with this affiliation
-    pub email: Option<String>,
 }
 
 /// Represents a detailed author with enhanced metadata
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Author {
-    /// Author's last name/surname
-    pub last_name: Option<String>,
-    /// Author's fore name (given name)
-    pub fore_name: Option<String>,
-    /// Author's first name (may be different from fore_name)
-    pub first_name: Option<String>,
-    /// Author's middle name
-    pub middle_name: Option<String>,
-    /// Author's initials
+    /// Author's surname (last name)
+    pub surname: Option<String>,
+    /// Author's given names (first name, middle names)
+    pub given_names: Option<String>,
+    /// Author's initials (useful when given_names not available)
     pub initials: Option<String>,
     /// Name suffix (e.g., "Jr", "Sr", "III")
     pub suffix: Option<String>,
@@ -39,10 +35,12 @@ pub struct Author {
     pub affiliations: Vec<Affiliation>,
     /// ORCID identifier (e.g., "0000-0000-0000-0000")
     pub orcid: Option<String>,
+    /// Author's email address
+    pub email: Option<String>,
     /// Whether this author is a corresponding author
     pub is_corresponding: bool,
     /// Author's roles/contributions (e.g., ["Conceptualization", "Writing - original draft"])
-    pub author_roles: Vec<String>,
+    pub roles: Vec<String>,
 }
 
 /// Represents a PubMed article with metadata
@@ -533,20 +531,19 @@ impl Display for Author {
 
 impl Author {
     /// Create a new Author with basic information
-    pub fn new(last_name: Option<String>, fore_name: Option<String>) -> Self {
-        let full_name = format_author_name(&last_name, &fore_name, &None);
+    pub fn new(surname: Option<String>, given_names: Option<String>) -> Self {
+        let full_name = format_author_name(&surname, &given_names, &None);
         Author {
-            last_name,
-            fore_name,
-            first_name: None,
-            middle_name: None,
+            surname,
+            given_names,
             initials: None,
             suffix: None,
             full_name,
             affiliations: Vec::new(),
             orcid: None,
+            email: None,
             is_corresponding: false,
-            author_roles: Vec::new(),
+            roles: Vec::new(),
         }
     }
 
@@ -617,20 +614,20 @@ impl Author {
 
 /// Format an author name from components
 fn format_author_name(
-    last_name: &Option<String>,
-    fore_name: &Option<String>,
+    surname: &Option<String>,
+    given_names: &Option<String>,
     initials: &Option<String>,
 ) -> String {
-    match (fore_name, last_name) {
-        (Some(fore), Some(last)) => format!("{fore} {last}"),
-        (None, Some(last)) => {
+    match (given_names, surname) {
+        (Some(given), Some(sur)) => format!("{given} {sur}"),
+        (None, Some(sur)) => {
             if let Some(init) = initials {
-                format!("{init} {last}")
+                format!("{init} {sur}")
             } else {
-                last.clone()
+                sur.clone()
             }
         }
-        (Some(fore), None) => fore.clone(),
+        (Some(given), None) => given.clone(),
         (None, None) => "Unknown Author".to_string(),
     }
 }
@@ -641,32 +638,31 @@ mod tests {
 
     fn create_test_author() -> Author {
         Author {
-            last_name: Some("Doe".to_string()),
-            fore_name: Some("John".to_string()),
-            first_name: None,
-            middle_name: Some("A".to_string()),
+            surname: Some("Doe".to_string()),
+            given_names: Some("John A".to_string()),
             initials: Some("JA".to_string()),
             suffix: None,
-            full_name: "John Doe".to_string(),
+            full_name: "John A Doe".to_string(),
             affiliations: vec![
                 Affiliation {
+                    id: None,
                     institution: Some("Harvard Medical School".to_string()),
                     department: Some("Department of Medicine".to_string()),
                     address: Some("Boston, MA".to_string()),
                     country: Some("USA".to_string()),
-                    email: Some("john.doe@hms.harvard.edu".to_string()),
                 },
                 Affiliation {
+                    id: None,
                     institution: Some("Massachusetts General Hospital".to_string()),
                     department: None,
                     address: Some("Boston, MA".to_string()),
                     country: Some("USA".to_string()),
-                    email: None,
                 },
             ],
             orcid: Some("0000-0001-2345-6789".to_string()),
+            email: Some("john.doe@hms.harvard.edu".to_string()),
             is_corresponding: true,
-            author_roles: vec![
+            roles: vec![
                 "Conceptualization".to_string(),
                 "Writing - original draft".to_string(),
             ],
@@ -854,8 +850,8 @@ mod tests {
     #[test]
     fn test_author_creation() {
         let author = Author::new(Some("Smith".to_string()), Some("Jane".to_string()));
-        assert_eq!(author.last_name, Some("Smith".to_string()));
-        assert_eq!(author.fore_name, Some("Jane".to_string()));
+        assert_eq!(author.surname, Some("Smith".to_string()));
+        assert_eq!(author.given_names, Some("Jane".to_string()));
         assert_eq!(author.full_name, "Jane Smith");
         assert!(!author.has_orcid());
         assert!(!author.is_corresponding);
@@ -885,7 +881,7 @@ mod tests {
         let corresponding = article.get_corresponding_authors();
 
         assert_eq!(corresponding.len(), 1);
-        assert_eq!(corresponding[0].full_name, "John Doe");
+        assert_eq!(corresponding[0].full_name, "John A Doe");
     }
 
     #[test]

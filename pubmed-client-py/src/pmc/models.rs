@@ -22,7 +22,7 @@ pub struct PyPmcAffiliation {
     #[pyo3(get)]
     pub id: Option<String>,
     #[pyo3(get)]
-    pub institution: String,
+    pub institution: Option<String>,
     #[pyo3(get)]
     pub department: Option<String>,
     #[pyo3(get)]
@@ -47,7 +47,7 @@ impl From<&pmc::Affiliation> for PyPmcAffiliation {
 #[pymethods]
 impl PyPmcAffiliation {
     fn __repr__(&self) -> String {
-        format!("PmcAffiliation(institution='{}')", self.institution)
+        format!("PmcAffiliation(institution={:?})", self.institution)
     }
 }
 
@@ -95,6 +95,12 @@ impl PyPmcAuthor {
             let py_affiliation = PyPmcAffiliation::from(affiliation);
             list.append(py_affiliation)?;
         }
+        Ok(list.into())
+    }
+
+    /// Get list of roles/contributions
+    fn roles(&self, py: Python) -> PyResult<Py<PyAny>> {
+        let list = PyList::new(py, &self.inner.roles)?;
         Ok(list.into())
     }
 

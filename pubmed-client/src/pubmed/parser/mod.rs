@@ -198,8 +198,8 @@ mod tests {
         assert_eq!(article.authors.len(), 1);
         assert_eq!(article.author_count, 1);
         let author = &article.authors[0];
-        assert_eq!(author.last_name, Some("Doe".to_string()));
-        assert_eq!(author.fore_name, Some("John".to_string()));
+        assert_eq!(author.surname, Some("Doe".to_string()));
+        assert_eq!(author.given_names, Some("John".to_string()));
         assert_eq!(author.initials, Some("JA".to_string()));
         assert_eq!(author.full_name, "John Doe");
         assert_eq!(author.orcid, Some("0000-0001-2345-6789".to_string()));

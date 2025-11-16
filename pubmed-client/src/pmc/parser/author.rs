@@ -193,7 +193,7 @@ fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
                 if let Some(rid) = &xref.rid {
                     affiliations.push(Affiliation {
                         id: Some(rid.clone()),
-                        institution: rid.clone(), // Use rid as institution for now
+                        institution: Some(rid.clone()), // Use rid as institution for now
                         department: None,
                         address: None,
                         country: None,
@@ -210,7 +210,7 @@ fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
             if !clean_text.is_empty() {
                 affiliations.push(Affiliation {
                     id: aff.id.clone(),
-                    institution: clean_text.to_string(),
+                    institution: Some(clean_text.to_string()),
                     department: None,
                     address: None,
                     country: None,

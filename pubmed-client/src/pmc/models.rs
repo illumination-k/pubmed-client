@@ -27,7 +27,7 @@ pub struct Affiliation {
     /// Affiliation ID
     pub id: Option<String>,
     /// Institution name
-    pub institution: String,
+    pub institution: Option<String>,
     /// Department
     pub department: Option<String>,
     /// Address
@@ -552,7 +552,7 @@ impl Author {
 
 impl Affiliation {
     /// Create a new Affiliation instance
-    pub fn new(institution: String) -> Self {
+    pub fn new(institution: Option<String>) -> Self {
         Self {
             id: None,
             institution,
