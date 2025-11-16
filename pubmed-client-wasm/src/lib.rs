@@ -426,6 +426,8 @@ impl From<JsAuthor> for pubmed_client::pmc::Author {
         Self {
             given_names: js.given_names,
             surname: js.surname,
+            initials: None,
+            suffix: None,
             full_name: js.full_name,
             affiliations,
             orcid: None,
@@ -516,6 +518,8 @@ impl From<JsReference> for pubmed_client::pmc::Reference {
             .map(|name| pubmed_client::pmc::Author {
                 given_names: None,
                 surname: None,
+                initials: None,
+                suffix: None,
                 full_name: name,
                 affiliations: Vec::new(),
                 orcid: None,

@@ -1,47 +1,7 @@
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::str::Chars;
-
 use serde::{Deserialize, Serialize};
 
-/// Represents an author's institutional affiliation
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
-pub struct Affiliation {
-    /// Affiliation ID (optional, from PMC)
-    pub id: Option<String>,
-    /// Institution name (e.g., "Harvard Medical School")
-    pub institution: Option<String>,
-    /// Department or division (e.g., "Department of Medicine")
-    pub department: Option<String>,
-    /// Full address including street, city, state/province
-    pub address: Option<String>,
-    /// Country
-    pub country: Option<String>,
-}
-
-/// Represents a detailed author with enhanced metadata
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
-pub struct Author {
-    /// Author's surname (last name)
-    pub surname: Option<String>,
-    /// Author's given names (first name, middle names)
-    pub given_names: Option<String>,
-    /// Author's initials (useful when given_names not available)
-    pub initials: Option<String>,
-    /// Name suffix (e.g., "Jr", "Sr", "III")
-    pub suffix: Option<String>,
-    /// Full formatted name
-    pub full_name: String,
-    /// List of institutional affiliations
-    pub affiliations: Vec<Affiliation>,
-    /// ORCID identifier (e.g., "0000-0000-0000-0000")
-    pub orcid: Option<String>,
-    /// Author's email address
-    pub email: Option<String>,
-    /// Whether this author is a corresponding author
-    pub is_corresponding: bool,
-    /// Author's roles/contributions (e.g., ["Conceptualization", "Writing - original draft"])
-    pub roles: Vec<String>,
-}
+// Re-export common types
+pub use crate::common::{Affiliation, Author};
 
 /// Represents a PubMed article with metadata
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -511,130 +471,10 @@ impl PubMedArticle {
     }
 }
 
-impl PartialEq<str> for Author {
-    fn eq(&self, other: &str) -> bool {
-        self.full_name == other
-    }
-}
-
-impl PartialEq<&str> for Author {
-    fn eq(&self, other: &&str) -> bool {
-        self.full_name == *other
-    }
-}
-
-impl Display for Author {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.full_name)
-    }
-}
-
-impl Author {
-    /// Create a new Author with basic information
-    pub fn new(surname: Option<String>, given_names: Option<String>) -> Self {
-        let full_name = format_author_name(&surname, &given_names, &None);
-        Author {
-            surname,
-            given_names,
-            initials: None,
-            suffix: None,
-            full_name,
-            affiliations: Vec::new(),
-            orcid: None,
-            email: None,
-            is_corresponding: false,
-            roles: Vec::new(),
-        }
-    }
-
-    /// Check if the author is affiliated with a specific institution
-    ///
-    /// # Arguments
-    ///
-    /// * `institution` - Institution name to check (case-insensitive)
-    ///
-    /// # Returns
-    ///
-    /// `true` if the author has an affiliation matching the institution
-    pub fn is_affiliated_with(&self, institution: &str) -> bool {
-        let institution_lower = institution.to_lowercase();
-        self.affiliations.iter().any(|affil| {
-            affil
-                .institution
-                .as_ref()
-                .is_some_and(|inst| inst.to_lowercase().contains(&institution_lower))
-        })
-    }
-
-    /// Get the author's primary affiliation (first in the list)
-    ///
-    /// # Returns
-    ///
-    /// A reference to the primary affiliation, if any
-    pub fn primary_affiliation(&self) -> Option<&Affiliation> {
-        self.affiliations.first()
-    }
-
-    /// Check if the author has an ORCID identifier
-    ///
-    /// # Returns
-    ///
-    /// `true` if the author has an ORCID ID
-    pub fn has_orcid(&self) -> bool {
-        self.orcid.is_some()
-    }
-
-    /// Check if the author name is empty
-    ///
-    /// # Returns
-    ///
-    /// `true` if the full name is empty or just whitespace
-    pub fn is_empty(&self) -> bool {
-        self.full_name.trim().is_empty()
-    }
-
-    /// Get the length of the author's full name
-    ///
-    /// # Returns
-    ///
-    /// Length of the full name string
-    pub fn len(&self) -> usize {
-        self.full_name.len()
-    }
-
-    /// Get an iterator over the characters in the author's full name
-    ///
-    /// # Returns
-    ///
-    /// Iterator over characters
-    pub fn chars(&self) -> Chars<'_> {
-        self.full_name.chars()
-    }
-}
-
-/// Format an author name from components
-fn format_author_name(
-    surname: &Option<String>,
-    given_names: &Option<String>,
-    initials: &Option<String>,
-) -> String {
-    match (given_names, surname) {
-        (Some(given), Some(sur)) => format!("{given} {sur}"),
-        (None, Some(sur)) => {
-            if let Some(init) = initials {
-                format!("{init} {sur}")
-            } else {
-                sur.clone()
-            }
-        }
-        (Some(given), None) => given.clone(),
-        (None, None) => "Unknown Author".to_string(),
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::common::format_author_name;
 
     fn create_test_author() -> Author {
         Author {

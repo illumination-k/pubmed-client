@@ -48,6 +48,7 @@ def test_complex_query_construction() -> None:
 
 def test_conditional_query_building() -> None:
     """Test building queries with conditional term addition."""
+
     # Simulate dynamic query building based on user preferences
     def build_research_query(
         base_term: str,

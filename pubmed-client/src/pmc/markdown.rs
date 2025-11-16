@@ -877,7 +877,7 @@ mod tests {
             pmcid: "PMC1234567".to_string(),
             pmid: Some("12345".to_string()),
             title: "Test Article".to_string(),
-            authors: vec![Author::new("John Doe".to_string())],
+            authors: vec![Author::from_full_name("John Doe".to_string())],
             journal: JournalInfo::new("Test Journal".to_string()),
             pub_date: "2023".to_string(),
             doi: Some("10.1000/test".to_string()),
