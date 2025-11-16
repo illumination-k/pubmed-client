@@ -461,4 +461,155 @@ impl PySearchQuery {
         slf.inner = slf.inner.clone().pmc_only();
         slf
     }
+
+    // ============================================================================================
+    // Boolean Logic Methods (User Story 4 - AND, OR, NOT operations)
+    // ============================================================================================
+
+    /// Combine this query with another using AND logic
+    ///
+    /// Combines two queries by wrapping each in parentheses and joining with AND.
+    /// If either query is empty, returns the non-empty query.
+    /// The result uses the higher limit of the two queries.
+    ///
+    /// Args:
+    ///     other: Another SearchQuery to combine with
+    ///
+    /// Returns:
+    ///     SearchQuery: New query with combined logic
+    ///
+    /// Example:
+    ///     >>> q1 = SearchQuery().query("covid-19")
+    ///     >>> q2 = SearchQuery().query("vaccine")
+    ///     >>> combined = q1.and_(q2)
+    ///     >>> combined.build()
+    ///     '(covid-19) AND (vaccine)'
+    ///
+    ///     >>> # Complex chaining
+    ///     >>> result = SearchQuery().query("cancer") \\
+    ///     ...     .and_(SearchQuery().query("treatment")) \\
+    ///     ...     .and_(SearchQuery().query("2024[pdat]"))
+    ///     >>> result.build()
+    ///     '((cancer) AND (treatment)) AND (2024[pdat])'
+    #[pyo3(name = "and_")]
+    fn py_and(slf: PyRefMut<Self>, other: PyRef<Self>) -> Self {
+        let combined_inner = slf.inner.clone().and(other.inner.clone());
+        PySearchQuery {
+            inner: combined_inner,
+        }
+    }
+
+    /// Combine this query with another using OR logic
+    ///
+    /// Combines two queries by wrapping each in parentheses and joining with OR.
+    /// If either query is empty, returns the non-empty query.
+    /// The result uses the higher limit of the two queries.
+    ///
+    /// Args:
+    ///     other: Another SearchQuery to combine with
+    ///
+    /// Returns:
+    ///     SearchQuery: New query with combined logic
+    ///
+    /// Example:
+    ///     >>> q1 = SearchQuery().query("diabetes")
+    ///     >>> q2 = SearchQuery().query("hypertension")
+    ///     >>> combined = q1.or_(q2)
+    ///     >>> combined.build()
+    ///     '(diabetes) OR (hypertension)'
+    ///
+    ///     >>> # Find articles about either condition
+    ///     >>> result = SearchQuery().query("cancer") \\
+    ///     ...     .or_(SearchQuery().query("tumor")) \\
+    ///     ...     .or_(SearchQuery().query("oncology"))
+    ///     >>> result.build()
+    ///     '((cancer) OR (tumor)) OR (oncology)'
+    #[pyo3(name = "or_")]
+    fn py_or(slf: PyRefMut<Self>, other: PyRef<Self>) -> Self {
+        let combined_inner = slf.inner.clone().or(other.inner.clone());
+        PySearchQuery {
+            inner: combined_inner,
+        }
+    }
+
+    /// Negate this query using NOT logic
+    ///
+    /// Wraps the current query with NOT operator.
+    /// This is typically used in combination with other queries to exclude results.
+    /// Returns an empty query if the current query is empty.
+    ///
+    /// Returns:
+    ///     SearchQuery: New query with NOT logic
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").negate()
+    ///     >>> query.build()
+    ///     'NOT (cancer)'
+    ///
+    ///     >>> # More practical: exclude from search results
+    ///     >>> base = SearchQuery().query("treatment")
+    ///     >>> excluded = SearchQuery().query("animal studies").negate()
+    ///     >>> # (Note: use exclude() method for this pattern)
+    fn negate(slf: PyRefMut<Self>) -> Self {
+        let negated_inner = slf.inner.clone().negate();
+        PySearchQuery {
+            inner: negated_inner,
+        }
+    }
+
+    /// Exclude articles matching the given query
+    ///
+    /// Excludes results from this query that match the excluded query.
+    /// This is the recommended way to filter out unwanted results.
+    /// If either query is empty, returns the base query unchanged.
+    ///
+    /// Args:
+    ///     excluded: SearchQuery representing articles to exclude
+    ///
+    /// Returns:
+    ///     SearchQuery: New query with exclusion logic
+    ///
+    /// Example:
+    ///     >>> base = SearchQuery().query("cancer treatment")
+    ///     >>> exclude = SearchQuery().query("animal studies")
+    ///     >>> filtered = base.exclude(exclude)
+    ///     >>> filtered.build()
+    ///     '(cancer treatment) NOT (animal studies)'
+    ///
+    ///     >>> # Exclude multiple types of studies
+    ///     >>> human_only = SearchQuery().query("therapy") \\
+    ///     ...     .exclude(SearchQuery().query("animal studies")) \\
+    ///     ...     .exclude(SearchQuery().query("in vitro"))
+    fn exclude(slf: PyRefMut<Self>, excluded: PyRef<Self>) -> Self {
+        let filtered_inner = slf.inner.clone().exclude(excluded.inner.clone());
+        PySearchQuery {
+            inner: filtered_inner,
+        }
+    }
+
+    /// Add parentheses around the current query for grouping
+    ///
+    /// Wraps the query in parentheses to control operator precedence in complex queries.
+    /// Returns an empty query if the current query is empty.
+    ///
+    /// Returns:
+    ///     SearchQuery: New query wrapped in parentheses
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").or_(SearchQuery().query("tumor")).group()
+    ///     >>> query.build()
+    ///     '((cancer) OR (tumor))'
+    ///
+    ///     >>> # Controlling precedence
+    ///     >>> q1 = SearchQuery().query("a").or_(SearchQuery().query("b")).group()
+    ///     >>> q2 = SearchQuery().query("c").or_(SearchQuery().query("d")).group()
+    ///     >>> result = q1.and_(q2)
+    ///     >>> result.build()
+    ///     '(((a) OR (b))) AND (((c) OR (d)))'
+    fn group(slf: PyRefMut<Self>) -> Self {
+        let grouped_inner = slf.inner.clone().group();
+        PySearchQuery {
+            inner: grouped_inner,
+        }
+    }
 }
