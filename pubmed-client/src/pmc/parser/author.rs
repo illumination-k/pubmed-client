@@ -152,7 +152,7 @@ pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
 fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
     let name = contrib.name?;
 
-    let mut author = Author::with_names(name.given_names.clone(), name.surname.clone());
+    let mut author = Author::with_names(name.surname.clone(), name.given_names.clone());
 
     // Extract ORCID from contrib-id tags
     for contrib_id in &contrib.contrib_ids {
@@ -240,12 +240,12 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
                         // Extract names from person-groups first
                         for person_group in citation.person_groups {
                             for name in person_group.names {
-                                authors.push(Author::with_names(name.given_names, name.surname));
+                                authors.push(Author::with_names(name.surname, name.given_names));
                             }
                         }
                         // Also check for direct names (without person-group wrapper)
                         for name in citation.names {
-                            authors.push(Author::with_names(name.given_names, name.surname));
+                            authors.push(Author::with_names(name.surname, name.given_names));
                         }
                         if !authors.is_empty() {
                             return Ok(authors);
@@ -277,12 +277,12 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
                         // Extract names from person-groups first
                         for person_group in citation.person_groups {
                             for name in person_group.names {
-                                authors.push(Author::with_names(name.given_names, name.surname));
+                                authors.push(Author::with_names(name.surname, name.given_names));
                             }
                         }
                         // Also check for direct names (without person-group wrapper)
                         for name in citation.names {
-                            authors.push(Author::with_names(name.given_names, name.surname));
+                            authors.push(Author::with_names(name.surname, name.given_names));
                         }
                         if !authors.is_empty() {
                             return Ok(authors);
