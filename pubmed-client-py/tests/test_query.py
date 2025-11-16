@@ -2,11 +2,11 @@
 
 import pytest
 
+from pubmed_client import SearchQuery
+
 
 def test_searchquery_constructor_creates_empty_query() -> None:
     """Test that SearchQuery() creates an empty query that raises ValueError on build()."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery()
     # Empty query should raise ValueError when build() is called
     with pytest.raises(ValueError, match="Cannot build query"):
@@ -15,39 +15,30 @@ def test_searchquery_constructor_creates_empty_query() -> None:
 
 def test_query_single_term() -> None:
     """Test adding a single search term."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("covid-19")
     assert query.build() == "covid-19"
 
 
 def test_query_multiple_calls_accumulate() -> None:
     """Test that multiple query() calls accumulate terms."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("covid-19").query("treatment")
     assert query.build() == "covid-19 treatment"
 
 
 def test_terms_batch_addition() -> None:
     """Test adding multiple terms at once via terms() method."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().terms(["covid-19", "vaccine", "efficacy"])
     assert query.build() == "covid-19 vaccine efficacy"
 
 
 def test_query_none_filtered_silently() -> None:
     """Test that None values in query() are silently filtered."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query(None).query("covid-19")
     assert query.build() == "covid-19"
 
 
 def test_terms_none_filtered_silently() -> None:
     """Test that None values in terms() list are silently filtered."""
-    from pubmed_client import SearchQuery
 
     terms: list[str | None] = [None, "covid-19", None, "vaccine"]
     query = SearchQuery().terms(terms)
@@ -56,16 +47,12 @@ def test_terms_none_filtered_silently() -> None:
 
 def test_query_empty_string_filtered() -> None:
     """Test that empty strings and whitespace-only strings are filtered."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("").query("   ").query("cancer")
     assert query.build() == "cancer"
 
 
 def test_limit_valid_values() -> None:
     """Test that valid limit values are accepted."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("cancer").limit(50)
     # Limit doesn't appear in build() output (used during execution)
     assert query.build() == "cancer"
@@ -80,8 +67,6 @@ def test_limit_valid_values() -> None:
 
 def test_limit_none_uses_default() -> None:
     """Test that limit(None) is treated as unset (uses default of 20)."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("cancer").limit(None)
     # Should not raise error, None means "use default"
     assert query.build() == "cancer"
@@ -89,25 +74,19 @@ def test_limit_none_uses_default() -> None:
 
 def test_limit_zero_raises_valueerror() -> None:
     """Test that limit(0) raises ValueError."""
-    from pubmed_client import SearchQuery
-
     with pytest.raises(ValueError, match="Limit must be greater than 0"):
         SearchQuery().query("cancer").limit(0)
 
 
 def test_limit_negative_raises_valueerror() -> None:
     """Test that negative limits are rejected by PyO3 type system."""
-    from pubmed_client import SearchQuery
-
-    # PyO3 rejects negative values for usize parameters before our validation runs
+    #PyO3 rejects negative values for usize parameters before our validation runs
     with pytest.raises(OverflowError, match="can't convert negative int to unsigned"):
         SearchQuery().query("cancer").limit(-1)
 
 
 def test_limit_exceeds_10000_raises_valueerror() -> None:
     """Test that limits > 10000 raise ValueError."""
-    from pubmed_client import SearchQuery
-
     with pytest.raises(ValueError, match="Limit should not exceed 10,000"):
         SearchQuery().query("cancer").limit(10001)
 
@@ -117,8 +96,6 @@ def test_limit_exceeds_10000_raises_valueerror() -> None:
 
 def test_build_empty_query_raises_valueerror() -> None:
     """Test that build() on empty query raises ValueError."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery()
     with pytest.raises(ValueError, match="Cannot build query: no search terms provided"):
         query.build()
@@ -126,8 +103,6 @@ def test_build_empty_query_raises_valueerror() -> None:
 
 def test_build_only_none_terms_raises_valueerror() -> None:
     """Test that query with only None/empty terms raises ValueError."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query(None).query("").query("   ")
     with pytest.raises(ValueError, match="Cannot build query"):
         query.build()
@@ -135,17 +110,13 @@ def test_build_only_none_terms_raises_valueerror() -> None:
 
 def test_build_single_term() -> None:
     """Test building query with single term."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("machine learning")
     assert query.build() == "machine learning"
 
 
 def test_build_multiple_terms_space_separated() -> None:
     """Test that multiple terms are space-separated in build output."""
-    from pubmed_client import SearchQuery
-
-    # Via multiple query() calls
+    #Via multiple query() calls
     query1 = SearchQuery().query("cancer").query("treatment").query("outcomes")
     assert query1.build() == "cancer treatment outcomes"
 
@@ -160,8 +131,6 @@ def test_build_multiple_terms_space_separated() -> None:
 
 def test_method_chaining_returns_self() -> None:
     """Test that builder methods return self for fluent API."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery()
 
     # Test that chaining works
@@ -182,8 +151,6 @@ def test_method_chaining_returns_self() -> None:
 
 def test_published_in_year() -> None:
     """Test that published_in_year() generates correct date filter."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("covid-19").published_in_year(2024)
     result = query.build()
     assert "2024[pdat]" in result
@@ -192,8 +159,6 @@ def test_published_in_year() -> None:
 
 def test_published_between_with_both_years() -> None:
     """Test that published_between() with both years generates correct date range filter."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("cancer").published_between(2020, 2023)
     result = query.build()
     assert "2020:2023[pdat]" in result
@@ -202,8 +167,6 @@ def test_published_between_with_both_years() -> None:
 
 def test_published_between_with_none_end_year() -> None:
     """Test that published_between() with None end_year uses 3000 as upper bound."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("diabetes").published_between(2020, None)
     result = query.build()
     assert "2020:3000[pdat]" in result
@@ -212,8 +175,6 @@ def test_published_between_with_none_end_year() -> None:
 
 def test_published_after() -> None:
     """Test that published_after() generates correct open-ended date range."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("treatment").published_after(2020)
     result = query.build()
     assert "2020:3000[pdat]" in result
@@ -222,8 +183,6 @@ def test_published_after() -> None:
 
 def test_published_before() -> None:
     """Test that published_before() generates correct upper-bounded date range."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("epidemiology").published_before(2020)
     result = query.build()
     assert "1900:2020[pdat]" in result
@@ -233,16 +192,12 @@ def test_published_before() -> None:
 @pytest.mark.parametrize("invalid_year", [999, 1799, 3001, 5000])
 def test_invalid_years_raise_valueerror(invalid_year: int) -> None:
     """Test that years outside 1800-3000 range raise ValueError."""
-    from pubmed_client import SearchQuery
-
     with pytest.raises(ValueError, match="Year must be between 1800 and 3000"):
         SearchQuery().query("topic").published_in_year(invalid_year)
 
 
 def test_invalid_date_range_raises_valueerror() -> None:
     """Test that start_year > end_year raises ValueError."""
-    from pubmed_client import SearchQuery
-
     with pytest.raises(ValueError, match=r"Start year.*must be.*end year"):
         SearchQuery().query("topic").published_between(2024, 2020)
 
@@ -254,8 +209,6 @@ def test_invalid_date_range_raises_valueerror() -> None:
 
 def test_article_type_single() -> None:
     """Test that article_type() with valid type generates correct filter."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("cancer").article_type("Clinical Trial")
     result = query.build()
     assert "Clinical Trial[pt]" in result
@@ -264,8 +217,6 @@ def test_article_type_single() -> None:
 
 def test_article_type_case_insensitive() -> None:
     """Test that article_type() handles case-insensitive input."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("diabetes").article_type("clinical trial")
     result = query.build()
     assert "Clinical Trial[pt]" in result
@@ -273,8 +224,6 @@ def test_article_type_case_insensitive() -> None:
 
 def test_article_types_multiple() -> None:
     """Test that article_types() with multiple types generates OR combination."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("treatment").article_types(["RCT", "Meta-Analysis"])
     result = query.build()
     # Should contain OR combination
@@ -285,8 +234,6 @@ def test_article_types_multiple() -> None:
 
 def test_article_types_empty_list() -> None:
     """Test that article_types() with empty list is ignored."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("research").article_types([])
     result = query.build()
     # Should just have the search term, no article type filter
@@ -307,8 +254,6 @@ def test_article_types_empty_list() -> None:
 )
 def test_all_article_types_supported(article_type_name: str, expected_tag: str) -> None:
     """Test that all 7 supported article types work correctly."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("topic").article_type(article_type_name)
     result = query.build()
     assert expected_tag in result
@@ -316,8 +261,6 @@ def test_all_article_types_supported(article_type_name: str, expected_tag: str) 
 
 def test_invalid_article_type_raises_valueerror() -> None:
     """Test that invalid article type raises ValueError with helpful message."""
-    from pubmed_client import SearchQuery
-
     with pytest.raises(ValueError, match=r"Invalid article type.*Supported types"):
         SearchQuery().query("topic").article_type("Invalid Type")
 
@@ -329,8 +272,6 @@ def test_invalid_article_type_raises_valueerror() -> None:
 
 def test_free_full_text_only() -> None:
     """Test that free_full_text_only() adds free full text filter."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("cancer").free_full_text_only()
     result = query.build()
     assert "cancer" in result
@@ -339,8 +280,6 @@ def test_free_full_text_only() -> None:
 
 def test_full_text_only() -> None:
     """Test that full_text_only() adds full text filter."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("diabetes").full_text_only()
     result = query.build()
     assert "diabetes" in result
@@ -349,8 +288,6 @@ def test_full_text_only() -> None:
 
 def test_pmc_only() -> None:
     """Test that pmc_only() adds PMC filter."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("treatment").pmc_only()
     result = query.build()
     assert "treatment" in result
@@ -359,8 +296,6 @@ def test_pmc_only() -> None:
 
 def test_multiple_access_filters_can_be_combined() -> None:
     """Test that multiple access filters can be combined (though unusual)."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("research").free_full_text_only().pmc_only()
     result = query.build()
     assert "research" in result
@@ -370,7 +305,6 @@ def test_multiple_access_filters_can_be_combined() -> None:
 
 def test_access_filters_with_other_filters() -> None:
     """Test that access filters work with date and article type filters."""
-    from pubmed_client import SearchQuery
 
     query = (
         SearchQuery()
@@ -393,7 +327,6 @@ def test_access_filters_with_other_filters() -> None:
 
 def test_and_operation() -> None:
     """Test that and_() combines two queries with AND logic."""
-    from pubmed_client import SearchQuery
 
     q1 = SearchQuery().query("covid-19")
     q2 = SearchQuery().query("vaccine")
@@ -403,7 +336,6 @@ def test_and_operation() -> None:
 
 def test_or_operation() -> None:
     """Test that or_() combines two queries with OR logic."""
-    from pubmed_client import SearchQuery
 
     q1 = SearchQuery().query("diabetes")
     q2 = SearchQuery().query("hypertension")
@@ -413,15 +345,12 @@ def test_or_operation() -> None:
 
 def test_negate_operation() -> None:
     """Test that negate() wraps query with NOT logic."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("cancer").negate()
     assert query.build() == "NOT (cancer)"
 
 
 def test_exclude_operation() -> None:
     """Test that exclude() filters out unwanted results."""
-    from pubmed_client import SearchQuery
 
     base = SearchQuery().query("cancer treatment")
     exclude = SearchQuery().query("animal studies")
@@ -431,15 +360,12 @@ def test_exclude_operation() -> None:
 
 def test_group_operation() -> None:
     """Test that group() wraps query in parentheses."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().query("cancer").group()
     assert query.build() == "(cancer)"
 
 
 def test_complex_boolean_chain() -> None:
     """Test complex chaining of boolean operations."""
-    from pubmed_client import SearchQuery
 
     ai_query = SearchQuery().query("machine learning")
     medicine_query = SearchQuery().query("medicine")
@@ -452,7 +378,6 @@ def test_complex_boolean_chain() -> None:
 
 def test_and_with_empty_first_query() -> None:
     """Test that and_() with empty first query returns the second query."""
-    from pubmed_client import SearchQuery
 
     q1 = SearchQuery()
     q2 = SearchQuery().query("test")
@@ -462,7 +387,6 @@ def test_and_with_empty_first_query() -> None:
 
 def test_or_with_empty_second_query() -> None:
     """Test that or_() with empty second query returns the first query."""
-    from pubmed_client import SearchQuery
 
     q1 = SearchQuery().query("test")
     q2 = SearchQuery()
@@ -472,8 +396,6 @@ def test_or_with_empty_second_query() -> None:
 
 def test_negate_empty_query() -> None:
     """Test that negating an empty query produces empty result."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().negate()
     # Empty query still raises ValueError
     with pytest.raises(ValueError, match="Cannot build query"):
@@ -482,7 +404,6 @@ def test_negate_empty_query() -> None:
 
 def test_exclude_with_empty_base() -> None:
     """Test that excluding from empty base returns empty."""
-    from pubmed_client import SearchQuery
 
     base = SearchQuery()
     exclude = SearchQuery().query("test")
@@ -494,7 +415,6 @@ def test_exclude_with_empty_base() -> None:
 
 def test_exclude_with_empty_excluded() -> None:
     """Test that excluding empty query returns base unchanged."""
-    from pubmed_client import SearchQuery
 
     base = SearchQuery().query("test")
     exclude = SearchQuery()
@@ -504,8 +424,6 @@ def test_exclude_with_empty_excluded() -> None:
 
 def test_group_empty_query() -> None:
     """Test that grouping empty query produces empty result."""
-    from pubmed_client import SearchQuery
-
     query = SearchQuery().group()
     # Empty query still raises ValueError
     with pytest.raises(ValueError, match="Cannot build query"):
@@ -514,7 +432,6 @@ def test_group_empty_query() -> None:
 
 def test_deep_boolean_nesting() -> None:
     """Test deeply nested boolean operations."""
-    from pubmed_client import SearchQuery
 
     q1 = SearchQuery().query("a")
     q2 = SearchQuery().query("b")
@@ -527,7 +444,6 @@ def test_deep_boolean_nesting() -> None:
 
 def test_boolean_operations_preserve_limit() -> None:
     """Test that boolean operations preserve the higher limit."""
-    from pubmed_client import SearchQuery
 
     q1 = SearchQuery().query("covid").limit(10)
     q2 = SearchQuery().query("vaccine").limit(50)
@@ -539,7 +455,6 @@ def test_boolean_operations_preserve_limit() -> None:
 
 def test_and_multiple_operations() -> None:
     """Test chaining multiple AND operations."""
-    from pubmed_client import SearchQuery
 
     result = (
         SearchQuery()
@@ -552,7 +467,6 @@ def test_and_multiple_operations() -> None:
 
 def test_or_multiple_operations() -> None:
     """Test chaining multiple OR operations."""
-    from pubmed_client import SearchQuery
 
     result = (
         SearchQuery()
@@ -565,9 +479,7 @@ def test_or_multiple_operations() -> None:
 
 def test_mixed_boolean_operations() -> None:
     """Test mixing AND and OR operations."""
-    from pubmed_client import SearchQuery
-
-    # (covid OR sars) AND vaccine
+    #(covid OR sars) AND vaccine
     covid_or_sars = SearchQuery().query("covid").or_(SearchQuery().query("sars"))
     result = covid_or_sars.and_(SearchQuery().query("vaccine"))
 
@@ -576,7 +488,6 @@ def test_mixed_boolean_operations() -> None:
 
 def test_exclude_multiple_terms() -> None:
     """Test excluding multiple terms sequentially."""
-    from pubmed_client import SearchQuery
 
     result = (
         SearchQuery()
@@ -590,7 +501,6 @@ def test_exclude_multiple_terms() -> None:
 
 def test_boolean_with_filters() -> None:
     """Test boolean operations combined with date and type filters."""
-    from pubmed_client import SearchQuery
 
     q1 = SearchQuery().query("covid-19").published_in_year(2024)
     q2 = SearchQuery().query("vaccine").article_type("Clinical Trial")
@@ -608,9 +518,7 @@ def test_boolean_with_filters() -> None:
 
 def test_complex_real_world_query() -> None:
     """Test a complex real-world research query."""
-    from pubmed_client import SearchQuery
-
-    # Find recent clinical trials for COVID-19 treatments, excluding animal studies
+    #Find recent clinical trials for COVID-19 treatments, excluding animal studies
     covid_query = SearchQuery().query("covid-19").query("treatment").published_after(2020)
     clinical_trials = SearchQuery().article_type("Clinical Trial")
     animal_studies = SearchQuery().query("animal studies")
@@ -628,7 +536,6 @@ def test_complex_real_world_query() -> None:
 
 def test_precedence_control_with_group() -> None:
     """Test controlling operator precedence with group()."""
-    from pubmed_client import SearchQuery
 
     q1 = SearchQuery().query("a").or_(SearchQuery().query("b")).group()
     q2 = SearchQuery().query("c").or_(SearchQuery().query("d")).group()
