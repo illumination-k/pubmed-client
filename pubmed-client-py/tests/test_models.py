@@ -53,18 +53,21 @@ class TestAuthorModel:
 
             # Test basic properties
             assert hasattr(author, "full_name")
-            assert hasattr(author, "last_name")
-            assert hasattr(author, "fore_name")
-            assert hasattr(author, "first_name")
-            assert hasattr(author, "middle_name")
+            assert hasattr(author, "surname")
+            assert hasattr(author, "given_names")
             assert hasattr(author, "initials")
             assert hasattr(author, "suffix")
             assert hasattr(author, "orcid")
+            assert hasattr(author, "email")
             assert hasattr(author, "is_corresponding")
 
             # Test affiliations method
             affiliations = author.affiliations()
             assert isinstance(affiliations, list)
+
+            # Test roles method
+            roles = author.roles()
+            assert isinstance(roles, list)
 
             # Test __repr__
             repr_str = repr(author)
@@ -133,6 +136,10 @@ class TestPmcAuthorModel:
             # Test affiliations method
             affiliations = author.affiliations()
             assert isinstance(affiliations, list)
+
+            # Test roles method
+            roles = author.roles()
+            assert isinstance(roles, list)
 
             # Test __repr__
             repr_str = repr(author)

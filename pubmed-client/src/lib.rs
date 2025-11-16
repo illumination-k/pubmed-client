@@ -261,6 +261,7 @@
 //! ```
 
 pub mod cache;
+pub mod common;
 pub mod config;
 pub mod error;
 pub mod pmc;
@@ -270,17 +271,17 @@ pub mod retry;
 pub mod time;
 
 // Re-export main types for convenience
+pub use common::{Affiliation, Author};
 pub use config::ClientConfig;
 pub use error::{PubMedError, Result};
 pub use pmc::{
-    models::ExtractedFigure, parse_pmc_xml, Affiliation, ArticleSection, Author, Figure,
-    FundingInfo, HeadingStyle, JournalInfo, MarkdownConfig, PmcClient, PmcFullText,
-    PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Table,
+    models::ExtractedFigure, parse_pmc_xml, ArticleSection, Figure, FundingInfo, HeadingStyle,
+    JournalInfo, MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter, PmcTarClient,
+    Reference, ReferenceStyle, Table,
 };
 pub use pubmed::{
-    parse_article_from_xml, Affiliation as PubMedAffiliation, ArticleType, Author as PubMedAuthor,
-    Citations, DatabaseInfo, FieldInfo, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient,
-    RelatedArticles, SearchQuery,
+    parse_article_from_xml, ArticleType, Citations, DatabaseInfo, FieldInfo, Language, LinkInfo,
+    PmcLinks, PubMedArticle, PubMedClient, RelatedArticles, SearchQuery,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{sleep, Duration, Instant};

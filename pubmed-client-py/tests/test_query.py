@@ -80,7 +80,7 @@ def test_limit_zero_raises_valueerror() -> None:
 
 def test_limit_negative_raises_valueerror() -> None:
     """Test that negative limits are rejected by PyO3 type system."""
-    #PyO3 rejects negative values for usize parameters before our validation runs
+    # PyO3 rejects negative values for usize parameters before our validation runs
     with pytest.raises(OverflowError, match="can't convert negative int to unsigned"):
         SearchQuery().query("cancer").limit(-1)
 
@@ -116,7 +116,7 @@ def test_build_single_term() -> None:
 
 def test_build_multiple_terms_space_separated() -> None:
     """Test that multiple terms are space-separated in build output."""
-    #Via multiple query() calls
+    # Via multiple query() calls
     query1 = SearchQuery().query("cancer").query("treatment").query("outcomes")
     assert query1.build() == "cancer treatment outcomes"
 
@@ -479,7 +479,7 @@ def test_or_multiple_operations() -> None:
 
 def test_mixed_boolean_operations() -> None:
     """Test mixing AND and OR operations."""
-    #(covid OR sars) AND vaccine
+    # (covid OR sars) AND vaccine
     covid_or_sars = SearchQuery().query("covid").or_(SearchQuery().query("sars"))
     result = covid_or_sars.and_(SearchQuery().query("vaccine"))
 
@@ -518,7 +518,7 @@ def test_boolean_with_filters() -> None:
 
 def test_complex_real_world_query() -> None:
     """Test a complex real-world research query."""
-    #Find recent clinical trials for COVID-19 treatments, excluding animal studies
+    # Find recent clinical trials for COVID-19 treatments, excluding animal studies
     covid_query = SearchQuery().query("covid-19").query("treatment").published_after(2020)
     clinical_trials = SearchQuery().article_type("Clinical Trial")
     animal_studies = SearchQuery().query("animal studies")

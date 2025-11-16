@@ -37,7 +37,7 @@ impl From<&pubmed::Affiliation> for PyAffiliation {
             department: affiliation.department.clone(),
             address: affiliation.address.clone(),
             country: affiliation.country.clone(),
-            email: affiliation.email.clone(),
+            email: None, // Email is now on Author, not Affiliation
         }
     }
 }
@@ -59,13 +59,9 @@ impl PyAffiliation {
 #[derive(Clone)]
 pub struct PyAuthor {
     #[pyo3(get)]
-    pub last_name: Option<String>,
+    pub surname: Option<String>,
     #[pyo3(get)]
-    pub fore_name: Option<String>,
-    #[pyo3(get)]
-    pub first_name: Option<String>,
-    #[pyo3(get)]
-    pub middle_name: Option<String>,
+    pub given_names: Option<String>,
     #[pyo3(get)]
     pub initials: Option<String>,
     #[pyo3(get)]
@@ -75,6 +71,8 @@ pub struct PyAuthor {
     #[pyo3(get)]
     pub orcid: Option<String>,
     #[pyo3(get)]
+    pub email: Option<String>,
+    #[pyo3(get)]
     pub is_corresponding: bool,
     inner: Arc<pubmed::Author>,
 }
@@ -82,14 +80,13 @@ pub struct PyAuthor {
 impl From<&pubmed::Author> for PyAuthor {
     fn from(author: &pubmed::Author) -> Self {
         PyAuthor {
-            last_name: author.last_name.clone(),
-            fore_name: author.fore_name.clone(),
-            first_name: author.first_name.clone(),
-            middle_name: author.middle_name.clone(),
+            surname: author.surname.clone(),
+            given_names: author.given_names.clone(),
             initials: author.initials.clone(),
             suffix: author.suffix.clone(),
             full_name: author.full_name.clone(),
             orcid: author.orcid.clone(),
+            email: author.email.clone(),
             is_corresponding: author.is_corresponding,
             inner: Arc::new(author.clone()),
         }
@@ -106,6 +103,12 @@ impl PyAuthor {
             let py_affiliation = PyAffiliation::from(affiliation);
             list.append(py_affiliation)?;
         }
+        Ok(list.into())
+    }
+
+    /// Get list of roles/contributions
+    fn roles(&self, py: Python) -> PyResult<Py<PyAny>> {
+        let list = PyList::new(py, &self.inner.roles)?;
         Ok(list.into())
     }
 
