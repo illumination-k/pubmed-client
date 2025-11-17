@@ -183,9 +183,8 @@ impl PubMedClient {
     #[instrument(skip(self), fields(pmid = %pmid))]
     pub async fn fetch_article(&self, pmid: &str) -> Result<PubMedArticle> {
         // Validate and parse PMID
-        let pmid_obj = PubMedId::parse(pmid).map_err(|e| {
+        let pmid_obj = PubMedId::parse(pmid).inspect_err(|_| {
             warn!("Invalid PMID format provided: {}", pmid);
-            e
         })?;
         let pmid_value = pmid_obj.as_u32();
 
