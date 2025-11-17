@@ -25,7 +25,7 @@ repos:
 
       - id: dprint-fmt
         name: dprint fmt
-        entry: mise exec -- dprint fmt
+        entry: dprint fmt
         language: system
         files: '\.(json|toml|md|yaml|yml)$'
         exclude: "^tests/integration/test_data/"

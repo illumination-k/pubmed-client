@@ -187,10 +187,10 @@ async fn test_extract_figures_with_captions_invalid_pmcid() {
         .await;
 
     assert!(result.is_err());
-    if let Err(PubMedError::InvalidPmid { pmid }) = result {
-        assert_eq!(pmid, "PMCinvalid_pmcid");
+    if let Err(PubMedError::InvalidPmcid { pmcid }) = result {
+        assert_eq!(pmcid, "PMCinvalid_pmcid");
     } else {
-        panic!("Expected InvalidPmid error, got: {:?}", result);
+        panic!("Expected InvalidPmcid error, got: {:?}", result);
     }
 }
 
@@ -207,10 +207,10 @@ async fn test_extract_figures_with_captions_empty_pmcid() {
         .await;
 
     assert!(result.is_err());
-    if let Err(PubMedError::InvalidPmid { pmid }) = result {
-        assert_eq!(pmid, "PMC");
+    if let Err(PubMedError::InvalidPmcid { pmcid }) = result {
+        assert_eq!(pmcid, "PMC");
     } else {
-        panic!("Expected InvalidPmid error, got: {:?}", result);
+        panic!("Expected InvalidPmcid error, got: {:?}", result);
     }
 }
 

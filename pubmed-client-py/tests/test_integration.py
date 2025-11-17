@@ -332,8 +332,10 @@ class TestPmcIntegration:
             output_dir = str(Path(temp_dir) / "invalid")
 
             # Use an invalid PMCID that should not exist
-            # Should raise an error (likely PmcNotAvailableById or network error)
-            with pytest.raises(Exception, match=r"PMC.*not available|error|Error|not found"):
+            # Should raise an error (likely InvalidPmcid due to validation)
+            with pytest.raises(
+                Exception, match=r"PMC.*not available|error|Error|not found|Invalid"
+            ):
                 client.pmc.extract_figures_with_captions("PMC99999999999", output_dir)
 
 
