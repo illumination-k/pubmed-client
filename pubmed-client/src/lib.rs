@@ -271,7 +271,7 @@ pub mod retry;
 pub mod time;
 
 // Re-export main types for convenience
-pub use common::{Affiliation, Author};
+pub use common::{Affiliation, Author, PmcId, PubMedId};
 pub use config::ClientConfig;
 pub use error::{PubMedError, Result};
 pub use pmc::{

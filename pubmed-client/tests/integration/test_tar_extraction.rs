@@ -13,10 +13,10 @@ async fn test_download_and_extract_tar_invalid_pmcid() {
         .await;
 
     assert!(result.is_err());
-    if let Err(PubMedError::InvalidPmid { pmid }) = result {
-        assert_eq!(pmid, "invalid_pmcid");
+    if let Err(PubMedError::InvalidPmcid { pmcid }) = result {
+        assert_eq!(pmcid, "invalid_pmcid");
     } else {
-        panic!("Expected InvalidPmid error, got: {:?}", result);
+        panic!("Expected InvalidPmcid error, got: {:?}", result);
     }
 }
 
@@ -30,10 +30,10 @@ async fn test_download_and_extract_tar_empty_pmcid() {
     let result = client.download_and_extract_tar("", temp_dir.path()).await;
 
     assert!(result.is_err());
-    if let Err(PubMedError::InvalidPmid { pmid }) = result {
-        assert_eq!(pmid, "");
+    if let Err(PubMedError::InvalidPmcid { pmcid }) = result {
+        assert_eq!(pmcid, "");
     } else {
-        panic!("Expected InvalidPmid error, got: {:?}", result);
+        panic!("Expected InvalidPmcid error, got: {:?}", result);
     }
 }
 

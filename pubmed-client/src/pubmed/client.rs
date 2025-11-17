@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::common::PubMedId;
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
@@ -181,18 +182,16 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(pmid = %pmid))]
     pub async fn fetch_article(&self, pmid: &str) -> Result<PubMedArticle> {
-        // Validate PMID format
-        if pmid.trim().is_empty() || !pmid.chars().all(|c| c.is_ascii_digit()) {
-            warn!("Invalid PMID format provided");
-            return Err(PubMedError::InvalidPmid {
-                pmid: pmid.to_string(),
-            });
-        }
+        // Validate and parse PMID
+        let pmid_obj = PubMedId::parse(pmid).inspect_err(|_| {
+            warn!("Invalid PMID format provided: {}", pmid);
+        })?;
+        let pmid_value = pmid_obj.as_u32();
 
         // Build URL - API parameters will be added by make_request
         let url = format!(
             "{}/efetch.fcgi?db=pubmed&id={}&retmode=xml&rettype=abstract",
-            self.base_url, pmid
+            self.base_url, pmid_value
         );
 
         debug!("Making EFetch API request");

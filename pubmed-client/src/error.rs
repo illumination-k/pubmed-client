@@ -38,6 +38,10 @@ pub enum PubMedError {
     #[error("Invalid PMID format: {pmid}")]
     InvalidPmid { pmid: String },
 
+    /// Invalid PMC ID format
+    #[error("Invalid PMC ID format: {pmcid}")]
+    InvalidPmcid { pmcid: String },
+
     /// Invalid query structure or parameters
     #[error("Invalid query: {0}")]
     InvalidQuery(String),
@@ -114,6 +118,7 @@ impl RetryableError for PubMedError {
             | PubMedError::PmcNotAvailable { .. }
             | PubMedError::PmcNotAvailableById { .. }
             | PubMedError::InvalidPmid { .. }
+            | PubMedError::InvalidPmcid { .. }
             | PubMedError::InvalidQuery(_)
             | PubMedError::IoError { .. }
             | PubMedError::SearchLimitExceeded { .. } => false,
@@ -145,7 +150,9 @@ impl RetryableError for PubMedError {
                 PubMedError::PmcNotAvailable { .. } | PubMedError::PmcNotAvailableById { .. } => {
                     "Content not available"
                 }
-                PubMedError::InvalidPmid { .. } => "Invalid input",
+                PubMedError::InvalidPmid { .. } | PubMedError::InvalidPmcid { .. } => {
+                    "Invalid input"
+                }
                 PubMedError::InvalidQuery(_) => "Invalid query",
                 PubMedError::IoError { .. } => "File system error",
                 _ => "Non-transient error",
@@ -229,6 +236,18 @@ mod tests {
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "Invalid input");
         assert!(format!("{}", err).contains("invalid"));
+    }
+
+    #[test]
+    fn test_invalid_pmcid_not_retryable() {
+        let err = PubMedError::InvalidPmcid {
+            pmcid: "PMCinvalid".to_string(),
+        };
+
+        assert!(!err.is_retryable());
+        assert_eq!(err.retry_reason(), "Invalid input");
+        assert!(format!("{}", err).contains("PMCinvalid"));
+        assert!(format!("{}", err).contains("Invalid PMC ID format"));
     }
 
     #[test]

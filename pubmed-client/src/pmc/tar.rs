@@ -1,5 +1,6 @@
 use std::{path::Path, str, time::Duration};
 
+use crate::common::PmcId;
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pmc::models::{ArticleSection, ExtractedFigure, Figure, PmcFullText};
@@ -101,15 +102,9 @@ impl PmcTarClient {
         pmcid: &str,
         output_dir: P,
     ) -> Result<Vec<String>> {
-        let normalized_pmcid = self.normalize_pmcid(pmcid);
-
-        // Validate PMCID format
-        let clean_pmcid = normalized_pmcid.trim_start_matches("PMC");
-        if clean_pmcid.is_empty() || !clean_pmcid.chars().all(|c| c.is_ascii_digit()) {
-            return Err(PubMedError::InvalidPmid {
-                pmid: pmcid.to_string(),
-            });
-        }
+        // Validate and parse PMC ID
+        let pmc_id = PmcId::parse(pmcid)?;
+        let normalized_pmcid = pmc_id.as_str();
 
         // Create output directory early (before any potential failures)
         let output_path = output_dir.as_ref();
@@ -331,17 +326,14 @@ impl PmcTarClient {
     /// Fetch raw XML content from PMC
     #[cfg(not(target_arch = "wasm32"))]
     async fn fetch_xml(&self, pmcid: &str) -> Result<String> {
-        // Remove PMC prefix if present and validate
-        let clean_pmcid = pmcid.trim_start_matches("PMC");
-        if clean_pmcid.is_empty() || !clean_pmcid.chars().all(|c| c.is_ascii_digit()) {
-            return Err(PubMedError::InvalidPmid {
-                pmid: pmcid.to_string(),
-            });
-        }
+        // Validate and parse PMC ID
+        let pmc_id = PmcId::parse(pmcid)?;
+        let normalized_pmcid = pmc_id.as_str();
+        let numeric_part = pmc_id.numeric_part();
 
         // Build URL with API parameters
         let mut url = format!(
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=PMC{clean_pmcid}&retmode=xml"
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=PMC{numeric_part}&retmode=xml"
         );
 
         // Add API parameters (API key, email, tool)
@@ -371,7 +363,7 @@ impl PmcTarClient {
         // Check if the response contains an error
         if xml_content.contains("<ERROR>") {
             return Err(PubMedError::PmcNotAvailableById {
-                pmcid: pmcid.to_string(),
+                pmcid: normalized_pmcid,
             });
         }
 
@@ -632,11 +624,17 @@ impl PmcTarClient {
 
     /// Normalize PMCID format (ensure it starts with "PMC")
     fn normalize_pmcid(&self, pmcid: &str) -> String {
-        if pmcid.starts_with("PMC") {
-            pmcid.to_string()
-        } else {
-            format!("PMC{pmcid}")
-        }
+        // Use PmcId for validation and normalization
+        // If parsing fails, fall back to the old behavior for backwards compatibility
+        PmcId::parse(pmcid)
+            .map(|id| id.as_str())
+            .unwrap_or_else(|_| {
+                if pmcid.starts_with("PMC") {
+                    pmcid.to_string()
+                } else {
+                    format!("PMC{pmcid}")
+                }
+            })
     }
 
     /// Internal helper method for making HTTP requests with retry logic
