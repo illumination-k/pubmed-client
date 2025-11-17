@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use crate::cache::{create_cache, PmcCache};
+use crate::common::{PmcId, PubMedId};
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pmc::models::{ExtractedFigure, PmcFullText};
@@ -215,17 +216,14 @@ impl PmcClient {
     ///
     /// Returns a `Result<String>` containing the raw XML content
     pub async fn fetch_xml(&self, pmcid: &str) -> Result<String> {
-        // Remove PMC prefix if present and validate
-        let clean_pmcid = pmcid.trim_start_matches("PMC");
-        if clean_pmcid.is_empty() || !clean_pmcid.chars().all(|c| c.is_ascii_digit()) {
-            return Err(PubMedError::InvalidPmid {
-                pmid: pmcid.to_string(),
-            });
-        }
+        // Validate and parse PMC ID
+        let pmc_id = PmcId::parse(pmcid)?;
+        let normalized_pmcid = pmc_id.as_str();
+        let numeric_part = pmc_id.numeric_part();
 
         // Build URL with API parameters
         let mut url = format!(
-            "{}/efetch.fcgi?db=pmc&id=PMC{clean_pmcid}&retmode=xml",
+            "{}/efetch.fcgi?db=pmc&id=PMC{numeric_part}&retmode=xml",
             self.base_url
         );
 
@@ -256,7 +254,7 @@ impl PmcClient {
         // Check if the response contains an error
         if xml_content.contains("<ERROR>") {
             return Err(PubMedError::PmcNotAvailableById {
-                pmcid: pmcid.to_string(),
+                pmcid: normalized_pmcid,
             });
         }
 
@@ -292,16 +290,13 @@ impl PmcClient {
     /// }
     /// ```
     pub async fn check_pmc_availability(&self, pmid: &str) -> Result<Option<String>> {
-        // Validate PMID format
-        if pmid.trim().is_empty() || !pmid.chars().all(|c| c.is_ascii_digit()) {
-            return Err(PubMedError::InvalidPmid {
-                pmid: pmid.to_string(),
-            });
-        }
+        // Validate and parse PMID
+        let pmid_obj = PubMedId::parse(pmid)?;
+        let pmid_value = pmid_obj.as_u32();
 
         // Build URL with API parameters
         let mut url = format!(
-            "{}/elink.fcgi?dbfrom=pubmed&db=pmc&id={pmid}&retmode=json",
+            "{}/elink.fcgi?dbfrom=pubmed&db=pmc&id={pmid_value}&retmode=json",
             self.base_url
         );
 
@@ -492,11 +487,17 @@ impl PmcClient {
 
     /// Normalize PMCID format (ensure it starts with "PMC")
     fn normalize_pmcid(&self, pmcid: &str) -> String {
-        if pmcid.starts_with("PMC") {
-            pmcid.to_string()
-        } else {
-            format!("PMC{pmcid}")
-        }
+        // Use PmcId for validation and normalization
+        // If parsing fails, fall back to the old behavior for backwards compatibility
+        PmcId::parse(pmcid)
+            .map(|id| id.as_str())
+            .unwrap_or_else(|_| {
+                if pmcid.starts_with("PMC") {
+                    pmcid.to_string()
+                } else {
+                    format!("PMC{pmcid}")
+                }
+            })
     }
 
     /// Internal helper method for making HTTP requests with retry logic
