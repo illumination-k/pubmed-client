@@ -1,0 +1,6 @@
+# Allow print statements in CLI scripts - they're meant to output to console
+[lint]
+ignore = ["T201"]
+
+# Allow broad exception catching for user-friendly error messages in CLI tools
+extend-ignore = ["BLE001", "PLR2004"]
