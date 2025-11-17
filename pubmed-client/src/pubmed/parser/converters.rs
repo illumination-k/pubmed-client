@@ -37,6 +37,9 @@ impl PubmedArticleXml {
             .article_title
             .ok_or_else(|| PubMedError::ArticleNotFound {
                 pmid: pmid.to_string(),
+                suggestion:
+                    "The PMID could not be found in the response. Verify it exists in PubMed"
+                        .to_string(),
             })?;
 
         // Extract authors

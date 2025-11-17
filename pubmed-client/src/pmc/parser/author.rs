@@ -138,9 +138,13 @@ pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
                 }
             }
         } else {
-            Err(PubMedError::XmlError(
-                "Found contrib-group start tag but no matching end tag".to_string(),
-            ))
+            Err(PubMedError::XmlError {
+                message: "Found contrib-group start tag but no matching end tag".to_string(),
+                context: Some("Parsing author information from PMC XML".to_string()),
+                suggestion: Some(
+                    "The XML structure may be malformed. Verify the source data".to_string(),
+                ),
+            })
         }
     } else {
         // No contrib-group found - return empty vector as success
@@ -252,16 +256,26 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
                         }
                     }
                     Err(e) => {
-                        return Err(PubMedError::XmlError(format!(
-                            "Failed to parse element-citation XML: {}",
-                            e
-                        )));
+                        return Err(PubMedError::XmlError {
+                            message: format!("Failed to parse element-citation XML: {}", e),
+                            context: Some(
+                                "Parsing reference citations from PMC article".to_string(),
+                            ),
+                            suggestion: Some(
+                                "The citation XML may be invalid. Check the source data"
+                                    .to_string(),
+                            ),
+                        });
                     }
                 }
             } else {
-                return Err(PubMedError::XmlError(
-                    "Found element-citation start tag but no matching end tag".to_string(),
-                ));
+                return Err(PubMedError::XmlError {
+                    message: "Found element-citation start tag but no matching end tag".to_string(),
+                    context: Some("Parsing reference citations from PMC article".to_string()),
+                    suggestion: Some(
+                        "The XML structure may be incomplete or malformed".to_string(),
+                    ),
+                });
             }
         }
     }
@@ -289,16 +303,26 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
                         }
                     }
                     Err(e) => {
-                        return Err(PubMedError::XmlError(format!(
-                            "Failed to parse mixed-citation XML: {}",
-                            e
-                        )));
+                        return Err(PubMedError::XmlError {
+                            message: format!("Failed to parse mixed-citation XML: {}", e),
+                            context: Some(
+                                "Parsing mixed-citation reference from PMC article".to_string(),
+                            ),
+                            suggestion: Some(
+                                "The citation XML may be invalid. Check the source data"
+                                    .to_string(),
+                            ),
+                        });
                     }
                 }
             } else {
-                return Err(PubMedError::XmlError(
-                    "Found mixed-citation start tag but no matching end tag".to_string(),
-                ));
+                return Err(PubMedError::XmlError {
+                    message: "Found mixed-citation start tag but no matching end tag".to_string(),
+                    context: Some("Parsing mixed-citation reference from PMC article".to_string()),
+                    suggestion: Some(
+                        "The XML structure may be incomplete or malformed".to_string(),
+                    ),
+                });
             }
         }
     }

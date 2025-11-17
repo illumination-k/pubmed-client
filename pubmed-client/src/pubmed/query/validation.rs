@@ -21,40 +21,51 @@ impl SearchQuery {
     pub fn validate(&self) -> Result<()> {
         // Check if query is completely empty
         if self.terms.is_empty() && self.filters.is_empty() {
-            return Err(PubMedError::InvalidQuery(
-                "Query cannot be empty".to_string(),
-            ));
+            return Err(PubMedError::InvalidQuery {
+                message: "Query cannot be empty".to_string(),
+                suggestion: Some(
+                    "Add search terms using .query() or filters like .mesh_term()".to_string(),
+                ),
+            });
         }
 
         // Validate limit is reasonable
         if let Some(limit) = self.limit {
             if limit == 0 {
-                return Err(PubMedError::InvalidQuery(
-                    "Limit must be greater than 0".to_string(),
-                ));
+                return Err(PubMedError::InvalidQuery {
+                    message: "Limit must be greater than 0".to_string(),
+                    suggestion: Some("Set a positive limit value, e.g., .limit(10)".to_string()),
+                });
             }
             if limit > 10000 {
-                return Err(PubMedError::InvalidQuery(
-                    "Limit should not exceed 10,000 for performance reasons".to_string(),
-                ));
+                return Err(PubMedError::InvalidQuery {
+                    message: "Limit should not exceed 10,000 for performance reasons".to_string(),
+                    suggestion: Some(
+                        "Use a limit of 10,000 or less, or implement pagination".to_string(),
+                    ),
+                });
             }
         }
 
         // Check for potentially problematic patterns
         let query_string = self.build();
         if query_string.len() > 4000 {
-            return Err(PubMedError::InvalidQuery(
-                "Query string is too long (>4000 characters)".to_string(),
-            ));
+            return Err(PubMedError::InvalidQuery {
+                message: "Query string is too long (>4000 characters)".to_string(),
+                suggestion: Some(
+                    "Simplify your query by using fewer terms or more specific filters".to_string(),
+                ),
+            });
         }
 
         // Check for unbalanced parentheses
         let open_parens = query_string.matches('(').count();
         let close_parens = query_string.matches(')').count();
         if open_parens != close_parens {
-            return Err(PubMedError::InvalidQuery(
-                "Unbalanced parentheses in query".to_string(),
-            ));
+            return Err(PubMedError::InvalidQuery {
+                message: "Unbalanced parentheses in query".to_string(),
+                suggestion: Some("Ensure all .group() calls are properly balanced".to_string()),
+            });
         }
 
         Ok(())

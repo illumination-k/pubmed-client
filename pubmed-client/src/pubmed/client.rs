@@ -186,6 +186,7 @@ impl PubMedClient {
             warn!("Invalid PMID format provided");
             return Err(PubMedError::InvalidPmid {
                 pmid: pmid.to_string(),
+                suggestion: "PMID must be a non-empty numeric string".to_string(),
             });
         }
 
@@ -258,6 +259,10 @@ impl PubMedClient {
             return Err(PubMedError::SearchLimitExceeded {
                 requested: limit,
                 maximum: MAX_RETRIEVABLE,
+                suggestion: format!(
+                    "Reduce limit to {} or less, or use pagination with offset",
+                    MAX_RETRIEVABLE
+                ),
             });
         }
 
@@ -284,6 +289,9 @@ impl PubMedClient {
             return Err(PubMedError::ApiError {
                 status: 200,
                 message: format!("NCBI ESearch API error: {}", error_msg),
+                context: Some("Searching PubMed database".to_string()),
+                suggestion: Some("Check your search query syntax and try again".to_string()),
+                retry_after: None,
             });
         }
 
@@ -429,6 +437,11 @@ impl PubMedClient {
             return Err(PubMedError::ApiError {
                 status: 400,
                 message: "Database name cannot be empty".to_string(),
+                context: Some("Validating database parameter".to_string()),
+                suggestion: Some(
+                    "Provide a valid NCBI database name (e.g., 'pubmed', 'pmc')".to_string(),
+                ),
+                retry_after: None,
             });
         }
 
@@ -451,6 +464,9 @@ impl PubMedClient {
                 .ok_or_else(|| PubMedError::ApiError {
                     status: 404,
                     message: format!("Database '{database}' not found or no information available"),
+                    context: Some("Fetching database information from NCBI".to_string()),
+                    suggestion: Some("Verify the database name is correct. Use get_database_list() to see available databases".to_string()),
+                    retry_after: None,
                 })?;
 
         let db_info = db_info_list
@@ -459,6 +475,9 @@ impl PubMedClient {
             .ok_or_else(|| PubMedError::ApiError {
                 status: 404,
                 message: format!("Database '{database}' information not found"),
+                context: Some("Parsing database information response".to_string()),
+                suggestion: Some("The database exists but no information was returned".to_string()),
+                retry_after: None,
             })?;
 
         // Convert internal response to public model
@@ -763,13 +782,27 @@ impl PubMedClient {
 
                 // Check if response has server error status and convert to retryable error
                 if response.status().is_server_error() || response.status().as_u16() == 429 {
+                    let status_code = response.status().as_u16();
                     return Err(PubMedError::ApiError {
-                        status: response.status().as_u16(),
+                        status: status_code,
                         message: response
                             .status()
                             .canonical_reason()
                             .unwrap_or("Unknown error")
                             .to_string(),
+                        context: Some("Making request to NCBI API".to_string()),
+                        suggestion: if status_code == 429 {
+                            Some(
+                                "Rate limit exceeded. Wait before making more requests".to_string(),
+                            )
+                        } else {
+                            Some("Server error. Try again later".to_string())
+                        },
+                        retry_after: Some(std::time::Duration::from_secs(if status_code == 429 {
+                            60
+                        } else {
+                            5
+                        })),
                     });
                 }
 
@@ -783,13 +816,23 @@ impl PubMedClient {
         // Check for any non-success status (client errors, etc.)
         if !response.status().is_success() {
             warn!("API request failed with status: {}", response.status());
+            let status_code = response.status().as_u16();
             return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
+                status: status_code,
                 message: response
                     .status()
                     .canonical_reason()
                     .unwrap_or("Unknown error")
                     .to_string(),
+                context: Some("NCBI API request".to_string()),
+                suggestion: if status_code == 404 {
+                    Some("Resource not found. Check your parameters".to_string())
+                } else if status_code == 400 {
+                    Some("Bad request. Verify your query parameters".to_string())
+                } else {
+                    Some("Request failed. Check the error message for details".to_string())
+                },
+                retry_after: None,
             });
         }
 

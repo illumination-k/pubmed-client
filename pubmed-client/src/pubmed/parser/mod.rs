@@ -84,6 +84,7 @@ pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {
     let article_set: PubmedArticleSet =
         from_str(&cleaned_xml).map_err(|e| PubMedError::XmlParseError {
             message: format!("Failed to deserialize XML: {}", e),
+            suggestion: Some("Verify the XML response is valid PubMed format".to_string()),
         })?;
 
     // Find the article with the matching PMID
@@ -98,6 +99,7 @@ pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {
         })
         .ok_or_else(|| PubMedError::ArticleNotFound {
             pmid: pmid.to_string(),
+            suggestion: "Verify the PMID exists in PubMed database".to_string(),
         })?;
 
     article_xml.into_article(pmid)

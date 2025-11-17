@@ -220,6 +220,9 @@ impl PmcClient {
         if clean_pmcid.is_empty() || !clean_pmcid.chars().all(|c| c.is_ascii_digit()) {
             return Err(PubMedError::InvalidPmid {
                 pmid: pmcid.to_string(),
+                suggestion:
+                    "PMCID must be in format 'PMC' followed by numbers (e.g., 'PMC7906746')"
+                        .to_string(),
             });
         }
 
@@ -241,13 +244,19 @@ impl PmcClient {
         let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
+            let status_code = response.status().as_u16();
             return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
+                status: status_code,
                 message: response
                     .status()
                     .canonical_reason()
                     .unwrap_or("Unknown error")
                     .to_string(),
+                context: Some(format!("Fetching PMC full-text for PMCID {}", pmcid)),
+                suggestion: Some(
+                    "Verify the PMCID is correct and the article is available in PMC".to_string(),
+                ),
+                retry_after: None,
             });
         }
 
@@ -257,6 +266,8 @@ impl PmcClient {
         if xml_content.contains("<ERROR>") {
             return Err(PubMedError::PmcNotAvailableById {
                 pmcid: pmcid.to_string(),
+                suggestion: "This PMCID may not have full-text available in PMC Open Access subset"
+                    .to_string(),
             });
         }
 
@@ -296,6 +307,7 @@ impl PmcClient {
         if pmid.trim().is_empty() || !pmid.chars().all(|c| c.is_ascii_digit()) {
             return Err(PubMedError::InvalidPmid {
                 pmid: pmid.to_string(),
+                suggestion: "PMID must be a non-empty numeric string".to_string(),
             });
         }
 
@@ -317,13 +329,17 @@ impl PmcClient {
         let response = self.make_request(&url).await?;
 
         if !response.status().is_success() {
+            let status_code = response.status().as_u16();
             return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
+                status: status_code,
                 message: response
                     .status()
                     .canonical_reason()
                     .unwrap_or("Unknown error")
                     .to_string(),
+                context: Some(format!("Checking PMC availability for PMID {}", pmid)),
+                suggestion: Some("Verify the PMID is correct".to_string()),
+                retry_after: None,
             });
         }
 
@@ -514,13 +530,27 @@ impl PmcClient {
 
                 // Check if response has server error status and convert to retryable error
                 if response.status().is_server_error() || response.status().as_u16() == 429 {
+                    let status_code = response.status().as_u16();
                     return Err(PubMedError::ApiError {
-                        status: response.status().as_u16(),
+                        status: status_code,
                         message: response
                             .status()
                             .canonical_reason()
                             .unwrap_or("Unknown error")
                             .to_string(),
+                        context: Some("Making request to PMC API".to_string()),
+                        suggestion: if status_code == 429 {
+                            Some(
+                                "Rate limit exceeded. Wait before making more requests".to_string(),
+                            )
+                        } else {
+                            Some("Server error. Try again later".to_string())
+                        },
+                        retry_after: Some(std::time::Duration::from_secs(if status_code == 429 {
+                            60
+                        } else {
+                            5
+                        })),
                     });
                 }
 

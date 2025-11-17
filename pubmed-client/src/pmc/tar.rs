@@ -108,6 +108,9 @@ impl PmcTarClient {
         if clean_pmcid.is_empty() || !clean_pmcid.chars().all(|c| c.is_ascii_digit()) {
             return Err(PubMedError::InvalidPmid {
                 pmid: pmcid.to_string(),
+                suggestion:
+                    "PMCID must be in format 'PMC' followed by numbers (e.g., 'PMC7906746')"
+                        .to_string(),
             });
         }
 
@@ -117,6 +120,7 @@ impl PmcTarClient {
             .await
             .map_err(|e| PubMedError::IoError {
                 message: format!("Failed to create output directory: {}", e),
+                suggestion: Some("Check write permissions and disk space".to_string()),
             })?;
 
         // Build OA API URL
@@ -147,6 +151,9 @@ impl PmcTarClient {
                     .canonical_reason()
                     .unwrap_or("Unknown error")
                     .to_string(),
+                context: None,
+                suggestion: None,
+                retry_after: None,
             });
         }
 
@@ -159,39 +166,44 @@ impl PmcTarClient {
 
         debug!("OA API response content-type: {}", content_type);
 
-        let download_url =
-            if content_type.contains("text/xml") || content_type.contains("application/xml") {
-                // Parse XML to extract the actual download URL
-                let xml_content = response.text().await?;
-                debug!("OA API returned XML, parsing for download URL");
-                let parsed_url = self.parse_oa_response(&xml_content, pmcid)?;
-                // Convert FTP URLs to HTTPS for HTTP client compatibility
-                if parsed_url.starts_with("ftp://ftp.ncbi.nlm.nih.gov/") {
-                    parsed_url.replace(
-                        "ftp://ftp.ncbi.nlm.nih.gov/",
-                        "https://ftp.ncbi.nlm.nih.gov/",
-                    )
-                } else {
-                    parsed_url
-                }
-            } else if content_type.contains("application/x-gzip")
-                || content_type.contains("application/gzip")
-            {
-                // Direct tar.gz download - use the original URL
-                url.clone()
+        let download_url = if content_type.contains("text/xml")
+            || content_type.contains("application/xml")
+        {
+            // Parse XML to extract the actual download URL
+            let xml_content = response.text().await?;
+            debug!("OA API returned XML, parsing for download URL");
+            let parsed_url = self.parse_oa_response(&xml_content, pmcid)?;
+            // Convert FTP URLs to HTTPS for HTTP client compatibility
+            if parsed_url.starts_with("ftp://ftp.ncbi.nlm.nih.gov/") {
+                parsed_url.replace(
+                    "ftp://ftp.ncbi.nlm.nih.gov/",
+                    "https://ftp.ncbi.nlm.nih.gov/",
+                )
             } else {
-                // Check if it's an error response
-                let error_text = response.text().await?;
-                if error_text.contains("error") || error_text.contains("Error") {
-                    return Err(PubMedError::PmcNotAvailableById {
-                        pmcid: pmcid.to_string(),
-                    });
-                }
-                // If we get here, it's likely still an error but we consumed the response
+                parsed_url
+            }
+        } else if content_type.contains("application/x-gzip")
+            || content_type.contains("application/gzip")
+        {
+            // Direct tar.gz download - use the original URL
+            url.clone()
+        } else {
+            // Check if it's an error response
+            let error_text = response.text().await?;
+            if error_text.contains("error") || error_text.contains("Error") {
                 return Err(PubMedError::PmcNotAvailableById {
                     pmcid: pmcid.to_string(),
+                    suggestion: "This PMCID may not have full-text available in PMC Open Access"
+                        .to_string(),
                 });
-            };
+            }
+            // If we get here, it's likely still an error but we consumed the response
+            return Err(PubMedError::PmcNotAvailableById {
+                pmcid: pmcid.to_string(),
+                suggestion: "This PMCID may not have full-text available in PMC Open Access"
+                    .to_string(),
+            });
+        };
 
         // Now download the actual tar.gz file
         let tar_response = self.make_request(&download_url).await?;
@@ -204,6 +216,9 @@ impl PmcTarClient {
                     .canonical_reason()
                     .unwrap_or("Unknown error")
                     .to_string(),
+                context: None,
+                suggestion: None,
+                retry_after: None,
             });
         }
 
@@ -213,6 +228,7 @@ impl PmcTarClient {
             .await
             .map_err(|e| PubMedError::IoError {
                 message: format!("Failed to create output directory: {}", e),
+                suggestion: Some("Check write permissions and disk space".to_string()),
             })?;
 
         // Stream the response to a temporary file
@@ -222,6 +238,7 @@ impl PmcTarClient {
                 .await
                 .map_err(|e| PubMedError::IoError {
                     message: format!("Failed to create temporary file: {}", e),
+                    suggestion: Some("Check file permissions and disk space".to_string()),
                 })?;
 
         let mut stream = tar_response.bytes_stream();
@@ -232,11 +249,13 @@ impl PmcTarClient {
                 .await
                 .map_err(|e| PubMedError::IoError {
                     message: format!("Failed to write to temporary file: {}", e),
+                    suggestion: Some("Check file permissions and disk space".to_string()),
                 })?;
         }
 
         temp_file.flush().await.map_err(|e| PubMedError::IoError {
             message: format!("Failed to flush temporary file: {}", e),
+            suggestion: Some("Check file permissions and disk space".to_string()),
         })?;
 
         debug!("Downloaded tar.gz to: {}", temp_file_path.display());
@@ -251,6 +270,7 @@ impl PmcTarClient {
             .await
             .map_err(|e| PubMedError::IoError {
                 message: format!("Failed to remove temporary file: {}", e),
+                suggestion: Some("Check file permissions and disk space".to_string()),
             })?;
 
         Ok(extracted_files)
@@ -309,6 +329,7 @@ impl PmcTarClient {
             .await
             .map_err(|e| PubMedError::IoError {
                 message: format!("Failed to create output directory: {}", e),
+                suggestion: Some("Check write permissions and disk space".to_string()),
             })?;
 
         // First, fetch the XML to get figure captions
@@ -336,6 +357,7 @@ impl PmcTarClient {
         if clean_pmcid.is_empty() || !clean_pmcid.chars().all(|c| c.is_ascii_digit()) {
             return Err(PubMedError::InvalidPmid {
                 pmid: pmcid.to_string(),
+                suggestion: "PMCID must be in format \'PMC\' followed by numbers".to_string(),
             });
         }
 
@@ -363,6 +385,9 @@ impl PmcTarClient {
                     .canonical_reason()
                     .unwrap_or("Unknown error")
                     .to_string(),
+                context: None,
+                suggestion: None,
+                retry_after: None,
             });
         }
 
@@ -372,6 +397,8 @@ impl PmcTarClient {
         if xml_content.contains("<ERROR>") {
             return Err(PubMedError::PmcNotAvailableById {
                 pmcid: pmcid.to_string(),
+                suggestion: "This PMCID may not have full-text available in PMC Open Access"
+                    .to_string(),
             });
         }
 
@@ -405,9 +432,15 @@ impl PmcTarClient {
                             str::from_utf8(&attr.value).unwrap_or("invalid")
                         );
                         if attr.key.as_ref() == b"href" {
-                            let href = str::from_utf8(&attr.value).map_err(|e| {
-                                PubMedError::XmlError(format!("Invalid UTF-8 in href: {}", e))
-                            })?;
+                            let href =
+                                str::from_utf8(&attr.value).map_err(|e| PubMedError::XmlError {
+                                    message: format!("Invalid UTF-8 in href: {}", e),
+                                    context: Some("Parsing figure reference XML".to_string()),
+                                    suggestion: Some(
+                                        "The XML may contain invalid character encoding"
+                                            .to_string(),
+                                    ),
+                                })?;
                             debug!("Found href: {}", href);
                             return Ok(href.to_string());
                         }
@@ -415,7 +448,11 @@ impl PmcTarClient {
                 }
                 Ok(Event::Eof) => break,
                 Err(e) => {
-                    return Err(PubMedError::XmlError(format!("XML parsing error: {}", e)));
+                    return Err(PubMedError::XmlError {
+                        message: format!("XML parsing error: {}", e),
+                        context: Some("Parsing figure reference XML".to_string()),
+                        suggestion: Some("The XML response may be invalid".to_string()),
+                    });
                 }
                 _ => {}
             }
@@ -425,6 +462,9 @@ impl PmcTarClient {
         debug!("No href attribute found in XML response");
         Err(PubMedError::PmcNotAvailableById {
             pmcid: pmcid.to_string(),
+            suggestion:
+                "This PMCID may not have full-text available or the figure reference is missing"
+                    .to_string(),
         })
     }
 
@@ -588,6 +628,7 @@ impl PmcTarClient {
         // Read the tar.gz file
         let tar_file = File::open(tar_path).map_err(|e| PubMedError::IoError {
             message: format!("Failed to open tar.gz file: {}", e),
+            suggestion: Some("Check file permissions and disk space".to_string()),
         })?;
 
         let tar_gz = GzDecoder::new(tar_file);
@@ -598,13 +639,16 @@ impl PmcTarClient {
         // Extract all entries
         for entry in archive.entries().map_err(|e| PubMedError::IoError {
             message: format!("Failed to read tar entries: {}", e),
+            suggestion: Some("Check file permissions and disk space".to_string()),
         })? {
             let mut entry = entry.map_err(|e| PubMedError::IoError {
                 message: format!("Failed to read tar entry: {}", e),
+                suggestion: Some("Check file permissions and disk space".to_string()),
             })?;
 
             let path = entry.path().map_err(|e| PubMedError::IoError {
                 message: format!("Failed to get entry path: {}", e),
+                suggestion: Some("Check file permissions and disk space".to_string()),
             })?;
 
             let output_path = output_dir.join(&path);
@@ -613,6 +657,7 @@ impl PmcTarClient {
             if let Some(parent) = output_path.parent() {
                 fs::create_dir_all(parent).map_err(|e| PubMedError::IoError {
                     message: format!("Failed to create parent directories: {}", e),
+                    suggestion: Some("Check file permissions and disk space".to_string()),
                 })?;
             }
 
@@ -621,6 +666,7 @@ impl PmcTarClient {
                 .unpack(&output_path)
                 .map_err(|e| PubMedError::IoError {
                     message: format!("Failed to extract entry: {}", e),
+                    suggestion: Some("Check file permissions and disk space".to_string()),
                 })?;
 
             extracted_files.push(output_path.to_string_lossy().to_string());
@@ -661,6 +707,9 @@ impl PmcTarClient {
                             .canonical_reason()
                             .unwrap_or("Unknown error")
                             .to_string(),
+                        context: None,
+                        suggestion: None,
+                        retry_after: None,
                     });
                 }
 
