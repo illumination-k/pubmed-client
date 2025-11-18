@@ -37,7 +37,15 @@ features = []
 include = ["pubmed_client.pyi"]
 
 [dependency-groups]
-dev = ["pytest>=8.0", "pytest-cov>=6.0", "mypy>=1.0", "ruff>=0.7"]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=6.0",
+  "mypy>=1.0",
+  "ruff>=0.7",
+  "sphinx>=7.0",
+  "sphinx-rtd-theme>=2.0",
+  "myst-parser>=2.0",
+]
 
 [tool.ruff]
 line-length = 100
