@@ -203,7 +203,7 @@ impl SearchQuery {
     ///     .pmc_only();
     /// ```
     pub fn pmc_only(mut self) -> Self {
-        self.filters.push("pmc[sb]".to_string());
+        self.filters.push("pubmed pmc[sb]".to_string());
         self
     }
 
@@ -363,7 +363,7 @@ mod tests {
     #[test]
     fn test_pmc_only() {
         let query = SearchQuery::new().pmc_only();
-        assert_eq!(query.build(), "pmc[sb]");
+        assert_eq!(query.build(), "pubmed pmc[sb]");
     }
 
     #[test]
@@ -452,7 +452,7 @@ mod tests {
             .pmc_only();
         assert_eq!(
             query.build(),
-            "research AND hasabstract AND full text[sb] AND free full text[sb] AND pmc[sb]"
+            "research AND hasabstract AND full text[sb] AND free full text[sb] AND pubmed pmc[sb]"
         );
     }
 

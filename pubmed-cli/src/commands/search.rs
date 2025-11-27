@@ -25,6 +25,10 @@ pub struct Search {
     #[arg(long)]
     ids_only: bool,
 
+    /// Show only PMC IDs (one per line) - converts PMIDs to PMCIDs
+    #[arg(long, conflicts_with = "ids_only")]
+    pmc_ids_only: bool,
+
     // Date filters
     /// Filter articles published from this year onwards
     #[arg(long)]
@@ -131,6 +135,23 @@ impl Search {
             // Just search for PMIDs
             let pmids = client.search_articles(&search_query, self.limit).await?;
             let output = pmids.join("\n");
+            self.output_results(&output).await?;
+        } else if self.pmc_ids_only {
+            // Search for PMIDs and convert to PMCIDs
+            let pmids = client.search_articles(&search_query, self.limit).await?;
+            let pmid_u32s: Vec<u32> = pmids
+                .iter()
+                .filter_map(|pmid| pmid.parse::<u32>().ok())
+                .collect();
+
+            if pmid_u32s.is_empty() {
+                tracing::warn!("No valid PMIDs found to convert");
+                return Ok(());
+            }
+
+            // Convert PMIDs to PMCIDs
+            let pmc_links = client.get_pmc_links(&pmid_u32s).await?;
+            let output = pmc_links.pmc_ids.join("\n");
             self.output_results(&output).await?;
         } else {
             // Fetch full articles
@@ -252,6 +273,7 @@ mod tests {
             limit: 10,
             output: None,
             ids_only: false,
+            pmc_ids_only: false,
             from_year: None,
             to_year: None,
             year: None,
@@ -280,6 +302,7 @@ mod tests {
             limit: 5,
             output: None,
             ids_only: false,
+            pmc_ids_only: false,
             from_year: Some(2020),
             to_year: Some(2023),
             year: None,
@@ -313,6 +336,7 @@ mod tests {
             limit: 10,
             output: None,
             ids_only: false,
+            pmc_ids_only: false,
             from_year: None,
             to_year: None,
             year: None,
@@ -351,6 +375,7 @@ mod tests {
             limit: 10,
             output: None,
             ids_only: true,
+            pmc_ids_only: false,
             from_year: None,
             to_year: None,
             year: None,
@@ -381,6 +406,7 @@ mod tests {
             limit: 10,
             output: None,
             ids_only: false,
+            pmc_ids_only: false,
             from_year: None,
             to_year: None,
             year: None,
@@ -401,5 +427,72 @@ mod tests {
         let query = search.build_query().unwrap();
         assert!(query.contains("diabetes"));
         assert!(query.contains("pmc[sb]"));
+    }
+
+    #[test]
+    fn test_pmc_ids_only_mode() {
+        let search = Search {
+            query: Some("COVID-19".to_string()),
+            limit: 10,
+            output: None,
+            ids_only: false,
+            pmc_ids_only: true,
+            from_year: None,
+            to_year: None,
+            year: None,
+            author: None,
+            first_author: None,
+            last_author: None,
+            journal: None,
+            journal_abbrev: None,
+            mesh_term: None,
+            mesh_major: None,
+            organism: None,
+            article_type: None,
+            open_access: false,
+            pmc_only: false,
+            grant_number: None,
+        };
+
+        // We can't test the actual execution here since it requires network calls,
+        // but we can verify that the search struct is properly constructed
+        assert!(search.pmc_ids_only);
+        assert!(!search.ids_only);
+        assert_eq!(search.query, Some("COVID-19".to_string()));
+    }
+
+    #[test]
+    fn test_pmc_ids_only_with_pmc_filter() {
+        let search = Search {
+            query: Some("cancer treatment".to_string()),
+            limit: 20,
+            output: None,
+            ids_only: false,
+            pmc_ids_only: true,
+            from_year: Some(2020),
+            to_year: None,
+            year: None,
+            author: None,
+            first_author: None,
+            last_author: None,
+            journal: None,
+            journal_abbrev: None,
+            mesh_term: None,
+            mesh_major: None,
+            organism: None,
+            article_type: None,
+            open_access: false,
+            pmc_only: true,
+            grant_number: None,
+        };
+
+        // Verify that we can combine pmc_ids_only with pmc_only filter
+        assert!(search.pmc_ids_only);
+        assert!(search.pmc_only);
+
+        let query = search.build_query().unwrap();
+        assert!(query.contains("cancer treatment"));
+        assert!(query.contains("pmc[sb]"));
+        assert!(query.contains("2020"));
     }
 }
