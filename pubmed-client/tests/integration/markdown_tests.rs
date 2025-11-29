@@ -498,6 +498,7 @@ fn test_markdown_config_builder() {
         include_identifier_links: false,
         include_figure_captions: true,
         include_local_figures: false,
+        use_yaml_frontmatter: false,
     };
 
     let converter = PmcMarkdownConverter::with_config(config.clone());

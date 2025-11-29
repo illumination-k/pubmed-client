@@ -96,6 +96,8 @@ pub struct MarkdownConfig {
     pub include_figure_captions: bool,
     /// Include local figure file paths in markdown images
     pub include_local_figures: bool,
+    /// Use YAML frontmatter for metadata instead of bold markdown format
+    pub use_yaml_frontmatter: bool,
 }
 
 /// Heading style options
@@ -130,6 +132,7 @@ impl Default for MarkdownConfig {
             include_identifier_links: true,
             include_figure_captions: true,
             include_local_figures: false,
+            use_yaml_frontmatter: false,
         }
     }
 }
@@ -197,6 +200,12 @@ impl PmcMarkdownConverter {
     /// Set whether to include figure captions
     pub fn with_include_figure_captions(mut self, include: bool) -> Self {
         self.config.include_figure_captions = include;
+        self
+    }
+
+    /// Set whether to use YAML frontmatter for metadata
+    pub fn with_yaml_frontmatter(mut self, use_yaml: bool) -> Self {
+        self.config.use_yaml_frontmatter = use_yaml;
         self
     }
 
@@ -272,8 +281,126 @@ impl PmcMarkdownConverter {
         markdown.trim().to_string()
     }
 
+    /// Generate YAML frontmatter from article metadata
+    fn generate_yaml_frontmatter(&self, article: &PmcFullText) -> String {
+        let mut yaml = String::from("---\n");
+
+        // Title (always required, escaped)
+        yaml.push_str(&format!("title: {}\n", self.yaml_escape(&article.title)));
+
+        // Authors (as array)
+        if !article.authors.is_empty() {
+            yaml.push_str("authors:\n");
+            for author in &article.authors {
+                let author_name = self.clean_content(&author.full_name);
+                yaml.push_str(&format!("  - {}\n", self.yaml_escape(&author_name)));
+            }
+        }
+
+        // Journal information
+        yaml.push_str(&format!(
+            "journal: {}\n",
+            self.yaml_escape(&article.journal.title)
+        ));
+
+        if let Some(abbrev) = &article.journal.abbreviation {
+            yaml.push_str(&format!("journal_abbrev: {}\n", self.yaml_escape(abbrev)));
+        }
+
+        // Publication date
+        if !article.pub_date.is_empty() && article.pub_date != "Unknown Date" {
+            yaml.push_str(&format!(
+                "pub_date: {}\n",
+                self.yaml_escape(&article.pub_date)
+            ));
+        }
+
+        // Identifiers
+        yaml.push_str(&format!("pmcid: {}\n", self.yaml_escape(&article.pmcid)));
+        if let Some(pmid) = &article.pmid {
+            yaml.push_str(&format!("pmid: {}\n", self.yaml_escape(pmid)));
+        }
+        if let Some(doi) = &article.doi {
+            yaml.push_str(&format!("doi: {}\n", self.yaml_escape(doi)));
+        }
+
+        // Article type
+        if let Some(article_type) = &article.article_type {
+            yaml.push_str(&format!(
+                "article_type: {}\n",
+                self.yaml_escape(article_type)
+            ));
+        }
+
+        // Keywords (as array)
+        if !article.keywords.is_empty() {
+            yaml.push_str("keywords:\n");
+            for keyword in &article.keywords {
+                let clean_keyword = self.clean_content(keyword);
+                yaml.push_str(&format!("  - {}\n", self.yaml_escape(&clean_keyword)));
+            }
+        }
+
+        // Journal details
+        if let Some(volume) = &article.journal.volume {
+            yaml.push_str(&format!("volume: {}\n", self.yaml_escape(volume)));
+        }
+        if let Some(issue) = &article.journal.issue {
+            yaml.push_str(&format!("issue: {}\n", self.yaml_escape(issue)));
+        }
+        if let Some(publisher) = &article.journal.publisher {
+            yaml.push_str(&format!("publisher: {}\n", self.yaml_escape(publisher)));
+        }
+
+        yaml.push_str("---\n");
+        yaml
+    }
+
+    /// Escape a string for use in YAML
+    /// Returns quoted string if it contains special characters, otherwise returns as-is
+    fn yaml_escape(&self, s: &str) -> String {
+        // Clean the content first
+        let cleaned = self.clean_content(s);
+
+        // Check if the string needs quoting
+        let needs_quoting = cleaned.contains(':')
+            || cleaned.contains('#')
+            || cleaned.contains('"')
+            || cleaned.contains('\'')
+            || cleaned.contains('\n')
+            || cleaned.contains('[')
+            || cleaned.contains(']')
+            || cleaned.contains('{')
+            || cleaned.contains('}')
+            || cleaned.contains('&')
+            || cleaned.contains('*')
+            || cleaned.contains('!')
+            || cleaned.contains('|')
+            || cleaned.contains('>')
+            || cleaned.contains('@')
+            || cleaned.starts_with(' ')
+            || cleaned.ends_with(' ')
+            || cleaned.starts_with('-')
+            || cleaned.starts_with('?');
+
+        if needs_quoting {
+            // Escape internal double quotes and backslashes
+            let escaped = cleaned.replace('\\', "\\\\").replace('"', "\\\"");
+            format!("\"{}\"", escaped)
+        } else if cleaned.is_empty() {
+            "\"\"".to_string()
+        } else {
+            cleaned
+        }
+    }
+
     /// Convert metadata section
     fn convert_metadata(&self, article: &PmcFullText) -> String {
+        // Use YAML frontmatter if configured
+        if self.config.use_yaml_frontmatter {
+            return self.generate_yaml_frontmatter(article);
+        }
+
         let mut metadata = String::new();
 
         // Title
@@ -898,5 +1025,169 @@ mod tests {
         assert!(markdown.contains("**Journal:** Test Journal"));
         assert!(markdown.contains("DOI: 10.1000/test"));
         assert!(markdown.contains("**Keywords:** test, example"));
+    }
+
+    #[test]
+    fn test_yaml_frontmatter_basic() {
+        let converter = PmcMarkdownConverter::new().with_yaml_frontmatter(true);
+
+        let article = PmcFullText {
+            pmcid: "PMC1234567".to_string(),
+            pmid: Some("12345".to_string()),
+            title: "Test Article".to_string(),
+            authors: vec![
+                Author::from_full_name("John Doe".to_string()),
+                Author::from_full_name("Jane Smith".to_string()),
+            ],
+            journal: JournalInfo::new("Test Journal".to_string()),
+            pub_date: "2023-05-15".to_string(),
+            doi: Some("10.1000/test".to_string()),
+            sections: vec![],
+            references: vec![],
+            article_type: Some("research-article".to_string()),
+            keywords: vec!["test".to_string(), "example".to_string()],
+            funding: vec![],
+            conflict_of_interest: None,
+            acknowledgments: None,
+            data_availability: None,
+            supplementary_materials: vec![],
+        };
+
+        let markdown = converter.convert(&article);
+
+        // Check frontmatter delimiters
+        assert!(markdown.starts_with("---\n"));
+        // Count occurrences of "---" - should have both opening and closing
+        let delimiter_count = markdown.matches("---").count();
+        assert_eq!(
+            delimiter_count, 2,
+            "Should have opening and closing YAML frontmatter delimiters"
+        );
+
+        // Check basic fields
+        assert!(markdown.contains("title: Test Article"));
+        assert!(markdown.contains("authors:"));
+        assert!(markdown.contains("  - John Doe"));
+        assert!(markdown.contains("  - Jane Smith"));
+        assert!(markdown.contains("journal: Test Journal"));
+        assert!(markdown.contains("pub_date: 2023-05-15"));
+        assert!(markdown.contains("pmcid: PMC1234567"));
+        assert!(markdown.contains("pmid: 12345")); // Numeric strings don't need quotes in YAML
+        assert!(markdown.contains("doi: 10.1000/test"));
+        assert!(markdown.contains("article_type: research-article"));
+        assert!(markdown.contains("keywords:"));
+        assert!(markdown.contains("  - test"));
+        assert!(markdown.contains("  - example"));
+    }
+
+    #[test]
+    fn test_yaml_escaping() {
+        let converter = PmcMarkdownConverter::new();
+
+        // Test string with colon
+        let result = converter.yaml_escape("Title: A Study");
+        assert_eq!(result, "\"Title: A Study\"");
+
+        // Test string with quotes
+        let result = converter.yaml_escape("The \"Best\" Article");
+        assert_eq!(result, "\"The \\\"Best\\\" Article\"");
+
+        // Test string with hash
+        let result = converter.yaml_escape("#COVID-19");
+        assert_eq!(result, "\"#COVID-19\"");
+
+        // Test simple string (no escaping needed)
+        let result = converter.yaml_escape("Simple Title");
+        assert_eq!(result, "Simple Title");
+
+        // Test string starting with dash
+        let result = converter.yaml_escape("- Important");
+        assert_eq!(result, "\"- Important\"");
+
+        // Test empty string
+        let result = converter.yaml_escape("");
+        assert_eq!(result, "\"\"");
+    }
+
+    #[test]
+    fn test_yaml_frontmatter_with_special_characters() {
+        let converter = PmcMarkdownConverter::new().with_yaml_frontmatter(true);
+
+        let article = PmcFullText {
+            pmcid: "PMC7890123".to_string(),
+            pmid: None,
+            title: "COVID-19: A Comprehensive Study".to_string(),
+            authors: vec![Author::from_full_name("O'Brien, Michael".to_string())],
+            journal: JournalInfo::new("Nature: Medicine & Science".to_string()),
+            pub_date: "2023".to_string(),
+            doi: Some("10.1038/s41591-023-01234-5".to_string()),
+            sections: vec![],
+            references: vec![],
+            article_type: Some("research-article".to_string()),
+            keywords: vec![
+                "#COVID-19".to_string(),
+                "SARS-CoV-2".to_string(),
+                "vaccine".to_string(),
+            ],
+            funding: vec![],
+            conflict_of_interest: None,
+            acknowledgments: None,
+            data_availability: None,
+            supplementary_materials: vec![],
+        };
+
+        let markdown = converter.convert(&article);
+
+        // Check that special characters are properly escaped
+        assert!(markdown.contains("title: \"COVID-19: A Comprehensive Study\""));
+        assert!(markdown.contains("journal: \"Nature: Medicine & Science\""));
+        assert!(markdown.contains("  - \"#COVID-19\""));
+        assert!(markdown.contains("  - SARS-CoV-2"));
+    }
+
+    #[test]
+    fn test_yaml_frontmatter_backward_compatibility() {
+        // Default should NOT use YAML frontmatter
+        let converter = PmcMarkdownConverter::new();
+        assert!(!converter.config.use_yaml_frontmatter);
+
+        let article = PmcFullText {
+            pmcid: "PMC1234567".to_string(),
+            pmid: None,
+            title: "Test Article".to_string(),
+            authors: vec![],
+            journal: JournalInfo::new("Test Journal".to_string()),
+            pub_date: "2023".to_string(),
+            doi: None,
+            sections: vec![],
+            references: vec![],
+            article_type: None,
+            keywords: vec![],
+            funding: vec![],
+            conflict_of_interest: None,
+            acknowledgments: None,
+            data_availability: None,
+            supplementary_materials: vec![],
+        };
+
+        let markdown = converter.convert(&article);
+
+        // Should use old format with markdown heading
+        assert!(markdown.contains("# Test Article"));
+        assert!(markdown.contains("**Journal:** Test Journal"));
+        // Should NOT have YAML frontmatter delimiters
+        assert!(!markdown.starts_with("---\n"));
+    }
+
+    #[test]
+    fn test_builder_pattern_with_yaml_frontmatter() {
+        let converter = PmcMarkdownConverter::new()
+            .with_yaml_frontmatter(true)
+            .with_include_metadata(true)
+            .with_heading_style(HeadingStyle::ATX);
+
+        assert!(converter.config.use_yaml_frontmatter);
+        assert!(converter.config.include_metadata);
+        assert_eq!(converter.config.heading_style, HeadingStyle::ATX);
     }
 }
