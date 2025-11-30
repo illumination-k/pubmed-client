@@ -5,6 +5,8 @@
 
 use std::collections::HashMap;
 
+use serde::Serialize;
+
 use crate::pmc::models::{
     ArticleSection, Author, Figure, FundingInfo, PmcFullText, Reference, Table,
 };
@@ -74,6 +76,34 @@ static HTML_ENTITIES: &[(&str, &str)] = &[
     ("&pi;", "π"),      // pi
     ("&sigma;", "σ"),   // sigma
 ];
+
+/// Metadata structure for YAML frontmatter serialization
+#[derive(Debug, Clone, Serialize)]
+struct ArticleMetadata {
+    title: String,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    authors: Vec<String>,
+    journal: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    journal_abbrev: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub_date: Option<String>,
+    pmcid: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pmid: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    doi: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    article_type: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    keywords: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    volume: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    issue: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    publisher: Option<String>,
+}
 
 /// Configuration options for Markdown conversion
 #[derive(Debug, Clone)]
@@ -283,114 +313,59 @@ impl PmcMarkdownConverter {
 
     /// Generate YAML frontmatter from article metadata
     fn generate_yaml_frontmatter(&self, article: &PmcFullText) -> String {
-        let mut yaml = String::from("---\n");
+        // Build metadata structure
+        let metadata = ArticleMetadata {
+            title: self.clean_content(&article.title),
+            authors: article
+                .authors
+                .iter()
+                .map(|a| self.clean_content(&a.full_name))
+                .collect(),
+            journal: self.clean_content(&article.journal.title),
+            journal_abbrev: article
+                .journal
+                .abbreviation
+                .as_ref()
+                .map(|a| self.clean_content(a)),
+            pub_date: if !article.pub_date.is_empty() && article.pub_date != "Unknown Date" {
+                Some(self.clean_content(&article.pub_date))
+            } else {
+                None
+            },
+            pmcid: self.clean_content(&article.pmcid),
+            pmid: article.pmid.as_ref().map(|p| self.clean_content(p)),
+            doi: article.doi.as_ref().map(|d| self.clean_content(d)),
+            article_type: article.article_type.as_ref().map(|t| self.clean_content(t)),
+            keywords: article
+                .keywords
+                .iter()
+                .map(|k| self.clean_content(k))
+                .collect(),
+            volume: article
+                .journal
+                .volume
+                .as_ref()
+                .map(|v| self.clean_content(v)),
+            issue: article
+                .journal
+                .issue
+                .as_ref()
+                .map(|i| self.clean_content(i)),
+            publisher: article
+                .journal
+                .publisher
+                .as_ref()
+                .map(|p| self.clean_content(p)),
+        };
 
-        // Title (always required, escaped)
-        yaml.push_str(&format!("title: {}\n", self.yaml_escape(&article.title)));
-
-        // Authors (as array)
-        if !article.authors.is_empty() {
-            yaml.push_str("authors:\n");
-            for author in &article.authors {
-                let author_name = self.clean_content(&author.full_name);
-                yaml.push_str(&format!("  - {}\n", self.yaml_escape(&author_name)));
+        // Serialize to YAML with proper formatting
+        match serde_yaml::to_string(&metadata) {
+            Ok(yaml_content) => format!("---\n{}---\n", yaml_content),
+            Err(e) => {
+                tracing::warn!("Failed to serialize YAML frontmatter: {}", e);
+                // Fallback to empty frontmatter
+                "---\n---\n".to_string()
             }
-        }
-
-        // Journal information
-        yaml.push_str(&format!(
-            "journal: {}\n",
-            self.yaml_escape(&article.journal.title)
-        ));
-
-        if let Some(abbrev) = &article.journal.abbreviation {
-            yaml.push_str(&format!("journal_abbrev: {}\n", self.yaml_escape(abbrev)));
-        }
-
-        // Publication date
-        if !article.pub_date.is_empty() && article.pub_date != "Unknown Date" {
-            yaml.push_str(&format!(
-                "pub_date: {}\n",
-                self.yaml_escape(&article.pub_date)
-            ));
-        }
-
-        // Identifiers
-        yaml.push_str(&format!("pmcid: {}\n", self.yaml_escape(&article.pmcid)));
-        if let Some(pmid) = &article.pmid {
-            yaml.push_str(&format!("pmid: {}\n", self.yaml_escape(pmid)));
-        }
-        if let Some(doi) = &article.doi {
-            yaml.push_str(&format!("doi: {}\n", self.yaml_escape(doi)));
-        }
-
-        // Article type
-        if let Some(article_type) = &article.article_type {
-            yaml.push_str(&format!(
-                "article_type: {}\n",
-                self.yaml_escape(article_type)
-            ));
-        }
-
-        // Keywords (as array)
-        if !article.keywords.is_empty() {
-            yaml.push_str("keywords:\n");
-            for keyword in &article.keywords {
-                let clean_keyword = self.clean_content(keyword);
-                yaml.push_str(&format!("  - {}\n", self.yaml_escape(&clean_keyword)));
-            }
-        }
-
-        // Journal details
-        if let Some(volume) = &article.journal.volume {
-            yaml.push_str(&format!("volume: {}\n", self.yaml_escape(volume)));
-        }
-        if let Some(issue) = &article.journal.issue {
-            yaml.push_str(&format!("issue: {}\n", self.yaml_escape(issue)));
-        }
-        if let Some(publisher) = &article.journal.publisher {
-            yaml.push_str(&format!("publisher: {}\n", self.yaml_escape(publisher)));
-        }
-
-        yaml.push_str("---\n");
-        yaml
-    }
-
-    /// Escape a string for use in YAML
-    /// Returns quoted string if it contains special characters, otherwise returns as-is
-    fn yaml_escape(&self, s: &str) -> String {
-        // Clean the content first
-        let cleaned = self.clean_content(s);
-
-        // Check if the string needs quoting
-        let needs_quoting = cleaned.contains(':')
-            || cleaned.contains('#')
-            || cleaned.contains('"')
-            || cleaned.contains('\'')
-            || cleaned.contains('\n')
-            || cleaned.contains('[')
-            || cleaned.contains(']')
-            || cleaned.contains('{')
-            || cleaned.contains('}')
-            || cleaned.contains('&')
-            || cleaned.contains('*')
-            || cleaned.contains('!')
-            || cleaned.contains('|')
-            || cleaned.contains('>')
-            || cleaned.contains('@')
-            || cleaned.starts_with(' ')
-            || cleaned.ends_with(' ')
-            || cleaned.starts_with('-')
-            || cleaned.starts_with('?');
-
-        if needs_quoting {
-            // Escape internal double quotes and backslashes
-            let escaped = cleaned.replace('\\', "\\\\").replace('"', "\\\"");
-            format!("\"{}\"", escaped)
-        } else if cleaned.is_empty() {
-            "\"\"".to_string()
-        } else {
-            cleaned
         }
     }
 
@@ -1064,49 +1039,20 @@ mod tests {
             "Should have opening and closing YAML frontmatter delimiters"
         );
 
-        // Check basic fields
+        // Check basic fields (serde_yaml format)
         assert!(markdown.contains("title: Test Article"));
         assert!(markdown.contains("authors:"));
-        assert!(markdown.contains("  - John Doe"));
-        assert!(markdown.contains("  - Jane Smith"));
+        assert!(markdown.contains("- John Doe")); // serde_yaml uses "- " for arrays
+        assert!(markdown.contains("- Jane Smith"));
         assert!(markdown.contains("journal: Test Journal"));
         assert!(markdown.contains("pub_date: 2023-05-15"));
         assert!(markdown.contains("pmcid: PMC1234567"));
-        assert!(markdown.contains("pmid: 12345")); // Numeric strings don't need quotes in YAML
+        assert!(markdown.contains("pmid: '12345'")); // serde_yaml quotes numeric strings
         assert!(markdown.contains("doi: 10.1000/test"));
         assert!(markdown.contains("article_type: research-article"));
         assert!(markdown.contains("keywords:"));
-        assert!(markdown.contains("  - test"));
-        assert!(markdown.contains("  - example"));
-    }
-
-    #[test]
-    fn test_yaml_escaping() {
-        let converter = PmcMarkdownConverter::new();
-
-        // Test string with colon
-        let result = converter.yaml_escape("Title: A Study");
-        assert_eq!(result, "\"Title: A Study\"");
-
-        // Test string with quotes
-        let result = converter.yaml_escape("The \"Best\" Article");
-        assert_eq!(result, "\"The \\\"Best\\\" Article\"");
-
-        // Test string with hash
-        let result = converter.yaml_escape("#COVID-19");
-        assert_eq!(result, "\"#COVID-19\"");
-
-        // Test simple string (no escaping needed)
-        let result = converter.yaml_escape("Simple Title");
-        assert_eq!(result, "Simple Title");
-
-        // Test string starting with dash
-        let result = converter.yaml_escape("- Important");
-        assert_eq!(result, "\"- Important\"");
-
-        // Test empty string
-        let result = converter.yaml_escape("");
-        assert_eq!(result, "\"\"");
+        assert!(markdown.contains("- test"));
+        assert!(markdown.contains("- example"));
     }
 
     #[test]
@@ -1138,11 +1084,19 @@ mod tests {
 
         let markdown = converter.convert(&article);
 
-        // Check that special characters are properly escaped
-        assert!(markdown.contains("title: \"COVID-19: A Comprehensive Study\""));
-        assert!(markdown.contains("journal: \"Nature: Medicine & Science\""));
-        assert!(markdown.contains("  - \"#COVID-19\""));
-        assert!(markdown.contains("  - SARS-CoV-2"));
+        // Check that special characters are properly escaped by serde_yaml
+        // serde_yaml uses single quotes for strings with special chars
+        assert!(
+            markdown.contains("title: 'COVID-19: A Comprehensive Study'")
+                || markdown.contains("title: \"COVID-19: A Comprehensive Study\"")
+        );
+        assert!(
+            markdown.contains("journal: 'Nature: Medicine & Science'")
+                || markdown.contains("journal: \"Nature: Medicine & Science\"")
+        );
+        // Keywords with special characters will be quoted
+        assert!(markdown.contains("'#COVID-19'") || markdown.contains("\"#COVID-19\""));
+        assert!(markdown.contains("SARS-CoV-2"));
     }
 
     #[test]
