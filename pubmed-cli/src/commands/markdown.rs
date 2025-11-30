@@ -19,6 +19,10 @@ pub struct Markdown {
     /// Download and embed figures in the markdown
     #[arg(long)]
     with_figures: bool,
+
+    /// Use YAML frontmatter for metadata
+    #[arg(long)]
+    frontmatter: bool,
 }
 
 impl Markdown {
@@ -60,7 +64,10 @@ impl Markdown {
         let article = client.fetch_full_text(pmcid).await?;
 
         // Prepare markdown config
-        let mut config = MarkdownConfig::default();
+        let mut config = MarkdownConfig {
+            use_yaml_frontmatter: self.frontmatter,
+            ..Default::default()
+        };
 
         // Handle figures if requested
         let figure_paths = if self.with_figures {

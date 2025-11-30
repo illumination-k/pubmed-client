@@ -22,6 +22,7 @@ rand = "0.8"
 regex = "1.10"
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_yaml = "0.9"
 thiserror = { workspace = true }
 time = "0.3"
 tracing = { workspace = true }
