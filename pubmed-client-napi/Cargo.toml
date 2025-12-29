@@ -11,9 +11,9 @@ description = "Node.js native bindings for PubMed/PMC API client"
 crate-type = ["cdylib"]
 
 [dependencies]
-pubmed-client = { path = "../pubmed-client" }
 napi = { version = "2", default-features = false, features = ["napi4", "tokio_rt", "async"] }
 napi-derive = "2"
+pubmed-client = { path = "../pubmed-client" }
 tokio = { version = "1", features = ["rt-multi-thread"] }
 
 [build-dependencies]
