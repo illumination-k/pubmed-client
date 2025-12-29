@@ -24,7 +24,6 @@ runs:
       with:
         experimental: true
         cache: true
-        github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install Rust
       if: inputs.rust-target != ''
