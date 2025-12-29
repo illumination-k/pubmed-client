@@ -3,8 +3,22 @@ name: NAPI-RS CI
 on:
   push:
     branches: [main]
+    paths:
+      - "pubmed-client-napi/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/napi.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "pubmed-client-napi/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/napi.yml"
 
 env:
   CARGO_TERM_COLOR: always
