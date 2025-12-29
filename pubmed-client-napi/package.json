@@ -1,0 +1,52 @@
+{
+  "name": "pubmed-client",
+  "version": "0.1.0",
+  "description": "Node.js native bindings for PubMed/PMC API client",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/illumination-k/pubmed-client-rs"
+  },
+  "license": "MIT",
+  "keywords": [
+    "pubmed",
+    "pmc",
+    "ncbi",
+    "bioinformatics",
+    "api-client",
+    "napi-rs"
+  ],
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "napi": {
+    "name": "pubmed-client",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-musl"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">= 16"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "vitest",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4",
+    "vitest": "^2.1.8"
+  }
+}

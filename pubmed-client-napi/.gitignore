@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+*.node
+index.js
+index.d.ts
+
+# npm/pnpm
+pnpm-lock.yaml
+npm-debug.log*
+
+# Platform-specific builds
+*.linux-x64-gnu.node
+*.linux-x64-musl.node
+*.darwin-arm64.node
+*.darwin-x64.node
+*.win32-x64-msvc.node
