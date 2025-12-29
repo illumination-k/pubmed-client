@@ -1,5 +1,5 @@
 name: "Setup Repository Environment"
-description: "Setup mise, Rust, and pnpm for builds"
+description: "Setup git, mise, Rust"
 
 inputs:
   lfs:
@@ -14,11 +14,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v4
-      with:
-        lfs: ${{ inputs.lfs }}
-        fetch-depth: 0
-
     - name: Pull Git LFS files
       if: inputs.lfs == 'true'
       run: git lfs pull

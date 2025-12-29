@@ -33,6 +33,7 @@ permissions:
 
 jobs:
   build:
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -66,6 +67,11 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+          fetch-depth: 0
+
       - name: Setup repository environment
         uses: ./.github/actions/setup-repo
         with:
@@ -106,6 +112,7 @@ jobs:
         run: ${{ matrix.settings.build }}
 
   test:
+    timeout-minutes: 10
     name: Test
     runs-on: ubuntu-latest
     needs: [build]
@@ -114,6 +121,11 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+          fetch-depth: 0
+
       - name: Setup repository environment
         uses: ./.github/actions/setup-repo
         with:
@@ -132,6 +144,7 @@ jobs:
         run: pnpm test
 
   lint:
+    timeout-minutes: 10
     name: Lint
     runs-on: ubuntu-latest
     defaults:
@@ -139,6 +152,11 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+          fetch-depth: 0
+
       - name: Setup repository environment
         uses: ./.github/actions/setup-repo
         with:
