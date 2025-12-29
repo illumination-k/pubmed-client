@@ -43,10 +43,15 @@
     "prepublishOnly": "napi prepublish -t npm",
     "test": "vitest",
     "universal": "napi universal",
-    "version": "napi version"
+    "version": "napi version",
+    "example": "npx ts-node examples/basic.ts",
+    "example:search": "npx ts-node examples/search-and-markdown.ts"
   },
   "devDependencies": {
     "@napi-rs/cli": "^2.18.4",
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.0",
     "vitest": "^2.1.8"
   }
 }
