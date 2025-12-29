@@ -91,6 +91,21 @@ run = ["cd pubmed-client-wasm && wasm-pack build --target nodejs"]
 description = "Build and test WASM package with TypeScript tests"
 run = ["cd pubmed-client-wasm && pnpm run build && pnpm run test"]
 
+[tasks."napi:build"]
+description = "Build napi-rs native Node.js bindings"
+dir = "pubmed-client-napi"
+run = ["pnpm run build"]
+
+[tasks."napi:test"]
+description = "Build and run napi-rs TypeScript tests"
+dir = "pubmed-client-napi"
+run = ["pnpm run build && pnpm run test"]
+
+[tasks."napi:lint"]
+description = "Run linting and type checking for napi package"
+dir = "pubmed-client-napi"
+run = ["pnpm run ci", "pnpm run typecheck"]
+
 [tasks."core:test"]
 description = "Run tests for core Rust library only"
 run = ["cargo test -p pubmed-client"]

@@ -225,6 +225,12 @@ pub struct PubMedClient {
     client: Arc<Client>,
 }
 
+impl Default for PubMedClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[napi]
 impl PubMedClient {
     /// Create a new PubMed client with default configuration
