@@ -160,18 +160,13 @@ jobs:
         with:
           lfs: true
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup mise
+        uses: jdx/mise-action@v3
         with:
-          version: 9
+          experimental: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-          cache: pnpm
-          cache-dependency-path: pubmed-client-napi/pnpm-lock.yaml
+      - name: Configure npm registry
+        run: npm config set registry https://registry.npmjs.org/
 
       - name: Install dependencies
         run: pnpm install
@@ -216,18 +211,13 @@ jobs:
         with:
           lfs: true
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup mise
+        uses: jdx/mise-action@v3
         with:
-          version: 9
+          experimental: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-          cache: pnpm
-          cache-dependency-path: pubmed-client-napi/pnpm-lock.yaml
+      - name: Configure npm registry
+        run: npm config set registry https://registry.npmjs.org/
 
       - name: Install dependencies
         run: pnpm install
