@@ -1,6 +1,3 @@
-[settings]
-lockfile = true
-
 [tools]
 pre-commit = "latest"
 dprint = "latest"
