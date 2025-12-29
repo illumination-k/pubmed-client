@@ -1,0 +1,24 @@
+[package]
+name = "pubmed-client-napi"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Node.js native bindings for PubMed/PMC API client"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+pubmed-client = { path = "../pubmed-client" }
+napi = { version = "2", default-features = false, features = ["napi4", "tokio_rt", "async"] }
+napi-derive = "2"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+strip = "symbols"
