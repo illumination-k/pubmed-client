@@ -1,0 +1,48 @@
+name: "Setup Repository Environment"
+description: "Setup mise, Rust, and pnpm for builds"
+
+inputs:
+  lfs:
+    description: "Whether to pull Git LFS files"
+    required: false
+    default: "true"
+  rust-target:
+    description: "Rust target triple for cross-compilation (optional)"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: ${{ inputs.lfs }}
+        fetch-depth: 0
+
+    - name: Pull Git LFS files
+      if: inputs.lfs == 'true'
+      run: git lfs pull
+      shell: bash
+
+    - name: Setup mise
+      uses: jdx/mise-action@v3
+      with:
+        experimental: true
+        cache: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Rust
+      if: inputs.rust-target != ''
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ inputs.rust-target }}
+
+    - name: Install Rust (default)
+      if: inputs.rust-target == ''
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo
+      if: inputs.rust-target != ''
+      uses: Swatinem/rust-cache@v2
+      with:
+        shared-key: ${{ inputs.rust-target }}

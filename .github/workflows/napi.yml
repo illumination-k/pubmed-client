@@ -10,6 +10,7 @@ on:
       - "Cargo.toml"
       - "Cargo.lock"
       - ".github/workflows/napi.yml"
+      - ".github/actions/setup-repo/**"
   pull_request:
     branches: [main]
     paths:
@@ -19,6 +20,7 @@ on:
       - "Cargo.toml"
       - "Cargo.lock"
       - ".github/workflows/napi.yml"
+      - ".github/actions/setup-repo/**"
 
 env:
   CARGO_TERM_COLOR: always
@@ -64,30 +66,10 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup repository environment
+        uses: ./.github/actions/setup-repo
         with:
-          lfs: true
-
-      - name: Pull Git LFS files
-        run: git lfs pull
-
-      - name: Setup mise
-        uses: jdx/mise-action@v3
-        with:
-          experimental: true
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.settings.target }}
-
-      - name: Cache Cargo
-        uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: ${{ matrix.settings.target }}
-
-      - name: Install dependencies
-        run: pnpm install
+          rust-target: ${{ matrix.settings.target }}
 
       # Linux musl
       - name: Install musl toolchain
@@ -123,13 +105,6 @@ jobs:
       - name: Build
         run: ${{ matrix.settings.build }}
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: bindings-${{ matrix.settings.target }}
-          path: pubmed-client-napi/${{ env.APP_NAME }}.*.node
-          if-no-files-found: error
-
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -139,19 +114,12 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup repository environment
+        uses: ./.github/actions/setup-repo
         with:
-          lfs: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull Git LFS files
-        run: git lfs pull
-
-      - name: Setup mise
-        uses: jdx/mise-action@v3
-        with:
-          experimental: true
-
-      - name: Install dependencies
+      - name: Install pnpm dependencies
         run: pnpm install
 
       - name: Download artifact
@@ -159,9 +127,6 @@ jobs:
         with:
           name: bindings-x86_64-unknown-linux-gnu
           path: pubmed-client-napi
-
-      - name: List files
-        run: ls -la
 
       - name: Run tests
         run: pnpm test
@@ -174,16 +139,12 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup repository environment
+        uses: ./.github/actions/setup-repo
         with:
-          lfs: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup mise
-        uses: jdx/mise-action@v3
-        with:
-          experimental: true
-
-      - name: Install dependencies
+      - name: Install pnpm dependencies
         run: pnpm install
 
       - name: Biome CI
