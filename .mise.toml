@@ -1,8 +1,8 @@
 [tools]
-# pre-commit = "latest"
-# dprint = "latest"
+pre-commit = "latest"
+dprint = "latest"
 
-# pnpm = "10"
+pnpm = "10"
 node = "20"
 uv = "0.8"
 
