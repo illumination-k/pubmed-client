@@ -1,15 +1,12 @@
 [tools]
-pre-commit = "latest"
-dprint = "latest"
+# pre-commit = "latest"
+# dprint = "latest"
 
-# "cargo:cargo-nextest" = "latest"
-# "cargo:cargo-llvm-cov" = "latest"
-
-pnpm = "10"
-node = "20"
+# pnpm = "10"
+# node = "20"
 uv = "0.8"
 
-shfmt = "3"
+# shfmt = "3"
 
 [env]
 # Use Python from pubmed-client-py venv for PyO3
