@@ -21,3 +21,5 @@ npm/
 
 # Artifacts directory
 artifacts/
+
+pnpm-lock.yaml
