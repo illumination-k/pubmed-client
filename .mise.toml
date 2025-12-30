@@ -3,10 +3,10 @@
 # dprint = "latest"
 
 # pnpm = "10"
-# node = "20"
+node = "20"
 uv = "0.8"
 
-# shfmt = "3"
+shfmt = "3"
 
 [env]
 # Use Python from pubmed-client-py venv for PyO3
