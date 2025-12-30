@@ -15,7 +15,7 @@ PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
 PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
 
 [hooks]
-postinstall = ["mise run setup"]
+postinstall = ["bash ./etc/postinstall.sh"]
 
 [tasks."fmt:root"]
 description = "Format Rust code at workspace root using mise, dprint, and cargo fmt"
@@ -43,22 +43,9 @@ run = [
 description = "Lint all code (Rust + Python)"
 depends = ["lint:root", "py:lint"]
 
-[tasks."setup:pre-commit"]
-description = "Install pre-commit hooks"
-run = ["pre-commit install --install-hooks"]
-
-[tasks."setup:py"]
-description = "Create Python virtual environment for PyO3 bindings"
-dir = "{{ config_root }}/pubmed-client-py"
-run = ["uv venv"]
-
-[tasks."setup:test"]
-description = "Setup test environment by running setup script"
-run = ["bash ./etc/setup-test.sh"]
-
 [tasks.setup]
-description = "Run all setup tasks (pre-commit, Python venv, test setup)"
-depends = ["setup:*"]
+description = "Run postinstall setup script"
+run = ["bash ./etc/postinstall.sh"]
 
 [tasks.test]
 description = "Run tests for entire workspace using nextest"
