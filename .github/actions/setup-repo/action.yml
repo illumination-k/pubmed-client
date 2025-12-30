@@ -24,6 +24,7 @@ runs:
       with:
         experimental: true
         cache: true
+        log_level: debug
 
     - name: Install Rust
       if: inputs.rust-target != ''
