@@ -198,8 +198,11 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/npm-v')
     permissions:
       contents: read
-      id-token: write # Required for npm provenance
+      id-token: write
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: pubmed-client-napi
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -218,7 +221,6 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install pnpm dependencies
-        working-directory: pubmed-client-napi
         run: pnpm install
 
       - name: Download all artifacts
@@ -229,23 +231,18 @@ jobs:
           merge-multiple: true
 
       - name: List artifacts
-        working-directory: pubmed-client-napi
         run: ls -la ./*.node || echo "No .node files found"
 
       - name: Move artifacts to platform directories
-        working-directory: pubmed-client-napi
         run: pnpm run artifacts
 
       - name: Prepare npm packages
-        working-directory: pubmed-client-napi
         run: pnpm run prepublishOnly
 
       - name: List npm packages
-        working-directory: pubmed-client-napi
         run: ls -laR npm
 
       - name: Publish platform packages
-        working-directory: pubmed-client-napi
         run: |
           for pkg in npm/*/; do
             echo "Publishing $pkg"
