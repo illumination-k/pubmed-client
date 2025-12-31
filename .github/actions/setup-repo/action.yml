@@ -27,17 +27,14 @@ runs:
         log_level: debug
 
     - name: Install Rust
-      if: inputs.rust-target != ''
       uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: ${{ inputs.rust-target }}
 
-    - name: Install Rust (default)
-      if: inputs.rust-target == ''
-      uses: dtolnay/rust-toolchain@stable
+    - name: Add Rust target for cross-compilation
+      if: inputs.rust-target != ''
+      run: rustup target add ${{ inputs.rust-target }}
+      shell: bash
 
     - name: Cache Cargo
-      if: inputs.rust-target != ''
       uses: Swatinem/rust-cache@v2
       with:
-        shared-key: ${{ inputs.rust-target }}
+        shared-key: ${{ inputs.rust-target || 'default' }}
