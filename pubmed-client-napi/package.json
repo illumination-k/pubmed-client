@@ -49,7 +49,7 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",
-    "ci": "biome ci .",
+    "ci": "pnpm run lint && pnpm run typecheck",
     "universal": "napi universal",
     "version": "napi version",
     "example": "npx ts-node examples/basic.ts",
