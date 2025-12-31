@@ -11,7 +11,7 @@ gh run list --branch $(git branch --show-current) -R $(gh repo view --json nameW
 Then you inspect the logs of the failed runs to identify the problems:
 
 ```bash
-gh run view <run-id> --log --failed
+gh run view <run-id> --log-failed
 ```
 
 And resolve the issues.
