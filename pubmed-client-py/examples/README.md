@@ -1,16 +1,19 @@
 # Python Examples for PubMed Client
 
-This directory contains comprehensive examples demonstrating how to use the `pubmed-client` Python package to retrieve and analyze biomedical literature metadata from PubMed and PubMed Central (PMC).
+This directory contains comprehensive examples demonstrating how to use the `pubmed-client-py` Python package to retrieve and analyze biomedical literature metadata from PubMed and PubMed Central (PMC).
 
 All examples support command-line arguments with `--help` for usage information.
 
 ## Prerequisites
 
-Before running these examples, you need to install the `pubmed-client` package:
+Before running these examples, you need to install the `pubmed-client-py` package:
 
 ```bash
-# Install from PyPI (when published)
-pip install pubmed-client
+# Install from PyPI
+pip install pubmed-client-py
+
+# Or with uv
+uv add pubmed-client-py
 
 # Or install from source (development)
 cd pubmed-client-py
