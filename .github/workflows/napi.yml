@@ -241,7 +241,7 @@ jobs:
 
       - name: Prepare npm packages (dry-run)
         if: github.event_name == 'workflow_dispatch'
-        run: napi prepublish -t npm --skip-gh-release
+        run: napi prepublish -t npm --dry-run
 
       - name: Prepare npm packages (with release)
         if: startsWith(github.ref, 'refs/tags/node-v')
