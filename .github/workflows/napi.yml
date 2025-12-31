@@ -81,16 +81,16 @@ jobs:
             build: pnpm build --target x86_64-unknown-linux-gnu
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            build: pnpm build --target x86_64-unknown-linux-musl
+            build: pnpm build --target x86_64-unknown-linux-musl --use-napi-cross
           - host: macos-latest
             target: aarch64-apple-darwin
             build: pnpm build --target aarch64-apple-darwin
           - host: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-            build: pnpm build --target aarch64-unknown-linux-gnu
+            build: pnpm build --target aarch64-unknown-linux-gnu --use-napi-cross
           - host: ubuntu-latest
             target: aarch64-unknown-linux-musl
-            build: pnpm build --target aarch64-unknown-linux-musl
+            build: pnpm build --target aarch64-unknown-linux-musl --use-napi-cross
 
     name: Build - ${{ matrix.settings.target }}
     runs-on: ${{ matrix.settings.host }}
@@ -112,33 +112,6 @@ jobs:
 
       - name: Install pnpm dependencies
         run: pnpm install
-
-      # Linux musl - use zigbuild for proper cross-compilation with OpenSSL
-      - name: Install zig for musl targets
-        if: contains(matrix.settings.target, '-linux-musl')
-        uses: goto-bus-stop/setup-zig@abea47f85e598557f500fa1fd2ab7464fcb39406 # v2.2.1
-        with:
-          version: 0.13.0
-
-      - name: Set cargo-zigbuild for musl targets
-        if: contains(matrix.settings.target, '-linux-musl')
-        run: |
-          cargo install cargo-zigbuild
-          echo "NAPI_RS_CLI_CARGO_COMMAND=zigbuild" >> "$GITHUB_ENV"
-
-      # Linux GNU cross-compilation
-      - name: Install aarch64 GNU toolchain
-        if: matrix.settings.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-
-      - name: Set cargo config for aarch64-unknown-linux-gnu
-        if: matrix.settings.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          mkdir -p ../.cargo
-          echo '[target.aarch64-unknown-linux-gnu]' >> ../.cargo/config.toml
-          echo 'linker = "aarch64-linux-gnu-gcc"' >> ../.cargo/config.toml
 
       - name: Build
         run: ${{ matrix.settings.build }}
