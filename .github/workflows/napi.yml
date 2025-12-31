@@ -197,7 +197,7 @@ jobs:
     # Run on tags and workflow_dispatch (for dry-run testing)
     if: startsWith(github.ref, 'refs/tags/node-v') || github.event_name == 'workflow_dispatch'
     permissions:
-      contents: read
+      contents: write # Required for GitHub release creation
       id-token: write
     timeout-minutes: 15
     defaults:
@@ -233,11 +233,21 @@ jobs:
       - name: List artifacts
         run: ls -la ./*.node || echo "No .node files found"
 
+      - name: Create npm directories
+        run: napi create-npm-dirs
+
       - name: Move artifacts to platform directories
         run: pnpm run artifacts
 
-      - name: Prepare npm packages
-        run: pnpm run prepublishOnly
+      - name: Prepare npm packages (dry-run)
+        if: github.event_name == 'workflow_dispatch'
+        run: napi prepublish -t npm --skip-gh-release
+
+      - name: Prepare npm packages (with release)
+        if: startsWith(github.ref, 'refs/tags/node-v')
+        run: napi prepublish -t npm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List npm packages
         run: ls -laR npm
