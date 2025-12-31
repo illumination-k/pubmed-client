@@ -27,6 +27,7 @@ env:
   DEBUG: napi:*
   APP_NAME: pubmed-client
   MACOSX_DEPLOYMENT_TARGET: "10.13"
+  SKIP_POSTINSTALL: "1"
 
 permissions:
   contents: read
@@ -38,27 +39,27 @@ jobs:
       fail-fast: false
       matrix:
         settings:
-          # - host: macos-latest
-          #   target: x86_64-apple-darwin
-          #   build: pnpm build --target x86_64-apple-darwin
-          # - host: windows-latest
-          #   target: x86_64-pc-windows-msvc
-          #   build: pnpm build --target x86_64-pc-windows-msvc
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            build: pnpm build --target x86_64-apple-darwin
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            build: pnpm build --target x86_64-pc-windows-msvc
           - host: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             build: pnpm build --target x86_64-unknown-linux-gnu
-          # - host: ubuntu-latest
-          #   target: x86_64-unknown-linux-musl
-          #   build: pnpm build --target x86_64-unknown-linux-musl
-          # - host: macos-latest
-          #   target: aarch64-apple-darwin
-          #   build: pnpm build --target aarch64-apple-darwin
-          # - host: ubuntu-latest
-          #   target: aarch64-unknown-linux-gnu
-          #   build: pnpm build --target aarch64-unknown-linux-gnu
-          # - host: ubuntu-latest
-          #   target: aarch64-unknown-linux-musl
-          #   build: pnpm build --target aarch64-unknown-linux-musl
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            build: pnpm build --target x86_64-unknown-linux-musl
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            build: pnpm build --target aarch64-apple-darwin
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            build: pnpm build --target aarch64-unknown-linux-gnu
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            build: pnpm build --target aarch64-unknown-linux-musl
 
     name: Build - ${{ matrix.settings.target }}
     runs-on: ${{ matrix.settings.host }}
