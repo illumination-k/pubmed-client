@@ -21,9 +21,11 @@ jobs:
       mcp: ${{ steps.check.outputs.mcp }}
     steps:
       - id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GIT_REF: ${{ github.ref }}
         run: |
-          # shellcheck disable=SC2193 # GitHub Actions expressions are evaluated before shell
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             # workflow_dispatch: always publish all packages
             {
               echo "core=true"
@@ -34,7 +36,7 @@ jobs:
           else
             # Tag-based release: check for prerelease and package-specific tags
             IS_PRERELEASE="false"
-            if [[ "${{ github.ref }}" == *"alpha"* ]] || [[ "${{ github.ref }}" == *"beta"* ]] || [[ "${{ github.ref }}" == *"rc"* ]]; then
+            if [[ "$GIT_REF" == *"alpha"* ]] || [[ "$GIT_REF" == *"beta"* ]] || [[ "$GIT_REF" == *"rc"* ]]; then
               IS_PRERELEASE="true"
             fi
 
@@ -50,7 +52,7 @@ jobs:
               echo "core=true" >> "$GITHUB_OUTPUT"
 
               # CLI: publish if tag contains 'cli'
-              if [[ "${{ github.ref }}" == *"cli"* ]]; then
+              if [[ "$GIT_REF" == *"cli"* ]]; then
                 echo "cli=true" >> "$GITHUB_OUTPUT"
                 echo "::notice::Tag contains 'cli' - will publish pubmed-cli"
               else
@@ -58,7 +60,7 @@ jobs:
               fi
 
               # MCP: publish if tag contains 'mcp'
-              if [[ "${{ github.ref }}" == *"mcp"* ]]; then
+              if [[ "$GIT_REF" == *"mcp"* ]]; then
                 echo "mcp=true" >> "$GITHUB_OUTPUT"
                 echo "::notice::Tag contains 'mcp' - will publish pubmed-mcp"
               else
@@ -82,8 +84,8 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
 
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
+      # Note: Intentionally not using rust-cache on publish workflows to prevent cache poisoning
+      # See: https://woodruffw.github.io/zizmor/audits/cache-poisoning/
 
       - name: Install nextest
         uses: taiki-e/install-action@1eefb499cca04a53d96437664bda0e2e3211ebc8 # nextest

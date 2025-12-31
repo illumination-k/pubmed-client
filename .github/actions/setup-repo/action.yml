@@ -36,7 +36,9 @@ runs:
 
     - name: Add Rust target for cross-compilation
       if: inputs.rust-target != ''
-      run: rustup target add ${{ inputs.rust-target }}
+      env:
+        RUST_TARGET: ${{ inputs.rust-target }}
+      run: rustup target add "$RUST_TARGET"
       shell: bash
 
     - name: Cache Cargo

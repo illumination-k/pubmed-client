@@ -49,17 +49,22 @@ jobs:
     steps:
       - name: Check if integration tests should run
         id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TEST_TYPE: ${{ github.event.inputs.test_type }}
+          INPUT_USE_API_KEY: ${{ github.event.inputs.use_api_key }}
+          HAS_INTEGRATION_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'test-integration') }}
         run: |
           # Always run on schedule or manual dispatch
-          if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [[ "$EVENT_NAME" == "schedule" || "$EVENT_NAME" == "workflow_dispatch" ]]; then
             {
               echo "should_run=true"
-              echo "test_type=${{ github.event.inputs.test_type || 'all' }}"
-              echo "use_api_key=${{ github.event.inputs.use_api_key || 'true' }}"
+              echo "test_type=${INPUT_TEST_TYPE:-all}"
+              echo "use_api_key=${INPUT_USE_API_KEY:-true}"
             } >> "$GITHUB_OUTPUT"
           # Run on PRs with integration-tests label
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            if [[ "${{ contains(github.event.pull_request.labels.*.name, 'test-integration') }}" == "true" ]]; then
+          elif [[ "$EVENT_NAME" == "pull_request" ]]; then
+            if [[ "$HAS_INTEGRATION_LABEL" == "true" ]]; then
               {
                 echo "should_run=true"
                 echo "test_type=all"
@@ -97,6 +102,9 @@ jobs:
       - uses: ./.github/actions/setup-repo
 
       - name: Setup integration test environment
+        env:
+          USE_API_KEY: ${{ needs.check-trigger.outputs.use_api_key }}
+          NCBI_API_KEY_SECRET: ${{ secrets.NCBI_API_KEY }}
         run: |
           # Set required environment variables
           {
@@ -105,8 +113,8 @@ jobs:
           } >> "$GITHUB_ENV"
 
           # Set API key if available and requested
-          if [[ "${{ needs.check-trigger.outputs.use_api_key }}" == "true" && -n "${{ secrets.NCBI_API_KEY }}" ]]; then
-            echo "NCBI_API_KEY=${{ secrets.NCBI_API_KEY }}" >> "$GITHUB_ENV"
+          if [[ "$USE_API_KEY" == "true" && -n "$NCBI_API_KEY_SECRET" ]]; then
+            echo "NCBI_API_KEY=$NCBI_API_KEY_SECRET" >> "$GITHUB_ENV"
             echo "Using NCBI API key for higher rate limits"
           else
             echo "Running without API key (standard rate limits)"
@@ -159,25 +167,30 @@ jobs:
 
       - name: Generate integration test summary
         if: always()
+        env:
+          TEST_TYPE: ${{ needs.check-trigger.outputs.test_type }}
+          USE_API_KEY: ${{ needs.check-trigger.outputs.use_api_key }}
+          RUST_VERSION: ${{ matrix.rust-version }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           {
             echo "## Integration Test Summary"
             echo ""
             echo "**Test Configuration:**"
-            echo "- Test Type: ${{ needs.check-trigger.outputs.test_type }}"
-            echo "- API Key Used: ${{ needs.check-trigger.outputs.use_api_key }}"
-            echo "- Rust Version: ${{ matrix.rust-version }}"
+            echo "- Test Type: $TEST_TYPE"
+            echo "- API Key Used: $USE_API_KEY"
+            echo "- Rust Version: $RUST_VERSION"
             echo ""
             echo "**Test Execution:**"
             echo "- Started: $(date -u)"
-            echo "- Trigger: ${{ github.event_name }}"
+            echo "- Trigger: $EVENT_NAME"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+          if [[ "$EVENT_NAME" == "schedule" ]]; then
             echo "- Type: Scheduled daily run" >> "$GITHUB_STEP_SUMMARY"
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          elif [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             echo "- Type: Manual trigger" >> "$GITHUB_STEP_SUMMARY"
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          elif [[ "$EVENT_NAME" == "pull_request" ]]; then
             echo "- Type: PR with integration-tests label" >> "$GITHUB_STEP_SUMMARY"
           fi
 
@@ -198,8 +211,10 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Report scheduled test results
+        env:
+          TEST_RESULT: ${{ needs.integration-tests.result }}
         run: |
-          if [[ "${{ needs.integration-tests.result }}" == "success" ]]; then
+          if [[ "$TEST_RESULT" == "success" ]]; then
             echo "✅ Scheduled integration tests completed successfully"
           else
             echo "⚠️ Scheduled integration tests encountered issues"
