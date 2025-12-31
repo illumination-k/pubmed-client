@@ -39,8 +39,8 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release",
-    "build:debug": "napi build --platform",
+    "build": "napi build --platform --release --esm",
+    "build:debug": "napi build --platform --esm",
     "prepublishOnly": "napi prepublish -t npm",
     "create-npm-dir": "napi create-npm-dir -t .",
     "test": "vitest run",
