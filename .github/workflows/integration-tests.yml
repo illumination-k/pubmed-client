@@ -39,6 +39,9 @@ jobs:
   # Check if integration tests should run
   check-trigger:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 5
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
       test_type: ${{ steps.check.outputs.test_type }}
@@ -49,20 +52,24 @@ jobs:
         run: |
           # Always run on schedule or manual dispatch
           if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-            echo "test_type=${{ github.event.inputs.test_type || 'all' }}" >> $GITHUB_OUTPUT
-            echo "use_api_key=${{ github.event.inputs.use_api_key || 'true' }}" >> $GITHUB_OUTPUT
+            {
+              echo "should_run=true"
+              echo "test_type=${{ github.event.inputs.test_type || 'all' }}"
+              echo "use_api_key=${{ github.event.inputs.use_api_key || 'true' }}"
+            } >> "$GITHUB_OUTPUT"
           # Run on PRs with integration-tests label
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             if [[ "${{ contains(github.event.pull_request.labels.*.name, 'test-integration') }}" == "true" ]]; then
-              echo "should_run=true" >> $GITHUB_OUTPUT
-              echo "test_type=all" >> $GITHUB_OUTPUT
-              echo "use_api_key=true" >> $GITHUB_OUTPUT
+              {
+                echo "should_run=true"
+                echo "test_type=all"
+                echo "use_api_key=true"
+              } >> "$GITHUB_OUTPUT"
             else
-              echo "should_run=false" >> $GITHUB_OUTPUT
+              echo "should_run=false" >> "$GITHUB_OUTPUT"
             fi
           else
-            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
 
   # Integration tests job
@@ -70,6 +77,8 @@ jobs:
     needs: check-trigger
     if: needs.check-trigger.outputs.should_run == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     timeout-minutes: 30 # Integration tests can take longer due to rate limiting
 
     strategy:
@@ -80,41 +89,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           lfs: true
+          persist-credentials: false
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ matrix.rust-version }}
-
-      - name: Cache Cargo dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-integration-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-integration-
-            ${{ runner.os }}-cargo-
-
-      - name: Install test dependencies
-        run: |
-          # Install cargo-nextest for better test output
-          cargo install cargo-nextest --locked
+      - uses: ./.github/actions/setup-repo
 
       - name: Setup integration test environment
         run: |
           # Set required environment variables
-          echo "PUBMED_REAL_API_TESTS=1" >> $GITHUB_ENV
-          echo "RUST_LOG=info" >> $GITHUB_ENV
+          {
+            echo "PUBMED_REAL_API_TESTS=1"
+            echo "RUST_LOG=info"
+          } >> "$GITHUB_ENV"
 
           # Set API key if available and requested
           if [[ "${{ needs.check-trigger.outputs.use_api_key }}" == "true" && -n "${{ secrets.NCBI_API_KEY }}" ]]; then
-            echo "NCBI_API_KEY=${{ secrets.NCBI_API_KEY }}" >> $GITHUB_ENV
+            echo "NCBI_API_KEY=${{ secrets.NCBI_API_KEY }}" >> "$GITHUB_ENV"
             echo "Using NCBI API key for higher rate limits"
           else
             echo "Running without API key (standard rate limits)"
@@ -168,38 +160,42 @@ jobs:
       - name: Generate integration test summary
         if: always()
         run: |
-          echo "## Integration Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Test Configuration:**" >> $GITHUB_STEP_SUMMARY
-          echo "- Test Type: ${{ needs.check-trigger.outputs.test_type }}" >> $GITHUB_STEP_SUMMARY
-          echo "- API Key Used: ${{ needs.check-trigger.outputs.use_api_key }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Rust Version: ${{ matrix.rust-version }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Add timing information
-          echo "**Test Execution:**" >> $GITHUB_STEP_SUMMARY
-          echo "- Started: $(date -u)" >> $GITHUB_STEP_SUMMARY
-          echo "- Trigger: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Integration Test Summary"
+            echo ""
+            echo "**Test Configuration:**"
+            echo "- Test Type: ${{ needs.check-trigger.outputs.test_type }}"
+            echo "- API Key Used: ${{ needs.check-trigger.outputs.use_api_key }}"
+            echo "- Rust Version: ${{ matrix.rust-version }}"
+            echo ""
+            echo "**Test Execution:**"
+            echo "- Started: $(date -u)"
+            echo "- Trigger: ${{ github.event_name }}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
-            echo "- Type: Scheduled daily run" >> $GITHUB_STEP_SUMMARY
+            echo "- Type: Scheduled daily run" >> "$GITHUB_STEP_SUMMARY"
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "- Type: Manual trigger" >> $GITHUB_STEP_SUMMARY
+            echo "- Type: Manual trigger" >> "$GITHUB_STEP_SUMMARY"
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "- Type: PR with integration-tests label" >> $GITHUB_STEP_SUMMARY
+            echo "- Type: PR with integration-tests label" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Notes:**" >> $GITHUB_STEP_SUMMARY
-          echo "- Tests may fail due to network issues or API changes" >> $GITHUB_STEP_SUMMARY
-          echo "- Rate limiting is enforced to be respectful to NCBI servers" >> $GITHUB_STEP_SUMMARY
-          echo "- Individual test failures don't fail the workflow" >> $GITHUB_STEP_SUMMARY
+          {
+            echo ""
+            echo "**Notes:**"
+            echo "- Tests may fail due to network issues or API changes"
+            echo "- Rate limiting is enforced to be respectful to NCBI servers"
+            echo "- Individual test failures don't fail the workflow"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # Notification job for scheduled runs
   notify-results:
     needs: [check-trigger, integration-tests]
     if: always() && needs.check-trigger.outputs.should_run == 'true' && github.event_name == 'schedule'
     runs-on: ubuntu-latest
+    permissions: {}
+    timeout-minutes: 5
     steps:
       - name: Report scheduled test results
         run: |

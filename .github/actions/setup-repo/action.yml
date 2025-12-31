@@ -10,6 +10,10 @@ inputs:
     description: "Rust target triple for cross-compilation (optional)"
     required: false
     default: ""
+  setup-mise:
+    description: "Whether to setup mise"
+    required: false
+    default: "true"
 
 runs:
   using: "composite"
@@ -20,14 +24,15 @@ runs:
       shell: bash
 
     - name: Setup mise
-      uses: jdx/mise-action@v3
+      if: inputs.setup-mise == 'true'
+      uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
       with:
         experimental: true
         cache: true
         log_level: debug
 
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
 
     - name: Add Rust target for cross-compilation
       if: inputs.rust-target != ''
@@ -35,6 +40,6 @@ runs:
       shell: bash
 
     - name: Cache Cargo
-      uses: Swatinem/rust-cache@v2
+      uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
       with:
         shared-key: ${{ inputs.rust-target || 'default' }}

@@ -8,6 +8,13 @@ uv = "0.8"
 
 shfmt = "3"
 
+# github actions ci
+actionlint = "1.7.7"
+"pipx:zizmor" = "1.9.0"
+shellcheck = "0.10.0"
+"aqua:suzuki-shunsuke/ghalint" = "1.4.1"
+"aqua:suzuki-shunsuke/pinact" = "3.3.0"
+
 [env]
 # Use Python from pubmed-client-py venv for PyO3
 PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
@@ -33,6 +40,8 @@ depends = ["fmt:root", "py:format", "fmt:sh"]
 [tasks."lint:root"]
 description = "Lint Rust code with dprint, cargo fmt, and clippy"
 run = [
+  "actionlint",
+  "ghalint run",
   "dprint check",
   "cargo fmt --all -- --check",
   "cargo clippy --workspace --all-targets -- -D warnings",

@@ -13,6 +13,8 @@ jobs:
   should-publish:
     name: Determine packages to publish
     runs-on: ubuntu-latest
+    permissions: {}
+    timeout-minutes: 5
     outputs:
       core: ${{ steps.check.outputs.core }}
       cli: ${{ steps.check.outputs.cli }}
@@ -20,11 +22,14 @@ jobs:
     steps:
       - id: check
         run: |
+          # shellcheck disable=SC2193 # GitHub Actions expressions are evaluated before shell
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             # workflow_dispatch: always publish all packages
-            echo "core=true" >> $GITHUB_OUTPUT
-            echo "cli=true" >> $GITHUB_OUTPUT
-            echo "mcp=true" >> $GITHUB_OUTPUT
+            {
+              echo "core=true"
+              echo "cli=true"
+              echo "mcp=true"
+            } >> "$GITHUB_OUTPUT"
             echo "::notice::workflow_dispatch triggered - all packages will be validated (dry-run mode)"
           else
             # Tag-based release: check for prerelease and package-specific tags
@@ -34,28 +39,30 @@ jobs:
             fi
 
             if [[ "$IS_PRERELEASE" == "true" ]]; then
-              echo "core=false" >> $GITHUB_OUTPUT
-              echo "cli=false" >> $GITHUB_OUTPUT
-              echo "mcp=false" >> $GITHUB_OUTPUT
+              {
+                echo "core=false"
+                echo "cli=false"
+                echo "mcp=false"
+              } >> "$GITHUB_OUTPUT"
               echo "::notice::Prerelease tag detected - skipping all package publishing"
             else
               # Core: always publish for non-prerelease
-              echo "core=true" >> $GITHUB_OUTPUT
+              echo "core=true" >> "$GITHUB_OUTPUT"
 
               # CLI: publish if tag contains 'cli'
               if [[ "${{ github.ref }}" == *"cli"* ]]; then
-                echo "cli=true" >> $GITHUB_OUTPUT
+                echo "cli=true" >> "$GITHUB_OUTPUT"
                 echo "::notice::Tag contains 'cli' - will publish pubmed-cli"
               else
-                echo "cli=false" >> $GITHUB_OUTPUT
+                echo "cli=false" >> "$GITHUB_OUTPUT"
               fi
 
               # MCP: publish if tag contains 'mcp'
               if [[ "${{ github.ref }}" == *"mcp"* ]]; then
-                echo "mcp=true" >> $GITHUB_OUTPUT
+                echo "mcp=true" >> "$GITHUB_OUTPUT"
                 echo "::notice::Tag contains 'mcp' - will publish pubmed-mcp"
               else
-                echo "mcp=false" >> $GITHUB_OUTPUT
+                echo "mcp=false" >> "$GITHUB_OUTPUT"
               fi
             fi
           fi
@@ -63,19 +70,23 @@ jobs:
   test-release:
     name: Test Before Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           lfs: true
+          persist-credentials: false
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
 
       - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
 
       - name: Install nextest
-        uses: taiki-e/install-action@nextest
+        uses: taiki-e/install-action@1eefb499cca04a53d96437664bda0e2e3211ebc8 # nextest
 
       - name: Run tests
         run: cargo nextest run --all-features
@@ -89,20 +100,24 @@ jobs:
     # Only create release for tag-based releases after tests pass
     needs: [test-release]
     if: ${{ github.event_name == 'push' }}
+    permissions:
+      contents: write
+    timeout-minutes: 10
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           lfs: true
+          persist-credentials: false
 
       - name: Get tag
         id: tag
-        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -115,6 +130,8 @@ jobs:
     name: Publish pubmed-client to crates.io
     needs: [should-publish, test-release]
     if: ${{ needs.should-publish.outputs.core == 'true' }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-client-rs
@@ -130,6 +147,8 @@ jobs:
     name: Publish pubmed-cli to crates.io
     needs: [should-publish, test-release]
     if: ${{ needs.should-publish.outputs.cli == 'true' }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-cli
@@ -145,6 +164,8 @@ jobs:
     name: Publish pubmed-mcp to crates.io
     needs: [should-publish, test-release]
     if: ${{ needs.should-publish.outputs.mcp == 'true' }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/publish-crates.yml
     with:
       package: pubmed-mcp

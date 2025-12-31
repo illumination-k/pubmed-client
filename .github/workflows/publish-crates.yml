@@ -31,17 +31,21 @@ jobs:
   publish:
     name: Publish ${{ inputs.package }} to crates.io
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           lfs: true
+          persist-credentials: false
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
 
       - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
         with:
           key: ${{ inputs.package }}
 
@@ -49,9 +53,9 @@ jobs:
         id: pkg-path
         run: |
           if [ -z "${{ inputs.package-path }}" ]; then
-            echo "path=${{ inputs.package }}" >> $GITHUB_OUTPUT
+            echo "path=${{ inputs.package }}" >> "$GITHUB_OUTPUT"
           else
-            echo "path=${{ inputs.package-path }}" >> $GITHUB_OUTPUT
+            echo "path=${{ inputs.package-path }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Extract version from tag
@@ -65,7 +69,7 @@ jobs:
           if [[ $TAG == *"${{ inputs.package }}"* ]]; then
             VERSION=${TAG##*-v}
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Tag version: $VERSION"
 
       - name: Check Cargo.toml version
@@ -74,7 +78,7 @@ jobs:
         working-directory: ${{ steps.pkg-path.outputs.path }}
         run: |
           VERSION=$(grep -m1 '^version' Cargo.toml | sed 's/.*"\(.*\)".*/\1/')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Cargo.toml version: $VERSION"
 
       - name: Verify version match
@@ -114,8 +118,10 @@ jobs:
       - name: Publish summary
         if: ${{ !inputs.dry-run }}
         run: |
-          echo "### ✅ Published to crates.io" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Package**: ${{ inputs.package }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version**: ${{ steps.cargo-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **crates.io**: https://crates.io/crates/${{ inputs.package }}" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "### ✅ Published to crates.io"
+            echo ""
+            echo "- **Package**: ${{ inputs.package }}"
+            echo "- **Version**: ${{ steps.cargo-version.outputs.version }}"
+            echo "- **crates.io**: https://crates.io/crates/${{ inputs.package }}"
+          } >> "$GITHUB_STEP_SUMMARY"

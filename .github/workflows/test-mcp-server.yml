@@ -25,13 +25,17 @@ jobs:
   test:
     name: MCP Server Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
-      - uses: jdx/mise-action@v3
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
+      - uses: ./.github/actions/setup-repo
+        with:
+          lfs: "false"
 
       - name: Run MCP server tests
         run: cargo test -p pubmed-mcp

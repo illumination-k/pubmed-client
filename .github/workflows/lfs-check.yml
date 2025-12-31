@@ -10,11 +10,15 @@ jobs:
   lfs-tracking-check:
     name: Verify LFS Tracking
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           lfs: false # Don't pull LFS files, we only check pointers
           fetch-depth: 0 # Fetch all history for comprehensive checking
+          persist-credentials: false
 
       - name: Install Git LFS
         run: |
@@ -30,11 +34,15 @@ jobs:
   large-files-check:
     name: Check for Large Files
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           lfs: false
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Find large files in repository
         run: |
