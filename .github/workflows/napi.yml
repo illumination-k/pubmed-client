@@ -81,16 +81,16 @@ jobs:
             build: pnpm build --target x86_64-unknown-linux-gnu
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            build: pnpm build --target x86_64-unknown-linux-musl --use-napi-cross
+            build: pnpm build --target x86_64-unknown-linux-musl -x
           - host: macos-latest
             target: aarch64-apple-darwin
             build: pnpm build --target aarch64-apple-darwin
           - host: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-            build: pnpm build --target aarch64-unknown-linux-gnu --use-napi-cross
+            build: pnpm build --target aarch64-unknown-linux-gnu -x
           - host: ubuntu-latest
             target: aarch64-unknown-linux-musl
-            build: pnpm build --target aarch64-unknown-linux-musl --use-napi-cross
+            build: pnpm build --target aarch64-unknown-linux-musl -x
 
     name: Build - ${{ matrix.settings.target }}
     runs-on: ${{ matrix.settings.host }}
@@ -112,6 +112,19 @@ jobs:
 
       - name: Install pnpm dependencies
         run: pnpm install
+
+      # Setup zig for cross-compilation (musl and aarch64-linux-gnu)
+      - name: Setup zig
+        if: contains(matrix.settings.target, 'musl') || matrix.settings.target == 'aarch64-unknown-linux-gnu'
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.1
+
+      - name: Install cargo-zigbuild
+        if: contains(matrix.settings.target, 'musl') || matrix.settings.target == 'aarch64-unknown-linux-gnu'
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-zigbuild
 
       - name: Build
         run: ${{ matrix.settings.build }}
