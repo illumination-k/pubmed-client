@@ -15,3 +15,5 @@ gh run view <run-id> --log-failed
 ```
 
 And resolve the issues.
+
+No not create commit messages and push. You only provide the code changes needed to fix the CI issues. Manually verify that the changes you suggest will fix the issues.
