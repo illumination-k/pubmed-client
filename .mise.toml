@@ -27,7 +27,7 @@ postinstall = ["bash ./etc/postinstall.sh"]
 [tasks."fmt:root"]
 description = "Format Rust code at workspace root using mise, dprint, and cargo fmt"
 env = { RUST_LOG = "warn" }
-run = ["mise fmt", "dprint fmt", "cargo fmt --all"]
+run = ["mise fmt", "dprint fmt", "cargo fmt --all", "pinact run"]
 
 [tasks."fmt:sh"]
 description = "Format shell scripts with shfmt"
@@ -42,6 +42,7 @@ description = "Lint Rust code with dprint, cargo fmt, and clippy"
 run = [
   "actionlint",
   "ghalint run",
+  "zizmor .",
   "dprint check",
   "cargo fmt --all -- --check",
   "cargo clippy --workspace --all-targets -- -D warnings",
