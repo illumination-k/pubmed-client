@@ -77,6 +77,9 @@ jobs:
         with:
           rust-target: ${{ matrix.settings.target }}
 
+      - name: Install pnpm dependencies
+        run: pnpm install
+
       # Linux musl
       - name: Install musl toolchain
         if: matrix.settings.target == 'x86_64-unknown-linux-musl'
@@ -128,8 +131,6 @@ jobs:
 
       - name: Setup repository environment
         uses: ./.github/actions/setup-repo
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install pnpm dependencies
         run: pnpm install
@@ -166,7 +167,7 @@ jobs:
         run: pnpm install
 
       - name: Biome CI
-        run: pnpm ci
+        run: pnpm run ci
 
       - name: TypeScript check
-        run: pnpm typecheck
+        run: pnpm run typecheck
