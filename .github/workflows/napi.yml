@@ -81,19 +81,15 @@ jobs:
       - name: Install pnpm dependencies
         run: pnpm install
 
-      # Linux musl
-      - name: Install musl toolchain
-        if: matrix.settings.target == 'x86_64-unknown-linux-musl'
-        run: sudo apt-get update && sudo apt-get install -y musl-tools
-
-      - name: Install aarch64 musl toolchain
-        if: matrix.settings.target == 'aarch64-unknown-linux-musl'
+      # Linux musl - use zigbuild for proper cross-compilation with OpenSSL
+      - name: Install zig for musl targets
+        if: contains(matrix.settings.target, '-linux-musl')
         uses: goto-bus-stop/setup-zig@v2
         with:
           version: 0.13.0
 
-      - name: Set cargo-zigbuild for aarch64-unknown-linux-musl
-        if: matrix.settings.target == 'aarch64-unknown-linux-musl'
+      - name: Set cargo-zigbuild for musl targets
+        if: contains(matrix.settings.target, '-linux-musl')
         run: |
           cargo install cargo-zigbuild
           echo "NAPI_RS_CLI_CARGO_COMMAND=zigbuild" >> $GITHUB_ENV
