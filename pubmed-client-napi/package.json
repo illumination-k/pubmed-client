@@ -19,7 +19,8 @@
   ],
   "files": [
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "npm"
   ],
   "napi": {
     "name": "pubmed-client",
@@ -48,7 +49,7 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",
-    "ci": "biome ci .",
+    "ci": "pnpm run lint",
     "universal": "napi universal",
     "version": "napi version",
     "example": "npx ts-node examples/basic.ts",
@@ -62,5 +63,14 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.7.0",
     "vitest": "^2.1.8"
+  },
+  "optionalDependencies": {
+    "pubmed-client-win32-x64-msvc": "0.1.0",
+    "pubmed-client-darwin-x64": "0.1.0",
+    "pubmed-client-linux-x64-gnu": "0.1.0",
+    "pubmed-client-linux-x64-musl": "0.1.0",
+    "pubmed-client-darwin-arm64": "0.1.0",
+    "pubmed-client-linux-arm64-gnu": "0.1.0",
+    "pubmed-client-linux-arm64-musl": "0.1.0"
   }
 }

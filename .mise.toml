@@ -2,9 +2,6 @@
 pre-commit = "latest"
 dprint = "latest"
 
-# "cargo:cargo-nextest" = "latest"
-# "cargo:cargo-llvm-cov" = "latest"
-
 pnpm = "10"
 node = "20"
 uv = "0.8"
@@ -18,7 +15,7 @@ PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
 PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
 
 [hooks]
-postinstall = ["mise run setup"]
+postinstall = ["bash ./etc/postinstall.sh"]
 
 [tasks."fmt:root"]
 description = "Format Rust code at workspace root using mise, dprint, and cargo fmt"
@@ -46,22 +43,9 @@ run = [
 description = "Lint all code (Rust + Python)"
 depends = ["lint:root", "py:lint"]
 
-[tasks."setup:pre-commit"]
-description = "Install pre-commit hooks"
-run = ["pre-commit install --install-hooks"]
-
-[tasks."setup:py"]
-description = "Create Python virtual environment for PyO3 bindings"
-dir = "{{ config_root }}/pubmed-client-py"
-run = ["uv venv"]
-
-[tasks."setup:test"]
-description = "Setup test environment by running setup script"
-run = ["bash ./etc/setup-test.sh"]
-
 [tasks.setup]
-description = "Run all setup tasks (pre-commit, Python venv, test setup)"
-depends = ["setup:*"]
+description = "Run postinstall setup script"
+run = ["bash ./etc/postinstall.sh"]
 
 [tasks.test]
 description = "Run tests for entire workspace using nextest"
@@ -90,6 +74,21 @@ run = ["cd pubmed-client-wasm && wasm-pack build --target nodejs"]
 [tasks."wasm:test"]
 description = "Build and test WASM package with TypeScript tests"
 run = ["cd pubmed-client-wasm && pnpm run build && pnpm run test"]
+
+[tasks."napi:build"]
+description = "Build napi-rs native Node.js bindings"
+dir = "pubmed-client-napi"
+run = ["pnpm run build"]
+
+[tasks."napi:test"]
+description = "Build and run napi-rs TypeScript tests"
+dir = "pubmed-client-napi"
+run = ["pnpm run build && pnpm run test"]
+
+[tasks."napi:lint"]
+description = "Run linting and type checking for napi package"
+dir = "pubmed-client-napi"
+run = ["pnpm run ci", "pnpm run typecheck"]
 
 [tasks."core:test"]
 description = "Run tests for core Rust library only"

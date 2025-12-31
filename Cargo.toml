@@ -1,5 +1,12 @@
 [workspace]
-members = ["pubmed-cli", "pubmed-client", "pubmed-client-napi", "pubmed-client-py", "pubmed-client-wasm", "pubmed-mcp"]
+members = [
+  "pubmed-cli",
+  "pubmed-client",
+  "pubmed-client-napi",
+  "pubmed-client-py",
+  "pubmed-client-wasm",
+  "pubmed-mcp",
+]
 resolver = "2"
 
 [workspace.package]
@@ -7,7 +14,7 @@ version = "0.1.0"
 authors = ["illumination-k"]
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/illumination-k/pubmed-client-rs"
+repository = "https://github.com/illumination-k/pubmed-client"
 
 [workspace.dependencies]
 anyhow = "1.0"

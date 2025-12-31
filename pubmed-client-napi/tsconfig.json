@@ -8,8 +8,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["vitest/globals", "node"]
   },
-  "include": ["examples/**/*.ts", "tests/**/*.ts"],
+  "include": ["examples/**/*.ts", "tests/**/*.ts", "vitest.config.ts"],
   "exclude": ["node_modules"]
 }

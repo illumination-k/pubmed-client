@@ -1,0 +1,40 @@
+name: "Setup Repository Environment"
+description: "Setup git, mise, Rust"
+
+inputs:
+  lfs:
+    description: "Whether to pull Git LFS files"
+    required: false
+    default: "true"
+  rust-target:
+    description: "Rust target triple for cross-compilation (optional)"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Pull Git LFS files
+      if: inputs.lfs == 'true'
+      run: git lfs pull
+      shell: bash
+
+    - name: Setup mise
+      uses: jdx/mise-action@v3
+      with:
+        experimental: true
+        cache: true
+        log_level: debug
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Add Rust target for cross-compilation
+      if: inputs.rust-target != ''
+      run: rustup target add ${{ inputs.rust-target }}
+      shell: bash
+
+    - name: Cache Cargo
+      uses: Swatinem/rust-cache@v2
+      with:
+        shared-key: ${{ inputs.rust-target || 'default' }}

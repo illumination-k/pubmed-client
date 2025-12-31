@@ -11,9 +11,10 @@ description = "Node.js native bindings for PubMed/PMC API client"
 crate-type = ["cdylib"]
 
 [dependencies]
-pubmed-client = { path = "../pubmed-client" }
 napi = { version = "2", default-features = false, features = ["napi4", "tokio_rt", "async"] }
 napi-derive = "2"
+# Use rustls-tls for cross-compilation (avoids OpenSSL linking issues with zigbuild)
+pubmed-client = { path = "../pubmed-client", default-features = false, features = ["rustls-tls"] }
 tokio = { version = "1", features = ["rt-multi-thread"] }
 
 [build-dependencies]

@@ -7,7 +7,6 @@ index.js
 index.d.ts
 
 # npm/pnpm
-pnpm-lock.yaml
 npm-debug.log*
 
 # Platform-specific builds
@@ -16,3 +15,11 @@ npm-debug.log*
 *.darwin-arm64.node
 *.darwin-x64.node
 *.win32-x64-msvc.node
+
+# Generated npm packages for publishing
+npm/
+
+# Artifacts directory
+artifacts/
+
+pnpm-lock.yaml

@@ -1,0 +1,180 @@
+name: NAPI-RS CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pubmed-client-napi/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/napi.yml"
+      - ".github/actions/setup-repo/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "pubmed-client-napi/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/napi.yml"
+      - ".github/actions/setup-repo/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  DEBUG: napi:*
+  APP_NAME: pubmed-client
+  MACOSX_DEPLOYMENT_TARGET: "10.13"
+  SKIP_POSTINSTALL: "1"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            build: pnpm build --target x86_64-apple-darwin
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            build: pnpm build --target x86_64-pc-windows-msvc
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            build: pnpm build --target x86_64-unknown-linux-gnu
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            build: pnpm build --target x86_64-unknown-linux-musl
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            build: pnpm build --target aarch64-apple-darwin
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            build: pnpm build --target aarch64-unknown-linux-gnu
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            build: pnpm build --target aarch64-unknown-linux-musl
+
+    name: Build - ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
+    defaults:
+      run:
+        working-directory: pubmed-client-napi
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Setup repository environment
+        uses: ./.github/actions/setup-repo
+        with:
+          rust-target: ${{ matrix.settings.target }}
+
+      - name: Install pnpm dependencies
+        run: pnpm install
+
+      # Linux musl - use zigbuild for proper cross-compilation with OpenSSL
+      - name: Install zig for musl targets
+        if: contains(matrix.settings.target, '-linux-musl')
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.13.0
+
+      - name: Set cargo-zigbuild for musl targets
+        if: contains(matrix.settings.target, '-linux-musl')
+        run: |
+          cargo install cargo-zigbuild
+          echo "NAPI_RS_CLI_CARGO_COMMAND=zigbuild" >> $GITHUB_ENV
+
+      # Linux GNU cross-compilation
+      - name: Install aarch64 GNU toolchain
+        if: matrix.settings.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Set cargo config for aarch64-unknown-linux-gnu
+        if: matrix.settings.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          mkdir -p ../.cargo
+          echo '[target.aarch64-unknown-linux-gnu]' >> ../.cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> ../.cargo/config.toml
+
+      - name: Build
+        run: ${{ matrix.settings.build }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: |
+            pubmed-client-napi/*.node
+            pubmed-client-napi/index.js
+            pubmed-client-napi/index.d.ts
+          if-no-files-found: error
+
+  test:
+    timeout-minutes: 10
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [build]
+    defaults:
+      run:
+        working-directory: pubmed-client-napi
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Setup repository environment
+        uses: ./.github/actions/setup-repo
+
+      - name: Install pnpm dependencies
+        run: pnpm install
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: bindings-x86_64-unknown-linux-gnu
+          path: pubmed-client-napi
+
+      - name: TypeScript check
+        run: pnpm run typecheck
+
+      - name: Run tests
+        run: pnpm test
+
+  lint:
+    timeout-minutes: 10
+    name: Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pubmed-client-napi
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Setup repository environment
+        uses: ./.github/actions/setup-repo
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install pnpm dependencies
+        run: pnpm install
+
+      - name: Biome CI
+        run: pnpm run ci
