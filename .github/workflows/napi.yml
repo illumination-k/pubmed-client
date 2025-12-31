@@ -34,6 +34,8 @@ permissions:
 
 jobs:
   build:
+    permissions:
+      contents: read
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -68,10 +70,11 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           lfs: true
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup repository environment
         uses: ./.github/actions/setup-repo
@@ -84,7 +87,7 @@ jobs:
       # Linux musl - use zigbuild for proper cross-compilation with OpenSSL
       - name: Install zig for musl targets
         if: contains(matrix.settings.target, '-linux-musl')
-        uses: goto-bus-stop/setup-zig@v2
+        uses: goto-bus-stop/setup-zig@abea47f85e598557f500fa1fd2ab7464fcb39406 # v2.2.1
         with:
           version: 0.13.0
 
@@ -92,7 +95,7 @@ jobs:
         if: contains(matrix.settings.target, '-linux-musl')
         run: |
           cargo install cargo-zigbuild
-          echo "NAPI_RS_CLI_CARGO_COMMAND=zigbuild" >> $GITHUB_ENV
+          echo "NAPI_RS_CLI_CARGO_COMMAND=zigbuild" >> "$GITHUB_ENV"
 
       # Linux GNU cross-compilation
       - name: Install aarch64 GNU toolchain
@@ -112,7 +115,7 @@ jobs:
         run: ${{ matrix.settings.build }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: bindings-${{ matrix.settings.target }}
           path: |
@@ -122,6 +125,8 @@ jobs:
           if-no-files-found: error
 
   test:
+    permissions:
+      contents: read
     timeout-minutes: 10
     name: Test
     runs-on: ubuntu-latest
@@ -131,10 +136,11 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           lfs: true
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup repository environment
         uses: ./.github/actions/setup-repo
@@ -143,7 +149,7 @@ jobs:
         run: pnpm install
 
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: bindings-x86_64-unknown-linux-gnu
           path: pubmed-client-napi
@@ -155,6 +161,8 @@ jobs:
         run: pnpm test
 
   lint:
+    permissions:
+      contents: read
     timeout-minutes: 10
     name: Lint
     runs-on: ubuntu-latest
@@ -163,15 +171,14 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           lfs: true
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup repository environment
         uses: ./.github/actions/setup-repo
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install pnpm dependencies
         run: pnpm install
