@@ -206,11 +206,12 @@ jobs:
       - name: Install pnpm dependencies
         run: pnpm install
 
+      # Note: download-artifact's path is relative to repo root, not working-directory
       - name: Download all artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: bindings-*
-          path: artifacts
+          path: pubmed-client-napi/artifacts
           merge-multiple: true
 
       - name: List artifacts
