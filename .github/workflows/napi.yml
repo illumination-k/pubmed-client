@@ -222,9 +222,14 @@ jobs:
       - name: Move artifacts to platform directories
         run: pnpm run artifacts
 
+      - name: Copy JS/TS binding files to package root
+        run: |
+          cp artifacts/index.js .
+          cp artifacts/index.d.ts .
+
       - name: Prepare npm packages (dry-run)
         if: github.event_name == 'workflow_dispatch'
-        run: pnpm run prepublishOnly --dry-run
+        run: pnpm run prepublishOnly --dry-run --no-gh-release
 
       - name: Publish dry-run main package
         if: github.event_name == 'workflow_dispatch'
@@ -232,7 +237,7 @@ jobs:
 
       - name: Prepare npm packages
         if: startsWith(github.ref, 'refs/tags/node-v')
-        run: pnpm run prepublishOnly
+        run: pnpm run prepublishOnly --no-gh-release
 
       - name: Publish main package
         if: startsWith(github.ref, 'refs/tags/node-v')
