@@ -6,7 +6,13 @@
   "types": "index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/illumination-k/pubmed-client"
+    "url": "git+https://github.com/illumination-k/pubmed-client.git",
+    "directory": "pubmed-client-napi"
+  },
+  "publishConfig": {
+    "provenance": true,
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "license": "MIT",
   "keywords": [
