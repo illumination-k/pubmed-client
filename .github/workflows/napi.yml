@@ -37,133 +37,6 @@ permissions:
   id-token: write # Required for npm provenance
 
 jobs:
-  build:
-    permissions:
-      contents: read
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        settings:
-          - host: macos-latest
-            target: x86_64-apple-darwin
-            build: pnpm build --target x86_64-apple-darwin
-          - host: windows-latest
-            target: x86_64-pc-windows-msvc
-            build: pnpm build --target x86_64-pc-windows-msvc
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            build: pnpm build --target x86_64-unknown-linux-gnu
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            build: pnpm build --target x86_64-unknown-linux-musl
-          - host: macos-latest
-            target: aarch64-apple-darwin
-            build: pnpm build --target aarch64-apple-darwin
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            build: pnpm build --target aarch64-unknown-linux-gnu
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-musl
-            build: pnpm build --target aarch64-unknown-linux-musl
-
-    name: Build - ${{ matrix.settings.target }}
-    runs-on: ${{ matrix.settings.host }}
-    defaults:
-      run:
-        working-directory: pubmed-client-napi
-
-    steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-        with:
-          lfs: true
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Setup repository environment
-        uses: ./.github/actions/setup-repo
-        with:
-          rust-target: ${{ matrix.settings.target }}
-
-      - name: Install pnpm dependencies
-        run: pnpm install
-
-      # Linux musl - use zigbuild for proper cross-compilation with OpenSSL
-      - name: Install zig for musl targets
-        if: contains(matrix.settings.target, '-linux-musl')
-        uses: goto-bus-stop/setup-zig@abea47f85e598557f500fa1fd2ab7464fcb39406 # v2.2.1
-        with:
-          version: 0.13.0
-
-      - name: Set cargo-zigbuild for musl targets
-        if: contains(matrix.settings.target, '-linux-musl')
-        run: |
-          cargo install cargo-zigbuild
-          echo "NAPI_RS_CLI_CARGO_COMMAND=zigbuild" >> "$GITHUB_ENV"
-
-      # Linux GNU cross-compilation
-      - name: Install aarch64 GNU toolchain
-        if: matrix.settings.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-
-      - name: Set cargo config for aarch64-unknown-linux-gnu
-        if: matrix.settings.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          mkdir -p ../.cargo
-          echo '[target.aarch64-unknown-linux-gnu]' >> ../.cargo/config.toml
-          echo 'linker = "aarch64-linux-gnu-gcc"' >> ../.cargo/config.toml
-
-      - name: Build
-        run: ${{ matrix.settings.build }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: bindings-${{ matrix.settings.target }}
-          path: |
-            pubmed-client-napi/*.node
-            pubmed-client-napi/index.js
-            pubmed-client-napi/index.d.ts
-          if-no-files-found: error
-
-  test:
-    permissions:
-      contents: read
-    timeout-minutes: 10
-    name: Test
-    runs-on: ubuntu-latest
-    needs: [build]
-    defaults:
-      run:
-        working-directory: pubmed-client-napi
-
-    steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-        with:
-          lfs: true
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Setup repository environment
-        uses: ./.github/actions/setup-repo
-
-      - name: Install pnpm dependencies
-        run: pnpm install
-
-      - name: Download artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: bindings-x86_64-unknown-linux-gnu
-          path: pubmed-client-napi
-
-      - name: TypeScript check
-        run: pnpm run typecheck
-
-      - name: Run tests
-        run: pnpm test
-
   lint:
     permissions:
       contents: read
@@ -187,17 +60,127 @@ jobs:
       - name: Install pnpm dependencies
         run: pnpm install
 
-      - name: Biome CI
+      - name: Biome lint and typecheck
         run: pnpm run ci
+  build:
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            build: pnpm build --target x86_64-apple-darwin
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            build: pnpm build --target x86_64-pc-windows-msvc
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            build: pnpm build --target x86_64-unknown-linux-gnu
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            build: pnpm build --target x86_64-unknown-linux-musl -x
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            build: pnpm build --target aarch64-apple-darwin
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            build: pnpm build --target aarch64-unknown-linux-gnu -x
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            build: pnpm build --target aarch64-unknown-linux-musl -x
+
+    name: Build - ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
+    defaults:
+      run:
+        working-directory: pubmed-client-napi
+
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          lfs: true
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup repository environment
+        uses: ./.github/actions/setup-repo
+        with:
+          rust-target: ${{ matrix.settings.target }}
+
+      - name: Install pnpm dependencies
+        run: pnpm install
+
+      # Setup zig for cross-compilation (musl and aarch64-linux-gnu)
+      - name: Setup zig
+        if: contains(matrix.settings.target, 'musl') || matrix.settings.target == 'aarch64-unknown-linux-gnu'
+        uses: mlugg/setup-zig@fa65c4058643678a4e4a9a60513944a7d8d35440 # v2.1.0 # zizmor: ignore[cache-poisoning]
+        with:
+          version: 0.14.1
+          cache-key: ${{ runner.os }}-${{ matrix.settings.target }}
+
+      - name: Install cargo-zigbuild
+        if: contains(matrix.settings.target, 'musl') || matrix.settings.target == 'aarch64-unknown-linux-gnu'
+        uses: taiki-e/install-action@e0db384ad69f5ba2c6dd0129d8934e0d0ba465c1 # v2.65.10
+        with:
+          tool: cargo-zigbuild
+
+      - name: Build
+        run: ${{ matrix.settings.build }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: |
+            pubmed-client-napi/*.node
+            pubmed-client-napi/index.js
+            pubmed-client-napi/index.d.ts
+          if-no-files-found: error
+
+  test:
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [build, lint]
+    defaults:
+      run:
+        working-directory: pubmed-client-napi
+
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          lfs: true
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup repository environment
+        uses: ./.github/actions/setup-repo
+
+      - name: Install pnpm dependencies
+        run: pnpm install
+
+      - name: Download artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: bindings-x86_64-unknown-linux-gnu
+          path: .
+
+      - name: Run tests
+        run: pnpm test
 
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
     needs: [build, test, lint]
-    # Run on tags and workflow_dispatch (for dry-run testing)
+    # Run on tags for release and workflow_dispatch for dry-run testing
     if: startsWith(github.ref, 'refs/tags/node-v') || github.event_name == 'workflow_dispatch'
     permissions:
-      contents: read
+      contents: write # Required for GitHub release creation
       id-token: write
     timeout-minutes: 15
     defaults:
@@ -223,24 +206,45 @@ jobs:
       - name: Install pnpm dependencies
         run: pnpm install
 
+      # Note: download-artifact's path is relative to repo root, not working-directory
       - name: Download all artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: bindings-*
-          path: pubmed-client-napi
+          path: pubmed-client-napi/artifacts
           merge-multiple: true
 
       - name: List artifacts
-        run: ls -la ./*.node || echo "No .node files found"
+        run: ls -la artifacts/*.node || echo "No .node files found"
+      - name: Create npm directories
+        run: pnpm run create-npm-dirs
 
       - name: Move artifacts to platform directories
         run: pnpm run artifacts
 
-      - name: Prepare npm packages
-        run: pnpm run prepublishOnly
+      - name: Prepare npm packages (dry-run)
+        if: github.event_name == 'workflow_dispatch'
+        run: pnpm run prepublishOnly --dry-run
 
-      - name: List npm packages
-        run: ls -laR npm
+      - name: Publish dry-run platform packages
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          for pkg in npm/*/; do
+            echo "Dry-run publishing $pkg"
+            cd "$pkg"
+            npm publish --dry-run --access public
+            cd ../..
+          done
+
+      - name: Publish dry-run main package
+        if: github.event_name == 'workflow_dispatch'
+        run: npm publish --dry-run --access public
+
+      - name: Prepare npm packages (with release)
+        if: startsWith(github.ref, 'refs/tags/node-v')
+        run: pnpm run prepublishOnly
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish platform packages
         if: startsWith(github.ref, 'refs/tags/node-v')
