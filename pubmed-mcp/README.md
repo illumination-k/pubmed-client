@@ -53,7 +53,7 @@ Add to your Claude Desktop configuration file:
 {
   "mcpServers": {
     "pubmed": {
-      "command": "/path/to/pubmed-client-rs/target/release/pubmed-mcp"
+      "command": "/path/to/pubmed-client/target/release/pubmed-mcp"
     }
   }
 }

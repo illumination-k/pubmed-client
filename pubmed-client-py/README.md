@@ -37,8 +37,8 @@ uv add pubmed-client-py
 
 ```bash
 # Clone the repository
-git clone https://github.com/illumination-k/pubmed-client-rs.git
-cd pubmed-client-rs/pubmed-client-py
+git clone https://github.com/illumination-k/pubmed-client.git
+cd pubmed-client/pubmed-client-py
 
 # Create virtual environment and install
 uv venv
@@ -340,7 +340,7 @@ MIT
 
 ## Links
 
-- [Repository](https://github.com/illumination-k/pubmed-client-rs)
+- [Repository](https://github.com/illumination-k/pubmed-client)
 - [PyPI Package](https://pypi.org/project/pubmed-client-py/)
 - [Core Rust Library](../pubmed-client)
 - [CLI Tool](../pubmed-cli)
