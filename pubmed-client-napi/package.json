@@ -42,7 +42,7 @@
     "build": "napi build --platform --release --esm",
     "build:debug": "napi build --platform --esm",
     "prepublishOnly": "napi prepublish -t npm",
-    "create-npm-dir": "napi create-npm-dir -t .",
+    "create-npm-dirs": "napi create-npm-dirs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -66,12 +66,12 @@
     "vitest": "^2.1.8"
   },
   "optionalDependencies": {
-    "pubmed-client-win32-x64-msvc": "0.1.0",
     "pubmed-client-darwin-x64": "0.1.0",
+    "pubmed-client-win32-x64-msvc": "0.1.0",
     "pubmed-client-linux-x64-gnu": "0.1.0",
     "pubmed-client-linux-x64-musl": "0.1.0",
-    "pubmed-client-linux-arm64-gnu": "0.1.0",
     "pubmed-client-darwin-arm64": "0.1.0",
+    "pubmed-client-linux-arm64-gnu": "0.1.0",
     "pubmed-client-linux-arm64-musl": "0.1.0"
   }
 }
