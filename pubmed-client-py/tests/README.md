@@ -1,6 +1,6 @@
 # Python Bindings Test Suite
 
-This directory contains the test suite for the `pubmed-client` Python bindings.
+This directory contains the test suite for the `pubmed-client-py` Python bindings.
 
 ## Test Organization
 
