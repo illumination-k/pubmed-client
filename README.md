@@ -452,8 +452,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 Clone the repository:
 
 ```bash
-git clone https://github.com/illumination-k/pubmed-client-rs.git
-cd pubmed-client-rs
+git clone https://github.com/illumination-k/pubmed-client.git
+cd pubmed-client
 ```
 
 If using mise, install tools:
