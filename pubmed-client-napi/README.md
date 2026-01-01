@@ -1,7 +1,7 @@
 # PubMed Client - Node.js Native Bindings
 
 [![npm version](https://badge.fury.io/js/pubmed-client.svg)](https://www.npmjs.com/package/pubmed-client)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D16-blue.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20-blue.svg)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Native Node.js bindings for the PubMed and PMC (PubMed Central) API client, built with [napi-rs](https://napi.rs/).
@@ -316,7 +316,7 @@ Pre-built binaries are available for:
 
 ### Prerequisites
 
-- Node.js >= 16
+- Node.js >= 20
 - Rust toolchain
 - pnpm
 
