@@ -24,6 +24,7 @@ A comprehensive Rust workspace for accessing PubMed and PMC (PubMed Central) API
 This is a Cargo workspace containing multiple packages:
 
 - **[pubmed-client](pubmed-client/)** - Core Rust library
+- **[pubmed-client-napi](pubmed-client-napi/)** - Native Node.js bindings via napi-rs
 - **[pubmed-client-wasm](pubmed-client-wasm/)** - WebAssembly bindings for npm
 - **[pubmed-client-py](pubmed-client-py/)** - Python bindings via PyO3
 - **[pubmed-cli](pubmed-cli/)** - Command-line interface
@@ -38,6 +39,14 @@ Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
 pubmed-client = "0.1.0"
+```
+
+### Node.js (Native)
+
+```bash
+npm install pubmed-client
+# or
+pnpm add pubmed-client
 ```
 
 ### JavaScript/TypeScript (WASM)
@@ -151,6 +160,48 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+```
+
+### Node.js (Native)
+
+```typescript
+import { PubMedClient, SearchQuery, type Config } from 'pubmed-client';
+
+async function main() {
+    // Create client with configuration
+    const config: Config = {
+        apiKey: process.env.NCBI_API_KEY,
+        email: 'you@example.com',
+        tool: 'MyApp',
+    };
+    const client = PubMedClient.withConfig(config);
+
+    // Search for articles
+    const articles = await client.search('covid-19 vaccine', 10);
+
+    for (const article of articles) {
+        console.log(`Title: ${article.title}`);
+        console.log(`PMID: ${article.pmid}`);
+    }
+
+    // Use SearchQuery builder for complex queries
+    const query = new SearchQuery()
+        .query('cancer')
+        .publishedBetween(2020, 2024)
+        .articleType('Clinical Trial')
+        .freeFullTextOnly()
+        .setLimit(50);
+
+    const results = await client.executeQuery(query);
+
+    // Fetch PMC full-text and convert to Markdown
+    const markdown = await client.fetchPmcAsMarkdown('PMC7906746', {
+        includeMetadata: true,
+        useYamlFrontmatter: true,
+    });
+}
+
+main().catch(console.error);
 ```
 
 ### JavaScript/TypeScript (WASM)
@@ -473,6 +524,7 @@ cargo test
 
 # Build specific package
 cargo build -p pubmed-client        # Core library
+cargo build -p pubmed-client-napi   # Node.js native bindings
 cargo build -p pubmed-client-wasm   # WASM bindings
 cargo build -p pubmed-client-py     # Python bindings
 cargo build -p pubmed-cli           # CLI
@@ -498,6 +550,9 @@ cd pubmed-client && cargo test --test comprehensive_pmc_tests
 # Using mise tasks
 mise run test
 mise run test:verbose
+
+# Node.js native tests (TypeScript)
+cd pubmed-client-napi && pnpm run test
 
 # WASM tests (TypeScript)
 cd pubmed-client-wasm && pnpm run test
@@ -525,10 +580,10 @@ cargo check
 mise run check
 ```
 
-#### WASM/TypeScript Code Quality
+#### Node.js/WASM TypeScript Code Quality
 
 ```bash
-# From pubmed-client-wasm/
+# From pubmed-client-napi/ or pubmed-client-wasm/
 pnpm run format     # Format TypeScript
 pnpm run lint       # Lint TypeScript
 pnpm run check      # Format + lint
@@ -577,6 +632,7 @@ mise run doc
 Online documentation is available at:
 
 - **Core library**: [docs.rs/pubmed-client](https://docs.rs/pubmed-client)
+- **Node.js package**: [npm package](https://www.npmjs.com/package/pubmed-client)
 - **WASM package**: [npm package](https://www.npmjs.com/package/pubmed-client-wasm)
 - **Python package**: [PyPI](https://pypi.org/project/pubmed-client-py)
 
@@ -597,7 +653,8 @@ See [CLAUDE.md](CLAUDE.md) for implementation details and API design patterns.
 The repository includes comprehensive examples:
 
 - **[Rust examples](examples/)** - Core library usage
-- **[WASM examples](pubmed-client-wasm/tests/)** - TypeScript integration
+- **[Node.js examples](pubmed-client-napi/examples/)** - Native TypeScript integration
+- **[WASM examples](pubmed-client-wasm/tests/)** - WebAssembly TypeScript integration
 - **[Python examples](pubmed-client-py/examples/)** - Python usage patterns
 - **[CLI usage](pubmed-cli/README.md)** - Command-line examples
 
