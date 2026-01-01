@@ -226,33 +226,13 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: pnpm run prepublishOnly --dry-run
 
-      - name: Publish dry-run platform packages
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          for pkg in npm/*/; do
-            echo "Dry-run publishing $pkg"
-            cd "$pkg"
-            npm publish --dry-run --access public
-            cd ../..
-          done
-
       - name: Publish dry-run main package
         if: github.event_name == 'workflow_dispatch'
         run: npm publish --dry-run --access public
 
       - name: Prepare npm packages
         if: startsWith(github.ref, 'refs/tags/node-v')
-        run: pnpm run prepublishOnly --skip-optional-publish
-
-      - name: Publish platform packages
-        if: startsWith(github.ref, 'refs/tags/node-v')
-        run: |
-          for pkg in npm/*/; do
-            echo "Publishing $pkg"
-            cd "$pkg"
-            npm publish --provenance --access public
-            cd ../..
-          done
+        run: pnpm run prepublishOnly
 
       - name: Publish main package
         if: startsWith(github.ref, 'refs/tags/node-v')

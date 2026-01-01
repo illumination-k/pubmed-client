@@ -1,6 +1,6 @@
 {
   "name": "pubmed-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node.js native bindings for PubMed/PMC API client",
   "main": "index.js",
   "types": "index.d.ts",
