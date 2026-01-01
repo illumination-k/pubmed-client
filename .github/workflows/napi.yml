@@ -224,7 +224,7 @@ jobs:
 
       - name: Prepare npm packages (dry-run)
         if: github.event_name == 'workflow_dispatch'
-        run: pnpm run prepublishOnly --no-gh-release
+        run: pnpm run prepublishOnly --dry-run
 
       - name: Publish dry-run platform packages
         if: github.event_name == 'workflow_dispatch'
