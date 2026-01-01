@@ -242,7 +242,7 @@ jobs:
 
       - name: Prepare npm packages
         if: startsWith(github.ref, 'refs/tags/node-v')
-        run: napi prepublish -t npm --no-gh-release --skip-optional-publish
+        run: napi prepublish -t npm --skip-optional-publish
 
       - name: Publish platform packages
         if: startsWith(github.ref, 'refs/tags/node-v')
