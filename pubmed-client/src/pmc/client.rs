@@ -4,7 +4,8 @@ use crate::cache::{create_cache, PmcCache};
 use crate::common::{PmcId, PubMedId};
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
-use crate::pmc::models::{ExtractedFigure, PmcFullText};
+use crate::pmc::models::{ExtractedFigure, OaSubsetInfo, PmcFullText};
+use crate::pmc::oa_api;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -341,6 +342,66 @@ impl PmcClient {
             }
         }
         Ok(None)
+    }
+
+    /// Check if a PMC article is in the OA (Open Access) subset
+    ///
+    /// The OA subset contains articles with programmatic access to full-text XML.
+    /// Some publishers restrict programmatic access even though the article may be
+    /// viewable on the PMC website.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    ///
+    /// # Returns
+    ///
+    /// Returns `Result<OaSubsetInfo>` containing detailed information about OA availability
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PmcClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     let oa_info = client.is_oa_subset("PMC7906746").await?;
+    ///
+    ///     if oa_info.is_oa_subset {
+    ///         println!("Article is in OA subset");
+    ///         if let Some(link) = oa_info.download_link {
+    ///             println!("Download: {}", link);
+    ///         }
+    ///     } else {
+    ///         println!("Article is NOT in OA subset");
+    ///         if let Some(code) = oa_info.error_code {
+    ///             println!("Reason: {}", code);
+    ///         }
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn is_oa_subset(&self, pmcid: &str) -> Result<OaSubsetInfo> {
+        let url = oa_api::build_oa_api_url(pmcid)?;
+
+        let response = self.make_request(&url).await?;
+
+        if !response.status().is_success() {
+            return Err(PubMedError::ApiError {
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
+            });
+        }
+
+        let xml_content = response.text().await?;
+
+        // Parse the OA API XML response
+        oa_api::parse_oa_response(&xml_content, pmcid)
     }
 
     /// Download and extract tar.gz file for a PMC article using the OA API

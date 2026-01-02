@@ -6,6 +6,7 @@
 pub mod client;
 pub mod markdown;
 pub mod models;
+pub mod oa_api;
 pub mod parser;
 pub mod tar;
 
@@ -13,8 +14,8 @@ pub mod tar;
 pub use client::PmcClient;
 pub use markdown::{HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle};
 pub use models::{
-    Affiliation, ArticleSection, Author, Figure, FundingInfo, JournalInfo, PmcFullText, Reference,
-    Table,
+    Affiliation, ArticleSection, Author, Figure, FundingInfo, JournalInfo, OaSubsetInfo,
+    PmcFullText, Reference, Table,
 };
 pub use parser::parse_pmc_xml;
 pub use tar::PmcTarClient;

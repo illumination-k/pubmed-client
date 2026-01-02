@@ -121,6 +121,52 @@ pub struct Section {
     pub content: String,
 }
 
+/// Information about OA (Open Access) subset availability for a PMC article
+///
+/// The OA subset contains articles with programmatic access to full-text XML.
+/// Not all PMC articles are in the OA subset - some publishers restrict programmatic access
+/// even though the article may be viewable on the PMC website.
+#[napi(object)]
+pub struct OaSubsetInfo {
+    /// PMC ID (e.g., "PMC7906746")
+    pub pmcid: String,
+    /// Whether the article is in the OA subset
+    pub is_oa_subset: bool,
+    /// Citation string (if available)
+    pub citation: Option<String>,
+    /// License type (if available)
+    pub license: Option<String>,
+    /// Whether the article is retracted
+    pub retracted: bool,
+    /// Download link for tar.gz package (if available)
+    pub download_link: Option<String>,
+    /// Format of the download (e.g., "tgz", "pdf")
+    pub download_format: Option<String>,
+    /// Last updated timestamp for the download
+    pub updated: Option<String>,
+    /// Error code if not in OA subset
+    pub error_code: Option<String>,
+    /// Error message if not in OA subset
+    pub error_message: Option<String>,
+}
+
+impl From<pubmed_client::OaSubsetInfo> for OaSubsetInfo {
+    fn from(info: pubmed_client::OaSubsetInfo) -> Self {
+        OaSubsetInfo {
+            pmcid: info.pmcid,
+            is_oa_subset: info.is_oa_subset,
+            citation: info.citation,
+            license: info.license,
+            retracted: info.retracted,
+            download_link: info.download_link,
+            download_format: info.download_format,
+            updated: info.updated,
+            error_code: info.error_code,
+            error_message: info.error_message,
+        }
+    }
+}
+
 /// Full-text article from PMC
 #[napi(object)]
 pub struct FullTextArticle {
@@ -365,6 +411,39 @@ impl PubMedClient {
             .check_pmc_availability(&pmid)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))
+    }
+
+    /// Check if a PMC article is in the OA (Open Access) subset
+    ///
+    /// The OA subset contains articles with programmatic access to full-text XML.
+    /// Some publishers restrict programmatic access even though the article may be
+    /// viewable on the PMC website.
+    ///
+    /// @param pmcid - PMC ID (e.g., "PMC7906746")
+    /// @returns OaSubsetInfo containing detailed information about OA availability
+    ///
+    /// @example
+    /// ```typescript
+    /// const client = new PubMedClient();
+    /// const info = await client.isOaSubset("PMC7906746");
+    ///
+    /// if (info.isOaSubset) {
+    ///     console.log("Article is in OA subset");
+    ///     console.log("Download:", info.downloadLink);
+    /// } else {
+    ///     console.log("Not in OA subset:", info.errorCode);
+    /// }
+    /// ```
+    #[napi]
+    pub async fn is_oa_subset(&self, pmcid: String) -> Result<OaSubsetInfo> {
+        let info = self
+            .client
+            .pmc
+            .is_oa_subset(&pmcid)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(OaSubsetInfo::from(info))
     }
 
     /// Execute a search query and return articles

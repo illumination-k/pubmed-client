@@ -276,8 +276,8 @@ pub use config::ClientConfig;
 pub use error::{PubMedError, Result};
 pub use pmc::{
     models::ExtractedFigure, parse_pmc_xml, ArticleSection, Figure, FundingInfo, HeadingStyle,
-    JournalInfo, MarkdownConfig, PmcClient, PmcFullText, PmcMarkdownConverter, PmcTarClient,
-    Reference, ReferenceStyle, Table,
+    JournalInfo, MarkdownConfig, OaSubsetInfo, PmcClient, PmcFullText, PmcMarkdownConverter,
+    PmcTarClient, Reference, ReferenceStyle, Table,
 };
 pub use pubmed::{
     parse_article_from_xml, ArticleType, Citations, DatabaseInfo, FieldInfo, Language, LinkInfo,
