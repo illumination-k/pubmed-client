@@ -533,6 +533,69 @@ impl Table {
     }
 }
 
+/// Information about OA (Open Access) subset availability for a PMC article
+///
+/// The OA subset contains articles with programmatic access to full-text XML.
+/// Not all PMC articles are in the OA subset - some publishers restrict programmatic access
+/// even though the article may be viewable on the PMC website.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct OaSubsetInfo {
+    /// PMC ID (e.g., "PMC7906746")
+    pub pmcid: String,
+    /// Whether the article is in the OA subset
+    pub is_oa_subset: bool,
+    /// Citation string (if available)
+    pub citation: Option<String>,
+    /// License type (if available)
+    pub license: Option<String>,
+    /// Whether the article is retracted
+    pub retracted: bool,
+    /// Download link for tar.gz package (if available)
+    pub download_link: Option<String>,
+    /// Format of the download (e.g., "tgz", "pdf")
+    pub download_format: Option<String>,
+    /// Last updated timestamp for the download
+    pub updated: Option<String>,
+    /// Error code if not in OA subset
+    pub error_code: Option<String>,
+    /// Error message if not in OA subset
+    pub error_message: Option<String>,
+}
+
+impl OaSubsetInfo {
+    /// Create a new OaSubsetInfo for an article in the OA subset
+    pub fn available(pmcid: String) -> Self {
+        Self {
+            pmcid,
+            is_oa_subset: true,
+            citation: None,
+            license: None,
+            retracted: false,
+            download_link: None,
+            download_format: None,
+            updated: None,
+            error_code: None,
+            error_message: None,
+        }
+    }
+
+    /// Create a new OaSubsetInfo for an article NOT in the OA subset
+    pub fn not_available(pmcid: String, error_code: String, error_message: String) -> Self {
+        Self {
+            pmcid,
+            is_oa_subset: false,
+            citation: None,
+            license: None,
+            retracted: false,
+            download_link: None,
+            download_format: None,
+            updated: None,
+            error_code: Some(error_code),
+            error_message: Some(error_message),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

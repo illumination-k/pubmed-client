@@ -4,7 +4,7 @@ use crate::cache::{create_cache, PmcCache};
 use crate::common::{PmcId, PubMedId};
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
-use crate::pmc::models::{ExtractedFigure, PmcFullText};
+use crate::pmc::models::{ExtractedFigure, OaSubsetInfo, PmcFullText};
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -343,6 +343,143 @@ impl PmcClient {
         Ok(None)
     }
 
+    /// Check if a PMC article is in the OA (Open Access) subset
+    ///
+    /// The OA subset contains articles with programmatic access to full-text XML.
+    /// Some publishers restrict programmatic access even though the article may be
+    /// viewable on the PMC website.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    ///
+    /// # Returns
+    ///
+    /// Returns `Result<OaSubsetInfo>` containing detailed information about OA availability
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PmcClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     let oa_info = client.is_oa_subset("PMC7906746").await?;
+    ///
+    ///     if oa_info.is_oa_subset {
+    ///         println!("Article is in OA subset");
+    ///         if let Some(link) = oa_info.download_link {
+    ///             println!("Download: {}", link);
+    ///         }
+    ///     } else {
+    ///         println!("Article is NOT in OA subset");
+    ///         if let Some(code) = oa_info.error_code {
+    ///             println!("Reason: {}", code);
+    ///         }
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn is_oa_subset(&self, pmcid: &str) -> Result<OaSubsetInfo> {
+        // Validate and parse PMC ID
+        let pmc_id = PmcId::parse(pmcid)?;
+        let normalized_pmcid = pmc_id.as_str();
+
+        // OA API endpoint (different from eutils)
+        let url = format!(
+            "https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={}",
+            normalized_pmcid
+        );
+
+        let response = self.make_request(&url).await?;
+
+        if !response.status().is_success() {
+            return Err(PubMedError::ApiError {
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
+            });
+        }
+
+        let xml_content = response.text().await?;
+
+        // Parse the OA API XML response
+        self.parse_oa_response(&xml_content, &normalized_pmcid)
+    }
+
+    /// Parse OA API XML response
+    fn parse_oa_response(&self, xml: &str, pmcid: &str) -> Result<OaSubsetInfo> {
+        // Check for error response first
+        // Example: <error code="idIsNotOpenAccess">identifier 'PMC8550608' is not Open Access</error>
+        if let Some(error_start) = xml.find("<error") {
+            if let Some(error_end) = xml[error_start..].find("</error>") {
+                let error_tag = &xml[error_start..error_start + error_end];
+
+                // Extract error code
+                let error_code = extract_xml_attribute(error_tag, "code");
+
+                // Extract error message (content between > and </error>)
+                let error_message = if let Some(content_start) = error_tag.find('>') {
+                    error_tag[content_start + 1..].trim().to_string()
+                } else {
+                    String::new()
+                };
+
+                return Ok(OaSubsetInfo::not_available(
+                    pmcid.to_string(),
+                    error_code.unwrap_or_else(|| "unknown".to_string()),
+                    error_message,
+                ));
+            }
+        }
+
+        // Parse successful response with records
+        // Example: <record id="PMC7906746" citation="..." license="none" retracted="no">
+        //            <link format="tgz" updated="..." href="ftp://..." />
+        //          </record>
+        if let Some(record_start) = xml.find("<record") {
+            if let Some(record_end) = xml[record_start..].find("</record>") {
+                let record_tag = &xml[record_start..record_start + record_end];
+
+                let mut info = OaSubsetInfo::available(pmcid.to_string());
+
+                // Extract record attributes
+                info.citation = extract_xml_attribute(record_tag, "citation");
+                info.license = extract_xml_attribute(record_tag, "license");
+
+                // Check retracted status
+                if let Some(retracted) = extract_xml_attribute(record_tag, "retracted") {
+                    info.retracted = retracted == "yes";
+                }
+
+                // Extract link information
+                if let Some(link_start) = record_tag.find("<link") {
+                    if let Some(link_end) = record_tag[link_start..].find("/>") {
+                        let link_tag = &record_tag[link_start..link_start + link_end];
+
+                        info.download_format = extract_xml_attribute(link_tag, "format");
+                        info.updated = extract_xml_attribute(link_tag, "updated");
+                        info.download_link = extract_xml_attribute(link_tag, "href");
+                    }
+                }
+
+                return Ok(info);
+            }
+        }
+
+        // If we get here, the response format is unexpected
+        debug!(pmcid = %pmcid, xml_snippet = %xml.chars().take(200).collect::<String>(), "Unexpected OA API response format");
+        Ok(OaSubsetInfo::not_available(
+            pmcid.to_string(),
+            "parseError".to_string(),
+            "Could not parse OA API response".to_string(),
+        ))
+    }
+
     /// Download and extract tar.gz file for a PMC article using the OA API
     ///
     /// # Arguments
@@ -540,6 +677,18 @@ impl Default for PmcClient {
     }
 }
 
+/// Helper function to extract XML attribute value
+fn extract_xml_attribute(tag: &str, attr_name: &str) -> Option<String> {
+    let pattern = format!("{attr_name}=\"");
+    if let Some(start) = tag.find(&pattern) {
+        let value_start = start + pattern.len();
+        if let Some(end) = tag[value_start..].find('"') {
+            return Some(tag[value_start..value_start + end].to_string());
+        }
+    }
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -562,5 +711,85 @@ mod tests {
     fn test_custom_base_url() {
         let client = PmcClient::new().with_base_url("https://custom.api.example.com".to_string());
         assert_eq!(client.base_url, "https://custom.api.example.com");
+    }
+
+    #[test]
+    fn test_extract_xml_attribute() {
+        let tag =
+            r#"<record id="PMC7906746" citation="Test Citation" license="none" retracted="no">"#;
+
+        assert_eq!(
+            extract_xml_attribute(tag, "id"),
+            Some("PMC7906746".to_string())
+        );
+        assert_eq!(
+            extract_xml_attribute(tag, "citation"),
+            Some("Test Citation".to_string())
+        );
+        assert_eq!(
+            extract_xml_attribute(tag, "license"),
+            Some("none".to_string())
+        );
+        assert_eq!(
+            extract_xml_attribute(tag, "retracted"),
+            Some("no".to_string())
+        );
+        assert_eq!(extract_xml_attribute(tag, "nonexistent"), None);
+    }
+
+    #[test]
+    fn test_parse_oa_response_not_open_access() {
+        let client = PmcClient::new();
+        let xml = r#"<OA><responseDate>2026-01-02 10:45:24</responseDate><request>https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC8550608</request><error code="idIsNotOpenAccess">identifier 'PMC8550608' is not Open Access</error></OA>"#;
+
+        let result = client.parse_oa_response(xml, "PMC8550608").unwrap();
+
+        assert!(!result.is_oa_subset);
+        assert_eq!(result.pmcid, "PMC8550608");
+        assert_eq!(result.error_code, Some("idIsNotOpenAccess".to_string()));
+        assert!(result
+            .error_message
+            .as_ref()
+            .unwrap()
+            .contains("is not Open Access"));
+        assert!(result.download_link.is_none());
+    }
+
+    #[test]
+    fn test_parse_oa_response_open_access() {
+        let client = PmcClient::new();
+        let xml = r#"<OA><responseDate>2026-01-02 10:45:39</responseDate><request id="PMC7906746">https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id=PMC7906746</request><records returned-count="1" total-count="1"><record id="PMC7906746" citation="Lancet. 2021 Jan 27 6-12 February; 397(10273):452-455" license="none" retracted="no"><link format="tgz" updated="2022-12-16 07:10:15" href="ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/f1/69/PMC7906746.tar.gz" /></record></records></OA>"#;
+
+        let result = client.parse_oa_response(xml, "PMC7906746").unwrap();
+
+        assert!(result.is_oa_subset);
+        assert_eq!(result.pmcid, "PMC7906746");
+        assert_eq!(
+            result.citation,
+            Some("Lancet. 2021 Jan 27 6-12 February; 397(10273):452-455".to_string())
+        );
+        assert_eq!(result.license, Some("none".to_string()));
+        assert!(!result.retracted);
+        assert_eq!(result.download_format, Some("tgz".to_string()));
+        assert_eq!(result.updated, Some("2022-12-16 07:10:15".to_string()));
+        assert_eq!(
+            result.download_link,
+            Some(
+                "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/f1/69/PMC7906746.tar.gz".to_string()
+            )
+        );
+        assert!(result.error_code.is_none());
+    }
+
+    #[test]
+    fn test_parse_oa_response_retracted() {
+        let client = PmcClient::new();
+        let xml = r#"<OA><records><record id="PMC1234567" citation="Test" license="cc-by" retracted="yes"><link format="tgz" href="ftp://test.com/file.tar.gz" /></record></records></OA>"#;
+
+        let result = client.parse_oa_response(xml, "PMC1234567").unwrap();
+
+        assert!(result.is_oa_subset);
+        assert!(result.retracted);
+        assert_eq!(result.license, Some("cc-by".to_string()));
     }
 }
