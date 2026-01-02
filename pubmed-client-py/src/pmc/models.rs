@@ -7,7 +7,7 @@ use pyo3::types::PyList;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
-use pubmed_client::pmc::{self, markdown::PmcMarkdownConverter};
+use pubmed_client::pmc::{self, markdown::PmcMarkdownConverter, OaSubsetInfo};
 use pubmed_client::{ExtractedFigure, PmcFullText};
 
 // ================================================================================================
@@ -423,6 +423,74 @@ impl PyPmcFullText {
         format!(
             "PmcFullText(pmcid='{}', title='{}')",
             self.pmcid, self.title
+        )
+    }
+}
+
+/// Python wrapper for OaSubsetInfo
+///
+/// Information about OA (Open Access) subset availability for a PMC article.
+/// The OA subset contains articles with programmatic access to full-text XML.
+#[gen_stub_pyclass]
+#[pyclass(name = "OaSubsetInfo")]
+#[derive(Clone)]
+pub struct PyOaSubsetInfo {
+    /// PMC ID (e.g., "PMC7906746")
+    #[pyo3(get)]
+    pub pmcid: String,
+    /// Whether the article is in the OA subset
+    #[pyo3(get)]
+    pub is_oa_subset: bool,
+    /// Citation string (if available)
+    #[pyo3(get)]
+    pub citation: Option<String>,
+    /// License type (if available)
+    #[pyo3(get)]
+    pub license: Option<String>,
+    /// Whether the article is retracted
+    #[pyo3(get)]
+    pub retracted: bool,
+    /// Download link for tar.gz package (if available)
+    #[pyo3(get)]
+    pub download_link: Option<String>,
+    /// Format of the download (e.g., "tgz", "pdf")
+    #[pyo3(get)]
+    pub download_format: Option<String>,
+    /// Last updated timestamp for the download
+    #[pyo3(get)]
+    pub updated: Option<String>,
+    /// Error code if not in OA subset
+    #[pyo3(get)]
+    pub error_code: Option<String>,
+    /// Error message if not in OA subset
+    #[pyo3(get)]
+    pub error_message: Option<String>,
+}
+
+impl From<OaSubsetInfo> for PyOaSubsetInfo {
+    fn from(info: OaSubsetInfo) -> Self {
+        PyOaSubsetInfo {
+            pmcid: info.pmcid,
+            is_oa_subset: info.is_oa_subset,
+            citation: info.citation,
+            license: info.license,
+            retracted: info.retracted,
+            download_link: info.download_link,
+            download_format: info.download_format,
+            updated: info.updated,
+            error_code: info.error_code,
+            error_message: info.error_message,
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyOaSubsetInfo {
+    fn __repr__(&self) -> String {
+        format!(
+            "OaSubsetInfo(pmcid='{}', is_oa_subset={})",
+            self.pmcid, self.is_oa_subset
         )
     }
 }

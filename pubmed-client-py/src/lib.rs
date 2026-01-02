@@ -17,8 +17,8 @@ mod utils;
 pub use client::PyClient;
 pub use config::PyClientConfig;
 pub use pmc::{
-    PyArticleSection, PyExtractedFigure, PyFigure, PyPmcAffiliation, PyPmcAuthor, PyPmcClient,
-    PyPmcFullText, PyReference, PyTable,
+    PyArticleSection, PyExtractedFigure, PyFigure, PyOaSubsetInfo, PyPmcAffiliation, PyPmcAuthor,
+    PyPmcClient, PyPmcFullText, PyReference, PyTable,
 };
 pub use pubmed::{
     PyAffiliation, PyAuthor, PyCitations, PyDatabaseInfo, PyPmcLinks, PyPubMedArticle,
@@ -73,6 +73,7 @@ fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyReference>()?;
     m.add_class::<PyArticleSection>()?;
     m.add_class::<PyPmcFullText>()?;
+    m.add_class::<PyOaSubsetInfo>()?;
 
     // Add clients
     m.add_class::<PyPubMedClient>()?;

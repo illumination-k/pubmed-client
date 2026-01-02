@@ -243,6 +243,37 @@ class PmcAuthor:
         """
     def __repr__(self) -> builtins.str: ...
 
+class OaSubsetInfo:
+    r"""
+    Information about OA (Open Access) subset availability for a PMC article.
+
+    The OA subset contains articles with programmatic access to full-text XML.
+    Not all PMC articles are in the OA subset - some publishers restrict
+    programmatic access even though the article may be viewable on the PMC website.
+    """
+
+    pmcid: builtins.str
+    r"""PMC ID (e.g., "PMC7906746")"""
+    is_oa_subset: builtins.bool
+    r"""Whether the article is in the OA subset"""
+    citation: typing.Optional[builtins.str]
+    r"""Citation string (if available)"""
+    license: typing.Optional[builtins.str]
+    r"""License type (if available)"""
+    retracted: builtins.bool
+    r"""Whether the article is retracted"""
+    download_link: typing.Optional[builtins.str]
+    r"""Download link for tar.gz package (if available)"""
+    download_format: typing.Optional[builtins.str]
+    r"""Format of the download (e.g., "tgz", "pdf")"""
+    updated: typing.Optional[builtins.str]
+    r"""Last updated timestamp for the download"""
+    error_code: typing.Optional[builtins.str]
+    r"""Error code if not in OA subset"""
+    error_message: typing.Optional[builtins.str]
+    r"""Error message if not in OA subset"""
+    def __repr__(self) -> builtins.str: ...
+
 class PmcClient:
     r"""
     PMC client for fetching full-text articles
@@ -280,6 +311,30 @@ class PmcClient:
 
         Returns:
             PMC ID if available, None otherwise
+        """
+    def is_oa_subset(self, pmcid: builtins.str) -> OaSubsetInfo:
+        r"""
+        Check if a PMC article is in the OA (Open Access) subset
+
+        The OA subset contains articles with programmatic access to full-text XML.
+        Some publishers restrict programmatic access even though the article may be
+        viewable on the PMC website.
+
+        Args:
+            pmcid: PMC ID (with or without "PMC" prefix, e.g., "PMC7906746" or "7906746")
+
+        Returns:
+            OaSubsetInfo object containing detailed information about OA availability
+
+        Example:
+            >>> client = PmcClient()
+            >>> oa_info = client.is_oa_subset("PMC7906746")
+            >>> if oa_info.is_oa_subset:
+            ...     print(f"Article is in OA subset")
+            ...     if oa_info.download_link:
+            ...         print(f"Download: {oa_info.download_link}")
+            ... else:
+            ...     print(f"Not in OA subset: {oa_info.error_message}")
         """
     def download_and_extract_tar(
         self, pmcid: builtins.str, output_dir: builtins.str
