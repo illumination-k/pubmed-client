@@ -6,6 +6,7 @@
 pub mod client;
 pub mod markdown;
 pub mod models;
+pub mod oa_api;
 pub mod parser;
 pub mod tar;
 
