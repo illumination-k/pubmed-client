@@ -33,6 +33,7 @@ build/
 .ruff_cache/
 *.whl
 .python-version
+pubmed_client_py/
 
 # speckit
 specs/
