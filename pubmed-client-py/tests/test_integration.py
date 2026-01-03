@@ -338,6 +338,59 @@ class TestPmcIntegration:
             ):
                 client.pmc.extract_figures_with_captions("PMC99999999999", output_dir)
 
+    def test_is_oa_subset_open_access(self, client: pubmed_client.Client) -> None:
+        """Test checking OA subset status for a known open access article."""
+        # PMC7906746 is a known OA article
+        oa_info = client.pmc.is_oa_subset("PMC7906746")
+
+        assert oa_info is not None
+        assert oa_info.pmcid == "PMC7906746"
+        assert oa_info.is_oa_subset is True
+
+        # Should have download information
+        assert oa_info.download_link is not None
+        assert oa_info.download_format is not None
+
+        # Should not have error information
+        assert oa_info.error_code is None
+        assert oa_info.error_message is None
+
+    def test_is_oa_subset_not_open_access(self, client: pubmed_client.Client) -> None:
+        """Test checking OA subset status for a non-OA article."""
+        # PMC8550608 is known to NOT be in the OA subset
+        oa_info = client.pmc.is_oa_subset("PMC8550608")
+
+        assert oa_info is not None
+        assert oa_info.pmcid == "PMC8550608"
+        assert oa_info.is_oa_subset is False
+
+        # Should have error information
+        assert oa_info.error_code is not None
+        assert oa_info.error_message is not None
+
+        # Should not have download link
+        assert oa_info.download_link is None
+
+    def test_is_oa_subset_without_pmc_prefix(self, client: pubmed_client.Client) -> None:
+        """Test is_oa_subset accepts PMCID without 'PMC' prefix."""
+        # Use just the numeric part
+        oa_info = client.pmc.is_oa_subset("7906746")
+
+        assert oa_info is not None
+        # Result should normalize to include PMC prefix
+        assert "7906746" in oa_info.pmcid
+        assert oa_info.is_oa_subset is True
+
+    def test_is_oa_subset_repr(self, client: pubmed_client.Client) -> None:
+        """Test OaSubsetInfo __repr__ method."""
+        oa_info = client.pmc.is_oa_subset("PMC7906746")
+
+        # Test __repr__ works and contains key information
+        repr_str = repr(oa_info)
+        assert "OaSubsetInfo" in repr_str
+        assert "PMC7906746" in repr_str
+        assert "is_oa_subset=true" in repr_str  # Rust uses lowercase 'true'
+
 
 @pytest.mark.integration
 @pytest.mark.slow

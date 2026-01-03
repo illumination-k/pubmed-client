@@ -13,7 +13,7 @@ use pubmed_client::PmcClient;
 use crate::config::PyClientConfig;
 use crate::utils::{get_runtime, to_py_err};
 
-use super::models::{PyExtractedFigure, PyPmcFullText};
+use super::models::{PyExtractedFigure, PyOaSubsetInfo, PyPmcFullText};
 
 // ================================================================================================
 // Client Implementation
@@ -174,6 +174,38 @@ impl PyPmcClient {
                 }
                 Ok(list.into())
             })
+        })
+    }
+
+    /// Check if a PMC article is in the OA (Open Access) subset
+    ///
+    /// The OA subset contains articles with programmatic access to full-text XML.
+    /// Some publishers restrict programmatic access even though the article may be
+    /// viewable on the PMC website.
+    ///
+    /// Args:
+    ///     pmcid: PMC ID (with or without "PMC" prefix, e.g., "PMC7906746" or "7906746")
+    ///
+    /// Returns:
+    ///     OaSubsetInfo object containing detailed information about OA availability
+    ///
+    /// Example:
+    ///     >>> client = PmcClient()
+    ///     >>> oa_info = client.is_oa_subset("PMC7906746")
+    ///     >>> if oa_info.is_oa_subset:
+    ///     ...     print(f"Article is in OA subset")
+    ///     ...     if oa_info.download_link:
+    ///     ...         print(f"Download: {oa_info.download_link}")
+    ///     ... else:
+    ///     ...     print(f"Not in OA subset: {oa_info.error_message}")
+    fn is_oa_subset(&self, py: Python, pmcid: String) -> PyResult<PyOaSubsetInfo> {
+        let client = self.client.clone();
+        py.detach(|| {
+            let rt = get_runtime();
+            let oa_info = rt
+                .block_on(client.is_oa_subset(&pmcid))
+                .map_err(to_py_err)?;
+            Ok(PyOaSubsetInfo::from(oa_info))
         })
     }
 
