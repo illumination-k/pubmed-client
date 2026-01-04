@@ -122,6 +122,57 @@ pub struct Citations {
     pub link_type: String,
 }
 
+/// Search result with WebEnv session information for history server pagination
+#[derive(Debug, Clone)]
+pub struct SearchResult {
+    /// List of PMIDs matching the search query
+    pub pmids: Vec<String>,
+    /// Total number of results matching the query
+    pub total_count: usize,
+    /// WebEnv session identifier for history server
+    pub webenv: Option<String>,
+    /// Query key for history server
+    pub query_key: Option<String>,
+}
+
+impl SearchResult {
+    /// Get the history session if WebEnv and query_key are available
+    ///
+    /// Returns `Some(HistorySession)` if both webenv and query_key are present,
+    /// `None` otherwise.
+    pub fn history_session(&self) -> Option<HistorySession> {
+        match (&self.webenv, &self.query_key) {
+            (Some(webenv), Some(query_key)) => Some(HistorySession {
+                webenv: webenv.clone(),
+                query_key: query_key.clone(),
+            }),
+            _ => None,
+        }
+    }
+
+    /// Check if this result has history session information
+    pub fn has_history(&self) -> bool {
+        self.webenv.is_some() && self.query_key.is_some()
+    }
+}
+
+/// History server session information for paginated fetching
+///
+/// This represents a session on NCBI's history server that can be used
+/// to efficiently fetch large result sets in batches without re-running
+/// the search query.
+///
+/// # Note
+///
+/// WebEnv sessions typically expire after 1 hour of inactivity.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HistorySession {
+    /// WebEnv session identifier
+    pub webenv: String,
+    /// Query key within the session
+    pub query_key: String,
+}
+
 /// Medical Subject Heading (MeSH) qualifier/subheading
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MeshQualifier {

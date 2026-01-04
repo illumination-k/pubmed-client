@@ -17,6 +17,12 @@ pub(crate) struct ESearchData {
     pub retstart: Option<String>,
     #[serde(default)]
     pub idlist: Vec<String>,
+    /// WebEnv session identifier for history server
+    #[serde(default)]
+    pub webenv: Option<String>,
+    /// Query key for history server
+    #[serde(default, rename = "querykey")]
+    pub query_key: Option<String>,
 }
 
 // EInfo API response structures
