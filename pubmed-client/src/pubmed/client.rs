@@ -7,7 +7,7 @@ use crate::pubmed::models::{
     Citations, DatabaseInfo, FieldInfo, HistorySession, LinkInfo, PmcLinks, PubMedArticle,
     RelatedArticles, SearchResult,
 };
-use crate::pubmed::parser::parse_article_from_xml;
+use crate::pubmed::parser::{parse_article_from_xml, parse_articles_from_xml};
 use crate::pubmed::responses::{EInfoResponse, ELinkResponse, ESearchResult};
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -542,8 +542,8 @@ impl PubMedClient {
             return Err(PubMedError::HistorySessionError(error_msg.to_string()));
         }
 
-        // Parse multiple articles from XML
-        let articles = self.parse_multiple_articles_xml(&xml_text)?;
+        // Parse multiple articles from XML using serde-based parser
+        let articles = parse_articles_from_xml(&xml_text)?;
 
         info!(
             fetched_count = articles.len(),
@@ -552,119 +552,6 @@ impl PubMedClient {
         );
 
         Ok(articles)
-    }
-
-    /// Parse multiple PubMed articles from XML response
-    fn parse_multiple_articles_xml(&self, xml_text: &str) -> Result<Vec<PubMedArticle>> {
-        use quick_xml::events::Event;
-        use quick_xml::Reader;
-
-        let mut articles = Vec::new();
-        let mut reader = Reader::from_str(xml_text);
-        reader.config_mut().trim_text(true);
-
-        let mut current_article_xml = String::new();
-        let mut depth = 0;
-        let mut in_pubmed_article = false;
-
-        loop {
-            match reader.read_event() {
-                Ok(Event::Start(ref e)) => {
-                    if e.name().as_ref() == b"PubmedArticle" {
-                        in_pubmed_article = true;
-                        depth = 1;
-                        current_article_xml.clear();
-                        current_article_xml.push_str("<PubmedArticle>");
-                    } else if in_pubmed_article {
-                        depth += 1;
-                        current_article_xml.push('<');
-                        current_article_xml.push_str(&String::from_utf8_lossy(e.name().as_ref()));
-                        for attr in e.attributes().flatten() {
-                            current_article_xml.push(' ');
-                            current_article_xml
-                                .push_str(&String::from_utf8_lossy(attr.key.as_ref()));
-                            current_article_xml.push_str("=\"");
-                            current_article_xml.push_str(&String::from_utf8_lossy(&attr.value));
-                            current_article_xml.push('"');
-                        }
-                        current_article_xml.push('>');
-                    }
-                }
-                Ok(Event::End(ref e)) => {
-                    if in_pubmed_article {
-                        current_article_xml.push_str("</");
-                        current_article_xml.push_str(&String::from_utf8_lossy(e.name().as_ref()));
-                        current_article_xml.push('>');
-                        depth -= 1;
-
-                        if e.name().as_ref() == b"PubmedArticle" && depth == 0 {
-                            in_pubmed_article = false;
-                            // Wrap in PubmedArticleSet for parser compatibility
-                            let wrapped_xml = format!(
-                                "<?xml version=\"1.0\"?><PubmedArticleSet>{}</PubmedArticleSet>",
-                                current_article_xml
-                            );
-                            // Extract PMID from the article XML for error reporting
-                            let pmid = self.extract_pmid_from_xml(&current_article_xml);
-                            match parse_article_from_xml(&wrapped_xml, &pmid) {
-                                Ok(article) => articles.push(article),
-                                Err(e) => {
-                                    warn!("Failed to parse article: {}", e);
-                                    // Continue with other articles
-                                }
-                            }
-                        }
-                    }
-                }
-                Ok(Event::Empty(ref e)) => {
-                    if in_pubmed_article {
-                        current_article_xml.push('<');
-                        current_article_xml.push_str(&String::from_utf8_lossy(e.name().as_ref()));
-                        for attr in e.attributes().flatten() {
-                            current_article_xml.push(' ');
-                            current_article_xml
-                                .push_str(&String::from_utf8_lossy(attr.key.as_ref()));
-                            current_article_xml.push_str("=\"");
-                            current_article_xml.push_str(&String::from_utf8_lossy(&attr.value));
-                            current_article_xml.push('"');
-                        }
-                        current_article_xml.push_str("/>");
-                    }
-                }
-                Ok(Event::Text(ref e)) => {
-                    if in_pubmed_article {
-                        current_article_xml.push_str(&e.unescape().unwrap_or_default());
-                    }
-                }
-                Ok(Event::CData(ref e)) => {
-                    if in_pubmed_article {
-                        current_article_xml.push_str(&String::from_utf8_lossy(e.as_ref()));
-                    }
-                }
-                Ok(Event::Eof) => break,
-                Err(e) => {
-                    warn!("Error parsing XML: {}", e);
-                    break;
-                }
-                _ => {}
-            }
-        }
-
-        Ok(articles)
-    }
-
-    /// Extract PMID from article XML for error reporting
-    fn extract_pmid_from_xml(&self, xml: &str) -> String {
-        // Simple extraction - look for <PMID ...>NUMBER</PMID>
-        if let Some(start) = xml.find("<PMID") {
-            if let Some(tag_end) = xml[start..].find('>') {
-                let after_tag = &xml[start + tag_end + 1..];
-                if let Some(end) = after_tag.find("</PMID>") {
-                    return after_tag[..end].trim().to_string();
-                }
-            }
-        }
-        "unknown".to_string()
     }
 
     /// Search and stream all matching articles using history server
