@@ -145,5 +145,10 @@ path = "tests/integration/error_handling_tests.rs"
 name = "test_pmc_cache"
 path = "tests/integration/test_pmc_cache.rs"
 
+# WebEnv/History server tests
+[[test]]
+name = "test_webenv"
+path = "tests/integration/test_webenv.rs"
+
 # Examples
 # (Python examples are in pubmed-client-py/examples/)

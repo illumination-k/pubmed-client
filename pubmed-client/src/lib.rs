@@ -280,8 +280,9 @@ pub use pmc::{
     PmcTarClient, Reference, ReferenceStyle, Table,
 };
 pub use pubmed::{
-    parse_article_from_xml, ArticleType, Citations, DatabaseInfo, FieldInfo, Language, LinkInfo,
-    PmcLinks, PubMedArticle, PubMedClient, RelatedArticles, SearchQuery,
+    parse_article_from_xml, ArticleType, Citations, DatabaseInfo, FieldInfo, HistorySession,
+    Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient, RelatedArticles, SearchQuery,
+    SearchResult,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{sleep, Duration, Instant};

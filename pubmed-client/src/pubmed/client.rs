@@ -4,14 +4,33 @@ use crate::common::PubMedId;
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
-    Citations, DatabaseInfo, FieldInfo, LinkInfo, PmcLinks, PubMedArticle, RelatedArticles,
+    Citations, DatabaseInfo, FieldInfo, HistorySession, LinkInfo, PmcLinks, PubMedArticle,
+    RelatedArticles, SearchResult,
 };
-use crate::pubmed::parser::parse_article_from_xml;
+use crate::pubmed::parser::{parse_article_from_xml, parse_articles_from_xml};
 use crate::pubmed::responses::{EInfoResponse, ELinkResponse, ESearchResult};
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
 use reqwest::{Client, Response};
 use tracing::{debug, info, instrument, warn};
+
+/// State machine for streaming search results
+#[cfg(not(target_arch = "wasm32"))]
+enum SearchAllState {
+    /// Initial state before search
+    Initial { query: String, batch_size: usize },
+    /// Fetching articles from history server
+    Fetching {
+        session: HistorySession,
+        total: usize,
+        batch_size: usize,
+        current_offset: usize,
+        pending_articles: Vec<PubMedArticle>,
+        article_index: usize,
+    },
+    /// All articles have been fetched
+    Done,
+}
 
 /// Client for interacting with PubMed API
 #[derive(Clone)]
@@ -345,6 +364,395 @@ impl PubMedClient {
         }
 
         Ok(articles)
+    }
+
+    /// Search for articles with history server support
+    ///
+    /// This method enables NCBI's history server feature, which stores search results
+    /// on the server and returns WebEnv/query_key identifiers. These can be used
+    /// with `fetch_from_history()` to efficiently paginate through large result sets.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - Search query string
+    /// * `limit` - Maximum number of PMIDs to return in the initial response
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<SearchResult>` containing PMIDs and history session information
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let result = client.search_with_history("covid-19", 100).await?;
+    ///
+    ///     println!("Total results: {}", result.total_count);
+    ///     println!("First batch: {} PMIDs", result.pmids.len());
+    ///
+    ///     // Use history session to fetch more results
+    ///     if let Some(session) = result.history_session() {
+    ///         let next_batch = client.fetch_from_history(&session, 100, 100).await?;
+    ///         println!("Next batch: {} articles", next_batch.len());
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(query = %query, limit = limit))]
+    pub async fn search_with_history(&self, query: &str, limit: usize) -> Result<SearchResult> {
+        if query.trim().is_empty() {
+            debug!("Empty query provided, returning empty results");
+            return Ok(SearchResult {
+                pmids: Vec::new(),
+                total_count: 0,
+                webenv: None,
+                query_key: None,
+            });
+        }
+
+        // Use usehistory=y to enable history server
+        let url = format!(
+            "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retstart={}&retmode=json&usehistory=y",
+            self.base_url,
+            urlencoding::encode(query),
+            limit,
+            0
+        );
+
+        debug!("Making ESearch API request with history");
+        let response = self.make_request(&url).await?;
+
+        let search_result: ESearchResult = response.json().await?;
+
+        // Check for API error response
+        if let Some(error_msg) = &search_result.esearchresult.error {
+            return Err(PubMedError::ApiError {
+                status: 200,
+                message: format!("NCBI ESearch API error: {}", error_msg),
+            });
+        }
+
+        let total_count: usize = search_result
+            .esearchresult
+            .count
+            .as_ref()
+            .and_then(|c| c.parse().ok())
+            .unwrap_or(0);
+
+        info!(
+            total_count = total_count,
+            returned_count = search_result.esearchresult.idlist.len(),
+            has_webenv = search_result.esearchresult.webenv.is_some(),
+            "Search with history completed"
+        );
+
+        Ok(SearchResult {
+            pmids: search_result.esearchresult.idlist,
+            total_count,
+            webenv: search_result.esearchresult.webenv,
+            query_key: search_result.esearchresult.query_key,
+        })
+    }
+
+    /// Fetch articles from history server using WebEnv session
+    ///
+    /// This method retrieves articles from a previously executed search using
+    /// the history server. It's useful for paginating through large result sets
+    /// without re-running the search query.
+    ///
+    /// # Arguments
+    ///
+    /// * `session` - History session containing WebEnv and query_key
+    /// * `start` - Starting index (0-based) for pagination
+    /// * `max` - Maximum number of articles to fetch
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<PubMedArticle>>` containing the fetched articles
+    ///
+    /// # Note
+    ///
+    /// WebEnv sessions typically expire after 1 hour of inactivity.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///
+    ///     // First, search with history
+    ///     let result = client.search_with_history("cancer treatment", 100).await?;
+    ///
+    ///     if let Some(session) = result.history_session() {
+    ///         // Fetch articles 100-199
+    ///         let batch2 = client.fetch_from_history(&session, 100, 100).await?;
+    ///         println!("Fetched {} articles", batch2.len());
+    ///
+    ///         // Fetch articles 200-299
+    ///         let batch3 = client.fetch_from_history(&session, 200, 100).await?;
+    ///         println!("Fetched {} more articles", batch3.len());
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(start = start, max = max))]
+    pub async fn fetch_from_history(
+        &self,
+        session: &HistorySession,
+        start: usize,
+        max: usize,
+    ) -> Result<Vec<PubMedArticle>> {
+        // Use WebEnv and query_key to fetch from history server
+        let url = format!(
+            "{}/efetch.fcgi?db=pubmed&query_key={}&WebEnv={}&retstart={}&retmax={}&retmode=xml&rettype=abstract",
+            self.base_url,
+            urlencoding::encode(&session.query_key),
+            urlencoding::encode(&session.webenv),
+            start,
+            max
+        );
+
+        debug!("Making EFetch API request from history");
+        let response = self.make_request(&url).await?;
+
+        let xml_text = response.text().await?;
+
+        // Check for empty response or error
+        if xml_text.trim().is_empty() {
+            return Ok(Vec::new());
+        }
+
+        // Check for NCBI error response
+        if xml_text.contains("<ERROR>") {
+            let error_msg = xml_text
+                .split("<ERROR>")
+                .nth(1)
+                .and_then(|s| s.split("</ERROR>").next())
+                .unwrap_or("Unknown error");
+
+            return Err(PubMedError::HistorySessionError(error_msg.to_string()));
+        }
+
+        // Parse multiple articles from XML using serde-based parser
+        let articles = parse_articles_from_xml(&xml_text)?;
+
+        info!(
+            fetched_count = articles.len(),
+            start = start,
+            "Fetched articles from history"
+        );
+
+        Ok(articles)
+    }
+
+    /// Search and stream all matching articles using history server
+    ///
+    /// This method performs a search and returns a stream that automatically
+    /// paginates through all results using the NCBI history server. It's ideal
+    /// for processing large result sets without loading all articles into memory.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - Search query string
+    /// * `batch_size` - Number of articles to fetch per batch (recommended: 100-500)
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Stream` that yields `Result<PubMedArticle>` for each article
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    /// use futures_util::StreamExt;
+    /// use std::pin::pin;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///
+    ///     let stream = client.search_all("cancer biomarker", 100);
+    ///     let mut stream = pin!(stream);
+    ///     let mut count = 0;
+    ///
+    ///     while let Some(result) = stream.next().await {
+    ///         match result {
+    ///             Ok(article) => {
+    ///                 count += 1;
+    ///                 println!("{}: {}", article.pmid, article.title);
+    ///             }
+    ///             Err(e) => eprintln!("Error: {}", e),
+    ///         }
+    ///
+    ///         // Stop after 1000 articles
+    ///         if count >= 1000 {
+    ///             break;
+    ///         }
+    ///     }
+    ///
+    ///     println!("Processed {} articles", count);
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn search_all(
+        &self,
+        query: &str,
+        batch_size: usize,
+    ) -> impl futures_util::Stream<Item = Result<PubMedArticle>> + '_ {
+        use futures_util::stream;
+
+        let query = query.to_string();
+        let batch_size = batch_size.max(1); // Ensure at least 1
+
+        stream::unfold(
+            SearchAllState::Initial { query, batch_size },
+            move |state| async move {
+                match state {
+                    SearchAllState::Initial { query, batch_size } => {
+                        // Perform initial search with history
+                        match self.search_with_history(&query, batch_size).await {
+                            Ok(result) => {
+                                let session = result.history_session();
+                                let total = result.total_count;
+
+                                if result.pmids.is_empty() {
+                                    return None;
+                                }
+
+                                // Fetch first batch of articles
+                                match session {
+                                    Some(session) => {
+                                        match self.fetch_from_history(&session, 0, batch_size).await
+                                        {
+                                            Ok(articles) => {
+                                                let next_state = SearchAllState::Fetching {
+                                                    session,
+                                                    total,
+                                                    batch_size,
+                                                    current_offset: batch_size,
+                                                    pending_articles: articles,
+                                                    article_index: 0,
+                                                };
+                                                self.next_article_from_state(next_state)
+                                            }
+                                            Err(e) => Some((Err(e), SearchAllState::Done)),
+                                        }
+                                    }
+                                    None => {
+                                        // No history session, can't stream
+                                        Some((
+                                            Err(PubMedError::WebEnvNotAvailable),
+                                            SearchAllState::Done,
+                                        ))
+                                    }
+                                }
+                            }
+                            Err(e) => Some((Err(e), SearchAllState::Done)),
+                        }
+                    }
+                    SearchAllState::Fetching {
+                        session,
+                        total,
+                        batch_size,
+                        current_offset,
+                        pending_articles,
+                        article_index,
+                    } => {
+                        if article_index < pending_articles.len() {
+                            // Return next article from current batch
+                            let article = pending_articles[article_index].clone();
+                            Some((
+                                Ok(article),
+                                SearchAllState::Fetching {
+                                    session,
+                                    total,
+                                    batch_size,
+                                    current_offset,
+                                    pending_articles,
+                                    article_index: article_index + 1,
+                                },
+                            ))
+                        } else if current_offset < total {
+                            // Fetch next batch
+                            match self
+                                .fetch_from_history(&session, current_offset, batch_size)
+                                .await
+                            {
+                                Ok(articles) => {
+                                    if articles.is_empty() {
+                                        return None;
+                                    }
+                                    let next_state = SearchAllState::Fetching {
+                                        session,
+                                        total,
+                                        batch_size,
+                                        current_offset: current_offset + batch_size,
+                                        pending_articles: articles,
+                                        article_index: 0,
+                                    };
+                                    self.next_article_from_state(next_state)
+                                }
+                                Err(e) => Some((Err(e), SearchAllState::Done)),
+                            }
+                        } else {
+                            // All done
+                            None
+                        }
+                    }
+                    SearchAllState::Done => None,
+                }
+            },
+        )
+    }
+
+    /// Helper to get next article from state
+    #[cfg(not(target_arch = "wasm32"))]
+    fn next_article_from_state(
+        &self,
+        state: SearchAllState,
+    ) -> Option<(Result<PubMedArticle>, SearchAllState)> {
+        match state {
+            SearchAllState::Fetching {
+                ref pending_articles,
+                article_index,
+                ..
+            } if article_index < pending_articles.len() => {
+                let article = pending_articles[article_index].clone();
+                let SearchAllState::Fetching {
+                    session,
+                    total,
+                    batch_size,
+                    current_offset,
+                    pending_articles,
+                    article_index,
+                } = state
+                else {
+                    unreachable!()
+                };
+                Some((
+                    Ok(article),
+                    SearchAllState::Fetching {
+                        session,
+                        total,
+                        batch_size,
+                        current_offset,
+                        pending_articles,
+                        article_index: article_index + 1,
+                    },
+                ))
+            }
+            _ => None,
+        }
     }
 
     /// Get list of all available NCBI databases

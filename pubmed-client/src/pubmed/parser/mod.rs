@@ -17,6 +17,7 @@
 //! The main entry point is [`parse_article_from_xml`], which takes a PubMed EFetch
 //! XML response and returns a [`PubMedArticle`].
 
+mod batch;
 mod converters;
 mod deserializers;
 mod extractors;
@@ -25,6 +26,9 @@ mod xml_types;
 
 // Re-export preprocessing function for use by PMC parser
 pub(crate) use preprocessing::strip_inline_html_tags;
+
+// Re-export batch parsing function
+pub use batch::parse_articles_from_xml;
 
 use crate::error::{PubMedError, Result};
 use crate::pubmed::models::PubMedArticle;

@@ -62,6 +62,17 @@ pub enum PubMedError {
     /// This error is returned when a search query requests more results than the maximum retrievable limit.
     #[error("Search limit exceeded: requested {requested}, maximum is {maximum}")]
     SearchLimitExceeded { requested: usize, maximum: usize },
+
+    /// History session expired or invalid
+    /// This error is returned when the WebEnv session is no longer valid (typically after 1 hour).
+    #[error("History session expired or invalid: {0}")]
+    HistorySessionError(String),
+
+    /// WebEnv not available in search result
+    /// This error is returned when attempting to use history server features but the search
+    /// did not return WebEnv/query_key (e.g., usehistory=y was not specified).
+    #[error("WebEnv not available in search result")]
+    WebEnvNotAvailable,
 }
 
 pub type Result<T> = result::Result<T, PubMedError>;
@@ -121,7 +132,9 @@ impl RetryableError for PubMedError {
             | PubMedError::InvalidPmcid { .. }
             | PubMedError::InvalidQuery(_)
             | PubMedError::IoError { .. }
-            | PubMedError::SearchLimitExceeded { .. } => false,
+            | PubMedError::SearchLimitExceeded { .. }
+            | PubMedError::HistorySessionError(_)
+            | PubMedError::WebEnvNotAvailable => false,
         }
     }
 
@@ -155,6 +168,8 @@ impl RetryableError for PubMedError {
                 }
                 PubMedError::InvalidQuery(_) => "Invalid query",
                 PubMedError::IoError { .. } => "File system error",
+                PubMedError::HistorySessionError(_) => "History session expired",
+                PubMedError::WebEnvNotAvailable => "WebEnv not available",
                 _ => "Non-transient error",
             }
         }
