@@ -1,13 +1,16 @@
 //! Internal time management module for cross-platform compatibility
 //!
 //! This module provides a simple time management API that works across
-//! both native and WASM targets without requiring external dependencies.
-//! It focuses on the minimal functionality needed by the PubMed client.
+//! both native and WASM targets. On native, it uses tokio's time utilities.
+//! On WASM, it uses gloo-timers for async sleep and js_sys::Date for time measurement.
 
 #[cfg(not(target_arch = "wasm32"))]
 use std::time::Duration as StdDuration;
 #[cfg(not(target_arch = "wasm32"))]
 use tokio::time;
+
+#[cfg(target_arch = "wasm32")]
+use gloo_timers::future::TimeoutFuture;
 
 /// Simple duration representation for cross-platform compatibility
 ///
@@ -129,52 +132,68 @@ pub async fn sleep(duration: Duration) {
     if duration.is_zero() {
         return;
     }
-    time::sleep(StdDuration::from_secs(duration.as_secs())).await;
+    time::sleep(StdDuration::from_millis(duration.as_millis())).await;
 }
 
 /// Sleep for the specified duration (WASM implementation)
 ///
-/// In WASM environments, this is a simplified implementation that
-/// returns immediately. For actual delays in WASM, rate limiting
-/// should be handled by the browser's natural request scheduling.
+/// Uses gloo-timers to provide actual async delays in WASM environments,
+/// enabling proper rate limiting in browser contexts.
 #[cfg(target_arch = "wasm32")]
-pub async fn sleep(_duration: Duration) {
-    // In WASM, we don't perform actual delays for rate limiting
-    // The browser will handle request scheduling naturally
+pub async fn sleep(duration: Duration) {
+    if duration.is_zero() {
+        return;
+    }
+    // gloo-timers uses u32 for milliseconds, cap at u32::MAX
+    let millis = duration.as_millis().min(u32::MAX as u64) as u32;
+    TimeoutFuture::new(millis).await;
 }
 
 /// Simple instant measurement for rate limiting
 ///
-/// This provides basic time measurement functionality for rate limiting
-/// without requiring std::time::Instant which panics in WASM.
+/// This provides basic time measurement functionality for rate limiting.
+/// On native targets, wraps std::time::Instant.
+/// On WASM targets, uses js_sys::Date::now() for millisecond precision.
 #[derive(Clone, Copy, Debug)]
 pub struct Instant {
-    // For simplicity, we'll use a counter approach rather than actual time
-    _marker: (),
+    /// Timestamp in milliseconds
+    millis: f64,
 }
 
 impl Instant {
     /// Get the current instant
     ///
-    /// Note: In WASM environments, this is a simplified implementation
-    /// that doesn't provide actual time measurement.
+    /// On native targets, uses std::time::Instant.
+    /// On WASM targets, uses js_sys::Date::now() for proper time measurement.
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn now() -> Self {
-        Self { _marker: () }
+        use std::time::Instant as StdInstant;
+        // Use a thread-local origin point for consistent measurements
+        thread_local! {
+            static ORIGIN: StdInstant = StdInstant::now();
+        }
+        ORIGIN.with(|origin| Self {
+            millis: origin.elapsed().as_secs_f64() * 1000.0,
+        })
+    }
+
+    /// Get the current instant (WASM implementation)
+    #[cfg(target_arch = "wasm32")]
+    pub fn now() -> Self {
+        Self {
+            millis: js_sys::Date::now(),
+        }
     }
 
     /// Calculate duration since another instant
-    ///
-    /// In WASM environments, this always returns zero duration
-    /// since we use simplified rate limiting.
-    pub fn duration_since(&self, _earlier: Instant) -> Duration {
-        Duration::from_secs(0)
+    pub fn duration_since(&self, earlier: Instant) -> Duration {
+        let diff_millis = (self.millis - earlier.millis).max(0.0);
+        Duration::from_millis(diff_millis as u64)
     }
 
     /// Calculate elapsed time since this instant
-    ///
-    /// In WASM environments, this always returns zero duration.
     pub fn elapsed(&self) -> Duration {
-        Duration::from_secs(0)
+        Self::now().duration_since(*self)
     }
 }
 
@@ -226,7 +245,18 @@ mod tests {
     fn test_instant_creation() {
         let instant = Instant::now();
         let duration = instant.elapsed();
-        assert_eq!(duration.as_secs(), 0); // In our simplified implementation
+        // Elapsed time should be very small (less than 1 second)
+        assert!(duration.as_secs() < 1);
+    }
+
+    #[test]
+    fn test_instant_duration_since() {
+        let earlier = Instant::now();
+        std::thread::sleep(std::time::Duration::from_millis(50));
+        let later = Instant::now();
+        let duration = later.duration_since(earlier);
+        // Should measure at least 40ms (allowing some tolerance)
+        assert!(duration.as_millis() >= 40);
     }
 
     #[tokio::test]
