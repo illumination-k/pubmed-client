@@ -4,6 +4,18 @@
   "description": "Node.js native bindings for PubMed/PMC API client",
   "main": "index.js",
   "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.js"
+    },
+    "./streaming": {
+      "types": "./streaming.d.ts",
+      "import": "./streaming.js",
+      "require": "./streaming.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/illumination-k/pubmed-client.git",
@@ -26,6 +38,8 @@
   "files": [
     "index.js",
     "index.d.ts",
+    "streaming.js",
+    "streaming.d.ts",
     "npm"
   ],
   "napi": {
