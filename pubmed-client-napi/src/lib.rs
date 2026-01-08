@@ -4,10 +4,12 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use pubmed_client::{
     pmc::{markdown::PmcMarkdownConverter, PmcFullText},
-    pubmed::{ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery},
+    pubmed::{
+        ArticleType, HistorySession, Language, PubMedArticle, SearchQuery as RustSearchQuery,
+    },
     Client, ClientConfig,
 };
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 /// Configuration options for the PubMed client
 #[napi(object)]
@@ -25,6 +27,7 @@ pub struct Config {
 
 /// Author information
 #[napi(object)]
+#[derive(Clone)]
 pub struct Author {
     /// Full name of the author
     pub full_name: String,
@@ -36,6 +39,7 @@ pub struct Author {
 
 /// PubMed article metadata
 #[napi(object)]
+#[derive(Clone)]
 pub struct Article {
     /// PubMed ID
     pub pmid: String,
@@ -265,6 +269,182 @@ pub struct MarkdownOptions {
     pub include_figure_captions: Option<bool>,
 }
 
+/// Internal state for ArticleIterator
+struct ArticleIteratorState {
+    current_offset: usize,
+    pending_articles: Vec<Article>,
+    pending_index: usize,
+    done: bool,
+}
+
+/// Stateful iterator for streaming PubMed search results
+///
+/// This iterator fetches articles in batches using NCBI's history server,
+/// enabling efficient streaming of large result sets without loading all
+/// articles into memory at once.
+///
+/// Implements async iteration through the `next()` method. Use with
+/// JavaScript's `Symbol.asyncIterator` for `for await...of` syntax.
+///
+/// @example
+/// ```typescript
+/// const iterator = await client.searchWithHistory("covid-19", 100);
+/// console.log(`Total results: ${iterator.totalCount}`);
+///
+/// let article;
+/// while ((article = await iterator.next()) !== null) {
+///   console.log(`${article.pmid}: ${article.title}`);
+///   console.log(`Progress: ${iterator.progress}/${iterator.totalCount}`);
+/// }
+/// ```
+#[napi]
+pub struct ArticleIterator {
+    client: Arc<Client>,
+    session: Option<HistorySession>,
+    total_count: usize,
+    batch_size: usize,
+    state: Mutex<ArticleIteratorState>,
+}
+
+#[napi]
+impl ArticleIterator {
+    /// Get the next article from the iterator
+    ///
+    /// Returns the next article in the result set, automatically fetching
+    /// new batches from the history server as needed. Returns `null` when
+    /// all articles have been returned.
+    ///
+    /// @returns The next Article, or null when iteration is complete
+    ///
+    /// @example
+    /// ```typescript
+    /// const iterator = await client.searchWithHistory("cancer", 50);
+    /// let article;
+    /// while ((article = await iterator.next()) !== null) {
+    ///   console.log(article.title);
+    /// }
+    /// ```
+    #[napi]
+    pub async fn next(&self) -> Result<Option<Article>> {
+        // Check if done or try to return from pending articles
+        {
+            let mut state = self
+                .state
+                .lock()
+                .map_err(|e| Error::from_reason(format!("Lock error: {}", e)))?;
+
+            if state.done {
+                return Ok(None);
+            }
+
+            // Return from pending articles if available
+            if state.pending_index < state.pending_articles.len() {
+                let article = state.pending_articles[state.pending_index].clone();
+                state.pending_index += 1;
+                return Ok(Some(article));
+            }
+
+            // Check if we've fetched all articles
+            if state.current_offset >= self.total_count {
+                state.done = true;
+                return Ok(None);
+            }
+        }
+
+        // Fetch next batch (outside of lock to allow async operation)
+        let session = match &self.session {
+            Some(s) => s,
+            None => {
+                let mut state = self
+                    .state
+                    .lock()
+                    .map_err(|e| Error::from_reason(format!("Lock error: {}", e)))?;
+                state.done = true;
+                return Ok(None);
+            }
+        };
+
+        let current_offset = {
+            let state = self
+                .state
+                .lock()
+                .map_err(|e| Error::from_reason(format!("Lock error: {}", e)))?;
+            state.current_offset
+        };
+
+        let articles = self
+            .client
+            .pubmed
+            .fetch_from_history(session, current_offset, self.batch_size)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        // Update state with fetched articles
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|e| Error::from_reason(format!("Lock error: {}", e)))?;
+
+        if articles.is_empty() {
+            state.done = true;
+            return Ok(None);
+        }
+
+        state.pending_articles = articles.into_iter().map(Article::from).collect();
+        state.pending_index = 0;
+        state.current_offset += self.batch_size;
+
+        // Return first article of new batch
+        if !state.pending_articles.is_empty() {
+            let article = state.pending_articles[0].clone();
+            state.pending_index = 1;
+            Ok(Some(article))
+        } else {
+            state.done = true;
+            Ok(None)
+        }
+    }
+
+    /// Check if iteration is complete
+    ///
+    /// @returns true if all articles have been returned, false otherwise
+    #[napi(getter)]
+    pub fn is_done(&self) -> bool {
+        self.state.lock().map(|s| s.done).unwrap_or(true)
+    }
+
+    /// Get the total count of results matching the query
+    ///
+    /// This value is determined at search time and represents the total
+    /// number of articles available to iterate through.
+    ///
+    /// @returns Total number of matching articles
+    #[napi(getter)]
+    pub fn total_count(&self) -> u32 {
+        self.total_count as u32
+    }
+
+    /// Get the current progress (number of articles yielded so far)
+    ///
+    /// Useful for displaying progress indicators when iterating through
+    /// large result sets.
+    ///
+    /// @returns Number of articles that have been returned via next()
+    #[napi(getter)]
+    pub fn progress(&self) -> u32 {
+        self.state
+            .lock()
+            .map(|s| {
+                if s.current_offset > self.batch_size {
+                    (s.current_offset - self.batch_size + s.pending_index) as u32
+                } else {
+                    s.pending_index as u32
+                }
+            })
+            .unwrap_or(0)
+    }
+}
+
 /// PubMed/PMC API client
 #[napi]
 pub struct PubMedClient {
@@ -462,6 +642,88 @@ impl PubMedClient {
             .map_err(|e| Error::from_reason(e.to_string()))?;
 
         Ok(articles.into_iter().map(Article::from).collect())
+    }
+
+    /// Search PubMed and create a streaming iterator for results
+    ///
+    /// Uses NCBI's history server to enable efficient streaming of large result sets.
+    /// The returned `ArticleIterator` can be used to fetch articles one at a time,
+    /// automatically handling batch fetching and pagination.
+    ///
+    /// @param query - Search query string (PubMed syntax supported)
+    /// @param batchSize - Number of articles to fetch per batch (default: 100, recommended: 100-500)
+    /// @returns ArticleIterator for streaming results
+    ///
+    /// @example
+    /// ```typescript
+    /// const client = new PubMedClient();
+    ///
+    /// // Create iterator
+    /// const iterator = await client.searchWithHistory("COVID-19 vaccine", 100);
+    /// console.log(`Total results: ${iterator.totalCount}`);
+    ///
+    /// // Iterate manually
+    /// let article;
+    /// while ((article = await iterator.next()) !== null) {
+    ///     console.log(`${article.pmid}: ${article.title}`);
+    ///     console.log(`Progress: ${iterator.progress}/${iterator.totalCount}`);
+    /// }
+    ///
+    /// // Or use with Symbol.asyncIterator (requires wrapper)
+    /// for await (const article of iterator) {
+    ///     console.log(article.title);
+    ///     if (someCondition) break; // Can break early
+    /// }
+    /// ```
+    #[napi]
+    pub async fn search_with_history(
+        &self,
+        query: String,
+        batch_size: Option<u32>,
+    ) -> Result<ArticleIterator> {
+        let batch_size = batch_size.unwrap_or(100) as usize;
+
+        let result = self
+            .client
+            .pubmed
+            .search_with_history(&query, batch_size)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        let session = result.history_session();
+        let total_count = result.total_count;
+
+        // Fetch first batch of articles
+        let pending_articles = if let Some(ref sess) = session {
+            if total_count > 0 {
+                let articles = self
+                    .client
+                    .pubmed
+                    .fetch_from_history(sess, 0, batch_size)
+                    .await
+                    .map_err(|e| Error::from_reason(e.to_string()))?;
+                articles.into_iter().map(Article::from).collect()
+            } else {
+                Vec::new()
+            }
+        } else {
+            Vec::new()
+        };
+
+        let initial_offset = pending_articles.len();
+
+        Ok(ArticleIterator {
+            client: self.client.clone(),
+            session,
+            total_count,
+            batch_size,
+            state: Mutex::new(ArticleIteratorState {
+                current_offset: initial_offset,
+                pending_articles,
+                pending_index: 0,
+                done: total_count == 0,
+            }),
+        })
     }
 }
 
