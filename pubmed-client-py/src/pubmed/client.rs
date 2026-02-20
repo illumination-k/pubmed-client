@@ -7,6 +7,7 @@ use pyo3_stub_gen::PyStubType;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
+use pubmed_client::pubmed::SortOrder;
 use pubmed_client::PubMedClient as RustPubMedClient;
 
 use crate::config::PyClientConfig;
@@ -49,6 +50,17 @@ impl QueryInput {
         match self {
             QueryInput::String(_) => default_limit,
             QueryInput::SearchQuery(q) => q.inner.get_limit(),
+        }
+    }
+
+    /// Get the sort order from QueryInput
+    ///
+    /// - For String input: returns None (no sort)
+    /// - For SearchQuery input: returns the query's sort order
+    fn get_sort(&self) -> Option<SortOrder> {
+        match self {
+            QueryInput::String(_) => None,
+            QueryInput::SearchQuery(q) => q.inner.get_sort().cloned(),
         }
     }
 }
@@ -126,11 +138,16 @@ impl PyPubMedClient {
         let client = self.client.clone();
         let query_string = query.to_query_string()?;
         let actual_limit = query.get_limit(limit);
+        let sort = query.get_sort();
 
         py.detach(|| {
             let rt = get_runtime();
-            rt.block_on(client.search_articles(&query_string, actual_limit))
-                .map_err(to_py_err)
+            rt.block_on(client.search_articles_with_options(
+                &query_string,
+                actual_limit,
+                sort.as_ref(),
+            ))
+            .map_err(to_py_err)
         })
     }
 
@@ -161,11 +178,16 @@ impl PyPubMedClient {
         let client = self.client.clone();
         let query_string = query.to_query_string()?;
         let actual_limit = query.get_limit(limit);
+        let sort = query.get_sort();
 
         py.detach(|| {
             let rt = get_runtime();
             let articles = rt
-                .block_on(client.search_and_fetch(&query_string, actual_limit))
+                .block_on(client.search_and_fetch_with_options(
+                    &query_string,
+                    actual_limit,
+                    sort.as_ref(),
+                ))
                 .map_err(to_py_err)?;
             Ok(articles.into_iter().map(PyPubMedArticle::from).collect())
         })

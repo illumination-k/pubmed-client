@@ -1,7 +1,9 @@
 //! Core SearchQuery builder with basic functionality
 
 use crate::error::Result;
-use crate::pubmed::{PubMedArticle, PubMedClient};
+use crate::pubmed::{PubMedArticle, PubMedClient, SearchResult};
+
+use super::filters::SortOrder;
 
 /// Builder for constructing PubMed search queries
 #[derive(Debug, Clone)]
@@ -9,6 +11,7 @@ pub struct SearchQuery {
     pub(crate) terms: Vec<String>,
     pub(crate) filters: Vec<String>,
     pub(crate) limit: Option<usize>,
+    pub(crate) sort: Option<SortOrder>,
 }
 
 impl SearchQuery {
@@ -26,6 +29,7 @@ impl SearchQuery {
             terms: Vec::new(),
             filters: Vec::new(),
             limit: None,
+            sort: None,
         }
     }
 
@@ -125,6 +129,31 @@ impl SearchQuery {
         self.limit.unwrap_or(20)
     }
 
+    /// Set the sort order for search results
+    ///
+    /// # Arguments
+    ///
+    /// * `sort` - Sort order for the search results
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client_rs::pubmed::{SearchQuery, SortOrder};
+    ///
+    /// let query = SearchQuery::new()
+    ///     .query("cancer")
+    ///     .sort(SortOrder::PublicationDate);
+    /// ```
+    pub fn sort(mut self, sort: SortOrder) -> Self {
+        self.sort = Some(sort);
+        self
+    }
+
+    /// Get the sort order for this query
+    pub fn get_sort(&self) -> Option<&SortOrder> {
+        self.sort.as_ref()
+    }
+
     /// Execute the search using the provided PubMed client
     ///
     /// # Arguments
@@ -156,7 +185,7 @@ impl SearchQuery {
     pub async fn search(&self, client: &PubMedClient) -> Result<Vec<String>> {
         let query_string = self.build();
         client
-            .search_articles(&query_string, self.get_limit())
+            .search_articles_with_options(&query_string, self.get_limit(), self.sort.as_ref())
             .await
     }
 
@@ -193,7 +222,49 @@ impl SearchQuery {
     pub async fn search_and_fetch(&self, client: &PubMedClient) -> Result<Vec<PubMedArticle>> {
         let query_string = self.build();
         client
-            .search_and_fetch(&query_string, self.get_limit())
+            .search_and_fetch_with_options(&query_string, self.get_limit(), self.sort.as_ref())
+            .await
+    }
+
+    /// Execute the search and return detailed results including query translation
+    ///
+    /// This method uses the NCBI history server and returns a `SearchResult` that includes
+    /// the query translation (how PubMed interpreted the query), total count, and session
+    /// information for paginated fetching.
+    ///
+    /// # Arguments
+    ///
+    /// * `client` - PubMed client to use for the search
+    ///
+    /// # Returns
+    ///
+    /// Returns a `SearchResult` with PMIDs, total count, query translation, and history session
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::{PubMedClient, pubmed::SearchQuery};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let result = SearchQuery::new()
+    ///         .query("asthma")
+    ///         .limit(10)
+    ///         .search_with_details(&client)
+    ///         .await?;
+    ///
+    ///     println!("Total: {}", result.total_count);
+    ///     if let Some(translation) = &result.query_translation {
+    ///         println!("PubMed interpreted query as: {}", translation);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn search_with_details(&self, client: &PubMedClient) -> Result<SearchResult> {
+        let query_string = self.build();
+        client
+            .search_with_history_and_options(&query_string, self.get_limit(), self.sort.as_ref())
             .await
     }
 }
@@ -309,5 +380,39 @@ mod tests {
 
         assert_eq!(query.get_limit(), 20);
         assert_eq!(query.build(), "test more");
+    }
+
+    #[test]
+    fn test_sort_setting() {
+        let query = SearchQuery::new()
+            .query("cancer")
+            .sort(SortOrder::PublicationDate);
+        assert_eq!(query.get_sort(), Some(&SortOrder::PublicationDate));
+    }
+
+    #[test]
+    fn test_sort_default_none() {
+        let query = SearchQuery::new().query("cancer");
+        assert_eq!(query.get_sort(), None);
+    }
+
+    #[test]
+    fn test_sort_override() {
+        let query = SearchQuery::new()
+            .query("cancer")
+            .sort(SortOrder::PublicationDate)
+            .sort(SortOrder::FirstAuthor);
+        assert_eq!(query.get_sort(), Some(&SortOrder::FirstAuthor));
+    }
+
+    #[test]
+    fn test_sort_with_other_options() {
+        let query = SearchQuery::new()
+            .query("cancer")
+            .limit(50)
+            .sort(SortOrder::JournalName);
+        assert_eq!(query.build(), "cancer");
+        assert_eq!(query.get_limit(), 50);
+        assert_eq!(query.get_sort(), Some(&SortOrder::JournalName));
     }
 }

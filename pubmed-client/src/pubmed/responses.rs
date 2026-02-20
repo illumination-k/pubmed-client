@@ -23,6 +23,9 @@ pub(crate) struct ESearchData {
     /// Query key for history server
     #[serde(default, rename = "querykey")]
     pub query_key: Option<String>,
+    /// How PubMed interpreted and translated the search query
+    #[serde(default)]
+    pub querytranslation: Option<String>,
 }
 
 // EInfo API response structures

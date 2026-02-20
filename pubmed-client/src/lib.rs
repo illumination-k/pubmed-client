@@ -283,7 +283,7 @@ pub use pubmed::{
     parse_article_from_xml, ArticleType, CitationMatch, CitationMatchStatus, CitationMatches,
     CitationQuery, Citations, DatabaseCount, DatabaseInfo, FieldInfo, GlobalQueryResults,
     HistorySession, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient, RelatedArticles,
-    SearchQuery, SearchResult,
+    SearchQuery, SearchResult, SortOrder,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{sleep, Duration, Instant};

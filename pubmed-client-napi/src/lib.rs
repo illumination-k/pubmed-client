@@ -4,7 +4,7 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use pubmed_client::{
     pmc::{markdown::PmcMarkdownConverter, PmcFullText},
-    pubmed::{ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery},
+    pubmed::{ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery, SortOrder},
     Client, ClientConfig,
 };
 use std::sync::Arc;
@@ -532,6 +532,22 @@ fn str_to_article_type(s: &str) -> Result<ArticleType> {
         "observational study" => Ok(ArticleType::ObservationalStudy),
         _ => Err(Error::from_reason(format!(
             "Invalid article type: '{}'. Supported types: Clinical Trial, Review, Systematic Review, Meta-Analysis, Case Reports, Randomized Controlled Trial, Observational Study",
+            s
+        ))),
+    }
+}
+
+/// Convert string to SortOrder enum with case-insensitive matching
+fn str_to_sort_order(s: &str) -> Result<SortOrder> {
+    let normalized = s.trim().to_lowercase();
+
+    match normalized.as_str() {
+        "relevance" => Ok(SortOrder::Relevance),
+        "pub_date" | "publication_date" | "date" => Ok(SortOrder::PublicationDate),
+        "author" | "first_author" => Ok(SortOrder::FirstAuthor),
+        "journal" | "journal_name" => Ok(SortOrder::JournalName),
+        _ => Err(Error::from_reason(format!(
+            "Invalid sort order: '{}'. Supported values: relevance, pub_date, author, journal",
             s
         ))),
     }
@@ -1403,5 +1419,29 @@ impl SearchQuery {
     pub fn group(&self) -> SearchQuery {
         let grouped = self.inner.clone().group();
         SearchQuery { inner: grouped }
+    }
+
+    // ============================================================================================
+    // Sort Methods
+    // ============================================================================================
+
+    /// Set the sort order for search results
+    ///
+    /// @param sortOrder - Sort order (case-insensitive)
+    ///   Supported: "relevance", "pub_date", "author", "journal"
+    /// @returns Self for method chaining
+    /// @throws Error if sort order is not recognized
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery()
+    ///   .query("cancer")
+    ///   .sort("pub_date");
+    /// ```
+    #[napi]
+    pub fn sort(&mut self, sort_order: String) -> Result<&Self> {
+        let sort = str_to_sort_order(&sort_order)?;
+        self.inner = self.inner.clone().sort(sort);
+        Ok(self)
     }
 }

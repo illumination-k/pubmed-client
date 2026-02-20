@@ -18,4 +18,4 @@ pub use models::{
     RelatedArticles, SearchResult, SupplementalConcept,
 };
 pub use parser::{parse_article_from_xml, parse_articles_from_xml};
-pub use query::{ArticleType, Language, PubDate, SearchQuery};
+pub use query::{ArticleType, Language, PubDate, SearchQuery, SortOrder};

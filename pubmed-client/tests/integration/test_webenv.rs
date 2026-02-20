@@ -280,6 +280,7 @@ mod unit_tests {
             total_count: 100,
             webenv: Some("MCID_abc123".to_string()),
             query_key: Some("1".to_string()),
+            query_translation: None,
         };
 
         assert!(result.has_history());
@@ -296,6 +297,7 @@ mod unit_tests {
             total_count: 100,
             webenv: None,
             query_key: Some("1".to_string()),
+            query_translation: None,
         };
 
         assert!(!result.has_history());
@@ -307,6 +309,7 @@ mod unit_tests {
             total_count: 100,
             webenv: Some("MCID_abc123".to_string()),
             query_key: None,
+            query_translation: None,
         };
 
         assert!(!result2.has_history());
