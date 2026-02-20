@@ -171,6 +171,25 @@ impl WasmPubMedClient {
         .unchecked_into()
     }
 
+    /// Fetch multiple articles by PMIDs in a single batch request
+    ///
+    /// More efficient than fetching one by one. Automatically batches large requests.
+    pub fn fetch_articles(&self, pmids: Vec<String>) -> JsPromiseArticles {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.fetch_articles(&pmid_refs).await {
+                Ok(articles) => {
+                    let js_articles: Vec<JsArticle> =
+                        articles.into_iter().map(JsArticle::from).collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_articles)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Batch fetch failed: {e}"))),
+            }
+        })
+        .unchecked_into()
+    }
+
     /// Fetch a single article by PMID
     pub fn fetch_article(&self, pmid: String) -> JsPromiseArticle {
         let client = self.client.clone();

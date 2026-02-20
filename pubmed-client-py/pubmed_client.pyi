@@ -529,6 +529,26 @@ class PubMedClient:
             >>> query = SearchQuery().query("cancer").published_after(2020).limit(50)
             >>> articles = client.search_and_fetch(query, 0)  # limit parameter ignored
         """
+    def fetch_articles(self, pmids: builtins.list[builtins.str]) -> builtins.list[PubMedArticle]:
+        r"""
+        Fetch multiple articles by PMIDs in a single batch request
+
+        This is significantly more efficient than fetching articles one by one,
+        as it sends fewer HTTP requests to the NCBI API. For large numbers of PMIDs,
+        the request is automatically split into batches of 200.
+
+        Args:
+            pmids: List of PubMed IDs as strings
+
+        Returns:
+            List of PubMedArticle objects
+
+        Examples:
+            >>> client = PubMedClient()
+            >>> articles = client.fetch_articles(["31978945", "33515491", "25760099"])
+            >>> for article in articles:
+            ...     print(f"{article.pmid}: {article.title}")
+        """
     def fetch_article(self, pmid: builtins.str) -> PubMedArticle:
         r"""
         Fetch a single article by PMID

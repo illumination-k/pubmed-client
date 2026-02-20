@@ -328,6 +328,26 @@ impl PubMedClient {
         Ok(articles.into_iter().map(Article::from).collect())
     }
 
+    /// Fetch multiple articles by PMIDs in a single batch request
+    ///
+    /// This is significantly more efficient than fetching articles one by one.
+    /// For large numbers of PMIDs, requests are automatically batched (200 per request).
+    ///
+    /// @param pmids - Array of PubMed IDs
+    /// @returns Array of article metadata
+    #[napi]
+    pub async fn fetch_articles(&self, pmids: Vec<String>) -> Result<Vec<Article>> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let articles = self
+            .client
+            .pubmed
+            .fetch_articles(&pmid_refs)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(articles.into_iter().map(Article::from).collect())
+    }
+
     /// Fetch a single article by PMID
     ///
     /// @param pmid - PubMed ID

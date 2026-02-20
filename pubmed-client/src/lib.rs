@@ -420,6 +420,38 @@ impl Client {
         Ok(results)
     }
 
+    /// Fetch multiple articles by PMIDs in a single batch request
+    ///
+    /// This is significantly more efficient than fetching articles one by one,
+    /// as it sends fewer HTTP requests to the NCBI API.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<PubMedArticle>>` containing articles with metadata
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let articles = client.fetch_articles(&["31978945", "33515491"]).await?;
+    ///     for article in &articles {
+    ///         println!("{}: {}", article.pmid, article.title);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn fetch_articles(&self, pmids: &[&str]) -> Result<Vec<PubMedArticle>> {
+        self.pubmed.fetch_articles(pmids).await
+    }
+
     /// Get list of all available NCBI databases
     ///
     /// # Returns
