@@ -91,7 +91,7 @@ async fn test_search_articles_with_sort_pub_date() {
     let client = create_test_client(&mock_server.uri());
 
     let pmids = client
-        .search_articles_with_options("asthma", 10, Some(&SortOrder::PublicationDate))
+        .search_articles("asthma", 10, Some(&SortOrder::PublicationDate))
         .await
         .unwrap();
 
@@ -116,7 +116,7 @@ async fn test_search_articles_with_sort_first_author() {
     let client = create_test_client(&mock_server.uri());
 
     let pmids = client
-        .search_articles_with_options("cancer", 10, Some(&SortOrder::FirstAuthor))
+        .search_articles("cancer", 10, Some(&SortOrder::FirstAuthor))
         .await
         .unwrap();
 
@@ -140,7 +140,7 @@ async fn test_search_articles_with_sort_journal_name() {
     let client = create_test_client(&mock_server.uri());
 
     let pmids = client
-        .search_articles_with_options("covid", 10, Some(&SortOrder::JournalName))
+        .search_articles("covid", 10, Some(&SortOrder::JournalName))
         .await
         .unwrap();
 
@@ -163,10 +163,7 @@ async fn test_search_articles_without_sort() {
 
     let client = create_test_client(&mock_server.uri());
 
-    let pmids = client
-        .search_articles_with_options("test", 10, None)
-        .await
-        .unwrap();
+    let pmids = client.search_articles("test", 10, None).await.unwrap();
 
     assert_eq!(pmids.len(), 1);
 }

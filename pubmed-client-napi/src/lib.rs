@@ -447,7 +447,7 @@ impl PubMedClient {
         let articles = self
             .client
             .pubmed
-            .search_and_fetch(&query, limit)
+            .search_and_fetch(&query, limit, None)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 
@@ -528,7 +528,7 @@ impl PubMedClient {
         let summaries = self
             .client
             .pubmed
-            .search_and_fetch_summaries(&query, limit)
+            .search_and_fetch_summaries(&query, limit, None)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 
@@ -686,7 +686,7 @@ impl PubMedClient {
         let articles = self
             .client
             .pubmed
-            .search_and_fetch(&query_string, limit)
+            .search_and_fetch(&query_string, limit, None)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 

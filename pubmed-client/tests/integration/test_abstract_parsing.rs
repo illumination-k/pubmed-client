@@ -71,8 +71,8 @@ fn test_parse_article_with_abstract() {
     );
     assert_eq!(article.journal, "The New England journal of medicine");
     assert_eq!(article.authors.len(), 2);
-    assert_eq!(article.authors[0], "Na Zhu");
-    assert_eq!(article.authors[1], "Dingyu Zhang");
+    assert_eq!(article.authors[0].full_name, "Na Zhu");
+    assert_eq!(article.authors[1].full_name, "Dingyu Zhang");
     assert_eq!(article.article_types, vec!["Journal Article"]);
 
     // Most importantly, check that the abstract is parsed correctly
@@ -97,7 +97,7 @@ fn test_parse_article_without_abstract() {
     );
     assert_eq!(article.journal, "Lancet (London, England)");
     assert_eq!(article.authors.len(), 1);
-    assert_eq!(article.authors[0], "Ester C Sabino");
+    assert_eq!(article.authors[0].full_name, "Ester C Sabino");
 
     // Abstract should be None for this article
     assert!(article.abstract_text.is_none());

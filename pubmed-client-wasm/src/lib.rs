@@ -164,7 +164,7 @@ impl WasmPubMedClient {
     pub fn search_articles(&self, query: String, limit: usize) -> JsPromiseArticles {
         let client = self.client.clone();
         future_to_promise(async move {
-            match client.pubmed.search_and_fetch(&query, limit).await {
+            match client.pubmed.search_and_fetch(&query, limit, None).await {
                 Ok(articles) => {
                     let js_articles: Vec<JsArticle> =
                         articles.into_iter().map(JsArticle::from).collect();
@@ -233,7 +233,7 @@ impl WasmPubMedClient {
         future_to_promise(async move {
             match client
                 .pubmed
-                .search_and_fetch_summaries(&query, limit)
+                .search_and_fetch_summaries(&query, limit, None)
                 .await
             {
                 Ok(summaries) => {

@@ -142,12 +142,8 @@ impl PyPubMedClient {
 
         py.detach(|| {
             let rt = get_runtime();
-            rt.block_on(client.search_articles_with_options(
-                &query_string,
-                actual_limit,
-                sort.as_ref(),
-            ))
-            .map_err(to_py_err)
+            rt.block_on(client.search_articles(&query_string, actual_limit, sort.as_ref()))
+                .map_err(to_py_err)
         })
     }
 
@@ -183,11 +179,7 @@ impl PyPubMedClient {
         py.detach(|| {
             let rt = get_runtime();
             let articles = rt
-                .block_on(client.search_and_fetch_with_options(
-                    &query_string,
-                    actual_limit,
-                    sort.as_ref(),
-                ))
+                .block_on(client.search_and_fetch(&query_string, actual_limit, sort.as_ref()))
                 .map_err(to_py_err)?;
             Ok(articles.into_iter().map(PyPubMedArticle::from).collect())
         })
@@ -304,7 +296,7 @@ impl PyPubMedClient {
         py.detach(|| {
             let rt = get_runtime();
             let summaries = rt
-                .block_on(client.search_and_fetch_summaries_with_options(
+                .block_on(client.search_and_fetch_summaries(
                     &query_string,
                     actual_limit,
                     sort.as_ref(),

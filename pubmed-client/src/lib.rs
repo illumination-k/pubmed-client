@@ -407,7 +407,7 @@ impl Client {
         query: &str,
         limit: usize,
     ) -> Result<Vec<(PubMedArticle, Option<PmcFullText>)>> {
-        let articles = self.pubmed.search_and_fetch(query, limit).await?;
+        let articles = self.pubmed.search_and_fetch(query, limit, None).await?;
         let mut results = Vec::new();
 
         for article in articles {
@@ -521,7 +521,9 @@ impl Client {
         query: &str,
         limit: usize,
     ) -> Result<Vec<ArticleSummary>> {
-        self.pubmed.search_and_fetch_summaries(query, limit).await
+        self.pubmed
+            .search_and_fetch_summaries(query, limit, None)
+            .await
     }
 
     /// Get list of all available NCBI databases

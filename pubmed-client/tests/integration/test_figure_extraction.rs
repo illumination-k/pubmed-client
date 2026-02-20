@@ -233,8 +233,8 @@ async fn test_extract_figures_with_captions_directory_creation() {
     // Should fail with error but directory creation should succeed
     assert!(result.is_err());
     match result.unwrap_err() {
-        PubMedError::PmcNotAvailableById { pmcid } => {
-            assert_eq!(pmcid, "PMC1234567");
+        PubMedError::PmcNotAvailable { id } => {
+            assert_eq!(id, "PMC1234567");
         }
         PubMedError::ApiError { status, .. } => {
             assert!(status == 404 || status >= 400);

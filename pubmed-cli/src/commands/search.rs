@@ -133,12 +133,16 @@ impl Search {
 
         if self.ids_only {
             // Just search for PMIDs
-            let pmids = client.search_articles(&search_query, self.limit).await?;
+            let pmids = client
+                .search_articles(&search_query, self.limit, None)
+                .await?;
             let output = pmids.join("\n");
             self.output_results(&output).await?;
         } else if self.pmc_ids_only {
             // Search for PMIDs and convert to PMCIDs
-            let pmids = client.search_articles(&search_query, self.limit).await?;
+            let pmids = client
+                .search_articles(&search_query, self.limit, None)
+                .await?;
             let pmid_u32s: Vec<u32> = pmids
                 .iter()
                 .filter_map(|pmid| pmid.parse::<u32>().ok())
@@ -155,7 +159,9 @@ impl Search {
             self.output_results(&output).await?;
         } else {
             // Fetch full articles
-            let articles = client.search_and_fetch(&search_query, self.limit).await?;
+            let articles = client
+                .search_and_fetch(&search_query, self.limit, None)
+                .await?;
             let output = serde_json::to_string_pretty(&articles)?;
             self.output_results(&output).await?;
         }
