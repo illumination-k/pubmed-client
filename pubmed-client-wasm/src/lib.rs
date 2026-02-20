@@ -318,6 +318,12 @@ pub struct JsArticle {
     pub doi: Option<String>,
     pub pmc_id: Option<String>,
     pub article_types: Vec<String>,
+    pub volume: Option<String>,
+    pub issue: Option<String>,
+    pub pages: Option<String>,
+    pub language: Option<String>,
+    pub journal_abbreviation: Option<String>,
+    pub issn: Option<String>,
 }
 
 impl From<PubMedArticle> for JsArticle {
@@ -339,6 +345,12 @@ impl From<PubMedArticle> for JsArticle {
             doi: article.doi,
             pmc_id: article.pmc_id,
             article_types: article.article_types,
+            volume: article.volume,
+            issue: article.issue,
+            pages: article.pages,
+            language: article.language,
+            journal_abbreviation: article.journal_abbreviation,
+            issn: article.issn,
         }
     }
 }

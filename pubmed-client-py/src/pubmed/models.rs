@@ -138,6 +138,18 @@ pub struct PyPubMedArticle {
     pub abstract_text: Option<String>,
     #[pyo3(get)]
     pub author_count: u32,
+    #[pyo3(get)]
+    pub volume: Option<String>,
+    #[pyo3(get)]
+    pub issue: Option<String>,
+    #[pyo3(get)]
+    pub pages: Option<String>,
+    #[pyo3(get)]
+    pub language: Option<String>,
+    #[pyo3(get)]
+    pub journal_abbreviation: Option<String>,
+    #[pyo3(get)]
+    pub issn: Option<String>,
     inner: Arc<PubMedArticle>,
 }
 
@@ -152,6 +164,12 @@ impl From<PubMedArticle> for PyPubMedArticle {
             pmc_id: article.pmc_id.clone(),
             abstract_text: article.abstract_text.clone(),
             author_count: article.author_count,
+            volume: article.volume.clone(),
+            issue: article.issue.clone(),
+            pages: article.pages.clone(),
+            language: article.language.clone(),
+            journal_abbreviation: article.journal_abbreviation.clone(),
+            issn: article.issn.clone(),
             inner: Arc::new(article),
         }
     }
