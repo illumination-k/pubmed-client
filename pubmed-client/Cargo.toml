@@ -150,5 +150,14 @@ path = "tests/integration/test_pmc_cache.rs"
 name = "test_webenv"
 path = "tests/integration/test_webenv.rs"
 
+# Batch fetch tests
+[[test]]
+name = "test_batch_fetch_mocked"
+path = "tests/integration/test_batch_fetch_mocked.rs"
+
+[[test]]
+name = "test_batch_fetch_api"
+path = "tests/integration/test_batch_fetch_api.rs"
+
 # Examples
 # (Python examples are in pubmed-client-py/examples/)

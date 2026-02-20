@@ -8,7 +8,7 @@ use crate::pubmed::models::{
     DatabaseInfo, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, PmcLinks, PubMedArticle,
     RelatedArticles, SearchResult,
 };
-use crate::pubmed::parser::{parse_article_from_xml, parse_articles_from_xml};
+use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::responses::{EInfoResponse, ELinkResponse, ESearchResult};
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -202,40 +202,20 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(pmid = %pmid))]
     pub async fn fetch_article(&self, pmid: &str) -> Result<PubMedArticle> {
-        // Validate and parse PMID
-        let pmid_obj = PubMedId::parse(pmid).inspect_err(|_| {
-            warn!("Invalid PMID format provided: {}", pmid);
-        })?;
-        let pmid_value = pmid_obj.as_u32();
+        let mut articles = self.fetch_articles(&[pmid]).await?;
 
-        // Build URL - API parameters will be added by make_request
-        let url = format!(
-            "{}/efetch.fcgi?db=pubmed&id={}&retmode=xml&rettype=abstract",
-            self.base_url, pmid_value
-        );
-
-        debug!("Making EFetch API request");
-        let response = self.make_request(&url).await?;
-
-        debug!("Received successful API response, parsing XML");
-        let xml_text = response.text().await?;
-
-        let result = parse_article_from_xml(&xml_text, pmid);
-        match &result {
-            Ok(article) => {
-                info!(
-                    title = %article.title,
-                    authors_count = article.authors.len(),
-                    has_abstract = article.abstract_text.is_some(),
-                    "Successfully parsed article"
-                );
-            }
-            Err(e) => {
-                warn!("Failed to parse article XML: {}", e);
+        if articles.len() == 1 {
+            Ok(articles.remove(0))
+        } else {
+            // Try to find by PMID in case batch returned extra/different articles
+            let idx = articles.iter().position(|a| a.pmid == pmid);
+            match idx {
+                Some(i) => Ok(articles.remove(i)),
+                None => Err(PubMedError::ArticleNotFound {
+                    pmid: pmid.to_string(),
+                }),
             }
         }
-
-        result
     }
 
     /// Search for articles using a query string
@@ -323,7 +303,88 @@ impl PubMedClient {
         Ok(search_result.esearchresult.idlist)
     }
 
+    /// Fetch multiple articles by PMIDs in a single batch request
+    ///
+    /// This method sends a single EFetch request with multiple PMIDs (comma-separated),
+    /// which is significantly more efficient than fetching articles one by one.
+    /// For large numbers of PMIDs, the request is automatically split into batches.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<PubMedArticle>>` containing articles with metadata.
+    /// Articles that fail to parse are skipped (logged via tracing).
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let articles = client.fetch_articles(&["31978945", "33515491", "25760099"]).await?;
+    ///     for article in &articles {
+    ///         println!("{}: {}", article.pmid, article.title);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(pmids_count = pmids.len()))]
+    pub async fn fetch_articles(&self, pmids: &[&str]) -> Result<Vec<PubMedArticle>> {
+        if pmids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        // Validate all PMIDs upfront
+        let validated: Vec<u32> = pmids
+            .iter()
+            .map(|pmid| PubMedId::parse(pmid).map(|p| p.as_u32()))
+            .collect::<Result<Vec<_>>>()?;
+
+        // NCBI recommends batches of up to 200 IDs per request
+        const BATCH_SIZE: usize = 200;
+
+        let mut all_articles = Vec::with_capacity(pmids.len());
+
+        for chunk in validated.chunks(BATCH_SIZE) {
+            let id_list: String = chunk
+                .iter()
+                .map(|id| id.to_string())
+                .collect::<Vec<_>>()
+                .join(",");
+
+            let url = format!(
+                "{}/efetch.fcgi?db=pubmed&id={}&retmode=xml&rettype=abstract",
+                self.base_url, id_list
+            );
+
+            debug!(batch_size = chunk.len(), "Making batch EFetch API request");
+            let response = self.make_request(&url).await?;
+            let xml_text = response.text().await?;
+
+            if xml_text.trim().is_empty() {
+                continue;
+            }
+
+            let articles = parse_articles_from_xml(&xml_text)?;
+            info!(
+                requested = chunk.len(),
+                parsed = articles.len(),
+                "Batch fetch completed"
+            );
+            all_articles.extend(articles);
+        }
+
+        Ok(all_articles)
+    }
+
     /// Search and fetch multiple articles with metadata
+    ///
+    /// Uses batch fetching internally for efficient retrieval.
     ///
     /// # Arguments
     ///
@@ -352,19 +413,8 @@ impl PubMedClient {
     pub async fn search_and_fetch(&self, query: &str, limit: usize) -> Result<Vec<PubMedArticle>> {
         let pmids = self.search_articles(query, limit).await?;
 
-        let mut articles = Vec::new();
-        for pmid in pmids {
-            match self.fetch_article(&pmid).await {
-                Ok(article) => articles.push(article),
-                Err(PubMedError::ArticleNotFound { .. }) => {
-                    // Skip articles that can't be found
-                    continue;
-                }
-                Err(e) => return Err(e),
-            }
-        }
-
-        Ok(articles)
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        self.fetch_articles(&pmid_refs).await
     }
 
     /// Search for articles with history server support
@@ -1760,5 +1810,42 @@ mod tests {
         let client = PubMedClient::new();
         let result = tokio_test::block_on(client.global_query("   "));
         assert!(result.is_err());
+    }
+
+    // ========================================================================================
+    // fetch_articles tests
+    // ========================================================================================
+
+    #[tokio::test]
+    async fn test_fetch_articles_empty_input() {
+        let client = PubMedClient::new();
+
+        let result = client.fetch_articles(&[]).await;
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_articles_invalid_pmid() {
+        let client = PubMedClient::new();
+
+        let result = client.fetch_articles(&["not_a_number"]).await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_articles_validates_all_pmids_before_request() {
+        let client = PubMedClient::new();
+
+        // Mix of valid and invalid - should fail on validation before any network request
+        let start = Instant::now();
+        let result = client
+            .fetch_articles(&["31978945", "invalid", "33515491"])
+            .await;
+        assert!(result.is_err());
+
+        // Should fail quickly (validation only, no network)
+        let elapsed = start.elapsed();
+        assert!(elapsed < Duration::from_millis(100));
     }
 }
