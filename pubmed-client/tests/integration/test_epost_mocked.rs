@@ -490,9 +490,7 @@ async fn test_fetch_all_by_pmids_invalid_pmid() {
     let mock_server = MockServer::start().await;
     let client = create_mock_client(&mock_server);
 
-    let result = client
-        .fetch_all_by_pmids(&["31978945", "invalid"])
-        .await;
+    let result = client.fetch_all_by_pmids(&["31978945", "invalid"]).await;
 
     assert!(result.is_err());
 

@@ -1007,7 +1007,9 @@ impl PubMedClient {
         let mut offset = 0;
 
         while offset < total {
-            let articles = self.fetch_from_history(&session, offset, BATCH_SIZE).await?;
+            let articles = self
+                .fetch_from_history(&session, offset, BATCH_SIZE)
+                .await?;
 
             if articles.is_empty() {
                 break;

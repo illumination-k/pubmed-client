@@ -442,11 +442,7 @@ impl PyPubMedClient {
     ///     >>> for a in articles:
     ///     ...     print(a.title)
     #[pyo3(text_signature = "(pmids: list[str]) -> list[PubMedArticle]")]
-    fn fetch_all_by_pmids(
-        &self,
-        py: Python,
-        pmids: Vec<String>,
-    ) -> PyResult<Vec<PyPubMedArticle>> {
+    fn fetch_all_by_pmids(&self, py: Python, pmids: Vec<String>) -> PyResult<Vec<PyPubMedArticle>> {
         let client = self.client.clone();
         py.detach(|| {
             let rt = get_runtime();
