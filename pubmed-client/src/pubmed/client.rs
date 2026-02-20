@@ -957,6 +957,82 @@ impl PubMedClient {
         Ok(articles)
     }
 
+    /// Fetch all articles for a list of PMIDs using EPost and the History server
+    ///
+    /// This is the recommended method for fetching large numbers of articles by PMID.
+    /// It uploads the PMID list to the History server via EPost (using HTTP POST to
+    /// avoid URL length limits), then fetches articles in batches using pagination.
+    ///
+    /// For small lists (up to ~200 PMIDs), `fetch_articles()` works fine. Use this
+    /// method when you have hundreds or thousands of PMIDs.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<PubMedArticle>>` containing all fetched articles
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///
+    ///     // Works efficiently even with thousands of PMIDs
+    ///     let pmids: Vec<&str> = vec!["31978945", "33515491", "25760099"];
+    ///     let articles = client.fetch_all_by_pmids(&pmids).await?;
+    ///     println!("Fetched {} articles", articles.len());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(pmids_count = pmids.len()))]
+    pub async fn fetch_all_by_pmids(&self, pmids: &[&str]) -> Result<Vec<PubMedArticle>> {
+        if pmids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        // Upload PMIDs to History server
+        let epost_result = self.epost(pmids).await?;
+        let session = epost_result.history_session();
+
+        const BATCH_SIZE: usize = 200;
+        let total = pmids.len();
+        let mut all_articles = Vec::with_capacity(total);
+        let mut offset = 0;
+
+        while offset < total {
+            let articles = self.fetch_from_history(&session, offset, BATCH_SIZE).await?;
+
+            if articles.is_empty() {
+                break;
+            }
+
+            info!(
+                offset = offset,
+                fetched = articles.len(),
+                total = total,
+                "Fetched batch from history"
+            );
+
+            offset += articles.len();
+            all_articles.extend(articles);
+        }
+
+        info!(
+            total_fetched = all_articles.len(),
+            requested = pmids.len(),
+            "fetch_all_by_pmids completed"
+        );
+
+        Ok(all_articles)
+    }
+
     /// Search and stream all matching articles using history server
     ///
     /// This method performs a search and returns a stream that automatically
@@ -2234,5 +2310,24 @@ mod tests {
         // Should fail quickly (validation only, no network)
         let elapsed = start.elapsed();
         assert!(elapsed < Duration::from_millis(100));
+    }
+
+    // ========================================================================================
+    // fetch_all_by_pmids tests
+    // ========================================================================================
+
+    #[tokio::test]
+    async fn test_fetch_all_by_pmids_empty_input() {
+        let client = PubMedClient::new();
+        let result = client.fetch_all_by_pmids(&[]).await;
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_all_by_pmids_invalid_pmid() {
+        let client = PubMedClient::new();
+        let result = client.fetch_all_by_pmids(&["not_a_number"]).await;
+        assert!(result.is_err());
     }
 }

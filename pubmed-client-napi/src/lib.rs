@@ -549,6 +549,33 @@ impl PubMedClient {
 
         Ok(EPostResult::from(result))
     }
+
+    /// Fetch all articles for a list of PMIDs using EPost and the History server
+    ///
+    /// Uploads the PMID list via EPost (HTTP POST), then fetches articles in
+    /// paginated batches. Recommended for large PMID lists (hundreds or thousands).
+    ///
+    /// @param pmids - Array of PubMed IDs as strings
+    /// @returns Array of article metadata
+    ///
+    /// @example
+    /// ```typescript
+    /// const client = new PubMedClient();
+    /// const articles = await client.fetchAllByPmids(["31978945", "33515491", "25760099"]);
+    /// articles.forEach(a => console.log(a.title));
+    /// ```
+    #[napi]
+    pub async fn fetch_all_by_pmids(&self, pmids: Vec<String>) -> Result<Vec<Article>> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let articles = self
+            .client
+            .pubmed
+            .fetch_all_by_pmids(&pmid_refs)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(articles.into_iter().map(Article::from).collect())
+    }
 }
 
 // ================================================================================================

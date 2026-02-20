@@ -360,3 +360,181 @@ fn test_epost_result_model() {
     assert_eq!(session.webenv, "MCID_test123");
     assert_eq!(session.query_key, "1");
 }
+
+// ================================================================================================
+// fetch_all_by_pmids tests
+// ================================================================================================
+
+const EFETCH_3_ARTICLES: &str = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+    <PubmedArticle>
+        <MedlineCitation>
+            <PMID Version="1">31978945</PMID>
+            <Article>
+                <Journal><Title>Nature</Title></Journal>
+                <ArticleTitle>Article One</ArticleTitle>
+                <AuthorList>
+                    <Author><LastName>Wu</LastName><ForeName>Fan</ForeName></Author>
+                </AuthorList>
+                <PublicationTypeList>
+                    <PublicationType>Journal Article</PublicationType>
+                </PublicationTypeList>
+            </Article>
+        </MedlineCitation>
+    </PubmedArticle>
+    <PubmedArticle>
+        <MedlineCitation>
+            <PMID Version="1">33515491</PMID>
+            <Article>
+                <Journal><Title>Lancet</Title></Journal>
+                <ArticleTitle>Article Two</ArticleTitle>
+                <AuthorList>
+                    <Author><LastName>Smith</LastName><ForeName>John</ForeName></Author>
+                </AuthorList>
+                <PublicationTypeList>
+                    <PublicationType>Review</PublicationType>
+                </PublicationTypeList>
+            </Article>
+        </MedlineCitation>
+    </PubmedArticle>
+    <PubmedArticle>
+        <MedlineCitation>
+            <PMID Version="1">25760099</PMID>
+            <Article>
+                <Journal><Title>Science</Title></Journal>
+                <ArticleTitle>Article Three</ArticleTitle>
+                <AuthorList>
+                    <Author><LastName>Doudna</LastName><ForeName>Jennifer</ForeName></Author>
+                </AuthorList>
+                <PublicationTypeList>
+                    <PublicationType>Journal Article</PublicationType>
+                </PublicationTypeList>
+            </Article>
+        </MedlineCitation>
+    </PubmedArticle>
+</PubmedArticleSet>"#;
+
+/// Helper to set up both EPost and EFetch mocks for fetch_all_by_pmids tests
+async fn setup_epost_and_efetch_mocks(mock_server: &MockServer, efetch_xml: &str) {
+    // EPost mock
+    Mock::given(method("POST"))
+        .and(path_regex(r"/epost\.fcgi.*"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(serde_json::json!({
+                    "epostresult": {
+                        "webenv": "MCID_fetch_all_test",
+                        "querykey": "1"
+                    }
+                }))
+                .insert_header("content-type", "application/json"),
+        )
+        .mount(mock_server)
+        .await;
+
+    // EFetch from history mock
+    Mock::given(method("GET"))
+        .and(path_regex(r"/efetch\.fcgi.*"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_string(efetch_xml.to_string())
+                .insert_header("content-type", "application/xml"),
+        )
+        .mount(mock_server)
+        .await;
+}
+
+/// Test fetch_all_by_pmids with multiple PMIDs
+#[tokio::test]
+#[traced_test]
+async fn test_fetch_all_by_pmids_success() {
+    let mock_server = MockServer::start().await;
+    setup_epost_and_efetch_mocks(&mock_server, EFETCH_3_ARTICLES).await;
+
+    let client = create_mock_client(&mock_server);
+
+    let articles = client
+        .fetch_all_by_pmids(&["31978945", "33515491", "25760099"])
+        .await
+        .expect("fetch_all_by_pmids should succeed");
+
+    assert_eq!(articles.len(), 3);
+    assert!(articles.iter().any(|a| a.pmid == "31978945"));
+    assert!(articles.iter().any(|a| a.pmid == "33515491"));
+    assert!(articles.iter().any(|a| a.pmid == "25760099"));
+}
+
+/// Test fetch_all_by_pmids with empty input
+#[tokio::test]
+#[traced_test]
+async fn test_fetch_all_by_pmids_empty() {
+    let mock_server = MockServer::start().await;
+    let client = create_mock_client(&mock_server);
+
+    let articles = client
+        .fetch_all_by_pmids(&[])
+        .await
+        .expect("Empty input should return Ok");
+
+    assert!(articles.is_empty());
+
+    // No requests should have been made
+    let received = mock_server.received_requests().await.unwrap();
+    assert_eq!(received.len(), 0);
+}
+
+/// Test fetch_all_by_pmids rejects invalid PMIDs
+#[tokio::test]
+#[traced_test]
+async fn test_fetch_all_by_pmids_invalid_pmid() {
+    let mock_server = MockServer::start().await;
+    let client = create_mock_client(&mock_server);
+
+    let result = client
+        .fetch_all_by_pmids(&["31978945", "invalid"])
+        .await;
+
+    assert!(result.is_err());
+
+    // No requests should have been made
+    let received = mock_server.received_requests().await.unwrap();
+    assert_eq!(received.len(), 0);
+}
+
+/// Test fetch_all_by_pmids with single PMID
+#[tokio::test]
+#[traced_test]
+async fn test_fetch_all_by_pmids_single() {
+    let single_xml = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+    <PubmedArticle>
+        <MedlineCitation>
+            <PMID Version="1">31978945</PMID>
+            <Article>
+                <Journal><Title>Nature</Title></Journal>
+                <ArticleTitle>Single Article</ArticleTitle>
+                <AuthorList>
+                    <Author><LastName>Wu</LastName><ForeName>Fan</ForeName></Author>
+                </AuthorList>
+                <PublicationTypeList>
+                    <PublicationType>Journal Article</PublicationType>
+                </PublicationTypeList>
+            </Article>
+        </MedlineCitation>
+    </PubmedArticle>
+</PubmedArticleSet>"#;
+
+    let mock_server = MockServer::start().await;
+    setup_epost_and_efetch_mocks(&mock_server, single_xml).await;
+
+    let client = create_mock_client(&mock_server);
+
+    let articles = client
+        .fetch_all_by_pmids(&["31978945"])
+        .await
+        .expect("Single PMID should succeed");
+
+    assert_eq!(articles.len(), 1);
+    assert_eq!(articles[0].pmid, "31978945");
+    assert_eq!(articles[0].title, "Single Article");
+}

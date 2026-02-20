@@ -673,6 +673,30 @@ impl Client {
     pub async fn epost(&self, pmids: &[&str]) -> Result<EPostResult> {
         self.pubmed.epost(pmids).await
     }
+
+    /// Fetch all articles for a list of PMIDs using EPost and the History server
+    ///
+    /// Uploads the PMID list via EPost (HTTP POST), then fetches articles in
+    /// paginated batches. Recommended for large PMID lists (hundreds or thousands).
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let articles = client.fetch_all_by_pmids(&["31978945", "33515491"]).await?;
+    ///     for a in &articles {
+    ///         println!("{}: {}", a.pmid, a.title);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn fetch_all_by_pmids(&self, pmids: &[&str]) -> Result<Vec<PubMedArticle>> {
+        self.pubmed.fetch_all_by_pmids(pmids).await
+    }
 }
 
 impl Default for Client {

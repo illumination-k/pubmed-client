@@ -313,6 +313,28 @@ impl WasmPubMedClient {
         })
     }
 
+    /// Fetch all articles for a list of PMIDs using EPost and the History server
+    ///
+    /// Uploads via EPost (HTTP POST), then fetches in paginated batches.
+    /// Recommended for large PMID lists.
+    pub fn fetch_all_by_pmids(&self, pmids: Vec<String>) -> JsPromiseArticles {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.fetch_all_by_pmids(&pmid_refs).await {
+                Ok(articles) => {
+                    let js_articles: Vec<JsArticle> =
+                        articles.into_iter().map(JsArticle::from).collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_articles)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!(
+                    "fetch_all_by_pmids failed: {e}"
+                ))),
+            }
+        })
+        .unchecked_into()
+    }
+
     /// Convert PMC full text to markdown
     pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
         let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)

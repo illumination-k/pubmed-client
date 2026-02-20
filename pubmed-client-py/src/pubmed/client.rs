@@ -425,6 +425,39 @@ impl PyPubMedClient {
         })
     }
 
+    /// Fetch all articles for a list of PMIDs using EPost and the History server
+    ///
+    /// Uploads the PMID list via EPost (HTTP POST), then fetches articles in
+    /// paginated batches. Recommended for large PMID lists (hundreds or thousands).
+    ///
+    /// Args:
+    ///     pmids: List of PubMed IDs as strings
+    ///
+    /// Returns:
+    ///     List of PubMedArticle objects
+    ///
+    /// Examples:
+    ///     >>> client = PubMedClient()
+    ///     >>> articles = client.fetch_all_by_pmids(["31978945", "33515491", "25760099"])
+    ///     >>> for a in articles:
+    ///     ...     print(a.title)
+    #[pyo3(text_signature = "(pmids: list[str]) -> list[PubMedArticle]")]
+    fn fetch_all_by_pmids(
+        &self,
+        py: Python,
+        pmids: Vec<String>,
+    ) -> PyResult<Vec<PyPubMedArticle>> {
+        let client = self.client.clone();
+        py.detach(|| {
+            let rt = get_runtime();
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            let articles = rt
+                .block_on(client.fetch_all_by_pmids(&pmid_refs))
+                .map_err(to_py_err)?;
+            Ok(articles.into_iter().map(PyPubMedArticle::from).collect())
+        })
+    }
+
     fn __repr__(&self) -> String {
         "PubMedClient()".to_string()
     }
