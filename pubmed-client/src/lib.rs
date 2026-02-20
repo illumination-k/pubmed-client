@@ -281,9 +281,9 @@ pub use pmc::{
 };
 pub use pubmed::{
     parse_article_from_xml, ArticleType, CitationMatch, CitationMatchStatus, CitationMatches,
-    CitationQuery, Citations, DatabaseCount, DatabaseInfo, FieldInfo, GlobalQueryResults,
-    HistorySession, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient, RelatedArticles,
-    SearchQuery, SearchResult, SortOrder,
+    CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult, FieldInfo,
+    GlobalQueryResults, HistorySession, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient,
+    RelatedArticles, SearchQuery, SearchResult, SortOrder,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{sleep, Duration, Instant};
@@ -643,6 +643,35 @@ impl Client {
     /// ```
     pub async fn global_query(&self, term: &str) -> Result<GlobalQueryResults> {
         self.pubmed.global_query(term).await
+    }
+
+    /// Upload a list of PMIDs to the NCBI History server using EPost
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<EPostResult>` containing WebEnv and query_key
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let result = client.epost(&["31978945", "33515491"]).await?;
+    ///     let session = result.history_session();
+    ///     let articles = client.pubmed.fetch_from_history(&session, 0, 100).await?;
+    ///     println!("Fetched {} articles", articles.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn epost(&self, pmids: &[&str]) -> Result<EPostResult> {
+        self.pubmed.epost(pmids).await
     }
 }
 

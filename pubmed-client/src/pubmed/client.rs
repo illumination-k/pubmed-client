@@ -5,12 +5,12 @@ use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
     CitationMatch, CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount,
-    DatabaseInfo, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, PmcLinks, PubMedArticle,
-    RelatedArticles, SearchResult,
+    DatabaseInfo, EPostResult, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, PmcLinks,
+    PubMedArticle, RelatedArticles, SearchResult,
 };
 use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::query::SortOrder;
-use crate::pubmed::responses::{EInfoResponse, ELinkResponse, ESearchResult};
+use crate::pubmed::responses::{EInfoResponse, ELinkResponse, EPostResponse, ESearchResult};
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
 use reqwest::{Client, Response};
@@ -647,6 +647,219 @@ impl PubMedClient {
             query_key: search_result.esearchresult.query_key,
             query_translation: search_result.esearchresult.querytranslation,
         })
+    }
+
+    /// Upload a list of PMIDs to the NCBI History server using EPost
+    ///
+    /// This stores the UIDs on the server and returns WebEnv/query_key identifiers
+    /// that can be used with `fetch_from_history()` to retrieve article metadata.
+    ///
+    /// This is useful when you have a pre-existing list of PMIDs (e.g., from a file,
+    /// database, or external source) and want to use them with history server features
+    /// like batch fetching.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<EPostResult>` containing WebEnv and query_key
+    ///
+    /// # Errors
+    ///
+    /// * `PubMedError::InvalidPmid` - If any PMID is invalid
+    /// * `PubMedError::RequestError` - If the HTTP request fails
+    /// * `PubMedError::ApiError` - If the NCBI API returns an error
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///
+    ///     // Upload PMIDs to the history server
+    ///     let result = client.epost(&["31978945", "33515491", "25760099"]).await?;
+    ///
+    ///     println!("WebEnv: {}", result.webenv);
+    ///     println!("Query Key: {}", result.query_key);
+    ///
+    ///     // Use the session to fetch articles
+    ///     let session = result.history_session();
+    ///     let articles = client.fetch_from_history(&session, 0, 100).await?;
+    ///     println!("Fetched {} articles", articles.len());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(pmids_count = pmids.len()))]
+    pub async fn epost(&self, pmids: &[&str]) -> Result<EPostResult> {
+        self.epost_internal(pmids, None).await
+    }
+
+    /// Upload PMIDs to an existing History server session using EPost
+    ///
+    /// This appends UIDs to an existing WebEnv session, allowing you to combine
+    /// multiple sets of IDs into a single session for subsequent operations.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    /// * `session` - Existing history session to append to
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<EPostResult>` with the updated session information.
+    /// The returned `webenv` will be the same as the input session, and a new
+    /// `query_key` will be assigned for the uploaded IDs.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///
+    ///     // First upload
+    ///     let result1 = client.epost(&["31978945", "33515491"]).await?;
+    ///
+    ///     // Append more PMIDs to the same session
+    ///     let result2 = client.epost_to_session(
+    ///         &["25760099"],
+    ///         &result1.history_session(),
+    ///     ).await?;
+    ///
+    ///     // result2 has the same webenv but a new query_key
+    ///     println!("New query key: {}", result2.query_key);
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(pmids_count = pmids.len()))]
+    pub async fn epost_to_session(
+        &self,
+        pmids: &[&str],
+        session: &HistorySession,
+    ) -> Result<EPostResult> {
+        self.epost_internal(pmids, Some(session)).await
+    }
+
+    /// Internal implementation for EPost
+    async fn epost_internal(
+        &self,
+        pmids: &[&str],
+        session: Option<&HistorySession>,
+    ) -> Result<EPostResult> {
+        if pmids.is_empty() {
+            return Err(PubMedError::InvalidQuery(
+                "PMID list cannot be empty for EPost".to_string(),
+            ));
+        }
+
+        // Validate all PMIDs upfront
+        let validated: Vec<u32> = pmids
+            .iter()
+            .map(|pmid| PubMedId::parse(pmid).map(|p| p.as_u32()))
+            .collect::<Result<Vec<_>>>()?;
+
+        let id_list: String = validated
+            .iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+
+        // Build form data for POST request
+        let mut params = vec![
+            ("db".to_string(), "pubmed".to_string()),
+            ("id".to_string(), id_list),
+            ("retmode".to_string(), "json".to_string()),
+        ];
+
+        if let Some(session) = session {
+            params.push(("WebEnv".to_string(), session.webenv.clone()));
+        }
+
+        // Append API parameters (api_key, email, tool)
+        params.extend(self.config.build_api_params());
+
+        let url = format!("{}/epost.fcgi", self.base_url);
+
+        debug!(pmids_count = pmids.len(), "Making EPost API request");
+
+        let response = with_retry(
+            || async {
+                self.rate_limiter.acquire().await?;
+                debug!("Making POST request to: {}", url);
+                let response = self
+                    .client
+                    .post(&url)
+                    .form(&params)
+                    .send()
+                    .await
+                    .map_err(PubMedError::from)?;
+
+                if response.status().is_server_error() || response.status().as_u16() == 429 {
+                    return Err(PubMedError::ApiError {
+                        status: response.status().as_u16(),
+                        message: response
+                            .status()
+                            .canonical_reason()
+                            .unwrap_or("Unknown error")
+                            .to_string(),
+                    });
+                }
+
+                Ok(response)
+            },
+            &self.config.retry_config,
+            "NCBI EPost API request",
+        )
+        .await?;
+
+        if !response.status().is_success() {
+            warn!("EPost request failed with status: {}", response.status());
+            return Err(PubMedError::ApiError {
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
+            });
+        }
+
+        let epost_response: EPostResponse = response.json().await?;
+
+        // Check for API error
+        if let Some(error_msg) = &epost_response.epostresult.error {
+            return Err(PubMedError::ApiError {
+                status: 200,
+                message: format!("NCBI EPost API error: {}", error_msg),
+            });
+        }
+
+        let webenv = epost_response
+            .epostresult
+            .webenv
+            .ok_or_else(|| PubMedError::WebEnvNotAvailable)?;
+
+        let query_key = epost_response
+            .epostresult
+            .query_key
+            .ok_or_else(|| PubMedError::WebEnvNotAvailable)?;
+
+        info!(
+            pmids_count = pmids.len(),
+            query_key = %query_key,
+            "EPost completed successfully"
+        );
+
+        Ok(EPostResult { webenv, query_key })
     }
 
     /// Fetch articles from history server using WebEnv session
@@ -1981,6 +2194,41 @@ mod tests {
         let result = client
             .fetch_articles(&["31978945", "invalid", "33515491"])
             .await;
+        assert!(result.is_err());
+
+        // Should fail quickly (validation only, no network)
+        let elapsed = start.elapsed();
+        assert!(elapsed < Duration::from_millis(100));
+    }
+
+    // ========================================================================================
+    // EPost tests
+    // ========================================================================================
+
+    #[tokio::test]
+    async fn test_epost_empty_input() {
+        let client = PubMedClient::new();
+        let result = client.epost(&[]).await;
+        assert!(result.is_err());
+        if let Err(e) = result {
+            assert!(e.to_string().contains("empty"));
+        }
+    }
+
+    #[tokio::test]
+    async fn test_epost_invalid_pmid() {
+        let client = PubMedClient::new();
+        let result = client.epost(&["not_a_number"]).await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_epost_validates_all_pmids_before_request() {
+        let client = PubMedClient::new();
+
+        // Mix of valid and invalid - should fail on validation before any network request
+        let start = Instant::now();
+        let result = client.epost(&["31978945", "invalid", "33515491"]).await;
         assert!(result.is_err());
 
         // Should fail quickly (validation only, no network)

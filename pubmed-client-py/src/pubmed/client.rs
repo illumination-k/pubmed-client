@@ -15,8 +15,8 @@ use crate::query::PySearchQuery;
 use crate::utils::{get_runtime, to_py_err};
 
 use super::models::{
-    PyCitationMatches, PyCitationQuery, PyCitations, PyDatabaseInfo, PyGlobalQueryResults,
-    PyPmcLinks, PyPubMedArticle, PyRelatedArticles,
+    PyCitationMatches, PyCitationQuery, PyCitations, PyDatabaseInfo, PyEPostResult,
+    PyGlobalQueryResults, PyPmcLinks, PyPubMedArticle, PyRelatedArticles,
 };
 
 // ================================================================================================
@@ -395,6 +395,33 @@ impl PyPubMedClient {
             let rt = get_runtime();
             let results = rt.block_on(client.global_query(&term)).map_err(to_py_err)?;
             Ok(PyGlobalQueryResults::from(results))
+        })
+    }
+
+    /// Upload a list of PMIDs to the NCBI History server using EPost
+    ///
+    /// Stores UIDs on the server and returns WebEnv/query_key identifiers
+    /// that can be used with subsequent API calls for batch fetching.
+    ///
+    /// Args:
+    ///     pmids: List of PubMed IDs as strings
+    ///
+    /// Returns:
+    ///     EPostResult containing webenv and query_key
+    ///
+    /// Examples:
+    ///     >>> client = PubMedClient()
+    ///     >>> result = client.epost(["31978945", "33515491", "25760099"])
+    ///     >>> print(f"WebEnv: {result.webenv}")
+    ///     >>> print(f"Query Key: {result.query_key}")
+    #[pyo3(text_signature = "(pmids: list[str]) -> EPostResult")]
+    fn epost(&self, py: Python, pmids: Vec<String>) -> PyResult<PyEPostResult> {
+        let client = self.client.clone();
+        py.detach(|| {
+            let rt = get_runtime();
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            let result = rt.block_on(client.epost(&pmid_refs)).map_err(to_py_err)?;
+            Ok(PyEPostResult::from(result))
         })
     }
 
