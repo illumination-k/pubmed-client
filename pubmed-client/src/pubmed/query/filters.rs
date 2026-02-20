@@ -1,5 +1,35 @@
 //! Filter types and enums for PubMed query filtering
 
+/// Sort order for PubMed search results
+///
+/// Controls how ESearch results are ordered. The default sort (when not specified)
+/// is by relevance for most queries.
+///
+/// See: <https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch>
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SortOrder {
+    /// Sort by relevance (default PubMed behavior)
+    Relevance,
+    /// Sort by publication date (newest first)
+    PublicationDate,
+    /// Sort by first author name (alphabetical)
+    FirstAuthor,
+    /// Sort by journal name (alphabetical)
+    JournalName,
+}
+
+impl SortOrder {
+    /// Get the API parameter value for this sort order
+    pub(crate) fn as_api_param(&self) -> &str {
+        match self {
+            SortOrder::Relevance => "relevance",
+            SortOrder::PublicationDate => "pub_date",
+            SortOrder::FirstAuthor => "Author",
+            SortOrder::JournalName => "JournalName",
+        }
+    }
+}
+
 /// Article types that can be filtered in PubMed searches
 #[derive(Debug, Clone, PartialEq)]
 pub enum ArticleType {
@@ -257,6 +287,29 @@ mod tests {
             );
             query_strings.push(query_string);
         }
+    }
+
+    #[test]
+    fn test_sort_order_as_api_param() {
+        assert_eq!(SortOrder::Relevance.as_api_param(), "relevance");
+        assert_eq!(SortOrder::PublicationDate.as_api_param(), "pub_date");
+        assert_eq!(SortOrder::FirstAuthor.as_api_param(), "Author");
+        assert_eq!(SortOrder::JournalName.as_api_param(), "JournalName");
+    }
+
+    #[test]
+    fn test_sort_order_equality() {
+        assert_eq!(SortOrder::Relevance, SortOrder::Relevance);
+        assert_ne!(SortOrder::Relevance, SortOrder::PublicationDate);
+        assert_ne!(SortOrder::FirstAuthor, SortOrder::JournalName);
+    }
+
+    #[test]
+    fn test_sort_order_clone() {
+        let original = SortOrder::PublicationDate;
+        let cloned = original.clone();
+        assert_eq!(original, cloned);
+        assert_eq!(original.as_api_param(), cloned.as_api_param());
     }
 
     #[test]

@@ -159,5 +159,10 @@ path = "tests/integration/test_batch_fetch_mocked.rs"
 name = "test_batch_fetch_api"
 path = "tests/integration/test_batch_fetch_api.rs"
 
+# Search options tests (sort, query translation)
+[[test]]
+name = "test_search_options"
+path = "tests/integration/test_search_options.rs"
+
 # Examples
 # (Python examples are in pubmed-client-py/examples/)

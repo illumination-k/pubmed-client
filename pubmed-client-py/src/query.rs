@@ -4,6 +4,7 @@
 
 use pubmed_client::pubmed::ArticleType;
 use pubmed_client::pubmed::SearchQuery;
+use pubmed_client::pubmed::SortOrder;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
@@ -27,6 +28,28 @@ fn validate_year(year: u32) -> PyResult<()> {
         )));
     }
     Ok(())
+}
+
+/// Convert string to SortOrder enum with case-insensitive matching
+///
+/// # Arguments
+/// * `s` - Sort order string (e.g., "pub_date", "relevance", "author")
+///
+/// # Errors
+/// Returns `PyValueError` if the sort order is not recognized
+fn str_to_sort_order(s: &str) -> PyResult<SortOrder> {
+    let normalized = s.trim().to_lowercase();
+
+    match normalized.as_str() {
+        "relevance" => Ok(SortOrder::Relevance),
+        "pub_date" | "publication_date" | "date" => Ok(SortOrder::PublicationDate),
+        "author" | "first_author" => Ok(SortOrder::FirstAuthor),
+        "journal" | "journal_name" => Ok(SortOrder::JournalName),
+        _ => Err(PyValueError::new_err(format!(
+            "Invalid sort order: '{}'. Supported values: relevance, pub_date, author, journal",
+            s
+        ))),
+    }
 }
 
 /// Convert string to ArticleType enum with case-insensitive matching
@@ -611,5 +634,34 @@ impl PySearchQuery {
         PySearchQuery {
             inner: grouped_inner,
         }
+    }
+
+    // ============================================================================================
+    // Sort Methods
+    // ============================================================================================
+
+    /// Set the sort order for search results
+    ///
+    /// Controls how PubMed orders the search results. The default (when not specified)
+    /// is relevance-based sorting.
+    ///
+    /// Args:
+    ///     sort_order: Sort order string (case-insensitive)
+    ///         Supported values: "relevance", "pub_date" (or "publication_date"),
+    ///         "author" (or "first_author"), "journal" (or "journal_name")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Raises:
+    ///     ValueError: If sort order is not recognized
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").sort("pub_date")
+    ///     >>> # Results will be sorted by publication date (newest first)
+    fn sort(mut slf: PyRefMut<Self>, sort_order: String) -> PyResult<PyRefMut<Self>> {
+        let sort = str_to_sort_order(&sort_order)?;
+        slf.inner = slf.inner.clone().sort(sort);
+        Ok(slf)
     }
 }

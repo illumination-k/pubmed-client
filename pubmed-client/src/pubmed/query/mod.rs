@@ -58,4 +58,4 @@ mod validation;
 // Re-export all public types
 pub use builder::SearchQuery;
 pub use date::PubDate;
-pub use filters::{ArticleType, Language};
+pub use filters::{ArticleType, Language, SortOrder};

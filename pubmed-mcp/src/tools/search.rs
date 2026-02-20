@@ -5,7 +5,7 @@ use serde::Deserialize;
 use std::borrow::Cow;
 use tracing::info;
 
-use pubmed_client::{ArticleType, SearchQuery};
+use pubmed_client::{ArticleType, SearchQuery, SortOrder};
 
 /// Study type filter for PubMed searches
 #[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
@@ -75,6 +75,40 @@ impl TextAvailability {
     }
 }
 
+/// Sort order for search results
+#[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SearchSortOrder {
+    /// Sort by relevance (default)
+    Relevance,
+    /// Sort by publication date (newest first)
+    PublicationDate,
+    /// Sort by first author name (alphabetical)
+    FirstAuthor,
+    /// Sort by journal name (alphabetical)
+    JournalName,
+}
+
+impl SearchSortOrder {
+    fn to_sort_order(&self) -> SortOrder {
+        match self {
+            SearchSortOrder::Relevance => SortOrder::Relevance,
+            SearchSortOrder::PublicationDate => SortOrder::PublicationDate,
+            SearchSortOrder::FirstAuthor => SortOrder::FirstAuthor,
+            SearchSortOrder::JournalName => SortOrder::JournalName,
+        }
+    }
+
+    fn display_name(&self) -> &'static str {
+        match self {
+            SearchSortOrder::Relevance => "Relevance",
+            SearchSortOrder::PublicationDate => "Publication Date",
+            SearchSortOrder::FirstAuthor => "First Author",
+            SearchSortOrder::JournalName => "Journal Name",
+        }
+    }
+}
+
 /// Search request parameters with filters
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub struct SearchRequest {
@@ -100,6 +134,11 @@ pub struct SearchRequest {
 
     #[schemars(description = "Include abstract preview in results (default: true)")]
     pub include_abstract: Option<bool>,
+
+    #[schemars(
+        description = "Sort order for results (relevance, publication_date, first_author, journal_name)"
+    )]
+    pub sort: Option<SearchSortOrder>,
 }
 
 /// Search PubMed for articles with advanced filtering
@@ -133,6 +172,11 @@ pub async fn search_pubmed(
         search_query = search_query.date_range(start_year, params.end_year);
     }
 
+    // Apply sort order
+    if let Some(ref sort_order) = params.sort {
+        search_query = search_query.sort(sort_order.to_sort_order());
+    }
+
     let query_string = search_query.build();
 
     info!(
@@ -142,13 +186,14 @@ pub async fn search_pubmed(
         text_availability = ?params.text_availability,
         start_year = ?params.start_year,
         end_year = ?params.end_year,
+        sort = ?params.sort,
         "Searching PubMed with filters"
     );
 
     let articles = server
         .client
         .pubmed
-        .search_and_fetch(&query_string, max)
+        .search_and_fetch_with_options(&query_string, max, search_query.get_sort())
         .await
         .map_err(|e| ErrorData {
             code: ErrorCode(-32603),
@@ -172,6 +217,9 @@ pub async fn search_pubmed(
         } else {
             filters_applied.push(format!("Published after {}", start));
         }
+    }
+    if let Some(ref sort_order) = params.sort {
+        filters_applied.push(format!("Sorted by {}", sort_order.display_name()));
     }
 
     if !filters_applied.is_empty() {

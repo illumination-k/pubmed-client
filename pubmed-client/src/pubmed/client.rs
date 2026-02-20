@@ -9,6 +9,7 @@ use crate::pubmed::models::{
     RelatedArticles, SearchResult,
 };
 use crate::pubmed::parser::parse_articles_from_xml;
+use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::{EInfoResponse, ELinkResponse, ESearchResult};
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -249,6 +250,43 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(query = %query, limit = limit))]
     pub async fn search_articles(&self, query: &str, limit: usize) -> Result<Vec<String>> {
+        self.search_articles_with_options(query, limit, None).await
+    }
+
+    /// Search for articles using a query string with sort options
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - Search query string
+    /// * `limit` - Maximum number of results to return
+    /// * `sort` - Optional sort order for results
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<String>>` containing PMIDs of matching articles
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::{PubMedClient, pubmed::SortOrder};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let pmids = client
+    ///         .search_articles_with_options("covid-19 treatment", 10, Some(&SortOrder::PublicationDate))
+    ///         .await?;
+    ///     println!("Found {} articles", pmids.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self, sort), fields(query = %query, limit = limit))]
+    pub async fn search_articles_with_options(
+        &self,
+        query: &str,
+        limit: usize,
+        sort: Option<&SortOrder>,
+    ) -> Result<Vec<String>> {
         // PubMed limits: retstart cannot exceed 9998, and retmax is capped at 9999
         // This means we can only retrieve the first 9,999 results (indices 0-9998)
         const MAX_RETRIEVABLE: usize = 9999;
@@ -265,13 +303,17 @@ impl PubMedClient {
             return Ok(Vec::new());
         }
 
-        let url = format!(
+        let mut url = format!(
             "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retstart={}&retmode=json",
             self.base_url,
             urlencoding::encode(query),
             limit,
             0
         );
+
+        if let Some(sort_order) = sort {
+            url.push_str(&format!("&sort={}", sort_order.as_api_param()));
+        }
 
         debug!("Making initial ESearch API request");
         let response = self.make_request(&url).await?;
@@ -411,7 +453,49 @@ impl PubMedClient {
     /// }
     /// ```
     pub async fn search_and_fetch(&self, query: &str, limit: usize) -> Result<Vec<PubMedArticle>> {
-        let pmids = self.search_articles(query, limit).await?;
+        self.search_and_fetch_with_options(query, limit, None).await
+    }
+
+    /// Search and fetch multiple articles with metadata, with sort options
+    ///
+    /// Uses batch fetching internally for efficient retrieval.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - Search query string
+    /// * `limit` - Maximum number of articles to fetch
+    /// * `sort` - Optional sort order for results
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<PubMedArticle>>` containing articles with metadata
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::{PubMedClient, pubmed::SortOrder};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let articles = client
+    ///         .search_and_fetch_with_options("covid-19", 5, Some(&SortOrder::PublicationDate))
+    ///         .await?;
+    ///     for article in articles {
+    ///         println!("{}: {}", article.pmid, article.title);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn search_and_fetch_with_options(
+        &self,
+        query: &str,
+        limit: usize,
+        sort: Option<&SortOrder>,
+    ) -> Result<Vec<PubMedArticle>> {
+        let pmids = self
+            .search_articles_with_options(query, limit, sort)
+            .await?;
 
         let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
         self.fetch_articles(&pmid_refs).await
@@ -456,6 +540,54 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(query = %query, limit = limit))]
     pub async fn search_with_history(&self, query: &str, limit: usize) -> Result<SearchResult> {
+        self.search_with_history_and_options(query, limit, None)
+            .await
+    }
+
+    /// Search for articles with history server support and sort options
+    ///
+    /// This method enables NCBI's history server feature, which stores search results
+    /// on the server and returns WebEnv/query_key identifiers. These can be used
+    /// with `fetch_from_history()` to efficiently paginate through large result sets.
+    ///
+    /// Also returns query translation showing how PubMed interpreted the query.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - Search query string
+    /// * `limit` - Maximum number of PMIDs to return in the initial response
+    /// * `sort` - Optional sort order for results
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<SearchResult>` containing PMIDs, history session, and query translation
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::{PubMedClient, pubmed::SortOrder};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let result = client
+    ///         .search_with_history_and_options("asthma", 100, Some(&SortOrder::PublicationDate))
+    ///         .await?;
+    ///
+    ///     println!("Total results: {}", result.total_count);
+    ///     if let Some(translation) = &result.query_translation {
+    ///         println!("Query interpreted as: {}", translation);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self, sort), fields(query = %query, limit = limit))]
+    pub async fn search_with_history_and_options(
+        &self,
+        query: &str,
+        limit: usize,
+        sort: Option<&SortOrder>,
+    ) -> Result<SearchResult> {
         if query.trim().is_empty() {
             debug!("Empty query provided, returning empty results");
             return Ok(SearchResult {
@@ -463,17 +595,22 @@ impl PubMedClient {
                 total_count: 0,
                 webenv: None,
                 query_key: None,
+                query_translation: None,
             });
         }
 
         // Use usehistory=y to enable history server
-        let url = format!(
+        let mut url = format!(
             "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retstart={}&retmode=json&usehistory=y",
             self.base_url,
             urlencoding::encode(query),
             limit,
             0
         );
+
+        if let Some(sort_order) = sort {
+            url.push_str(&format!("&sort={}", sort_order.as_api_param()));
+        }
 
         debug!("Making ESearch API request with history");
         let response = self.make_request(&url).await?;
@@ -499,6 +636,7 @@ impl PubMedClient {
             total_count = total_count,
             returned_count = search_result.esearchresult.idlist.len(),
             has_webenv = search_result.esearchresult.webenv.is_some(),
+            query_translation = ?search_result.esearchresult.querytranslation,
             "Search with history completed"
         );
 
@@ -507,6 +645,7 @@ impl PubMedClient {
             total_count,
             webenv: search_result.esearchresult.webenv,
             query_key: search_result.esearchresult.query_key,
+            query_translation: search_result.esearchresult.querytranslation,
         })
     }
 

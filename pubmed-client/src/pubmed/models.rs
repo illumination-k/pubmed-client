@@ -133,6 +133,14 @@ pub struct SearchResult {
     pub webenv: Option<String>,
     /// Query key for history server
     pub query_key: Option<String>,
+    /// How PubMed interpreted and translated the search query
+    ///
+    /// For example, searching "asthma" might be translated to:
+    /// `"asthma"[MeSH Terms] OR "asthma"[All Fields]`
+    ///
+    /// This is useful for debugging search queries and understanding
+    /// how PubMed's automatic term mapping works.
+    pub query_translation: Option<String>,
 }
 
 impl SearchResult {
