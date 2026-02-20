@@ -8,6 +8,7 @@ pub mod models;
 // Re-export public types
 pub use client::PyPubMedClient;
 pub use models::{
-    PyAffiliation, PyAuthor, PyCitations, PyDatabaseInfo, PyPmcLinks, PyPubMedArticle,
+    PyAffiliation, PyAuthor, PyCitationMatch, PyCitationMatches, PyCitationQuery, PyCitations,
+    PyDatabaseCount, PyDatabaseInfo, PyGlobalQueryResults, PyPmcLinks, PyPubMedArticle,
     PyRelatedArticles,
 };

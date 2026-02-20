@@ -522,6 +522,199 @@ impl PubMedArticle {
     }
 }
 
+// ================================================================================================
+// ECitMatch API types
+// ================================================================================================
+
+/// Input for a single citation match query
+///
+/// Used with the ECitMatch API to find PMIDs from citation information.
+/// Each field corresponds to a part of the citation string sent to the API.
+///
+/// # Example
+///
+/// ```
+/// use pubmed_client_rs::pubmed::CitationQuery;
+///
+/// let query = CitationQuery::new(
+///     "proc natl acad sci u s a",
+///     "1991",
+///     "88",
+///     "3248",
+///     "mann bj",
+///     "Art1",
+/// );
+/// ```
+#[derive(Debug, Clone)]
+pub struct CitationQuery {
+    /// Journal title abbreviation (e.g., "proc natl acad sci u s a")
+    pub journal: String,
+    /// Publication year (e.g., "1991")
+    pub year: String,
+    /// Volume number (e.g., "88")
+    pub volume: String,
+    /// First page number (e.g., "3248")
+    pub first_page: String,
+    /// Author name (e.g., "mann bj")
+    pub author_name: String,
+    /// User-defined key for identifying results (e.g., "Art1")
+    pub key: String,
+}
+
+impl CitationQuery {
+    /// Create a new citation query
+    pub fn new(
+        journal: &str,
+        year: &str,
+        volume: &str,
+        first_page: &str,
+        author_name: &str,
+        key: &str,
+    ) -> Self {
+        Self {
+            journal: journal.to_string(),
+            year: year.to_string(),
+            volume: volume.to_string(),
+            first_page: first_page.to_string(),
+            author_name: author_name.to_string(),
+            key: key.to_string(),
+        }
+    }
+
+    /// Format this citation as a bdata string for the ECitMatch API
+    pub(crate) fn to_bdata(&self) -> String {
+        format!(
+            "{}|{}|{}|{}|{}|{}|",
+            self.journal.replace(' ', "+"),
+            self.year,
+            self.volume,
+            self.first_page,
+            self.author_name.replace(' ', "+"),
+            self.key,
+        )
+    }
+}
+
+/// Status of a citation match result
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub enum CitationMatchStatus {
+    /// A unique PMID was found for the citation
+    Found,
+    /// No PMID could be found for the citation
+    NotFound,
+    /// Multiple PMIDs matched the citation (ambiguous)
+    Ambiguous,
+}
+
+/// Result of a single citation match from the ECitMatch API
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CitationMatch {
+    /// Journal title from the query
+    pub journal: String,
+    /// Year from the query
+    pub year: String,
+    /// Volume from the query
+    pub volume: String,
+    /// First page from the query
+    pub first_page: String,
+    /// Author name from the query
+    pub author_name: String,
+    /// User-defined key from the query
+    pub key: String,
+    /// Matched PMID (if found)
+    pub pmid: Option<String>,
+    /// Match status
+    pub status: CitationMatchStatus,
+}
+
+/// Results from ECitMatch API for batch citation matching
+///
+/// Contains the results of matching multiple citations to PMIDs.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CitationMatches {
+    /// List of citation match results
+    pub matches: Vec<CitationMatch>,
+}
+
+impl CitationMatches {
+    /// Get only the successfully matched citations
+    pub fn found(&self) -> Vec<&CitationMatch> {
+        self.matches
+            .iter()
+            .filter(|m| m.status == CitationMatchStatus::Found)
+            .collect()
+    }
+
+    /// Get the number of successful matches
+    pub fn found_count(&self) -> usize {
+        self.matches
+            .iter()
+            .filter(|m| m.status == CitationMatchStatus::Found)
+            .count()
+    }
+}
+
+// ================================================================================================
+// EGQuery API types
+// ================================================================================================
+
+/// Record count for a single NCBI database from the EGQuery API
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct DatabaseCount {
+    /// Internal database name (e.g., "pubmed", "pmc", "nuccore")
+    pub db_name: String,
+    /// Human-readable database name (e.g., "PubMed", "PMC", "Nucleotide")
+    pub menu_name: String,
+    /// Number of records matching the query in this database
+    pub count: u64,
+    /// Status of the query for this database (e.g., "Ok")
+    pub status: String,
+}
+
+/// Results from EGQuery API for global database search
+///
+/// Contains the number of records matching a query across all NCBI Entrez databases.
+///
+/// # Example
+///
+/// ```no_run
+/// use pubmed_client_rs::PubMedClient;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let client = PubMedClient::new();
+///     let results = client.global_query("asthma").await?;
+///     for db in &results.results {
+///         if db.count > 0 {
+///             println!("{}: {} records", db.menu_name, db.count);
+///         }
+///     }
+///     Ok(())
+/// }
+/// ```
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GlobalQueryResults {
+    /// The query term that was searched
+    pub term: String,
+    /// Results for each NCBI database
+    pub results: Vec<DatabaseCount>,
+}
+
+impl GlobalQueryResults {
+    /// Get results for databases with matching records (count > 0)
+    pub fn non_zero(&self) -> Vec<&DatabaseCount> {
+        self.results.iter().filter(|r| r.count > 0).collect()
+    }
+
+    /// Get the count for a specific database
+    pub fn count_for(&self, db_name: &str) -> Option<u64> {
+        self.results
+            .iter()
+            .find(|r| r.db_name == db_name)
+            .map(|r| r.count)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

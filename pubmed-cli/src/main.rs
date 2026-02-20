@@ -83,6 +83,12 @@ enum Commands {
     /// Convert PMID to PMCID
     #[command(name = "pmid-to-pmcid")]
     PmidToPmcid(Box<commands::convert::Convert>),
+    /// Match citations to PMIDs (journal|year|volume|page|author format)
+    #[command(name = "citmatch")]
+    CitMatch(commands::citmatch::CitMatch),
+    /// Query all NCBI databases for record counts
+    #[command(name = "gquery")]
+    GQuery(commands::gquery::GQuery),
 }
 
 #[tokio::main]
@@ -156,6 +162,18 @@ async fn main() -> Result<()> {
             commands::metadata::execute(options, &cli).await
         }
         Commands::PmidToPmcid(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::CitMatch(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::GQuery(cmd) => {
             let api_key = cli.api_key.as_deref();
             let email = cli.email.as_deref();
             let tool = &cli.tool;

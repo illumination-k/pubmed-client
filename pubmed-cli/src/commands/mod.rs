@@ -1,5 +1,7 @@
+pub mod citmatch;
 pub mod convert;
 pub mod figures;
+pub mod gquery;
 pub mod markdown;
 pub mod metadata;
 pub mod search;

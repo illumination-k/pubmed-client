@@ -13,7 +13,10 @@ use crate::config::PyClientConfig;
 use crate::query::PySearchQuery;
 use crate::utils::{get_runtime, to_py_err};
 
-use super::models::{PyCitations, PyDatabaseInfo, PyPmcLinks, PyPubMedArticle, PyRelatedArticles};
+use super::models::{
+    PyCitationMatches, PyCitationQuery, PyCitations, PyDatabaseInfo, PyGlobalQueryResults,
+    PyPmcLinks, PyPubMedArticle, PyRelatedArticles,
+};
 
 // ================================================================================================
 // Query Input Type for Union[str, SearchQuery]
@@ -276,6 +279,70 @@ impl PyPubMedClient {
                 .block_on(client.get_citations(&pmids))
                 .map_err(to_py_err)?;
             Ok(PyCitations::from(citations))
+        })
+    }
+
+    /// Match citations to PMIDs using the ECitMatch API
+    ///
+    /// Takes citation information (journal, year, volume, page, author)
+    /// and returns corresponding PMIDs. Useful for identifying PMIDs
+    /// from reference lists.
+    ///
+    /// Args:
+    ///     citations: List of CitationQuery objects
+    ///
+    /// Returns:
+    ///     CitationMatches object containing match results
+    ///
+    /// Examples:
+    ///     >>> client = PubMedClient()
+    ///     >>> queries = [
+    ///     ...     CitationQuery("proc natl acad sci u s a", "1991", "88", "3248", "mann bj", "Art1"),
+    ///     ...     CitationQuery("science", "1987", "235", "182", "palmenberg ac", "Art2"),
+    ///     ... ]
+    ///     >>> results = client.match_citations(queries)
+    ///     >>> for m in results.matches:
+    ///     ...     print(f"{m.key}: {m.pmid} ({m.status})")
+    fn match_citations(
+        &self,
+        py: Python,
+        citations: Vec<PyCitationQuery>,
+    ) -> PyResult<PyCitationMatches> {
+        let client = self.client.clone();
+        let rust_citations: Vec<pubmed_client::CitationQuery> =
+            citations.iter().map(|c| c.into()).collect();
+
+        py.detach(|| {
+            let rt = get_runtime();
+            let results = rt
+                .block_on(client.match_citations(&rust_citations))
+                .map_err(to_py_err)?;
+            Ok(PyCitationMatches::from(results))
+        })
+    }
+
+    /// Query all NCBI databases for record counts using the EGQuery API
+    ///
+    /// Returns the number of records matching the query in each
+    /// Entrez database. Useful for exploratory searches.
+    ///
+    /// Args:
+    ///     term: Search query string
+    ///
+    /// Returns:
+    ///     GlobalQueryResults object containing counts per database
+    ///
+    /// Examples:
+    ///     >>> client = PubMedClient()
+    ///     >>> results = client.global_query("asthma")
+    ///     >>> for db in results.non_zero():
+    ///     ...     print(f"{db.menu_name}: {db.count}")
+    fn global_query(&self, py: Python, term: String) -> PyResult<PyGlobalQueryResults> {
+        let client = self.client.clone();
+        py.detach(|| {
+            let rt = get_runtime();
+            let results = rt.block_on(client.global_query(&term)).map_err(to_py_err)?;
+            Ok(PyGlobalQueryResults::from(results))
         })
     }
 

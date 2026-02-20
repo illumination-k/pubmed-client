@@ -280,9 +280,10 @@ pub use pmc::{
     PmcTarClient, Reference, ReferenceStyle, Table,
 };
 pub use pubmed::{
-    parse_article_from_xml, ArticleType, Citations, DatabaseInfo, FieldInfo, HistorySession,
-    Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient, RelatedArticles, SearchQuery,
-    SearchResult,
+    parse_article_from_xml, ArticleType, CitationMatch, CitationMatchStatus, CitationMatches,
+    CitationQuery, Citations, DatabaseCount, DatabaseInfo, FieldInfo, GlobalQueryResults,
+    HistorySession, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient, RelatedArticles,
+    SearchQuery, SearchResult,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{sleep, Duration, Instant};
@@ -551,6 +552,65 @@ impl Client {
     /// ```
     pub async fn get_citations(&self, pmids: &[u32]) -> Result<Citations> {
         self.pubmed.get_citations(pmids).await
+    }
+
+    /// Match citations to PMIDs using the ECitMatch API
+    ///
+    /// # Arguments
+    ///
+    /// * `citations` - List of citation queries to match
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<CitationMatches>` containing match results
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::{Client, CitationQuery};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let citations = vec![
+    ///         CitationQuery::new("science", "1987", "235", "182", "palmenberg ac", "ref1"),
+    ///     ];
+    ///     let results = client.match_citations(&citations).await?;
+    ///     println!("Found {} matches", results.found_count());
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn match_citations(&self, citations: &[CitationQuery]) -> Result<CitationMatches> {
+        self.pubmed.match_citations(citations).await
+    }
+
+    /// Query all NCBI databases for record counts
+    ///
+    /// # Arguments
+    ///
+    /// * `term` - Search query string
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<GlobalQueryResults>` containing counts per database
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let results = client.global_query("asthma").await?;
+    ///     for db in results.non_zero() {
+    ///         println!("{}: {} records", db.menu_name, db.count);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn global_query(&self, term: &str) -> Result<GlobalQueryResults> {
+        self.pubmed.global_query(term).await
     }
 }
 
