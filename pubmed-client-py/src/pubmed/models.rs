@@ -7,7 +7,7 @@ use pyo3::types::PyList;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
-use pubmed_client::{pubmed, PubMedArticle};
+use pubmed_client::{pubmed, ArticleSummary, PubMedArticle};
 
 // ================================================================================================
 // PubMed Data Models
@@ -740,5 +740,100 @@ impl PyGlobalQueryResults {
 
     fn __len__(&self) -> usize {
         self.inner_results.len()
+    }
+}
+
+// ================================================================================================
+// ESummary API types
+// ================================================================================================
+
+/// Lightweight article summary from the ESummary API
+///
+/// Contains basic metadata (title, authors, journal, dates) without abstracts,
+/// MeSH terms, or chemical lists. Faster than PubMedArticle for bulk retrieval.
+///
+/// Examples:
+///     >>> client = PubMedClient()
+///     >>> summaries = client.fetch_summaries(["31978945", "33515491"])
+///     >>> for s in summaries:
+///     ...     print(f"{s.pmid}: {s.title} ({s.pub_date})")
+#[gen_stub_pyclass]
+#[pyclass(name = "ArticleSummary")]
+#[derive(Clone)]
+pub struct PyArticleSummary {
+    #[pyo3(get)]
+    pub pmid: String,
+    #[pyo3(get)]
+    pub title: String,
+    #[pyo3(get)]
+    pub authors: Vec<String>,
+    #[pyo3(get)]
+    pub journal: String,
+    #[pyo3(get)]
+    pub full_journal_name: String,
+    #[pyo3(get)]
+    pub pub_date: String,
+    #[pyo3(get)]
+    pub epub_date: String,
+    #[pyo3(get)]
+    pub doi: Option<String>,
+    #[pyo3(get)]
+    pub pmc_id: Option<String>,
+    #[pyo3(get)]
+    pub volume: String,
+    #[pyo3(get)]
+    pub issue: String,
+    #[pyo3(get)]
+    pub pages: String,
+    #[pyo3(get)]
+    pub languages: Vec<String>,
+    #[pyo3(get)]
+    pub pub_types: Vec<String>,
+    #[pyo3(get)]
+    pub issn: String,
+    #[pyo3(get)]
+    pub essn: String,
+    #[pyo3(get)]
+    pub sort_pub_date: String,
+    #[pyo3(get)]
+    pub pmc_ref_count: u64,
+    #[pyo3(get)]
+    pub record_status: String,
+}
+
+impl From<ArticleSummary> for PyArticleSummary {
+    fn from(s: ArticleSummary) -> Self {
+        PyArticleSummary {
+            pmid: s.pmid,
+            title: s.title,
+            authors: s.authors,
+            journal: s.journal,
+            full_journal_name: s.full_journal_name,
+            pub_date: s.pub_date,
+            epub_date: s.epub_date,
+            doi: s.doi,
+            pmc_id: s.pmc_id,
+            volume: s.volume,
+            issue: s.issue,
+            pages: s.pages,
+            languages: s.languages,
+            pub_types: s.pub_types,
+            issn: s.issn,
+            essn: s.essn,
+            sort_pub_date: s.sort_pub_date,
+            pmc_ref_count: s.pmc_ref_count,
+            record_status: s.record_status,
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyArticleSummary {
+    fn __repr__(&self) -> String {
+        format!(
+            "ArticleSummary(pmid='{}', title='{}')",
+            self.pmid, self.title
+        )
     }
 }
