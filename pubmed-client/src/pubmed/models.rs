@@ -549,6 +549,72 @@ impl PubMedArticle {
 }
 
 // ================================================================================================
+// ESpell API types
+// ================================================================================================
+
+/// Represents a segment of the spelled query from the ESpell API
+///
+/// Each segment is either an original (unchanged) part of the query or a
+/// replacement (corrected spelling suggestion).
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub enum SpelledQuerySegment {
+    /// A term or separator that was not changed
+    Original(String),
+    /// A corrected/suggested replacement term
+    Replaced(String),
+}
+
+/// Result from the ESpell API providing spelling suggestions
+///
+/// ESpell provides spelling suggestions for terms within a single text query
+/// in a given database. It acts as a preprocessing/spell-check tool to improve
+/// search accuracy before executing actual searches.
+///
+/// # Example
+///
+/// ```no_run
+/// use pubmed_client_rs::PubMedClient;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let client = PubMedClient::new();
+///     let result = client.spell_check("asthmaa OR alergies").await?;
+///     println!("Original: {}", result.query);
+///     println!("Corrected: {}", result.corrected_query);
+///     Ok(())
+/// }
+/// ```
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SpellCheckResult {
+    /// The database that was queried
+    pub database: String,
+    /// The original query string as submitted
+    pub query: String,
+    /// The full corrected/suggested query as a plain string
+    pub corrected_query: String,
+    /// Detailed segments showing which terms were replaced vs. kept
+    pub spelled_query: Vec<SpelledQuerySegment>,
+}
+
+impl SpellCheckResult {
+    /// Check if the query had any spelling corrections
+    pub fn has_corrections(&self) -> bool {
+        self.query != self.corrected_query
+    }
+
+    /// Get only the replaced (corrected) terms
+    pub fn replacements(&self) -> Vec<&str> {
+        self.spelled_query
+            .iter()
+            .filter_map(|segment| match segment {
+                SpelledQuerySegment::Replaced(s) => Some(s.as_str()),
+                SpelledQuerySegment::Original(_) => None,
+            })
+            .collect()
+    }
+}
+
+// ================================================================================================
 // ECitMatch API types
 // ================================================================================================
 
@@ -1143,6 +1209,44 @@ mod tests {
         );
 
         assert_eq!(format_author_name(&None, &None, &None), "Unknown Author");
+    }
+
+    #[test]
+    fn test_spell_check_result_has_corrections() {
+        let result = SpellCheckResult {
+            database: "pubmed".to_string(),
+            query: "asthmaa".to_string(),
+            corrected_query: "asthma".to_string(),
+            spelled_query: vec![SpelledQuerySegment::Replaced("asthma".to_string())],
+        };
+        assert!(result.has_corrections());
+
+        let no_correction = SpellCheckResult {
+            database: "pubmed".to_string(),
+            query: "asthma".to_string(),
+            corrected_query: "asthma".to_string(),
+            spelled_query: vec![SpelledQuerySegment::Original("asthma".to_string())],
+        };
+        assert!(!no_correction.has_corrections());
+    }
+
+    #[test]
+    fn test_spell_check_result_replacements() {
+        let result = SpellCheckResult {
+            database: "pubmed".to_string(),
+            query: "asthmaa OR alergies".to_string(),
+            corrected_query: "asthma or allergies".to_string(),
+            spelled_query: vec![
+                SpelledQuerySegment::Original("".to_string()),
+                SpelledQuerySegment::Replaced("asthma".to_string()),
+                SpelledQuerySegment::Original(" OR ".to_string()),
+                SpelledQuerySegment::Replaced("allergies".to_string()),
+            ],
+        };
+        let replacements = result.replacements();
+        assert_eq!(replacements.len(), 2);
+        assert_eq!(replacements[0], "asthma");
+        assert_eq!(replacements[1], "allergies");
     }
 
     #[test]

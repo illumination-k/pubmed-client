@@ -1,5 +1,6 @@
 pub mod citmatch;
 pub mod convert;
+pub mod espell;
 pub mod figures;
 pub mod gquery;
 pub mod markdown;

@@ -10,5 +10,5 @@ pub use client::PyPubMedClient;
 pub use models::{
     PyAffiliation, PyArticleSummary, PyAuthor, PyCitationMatch, PyCitationMatches, PyCitationQuery,
     PyCitations, PyDatabaseCount, PyDatabaseInfo, PyGlobalQueryResults, PyPmcLinks,
-    PyPubMedArticle, PyRelatedArticles,
+    PyPubMedArticle, PyRelatedArticles, PySpellCheckResult,
 };

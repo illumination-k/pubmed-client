@@ -15,7 +15,8 @@ pub use models::{
     Affiliation, ArticleSummary, Author, ChemicalConcept, CitationMatch, CitationMatchStatus,
     CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, FieldInfo,
     GlobalQueryResults, HistorySession, LinkInfo, MeshHeading, MeshQualifier, MeshTerm, PmcLinks,
-    PubMedArticle, RelatedArticles, SearchResult, SupplementalConcept,
+    PubMedArticle, RelatedArticles, SearchResult, SpellCheckResult, SpelledQuerySegment,
+    SupplementalConcept,
 };
 pub use parser::{parse_article_from_xml, parse_articles_from_xml};
 pub use query::{ArticleType, Language, PubDate, SearchQuery, SortOrder};

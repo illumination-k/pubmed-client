@@ -89,6 +89,9 @@ enum Commands {
     /// Query all NCBI databases for record counts
     #[command(name = "gquery")]
     GQuery(commands::gquery::GQuery),
+    /// Check spelling of a search term using the ESpell API
+    #[command(name = "spell-check")]
+    SpellCheck(commands::espell::ESpell),
 }
 
 #[tokio::main]
@@ -174,6 +177,12 @@ async fn main() -> Result<()> {
             cmd.execute_with_config(api_key, email, tool).await
         }
         Commands::GQuery(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::SpellCheck(cmd) => {
             let api_key = cli.api_key.as_deref();
             let email = cli.email.as_deref();
             let tool = &cli.tool;

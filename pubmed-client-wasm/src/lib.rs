@@ -335,6 +335,34 @@ impl WasmPubMedClient {
         })
     }
 
+    /// Check spelling of a search term using the ESpell API (PubMed database)
+    pub fn spell_check(&self, term: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.pubmed.spell_check(&term).await {
+                Ok(result) => {
+                    let js_result = JsSpellCheckResult::from(result);
+                    Ok(serde_wasm_bindgen::to_value(&js_result)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Spell check failed: {e}"))),
+            }
+        })
+    }
+
+    /// Check spelling of a search term against a specific database using the ESpell API
+    pub fn spell_check_db(&self, term: String, db: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.pubmed.spell_check_db(&term, &db).await {
+                Ok(result) => {
+                    let js_result = JsSpellCheckResult::from(result);
+                    Ok(serde_wasm_bindgen::to_value(&js_result)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Spell check failed: {e}"))),
+            }
+        })
+    }
+
     /// Convert PMC full text to markdown
     pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
         let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)
@@ -783,6 +811,38 @@ pub struct JsDatabaseCount {
 pub struct JsGlobalQueryResults {
     pub term: String,
     pub results: Vec<JsDatabaseCount>,
+}
+
+// ================================================================================================
+// ESpell types for WASM
+// ================================================================================================
+
+/// JavaScript-friendly spell check result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsSpellCheckResult {
+    pub database: String,
+    pub query: String,
+    pub corrected_query: String,
+    pub has_corrections: bool,
+    pub replacements: Vec<String>,
+}
+
+impl From<pubmed_client::SpellCheckResult> for JsSpellCheckResult {
+    fn from(result: pubmed_client::SpellCheckResult) -> Self {
+        let has_corrections = result.has_corrections();
+        let replacements = result
+            .replacements()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
+        Self {
+            database: result.database,
+            query: result.query,
+            corrected_query: result.corrected_query,
+            has_corrections,
+            replacements,
+        }
+    }
 }
 
 impl From<pubmed_client::GlobalQueryResults> for JsGlobalQueryResults {
