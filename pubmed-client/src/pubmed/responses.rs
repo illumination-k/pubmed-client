@@ -28,6 +28,22 @@ pub(crate) struct ESearchData {
     pub querytranslation: Option<String>,
 }
 
+// EPost API response structures
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct EPostResponse {
+    pub epostresult: EPostData,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct EPostData {
+    #[serde(default)]
+    pub webenv: Option<String>,
+    #[serde(default, rename = "querykey")]
+    pub query_key: Option<String>,
+    #[serde(default, rename = "ERROR")]
+    pub error: Option<String>,
+}
+
 // EInfo API response structures
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct EInfoResponse {

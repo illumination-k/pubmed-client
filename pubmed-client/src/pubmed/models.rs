@@ -193,6 +193,53 @@ pub struct HistorySession {
     pub query_key: String,
 }
 
+/// Result from EPost API for uploading PMIDs to the NCBI History server
+///
+/// EPost stores a list of UIDs (PMIDs) on the History server and returns
+/// WebEnv/query_key identifiers. These can then be used with `fetch_from_history()`
+/// to retrieve article metadata, or combined with other E-utility calls.
+///
+/// # Example
+///
+/// ```no_run
+/// use pubmed_client_rs::PubMedClient;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let client = PubMedClient::new();
+///
+///     // Upload a list of PMIDs to the history server
+///     let result = client.epost(&["31978945", "33515491", "25760099"]).await?;
+///
+///     // Use the session to fetch articles
+///     let session = result.history_session();
+///     let articles = client.fetch_from_history(&session, 0, 100).await?;
+///     println!("Fetched {} articles", articles.len());
+///
+///     Ok(())
+/// }
+/// ```
+#[derive(Debug, Clone)]
+pub struct EPostResult {
+    /// WebEnv session identifier for the uploaded IDs
+    pub webenv: String,
+    /// Query key for the uploaded IDs within the session
+    pub query_key: String,
+}
+
+impl EPostResult {
+    /// Convert to a HistorySession for use with `fetch_from_history()`
+    ///
+    /// This is a convenience method that creates a `HistorySession` from the
+    /// EPost result, which can then be passed to `fetch_from_history()`.
+    pub fn history_session(&self) -> HistorySession {
+        HistorySession {
+            webenv: self.webenv.clone(),
+            query_key: self.query_key.clone(),
+        }
+    }
+}
+
 /// Medical Subject Heading (MeSH) qualifier/subheading
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MeshQualifier {

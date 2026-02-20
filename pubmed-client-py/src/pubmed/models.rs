@@ -213,6 +213,49 @@ impl PyPubMedArticle {
     }
 }
 
+/// Python wrapper for EPostResult
+///
+/// Result from EPost API for uploading PMIDs to the NCBI History server.
+/// Contains WebEnv and query_key identifiers for use with subsequent API calls.
+///
+/// Attributes:
+///     webenv: WebEnv session identifier
+///     query_key: Query key for the uploaded IDs within the session
+///
+/// Examples:
+///     >>> client = PubMedClient()
+///     >>> result = client.epost(["31978945", "33515491"])
+///     >>> print(f"WebEnv: {result.webenv}, Query Key: {result.query_key}")
+#[gen_stub_pyclass]
+#[pyclass(name = "EPostResult")]
+#[derive(Clone)]
+pub struct PyEPostResult {
+    #[pyo3(get)]
+    pub webenv: String,
+    #[pyo3(get)]
+    pub query_key: String,
+}
+
+impl From<pubmed::EPostResult> for PyEPostResult {
+    fn from(result: pubmed::EPostResult) -> Self {
+        PyEPostResult {
+            webenv: result.webenv,
+            query_key: result.query_key,
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyEPostResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "EPostResult(webenv='{}', query_key='{}')",
+            self.webenv, self.query_key
+        )
+    }
+}
+
 /// Python wrapper for RelatedArticles
 #[gen_stub_pyclass]
 #[pyclass(name = "RelatedArticles")]

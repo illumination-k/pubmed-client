@@ -150,6 +150,11 @@ path = "tests/integration/test_pmc_cache.rs"
 name = "test_webenv"
 path = "tests/integration/test_webenv.rs"
 
+# EPost tests
+[[test]]
+name = "test_epost_mocked"
+path = "tests/integration/test_epost_mocked.rs"
+
 # Batch fetch tests
 [[test]]
 name = "test_batch_fetch_mocked"
