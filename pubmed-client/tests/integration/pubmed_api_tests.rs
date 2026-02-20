@@ -53,7 +53,7 @@ mod integration_tests {
             info!(query = query, "Testing search query");
 
             let start_time = Instant::now();
-            match client.search_articles(query, 10).await {
+            match client.search_articles(query, 10, None).await {
                 Ok(pmids) => {
                     let duration = start_time.elapsed();
                     info!(
@@ -167,7 +167,7 @@ mod integration_tests {
         // Step 1: Search for articles
         info!(query = query, "Step 1: Searching for articles");
 
-        let pmids = match client.search_articles(query, 5).await {
+        let pmids = match client.search_articles(query, 5, None).await {
             Ok(pmids) => {
                 info!(results_count = pmids.len(), "Search completed successfully");
                 pmids
@@ -390,7 +390,7 @@ mod integration_tests {
 
         info!(query = %query, "Testing advanced query");
 
-        match client.search_articles(&query, 15).await {
+        match client.search_articles(&query, 15, None).await {
             Ok(pmids) => {
                 info!(
                     query = %query,
@@ -462,7 +462,7 @@ mod integration_tests {
         for i in 0..8 {
             let query = format!("test query {i}");
 
-            match client.search_articles(&query, 3).await {
+            match client.search_articles(&query, 3, None).await {
                 Ok(pmids) => {
                     successful_requests += 1;
                     debug!(
