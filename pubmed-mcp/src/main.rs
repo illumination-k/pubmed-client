@@ -49,6 +49,16 @@ impl PubMedServer {
     ) -> Result<CallToolResult, ErrorData> {
         tools::gquery::global_query(self, params).await
     }
+
+    #[tool(
+        description = "Check spelling of a search term using the NCBI ESpell API. Returns spelling suggestions and corrected query. Use before searching to improve accuracy."
+    )]
+    async fn spell_check(
+        &self,
+        params: Parameters<tools::espell::SpellCheckRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::espell::spell_check(self, params).await
+    }
 }
 
 #[tool_handler]

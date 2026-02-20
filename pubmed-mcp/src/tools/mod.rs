@@ -5,6 +5,7 @@ use rmcp::handler::server::router::tool::ToolRouter;
 use std::sync::Arc;
 
 pub mod citmatch;
+pub mod espell;
 pub mod gquery;
 pub mod markdown;
 pub mod search;
