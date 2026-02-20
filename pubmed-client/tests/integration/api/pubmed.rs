@@ -27,7 +27,7 @@ mod integration_tests {
     use tracing::{debug, info, warn};
     use tracing_test::traced_test;
 
-    use pubmed_client::{Client, ClientConfig, PubMedError, SearchQuery};
+    use pubmed_client::{ClientConfig, PubMedError, SearchQuery};
 
     // Import test utilities
     use crate::common::integration_test_utils::{
