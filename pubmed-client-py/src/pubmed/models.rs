@@ -348,3 +348,314 @@ impl PyDatabaseInfo {
         )
     }
 }
+
+// ================================================================================================
+// ECitMatch API types
+// ================================================================================================
+
+/// Input for a single citation match query
+///
+/// Used with the ECitMatch API to find PMIDs from citation information
+/// (journal, year, volume, page, author).
+///
+/// Examples:
+///     >>> query = CitationQuery(
+///     ...     journal="proc natl acad sci u s a",
+///     ...     year="1991",
+///     ...     volume="88",
+///     ...     first_page="3248",
+///     ...     author_name="mann bj",
+///     ...     key="Art1",
+///     ... )
+#[gen_stub_pyclass]
+#[pyclass(name = "CitationQuery")]
+#[derive(Clone)]
+pub struct PyCitationQuery {
+    #[pyo3(get)]
+    pub journal: String,
+    #[pyo3(get)]
+    pub year: String,
+    #[pyo3(get)]
+    pub volume: String,
+    #[pyo3(get)]
+    pub first_page: String,
+    #[pyo3(get)]
+    pub author_name: String,
+    #[pyo3(get)]
+    pub key: String,
+}
+
+impl From<&PyCitationQuery> for pubmed::CitationQuery {
+    fn from(query: &PyCitationQuery) -> Self {
+        pubmed::CitationQuery::new(
+            &query.journal,
+            &query.year,
+            &query.volume,
+            &query.first_page,
+            &query.author_name,
+            &query.key,
+        )
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyCitationQuery {
+    #[new]
+    fn new(
+        journal: String,
+        year: String,
+        volume: String,
+        first_page: String,
+        author_name: String,
+        key: String,
+    ) -> Self {
+        PyCitationQuery {
+            journal,
+            year,
+            volume,
+            first_page,
+            author_name,
+            key,
+        }
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "CitationQuery(journal='{}', year='{}', key='{}')",
+            self.journal, self.year, self.key
+        )
+    }
+}
+
+/// Result of a single citation match from the ECitMatch API
+///
+/// Attributes:
+///     journal: Journal title from the query
+///     year: Year from the query
+///     volume: Volume from the query
+///     first_page: First page from the query
+///     author_name: Author name from the query
+///     key: User-defined key from the query
+///     pmid: Matched PMID (None if not found)
+///     status: Match status ("found", "not_found", or "ambiguous")
+#[gen_stub_pyclass]
+#[pyclass(name = "CitationMatch")]
+#[derive(Clone)]
+pub struct PyCitationMatch {
+    #[pyo3(get)]
+    pub journal: String,
+    #[pyo3(get)]
+    pub year: String,
+    #[pyo3(get)]
+    pub volume: String,
+    #[pyo3(get)]
+    pub first_page: String,
+    #[pyo3(get)]
+    pub author_name: String,
+    #[pyo3(get)]
+    pub key: String,
+    #[pyo3(get)]
+    pub pmid: Option<String>,
+    #[pyo3(get)]
+    pub status: String,
+}
+
+impl From<&pubmed::CitationMatch> for PyCitationMatch {
+    fn from(m: &pubmed::CitationMatch) -> Self {
+        let status = match m.status {
+            pubmed::CitationMatchStatus::Found => "found".to_string(),
+            pubmed::CitationMatchStatus::NotFound => "not_found".to_string(),
+            pubmed::CitationMatchStatus::Ambiguous => "ambiguous".to_string(),
+        };
+        PyCitationMatch {
+            journal: m.journal.clone(),
+            year: m.year.clone(),
+            volume: m.volume.clone(),
+            first_page: m.first_page.clone(),
+            author_name: m.author_name.clone(),
+            key: m.key.clone(),
+            pmid: m.pmid.clone(),
+            status,
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyCitationMatch {
+    fn __repr__(&self) -> String {
+        format!(
+            "CitationMatch(key='{}', pmid={:?}, status='{}')",
+            self.key, self.pmid, self.status
+        )
+    }
+}
+
+/// Results from ECitMatch API for batch citation matching
+///
+/// Attributes:
+///     matches: List of CitationMatch results
+#[gen_stub_pyclass]
+#[pyclass(name = "CitationMatches")]
+#[derive(Clone)]
+pub struct PyCitationMatches {
+    inner_matches: Vec<PyCitationMatch>,
+}
+
+impl From<pubmed::CitationMatches> for PyCitationMatches {
+    fn from(results: pubmed::CitationMatches) -> Self {
+        PyCitationMatches {
+            inner_matches: results.matches.iter().map(PyCitationMatch::from).collect(),
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyCitationMatches {
+    /// Get the list of citation match results
+    #[getter]
+    fn matches(&self, py: Python) -> PyResult<Py<PyAny>> {
+        let list = PyList::empty(py);
+        for m in &self.inner_matches {
+            list.append(m.clone())?;
+        }
+        Ok(list.into())
+    }
+
+    /// Get the number of successful matches
+    fn found_count(&self) -> usize {
+        self.inner_matches
+            .iter()
+            .filter(|m| m.status == "found")
+            .count()
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "CitationMatches(total={}, found={})",
+            self.inner_matches.len(),
+            self.found_count()
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.inner_matches.len()
+    }
+}
+
+// ================================================================================================
+// EGQuery API types
+// ================================================================================================
+
+/// Record count for a single NCBI database from the EGQuery API
+///
+/// Attributes:
+///     db_name: Internal database name (e.g., "pubmed", "pmc")
+///     menu_name: Human-readable database name (e.g., "PubMed", "PMC")
+///     count: Number of matching records
+///     status: Query status (e.g., "Ok")
+#[gen_stub_pyclass]
+#[pyclass(name = "DatabaseCount")]
+#[derive(Clone)]
+pub struct PyDatabaseCount {
+    #[pyo3(get)]
+    pub db_name: String,
+    #[pyo3(get)]
+    pub menu_name: String,
+    #[pyo3(get)]
+    pub count: u64,
+    #[pyo3(get)]
+    pub status: String,
+}
+
+impl From<&pubmed::DatabaseCount> for PyDatabaseCount {
+    fn from(dc: &pubmed::DatabaseCount) -> Self {
+        PyDatabaseCount {
+            db_name: dc.db_name.clone(),
+            menu_name: dc.menu_name.clone(),
+            count: dc.count,
+            status: dc.status.clone(),
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyDatabaseCount {
+    fn __repr__(&self) -> String {
+        format!(
+            "DatabaseCount(db_name='{}', count={})",
+            self.db_name, self.count
+        )
+    }
+}
+
+/// Results from EGQuery API for global database search
+///
+/// Attributes:
+///     term: The query term that was searched
+///     results: List of DatabaseCount results for each database
+#[gen_stub_pyclass]
+#[pyclass(name = "GlobalQueryResults")]
+#[derive(Clone)]
+pub struct PyGlobalQueryResults {
+    #[pyo3(get)]
+    pub term: String,
+    inner_results: Vec<PyDatabaseCount>,
+}
+
+impl From<pubmed::GlobalQueryResults> for PyGlobalQueryResults {
+    fn from(results: pubmed::GlobalQueryResults) -> Self {
+        PyGlobalQueryResults {
+            term: results.term,
+            inner_results: results.results.iter().map(PyDatabaseCount::from).collect(),
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PyGlobalQueryResults {
+    /// Get the list of database count results
+    #[getter]
+    fn results(&self, py: Python) -> PyResult<Py<PyAny>> {
+        let list = PyList::empty(py);
+        for r in &self.inner_results {
+            list.append(r.clone())?;
+        }
+        Ok(list.into())
+    }
+
+    /// Get results with count > 0
+    fn non_zero(&self, py: Python) -> PyResult<Py<PyAny>> {
+        let list = PyList::empty(py);
+        for r in &self.inner_results {
+            if r.count > 0 {
+                list.append(r.clone())?;
+            }
+        }
+        Ok(list.into())
+    }
+
+    /// Get count for a specific database
+    fn count_for(&self, db_name: &str) -> Option<u64> {
+        self.inner_results
+            .iter()
+            .find(|r| r.db_name == db_name)
+            .map(|r| r.count)
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "GlobalQueryResults(term='{}', databases={})",
+            self.term,
+            self.inner_results.len()
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.inner_results.len()
+    }
+}

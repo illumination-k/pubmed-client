@@ -246,6 +246,53 @@ impl WasmPubMedClient {
         .unchecked_into()
     }
 
+    /// Match citations to PMIDs using the ECitMatch API
+    pub fn match_citations(&self, citations: JsValue) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let citation_inputs: Vec<JsCitationQuery> =
+                serde_wasm_bindgen::from_value(citations)
+                    .map_err(|e| JsValue::from_str(&format!("Invalid citations data: {e}")))?;
+
+            let rust_citations: Vec<pubmed_client::CitationQuery> = citation_inputs
+                .iter()
+                .map(|c| {
+                    pubmed_client::CitationQuery::new(
+                        &c.journal,
+                        &c.year,
+                        &c.volume,
+                        &c.first_page,
+                        &c.author_name,
+                        &c.key,
+                    )
+                })
+                .collect();
+
+            match client.pubmed.match_citations(&rust_citations).await {
+                Ok(results) => {
+                    let js_results: Vec<JsCitationMatch> =
+                        results.matches.iter().map(JsCitationMatch::from).collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_results)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Citation match failed: {e}"))),
+            }
+        })
+    }
+
+    /// Query all NCBI databases for record counts
+    pub fn global_query(&self, term: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.pubmed.global_query(&term).await {
+                Ok(results) => {
+                    let js_results = JsGlobalQueryResults::from(results);
+                    Ok(serde_wasm_bindgen::to_value(&js_results)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Global query failed: {e}"))),
+            }
+        })
+    }
+
     /// Convert PMC full text to markdown
     pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
         let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)
@@ -560,6 +607,92 @@ impl From<JsReference> for pubmed_client::pmc::Reference {
             pmid: js.pmid,
             doi: js.doi,
             ref_type: None,
+        }
+    }
+}
+
+// ================================================================================================
+// ECitMatch types for WASM
+// ================================================================================================
+
+/// JavaScript-friendly citation query input
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsCitationQuery {
+    pub journal: String,
+    pub year: String,
+    pub volume: String,
+    pub first_page: String,
+    pub author_name: String,
+    pub key: String,
+}
+
+/// JavaScript-friendly citation match result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsCitationMatch {
+    pub journal: String,
+    pub year: String,
+    pub volume: String,
+    pub first_page: String,
+    pub author_name: String,
+    pub key: String,
+    pub pmid: Option<String>,
+    pub status: String,
+}
+
+impl From<&pubmed_client::CitationMatch> for JsCitationMatch {
+    fn from(m: &pubmed_client::CitationMatch) -> Self {
+        let status = match m.status {
+            pubmed_client::CitationMatchStatus::Found => "found",
+            pubmed_client::CitationMatchStatus::NotFound => "not_found",
+            pubmed_client::CitationMatchStatus::Ambiguous => "ambiguous",
+        };
+        Self {
+            journal: m.journal.clone(),
+            year: m.year.clone(),
+            volume: m.volume.clone(),
+            first_page: m.first_page.clone(),
+            author_name: m.author_name.clone(),
+            key: m.key.clone(),
+            pmid: m.pmid.clone(),
+            status: status.to_string(),
+        }
+    }
+}
+
+// ================================================================================================
+// EGQuery types for WASM
+// ================================================================================================
+
+/// JavaScript-friendly database count result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsDatabaseCount {
+    pub db_name: String,
+    pub menu_name: String,
+    pub count: u64,
+    pub status: String,
+}
+
+/// JavaScript-friendly global query results
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsGlobalQueryResults {
+    pub term: String,
+    pub results: Vec<JsDatabaseCount>,
+}
+
+impl From<pubmed_client::GlobalQueryResults> for JsGlobalQueryResults {
+    fn from(results: pubmed_client::GlobalQueryResults) -> Self {
+        Self {
+            term: results.term,
+            results: results
+                .results
+                .into_iter()
+                .map(|r| JsDatabaseCount {
+                    db_name: r.db_name,
+                    menu_name: r.menu_name,
+                    count: r.count,
+                    status: r.status,
+                })
+                .collect(),
         }
     }
 }

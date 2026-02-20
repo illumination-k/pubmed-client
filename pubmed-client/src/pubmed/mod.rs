@@ -12,9 +12,10 @@ pub mod responses;
 // Re-export public types
 pub use client::PubMedClient;
 pub use models::{
-    Affiliation, Author, ChemicalConcept, Citations, DatabaseInfo, FieldInfo, HistorySession,
-    LinkInfo, MeshHeading, MeshQualifier, MeshTerm, PmcLinks, PubMedArticle, RelatedArticles,
-    SearchResult, SupplementalConcept,
+    Affiliation, Author, ChemicalConcept, CitationMatch, CitationMatchStatus, CitationMatches,
+    CitationQuery, Citations, DatabaseCount, DatabaseInfo, FieldInfo, GlobalQueryResults,
+    HistorySession, LinkInfo, MeshHeading, MeshQualifier, MeshTerm, PmcLinks, PubMedArticle,
+    RelatedArticles, SearchResult, SupplementalConcept,
 };
 pub use parser::{parse_article_from_xml, parse_articles_from_xml};
 pub use query::{ArticleType, Language, PubDate, SearchQuery};

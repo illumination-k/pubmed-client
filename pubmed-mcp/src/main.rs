@@ -29,6 +29,26 @@ impl PubMedServer {
     ) -> Result<CallToolResult, ErrorData> {
         tools::markdown::get_pmc_markdown(self, params).await
     }
+
+    #[tool(
+        description = "Match citations to PubMed IDs (PMIDs) using journal name, year, volume, page, and author. Useful for identifying PMIDs from reference lists."
+    )]
+    async fn match_citations(
+        &self,
+        params: Parameters<tools::citmatch::CitMatchRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::citmatch::match_citations(self, params).await
+    }
+
+    #[tool(
+        description = "Query all NCBI databases for record counts matching a search term. Returns hit counts across all Entrez databases (PubMed, PMC, Nucleotide, Protein, etc.)."
+    )]
+    async fn global_query(
+        &self,
+        params: Parameters<tools::gquery::GlobalQueryRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::gquery::global_query(self, params).await
+    }
 }
 
 #[tool_handler]

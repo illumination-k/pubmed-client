@@ -4,7 +4,8 @@ use crate::common::PubMedId;
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
-    Citations, DatabaseInfo, FieldInfo, HistorySession, LinkInfo, PmcLinks, PubMedArticle,
+    CitationMatch, CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount,
+    DatabaseInfo, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, PmcLinks, PubMedArticle,
     RelatedArticles, SearchResult,
 };
 use crate::pubmed::parser::parse_articles_from_xml;
@@ -1187,6 +1188,215 @@ impl PubMedClient {
         })
     }
 
+    /// Match citations to PMIDs using the ECitMatch API
+    ///
+    /// This method takes citation information (journal, year, volume, page, author)
+    /// and returns the corresponding PMIDs. Useful for identifying PMIDs from
+    /// reference lists.
+    ///
+    /// # Arguments
+    ///
+    /// * `citations` - List of citation queries to match
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<CitationMatches>` containing match results for each citation
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::{PubMedClient, pubmed::CitationQuery};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let citations = vec![
+    ///         CitationQuery::new(
+    ///             "proc natl acad sci u s a", "1991", "88", "3248", "mann bj", "Art1",
+    ///         ),
+    ///         CitationQuery::new(
+    ///             "science", "1987", "235", "182", "palmenberg ac", "Art2",
+    ///         ),
+    ///     ];
+    ///     let results = client.match_citations(&citations).await?;
+    ///     for m in &results.matches {
+    ///         println!("{}: {:?} ({:?})", m.key, m.pmid, m.status);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(citations_count = citations.len()))]
+    pub async fn match_citations(&self, citations: &[CitationQuery]) -> Result<CitationMatches> {
+        if citations.is_empty() {
+            return Ok(CitationMatches {
+                matches: Vec::new(),
+            });
+        }
+
+        // Build bdata parameter: citations separated by %0D (carriage return)
+        let bdata: String = citations
+            .iter()
+            .map(|c| c.to_bdata())
+            .collect::<Vec<_>>()
+            .join("%0D");
+
+        let url = format!(
+            "{}/ecitmatch.cgi?db=pubmed&retmode=xml&bdata={}",
+            self.base_url, bdata
+        );
+
+        debug!(
+            citations_count = citations.len(),
+            "Making ECitMatch API request"
+        );
+        let response = self.make_request(&url).await?;
+        let text = response.text().await?;
+
+        // Parse pipe-delimited response
+        let matches = Self::parse_ecitmatch_response(&text);
+
+        info!(
+            citations_count = citations.len(),
+            matched_count = matches
+                .iter()
+                .filter(|m| m.status == CitationMatchStatus::Found)
+                .count(),
+            "ECitMatch completed"
+        );
+
+        Ok(CitationMatches { matches })
+    }
+
+    /// Parse ECitMatch pipe-delimited response into CitationMatch results
+    fn parse_ecitmatch_response(text: &str) -> Vec<CitationMatch> {
+        let mut matches = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+
+            let parts: Vec<&str> = line.split('|').collect();
+            if parts.len() >= 7 {
+                let pmid_str = parts[6].trim();
+                let (pmid, status) = if pmid_str.is_empty() {
+                    (None, CitationMatchStatus::NotFound)
+                } else if pmid_str.eq_ignore_ascii_case("AMBIGUOUS") {
+                    (None, CitationMatchStatus::Ambiguous)
+                } else {
+                    (Some(pmid_str.to_string()), CitationMatchStatus::Found)
+                };
+
+                matches.push(CitationMatch {
+                    journal: parts[0].replace('+', " "),
+                    year: parts[1].to_string(),
+                    volume: parts[2].to_string(),
+                    first_page: parts[3].to_string(),
+                    author_name: parts[4].replace('+', " "),
+                    key: parts[5].to_string(),
+                    pmid,
+                    status,
+                });
+            }
+        }
+
+        matches
+    }
+
+    /// Query all NCBI databases for record counts using the EGQuery API
+    ///
+    /// Returns the number of records matching the query in each Entrez database.
+    /// Useful for exploratory searches and understanding data distribution across databases.
+    ///
+    /// # Arguments
+    ///
+    /// * `term` - Search query string
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<GlobalQueryResults>` containing counts per database
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let results = client.global_query("asthma").await?;
+    ///     println!("Query: {}", results.term);
+    ///     for db in results.non_zero() {
+    ///         println!("  {}: {} records", db.menu_name, db.count);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self))]
+    pub async fn global_query(&self, term: &str) -> Result<GlobalQueryResults> {
+        let term = term.trim();
+        if term.is_empty() {
+            return Err(PubMedError::InvalidQuery(
+                "Search term cannot be empty".to_string(),
+            ));
+        }
+
+        let url = format!(
+            "{}/egquery.fcgi?term={}",
+            self.base_url,
+            urlencoding::encode(term)
+        );
+
+        debug!(term = %term, "Making EGQuery API request");
+        let response = self.make_request(&url).await?;
+        let xml_text = response.text().await?;
+
+        // Parse XML response using string-based extraction (consistent with existing xml_utils)
+        let results = Self::parse_egquery_response(&xml_text, term)?;
+
+        info!(
+            term = %term,
+            database_count = results.results.len(),
+            non_zero_count = results.non_zero().len(),
+            "EGQuery completed"
+        );
+
+        Ok(results)
+    }
+
+    /// Parse EGQuery XML response into GlobalQueryResults
+    fn parse_egquery_response(xml: &str, query_term: &str) -> Result<GlobalQueryResults> {
+        use crate::common::xml_utils::{extract_all_text_between, extract_text_between};
+
+        // Extract the term from response, fallback to the query term
+        let term = extract_text_between(xml, "<Term>", "</Term>")
+            .unwrap_or_else(|| query_term.to_string());
+
+        // Extract all ResultItem blocks
+        let result_items = extract_all_text_between(xml, "<ResultItem>", "</ResultItem>");
+
+        let mut results = Vec::new();
+        for item in &result_items {
+            let db_name = extract_text_between(item, "<DbName>", "</DbName>").unwrap_or_default();
+            let menu_name =
+                extract_text_between(item, "<MenuName>", "</MenuName>").unwrap_or_default();
+            let count_str = extract_text_between(item, "<Count>", "</Count>").unwrap_or_default();
+            let status = extract_text_between(item, "<Status>", "</Status>").unwrap_or_default();
+
+            let count = count_str.parse::<u64>().unwrap_or(0);
+
+            results.push(DatabaseCount {
+                db_name,
+                menu_name,
+                count,
+                status,
+            });
+        }
+
+        Ok(GlobalQueryResults { term, results })
+    }
+
     /// Internal helper method for making HTTP requests with retry logic
     /// Automatically appends API parameters (api_key, email, tool) to the URL
     async fn make_request(&self, url: &str) -> Result<Response> {
@@ -1409,6 +1619,202 @@ mod tests {
             assert!(e.to_string().contains("empty"));
         }
     }
+
+    // ========================================================================================
+    // ECitMatch parsing tests
+    // ========================================================================================
+
+    #[test]
+    fn test_parse_ecitmatch_response_found() {
+        let response = "proc natl acad sci u s a|1991|88|3248|mann bj|Art1|2014248\n";
+        let matches = PubMedClient::parse_ecitmatch_response(response);
+
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].journal, "proc natl acad sci u s a");
+        assert_eq!(matches[0].year, "1991");
+        assert_eq!(matches[0].volume, "88");
+        assert_eq!(matches[0].first_page, "3248");
+        assert_eq!(matches[0].author_name, "mann bj");
+        assert_eq!(matches[0].key, "Art1");
+        assert_eq!(matches[0].pmid, Some("2014248".to_string()));
+        assert_eq!(matches[0].status, CitationMatchStatus::Found);
+    }
+
+    #[test]
+    fn test_parse_ecitmatch_response_not_found() {
+        let response = "fake journal|2000|1|1|nobody|ref1|\n";
+        let matches = PubMedClient::parse_ecitmatch_response(response);
+
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].pmid, None);
+        assert_eq!(matches[0].status, CitationMatchStatus::NotFound);
+    }
+
+    #[test]
+    fn test_parse_ecitmatch_response_ambiguous() {
+        let response = "some journal|2000|1|1|smith|ref1|AMBIGUOUS\n";
+        let matches = PubMedClient::parse_ecitmatch_response(response);
+
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].pmid, None);
+        assert_eq!(matches[0].status, CitationMatchStatus::Ambiguous);
+    }
+
+    #[test]
+    fn test_parse_ecitmatch_response_multiple() {
+        let response = concat!(
+            "proc natl acad sci u s a|1991|88|3248|mann bj|Art1|2014248\n",
+            "science|1987|235|182|palmenberg ac|Art2|3026048\n",
+        );
+        let matches = PubMedClient::parse_ecitmatch_response(response);
+
+        assert_eq!(matches.len(), 2);
+        assert_eq!(matches[0].pmid, Some("2014248".to_string()));
+        assert_eq!(matches[1].pmid, Some("3026048".to_string()));
+    }
+
+    #[test]
+    fn test_parse_ecitmatch_response_empty() {
+        let matches = PubMedClient::parse_ecitmatch_response("");
+        assert!(matches.is_empty());
+    }
+
+    #[test]
+    fn test_parse_ecitmatch_response_plus_to_space() {
+        let response = "proc+natl+acad+sci|1991|88|3248|mann+bj|Art1|2014248\n";
+        let matches = PubMedClient::parse_ecitmatch_response(response);
+
+        assert_eq!(matches[0].journal, "proc natl acad sci");
+        assert_eq!(matches[0].author_name, "mann bj");
+    }
+
+    #[test]
+    fn test_citation_query_to_bdata() {
+        let query = CitationQuery::new(
+            "proc natl acad sci u s a",
+            "1991",
+            "88",
+            "3248",
+            "mann bj",
+            "Art1",
+        );
+        let bdata = query.to_bdata();
+        assert_eq!(bdata, "proc+natl+acad+sci+u+s+a|1991|88|3248|mann+bj|Art1|");
+    }
+
+    #[test]
+    fn test_empty_citations_match() {
+        use tokio_test;
+        let client = PubMedClient::new();
+        let result = tokio_test::block_on(client.match_citations(&[]));
+        assert!(result.is_ok());
+        assert!(result.unwrap().matches.is_empty());
+    }
+
+    // ========================================================================================
+    // EGQuery parsing tests
+    // ========================================================================================
+
+    #[test]
+    fn test_parse_egquery_response() {
+        let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+<Result>
+  <Term>asthma</Term>
+  <eGQueryResult>
+    <ResultItem>
+      <DbName>pubmed</DbName>
+      <MenuName>PubMed</MenuName>
+      <Count>234567</Count>
+      <Status>Ok</Status>
+    </ResultItem>
+    <ResultItem>
+      <DbName>pmc</DbName>
+      <MenuName>PMC</MenuName>
+      <Count>89012</Count>
+      <Status>Ok</Status>
+    </ResultItem>
+    <ResultItem>
+      <DbName>mesh</DbName>
+      <MenuName>MeSH</MenuName>
+      <Count>0</Count>
+      <Status>Ok</Status>
+    </ResultItem>
+  </eGQueryResult>
+</Result>"#;
+
+        let result = PubMedClient::parse_egquery_response(xml, "asthma").unwrap();
+        assert_eq!(result.term, "asthma");
+        assert_eq!(result.results.len(), 3);
+
+        assert_eq!(result.results[0].db_name, "pubmed");
+        assert_eq!(result.results[0].menu_name, "PubMed");
+        assert_eq!(result.results[0].count, 234567);
+        assert_eq!(result.results[0].status, "Ok");
+
+        assert_eq!(result.results[1].db_name, "pmc");
+        assert_eq!(result.results[1].count, 89012);
+
+        // Test helper methods
+        let non_zero = result.non_zero();
+        assert_eq!(non_zero.len(), 2); // pubmed and pmc, not mesh
+
+        assert_eq!(result.count_for("pubmed"), Some(234567));
+        assert_eq!(result.count_for("pmc"), Some(89012));
+        assert_eq!(result.count_for("mesh"), Some(0));
+        assert_eq!(result.count_for("nonexistent"), None);
+    }
+
+    #[test]
+    fn test_parse_egquery_response_empty() {
+        let xml = r#"<Result><Term>test</Term><eGQueryResult></eGQueryResult></Result>"#;
+        let result = PubMedClient::parse_egquery_response(xml, "test").unwrap();
+        assert_eq!(result.term, "test");
+        assert!(result.results.is_empty());
+    }
+
+    #[test]
+    fn test_parse_egquery_response_error_status() {
+        let xml = r#"<Result>
+  <Term>test</Term>
+  <eGQueryResult>
+    <ResultItem>
+      <DbName>pubmed</DbName>
+      <MenuName>PubMed</MenuName>
+      <Count>100</Count>
+      <Status>Ok</Status>
+    </ResultItem>
+    <ResultItem>
+      <DbName>snp</DbName>
+      <MenuName>SNP</MenuName>
+      <Count>0</Count>
+      <Status>Term or Database is not found</Status>
+    </ResultItem>
+  </eGQueryResult>
+</Result>"#;
+        let result = PubMedClient::parse_egquery_response(xml, "test").unwrap();
+        assert_eq!(result.results.len(), 2);
+        assert_eq!(result.results[1].status, "Term or Database is not found");
+    }
+
+    #[test]
+    fn test_global_query_empty_term() {
+        use tokio_test;
+        let client = PubMedClient::new();
+        let result = tokio_test::block_on(client.global_query(""));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_global_query_whitespace_term() {
+        use tokio_test;
+        let client = PubMedClient::new();
+        let result = tokio_test::block_on(client.global_query("   "));
+        assert!(result.is_err());
+    }
+
+    // ========================================================================================
+    // fetch_articles tests
+    // ========================================================================================
 
     #[tokio::test]
     async fn test_fetch_articles_empty_input() {
