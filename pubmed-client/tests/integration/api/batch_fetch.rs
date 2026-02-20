@@ -11,6 +11,7 @@
 //! PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test test_batch_fetch_api
 //! ```
 
+#[path = "../common/mod.rs"]
 mod common;
 
 #[cfg(feature = "integration-tests")]

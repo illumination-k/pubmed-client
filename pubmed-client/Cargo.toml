@@ -60,109 +60,80 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-test = "0.2"
 wiremock = "0.6"
 
-# Integration tests
-# Comprehensive test suites
-[[test]]
-name = "comprehensive_pmc_tests"
-path = "tests/integration/comprehensive_pmc_tests.rs"
+# --- Parsing tests (fixture-based, no network) ---
 
 [[test]]
-name = "comprehensive_pubmed_tests"
-path = "tests/integration/comprehensive_pubmed_tests.rs"
+name = "parsing_pubmed"
+path = "tests/integration/parsing/pubmed.rs"
 
 [[test]]
-name = "comprehensive_einfo_tests"
-path = "tests/integration/comprehensive_einfo_tests.rs"
+name = "parsing_pmc"
+path = "tests/integration/parsing/pmc.rs"
 
 [[test]]
-name = "comprehensive_elink_tests"
-path = "tests/integration/comprehensive_elink_tests.rs"
-
-# Feature-specific tests
-[[test]]
-name = "markdown_tests"
-path = "tests/integration/markdown_tests.rs"
+name = "parsing_einfo"
+path = "tests/integration/parsing/einfo.rs"
 
 [[test]]
-name = "pmc_xml_tests"
-path = "tests/integration/pmc_xml_tests.rs"
+name = "parsing_elink"
+path = "tests/integration/parsing/elink.rs"
+
+# --- Mocked tests (wiremock/offline, no network) ---
 
 [[test]]
-name = "test_abstract_parsing"
-path = "tests/integration/test_abstract_parsing.rs"
+name = "mocked_markdown"
+path = "tests/integration/mocked/markdown.rs"
 
 [[test]]
-name = "test_einfo_integration"
-path = "tests/integration/test_einfo_integration.rs"
+name = "mocked_figures"
+path = "tests/integration/mocked/figures.rs"
 
 [[test]]
-name = "test_elink_integration"
-path = "tests/integration/test_elink_integration.rs"
+name = "mocked_supplementary"
+path = "tests/integration/mocked/supplementary.rs"
 
 [[test]]
-name = "test_integration_abstract"
-path = "tests/integration/test_integration_abstract.rs"
+name = "mocked_tar"
+path = "tests/integration/mocked/tar.rs"
 
 [[test]]
-name = "test_mesh_integration"
-path = "tests/integration/test_mesh_integration.rs"
+name = "mocked_cache"
+path = "tests/integration/mocked/cache.rs"
 
 [[test]]
-name = "test_rate_limiting_mocked"
-path = "tests/integration/test_rate_limiting_mocked.rs"
+name = "mocked_batch_fetch"
+path = "tests/integration/mocked/batch_fetch.rs"
 
 [[test]]
-name = "test_supplemental_material"
-path = "tests/integration/test_supplementary_materials.rs"
+name = "mocked_search_options"
+path = "tests/integration/mocked/search_options.rs"
 
 [[test]]
-name = "test_tar_extraction"
-path = "tests/integration/test_tar_extraction.rs"
+name = "mocked_rate_limiting"
+path = "tests/integration/mocked/rate_limiting.rs"
+
+# --- API tests (opt-in, require network + PUBMED_REAL_API_TESTS=1) ---
 
 [[test]]
-name = "test_figure_extraction"
-path = "tests/integration/test_figure_extraction.rs"
-
-# Real API tests (opt-in)
-[[test]]
-name = "test_real_api_rate_limiting"
-path = "tests/integration/test_real_api_rate_limiting.rs"
+name = "api_pubmed"
+path = "tests/integration/api/pubmed.rs"
 
 [[test]]
-name = "pubmed_api_tests"
-path = "tests/integration/pubmed_api_tests.rs"
+name = "api_pmc"
+path = "tests/integration/api/pmc.rs"
 
 [[test]]
-name = "pmc_api_tests"
-path = "tests/integration/pmc_api_tests.rs"
+name = "api_error_handling"
+path = "tests/integration/api/error_handling.rs"
 
 [[test]]
-name = "error_handling_tests"
-path = "tests/integration/error_handling_tests.rs"
-
-# Caching tests
-[[test]]
-name = "test_pmc_cache"
-path = "tests/integration/test_pmc_cache.rs"
-
-# WebEnv/History server tests
-[[test]]
-name = "test_webenv"
-path = "tests/integration/test_webenv.rs"
-
-# Batch fetch tests
-[[test]]
-name = "test_batch_fetch_mocked"
-path = "tests/integration/test_batch_fetch_mocked.rs"
+name = "api_rate_limiting"
+path = "tests/integration/api/rate_limiting.rs"
 
 [[test]]
-name = "test_batch_fetch_api"
-path = "tests/integration/test_batch_fetch_api.rs"
+name = "api_batch_fetch"
+path = "tests/integration/api/batch_fetch.rs"
 
-# Search options tests (sort, query translation)
 [[test]]
-name = "test_search_options"
-path = "tests/integration/test_search_options.rs"
-
-# Examples
-# (Python examples are in pubmed-client-py/examples/)
+name = "api_webenv"
+path = "tests/integration/api/webenv.rs"

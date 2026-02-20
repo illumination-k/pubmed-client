@@ -17,6 +17,7 @@
 //! PUBMED_REAL_API_TESTS=1 NCBI_API_KEY=your_key cargo test --features integration-tests --test pubmed_api_tests
 //! ```
 
+#[path = "../common/mod.rs"]
 mod common;
 
 #[cfg(feature = "integration-tests")]
@@ -26,12 +27,12 @@ mod integration_tests {
     use tracing::{debug, info, warn};
     use tracing_test::traced_test;
 
-    use pubmed_client::{PubMedError, SearchQuery};
+    use pubmed_client::{Client, ClientConfig, PubMedError, SearchQuery};
 
     // Import test utilities
     use crate::common::integration_test_utils::{
-        create_test_pubmed_client, should_run_real_api_tests, TEST_PMIDS, TEST_PMIDS_STR,
-        TEST_SEARCH_QUERIES,
+        create_test_client, create_test_pubmed_client, should_run_real_api_tests, TEST_PMIDS,
+        TEST_PMIDS_STR, TEST_SEARCH_QUERIES,
     };
 
     /// Test basic article search functionality with real API
@@ -555,6 +556,435 @@ mod integration_tests {
             Err(e) => {
                 warn!(pmid = pmid, error = %e, "Failed to fetch article for MeSH test");
                 panic!("Should be able to fetch article for MeSH test");
+            }
+        }
+    }
+
+    // ==================================================================================
+    // Abstract fetch tests (from test_integration_abstract.rs)
+    // ==================================================================================
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_fetch_article_with_abstract_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+
+        info!("Testing abstract retrieval for article with known abstract");
+        let article = client.fetch_article("31978945").await.unwrap();
+
+        assert!(
+            article.abstract_text.is_some(),
+            "Abstract should not be None!"
+        );
+
+        let abstract_text = article.abstract_text.unwrap();
+        info!(
+            abstract_length = abstract_text.len(),
+            "Abstract retrieved successfully"
+        );
+
+        assert!(
+            abstract_text.contains("2019"),
+            "Abstract should mention 2019"
+        );
+        assert!(abstract_text.len() > 100, "Abstract should be substantial");
+        assert_eq!(article.pmid, "31978945");
+        assert!(!article.title.is_empty());
+        assert!(!article.authors.is_empty());
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_fetch_article_without_abstract_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+
+        info!("Testing article without abstract");
+        let article = client.fetch_article("33515491").await.unwrap();
+
+        assert_eq!(article.pmid, "33515491");
+        assert!(!article.title.is_empty());
+
+        if let Some(abstract_text) = &article.abstract_text {
+            info!(abstract_length = abstract_text.len(), "Abstract found");
+        } else {
+            info!("No abstract found for this article - this is expected");
+        }
+    }
+
+    // ==================================================================================
+    // EInfo API tests (from test_einfo_integration.rs)
+    // ==================================================================================
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_get_database_list_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+
+        let databases = client.get_database_list().await.unwrap();
+        assert!(!databases.is_empty(), "Database list should not be empty");
+        assert!(
+            databases.contains(&"pubmed".to_string()),
+            "Should contain pubmed database"
+        );
+        assert!(
+            databases.contains(&"pmc".to_string()),
+            "Should contain pmc database"
+        );
+
+        info!(
+            database_count = databases.len(),
+            first_databases = ?&databases[..10.min(databases.len())],
+            "Found databases"
+        );
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_get_pubmed_database_info_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+
+        let db_info = client.get_database_info("pubmed").await.unwrap();
+        assert_eq!(db_info.name, "pubmed");
+        assert!(
+            !db_info.description.is_empty(),
+            "Description should not be empty"
+        );
+        assert!(!db_info.fields.is_empty(), "Should have search fields");
+
+        let field_names: Vec<&str> = db_info.fields.iter().map(|f| f.name.as_str()).collect();
+        assert!(field_names.contains(&"TITL"), "Should have title field");
+        assert!(field_names.contains(&"FULL"), "Should have author field");
+
+        info!(
+            description = %db_info.description,
+            field_count = db_info.fields.len(),
+            link_count = db_info.links.len(),
+            "PubMed database information"
+        );
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_get_pmc_database_info_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+
+        let db_info = client.get_database_info("pmc").await.unwrap();
+        assert_eq!(db_info.name, "pmc");
+        assert!(
+            !db_info.description.is_empty(),
+            "Description should not be empty"
+        );
+
+        info!(
+            description = %db_info.description,
+            field_count = db_info.fields.len(),
+            link_count = db_info.links.len(),
+            "PMC database information"
+        );
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_combined_client_einfo() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_client();
+
+        let databases = client.get_database_list().await.unwrap();
+        assert!(!databases.is_empty(), "Database list should not be empty");
+        info!(
+            database_count = databases.len(),
+            "Combined client found databases"
+        );
+
+        let db_info = client.get_database_info("pubmed").await.unwrap();
+        assert_eq!(db_info.name, "pubmed");
+        info!(
+            field_count = db_info.fields.len(),
+            "Combined client got PubMed info"
+        );
+    }
+
+    // ==================================================================================
+    // ELink API tests (from test_elink_integration.rs)
+    // ==================================================================================
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_get_related_articles_direct_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+        let test_pmids = vec![31978945];
+
+        let related = client.get_related_articles(&test_pmids).await.unwrap();
+        assert_eq!(related.source_pmids, test_pmids);
+        assert_eq!(related.link_type, "pubmed_pubmed");
+        info!(
+            related_count = related.related_pmids.len(),
+            pmid = test_pmids[0],
+            "Found related articles"
+        );
+
+        for &pmid in &related.related_pmids {
+            assert!(
+                !test_pmids.contains(&pmid),
+                "Related articles should not include source PMID"
+            );
+        }
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_get_pmc_links_direct_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+        let test_pmids = vec![31978945, 33515491];
+
+        let pmc_links = client.get_pmc_links(&test_pmids).await.unwrap();
+        assert_eq!(pmc_links.source_pmids, test_pmids);
+        info!(
+            pmc_count = pmc_links.pmc_ids.len(),
+            pmid_count = test_pmids.len(),
+            "Found PMC articles"
+        );
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_get_citations_direct_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+        let test_pmids = vec![31978945];
+
+        let citations = client.get_citations(&test_pmids).await.unwrap();
+        assert_eq!(citations.source_pmids, test_pmids);
+        assert_eq!(citations.link_type, "pubmed_pubmed_citedin");
+        info!(
+            citing_count = citations.citing_pmids.len(),
+            pmid = test_pmids[0],
+            "Found citing articles"
+        );
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_empty_pmids_handling() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+        let empty_pmids: Vec<u32> = vec![];
+
+        let related = client.get_related_articles(&empty_pmids).await.unwrap();
+        assert!(related.source_pmids.is_empty());
+        assert!(related.related_pmids.is_empty());
+        assert_eq!(related.link_type, "pubmed_pubmed");
+
+        let pmc_links = client.get_pmc_links(&empty_pmids).await.unwrap();
+        assert!(pmc_links.source_pmids.is_empty());
+        assert!(pmc_links.pmc_ids.is_empty());
+
+        let citations = client.get_citations(&empty_pmids).await.unwrap();
+        assert!(citations.source_pmids.is_empty());
+        assert!(citations.citing_pmids.is_empty());
+        assert_eq!(citations.link_type, "pubmed_pubmed_citedin");
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_elink_methods_through_combined_client() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_client();
+        let test_pmids = vec![31978945];
+
+        let related = client.get_related_articles(&test_pmids).await.unwrap();
+        info!(
+            related_count = related.related_pmids.len(),
+            "Combined client found related articles"
+        );
+
+        let pmc_links = client.get_pmc_links(&test_pmids).await.unwrap();
+        info!(
+            pmc_count = pmc_links.pmc_ids.len(),
+            "Combined client found PMC links"
+        );
+
+        let citations = client.get_citations(&test_pmids).await.unwrap();
+        info!(
+            citing_count = citations.citing_pmids.len(),
+            "Combined client found citations"
+        );
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_multiple_pmids_handling() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+        let multiple_pmids = vec![31978945, 33515491, 32960547];
+
+        let related = client.get_related_articles(&multiple_pmids).await.unwrap();
+        assert_eq!(related.source_pmids, multiple_pmids);
+        info!(
+            related_count = related.related_pmids.len(),
+            source_count = multiple_pmids.len(),
+            "Multiple PMIDs: Found related articles"
+        );
+
+        for &source_pmid in &multiple_pmids {
+            assert!(
+                !related.related_pmids.contains(&source_pmid),
+                "Related articles should not contain source PMIDs"
+            );
+        }
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_elink_deduplication() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+        let duplicate_pmids = vec![31978945, 31978945, 31978945];
+
+        let related = client.get_related_articles(&duplicate_pmids).await.unwrap();
+        assert_eq!(related.source_pmids, duplicate_pmids);
+
+        let mut sorted_related = related.related_pmids.clone();
+        sorted_related.sort_unstable();
+        let original_len = sorted_related.len();
+        sorted_related.dedup();
+        assert_eq!(
+            original_len,
+            sorted_related.len(),
+            "Related PMIDs should already be deduplicated"
+        );
+    }
+
+    // ==================================================================================
+    // MeSH search tests (from test_mesh_integration.rs)
+    // ==================================================================================
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_mesh_search_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let config = ClientConfig::new().with_rate_limit(1.0);
+        let client = pubmed_client::PubMedClient::with_config(config);
+
+        let articles = SearchQuery::new()
+            .mesh_major_topic("COVID-19")
+            .mesh_subheading("prevention & control")
+            .published_after(2023)
+            .limit(5)
+            .search_and_fetch(&client)
+            .await
+            .unwrap();
+
+        assert!(!articles.is_empty());
+
+        for article in &articles {
+            info!(pmid = %article.pmid, title = %article.title, "Found article");
+            if article.mesh_headings.is_some() {
+                let mesh_terms = article.get_all_mesh_terms();
+                info!(mesh_terms = %mesh_terms.join(", "), "Article MeSH terms");
+
+                let major_terms = article.get_major_mesh_terms();
+                info!(major_topics = %major_terms.join(", "), "Major topics");
+            }
+        }
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_chemical_search_integration() {
+        if !should_run_real_api_tests() {
+            info!("Skipping real API test - enable with PUBMED_REAL_API_TESTS=1");
+            return;
+        }
+
+        let config = ClientConfig::new().with_rate_limit(1.0);
+        let client = pubmed_client::PubMedClient::with_config(config);
+
+        let articles = SearchQuery::new()
+            .mesh_term("Metformin")
+            .mesh_major_topic("Diabetes Mellitus, Type 2")
+            .published_after(2022)
+            .limit(3)
+            .search_and_fetch(&client)
+            .await
+            .unwrap();
+
+        assert!(!articles.is_empty());
+
+        for article in &articles {
+            info!(pmid = %article.pmid, title = %article.title, "Found article");
+
+            let chemicals = article.get_chemical_names();
+            if !chemicals.is_empty() {
+                info!(chemicals = %chemicals.join(", "), "Article chemicals");
+            }
+
+            let qualifiers = article.get_mesh_qualifiers("Diabetes Mellitus, Type 2");
+            if !qualifiers.is_empty() {
+                info!(diabetes_qualifiers = %qualifiers.join(", "), "Diabetes qualifiers");
             }
         }
     }
