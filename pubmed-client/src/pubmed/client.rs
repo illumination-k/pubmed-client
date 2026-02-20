@@ -227,6 +227,7 @@ impl PubMedClient {
     ///
     /// * `query` - Search query string
     /// * `limit` - Maximum number of results to return
+    /// * `sort` - Optional sort order for results
     ///
     /// # Returns
     ///
@@ -245,45 +246,13 @@ impl PubMedClient {
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PubMedClient::new();
-    ///     let pmids = client.search_articles("covid-19 treatment", 10).await?;
-    ///     println!("Found {} articles", pmids.len());
-    ///     Ok(())
-    /// }
-    /// ```
-    #[instrument(skip(self), fields(query = %query, limit = limit))]
-    pub async fn search_articles(&self, query: &str, limit: usize) -> Result<Vec<String>> {
-        self.search_articles_with_options(query, limit, None).await
-    }
-
-    /// Search for articles using a query string with sort options
-    ///
-    /// # Arguments
-    ///
-    /// * `query` - Search query string
-    /// * `limit` - Maximum number of results to return
-    /// * `sort` - Optional sort order for results
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<Vec<String>>` containing PMIDs of matching articles
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::SortOrder};
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = PubMedClient::new();
-    ///     let pmids = client
-    ///         .search_articles_with_options("covid-19 treatment", 10, Some(&SortOrder::PublicationDate))
-    ///         .await?;
+    ///     let pmids = client.search_articles("covid-19 treatment", 10, None).await?;
     ///     println!("Found {} articles", pmids.len());
     ///     Ok(())
     /// }
     /// ```
     #[instrument(skip(self, sort), fields(query = %query, limit = limit))]
-    pub async fn search_articles_with_options(
+    pub async fn search_articles(
         &self,
         query: &str,
         limit: usize,
@@ -447,57 +416,20 @@ impl PubMedClient {
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PubMedClient::new();
-    ///     let articles = client.search_and_fetch("covid-19", 5).await?;
+    ///     let articles = client.search_and_fetch("covid-19", 5, None).await?;
     ///     for article in articles {
     ///         println!("{}: {}", article.pmid, article.title);
     ///     }
     ///     Ok(())
     /// }
     /// ```
-    pub async fn search_and_fetch(&self, query: &str, limit: usize) -> Result<Vec<PubMedArticle>> {
-        self.search_and_fetch_with_options(query, limit, None).await
-    }
-
-    /// Search and fetch multiple articles with metadata, with sort options
-    ///
-    /// Uses batch fetching internally for efficient retrieval.
-    ///
-    /// # Arguments
-    ///
-    /// * `query` - Search query string
-    /// * `limit` - Maximum number of articles to fetch
-    /// * `sort` - Optional sort order for results
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<Vec<PubMedArticle>>` containing articles with metadata
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::SortOrder};
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = PubMedClient::new();
-    ///     let articles = client
-    ///         .search_and_fetch_with_options("covid-19", 5, Some(&SortOrder::PublicationDate))
-    ///         .await?;
-    ///     for article in articles {
-    ///         println!("{}: {}", article.pmid, article.title);
-    ///     }
-    ///     Ok(())
-    /// }
-    /// ```
-    pub async fn search_and_fetch_with_options(
+    pub async fn search_and_fetch(
         &self,
         query: &str,
         limit: usize,
         sort: Option<&SortOrder>,
     ) -> Result<Vec<PubMedArticle>> {
-        let pmids = self
-            .search_articles_with_options(query, limit, sort)
-            .await?;
+        let pmids = self.search_articles(query, limit, sort).await?;
 
         let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
         self.fetch_articles(&pmid_refs).await
@@ -646,7 +578,7 @@ impl PubMedClient {
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PubMedClient::new();
-    ///     let summaries = client.search_and_fetch_summaries("covid-19 treatment", 20).await?;
+    ///     let summaries = client.search_and_fetch_summaries("covid-19 treatment", 20, None).await?;
     ///     for summary in &summaries {
     ///         println!("{}: {}", summary.pmid, summary.title);
     ///     }
@@ -657,31 +589,9 @@ impl PubMedClient {
         &self,
         query: &str,
         limit: usize,
-    ) -> Result<Vec<ArticleSummary>> {
-        self.search_and_fetch_summaries_with_options(query, limit, None)
-            .await
-    }
-
-    /// Search and fetch lightweight summaries with sort options
-    ///
-    /// # Arguments
-    ///
-    /// * `query` - Search query string
-    /// * `limit` - Maximum number of articles to fetch
-    /// * `sort` - Optional sort order for results
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<Vec<ArticleSummary>>` containing lightweight article metadata
-    pub async fn search_and_fetch_summaries_with_options(
-        &self,
-        query: &str,
-        limit: usize,
         sort: Option<&SortOrder>,
     ) -> Result<Vec<ArticleSummary>> {
-        let pmids = self
-            .search_articles_with_options(query, limit, sort)
-            .await?;
+        let pmids = self.search_articles(query, limit, sort).await?;
 
         let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
         self.fetch_summaries(&pmid_refs).await

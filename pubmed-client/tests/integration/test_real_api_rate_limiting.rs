@@ -77,7 +77,7 @@ async fn test_real_api_basic_rate_limiting() {
             "Making real API request"
         );
 
-        match client.search_articles(query, 5).await {
+        match client.search_articles(query, 5, None).await {
             Ok(results) => {
                 successful_requests += 1;
                 total_results += results.len();
@@ -182,7 +182,7 @@ async fn test_real_api_concurrent_rate_limiting() {
 
                 debug!(task_id = i, query = %query, "Starting concurrent task");
 
-                let result = client.search_articles(&query, 3).await;
+                let result = client.search_articles(&query, 3, None).await;
                 let task_duration = task_start.elapsed();
 
                 match result {
@@ -321,7 +321,7 @@ async fn test_real_api_with_api_key() {
             "Making API request with key"
         );
 
-        match client.search_articles(query, 3).await {
+        match client.search_articles(query, 3, None).await {
             Ok(results) => {
                 successful_requests += 1;
                 debug!(
@@ -393,7 +393,7 @@ async fn test_real_api_end_to_end_with_rate_limiting() {
     let search_start = Instant::now();
 
     let pmids = match client
-        .search_articles("COVID-19[Title] AND 2023[PDAT]", 5)
+        .search_articles("COVID-19[Title] AND 2023[PDAT]", 5, None)
         .await
     {
         Ok(pmids) => {
@@ -529,7 +529,9 @@ async fn test_real_api_server_rate_limit_handling() {
     for i in 0..10 {
         requests_made += 1;
 
-        let result = client.search_articles(&format!("test query {i}"), 1).await;
+        let result = client
+            .search_articles(&format!("test query {i}"), 1, None)
+            .await;
 
         match result {
             Ok(pmids) => {

@@ -193,7 +193,7 @@ pub async fn search_pubmed(
     let articles = server
         .client
         .pubmed
-        .search_and_fetch_with_options(&query_string, max, search_query.get_sort())
+        .search_and_fetch(&query_string, max, search_query.get_sort())
         .await
         .map_err(|e| ErrorData {
             code: ErrorCode(-32603),

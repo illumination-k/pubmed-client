@@ -44,10 +44,8 @@ pub fn parse_articles_from_xml(xml: &str) -> Result<Vec<PubMedArticle>> {
     let cleaned_xml = strip_inline_html_tags(xml);
 
     // Parse the XML using quick-xml serde
-    let article_set: PubmedArticleSet =
-        from_str(&cleaned_xml).map_err(|e| PubMedError::XmlParseError {
-            message: format!("Failed to deserialize XML: {}", e),
-        })?;
+    let article_set: PubmedArticleSet = from_str(&cleaned_xml)
+        .map_err(|e| PubMedError::XmlError(format!("Failed to deserialize XML: {}", e)))?;
 
     // Convert all articles, skipping those that fail
     let articles: Vec<PubMedArticle> = article_set
