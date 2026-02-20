@@ -4,7 +4,10 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use pubmed_client::{
     pmc::{markdown::PmcMarkdownConverter, PmcFullText},
-    pubmed::{ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery, SortOrder},
+    pubmed::{
+        ArticleSummary, ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery,
+        SortOrder,
+    },
     Client, ClientConfig,
 };
 use std::sync::Arc;
@@ -105,6 +108,78 @@ impl From<PubMedArticle> for Article {
             language: article.language,
             journal_abbreviation: article.journal_abbreviation,
             issn: article.issn,
+        }
+    }
+}
+
+/// Lightweight article summary from ESummary API
+///
+/// Contains basic metadata without abstracts, MeSH terms, or chemical lists.
+/// Use fetchSummaries() for faster bulk metadata retrieval.
+#[napi(object)]
+pub struct Summary {
+    /// PubMed ID
+    pub pmid: String,
+    /// Article title
+    pub title: String,
+    /// Author names
+    pub authors: Vec<String>,
+    /// Journal name
+    pub journal: String,
+    /// Full journal name
+    pub full_journal_name: String,
+    /// Publication date
+    pub pub_date: String,
+    /// Electronic publication date
+    pub epub_date: String,
+    /// DOI if available
+    pub doi: Option<String>,
+    /// PMC ID if available
+    pub pmc_id: Option<String>,
+    /// Journal volume
+    pub volume: String,
+    /// Journal issue
+    pub issue: String,
+    /// Page range
+    pub pages: String,
+    /// Languages
+    pub languages: Vec<String>,
+    /// Publication types
+    pub pub_types: Vec<String>,
+    /// ISSN
+    pub issn: String,
+    /// Electronic ISSN
+    pub essn: String,
+    /// Sorted publication date
+    pub sort_pub_date: String,
+    /// PMC reference count
+    pub pmc_ref_count: u32,
+    /// Record status
+    pub record_status: String,
+}
+
+impl From<ArticleSummary> for Summary {
+    fn from(s: ArticleSummary) -> Self {
+        Summary {
+            pmid: s.pmid,
+            title: s.title,
+            authors: s.authors,
+            journal: s.journal,
+            full_journal_name: s.full_journal_name,
+            pub_date: s.pub_date,
+            epub_date: s.epub_date,
+            doi: s.doi,
+            pmc_id: s.pmc_id,
+            volume: s.volume,
+            issue: s.issue,
+            pages: s.pages,
+            languages: s.languages,
+            pub_types: s.pub_types,
+            issn: s.issn,
+            essn: s.essn,
+            sort_pub_date: s.sort_pub_date,
+            pmc_ref_count: s.pmc_ref_count as u32,
+            record_status: s.record_status,
         }
     }
 }
@@ -380,6 +455,51 @@ impl PubMedClient {
             .map_err(|e| Error::from_reason(e.to_string()))?;
 
         Ok(Article::from(article))
+    }
+
+    /// Fetch lightweight article summaries by PMIDs using the ESummary API
+    ///
+    /// Returns basic metadata (title, authors, journal, dates, DOI) without
+    /// abstracts, MeSH terms, or chemical lists. Faster than fetchArticles().
+    ///
+    /// @param pmids - Array of PubMed IDs
+    /// @returns Array of article summaries
+    #[napi]
+    pub async fn fetch_summaries(&self, pmids: Vec<String>) -> Result<Vec<Summary>> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let summaries = self
+            .client
+            .pubmed
+            .fetch_summaries(&pmid_refs)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(summaries.into_iter().map(Summary::from).collect())
+    }
+
+    /// Search PubMed and fetch lightweight summaries
+    ///
+    /// Combines search and ESummary fetch. Faster than search() when you
+    /// only need basic metadata.
+    ///
+    /// @param query - Search query string
+    /// @param limit - Maximum number of results
+    /// @returns Array of article summaries
+    #[napi]
+    pub async fn search_summaries(
+        &self,
+        query: String,
+        limit: Option<u32>,
+    ) -> Result<Vec<Summary>> {
+        let limit = limit.unwrap_or(10) as usize;
+        let summaries = self
+            .client
+            .pubmed
+            .search_and_fetch_summaries(&query, limit)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(summaries.into_iter().map(Summary::from).collect())
     }
 
     /// Fetch full-text article from PMC

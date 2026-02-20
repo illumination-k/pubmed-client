@@ -8,6 +8,7 @@ pub mod citmatch;
 pub mod gquery;
 pub mod markdown;
 pub mod search;
+pub mod summary;
 
 /// PubMed MCP Server
 #[derive(Clone)]

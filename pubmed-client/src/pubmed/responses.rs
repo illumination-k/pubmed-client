@@ -97,6 +97,70 @@ pub(crate) struct EInfoLink {
     pub db_to: String,
 }
 
+// ESummary API response structures
+
+/// ESummary returns a JSON object with "result" containing "uids" array and per-UID objects.
+/// We use serde_json::Value to handle the dynamic per-UID keys, then parse manually.
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ESummaryResponse {
+    pub result: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ESummaryAuthor {
+    pub name: String,
+    #[serde(default)]
+    pub authtype: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ESummaryArticleId {
+    pub idtype: String,
+    #[serde(default)]
+    pub value: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ESummaryDocSum {
+    pub uid: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default, rename = "sorttitle")]
+    pub sort_title: String,
+    #[serde(default)]
+    pub source: String,
+    #[serde(default)]
+    pub authors: Vec<ESummaryAuthor>,
+    #[serde(default)]
+    pub pubdate: String,
+    #[serde(default)]
+    pub epubdate: String,
+    #[serde(default)]
+    pub volume: String,
+    #[serde(default)]
+    pub issue: String,
+    #[serde(default)]
+    pub pages: String,
+    #[serde(default)]
+    pub lang: Vec<String>,
+    #[serde(default)]
+    pub issn: String,
+    #[serde(default)]
+    pub essn: String,
+    #[serde(default)]
+    pub pubtype: Vec<String>,
+    #[serde(default)]
+    pub articleids: Vec<ESummaryArticleId>,
+    #[serde(default)]
+    pub fulljournalname: String,
+    #[serde(default)]
+    pub sortpubdate: String,
+    #[serde(default)]
+    pub pmcrefcount: u64,
+    #[serde(default)]
+    pub recordstatus: String,
+}
+
 // ELink API response structures
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct ELinkResponse {
