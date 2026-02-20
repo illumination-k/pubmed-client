@@ -7,7 +7,7 @@ use crate::pubmed::models::{
     Citations, DatabaseInfo, FieldInfo, HistorySession, LinkInfo, PmcLinks, PubMedArticle,
     RelatedArticles, SearchResult,
 };
-use crate::pubmed::parser::{parse_article_from_xml, parse_articles_from_xml};
+use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::responses::{EInfoResponse, ELinkResponse, ESearchResult};
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -201,40 +201,20 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(pmid = %pmid))]
     pub async fn fetch_article(&self, pmid: &str) -> Result<PubMedArticle> {
-        // Validate and parse PMID
-        let pmid_obj = PubMedId::parse(pmid).inspect_err(|_| {
-            warn!("Invalid PMID format provided: {}", pmid);
-        })?;
-        let pmid_value = pmid_obj.as_u32();
+        let mut articles = self.fetch_articles(&[pmid]).await?;
 
-        // Build URL - API parameters will be added by make_request
-        let url = format!(
-            "{}/efetch.fcgi?db=pubmed&id={}&retmode=xml&rettype=abstract",
-            self.base_url, pmid_value
-        );
-
-        debug!("Making EFetch API request");
-        let response = self.make_request(&url).await?;
-
-        debug!("Received successful API response, parsing XML");
-        let xml_text = response.text().await?;
-
-        let result = parse_article_from_xml(&xml_text, pmid);
-        match &result {
-            Ok(article) => {
-                info!(
-                    title = %article.title,
-                    authors_count = article.authors.len(),
-                    has_abstract = article.abstract_text.is_some(),
-                    "Successfully parsed article"
-                );
-            }
-            Err(e) => {
-                warn!("Failed to parse article XML: {}", e);
+        if articles.len() == 1 {
+            Ok(articles.remove(0))
+        } else {
+            // Try to find by PMID in case batch returned extra/different articles
+            let idx = articles.iter().position(|a| a.pmid == pmid);
+            match idx {
+                Some(i) => Ok(articles.remove(i)),
+                None => Err(PubMedError::ArticleNotFound {
+                    pmid: pmid.to_string(),
+                }),
             }
         }
-
-        result
     }
 
     /// Search for articles using a query string

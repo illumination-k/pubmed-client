@@ -164,6 +164,8 @@ async fn test_batch_fetch_multiple_articles() {
     assert_eq!(covid.journal, "Nature");
     assert_eq!(covid.authors.len(), 2);
     assert!(covid.abstract_text.is_some());
+    // DOI extracted from PubmedData/ArticleIdList fallback
+    assert_eq!(covid.doi.as_deref(), Some("10.1038/s41586-020-2008-3"));
 
     // Verify second article (Cancer)
     let cancer = articles.iter().find(|a| a.pmid == "33515491").unwrap();

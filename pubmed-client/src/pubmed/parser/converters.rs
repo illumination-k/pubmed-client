@@ -12,15 +12,15 @@ use crate::pubmed::models::{
 use tracing::debug;
 
 impl PubmedArticleXml {
-    /// Extract PMC ID from PubmedData ArticleIdList
-    fn extract_pmc_id(pubmed_data: &Option<PubmedData>) -> Option<String> {
+    /// Extract an article ID by type from PubmedData ArticleIdList
+    fn extract_article_id(pubmed_data: &Option<PubmedData>, id_type: &str) -> Option<String> {
         pubmed_data
             .as_ref()?
             .article_id_list
             .as_ref()?
             .ids
             .iter()
-            .find(|id| id.id_type.to_lowercase() == "pmc")
+            .find(|id| id.id_type.eq_ignore_ascii_case(id_type))
             .map(|id| id.value.clone())
     }
 
@@ -30,7 +30,7 @@ impl PubmedArticleXml {
         let article = medline.article;
 
         // Extract PMC ID from PubmedData
-        let pmc_id = Self::extract_pmc_id(&self.pubmed_data);
+        let pmc_id = Self::extract_article_id(&self.pubmed_data, "pmc");
 
         // Extract title
         let title = article
@@ -59,12 +59,15 @@ impl PubmedArticleXml {
                 .map_or(String::new(), |pd| pd.to_string())
         });
 
-        // Extract DOI
-        let doi = article.elocation_ids.and_then(|ids| {
-            ids.into_iter()
-                .find(|id| id.eid_type.as_deref() == Some("doi"))
-                .map(|id| id.value)
-        });
+        // Extract DOI from ELocationID, falling back to PubmedData/ArticleIdList
+        let doi = article
+            .elocation_ids
+            .and_then(|ids| {
+                ids.into_iter()
+                    .find(|id| id.eid_type.as_deref() == Some("doi"))
+                    .map(|id| id.value)
+            })
+            .or_else(|| Self::extract_article_id(&self.pubmed_data, "doi"));
 
         // Extract abstract
         let abstract_text = article.abstract_section.and_then(|s| s.to_string_opt());
