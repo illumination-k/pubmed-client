@@ -49,6 +49,16 @@ impl PubMedServer {
     ) -> Result<CallToolResult, ErrorData> {
         tools::gquery::global_query(self, params).await
     }
+
+    #[tool(
+        description = "Fetch lightweight article summaries by PubMed IDs using the ESummary API. Returns basic metadata (title, authors, journal, dates, DOI) without abstracts or MeSH terms. Faster than search_pubmed when you already have PMIDs and only need bibliographic overview data."
+    )]
+    async fn fetch_summaries(
+        &self,
+        params: Parameters<tools::summary::SummaryRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::summary::fetch_summaries(self, params).await
+    }
 }
 
 #[tool_handler]

@@ -741,6 +741,73 @@ impl GlobalQueryResults {
     }
 }
 
+// ================================================================================================
+// ESummary API types
+// ================================================================================================
+
+/// Lightweight article summary from the ESummary API
+///
+/// Contains basic metadata (title, authors, journal, dates) without the full
+/// abstract, MeSH terms, or chemical lists that EFetch provides. Use this when
+/// you only need basic bibliographic information for a large number of articles.
+///
+/// # Example
+///
+/// ```no_run
+/// use pubmed_client_rs::PubMedClient;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let client = PubMedClient::new();
+///     let summaries = client.fetch_summaries(&["31978945", "33515491"]).await?;
+///     for summary in &summaries {
+///         println!("{}: {} ({})", summary.pmid, summary.title, summary.pub_date);
+///     }
+///     Ok(())
+/// }
+/// ```
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ArticleSummary {
+    /// PubMed ID
+    pub pmid: String,
+    /// Article title
+    pub title: String,
+    /// Author names (e.g., ["Zhu N", "Zhang D", "Wang W"])
+    pub authors: Vec<String>,
+    /// Journal name (source field)
+    pub journal: String,
+    /// Full journal name (e.g., "The New England journal of medicine")
+    pub full_journal_name: String,
+    /// Publication date (e.g., "2020 Feb")
+    pub pub_date: String,
+    /// Electronic publication date (e.g., "2020 Jan 24")
+    pub epub_date: String,
+    /// DOI (Digital Object Identifier)
+    pub doi: Option<String>,
+    /// PMC ID if available (e.g., "PMC7092803")
+    pub pmc_id: Option<String>,
+    /// Journal volume (e.g., "382")
+    pub volume: String,
+    /// Journal issue (e.g., "8")
+    pub issue: String,
+    /// Page range (e.g., "727-733")
+    pub pages: String,
+    /// Languages (e.g., ["eng"])
+    pub languages: Vec<String>,
+    /// Publication types (e.g., ["Journal Article", "Review"])
+    pub pub_types: Vec<String>,
+    /// ISSN
+    pub issn: String,
+    /// Electronic ISSN
+    pub essn: String,
+    /// Sorted publication date (e.g., "2020/02/20 00:00")
+    pub sort_pub_date: String,
+    /// PMC reference count (number of citing articles in PMC)
+    pub pmc_ref_count: u64,
+    /// Record status (e.g., "PubMed - indexed for MEDLINE")
+    pub record_status: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
