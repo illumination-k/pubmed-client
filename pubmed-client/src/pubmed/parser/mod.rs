@@ -421,8 +421,60 @@ mod tests {
         assert!(article.keywords.is_none());
     }
 
+    // ==================================================================================
+    // Bibliographic field tests
+    //
+    // Strategy to guard against silent None on Optional fields:
+    //   (A) XML cross-check: if the raw XML contains a given element tag, the parsed
+    //       field MUST be Some — catches parser regressions that silently drop data.
+    //   (B) Statistical assertion: parse multiple articles that all have the fields in
+    //       XML, assert 100% extraction rate — catches systematic failures.
+    //   (C) Known-value assertion: hardcode expected values for specific test articles
+    //       — catches incorrect extraction or value corruption.
+    // ==================================================================================
+
+    /// Cross-check helper: if a given XML element tag is present in the source XML,
+    /// the corresponding parsed field must be Some (not silently dropped).
+    fn assert_xml_field_extracted(
+        xml: &str,
+        xml_tag: &str,
+        field_value: &Option<String>,
+        field_name: &str,
+    ) {
+        let tag_open = format!("<{}", xml_tag);
+        if xml.contains(&tag_open) {
+            assert!(
+                field_value.is_some(),
+                "XML contains <{}> but parsed `{}` is None — parser silently dropped the field",
+                xml_tag,
+                field_name,
+            );
+        }
+    }
+
+    /// Apply cross-check to all 6 bibliographic fields at once.
+    fn assert_bibliographic_fields_cross_check(xml: &str, article: &PubMedArticle) {
+        assert_xml_field_extracted(xml, "Volume", &article.volume, "volume");
+        assert_xml_field_extracted(xml, "Issue", &article.issue, "issue");
+        assert_xml_field_extracted(xml, "MedlinePgn", &article.pages, "pages");
+        assert_xml_field_extracted(xml, "Language", &article.language, "language");
+        assert_xml_field_extracted(
+            xml,
+            "ISOAbbreviation",
+            &article.journal_abbreviation,
+            "journal_abbreviation",
+        );
+        // ISSN tag can appear in other contexts; only check within Journal
+        if xml.contains("<ISSN") && xml.contains("<Journal>") {
+            assert!(
+                article.issn.is_some(),
+                "XML contains <ISSN> within <Journal> but parsed `issn` is None",
+            );
+        }
+    }
+
     #[test]
-    fn test_bibliographic_fields_parsing() {
+    fn test_bibliographic_fields_all_present() {
         let xml = r#"<?xml version="1.0" ?>
 <PubmedArticleSet>
 <PubmedArticle>
@@ -454,22 +506,20 @@ mod tests {
 
         let article = parse_article_from_xml(xml, "31978945").unwrap();
 
-        assert_eq!(article.pmid, "31978945");
-        assert_eq!(article.journal, "Nature");
-        assert_eq!(article.pub_date, "2020 Mar");
+        // (A) Cross-check: XML elements present → parsed field must be Some
+        assert_bibliographic_fields_cross_check(xml, &article);
 
-        // New bibliographic fields
-        assert_eq!(article.volume, Some("579".to_string()));
-        assert_eq!(article.issue, Some("7798".to_string()));
-        assert_eq!(article.pages, Some("270-273".to_string()));
-        assert_eq!(article.language, Some("eng".to_string()));
-        assert_eq!(article.journal_abbreviation, Some("Nature".to_string()));
-        assert_eq!(article.issn, Some("1476-4687".to_string()));
+        // (C) Exact value assertions
+        assert_eq!(article.volume.as_deref(), Some("579"));
+        assert_eq!(article.issue.as_deref(), Some("7798"));
+        assert_eq!(article.pages.as_deref(), Some("270-273"));
+        assert_eq!(article.language.as_deref(), Some("eng"));
+        assert_eq!(article.journal_abbreviation.as_deref(), Some("Nature"));
+        assert_eq!(article.issn.as_deref(), Some("1476-4687"));
     }
 
     #[test]
-    fn test_bibliographic_fields_missing() {
-        // Verify that articles without these fields still parse correctly
+    fn test_bibliographic_fields_all_absent() {
         let xml = r#"<?xml version="1.0" ?>
 <PubmedArticleSet>
 <PubmedArticle>
@@ -487,8 +537,10 @@ mod tests {
 
         let article = parse_article_from_xml(xml, "99990001").unwrap();
 
-        assert_eq!(article.pmid, "99990001");
-        assert_eq!(article.journal, "Minimal Journal");
+        // Cross-check still holds (no XML tags → None is correct)
+        assert_bibliographic_fields_cross_check(xml, &article);
+
+        // All fields must actually be None
         assert!(article.volume.is_none());
         assert!(article.issue.is_none());
         assert!(article.pages.is_none());
@@ -499,7 +551,7 @@ mod tests {
 
     #[test]
     fn test_bibliographic_fields_partial() {
-        // Test with some fields present and some missing
+        // Volume + ISOAbbreviation + ISSN + Language present; Issue + Pagination absent
         let xml = r#"<?xml version="1.0" ?>
 <PubmedArticleSet>
 <PubmedArticle>
@@ -526,17 +578,157 @@ mod tests {
 
         let article = parse_article_from_xml(xml, "99990002").unwrap();
 
-        assert_eq!(article.volume, Some("100".to_string()));
-        assert!(article.issue.is_none()); // No Issue element
-        assert!(article.pages.is_none()); // No Pagination element
-        assert_eq!(article.language, Some("jpn".to_string()));
-        assert_eq!(article.journal_abbreviation, Some("Test J Med".to_string()));
-        assert_eq!(article.issn, Some("0028-0836".to_string()));
+        // (A) Cross-check: present tags must yield Some
+        assert_bibliographic_fields_cross_check(xml, &article);
+
+        // (C) Exact values for present fields
+        assert_eq!(article.volume.as_deref(), Some("100"));
+        assert_eq!(article.language.as_deref(), Some("jpn"));
+        assert_eq!(article.journal_abbreviation.as_deref(), Some("Test J Med"));
+        assert_eq!(article.issn.as_deref(), Some("0028-0836"));
+
+        // Absent fields must be None
+        assert!(article.issue.is_none(), "No <Issue> in XML, must be None");
+        assert!(
+            article.pages.is_none(),
+            "No <MedlinePgn> in XML, must be None"
+        );
     }
 
     #[test]
-    fn test_bibliographic_fields_citation_format() {
-        // Verify all fields needed for NLM citation format are extractable
+    fn test_bibliographic_fields_batch_extraction_rate() {
+        // (B) Statistical approach: parse 3 articles, all have all 6 fields in XML,
+        //     assert 100% extraction rate.  If any field silently returns None,
+        //     the count will be < 3 and the assertion fails.
+        let xml = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>10000001</PMID>
+        <Article>
+            <Journal>
+                <ISSN IssnType="Electronic">1111-2222</ISSN>
+                <JournalIssue>
+                    <Volume>10</Volume>
+                    <Issue>1</Issue>
+                    <PubDate><Year>2020</Year></PubDate>
+                </JournalIssue>
+                <Title>Journal Alpha</Title>
+                <ISOAbbreviation>J Alpha</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Article One</ArticleTitle>
+            <Pagination><MedlinePgn>1-10</MedlinePgn></Pagination>
+            <Language>eng</Language>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>10000002</PMID>
+        <Article>
+            <Journal>
+                <ISSN IssnType="Print">3333-4444</ISSN>
+                <JournalIssue>
+                    <Volume>25</Volume>
+                    <Issue>12</Issue>
+                    <PubDate><Year>2021</Year><Month>Dec</Month></PubDate>
+                </JournalIssue>
+                <Title>Journal Beta</Title>
+                <ISOAbbreviation>J Beta</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Article Two</ArticleTitle>
+            <Pagination><MedlinePgn>100-115</MedlinePgn></Pagination>
+            <Language>fre</Language>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>10000003</PMID>
+        <Article>
+            <Journal>
+                <ISSN IssnType="Electronic">5555-6666</ISSN>
+                <JournalIssue>
+                    <Volume>8</Volume>
+                    <Issue>4</Issue>
+                    <PubDate><Year>2023</Year><Month>Apr</Month><Day>01</Day></PubDate>
+                </JournalIssue>
+                <Title>Journal Gamma</Title>
+                <ISOAbbreviation>J Gamma</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Article Three</ArticleTitle>
+            <Pagination><MedlinePgn>e2023001</MedlinePgn></Pagination>
+            <Language>jpn</Language>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        use crate::pubmed::parser::batch::parse_articles_from_xml;
+        let articles = parse_articles_from_xml(xml).unwrap();
+        assert_eq!(articles.len(), 3, "Should parse all 3 articles");
+
+        let mut counts = [0u32; 6]; // volume, issue, pages, language, abbreviation, issn
+
+        for article in &articles {
+            if article.volume.is_some() {
+                counts[0] += 1;
+            }
+            if article.issue.is_some() {
+                counts[1] += 1;
+            }
+            if article.pages.is_some() {
+                counts[2] += 1;
+            }
+            if article.language.is_some() {
+                counts[3] += 1;
+            }
+            if article.journal_abbreviation.is_some() {
+                counts[4] += 1;
+            }
+            if article.issn.is_some() {
+                counts[5] += 1;
+            }
+        }
+
+        let n = articles.len() as u32;
+        let field_names = [
+            "volume",
+            "issue",
+            "pages",
+            "language",
+            "journal_abbreviation",
+            "issn",
+        ];
+        for (i, name) in field_names.iter().enumerate() {
+            assert_eq!(
+                counts[i], n,
+                "All {} articles have <{}> in XML but only {} were extracted (expected {})",
+                n, name, counts[i], n,
+            );
+        }
+
+        // (C) Spot-check exact values on first and last article
+        let a1 = articles.iter().find(|a| a.pmid == "10000001").unwrap();
+        assert_eq!(a1.volume.as_deref(), Some("10"));
+        assert_eq!(a1.issue.as_deref(), Some("1"));
+        assert_eq!(a1.pages.as_deref(), Some("1-10"));
+        assert_eq!(a1.language.as_deref(), Some("eng"));
+        assert_eq!(a1.journal_abbreviation.as_deref(), Some("J Alpha"));
+        assert_eq!(a1.issn.as_deref(), Some("1111-2222"));
+
+        let a3 = articles.iter().find(|a| a.pmid == "10000003").unwrap();
+        assert_eq!(a3.volume.as_deref(), Some("8"));
+        assert_eq!(a3.issue.as_deref(), Some("4"));
+        assert_eq!(a3.pages.as_deref(), Some("e2023001"));
+        assert_eq!(a3.language.as_deref(), Some("jpn"));
+        assert_eq!(a3.journal_abbreviation.as_deref(), Some("J Gamma"));
+        assert_eq!(a3.issn.as_deref(), Some("5555-6666"));
+    }
+
+    #[test]
+    fn test_bibliographic_fields_nlm_citation() {
+        // End-to-end: parse → cross-check → construct NLM citation string
         let xml = r#"<?xml version="1.0" ?>
 <PubmedArticleSet>
 <PubmedArticle>
@@ -579,22 +771,10 @@ mod tests {
 
         let article = parse_article_from_xml(xml, "99990003").unwrap();
 
-        // All fields needed for NLM citation:
-        // Author. Title. Journal. Year;Volume(Issue):Pages.
-        assert_eq!(article.authors.len(), 2);
-        assert_eq!(article.title, "Complete Citation Test Article.");
-        assert_eq!(
-            article.journal_abbreviation,
-            Some("J Biol Chem".to_string())
-        );
-        assert_eq!(article.pub_date, "2024 Jun 15");
-        assert_eq!(article.volume, Some("45".to_string()));
-        assert_eq!(article.issue, Some("3".to_string()));
-        assert_eq!(article.pages, Some("e100234".to_string()));
-        assert_eq!(article.language, Some("eng".to_string()));
-        assert_eq!(article.issn, Some("1234-5678".to_string()));
+        // (A) Cross-check
+        assert_bibliographic_fields_cross_check(xml, &article);
 
-        // Verify we can construct an NLM-style citation string
+        // Construct NLM citation and verify
         let citation = format!(
             "{}. {}. {} {};{}({}):{}.",
             article.authors[0].full_name,

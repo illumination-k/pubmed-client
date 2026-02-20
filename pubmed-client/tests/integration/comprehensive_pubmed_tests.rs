@@ -75,6 +75,51 @@ fn test_comprehensive_pubmed_parsing(#[from(xml_test_cases)] test_cases: Vec<Pub
                     debug!(doi = doi, "Article has DOI");
                 }
 
+                // Cross-check: if raw XML contains bibliographic element tags,
+                // the parsed fields must not be None
+                if xml_content.contains("<Volume>") {
+                    assert!(
+                        article.volume.is_some(),
+                        "XML contains <Volume> but article.volume is None for PMID {}",
+                        article.pmid,
+                    );
+                }
+                if xml_content.contains("<Issue>") {
+                    assert!(
+                        article.issue.is_some(),
+                        "XML contains <Issue> but article.issue is None for PMID {}",
+                        article.pmid,
+                    );
+                }
+                if xml_content.contains("<MedlinePgn>") {
+                    assert!(
+                        article.pages.is_some(),
+                        "XML contains <MedlinePgn> but article.pages is None for PMID {}",
+                        article.pmid,
+                    );
+                }
+                if xml_content.contains("<Language>") {
+                    assert!(
+                        article.language.is_some(),
+                        "XML contains <Language> but article.language is None for PMID {}",
+                        article.pmid,
+                    );
+                }
+                if xml_content.contains("<ISOAbbreviation>") {
+                    assert!(
+                        article.journal_abbreviation.is_some(),
+                        "XML contains <ISOAbbreviation> but article.journal_abbreviation is None for PMID {}",
+                        article.pmid,
+                    );
+                }
+                if xml_content.contains("<ISSN") {
+                    assert!(
+                        article.issn.is_some(),
+                        "XML contains <ISSN> but article.issn is None for PMID {}",
+                        article.pmid,
+                    );
+                }
+
                 debug!(
                     has_abstract = article.abstract_text.is_some(),
                     "Abstract status"
@@ -139,6 +184,12 @@ fn test_pubmed_parsing_statistics(#[from(xml_test_cases)] test_cases: Vec<PubMed
     let mut articles_with_mesh = 0;
     let mut articles_with_keywords = 0;
     let mut articles_with_chemicals = 0;
+    let mut articles_with_volume = 0;
+    let mut articles_with_issue = 0;
+    let mut articles_with_pages = 0;
+    let mut articles_with_language = 0;
+    let mut articles_with_journal_abbrev = 0;
+    let mut articles_with_issn = 0;
 
     let mut successful_parses = 0;
 
@@ -178,6 +229,24 @@ fn test_pubmed_parsing_statistics(#[from(xml_test_cases)] test_cases: Vec<PubMed
                     articles_with_chemicals += 1;
                 }
             }
+            if article.volume.is_some() {
+                articles_with_volume += 1;
+            }
+            if article.issue.is_some() {
+                articles_with_issue += 1;
+            }
+            if article.pages.is_some() {
+                articles_with_pages += 1;
+            }
+            if article.language.is_some() {
+                articles_with_language += 1;
+            }
+            if article.journal_abbreviation.is_some() {
+                articles_with_journal_abbrev += 1;
+            }
+            if article.issn.is_some() {
+                articles_with_issn += 1;
+            }
 
             debug!(
                 authors_count = article.authors.len(),
@@ -206,6 +275,14 @@ fn test_pubmed_parsing_statistics(#[from(xml_test_cases)] test_cases: Vec<PubMed
             (articles_with_keywords as f64 / successful_parses as f64) * 100.0;
         let chemicals_percentage =
             (articles_with_chemicals as f64 / successful_parses as f64) * 100.0;
+        let volume_percentage = (articles_with_volume as f64 / successful_parses as f64) * 100.0;
+        let issue_percentage = (articles_with_issue as f64 / successful_parses as f64) * 100.0;
+        let pages_percentage = (articles_with_pages as f64 / successful_parses as f64) * 100.0;
+        let language_percentage =
+            (articles_with_language as f64 / successful_parses as f64) * 100.0;
+        let journal_abbrev_percentage =
+            (articles_with_journal_abbrev as f64 / successful_parses as f64) * 100.0;
+        let issn_percentage = (articles_with_issn as f64 / successful_parses as f64) * 100.0;
 
         info!(
             avg_authors_per_article = avg_authors,
@@ -220,7 +297,36 @@ fn test_pubmed_parsing_statistics(#[from(xml_test_cases)] test_cases: Vec<PubMed
             keywords_percentage = keywords_percentage,
             articles_with_chemicals = articles_with_chemicals,
             chemicals_percentage = chemicals_percentage,
+            volume_percentage = volume_percentage,
+            issue_percentage = issue_percentage,
+            pages_percentage = pages_percentage,
+            language_percentage = language_percentage,
+            journal_abbrev_percentage = journal_abbrev_percentage,
+            issn_percentage = issn_percentage,
             "Content statistics summary"
+        );
+
+        // Bibliographic fields should be present in most real PubMed articles.
+        // These thresholds catch systematic parser regressions (all None).
+        assert!(
+            volume_percentage >= 50.0,
+            "volume extraction rate too low: {:.1}% (expected >= 50%)",
+            volume_percentage,
+        );
+        assert!(
+            language_percentage >= 50.0,
+            "language extraction rate too low: {:.1}% (expected >= 50%)",
+            language_percentage,
+        );
+        assert!(
+            journal_abbrev_percentage >= 50.0,
+            "journal_abbreviation extraction rate too low: {:.1}% (expected >= 50%)",
+            journal_abbrev_percentage,
+        );
+        assert!(
+            issn_percentage >= 50.0,
+            "issn extraction rate too low: {:.1}% (expected >= 50%)",
+            issn_percentage,
         );
     }
 }
