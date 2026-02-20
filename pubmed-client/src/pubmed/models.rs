@@ -32,6 +32,18 @@ pub struct PubMedArticle {
     pub keywords: Option<Vec<String>>,
     /// Chemical substances mentioned in the article
     pub chemical_list: Option<Vec<ChemicalConcept>>,
+    /// Journal volume (e.g., "88")
+    pub volume: Option<String>,
+    /// Journal issue number (e.g., "3")
+    pub issue: Option<String>,
+    /// Page range (e.g., "123-130")
+    pub pages: Option<String>,
+    /// Article language (e.g., "eng", "jpn")
+    pub language: Option<String>,
+    /// ISO journal abbreviation (e.g., "J Biol Chem")
+    pub journal_abbreviation: Option<String>,
+    /// ISSN (International Standard Serial Number)
+    pub issn: Option<String>,
 }
 
 /// Database information from EInfo API
@@ -252,6 +264,8 @@ impl PubMedArticle {
     /// #     mesh_headings: None,
     /// #     keywords: None,
     /// #     chemical_list: None,
+    /// #     volume: None, issue: None, pages: None,
+    /// #     language: None, journal_abbreviation: None, issn: None,
     /// # };
     /// let major_terms = article.get_major_mesh_terms();
     /// ```
@@ -298,6 +312,8 @@ impl PubMedArticle {
     /// #     mesh_headings: None,
     /// #     keywords: None,
     /// #     chemical_list: None,
+    /// #     volume: None, issue: None, pages: None,
+    /// #     language: None, journal_abbreviation: None, issn: None,
     /// # };
     /// let has_diabetes = article.has_mesh_term("Diabetes Mellitus");
     /// ```
@@ -437,6 +453,8 @@ impl PubMedArticle {
     /// #     mesh_headings: None,
     /// #     keywords: None,
     /// #     chemical_list: None,
+    /// #     volume: None, issue: None, pages: None,
+    /// #     language: None, journal_abbreviation: None, issn: None,
     /// # };
     /// # let article2 = article1.clone();
     /// let similarity = article1.mesh_term_similarity(&article2);
@@ -802,6 +820,12 @@ mod tests {
                 registry_number: Some("657-24-9".to_string()),
                 ui: Some("D008687".to_string()),
             }]),
+            volume: Some("45".to_string()),
+            issue: Some("3".to_string()),
+            pages: Some("123-130".to_string()),
+            language: Some("eng".to_string()),
+            journal_abbreviation: Some("Test J".to_string()),
+            issn: Some("1234-5678".to_string()),
         }
     }
 
@@ -882,6 +906,12 @@ mod tests {
             mesh_headings: None,
             keywords: None,
             chemical_list: None,
+            volume: None,
+            issue: None,
+            pages: None,
+            language: None,
+            journal_abbreviation: None,
+            issn: None,
         };
 
         assert_eq!(article1.mesh_term_similarity(&article3), 0.0);
@@ -1038,5 +1068,17 @@ mod tests {
         );
 
         assert_eq!(format_author_name(&None, &None, &None), "Unknown Author");
+    }
+
+    #[test]
+    fn test_bibliographic_fields_on_article() {
+        let article = create_test_article_with_mesh();
+
+        assert_eq!(article.volume, Some("45".to_string()));
+        assert_eq!(article.issue, Some("3".to_string()));
+        assert_eq!(article.pages, Some("123-130".to_string()));
+        assert_eq!(article.language, Some("eng".to_string()));
+        assert_eq!(article.journal_abbreviation, Some("Test J".to_string()));
+        assert_eq!(article.issn, Some("1234-5678".to_string()));
     }
 }

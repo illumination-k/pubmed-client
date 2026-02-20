@@ -59,6 +59,42 @@ impl PubmedArticleXml {
                 .map_or(String::new(), |pd| pd.to_string())
         });
 
+        // Extract volume
+        let volume = article
+            .journal
+            .as_ref()
+            .and_then(|j| j.journal_issue.as_ref())
+            .and_then(|ji| ji.volume.clone());
+
+        // Extract issue
+        let issue = article
+            .journal
+            .as_ref()
+            .and_then(|j| j.journal_issue.as_ref())
+            .and_then(|ji| ji.issue.clone());
+
+        // Extract pages from Pagination/MedlinePgn
+        let pages = article
+            .pagination
+            .as_ref()
+            .and_then(|p| p.medline_pgn.clone());
+
+        // Extract language
+        let language = article.language.clone();
+
+        // Extract ISO journal abbreviation
+        let journal_abbreviation = article
+            .journal
+            .as_ref()
+            .and_then(|j| j.iso_abbreviation.clone());
+
+        // Extract ISSN
+        let issn = article
+            .journal
+            .as_ref()
+            .and_then(|j| j.issn.as_ref())
+            .map(|i| i.value.clone());
+
         // Extract DOI from ELocationID, falling back to PubmedData/ArticleIdList
         let doi = article
             .elocation_ids
@@ -114,6 +150,12 @@ impl PubmedArticleXml {
             mesh_headings,
             keywords,
             chemical_list,
+            volume,
+            issue,
+            pages,
+            language,
+            journal_abbreviation,
+            issn,
         })
     }
 }

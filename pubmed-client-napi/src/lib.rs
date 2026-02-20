@@ -57,6 +57,18 @@ pub struct Article {
     pub article_types: Vec<String>,
     /// Keywords
     pub keywords: Vec<String>,
+    /// Journal volume (e.g., "88")
+    pub volume: Option<String>,
+    /// Journal issue number (e.g., "3")
+    pub issue: Option<String>,
+    /// Page range (e.g., "123-130")
+    pub pages: Option<String>,
+    /// Article language (e.g., "eng")
+    pub language: Option<String>,
+    /// ISO journal abbreviation (e.g., "J Biol Chem")
+    pub journal_abbreviation: Option<String>,
+    /// ISSN
+    pub issn: Option<String>,
 }
 
 impl From<PubMedArticle> for Article {
@@ -87,6 +99,12 @@ impl From<PubMedArticle> for Article {
             abstract_text: article.abstract_text,
             article_types: article.article_types,
             keywords: article.keywords.unwrap_or_default(),
+            volume: article.volume,
+            issue: article.issue,
+            pages: article.pages,
+            language: article.language,
+            journal_abbreviation: article.journal_abbreviation,
+            issn: article.issn,
         }
     }
 }

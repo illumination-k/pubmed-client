@@ -73,6 +73,13 @@ pub(super) struct PmidXml {
     pub value: String,
 }
 
+/// Pagination element containing page range
+#[derive(Debug, Deserialize)]
+pub(super) struct Pagination {
+    #[serde(rename = "MedlinePgn")]
+    pub medline_pgn: Option<String>,
+}
+
 /// Article element containing core metadata
 #[derive(Debug, Deserialize)]
 pub(super) struct Article {
@@ -80,10 +87,14 @@ pub(super) struct Article {
     pub journal: Option<Journal>,
     #[serde(rename = "ArticleTitle")]
     pub article_title: Option<String>,
+    #[serde(rename = "Pagination")]
+    pub pagination: Option<Pagination>,
     #[serde(rename = "Abstract")]
     pub abstract_section: Option<AbstractSection>,
     #[serde(rename = "AuthorList")]
     pub author_list: Option<AuthorList>,
+    #[serde(rename = "Language")]
+    pub language: Option<String>,
     #[serde(rename = "PublicationTypeList")]
     pub publication_type_list: Option<PublicationTypeList>,
     #[serde(rename = "ELocationID")]
@@ -97,11 +108,29 @@ pub(super) struct Journal {
     pub title: Option<String>,
     #[serde(rename = "JournalIssue")]
     pub journal_issue: Option<JournalIssue>,
+    #[serde(rename = "ISOAbbreviation")]
+    pub iso_abbreviation: Option<String>,
+    #[serde(rename = "ISSN")]
+    pub issn: Option<IssnXml>,
 }
 
-/// Journal issue containing publication date
+/// ISSN element with IssnType attribute
+#[derive(Debug, Deserialize)]
+pub(super) struct IssnXml {
+    #[serde(rename = "$text")]
+    pub value: String,
+    #[serde(rename = "@IssnType")]
+    #[allow(dead_code)]
+    pub issn_type: Option<String>,
+}
+
+/// Journal issue containing publication date, volume, and issue
 #[derive(Debug, Deserialize)]
 pub(super) struct JournalIssue {
+    #[serde(rename = "Volume")]
+    pub volume: Option<String>,
+    #[serde(rename = "Issue")]
+    pub issue: Option<String>,
     #[serde(rename = "PubDate")]
     pub pub_date: Option<PubDate>,
 }

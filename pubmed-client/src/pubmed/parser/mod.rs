@@ -420,4 +420,197 @@ mod tests {
         assert!(article.chemical_list.is_none());
         assert!(article.keywords.is_none());
     }
+
+    #[test]
+    fn test_bibliographic_fields_parsing() {
+        let xml = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>31978945</PMID>
+        <Article>
+            <Journal>
+                <ISSN IssnType="Electronic">1476-4687</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>579</Volume>
+                    <Issue>7798</Issue>
+                    <PubDate>
+                        <Year>2020</Year>
+                        <Month>Mar</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Nature</Title>
+                <ISOAbbreviation>Nature</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>A pneumonia outbreak associated with a new coronavirus of probable bat origin.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>270-273</MedlinePgn>
+            </Pagination>
+            <Language>eng</Language>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = parse_article_from_xml(xml, "31978945").unwrap();
+
+        assert_eq!(article.pmid, "31978945");
+        assert_eq!(article.journal, "Nature");
+        assert_eq!(article.pub_date, "2020 Mar");
+
+        // New bibliographic fields
+        assert_eq!(article.volume, Some("579".to_string()));
+        assert_eq!(article.issue, Some("7798".to_string()));
+        assert_eq!(article.pages, Some("270-273".to_string()));
+        assert_eq!(article.language, Some("eng".to_string()));
+        assert_eq!(article.journal_abbreviation, Some("Nature".to_string()));
+        assert_eq!(article.issn, Some("1476-4687".to_string()));
+    }
+
+    #[test]
+    fn test_bibliographic_fields_missing() {
+        // Verify that articles without these fields still parse correctly
+        let xml = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>99990001</PMID>
+        <Article>
+            <Journal>
+                <Title>Minimal Journal</Title>
+            </Journal>
+            <ArticleTitle>Minimal Article</ArticleTitle>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = parse_article_from_xml(xml, "99990001").unwrap();
+
+        assert_eq!(article.pmid, "99990001");
+        assert_eq!(article.journal, "Minimal Journal");
+        assert!(article.volume.is_none());
+        assert!(article.issue.is_none());
+        assert!(article.pages.is_none());
+        assert!(article.language.is_none());
+        assert!(article.journal_abbreviation.is_none());
+        assert!(article.issn.is_none());
+    }
+
+    #[test]
+    fn test_bibliographic_fields_partial() {
+        // Test with some fields present and some missing
+        let xml = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>99990002</PMID>
+        <Article>
+            <Journal>
+                <ISSN IssnType="Print">0028-0836</ISSN>
+                <JournalIssue>
+                    <Volume>100</Volume>
+                    <PubDate>
+                        <Year>2023</Year>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Test Journal of Medicine</Title>
+                <ISOAbbreviation>Test J Med</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Partial Fields Article</ArticleTitle>
+            <Language>jpn</Language>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = parse_article_from_xml(xml, "99990002").unwrap();
+
+        assert_eq!(article.volume, Some("100".to_string()));
+        assert!(article.issue.is_none()); // No Issue element
+        assert!(article.pages.is_none()); // No Pagination element
+        assert_eq!(article.language, Some("jpn".to_string()));
+        assert_eq!(article.journal_abbreviation, Some("Test J Med".to_string()));
+        assert_eq!(article.issn, Some("0028-0836".to_string()));
+    }
+
+    #[test]
+    fn test_bibliographic_fields_citation_format() {
+        // Verify all fields needed for NLM citation format are extractable
+        let xml = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation>
+        <PMID>99990003</PMID>
+        <Article>
+            <Journal>
+                <ISSN IssnType="Electronic">1234-5678</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>45</Volume>
+                    <Issue>3</Issue>
+                    <PubDate>
+                        <Year>2024</Year>
+                        <Month>Jun</Month>
+                        <Day>15</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Journal of Biological Chemistry</Title>
+                <ISOAbbreviation>J Biol Chem</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Complete Citation Test Article.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>e100234</MedlinePgn>
+            </Pagination>
+            <AuthorList>
+                <Author>
+                    <LastName>Tanaka</LastName>
+                    <ForeName>Yuki</ForeName>
+                </Author>
+                <Author>
+                    <LastName>Suzuki</LastName>
+                    <ForeName>Kenji</ForeName>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+        </Article>
+    </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = parse_article_from_xml(xml, "99990003").unwrap();
+
+        // All fields needed for NLM citation:
+        // Author. Title. Journal. Year;Volume(Issue):Pages.
+        assert_eq!(article.authors.len(), 2);
+        assert_eq!(article.title, "Complete Citation Test Article.");
+        assert_eq!(
+            article.journal_abbreviation,
+            Some("J Biol Chem".to_string())
+        );
+        assert_eq!(article.pub_date, "2024 Jun 15");
+        assert_eq!(article.volume, Some("45".to_string()));
+        assert_eq!(article.issue, Some("3".to_string()));
+        assert_eq!(article.pages, Some("e100234".to_string()));
+        assert_eq!(article.language, Some("eng".to_string()));
+        assert_eq!(article.issn, Some("1234-5678".to_string()));
+
+        // Verify we can construct an NLM-style citation string
+        let citation = format!(
+            "{}. {}. {} {};{}({}):{}.",
+            article.authors[0].full_name,
+            article.title,
+            article
+                .journal_abbreviation
+                .as_deref()
+                .unwrap_or(&article.journal),
+            "2024",
+            article.volume.as_deref().unwrap_or(""),
+            article.issue.as_deref().unwrap_or(""),
+            article.pages.as_deref().unwrap_or(""),
+        );
+        assert_eq!(
+            citation,
+            "Yuki Tanaka. Complete Citation Test Article.. J Biol Chem 2024;45(3):e100234."
+        );
+    }
 }
