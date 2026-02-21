@@ -1,6 +1,6 @@
 # Test Coverage Analysis
 
-*Generated: 2026-02-20*
+_Generated: 2026-02-20_
 
 ## Overall Numbers
 
@@ -10,34 +10,34 @@
 
 ## Coverage by Module (line coverage)
 
-| Module | Lines | Coverage | Notes |
-|--------|-------|----------|-------|
-| `rate_limit.rs` | 73 | **100%** | Excellent |
-| `time.rs` | 81 | **100%** | Excellent |
-| `pubmed/query/*` | ~1,200 | **97-100%** | Excellent — best-tested module |
-| `cache.rs` | 73 | **100%** | Excellent |
-| `common/ids.rs` | 265 | **97.7%** | Good |
-| `pubmed/parser/mod.rs` | 564 | **97.5%** | Good |
-| `pubmed/models.rs` | 492 | **96.1%** | Good |
-| `pubmed/parser/converters.rs` | 277 | **93.9%** | Good, but **no unit tests** — covered only via integration tests |
-| `error.rs` | 225 | **92.9%** | Good |
-| `pubmed/parser/xml_types.rs` | 45 | **91.1%** | Good, but **no unit tests** |
-| `common/models.rs` | 121 | **90.1%** | Good |
-| `retry.rs` | 196 | **88.8%** | Acceptable |
-| `common/xml_utils.rs` | 238 | **87.8%** | Acceptable |
-| `config.rs` | 166 | **86.1%** | Acceptable |
-| `pmc/models.rs` | 402 | **85.3%** | Acceptable |
-| `pmc/oa_api.rs` | 83 | **83.1%** | Acceptable |
-| `pubmed/client.rs` | 1,065 | **81.8%** | Moderate — largest file, many HTTP-dependent paths |
-| `pubmed/parser/deserializers.rs` | 47 | **72.3%** | Needs improvement |
-| `pmc/parser/metadata.rs` | 373 | **71.1%** | Needs improvement |
-| `pmc/parser/author.rs` | 264 | **70.5%** | Needs improvement |
-| `pmc/parser/section.rs` | 357 | **69.8%** | Needs improvement |
-| `pmc/parser/reference.rs` | 195 | **65.6%** | Needs improvement |
-| `pmc/markdown.rs` | 719 | **61.9%** | Needs improvement — 1,147 lines total |
-| `pmc/client.rs` | 248 | **53.2%** | Poor — many untested HTTP paths |
-| `pmc/tar.rs` | 418 | **43.5%** | Poor — 693 lines, barely half tested |
-| `lib.rs` | 84 | **35.7%** | Poor — `Client` wrapper has no unit tests |
+| Module                           | Lines  | Coverage    | Notes                                                            |
+| -------------------------------- | ------ | ----------- | ---------------------------------------------------------------- |
+| `rate_limit.rs`                  | 73     | **100%**    | Excellent                                                        |
+| `time.rs`                        | 81     | **100%**    | Excellent                                                        |
+| `pubmed/query/*`                 | ~1,200 | **97-100%** | Excellent — best-tested module                                   |
+| `cache.rs`                       | 73     | **100%**    | Excellent                                                        |
+| `common/ids.rs`                  | 265    | **97.7%**   | Good                                                             |
+| `pubmed/parser/mod.rs`           | 564    | **97.5%**   | Good                                                             |
+| `pubmed/models.rs`               | 492    | **96.1%**   | Good                                                             |
+| `pubmed/parser/converters.rs`    | 277    | **93.9%**   | Good, but **no unit tests** — covered only via integration tests |
+| `error.rs`                       | 225    | **92.9%**   | Good                                                             |
+| `pubmed/parser/xml_types.rs`     | 45     | **91.1%**   | Good, but **no unit tests**                                      |
+| `common/models.rs`               | 121    | **90.1%**   | Good                                                             |
+| `retry.rs`                       | 196    | **88.8%**   | Acceptable                                                       |
+| `common/xml_utils.rs`            | 238    | **87.8%**   | Acceptable                                                       |
+| `config.rs`                      | 166    | **86.1%**   | Acceptable                                                       |
+| `pmc/models.rs`                  | 402    | **85.3%**   | Acceptable                                                       |
+| `pmc/oa_api.rs`                  | 83     | **83.1%**   | Acceptable                                                       |
+| `pubmed/client.rs`               | 1,065  | **81.8%**   | Moderate — largest file, many HTTP-dependent paths               |
+| `pubmed/parser/deserializers.rs` | 47     | **72.3%**   | Needs improvement                                                |
+| `pmc/parser/metadata.rs`         | 373    | **71.1%**   | Needs improvement                                                |
+| `pmc/parser/author.rs`           | 264    | **70.5%**   | Needs improvement                                                |
+| `pmc/parser/section.rs`          | 357    | **69.8%**   | Needs improvement                                                |
+| `pmc/parser/reference.rs`        | 195    | **65.6%**   | Needs improvement                                                |
+| `pmc/markdown.rs`                | 719    | **61.9%**   | Needs improvement — 1,147 lines total                            |
+| `pmc/client.rs`                  | 248    | **53.2%**   | Poor — many untested HTTP paths                                  |
+| `pmc/tar.rs`                     | 418    | **43.5%**   | Poor — 693 lines, barely half tested                             |
+| `lib.rs`                         | 84     | **35.7%**   | Poor — `Client` wrapper has no unit tests                        |
 
 ## Source Files With No Unit Tests
 
@@ -50,12 +50,12 @@ These files have no `#[cfg(test)]` module — whatever coverage they have comes 
 
 ## Packages With Zero or Minimal Test Coverage
 
-| Package | Source Lines | Tests |
-|---------|-------------|-------|
-| `pubmed-mcp` | 832 | Zero tests |
-| `pubmed-cli` | 2,769 | Only `search.rs` and `storage.rs` have unit tests |
-| `pubmed-client-napi` | — | 2 test files |
-| `pubmed-client-wasm` | — | 1 test file |
+| Package              | Source Lines | Tests                                             |
+| -------------------- | ------------ | ------------------------------------------------- |
+| `pubmed-mcp`         | 832          | Zero tests                                        |
+| `pubmed-cli`         | 2,769        | Only `search.rs` and `storage.rs` have unit tests |
+| `pubmed-client-napi` | —            | 2 test files                                      |
+| `pubmed-client-wasm` | —            | 1 test file                                       |
 
 ## Existing Test Failures (15 tests)
 
