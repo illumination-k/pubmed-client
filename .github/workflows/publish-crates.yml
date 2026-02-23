@@ -82,7 +82,12 @@ jobs:
         if: inputs.check-version
         working-directory: ${{ steps.pkg-path.outputs.path }}
         run: |
-          VERSION=$(grep -m1 '^version' Cargo.toml | sed 's/.*"\(.*\)".*/\1/')
+          # Match only 'version = "..."', not 'version.workspace = true'
+          VERSION=$(grep -m1 '^version\s*=' Cargo.toml | sed 's/.*"\(.*\)".*/\1/')
+          # If empty, package uses workspace inheritance - read from workspace root
+          if [ -z "$VERSION" ]; then
+            VERSION=$(grep -m1 '^version\s*=' "$GITHUB_WORKSPACE/Cargo.toml" | sed 's/.*"\(.*\)".*/\1/')
+          fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Cargo.toml version: $VERSION"
 
