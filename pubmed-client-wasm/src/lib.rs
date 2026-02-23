@@ -164,7 +164,7 @@ impl WasmPubMedClient {
     pub fn search_articles(&self, query: String, limit: usize) -> JsPromiseArticles {
         let client = self.client.clone();
         future_to_promise(async move {
-            match client.pubmed.search_and_fetch(&query, limit).await {
+            match client.pubmed.search_and_fetch(&query, limit, None).await {
                 Ok(articles) => {
                     let js_articles: Vec<JsArticle> =
                         articles.into_iter().map(JsArticle::from).collect();
@@ -233,7 +233,7 @@ impl WasmPubMedClient {
         future_to_promise(async move {
             match client
                 .pubmed
-                .search_and_fetch_summaries(&query, limit)
+                .search_and_fetch_summaries(&query, limit, None)
                 .await
             {
                 Ok(summaries) => {
@@ -331,6 +331,34 @@ impl WasmPubMedClient {
                     Ok(serde_wasm_bindgen::to_value(&js_results)?)
                 }
                 Err(e) => Err(JsValue::from_str(&format!("Global query failed: {e}"))),
+            }
+        })
+    }
+
+    /// Check spelling of a search term using the ESpell API (PubMed database)
+    pub fn spell_check(&self, term: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.pubmed.spell_check(&term).await {
+                Ok(result) => {
+                    let js_result = JsSpellCheckResult::from(result);
+                    Ok(serde_wasm_bindgen::to_value(&js_result)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Spell check failed: {e}"))),
+            }
+        })
+    }
+
+    /// Check spelling of a search term against a specific database using the ESpell API
+    pub fn spell_check_db(&self, term: String, db: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.pubmed.spell_check_db(&term, &db).await {
+                Ok(result) => {
+                    let js_result = JsSpellCheckResult::from(result);
+                    Ok(serde_wasm_bindgen::to_value(&js_result)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Spell check failed: {e}"))),
             }
         })
     }
@@ -783,6 +811,38 @@ pub struct JsDatabaseCount {
 pub struct JsGlobalQueryResults {
     pub term: String,
     pub results: Vec<JsDatabaseCount>,
+}
+
+// ================================================================================================
+// ESpell types for WASM
+// ================================================================================================
+
+/// JavaScript-friendly spell check result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsSpellCheckResult {
+    pub database: String,
+    pub query: String,
+    pub corrected_query: String,
+    pub has_corrections: bool,
+    pub replacements: Vec<String>,
+}
+
+impl From<pubmed_client::SpellCheckResult> for JsSpellCheckResult {
+    fn from(result: pubmed_client::SpellCheckResult) -> Self {
+        let has_corrections = result.has_corrections();
+        let replacements = result
+            .replacements()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
+        Self {
+            database: result.database,
+            query: result.query,
+            corrected_query: result.corrected_query,
+            has_corrections,
+            replacements,
+        }
+    }
 }
 
 impl From<pubmed_client::GlobalQueryResults> for JsGlobalQueryResults {

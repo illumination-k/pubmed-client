@@ -526,7 +526,7 @@ mod integration_tests {
             "Step 1: Searching for open access articles"
         );
 
-        let pmids = match pubmed_client.search_articles(search_query, 10).await {
+        let pmids = match pubmed_client.search_articles(search_query, 10, None).await {
             Ok(pmids) => {
                 info!(results_count = pmids.len(), "Search completed");
                 pmids

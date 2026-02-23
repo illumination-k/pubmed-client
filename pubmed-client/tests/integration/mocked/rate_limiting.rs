@@ -191,7 +191,7 @@ async fn test_pubmed_client_with_mock_server() {
     let client = PubMedClient::with_config(config);
 
     let pmids = client
-        .search_articles("test query", 1)
+        .search_articles("test query", 1, None)
         .await
         .expect("Mock request should succeed");
     assert_eq!(pmids.len(), 1);
@@ -214,7 +214,7 @@ async fn test_api_parameters_in_requests() {
 
     // Make a request - should succeed only if API parameters are properly included
     let pmids = client
-        .search_articles("test query", 1)
+        .search_articles("test query", 1, None)
         .await
         .expect("Request should succeed with correct API parameters");
 
@@ -246,7 +246,7 @@ async fn test_fetch_article_rate_limiting_with_mock() {
         assert_eq!(article.journal, "Test Journal");
         assert!(article.abstract_text.is_some());
         assert_eq!(article.authors.len(), 1);
-        assert_eq!(article.authors[0], "John Doe");
+        assert_eq!(article.authors[0].full_name, "John Doe");
     }
 }
 
@@ -264,7 +264,7 @@ async fn test_shared_rate_limiting_across_methods() {
 
     // Mix search and fetch requests - verify they work correctly with mocked responses
     let search_result = client
-        .search_articles("test", 1)
+        .search_articles("test", 1, None)
         .await
         .expect("Mock search should succeed");
     assert_eq!(search_result.len(), 1);
@@ -278,7 +278,7 @@ async fn test_shared_rate_limiting_across_methods() {
     assert_eq!(article.title, "Test Article");
 
     let search_result2 = client
-        .search_articles("test2", 1)
+        .search_articles("test2", 1, None)
         .await
         .expect("Mock search should succeed");
     assert_eq!(search_result2.len(), 1);
@@ -303,7 +303,9 @@ async fn test_high_concurrency_rate_limiting() {
     for i in 0..5 {
         let client = client.clone();
         let task =
-            tokio::spawn(async move { client.search_articles(&format!("query {i}"), 1).await });
+            tokio::spawn(
+                async move { client.search_articles(&format!("query {i}"), 1, None).await },
+            );
         tasks.push(task);
     }
 
@@ -348,7 +350,7 @@ async fn test_rate_limiting_with_429_responses() {
     let client = PubMedClient::with_config(config);
 
     // Test that 429 response results in ApiError
-    let result = client.search_articles("test query", 10).await;
+    let result = client.search_articles("test query", 10, None).await;
     assert!(result.is_err());
 
     match result.unwrap_err() {
@@ -371,7 +373,7 @@ async fn test_realistic_429_rate_limit_response() {
     let client = PubMedClient::with_config(config);
 
     // Request should get 429 error from server
-    let result = client.search_articles("test query", 1).await;
+    let result = client.search_articles("test query", 1, None).await;
     assert!(result.is_err());
 
     match result.unwrap_err() {
@@ -394,7 +396,7 @@ async fn test_server_rate_limit_simulation() {
     let client = PubMedClient::with_config(config);
 
     // Even with client-side rate limiting, server can still return 429
-    let result = client.search_articles("test", 1).await;
+    let result = client.search_articles("test", 1, None).await;
     assert!(result.is_err());
 
     if let Err(PubMedError::ApiError { status, message }) = result {

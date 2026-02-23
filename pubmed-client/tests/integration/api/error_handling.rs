@@ -60,7 +60,7 @@ mod integration_tests {
 
             info!(query = query, "Testing invalid query");
 
-            match client.search_articles(query, 10).await {
+            match client.search_articles(query, 10, None).await {
                 Ok(results) => {
                     // Some "invalid" queries might actually return results
                     // This is not necessarily an error - NCBI might be forgiving
@@ -242,7 +242,7 @@ mod integration_tests {
 
         info!("Testing search with short timeout");
 
-        match client.search_articles("COVID-19", 5).await {
+        match client.search_articles("COVID-19", 5, None).await {
             Ok(results) => {
                 // This might succeed if the request is very fast
                 info!(
@@ -317,7 +317,7 @@ mod integration_tests {
                     // Test search for other tasks
                     info!(task_label = %label, query = %query, "Testing concurrent search");
                     client
-                        .search_articles(&query, 3)
+                        .search_articles(&query, 3, None)
                         .await
                         .map(|r| r.len())
                         .map_err(|e| (label, e))
@@ -494,7 +494,7 @@ mod integration_tests {
 
             info!(scenario = scenario, "Testing error scenario");
 
-            match client.search_articles(query, 10).await {
+            match client.search_articles(query, 10, None).await {
                 Ok(results) => {
                     info!(
                         scenario = scenario,
@@ -572,7 +572,10 @@ mod integration_tests {
                 client.fetch_article(input).await.map(|_| 1)
             } else {
                 // Search
-                client.search_articles(input, 5).await.map(|r| r.len())
+                client
+                    .search_articles(input, 5, None)
+                    .await
+                    .map(|r| r.len())
             };
 
             match result {

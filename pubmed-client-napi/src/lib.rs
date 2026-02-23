@@ -260,6 +260,39 @@ impl From<pubmed_client::OaSubsetInfo> for OaSubsetInfo {
     }
 }
 
+/// Spelling suggestion result from the ESpell API
+#[napi(object)]
+pub struct SpellCheckResult {
+    /// The database that was queried
+    pub database: String,
+    /// The original query string as submitted
+    pub query: String,
+    /// The full corrected/suggested query as a plain string
+    pub corrected_query: String,
+    /// Whether any spelling corrections were made
+    pub has_corrections: bool,
+    /// The corrected terms (only the replaced parts)
+    pub replacements: Vec<String>,
+}
+
+impl From<pubmed_client::SpellCheckResult> for SpellCheckResult {
+    fn from(result: pubmed_client::SpellCheckResult) -> Self {
+        let has_corrections = result.has_corrections();
+        let replacements = result
+            .replacements()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
+        SpellCheckResult {
+            database: result.database,
+            query: result.query,
+            corrected_query: result.corrected_query,
+            has_corrections,
+            replacements,
+        }
+    }
+}
+
 /// Full-text article from PMC
 #[napi(object)]
 pub struct FullTextArticle {
@@ -414,7 +447,7 @@ impl PubMedClient {
         let articles = self
             .client
             .pubmed
-            .search_and_fetch(&query, limit)
+            .search_and_fetch(&query, limit, None)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 
@@ -495,7 +528,7 @@ impl PubMedClient {
         let summaries = self
             .client
             .pubmed
-            .search_and_fetch_summaries(&query, limit)
+            .search_and_fetch_summaries(&query, limit, None)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 
@@ -604,6 +637,44 @@ impl PubMedClient {
         Ok(OaSubsetInfo::from(info))
     }
 
+    /// Check spelling of a search term using the ESpell API
+    ///
+    /// Provides spelling suggestions for terms within a single text query.
+    /// Uses the PubMed database by default.
+    ///
+    /// @param term - The search term to spell-check
+    /// @returns Spelling suggestions with corrected query
+    #[napi]
+    pub async fn spell_check(&self, term: String) -> Result<SpellCheckResult> {
+        let result = self
+            .client
+            .pubmed
+            .spell_check(&term)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(SpellCheckResult::from(result))
+    }
+
+    /// Check spelling of a search term against a specific database using the ESpell API
+    ///
+    /// Spelling suggestions are database-specific, so use the same database you plan to search.
+    ///
+    /// @param term - The search term to spell-check
+    /// @param db - The NCBI database to check against (e.g., "pubmed", "pmc")
+    /// @returns Spelling suggestions with corrected query
+    #[napi]
+    pub async fn spell_check_db(&self, term: String, db: String) -> Result<SpellCheckResult> {
+        let result = self
+            .client
+            .pubmed
+            .spell_check_db(&term, &db)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(SpellCheckResult::from(result))
+    }
+
     /// Execute a search query and return articles
     ///
     /// @param query - SearchQuery instance
@@ -615,7 +686,7 @@ impl PubMedClient {
         let articles = self
             .client
             .pubmed
-            .search_and_fetch(&query_string, limit)
+            .search_and_fetch(&query_string, limit, None)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 

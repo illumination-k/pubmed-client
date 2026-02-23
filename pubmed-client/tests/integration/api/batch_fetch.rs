@@ -252,7 +252,7 @@ mod integration_tests {
 
         let start = Instant::now();
         let articles = client
-            .search_and_fetch("COVID-19[Title] AND 2023[PDAT]", 5)
+            .search_and_fetch("COVID-19[Title] AND 2023[PDAT]", 5, None)
             .await
             .expect("search_and_fetch should succeed");
         let duration = start.elapsed();

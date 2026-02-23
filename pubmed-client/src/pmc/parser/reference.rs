@@ -360,7 +360,7 @@ fn extract_authors_from_person_groups(person_groups: Vec<PersonGroup>) -> Vec<Au
         if group.person_group_type.as_deref() == Some("author") || group.person_group_type.is_none()
         {
             for name in group.names {
-                let author = Author::with_names(name.given_names.clone(), name.surname.clone());
+                let author = Author::new(name.given_names.clone(), name.surname.clone());
                 authors.push(author);
             }
         }

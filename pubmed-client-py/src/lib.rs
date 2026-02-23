@@ -23,7 +23,7 @@ pub use pmc::{
 pub use pubmed::{
     PyAffiliation, PyArticleSummary, PyAuthor, PyCitationMatch, PyCitationMatches, PyCitationQuery,
     PyCitations, PyDatabaseCount, PyDatabaseInfo, PyGlobalQueryResults, PyPmcLinks,
-    PyPubMedArticle, PyPubMedClient, PyRelatedArticles,
+    PyPubMedArticle, PyPubMedClient, PyRelatedArticles, PySpellCheckResult,
 };
 pub use query::PySearchQuery;
 
@@ -69,6 +69,7 @@ fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyCitationMatches>()?;
     m.add_class::<PyDatabaseCount>()?;
     m.add_class::<PyGlobalQueryResults>()?;
+    m.add_class::<PySpellCheckResult>()?;
     m.add_class::<PyArticleSummary>()?;
 
     // Add PMC models

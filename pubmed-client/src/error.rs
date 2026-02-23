@@ -18,21 +18,13 @@ pub enum PubMedError {
     #[error("XML parsing failed: {0}")]
     XmlError(String),
 
-    /// XML parsing error with detailed message
-    #[error("XML parsing error: {message}")]
-    XmlParseError { message: String },
-
     /// Article not found
     #[error("Article not found: PMID {pmid}")]
     ArticleNotFound { pmid: String },
 
     /// PMC full text not available
-    #[error("PMC full text not available for PMID {pmid}")]
-    PmcNotAvailable { pmid: String },
-
-    /// PMC full text not available for PMCID
-    #[error("PMC full text not available for PMCID {pmcid}")]
-    PmcNotAvailableById { pmcid: String },
+    #[error("PMC full text not available for {id}")]
+    PmcNotAvailable { id: String },
 
     /// Invalid PMID format
     #[error("Invalid PMID format: {pmid}")]
@@ -124,10 +116,8 @@ impl RetryableError for PubMedError {
             // All other errors are not retryable
             PubMedError::JsonError(_)
             | PubMedError::XmlError(_)
-            | PubMedError::XmlParseError { .. }
             | PubMedError::ArticleNotFound { .. }
             | PubMedError::PmcNotAvailable { .. }
-            | PubMedError::PmcNotAvailableById { .. }
             | PubMedError::InvalidPmid { .. }
             | PubMedError::InvalidPmcid { .. }
             | PubMedError::InvalidQuery(_)
@@ -156,13 +146,9 @@ impl RetryableError for PubMedError {
         } else {
             match self {
                 PubMedError::JsonError(_) => "Invalid JSON response",
-                PubMedError::XmlError(_) | PubMedError::XmlParseError { .. } => {
-                    "Invalid XML response"
-                }
+                PubMedError::XmlError(_) => "Invalid XML response",
                 PubMedError::ArticleNotFound { .. } => "Article does not exist",
-                PubMedError::PmcNotAvailable { .. } | PubMedError::PmcNotAvailableById { .. } => {
-                    "Content not available"
-                }
+                PubMedError::PmcNotAvailable { .. } => "Content not available",
                 PubMedError::InvalidPmid { .. } | PubMedError::InvalidPmcid { .. } => {
                     "Invalid input"
                 }
@@ -200,16 +186,6 @@ mod tests {
     }
 
     #[test]
-    fn test_xml_parse_error_not_retryable() {
-        let err = PubMedError::XmlParseError {
-            message: "Failed to parse element".to_string(),
-        };
-
-        assert!(!err.is_retryable());
-        assert_eq!(err.retry_reason(), "Invalid XML response");
-    }
-
-    #[test]
     fn test_article_not_found_not_retryable() {
         let err = PubMedError::ArticleNotFound {
             pmid: "12345".to_string(),
@@ -223,7 +199,7 @@ mod tests {
     #[test]
     fn test_pmc_not_available_not_retryable() {
         let err = PubMedError::PmcNotAvailable {
-            pmid: "67890".to_string(),
+            id: "67890".to_string(),
         };
 
         assert!(!err.is_retryable());
@@ -232,9 +208,9 @@ mod tests {
     }
 
     #[test]
-    fn test_pmc_not_available_by_id_not_retryable() {
-        let err = PubMedError::PmcNotAvailableById {
-            pmcid: "PMC123456".to_string(),
+    fn test_pmc_not_available_by_pmcid_not_retryable() {
+        let err = PubMedError::PmcNotAvailable {
+            id: "PMC123456".to_string(),
         };
 
         assert!(!err.is_retryable());
@@ -402,12 +378,6 @@ mod tests {
             (
                 PubMedError::XmlError("test".to_string()),
                 "XML parsing failed: test",
-            ),
-            (
-                PubMedError::XmlParseError {
-                    message: "test error".to_string(),
-                },
-                "XML parsing error: test error",
             ),
             (
                 PubMedError::InvalidQuery("bad query".to_string()),

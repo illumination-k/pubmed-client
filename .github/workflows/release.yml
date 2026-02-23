@@ -136,7 +136,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/publish-crates.yml
     with:
-      package: pubmed-client-rs
+      package: pubmed-client
       package-path: pubmed-client
       # Skip version check for workflow_dispatch (no tag available)
       check-version: ${{ github.event_name == 'push' }}

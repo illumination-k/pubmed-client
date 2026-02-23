@@ -16,7 +16,7 @@ use crate::utils::{get_runtime, to_py_err};
 
 use super::models::{
     PyArticleSummary, PyCitationMatches, PyCitationQuery, PyCitations, PyDatabaseInfo,
-    PyGlobalQueryResults, PyPmcLinks, PyPubMedArticle, PyRelatedArticles,
+    PyGlobalQueryResults, PyPmcLinks, PyPubMedArticle, PyRelatedArticles, PySpellCheckResult,
 };
 
 // ================================================================================================
@@ -142,12 +142,8 @@ impl PyPubMedClient {
 
         py.detach(|| {
             let rt = get_runtime();
-            rt.block_on(client.search_articles_with_options(
-                &query_string,
-                actual_limit,
-                sort.as_ref(),
-            ))
-            .map_err(to_py_err)
+            rt.block_on(client.search_articles(&query_string, actual_limit, sort.as_ref()))
+                .map_err(to_py_err)
         })
     }
 
@@ -183,11 +179,7 @@ impl PyPubMedClient {
         py.detach(|| {
             let rt = get_runtime();
             let articles = rt
-                .block_on(client.search_and_fetch_with_options(
-                    &query_string,
-                    actual_limit,
-                    sort.as_ref(),
-                ))
+                .block_on(client.search_and_fetch(&query_string, actual_limit, sort.as_ref()))
                 .map_err(to_py_err)?;
             Ok(articles.into_iter().map(PyPubMedArticle::from).collect())
         })
@@ -304,7 +296,7 @@ impl PyPubMedClient {
         py.detach(|| {
             let rt = get_runtime();
             let summaries = rt
-                .block_on(client.search_and_fetch_summaries_with_options(
+                .block_on(client.search_and_fetch_summaries(
                     &query_string,
                     actual_limit,
                     sort.as_ref(),
@@ -468,6 +460,59 @@ impl PyPubMedClient {
             let rt = get_runtime();
             let results = rt.block_on(client.global_query(&term)).map_err(to_py_err)?;
             Ok(PyGlobalQueryResults::from(results))
+        })
+    }
+
+    /// Check spelling of a search term using the ESpell API
+    ///
+    /// Provides spelling suggestions for terms within a single text query.
+    /// Uses the PubMed database by default.
+    ///
+    /// Args:
+    ///     term: The search term to spell-check
+    ///
+    /// Returns:
+    ///     SpellCheckResult with the corrected query and details
+    ///
+    /// Examples:
+    ///     >>> client = PubMedClient()
+    ///     >>> result = client.spell_check("asthmaa")
+    ///     >>> print(result.corrected_query)
+    ///     "asthma"
+    fn spell_check(&self, py: Python, term: String) -> PyResult<PySpellCheckResult> {
+        let client = self.client.clone();
+        py.detach(|| {
+            let rt = get_runtime();
+            let result = rt.block_on(client.spell_check(&term)).map_err(to_py_err)?;
+            Ok(PySpellCheckResult::from(result))
+        })
+    }
+
+    /// Check spelling of a search term against a specific database
+    ///
+    /// Spelling suggestions are database-specific, so use the same
+    /// database you plan to search.
+    ///
+    /// Args:
+    ///     term: The search term to spell-check
+    ///     db: The NCBI database to check against (e.g., "pubmed", "pmc")
+    ///
+    /// Returns:
+    ///     SpellCheckResult with the corrected query and details
+    ///
+    /// Examples:
+    ///     >>> client = PubMedClient()
+    ///     >>> result = client.spell_check_db("fiberblast", "pmc")
+    ///     >>> print(result.corrected_query)
+    ///     "fibroblast"
+    fn spell_check_db(&self, py: Python, term: String, db: String) -> PyResult<PySpellCheckResult> {
+        let client = self.client.clone();
+        py.detach(|| {
+            let rt = get_runtime();
+            let result = rt
+                .block_on(client.spell_check_db(&term, &db))
+                .map_err(to_py_err)?;
+            Ok(PySpellCheckResult::from(result))
         })
     }
 

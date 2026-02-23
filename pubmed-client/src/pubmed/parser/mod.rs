@@ -85,10 +85,8 @@ pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {
     let cleaned_xml = strip_inline_html_tags(xml);
 
     // Parse the XML using quick-xml serde
-    let article_set: PubmedArticleSet =
-        from_str(&cleaned_xml).map_err(|e| PubMedError::XmlParseError {
-            message: format!("Failed to deserialize XML: {}", e),
-        })?;
+    let article_set: PubmedArticleSet = from_str(&cleaned_xml)
+        .map_err(|e| PubMedError::XmlError(format!("Failed to deserialize XML: {}", e)))?;
 
     // Find the article with the matching PMID
     let article_xml = article_set

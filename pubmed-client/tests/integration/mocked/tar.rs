@@ -45,7 +45,7 @@ async fn test_download_and_extract_tar_directory_creation() {
     let nested_path = temp_dir.path().join("nested").join("directory");
 
     // Test with a PMCID that likely won't be available in OA
-    // This should fail with PmcNotAvailableById, but only after creating the directory
+    // This should fail with PmcNotAvailable, but only after creating the directory
     let result = client
         .download_and_extract_tar("PMC1234567", &nested_path)
         .await;
@@ -56,8 +56,8 @@ async fn test_download_and_extract_tar_directory_creation() {
     // Should fail with not available error
     assert!(result.is_err());
     match result.unwrap_err() {
-        PubMedError::PmcNotAvailableById { pmcid } => {
-            assert_eq!(pmcid, "PMC1234567");
+        PubMedError::PmcNotAvailable { id } => {
+            assert_eq!(id, "PMC1234567");
         }
         PubMedError::ApiError { status, .. } => {
             // Could also be a 404 or similar API error
@@ -92,12 +92,9 @@ async fn test_pmcid_normalization() {
 
     // The errors should be similar (both should reference PMC1234567)
     match (result1.unwrap_err(), result2.unwrap_err()) {
-        (
-            PubMedError::PmcNotAvailableById { pmcid: pmcid1 },
-            PubMedError::PmcNotAvailableById { pmcid: pmcid2 },
-        ) => {
-            assert_eq!(pmcid1, "1234567");
-            assert_eq!(pmcid2, "PMC1234567");
+        (PubMedError::PmcNotAvailable { id: id1 }, PubMedError::PmcNotAvailable { id: id2 }) => {
+            assert_eq!(id1, "1234567");
+            assert_eq!(id2, "PMC1234567");
         }
         (PubMedError::ApiError { status: s1, .. }, PubMedError::ApiError { status: s2, .. }) => {
             assert_eq!(s1, s2);

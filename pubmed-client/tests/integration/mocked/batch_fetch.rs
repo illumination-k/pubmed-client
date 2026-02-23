@@ -328,7 +328,7 @@ async fn test_search_and_fetch_uses_batch() {
     let client = create_mock_client(&mock_server);
 
     let articles = client
-        .search_and_fetch("test query", 3)
+        .search_and_fetch("test query", 3, None)
         .await
         .expect("search_and_fetch should succeed");
 

@@ -283,7 +283,7 @@ pub use pubmed::{
     parse_article_from_xml, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,
     CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, FieldInfo,
     GlobalQueryResults, HistorySession, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient,
-    RelatedArticles, SearchQuery, SearchResult, SortOrder,
+    RelatedArticles, SearchQuery, SearchResult, SortOrder, SpellCheckResult, SpelledQuerySegment,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{sleep, Duration, Instant};
@@ -407,7 +407,7 @@ impl Client {
         query: &str,
         limit: usize,
     ) -> Result<Vec<(PubMedArticle, Option<PmcFullText>)>> {
-        let articles = self.pubmed.search_and_fetch(query, limit).await?;
+        let articles = self.pubmed.search_and_fetch(query, limit, None).await?;
         let mut results = Vec::new();
 
         for article in articles {
@@ -521,7 +521,9 @@ impl Client {
         query: &str,
         limit: usize,
     ) -> Result<Vec<ArticleSummary>> {
-        self.pubmed.search_and_fetch_summaries(query, limit).await
+        self.pubmed
+            .search_and_fetch_summaries(query, limit, None)
+            .await
     }
 
     /// Get list of all available NCBI databases
@@ -714,6 +716,37 @@ impl Client {
     /// ```
     pub async fn global_query(&self, term: &str) -> Result<GlobalQueryResults> {
         self.pubmed.global_query(term).await
+    }
+
+    /// Check spelling of a search term using the ESpell API
+    ///
+    /// Provides spelling suggestions for terms within a single text query.
+    /// Uses the PubMed database by default. For other databases, use
+    /// `client.pubmed.spell_check_db(term, db)` directly.
+    ///
+    /// # Arguments
+    ///
+    /// * `term` - The search term to spell-check
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<SpellCheckResult>` containing spelling suggestions
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let result = client.spell_check("asthmaa").await?;
+    ///     println!("Corrected: {}", result.corrected_query);
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn spell_check(&self, term: &str) -> Result<SpellCheckResult> {
+        self.pubmed.spell_check(term).await
     }
 }
 

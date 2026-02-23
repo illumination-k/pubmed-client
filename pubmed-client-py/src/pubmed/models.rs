@@ -368,6 +368,71 @@ impl PyDatabaseInfo {
 }
 
 // ================================================================================================
+// ESpell API types
+// ================================================================================================
+
+/// Python wrapper for SpellCheckResult
+///
+/// Attributes:
+///     database: The database that was queried
+///     query: The original query string
+///     corrected_query: The corrected/suggested query
+///     has_corrections: Whether any spelling corrections were made
+///     replacements: List of corrected terms
+///
+/// Examples:
+///     >>> client = PubMedClient()
+///     >>> result = client.spell_check("asthmaa")
+///     >>> print(result.corrected_query)
+///     "asthma"
+///     >>> result.has_corrections
+///     True
+#[gen_stub_pyclass]
+#[pyclass(name = "SpellCheckResult")]
+#[derive(Clone)]
+pub struct PySpellCheckResult {
+    #[pyo3(get)]
+    pub database: String,
+    #[pyo3(get)]
+    pub query: String,
+    #[pyo3(get)]
+    pub corrected_query: String,
+    #[pyo3(get)]
+    pub has_corrections: bool,
+    #[pyo3(get)]
+    pub replacements: Vec<String>,
+}
+
+impl From<pubmed::SpellCheckResult> for PySpellCheckResult {
+    fn from(result: pubmed::SpellCheckResult) -> Self {
+        let has_corrections = result.has_corrections();
+        let replacements = result
+            .replacements()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
+        PySpellCheckResult {
+            database: result.database,
+            query: result.query,
+            corrected_query: result.corrected_query,
+            has_corrections,
+            replacements,
+        }
+    }
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl PySpellCheckResult {
+    fn __repr__(&self) -> String {
+        format!(
+            "SpellCheckResult(query='{}', corrected='{}', has_corrections={})",
+            self.query, self.corrected_query, self.has_corrections
+        )
+    }
+}
+
+// ================================================================================================
 // ECitMatch API types
 // ================================================================================================
 

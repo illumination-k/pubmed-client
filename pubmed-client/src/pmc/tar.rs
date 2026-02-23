@@ -178,13 +178,13 @@ impl PmcTarClient {
                 // Check if it's an error response
                 let error_text = response.text().await?;
                 if error_text.contains("error") || error_text.contains("Error") {
-                    return Err(PubMedError::PmcNotAvailableById {
-                        pmcid: pmcid.to_string(),
+                    return Err(PubMedError::PmcNotAvailable {
+                        id: pmcid.to_string(),
                     });
                 }
                 // If we get here, it's likely still an error but we consumed the response
-                return Err(PubMedError::PmcNotAvailableById {
-                    pmcid: pmcid.to_string(),
+                return Err(PubMedError::PmcNotAvailable {
+                    id: pmcid.to_string(),
                 });
             };
 
@@ -362,8 +362,8 @@ impl PmcTarClient {
 
         // Check if the response contains an error
         if xml_content.contains("<ERROR>") {
-            return Err(PubMedError::PmcNotAvailableById {
-                pmcid: normalized_pmcid,
+            return Err(PubMedError::PmcNotAvailable {
+                id: normalized_pmcid,
             });
         }
 
@@ -415,8 +415,8 @@ impl PmcTarClient {
         }
 
         debug!("No href attribute found in XML response");
-        Err(PubMedError::PmcNotAvailableById {
-            pmcid: pmcid.to_string(),
+        Err(PubMedError::PmcNotAvailable {
+            id: pmcid.to_string(),
         })
     }
 
