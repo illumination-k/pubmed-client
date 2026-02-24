@@ -62,8 +62,14 @@ jobs:
         with:
           tool: cargo-llvm-cov
 
-      - name: Generate coverage report
-        run: cargo llvm-cov nextest -p pubmed-client --all-features --lcov --output-path lcov.info
+      - name: Run tests with coverage instrumentation
+        run: cargo llvm-cov nextest -p pubmed-client --all-features --branch --no-report
+
+      - name: Generate LCOV report
+        run: cargo llvm-cov report --branch --lcov --output-path lcov.info
+
+      - name: Print per-file coverage summary
+        run: cargo llvm-cov report --branch --text
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
