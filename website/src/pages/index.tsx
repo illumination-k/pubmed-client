@@ -1,4 +1,5 @@
 import Link from "@docusaurus/Link"
+import CodeBlock from "@theme/CodeBlock"
 import Layout from "@theme/Layout"
 import type React from "react"
 import { useState } from "react"
@@ -48,8 +49,9 @@ const installCommands: Record<string, string> = {
   python: "pip install pubmed-client-py",
 }
 
-const quickstartCode: Record<string, string> = {
-  rust: `use pubmed_client::PubMedClient;
+const quickstartCode: Record<string, { code: string; language: string }> = {
+  rust: {
+    code: `use pubmed_client::PubMedClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -67,7 +69,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     Ok(())
 }`,
-  node: `import { PubMedClient } from "pubmed-client";
+    language: "rust",
+  },
+  node: {
+    code: `import { PubMedClient } from "pubmed-client";
 
 const client = new PubMedClient();
 const articles = await client.search("COVID-19 vaccine", 5);
@@ -75,13 +80,18 @@ const articles = await client.search("COVID-19 vaccine", 5);
 for (const article of articles) {
   console.log(article.title);
 }`,
-  python: `from pubmed_client_py import Client
+    language: "typescript",
+  },
+  python: {
+    code: `from pubmed_client_py import Client
 
 client = Client()
 articles = client.pubmed.search_and_fetch("COVID-19 vaccine", 5)
 
 for article in articles:
     print(article.title)`,
+    language: "python",
+  },
 }
 
 const docCards: DocCard[] = [
@@ -159,24 +169,13 @@ function TabBar({
   )
 }
 
-function CodeSnippet({ code }: { code: string }): React.JSX.Element {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
-
+function CodeSnippet({
+  code,
+  language,
+}: { code: string; language: string }): React.JSX.Element {
   return (
-    <div className={styles.codeBlock}>
-      <button type="button" className={styles.copyBtn} onClick={handleCopy}>
-        {copied ? "Copied!" : "Copy"}
-      </button>
-      <pre className={styles.codePre}>
-        <code>{code}</code>
-      </pre>
+    <div className={styles.codeBlockWrapper}>
+      <CodeBlock language={language}>{code}</CodeBlock>
     </div>
   )
 }
@@ -238,7 +237,7 @@ export default function Home(): React.JSX.Element {
             <h2>Installation</h2>
             <p className={styles.sectionIntro}>Install via your language's package manager.</p>
             <TabBar tabs={installTabs} selected={lang} onSelect={handleLangChange} />
-            <CodeSnippet code={installCommands[lang] ?? ""} />
+            <CodeSnippet code={installCommands[lang] ?? ""} language="bash" />
           </div>
         </section>
 
@@ -250,7 +249,10 @@ export default function Home(): React.JSX.Element {
               Search PubMed and fetch article metadata in a few lines.
             </p>
             <TabBar tabs={quickstartTabs} selected={quickstartLang} onSelect={handleLangChange} />
-            <CodeSnippet code={quickstartCode[quickstartLang] ?? ""} />
+            <CodeSnippet
+              code={quickstartCode[quickstartLang]?.code ?? ""}
+              language={quickstartCode[quickstartLang]?.language ?? "text"}
+            />
           </div>
         </section>
 
