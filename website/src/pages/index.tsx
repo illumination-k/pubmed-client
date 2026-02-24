@@ -169,10 +169,7 @@ function TabBar({
   )
 }
 
-function CodeSnippet({
-  code,
-  language,
-}: { code: string; language: string }): React.JSX.Element {
+function CodeSnippet({ code, language }: { code: string; language: string }): React.JSX.Element {
   return (
     <div className={styles.codeBlockWrapper}>
       <CodeBlock language={language}>{code}</CodeBlock>

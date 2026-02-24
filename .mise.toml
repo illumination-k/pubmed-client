@@ -34,8 +34,8 @@ description = "Format shell scripts with shfmt"
 run = ["shfmt -w ./**/*.sh"]
 
 [tasks.fmt]
-description = "Format all code (Rust + Python)"
-depends = ["fmt:root", "py:format", "fmt:sh"]
+description = "Format all code (Rust + Python + website)"
+depends = ["fmt:root", "py:format", "fmt:sh", "website:fmt"]
 
 [tasks."lint:root"]
 description = "Lint Rust code with dprint, cargo fmt, and clippy"
@@ -50,8 +50,8 @@ run = [
 ]
 
 [tasks.lint]
-description = "Lint all code (Rust + Python)"
-depends = ["lint:root", "py:lint"]
+description = "Lint all code (Rust + Python + website)"
+depends = ["lint:root", "py:lint", "website:lint"]
 
 [tasks.setup]
 description = "Run postinstall setup script"
@@ -102,6 +102,16 @@ run = ["pnpm run build && pnpm run test"]
 [tasks."napi:lint"]
 description = "Run linting and type checking for napi package"
 dir = "pubmed-client-napi"
+run = ["pnpm run ci", "pnpm run typecheck"]
+
+[tasks."website:fmt"]
+description = "Format website code with Biome"
+dir = "website"
+run = ["pnpm run format"]
+
+[tasks."website:lint"]
+description = "Run Biome linting and TypeScript type checking on website"
+dir = "website"
 run = ["pnpm run ci", "pnpm run typecheck"]
 
 [tasks."core:test"]
