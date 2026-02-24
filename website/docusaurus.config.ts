@@ -1,16 +1,14 @@
-import type { Config } from "@docusaurus/types";
-import type * as Preset from "@docusaurus/preset-classic";
+import type * as Preset from "@docusaurus/preset-classic"
+import type { Config } from "@docusaurus/types"
 
 const config: Config = {
   title: "pubmed-client",
-  tagline:
-    "Fast, type-safe PubMed & PMC API client for Rust, Node.js, WebAssembly, and Python",
+  tagline: "Fast, type-safe PubMed & PMC API client for Rust, Node.js, WebAssembly, and Python",
   url: "https://illumination-k.github.io",
-  baseUrl: "/pubmed-client-rs/",
+  baseUrl: "/pubmed-client/",
   organizationName: "illumination-k",
-  projectName: "pubmed-client-rs",
+  projectName: "pubmed-client",
   onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
   trailingSlash: false,
 
   i18n: {
@@ -46,7 +44,7 @@ const config: Config = {
           position: "left",
         },
         {
-          href: "https://github.com/illumination-k/pubmed-client-rs",
+          href: "https://github.com/illumination-k/pubmed-client",
           label: "GitHub",
           position: "right",
         },
@@ -90,11 +88,11 @@ const config: Config = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/illumination-k/pubmed-client-rs",
+              href: "https://github.com/illumination-k/pubmed-client",
             },
             {
               label: "Issues",
-              href: "https://github.com/illumination-k/pubmed-client-rs/issues",
+              href: "https://github.com/illumination-k/pubmed-client/issues",
             },
           ],
         },
@@ -102,6 +100,6 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} illumination-k. Built with Docusaurus.`,
     },
   } satisfies Preset.ThemeConfig,
-};
+}
 
-export default config;
+export default config

@@ -1,0 +1,9 @@
+# Docusaurus generated files
+.docusaurus/
+build/
+
+# Dependencies
+node_modules/
+
+# pnpm
+.pnpm-store/

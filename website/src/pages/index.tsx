@@ -1,14 +1,14 @@
-import React from "react";
-import Layout from "@theme/Layout";
-import Link from "@docusaurus/Link";
-import styles from "./index.module.css";
+import Link from "@docusaurus/Link"
+import Layout from "@theme/Layout"
+import type React from "react"
+import styles from "./index.module.css"
 
 type DocCard = {
-  title: string;
-  description: string;
-  href?: string;
-  comingSoon?: boolean;
-};
+  title: string
+  description: string
+  href?: string
+  comingSoon?: boolean
+}
 
 const docCards: DocCard[] = [
   {
@@ -21,14 +21,14 @@ const docCards: DocCard[] = [
     description: "Sphinx docs for pubmed-client-py",
     comingSoon: true,
   },
-];
+]
 
 type Package = {
-  name: string;
-  language: string;
-  registry: string;
-  href: string;
-};
+  name: string
+  language: string
+  registry: string
+  href: string
+}
 
 const packages: Package[] = [
   {
@@ -55,7 +55,7 @@ const packages: Package[] = [
     registry: "PyPI",
     href: "https://pypi.org/project/pubmed-client-py/",
   },
-];
+]
 
 export default function Home(): React.JSX.Element {
   return (
@@ -74,10 +74,7 @@ export default function Home(): React.JSX.Element {
               for Rust, Node.js, WebAssembly, and Python
             </p>
             <div className={styles.heroButtons}>
-              <Link
-                className="button button--primary button--lg"
-                to="rust/pubmed_client/"
-              >
+              <Link className="button button--primary button--lg" to="rust/pubmed_client/">
                 Rust API Docs
               </Link>
               <Link
@@ -95,26 +92,21 @@ export default function Home(): React.JSX.Element {
           <div className={styles.container}>
             <h2>API Documentation</h2>
             <div className={styles.cardGrid}>
-              {docCards.map((card) =>
+              {docCards.map(card =>
                 card.href ? (
                   <Link key={card.title} className={styles.card} to={card.href}>
                     <h3>{card.title}</h3>
                     <p>{card.description}</p>
                   </Link>
                 ) : (
-                  <div
-                    key={card.title}
-                    className={`${styles.card} ${styles.cardDisabled}`}
-                  >
+                  <div key={card.title} className={`${styles.card} ${styles.cardDisabled}`}>
                     <h3>
                       {card.title}{" "}
-                      {card.comingSoon && (
-                        <span className={styles.badge}>Coming soon</span>
-                      )}
+                      {card.comingSoon && <span className={styles.badge}>Coming soon</span>}
                     </h3>
                     <p>{card.description}</p>
                   </div>
-                ),
+                )
               )}
             </div>
           </div>
@@ -133,7 +125,7 @@ export default function Home(): React.JSX.Element {
                 </tr>
               </thead>
               <tbody>
-                {packages.map((pkg) => (
+                {packages.map(pkg => (
                   <tr key={`${pkg.name}-${pkg.language}`}>
                     <td>
                       <code>{pkg.name}</code>
@@ -150,5 +142,5 @@ export default function Home(): React.JSX.Element {
         </section>
       </main>
     </Layout>
-  );
+  )
 }
