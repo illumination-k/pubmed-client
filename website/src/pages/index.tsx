@@ -79,7 +79,7 @@ export default function Home(): React.JSX.Element {
               </Link>
               <Link
                 className="button button--secondary button--lg"
-                href="https://github.com/illumination-k/pubmed-client-rs"
+                href="https://github.com/illumination-k/pubmed-client"
               >
                 GitHub
               </Link>
@@ -101,7 +101,7 @@ export default function Home(): React.JSX.Element {
                 ) : (
                   <div key={card.title} className={`${styles.card} ${styles.cardDisabled}`}>
                     <h3>
-                      {card.title}{" "}
+                      {card.title}
                       {card.comingSoon && <span className={styles.badge}>Coming soon</span>}
                     </h3>
                     <p>{card.description}</p>
