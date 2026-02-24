@@ -22,4 +22,7 @@ npm/
 # Artifacts directory
 artifacts/
 
+# TypeDoc output
+docs/
+
 pnpm-lock.yaml

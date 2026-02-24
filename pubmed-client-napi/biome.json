@@ -51,7 +51,8 @@
       "!**/Cargo.lock",
       "!**/src",
       "!**/*.node",
-      "!index.js"
+      "!index.js",
+      "!**/docs"
     ],
     "ignoreUnknown": false
   },

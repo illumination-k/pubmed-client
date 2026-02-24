@@ -1,0 +1,16 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["index.d.ts"],
+  "entryPointStrategy": "resolve",
+  "tsconfig": "./tsconfig.typedoc.json",
+  "out": "docs",
+  "name": "pubmed-client (Node.js)",
+  "readme": "README.md",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "skipErrorChecking": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/illumination-k/pubmed-client",
+    "npm": "https://www.npmjs.com/package/pubmed-client"
+  }
+}

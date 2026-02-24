@@ -45,6 +45,7 @@ cargo test --lib -p pubmed-client pubmed::parser::tests::test_mesh_term_parsing
 
 # NAPI (from pubmed-client-napi/)
 pnpm run build && pnpm run test
+pnpm run docs                        # Generate TypeDoc HTML → docs/
 
 # WASM (from pubmed-client-wasm/)
 pnpm run build && pnpm run test
@@ -156,6 +157,10 @@ pmc/                   # PMC (PubMed Central) API
 
 Native Node.js bindings via napi-rs. Published as `pubmed-client` on npm. Pre-built binaries for Windows/macOS/Linux (x64/ARM64). Key types: `PubMedClient`, `SearchQuery`, `Config`.
 
+- TypeDoc generates HTML docs from `index.d.ts` via `pnpm run docs` (output: `docs/`, gitignored)
+- Config: `typedoc.json` + `tsconfig.typedoc.json` (separate tsconfig scoped to `index.d.ts`)
+- CI: `node-docs` job in `docs.yml` uploads artifact → merged into `website/build/node/` by `build-site`
+
 ### WASM Bindings (`pubmed-client-wasm/`)
 
 WebAssembly bindings via wasm-pack. Published as `pubmed-client-wasm` on npm. Key types: `WasmPubMedClient`, `WasmClientConfig`.
@@ -170,9 +175,9 @@ Docusaurus v3 landing page deployed to GitHub Pages at `https://illumination-k.g
 
 - `baseUrl: '/pubmed-client/'`, `docs: false`, `blog: false` (landing page only)
 - Linter/formatter: Biome v2 (`pnpm run check`), TypeScript: `pnpm run typecheck`
-- Links to Rust rustdoc use full absolute URLs (`https://illumination-k.github.io/pubmed-client/rust/pubmed_client/`) — use `<a href>` not `<Link to>` for rustdoc links (React Router can't route to non-Docusaurus paths)
-- CI: `.github/workflows/docs.yml` — `docs` job (cargo doc) → `build-site` job (Docusaurus build + merge rust docs into `build/rust/`) → `deploy-docs` job (GitHub Pages, main only)
-- GitHub Pages URL structure: `/` (landing) · `/rust/pubmed_client/` (rustdoc) · `/python/` (placeholder, future Sphinx)
+- All doc links use full absolute URLs (`https://illumination-k.github.io/pubmed-client/...`) — use `<a href>` not `<Link to>` for external HTML (React Router can't route to non-Docusaurus paths); same rule applies in `docusaurus.config.ts` navbar/footer
+- CI: `.github/workflows/docs.yml` — `docs` job (cargo doc) + `node-docs` job (TypeDoc, parallel) → `build-site` job (Docusaurus build + merge both into `build/`) → `deploy-docs` job (GitHub Pages, main only)
+- GitHub Pages URL structure: `/` (landing) · `/rust/pubmed_client/` (rustdoc) · `/node/` (TypeDoc) · `/python/` (placeholder, future Sphinx)
 
 ```bash
 # from website/
