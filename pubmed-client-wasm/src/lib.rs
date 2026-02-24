@@ -335,6 +335,48 @@ impl WasmPubMedClient {
         })
     }
 
+    /// Upload a list of PMIDs to the NCBI History server using EPost
+    ///
+    /// Returns a Promise resolving to an object with `webenv` and `query_key` fields.
+    pub fn epost(&self, pmids: Vec<String>) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.epost(&pmid_refs).await {
+                Ok(result) => {
+                    let js_result = JsEPostResult {
+                        webenv: result.webenv,
+                        query_key: result.query_key,
+                    };
+                    Ok(serde_wasm_bindgen::to_value(&js_result)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("EPost failed: {e}"))),
+            }
+        })
+    }
+
+    /// Fetch all articles for a list of PMIDs using EPost and the History server
+    ///
+    /// Uploads via EPost (HTTP POST), then fetches in paginated batches.
+    /// Recommended for large PMID lists.
+    pub fn fetch_all_by_pmids(&self, pmids: Vec<String>) -> JsPromiseArticles {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.fetch_all_by_pmids(&pmid_refs).await {
+                Ok(articles) => {
+                    let js_articles: Vec<JsArticle> =
+                        articles.into_iter().map(JsArticle::from).collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_articles)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!(
+                    "fetch_all_by_pmids failed: {e}"
+                ))),
+            }
+        })
+        .unchecked_into()
+    }
+
     /// Check spelling of a search term using the ESpell API (PubMed database)
     pub fn spell_check(&self, term: String) -> js_sys::Promise {
         let client = self.client.clone();
@@ -372,6 +414,13 @@ impl WasmPubMedClient {
         let converter = pubmed_client::pmc::PmcMarkdownConverter::new();
         Ok(converter.convert(&full_text))
     }
+}
+
+/// JavaScript-friendly EPost result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsEPostResult {
+    pub webenv: String,
+    pub query_key: String,
 }
 
 /// JavaScript-friendly article representation

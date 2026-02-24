@@ -9,6 +9,6 @@ pub mod models;
 pub use client::PyPubMedClient;
 pub use models::{
     PyAffiliation, PyArticleSummary, PyAuthor, PyCitationMatch, PyCitationMatches, PyCitationQuery,
-    PyCitations, PyDatabaseCount, PyDatabaseInfo, PyGlobalQueryResults, PyPmcLinks,
+    PyCitations, PyDatabaseCount, PyDatabaseInfo, PyEPostResult, PyGlobalQueryResults, PyPmcLinks,
     PyPubMedArticle, PyRelatedArticles, PySpellCheckResult,
 };

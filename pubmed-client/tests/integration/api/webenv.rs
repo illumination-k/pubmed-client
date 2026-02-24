@@ -187,6 +187,120 @@ mod integration_tests {
         );
     }
 
+    /// Test EPost uploads PMIDs and returns a valid session
+    #[tokio::test]
+    #[traced_test]
+    async fn test_epost_returns_session() {
+        if !should_run_real_api_tests() {
+            info!(
+                "Skipping real API test - enable with PUBMED_REAL_API_TESTS=1 and --features integration-tests"
+            );
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+
+        let result = client
+            .epost(&["31978945", "33515491", "25760099"])
+            .await
+            .unwrap();
+
+        info!(
+            webenv = %result.webenv,
+            query_key = %result.query_key,
+            "EPost completed"
+        );
+
+        assert!(!result.webenv.is_empty(), "WebEnv should not be empty");
+        assert!(
+            !result.query_key.is_empty(),
+            "query_key should not be empty"
+        );
+    }
+
+    /// Test EPost followed by fetch_from_history retrieves articles
+    #[tokio::test]
+    #[traced_test]
+    async fn test_epost_then_fetch() {
+        if !should_run_real_api_tests() {
+            info!(
+                "Skipping real API test - enable with PUBMED_REAL_API_TESTS=1 and --features integration-tests"
+            );
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+
+        // Upload PMIDs
+        let result = client.epost(&["31978945", "33515491"]).await.unwrap();
+
+        let session = result.history_session();
+
+        sleep(Duration::from_millis(200)).await;
+
+        // Fetch articles using the session
+        let articles = client.fetch_from_history(&session, 0, 10).await.unwrap();
+
+        info!(
+            fetched_count = articles.len(),
+            "Fetched articles from EPost session"
+        );
+
+        assert!(
+            !articles.is_empty(),
+            "Should fetch articles from EPost session"
+        );
+
+        // Verify we got the expected PMIDs
+        let pmids: Vec<&str> = articles.iter().map(|a| a.pmid.as_str()).collect();
+        debug!(pmids = ?pmids, "Fetched PMIDs from EPost session");
+    }
+
+    /// Test EPost to existing session appends PMIDs
+    #[tokio::test]
+    #[traced_test]
+    async fn test_epost_to_session() {
+        if !should_run_real_api_tests() {
+            info!(
+                "Skipping real API test - enable with PUBMED_REAL_API_TESTS=1 and --features integration-tests"
+            );
+            return;
+        }
+
+        let client = create_test_pubmed_client();
+
+        // First upload
+        let result1 = client.epost(&["31978945"]).await.unwrap();
+
+        sleep(Duration::from_millis(200)).await;
+
+        // Append to existing session
+        let result2 = client
+            .epost_to_session(&["33515491"], &result1.history_session())
+            .await
+            .unwrap();
+
+        info!(
+            webenv1 = %result1.webenv,
+            query_key1 = %result1.query_key,
+            webenv2 = %result2.webenv,
+            query_key2 = %result2.query_key,
+            "EPost to session completed"
+        );
+
+        // WebEnv should be the same session
+        assert_eq!(
+            result1.webenv, result2.webenv,
+            "WebEnv should be the same for appended session"
+        );
+
+        // Query key should be different (new set of IDs)
+        assert_ne!(
+            result1.query_key, result2.query_key,
+            "Query keys should differ between uploads"
+        );
+    }
+
     /// Test empty query returns empty result
     #[tokio::test]
     #[traced_test]
@@ -315,6 +429,20 @@ mod unit_tests {
 
         assert!(!result2.has_history());
         assert!(result2.history_session().is_none());
+    }
+
+    #[test]
+    fn test_epost_result_history_session() {
+        use pubmed_client::EPostResult;
+
+        let result = EPostResult {
+            webenv: "MCID_epost123".to_string(),
+            query_key: "1".to_string(),
+        };
+
+        let session = result.history_session();
+        assert_eq!(session.webenv, "MCID_epost123");
+        assert_eq!(session.query_key, "1");
     }
 
     #[test]

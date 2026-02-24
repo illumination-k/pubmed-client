@@ -391,6 +391,27 @@ pub struct MarkdownOptions {
     pub include_figure_captions: Option<bool>,
 }
 
+/// Result from EPost API for uploading PMIDs to the NCBI History server
+///
+/// Contains WebEnv and query_key identifiers that can be used with
+/// subsequent API calls for fetching articles from the history server.
+#[napi(object)]
+pub struct EPostResult {
+    /// WebEnv session identifier
+    pub webenv: String,
+    /// Query key for the uploaded IDs within the session
+    pub query_key: String,
+}
+
+impl From<pubmed_client::EPostResult> for EPostResult {
+    fn from(result: pubmed_client::EPostResult) -> Self {
+        EPostResult {
+            webenv: result.webenv,
+            query_key: result.query_key,
+        }
+    }
+}
+
 /// PubMed/PMC API client
 #[napi]
 pub struct PubMedClient {
@@ -687,6 +708,60 @@ impl PubMedClient {
             .client
             .pubmed
             .search_and_fetch(&query_string, limit, None)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(articles.into_iter().map(Article::from).collect())
+    }
+
+    /// Upload a list of PMIDs to the NCBI History server using EPost
+    ///
+    /// Stores UIDs on the server and returns WebEnv/query_key identifiers
+    /// that can be used with subsequent API calls.
+    ///
+    /// @param pmids - Array of PubMed IDs as strings
+    /// @returns EPostResult containing webenv and query_key
+    ///
+    /// @example
+    /// ```typescript
+    /// const client = new PubMedClient();
+    /// const result = await client.epost(["31978945", "33515491", "25760099"]);
+    /// console.log(`WebEnv: ${result.webenv}, Query Key: ${result.queryKey}`);
+    /// ```
+    #[napi]
+    pub async fn epost(&self, pmids: Vec<String>) -> Result<EPostResult> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let result = self
+            .client
+            .pubmed
+            .epost(&pmid_refs)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(EPostResult::from(result))
+    }
+
+    /// Fetch all articles for a list of PMIDs using EPost and the History server
+    ///
+    /// Uploads the PMID list via EPost (HTTP POST), then fetches articles in
+    /// paginated batches. Recommended for large PMID lists (hundreds or thousands).
+    ///
+    /// @param pmids - Array of PubMed IDs as strings
+    /// @returns Array of article metadata
+    ///
+    /// @example
+    /// ```typescript
+    /// const client = new PubMedClient();
+    /// const articles = await client.fetchAllByPmids(["31978945", "33515491", "25760099"]);
+    /// articles.forEach(a => console.log(a.title));
+    /// ```
+    #[napi]
+    pub async fn fetch_all_by_pmids(&self, pmids: Vec<String>) -> Result<Vec<Article>> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let articles = self
+            .client
+            .pubmed
+            .fetch_all_by_pmids(&pmid_refs)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 

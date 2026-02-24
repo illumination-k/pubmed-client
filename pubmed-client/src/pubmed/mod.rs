@@ -13,7 +13,7 @@ pub mod responses;
 pub use client::PubMedClient;
 pub use models::{
     Affiliation, ArticleSummary, Author, ChemicalConcept, CitationMatch, CitationMatchStatus,
-    CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, FieldInfo,
+    CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult, FieldInfo,
     GlobalQueryResults, HistorySession, LinkInfo, MeshHeading, MeshQualifier, MeshTerm, PmcLinks,
     PubMedArticle, RelatedArticles, SearchResult, SpellCheckResult, SpelledQuerySegment,
     SupplementalConcept,

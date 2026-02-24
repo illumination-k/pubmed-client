@@ -5,13 +5,14 @@ use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
     ArticleSummary, CitationMatch, CitationMatchStatus, CitationMatches, CitationQuery, Citations,
-    DatabaseCount, DatabaseInfo, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, PmcLinks,
-    PubMedArticle, RelatedArticles, SearchResult, SpellCheckResult, SpelledQuerySegment,
+    DatabaseCount, DatabaseInfo, EPostResult, FieldInfo, GlobalQueryResults, HistorySession,
+    LinkInfo, PmcLinks, PubMedArticle, RelatedArticles, SearchResult, SpellCheckResult,
+    SpelledQuerySegment,
 };
 use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::{
-    EInfoResponse, ELinkResponse, ESearchResult, ESummaryDocSum, ESummaryResponse,
+    EInfoResponse, ELinkResponse, EPostResponse, ESearchResult, ESummaryDocSum, ESummaryResponse,
 };
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
@@ -832,6 +833,195 @@ impl PubMedClient {
         })
     }
 
+    /// Upload a list of PMIDs to the NCBI History server using EPost
+    ///
+    /// This stores the UIDs on the server and returns WebEnv/query_key identifiers
+    /// that can be used with `fetch_from_history()` to retrieve article metadata.
+    ///
+    /// This is useful when you have a pre-existing list of PMIDs (e.g., from a file,
+    /// database, or external source) and want to use them with history server features
+    /// like batch fetching.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<EPostResult>` containing WebEnv and query_key
+    ///
+    /// # Errors
+    ///
+    /// * `PubMedError::InvalidPmid` - If any PMID is invalid
+    /// * `PubMedError::RequestError` - If the HTTP request fails
+    /// * `PubMedError::ApiError` - If the NCBI API returns an error
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///
+    ///     // Upload PMIDs to the history server
+    ///     let result = client.epost(&["31978945", "33515491", "25760099"]).await?;
+    ///
+    ///     println!("WebEnv: {}", result.webenv);
+    ///     println!("Query Key: {}", result.query_key);
+    ///
+    ///     // Use the session to fetch articles
+    ///     let session = result.history_session();
+    ///     let articles = client.fetch_from_history(&session, 0, 100).await?;
+    ///     println!("Fetched {} articles", articles.len());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(pmids_count = pmids.len()))]
+    pub async fn epost(&self, pmids: &[&str]) -> Result<EPostResult> {
+        self.epost_internal(pmids, None).await
+    }
+
+    /// Upload PMIDs to an existing History server session using EPost
+    ///
+    /// This appends UIDs to an existing WebEnv session, allowing you to combine
+    /// multiple sets of IDs into a single session for subsequent operations.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    /// * `session` - Existing history session to append to
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<EPostResult>` with the updated session information.
+    /// The returned `webenv` will be the same as the input session, and a new
+    /// `query_key` will be assigned for the uploaded IDs.
+    ///
+    #[instrument(skip(self), fields(pmids_count = pmids.len()))]
+    pub async fn epost_to_session(
+        &self,
+        pmids: &[&str],
+        session: &HistorySession,
+    ) -> Result<EPostResult> {
+        self.epost_internal(pmids, Some(session)).await
+    }
+
+    /// Internal implementation for EPost
+    async fn epost_internal(
+        &self,
+        pmids: &[&str],
+        session: Option<&HistorySession>,
+    ) -> Result<EPostResult> {
+        if pmids.is_empty() {
+            return Err(PubMedError::InvalidQuery(
+                "PMID list cannot be empty for EPost".to_string(),
+            ));
+        }
+
+        // Validate all PMIDs upfront
+        let validated: Vec<u32> = pmids
+            .iter()
+            .map(|pmid| PubMedId::parse(pmid).map(|p| p.as_u32()))
+            .collect::<Result<Vec<_>>>()?;
+
+        let id_list: String = validated
+            .iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+
+        // Build form data for POST request
+        let mut params = vec![
+            ("db".to_string(), "pubmed".to_string()),
+            ("id".to_string(), id_list),
+            ("retmode".to_string(), "json".to_string()),
+        ];
+
+        if let Some(session) = session {
+            params.push(("WebEnv".to_string(), session.webenv.clone()));
+        }
+
+        // Append API parameters (api_key, email, tool)
+        params.extend(self.config.build_api_params());
+
+        let url = format!("{}/epost.fcgi", self.base_url);
+
+        debug!(pmids_count = pmids.len(), "Making EPost API request");
+
+        let response = with_retry(
+            || async {
+                self.rate_limiter.acquire().await?;
+                debug!("Making POST request to: {}", url);
+                let response = self
+                    .client
+                    .post(&url)
+                    .form(&params)
+                    .send()
+                    .await
+                    .map_err(PubMedError::from)?;
+
+                if response.status().is_server_error() || response.status().as_u16() == 429 {
+                    return Err(PubMedError::ApiError {
+                        status: response.status().as_u16(),
+                        message: response
+                            .status()
+                            .canonical_reason()
+                            .unwrap_or("Unknown error")
+                            .to_string(),
+                    });
+                }
+
+                Ok(response)
+            },
+            &self.config.retry_config,
+            "NCBI EPost API request",
+        )
+        .await?;
+
+        if !response.status().is_success() {
+            warn!("EPost request failed with status: {}", response.status());
+            return Err(PubMedError::ApiError {
+                status: response.status().as_u16(),
+                message: response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
+                    .to_string(),
+            });
+        }
+
+        let epost_response: EPostResponse = response.json().await?;
+
+        // Check for API error
+        if let Some(error_msg) = &epost_response.epostresult.error {
+            return Err(PubMedError::ApiError {
+                status: 200,
+                message: format!("NCBI EPost API error: {}", error_msg),
+            });
+        }
+
+        let webenv = epost_response
+            .epostresult
+            .webenv
+            .ok_or_else(|| PubMedError::WebEnvNotAvailable)?;
+
+        let query_key = epost_response
+            .epostresult
+            .query_key
+            .ok_or_else(|| PubMedError::WebEnvNotAvailable)?;
+
+        info!(
+            pmids_count = pmids.len(),
+            query_key = %query_key,
+            "EPost completed successfully"
+        );
+
+        Ok(EPostResult { webenv, query_key })
+    }
+
     /// Fetch articles from history server using WebEnv session
     ///
     /// This method retrieves articles from a previously executed search using
@@ -925,6 +1115,84 @@ impl PubMedClient {
         );
 
         Ok(articles)
+    }
+
+    /// Fetch all articles for a list of PMIDs using EPost and the History server
+    ///
+    /// This is the recommended method for fetching large numbers of articles by PMID.
+    /// It uploads the PMID list to the History server via EPost (using HTTP POST to
+    /// avoid URL length limits), then fetches articles in batches using pagination.
+    ///
+    /// For small lists (up to ~200 PMIDs), `fetch_articles()` works fine. Use this
+    /// method when you have hundreds or thousands of PMIDs.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<PubMedArticle>>` containing all fetched articles
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///
+    ///     // Works efficiently even with thousands of PMIDs
+    ///     let pmids: Vec<&str> = vec!["31978945", "33515491", "25760099"];
+    ///     let articles = client.fetch_all_by_pmids(&pmids).await?;
+    ///     println!("Fetched {} articles", articles.len());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(pmids_count = pmids.len()))]
+    pub async fn fetch_all_by_pmids(&self, pmids: &[&str]) -> Result<Vec<PubMedArticle>> {
+        if pmids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        // Upload PMIDs to History server
+        let epost_result = self.epost(pmids).await?;
+        let session = epost_result.history_session();
+
+        const BATCH_SIZE: usize = 200;
+        let total = pmids.len();
+        let mut all_articles = Vec::with_capacity(total);
+        let mut offset = 0;
+
+        while offset < total {
+            let articles = self
+                .fetch_from_history(&session, offset, BATCH_SIZE)
+                .await?;
+
+            if articles.is_empty() {
+                break;
+            }
+
+            info!(
+                offset = offset,
+                fetched = articles.len(),
+                total = total,
+                "Fetched batch from history"
+            );
+
+            offset += articles.len();
+            all_articles.extend(articles);
+        }
+
+        info!(
+            total_fetched = all_articles.len(),
+            requested = pmids.len(),
+            "fetch_all_by_pmids completed"
+        );
+
+        Ok(all_articles)
     }
 
     /// Search and stream all matching articles using history server
@@ -2519,45 +2787,52 @@ mod tests {
         assert!(elapsed < Duration::from_millis(100));
     }
 
-    // ========================================================================================
-    // ESummary parsing tests
-    // ========================================================================================
+    #[tokio::test]
+    async fn test_epost_empty_input() {
+        let client = PubMedClient::new();
+        let result = client.epost(&[]).await;
+        assert!(result.is_err());
+        if let Err(e) = result {
+            assert!(e.to_string().contains("empty"));
+        }
+    }
+
+    #[tokio::test]
+    async fn test_epost_invalid_pmid() {
+        let client = PubMedClient::new();
+        let result = client.epost(&["not_a_number"]).await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_epost_validates_all_pmids_before_request() {
+        let client = PubMedClient::new();
+
+        let start = Instant::now();
+        let result = client.epost(&["31978945", "invalid", "33515491"]).await;
+        assert!(result.is_err());
+        let elapsed = start.elapsed();
+        assert!(elapsed < Duration::from_millis(100));
+    }
+
+    #[tokio::test]
+    async fn test_fetch_all_by_pmids_empty_input() {
+        let client = PubMedClient::new();
+        let result = client.fetch_all_by_pmids(&[]).await;
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_all_by_pmids_invalid_pmid() {
+        let client = PubMedClient::new();
+        let result = client.fetch_all_by_pmids(&["not_a_number"]).await;
+        assert!(result.is_err());
+    }
 
     #[test]
     fn test_parse_esummary_response_basic() {
-        let json = r#"{
-            "result": {
-                "uids": ["31978945"],
-                "31978945": {
-                    "uid": "31978945",
-                    "pubdate": "2020 Feb",
-                    "epubdate": "2020 Jan 24",
-                    "source": "N Engl J Med",
-                    "authors": [
-                        {"name": "Zhu N", "authtype": "Author", "clusterid": ""},
-                        {"name": "Zhang D", "authtype": "Author", "clusterid": ""}
-                    ],
-                    "title": "A Novel Coronavirus from Patients with Pneumonia in China, 2019.",
-                    "sorttitle": "novel coronavirus",
-                    "volume": "382",
-                    "issue": "8",
-                    "pages": "727-733",
-                    "lang": ["eng"],
-                    "issn": "0028-4793",
-                    "essn": "1533-4406",
-                    "pubtype": ["Journal Article"],
-                    "articleids": [
-                        {"idtype": "pubmed", "idtypen": 1, "value": "31978945"},
-                        {"idtype": "doi", "idtypen": 3, "value": "10.1056/NEJMoa2001017"},
-                        {"idtype": "pmc", "idtypen": 8, "value": "PMC7092803"}
-                    ],
-                    "fulljournalname": "The New England journal of medicine",
-                    "sortpubdate": "2020/02/20 00:00",
-                    "pmcrefcount": 14123,
-                    "recordstatus": "PubMed - indexed for MEDLINE"
-                }
-            }
-        }"#;
+        let json = r#"{"result":{"uids":["31978945"],"31978945":{"uid":"31978945","pubdate":"2020 Feb","epubdate":"2020 Jan 24","source":"N Engl J Med","authors":[{"name":"Zhu N","authtype":"Author","clusterid":""},{"name":"Zhang D","authtype":"Author","clusterid":""}],"title":"A Novel Coronavirus from Patients with Pneumonia in China, 2019.","sorttitle":"novel coronavirus","volume":"382","issue":"8","pages":"727-733","lang":["eng"],"issn":"0028-4793","essn":"1533-4406","pubtype":["Journal Article"],"articleids":[{"idtype":"pubmed","idtypen":1,"value":"31978945"},{"idtype":"doi","idtypen":3,"value":"10.1056/NEJMoa2001017"},{"idtype":"pmc","idtypen":8,"value":"PMC7092803"}],"fulljournalname":"The New England journal of medicine","sortpubdate":"2020/02/20 00:00","pmcrefcount":14123,"recordstatus":"PubMed - indexed for MEDLINE"}}}"#;
 
         let summaries = PubMedClient::parse_esummary_response(json).unwrap();
         assert_eq!(summaries.len(), 1);
@@ -2589,53 +2864,7 @@ mod tests {
 
     #[test]
     fn test_parse_esummary_response_multiple_uids() {
-        let json = r#"{
-            "result": {
-                "uids": ["31978945", "33515491"],
-                "31978945": {
-                    "uid": "31978945",
-                    "pubdate": "2020 Feb",
-                    "epubdate": "",
-                    "source": "N Engl J Med",
-                    "authors": [{"name": "Zhu N", "authtype": "Author", "clusterid": ""}],
-                    "title": "Article One",
-                    "volume": "382",
-                    "issue": "8",
-                    "pages": "727-733",
-                    "lang": ["eng"],
-                    "issn": "",
-                    "essn": "",
-                    "pubtype": [],
-                    "articleids": [],
-                    "fulljournalname": "N Engl J Med",
-                    "sortpubdate": "",
-                    "pmcrefcount": 0,
-                    "recordstatus": ""
-                },
-                "33515491": {
-                    "uid": "33515491",
-                    "pubdate": "2021 Jan",
-                    "epubdate": "",
-                    "source": "Science",
-                    "authors": [{"name": "Smith J", "authtype": "Author", "clusterid": ""}],
-                    "title": "Article Two",
-                    "volume": "371",
-                    "issue": "6526",
-                    "pages": "120-125",
-                    "lang": ["eng"],
-                    "issn": "",
-                    "essn": "",
-                    "pubtype": [],
-                    "articleids": [
-                        {"idtype": "doi", "idtypen": 3, "value": "10.1126/science.abc123"}
-                    ],
-                    "fulljournalname": "Science",
-                    "sortpubdate": "",
-                    "pmcrefcount": 100,
-                    "recordstatus": ""
-                }
-            }
-        }"#;
+        let json = r#"{"result":{"uids":["31978945","33515491"],"31978945":{"uid":"31978945","pubdate":"2020 Feb","epubdate":"","source":"N Engl J Med","authors":[{"name":"Zhu N","authtype":"Author","clusterid":""}],"title":"Article One","volume":"382","issue":"8","pages":"727-733","lang":["eng"],"issn":"","essn":"","pubtype":[],"articleids":[],"fulljournalname":"N Engl J Med","sortpubdate":"","pmcrefcount":0,"recordstatus":""},"33515491":{"uid":"33515491","pubdate":"2021 Jan","epubdate":"","source":"Science","authors":[{"name":"Smith J","authtype":"Author","clusterid":""}],"title":"Article Two","volume":"371","issue":"6526","pages":"120-125","lang":["eng"],"issn":"","essn":"","pubtype":[],"articleids":[{"idtype":"doi","idtypen":3,"value":"10.1126/science.abc123"}],"fulljournalname":"Science","sortpubdate":"","pmcrefcount":100,"recordstatus":""}}}"#;
 
         let summaries = PubMedClient::parse_esummary_response(json).unwrap();
         assert_eq!(summaries.len(), 2);
@@ -2655,16 +2884,7 @@ mod tests {
 
     #[test]
     fn test_parse_esummary_response_with_error_uid() {
-        // When a UID is not found, ESummary returns an error object for that UID
-        let json = r#"{
-            "result": {
-                "uids": ["99999999999"],
-                "99999999999": {
-                    "uid": "99999999999",
-                    "error": "cannot get document summary"
-                }
-            }
-        }"#;
+        let json = r#"{"result":{"uids":["99999999999"],"99999999999":{"uid":"99999999999","error":"cannot get document summary"}}}"#;
 
         let summaries = PubMedClient::parse_esummary_response(json).unwrap();
         assert!(summaries.is_empty());
@@ -2672,33 +2892,7 @@ mod tests {
 
     #[test]
     fn test_parse_esummary_response_no_doi_no_pmc() {
-        let json = r#"{
-            "result": {
-                "uids": ["12345678"],
-                "12345678": {
-                    "uid": "12345678",
-                    "pubdate": "2020",
-                    "epubdate": "",
-                    "source": "Some Journal",
-                    "authors": [],
-                    "title": "Test Article",
-                    "volume": "",
-                    "issue": "",
-                    "pages": "",
-                    "lang": [],
-                    "issn": "",
-                    "essn": "",
-                    "pubtype": [],
-                    "articleids": [
-                        {"idtype": "pubmed", "idtypen": 1, "value": "12345678"}
-                    ],
-                    "fulljournalname": "Some Journal",
-                    "sortpubdate": "",
-                    "pmcrefcount": 0,
-                    "recordstatus": ""
-                }
-            }
-        }"#;
+        let json = r#"{"result":{"uids":["12345678"],"12345678":{"uid":"12345678","pubdate":"2020","epubdate":"","source":"Some Journal","authors":[],"title":"Test Article","volume":"","issue":"","pages":"","lang":[],"issn":"","essn":"","pubtype":[],"articleids":[{"idtype":"pubmed","idtypen":1,"value":"12345678"}],"fulljournalname":"Some Journal","sortpubdate":"","pmcrefcount":0,"recordstatus":""}}}"#;
 
         let summaries = PubMedClient::parse_esummary_response(json).unwrap();
         assert_eq!(summaries.len(), 1);
@@ -2712,7 +2906,9 @@ mod tests {
         let client = PubMedClient::new();
         let result = client.fetch_summaries(&[]).await;
         assert!(result.is_ok());
-        assert!(result.unwrap().is_empty());
+        assert!(result
+            .expect("empty input should return empty summaries")
+            .is_empty());
     }
 
     #[tokio::test]
