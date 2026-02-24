@@ -59,6 +59,7 @@ async fn test_pmc_cache_hit() {
     let cache_config = CacheConfig {
         max_capacity: 100,
         time_to_live: Duration::from_secs(60),
+        ..Default::default()
     };
 
     let config = ClientConfig::new()
@@ -152,6 +153,7 @@ async fn test_pmc_cache_stats() {
     let cache_config = CacheConfig {
         max_capacity: 100,
         time_to_live: Duration::from_secs(60),
+        ..Default::default()
     };
 
     let config = ClientConfig::new()

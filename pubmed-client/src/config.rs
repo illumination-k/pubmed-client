@@ -64,7 +64,9 @@ pub struct ClientConfig {
 
     /// Cache configuration for response caching
     ///
-    /// Default: Memory-only cache with 1000 items max
+    /// Default: disabled (`None`). Use [`ClientConfig::with_cache`],
+    /// [`ClientConfig::with_redis_cache`], or [`ClientConfig::with_sqlite_cache`]
+    /// to enable caching.
     pub cache_config: Option<CacheConfig>,
 }
 
@@ -325,6 +327,72 @@ impl ClientConfig {
     /// ```
     pub fn without_cache(mut self) -> Self {
         self.cache_config = None;
+        self
+    }
+
+    /// Enable Redis-backed caching.
+    ///
+    /// Requires the `cache-redis` feature.  The cache uses JSON serialisation
+    /// with per-entry TTL (default: 7 days from [`CacheConfig::default`]).
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - Redis connection URL, e.g. `"redis://127.0.0.1/"`
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use pubmed_client::config::ClientConfig;
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_redis_cache("redis://127.0.0.1/");
+    /// ```
+    #[cfg(feature = "cache-redis")]
+    pub fn with_redis_cache(mut self, url: impl Into<String>) -> Self {
+        use crate::cache::CacheBackendConfig;
+        let ttl = self
+            .cache_config
+            .as_ref()
+            .map(|c| c.time_to_live)
+            .unwrap_or(CacheConfig::default().time_to_live);
+        self.cache_config = Some(CacheConfig {
+            backend: CacheBackendConfig::Redis { url: url.into() },
+            time_to_live: ttl,
+            ..CacheConfig::default()
+        });
+        self
+    }
+
+    /// Enable SQLite-backed caching.
+    ///
+    /// Requires the `cache-sqlite` feature.  Not available on WASM targets.
+    /// The database file is created automatically if it does not exist.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - Path to the SQLite database file
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use pubmed_client::config::ClientConfig;
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_sqlite_cache("/tmp/pubmed_cache.db");
+    /// ```
+    #[cfg(feature = "cache-sqlite")]
+    pub fn with_sqlite_cache(mut self, path: impl Into<std::path::PathBuf>) -> Self {
+        use crate::cache::CacheBackendConfig;
+        let ttl = self
+            .cache_config
+            .as_ref()
+            .map(|c| c.time_to_live)
+            .unwrap_or(CacheConfig::default().time_to_live);
+        self.cache_config = Some(CacheConfig {
+            backend: CacheBackendConfig::Sqlite { path: path.into() },
+            time_to_live: ttl,
+            ..CacheConfig::default()
+        });
         self
     }
 
