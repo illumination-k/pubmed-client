@@ -66,7 +66,7 @@ export default function Home(): React.JSX.Element {
   return (
     <Layout
       title="PubMed & PMC API Client"
-      description="Fast, type-safe PubMed and PMC API client for Rust, Node.js, WebAssembly, and Python"
+      description="Type-safe PubMed and PMC API client for Rust, Node.js, WebAssembly, and Python"
     >
       <main>
         {/* Hero */}
@@ -74,7 +74,7 @@ export default function Home(): React.JSX.Element {
           <div className={styles.heroInner}>
             <h1 className={styles.heroTitle}>pubmed-client</h1>
             <p className={styles.heroTagline}>
-              Fast, type-safe PubMed &amp; PMC API client
+              Type-safe PubMed &amp; PMC API client
               <br />
               for Rust, Node.js, WebAssembly, and Python
             </p>
