@@ -12,7 +12,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query1 = SearchQuery::new().query("covid-19");
     /// let query2 = SearchQuery::new().query("vaccine");
@@ -50,7 +50,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query1 = SearchQuery::new().query("diabetes");
     /// let query2 = SearchQuery::new().query("hypertension");
@@ -84,7 +84,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer")
@@ -111,7 +111,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let base_query = SearchQuery::new().query("cancer treatment");
     /// let exclude_query = SearchQuery::new().query("animal studies");
@@ -135,7 +135,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer")

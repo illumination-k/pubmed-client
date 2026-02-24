@@ -27,7 +27,7 @@ use tracing::{instrument, warn};
 /// # Example
 ///
 /// ```ignore
-/// use pubmed_client_rs::pubmed::parser::parse_articles_from_xml;
+/// use pubmed_client::pubmed::parser::parse_articles_from_xml;
 ///
 /// let xml = r#"<?xml version="1.0"?>
 /// <PubmedArticleSet>

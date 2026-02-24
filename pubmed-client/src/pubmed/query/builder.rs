@@ -20,7 +20,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new();
     /// ```
@@ -42,7 +42,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("covid-19 treatment");
@@ -61,7 +61,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .terms(&["covid-19", "treatment", "vaccine"]);
@@ -82,7 +82,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer")
@@ -102,7 +102,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query_string = SearchQuery::new()
     ///     .query("covid-19")
@@ -138,7 +138,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::{SearchQuery, SortOrder};
+    /// use pubmed_client::pubmed::{SearchQuery, SortOrder};
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer")
@@ -167,7 +167,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::SearchQuery};
+    /// use pubmed_client::{PubMedClient, pubmed::SearchQuery};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -202,7 +202,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::SearchQuery};
+    /// use pubmed_client::{PubMedClient, pubmed::SearchQuery};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -243,7 +243,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::SearchQuery};
+    /// use pubmed_client::{PubMedClient, pubmed::SearchQuery};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {

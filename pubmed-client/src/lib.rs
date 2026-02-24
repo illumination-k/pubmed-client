@@ -26,7 +26,7 @@
 //! ### Searching for Articles
 //!
 //! ```no_run
-//! use pubmed_client_rs::PubMedClient;
+//! use pubmed_client::PubMedClient;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -36,7 +36,7 @@
 //!     let articles = client
 //!         .search()
 //!         .query("covid-19 treatment")
-//!         .open_access_only()
+//!         .free_full_text_only()
 //!         .published_after(2020)
 //!         .limit(10)
 //!         .search_and_fetch(&client)
@@ -55,7 +55,7 @@
 //! ### Fetching Full Text from PMC
 //!
 //! ```no_run
-//! use pubmed_client_rs::PmcClient;
+//! use pubmed_client::PmcClient;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -78,7 +78,7 @@
 //! ### Converting PMC Articles to Markdown
 //!
 //! ```no_run
-//! use pubmed_client_rs::{PmcClient, PmcMarkdownConverter, HeadingStyle, ReferenceStyle};
+//! use pubmed_client::{PmcClient, PmcMarkdownConverter, HeadingStyle, ReferenceStyle};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -108,7 +108,7 @@
 //! ### Downloading and Extracting PMC Articles as TAR files
 //!
 //! ```no_run
-//! use pubmed_client_rs::PmcClient;
+//! use pubmed_client::PmcClient;
 //! use std::path::Path;
 //!
 //! #[tokio::main]
@@ -131,7 +131,7 @@
 //! ### Extracting Figures with Captions
 //!
 //! ```no_run
-//! use pubmed_client_rs::PmcClient;
+//! use pubmed_client::PmcClient;
 //! use std::path::Path;
 //!
 //! #[tokio::main]
@@ -161,7 +161,7 @@
 //! ### Basic Caching
 //!
 //! ```no_run
-//! use pubmed_client_rs::{PmcClient, ClientConfig};
+//! use pubmed_client::{PmcClient, ClientConfig};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -182,8 +182,8 @@
 //! ### Advanced Caching Options
 //!
 //! ```no_run
-//! use pubmed_client_rs::{PmcClient, ClientConfig};
-//! use pubmed_client_rs::cache::CacheConfig;
+//! use pubmed_client::{PmcClient, ClientConfig};
+//! use pubmed_client::cache::CacheConfig;
 //! use std::time::Duration;
 //!
 //! #[tokio::main]
@@ -210,8 +210,8 @@
 //! ```no_run
 //! #[cfg(not(target_arch = "wasm32"))]
 //! {
-//! use pubmed_client_rs::{PmcClient, ClientConfig};
-//! use pubmed_client_rs::cache::CacheConfig;
+//! use pubmed_client::{PmcClient, ClientConfig};
+//! use pubmed_client::cache::CacheConfig;
 //! use std::time::Duration;
 //! use std::path::PathBuf;
 //!
@@ -238,7 +238,7 @@
 //! ### Cache Management
 //!
 //! ```no_run
-//! use pubmed_client_rs::{PmcClient, ClientConfig};
+//! use pubmed_client::{PmcClient, ClientConfig};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -306,7 +306,7 @@ impl Client {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// let client = Client::new();
     /// ```
@@ -327,7 +327,7 @@ impl Client {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::{Client, ClientConfig};
+    /// use pubmed_client::{Client, ClientConfig};
     ///
     /// let config = ClientConfig::new()
     ///     .with_api_key("your_api_key_here")
@@ -351,7 +351,7 @@ impl Client {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     /// use reqwest::ClientBuilder;
     /// use std::time::Duration;
     ///
@@ -383,7 +383,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -437,7 +437,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -470,7 +470,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -504,7 +504,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -535,7 +535,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -562,7 +562,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -591,7 +591,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -618,7 +618,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -645,7 +645,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -672,7 +672,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::{Client, CitationQuery};
+    /// use pubmed_client::{Client, CitationQuery};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -702,7 +702,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -731,7 +731,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -755,7 +755,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -788,7 +788,7 @@ impl Client {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::Client;
+    /// use pubmed_client::Client;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {

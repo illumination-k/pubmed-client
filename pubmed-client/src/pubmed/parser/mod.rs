@@ -59,7 +59,7 @@ use xml_types::PubmedArticleSet;
 /// # Example
 ///
 /// ```ignore
-/// use pubmed_client_rs::pubmed::parser::parse_article_from_xml;
+/// use pubmed_client::pubmed::parser::parse_article_from_xml;
 ///
 /// let xml = r#"<?xml version="1.0"?>
 /// <PubmedArticleSet>
@@ -76,7 +76,7 @@ use xml_types::PubmedArticleSet;
 ///
 /// let article = parse_article_from_xml(xml, "12345678")?;
 /// assert_eq!(article.title, "Example Article");
-/// # Ok::<(), pubmed_client_rs::error::PubMedError>(())
+/// # Ok::<(), pubmed_client::error::PubMedError>(())
 /// ```
 #[instrument(skip(xml), fields(pmid = %pmid, xml_size = xml.len()))]
 pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {

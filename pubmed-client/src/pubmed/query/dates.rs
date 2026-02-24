@@ -13,7 +13,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("immunotherapy")
@@ -38,7 +38,7 @@ impl SearchQuery {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// // Year range
     /// let query = SearchQuery::new()
@@ -90,7 +90,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("artificial intelligence")
@@ -111,7 +111,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("recent discoveries")
@@ -148,7 +148,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("updated articles")
@@ -184,7 +184,7 @@ impl SearchQuery {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// // After a specific year
     /// let query = SearchQuery::new()
@@ -217,7 +217,7 @@ impl SearchQuery {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// // Before a specific year
     /// let query = SearchQuery::new()
