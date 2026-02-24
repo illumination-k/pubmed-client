@@ -24,7 +24,7 @@ const docCards: DocCard[] = [
   {
     title: "🐍 Python",
     description: "Sphinx docs for pubmed-client-py",
-    comingSoon: true,
+    href: "https://illumination-k.github.io/pubmed-client/python/",
   },
 ]
 
