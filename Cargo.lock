@@ -3053,6 +3053,7 @@ name = "pubmed-client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "chrono",
  "clap 3.2.25",
  "flate2",

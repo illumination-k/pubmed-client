@@ -192,6 +192,7 @@
 //!     let cache_config = CacheConfig {
 //!         max_capacity: 5000,
 //!         time_to_live: Duration::from_secs(24 * 60 * 60), // 24 hours
+//!         ..Default::default()
 //!     };
 //!
 //!     let config = ClientConfig::new()
@@ -221,6 +222,7 @@
 //!     let cache_config = CacheConfig {
 //!         max_capacity: 1000,
 //!         time_to_live: Duration::from_secs(24 * 60 * 60),
+//!         ..Default::default()
 //!     };
 //!
 //!     let config = ClientConfig::new()

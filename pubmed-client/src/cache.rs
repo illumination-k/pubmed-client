@@ -1,43 +1,82 @@
 use moka::future::Cache as MokaCache;
-use std::hash::Hash;
+use std::sync::Arc;
 use std::time::Duration;
 use tracing::{debug, info};
 
 use crate::pmc::models::PmcFullText;
 
-/// Selects which storage backend to use for caching
+// ---------------------------------------------------------------------------
+// CacheBackend trait
+// ---------------------------------------------------------------------------
+
+/// Async storage backend for a cache.
+///
+/// Implement this trait to provide a custom caching layer.  The type
+/// parameter `V` is the cached value type.
+///
+/// # Object safety
+///
+/// `CacheBackend<V>` is object-safe when used with [`async_trait`], so
+/// [`TypedCache<V>`] can hold any backend behind `Arc<dyn CacheBackend<V>>`.
+#[async_trait::async_trait]
+pub trait CacheBackend<V>: Send + Sync
+where
+    V: Send + Sync,
+{
+    /// Return the cached value for `key`, or `None` on a miss.
+    async fn get(&self, key: &str) -> Option<V>;
+
+    /// Store `value` under `key`.
+    async fn insert(&self, key: String, value: V);
+
+    /// Remove all entries.
+    async fn clear(&self);
+
+    /// Return the number of live entries (best-effort; may return 0 for some
+    /// backends).
+    fn entry_count(&self) -> u64;
+
+    /// Flush any pending internal tasks (useful for testing).
+    async fn sync(&self);
+}
+
+// ---------------------------------------------------------------------------
+// CacheBackendConfig / CacheConfig
+// ---------------------------------------------------------------------------
+
+/// Selects which storage backend to use for caching.
 #[derive(Debug, Clone, Default)]
 pub enum CacheBackendConfig {
-    /// In-memory cache using Moka (default)
+    /// In-memory cache using Moka (default).
     #[default]
     Memory,
-    /// Redis-backed persistent cache
+    /// Redis-backed persistent cache.
     ///
     /// Requires the `cache-redis` feature.
     #[cfg(feature = "cache-redis")]
     Redis {
-        /// Redis connection URL, e.g. `"redis://127.0.0.1/"`
+        /// Redis connection URL, e.g. `"redis://127.0.0.1/"`.
         url: String,
     },
-    /// SQLite-backed persistent cache
+    /// SQLite-backed persistent cache.
     ///
     /// Requires the `cache-sqlite` feature.
     /// Not supported on WASM targets.
     #[cfg(feature = "cache-sqlite")]
     Sqlite {
-        /// Path to the SQLite database file
+        /// Path to the SQLite database file.
         path: std::path::PathBuf,
     },
 }
 
-/// Configuration for response caching
+/// Configuration for response caching.
 #[derive(Debug, Clone)]
 pub struct CacheConfig {
-    /// Maximum number of items to store (used by the memory backend)
+    /// Maximum number of items to store (used by the memory backend).
     pub max_capacity: u64,
-    /// Time-to-live for cached items
+    /// Time-to-live for cached items.
     pub time_to_live: Duration,
-    /// Which storage backend to use
+    /// Which storage backend to use.
     pub backend: CacheBackendConfig,
 }
 
@@ -55,17 +94,14 @@ impl Default for CacheConfig {
 // Memory backend
 // ---------------------------------------------------------------------------
 
-/// In-memory cache backed by Moka
+/// In-memory cache backed by [Moka](https://docs.rs/moka).
 #[derive(Clone)]
-pub struct MemoryCache<K, V> {
-    cache: MokaCache<K, V>,
+pub struct MemoryCache<V> {
+    cache: MokaCache<String, V>,
 }
 
-impl<K, V> MemoryCache<K, V>
-where
-    K: Hash + Eq + Clone + Send + Sync + 'static,
-    V: Clone + Send + Sync + 'static,
-{
+impl<V: Clone + Send + Sync + 'static> MemoryCache<V> {
+    /// Create a new in-memory cache from `config`.
     pub fn new(config: &CacheConfig) -> Self {
         let cache = MokaCache::builder()
             .max_capacity(config.max_capacity)
@@ -73,8 +109,11 @@ where
             .build();
         Self { cache }
     }
+}
 
-    pub async fn get(&self, key: &K) -> Option<V> {
+#[async_trait::async_trait]
+impl<V: Clone + Send + Sync + 'static> CacheBackend<V> for MemoryCache<V> {
+    async fn get(&self, key: &str) -> Option<V> {
         let result = self.cache.get(key).await;
         if result.is_some() {
             debug!("Cache hit");
@@ -84,52 +123,66 @@ where
         result
     }
 
-    pub async fn insert(&self, key: K, value: V) {
+    async fn insert(&self, key: String, value: V) {
         self.cache.insert(key, value).await;
         info!("Item cached");
     }
 
-    pub async fn clear(&self) {
+    async fn clear(&self) {
         self.cache.invalidate_all();
         info!("Cache cleared");
     }
 
-    pub fn entry_count(&self) -> u64 {
+    fn entry_count(&self) -> u64 {
         self.cache.entry_count()
     }
 
-    pub async fn sync(&self) {
+    async fn sync(&self) {
         self.cache.run_pending_tasks().await;
     }
 }
 
 // ---------------------------------------------------------------------------
-// Redis backend (feature = "cache-redis")
+// Redis backend  (feature = "cache-redis")
 // ---------------------------------------------------------------------------
 
-/// Redis-backed cache using JSON serialization.
+/// Redis-backed cache using JSON serialisation.
 ///
-/// TTL is applied per entry via `SET … EX`.  Each cache operation opens a new
-/// multiplexed connection; for high-throughput use cases consider a connection
-/// pool on top of this client.
+/// Each cache operation opens a new multiplexed connection.  TTL is applied
+/// per entry via `SET … EX`.
 ///
-/// `entry_count()` always returns 0 because a synchronous DBSIZE call is not
-/// feasible here; use the memory backend if you need accurate counts.
+/// `entry_count()` always returns 0; Redis `DBSIZE` counts all keys and
+/// cannot be scoped to this cache without a full scan.
+///
+/// Requires the `cache-redis` feature.
 #[cfg(feature = "cache-redis")]
 #[derive(Clone)]
-pub struct RedisCache {
+pub struct RedisCache<V> {
     client: redis::Client,
     ttl: Duration,
+    _phantom: std::marker::PhantomData<fn() -> V>,
 }
 
 #[cfg(feature = "cache-redis")]
-impl RedisCache {
+impl<V> RedisCache<V> {
+    /// Open a Redis connection pool at `url`.
     pub fn new(url: &str, ttl: Duration) -> Result<Self, redis::RedisError> {
         let client = redis::Client::open(url)?;
-        Ok(Self { client, ttl })
+        Ok(Self {
+            client,
+            ttl,
+            _phantom: std::marker::PhantomData,
+        })
     }
+}
 
-    pub async fn get(&self, key: &str) -> Option<PmcFullText> {
+#[cfg(feature = "cache-redis")]
+#[async_trait::async_trait]
+impl<V> CacheBackend<V> for RedisCache<V>
+where
+    V: serde::Serialize + serde::de::DeserializeOwned + Send + Sync + 'static,
+{
+    async fn get(&self, key: &str) -> Option<V> {
         use redis::AsyncCommands;
         let mut conn = self.client.get_multiplexed_async_connection().await.ok()?;
         let json: String = conn.get(key).await.ok()?;
@@ -145,20 +198,19 @@ impl RedisCache {
         value
     }
 
-    pub async fn insert(&self, key: String, value: &PmcFullText) {
+    async fn insert(&self, key: String, value: V) {
         use redis::AsyncCommands;
         let Ok(mut conn) = self.client.get_multiplexed_async_connection().await else {
             return;
         };
-        let Ok(json) = serde_json::to_string(value) else {
+        let Ok(json) = serde_json::to_string(&value) else {
             return;
         };
-        let ttl_secs = self.ttl.as_secs();
-        let _: Result<(), _> = conn.set_ex(key, json, ttl_secs).await;
+        let _: Result<(), _> = conn.set_ex(key, json, self.ttl.as_secs()).await;
         info!("Item cached (Redis)");
     }
 
-    pub async fn clear(&self) {
+    async fn clear(&self) {
         let Ok(mut conn) = self.client.get_multiplexed_async_connection().await else {
             return;
         };
@@ -166,71 +218,79 @@ impl RedisCache {
         info!("Cache cleared (Redis)");
     }
 
-    /// Always returns 0; Redis does not provide a per-prefix key count without
-    /// a full scan.
-    pub fn entry_count(&self) -> u64 {
+    fn entry_count(&self) -> u64 {
         0
     }
 
-    pub async fn sync(&self) {
+    async fn sync(&self) {
         // No-op for Redis
     }
 }
 
 // ---------------------------------------------------------------------------
-// SQLite backend (feature = "cache-sqlite")
+// SQLite backend  (feature = "cache-sqlite")
 // ---------------------------------------------------------------------------
 
-/// SQLite-backed cache using JSON serialization.
+/// SQLite-backed cache using JSON serialisation.
 ///
-/// The database is created automatically if it does not exist.
-/// Expired entries are not purged automatically; call [`SqliteCache::clear`]
-/// or implement a periodic cleanup if storage space matters.
+/// The database schema is created automatically on first use.  Expired entries
+/// are not purged automatically; call [`CacheBackend::clear`] or run
+/// `DELETE FROM cache WHERE expires_at <= unixepoch()` periodically.
 ///
-/// `entry_count()` returns the number of non-expired entries via a
-/// non-blocking `try_lock`; it returns 0 if the mutex is currently held.
+/// `entry_count()` uses `try_lock`; returns 0 if the mutex is currently held.
 ///
-/// Not available on WASM targets.
+/// Requires the `cache-sqlite` feature.  Not available on WASM targets.
 #[cfg(feature = "cache-sqlite")]
 #[derive(Clone)]
-pub struct SqliteCache {
-    conn: std::sync::Arc<std::sync::Mutex<rusqlite::Connection>>,
+pub struct SqliteCache<V> {
+    conn: Arc<std::sync::Mutex<rusqlite::Connection>>,
     ttl: Duration,
+    _phantom: std::marker::PhantomData<fn() -> V>,
 }
 
 #[cfg(feature = "cache-sqlite")]
-impl SqliteCache {
+impl<V> SqliteCache<V> {
+    /// Open (or create) a SQLite database at `path`.
     pub fn new(path: &std::path::Path, ttl: Duration) -> rusqlite::Result<Self> {
         let conn = rusqlite::Connection::open(path)?;
         conn.execute_batch(
-            "CREATE TABLE IF NOT EXISTS pmc_cache (
+            "CREATE TABLE IF NOT EXISTS cache (
                 key        TEXT    PRIMARY KEY,
                 value      TEXT    NOT NULL,
                 expires_at INTEGER NOT NULL
             );
-            CREATE INDEX IF NOT EXISTS idx_pmc_cache_expires ON pmc_cache (expires_at);",
+            CREATE INDEX IF NOT EXISTS idx_cache_expires ON cache (expires_at);",
         )?;
         Ok(Self {
-            conn: std::sync::Arc::new(std::sync::Mutex::new(conn)),
+            conn: Arc::new(std::sync::Mutex::new(conn)),
             ttl,
+            _phantom: std::marker::PhantomData,
         })
     }
+}
 
-    fn now_secs() -> i64 {
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs() as i64
-    }
+#[cfg(feature = "cache-sqlite")]
+fn sqlite_now_secs() -> i64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs() as i64
+}
 
-    pub async fn get(&self, key: &str) -> Option<PmcFullText> {
+#[cfg(feature = "cache-sqlite")]
+#[async_trait::async_trait]
+impl<V> CacheBackend<V> for SqliteCache<V>
+where
+    V: serde::Serialize + serde::de::DeserializeOwned + Send + Sync + 'static,
+{
+    async fn get(&self, key: &str) -> Option<V> {
         let key = key.to_owned();
-        let conn = std::sync::Arc::clone(&self.conn);
+        let conn = Arc::clone(&self.conn);
         tokio::task::spawn_blocking(move || {
-            let now = Self::now_secs();
+            let now = sqlite_now_secs();
             let guard = conn.lock().unwrap();
             let result: rusqlite::Result<String> = guard.query_row(
-                "SELECT value FROM pmc_cache WHERE key = ?1 AND expires_at > ?2",
+                "SELECT value FROM cache WHERE key = ?1 AND expires_at > ?2",
                 rusqlite::params![key, now],
                 |row| row.get(0),
             );
@@ -254,17 +314,17 @@ impl SqliteCache {
         .unwrap_or(None)
     }
 
-    pub async fn insert(&self, key: String, value: PmcFullText) {
-        let conn = std::sync::Arc::clone(&self.conn);
+    async fn insert(&self, key: String, value: V) {
+        let conn = Arc::clone(&self.conn);
         let ttl = self.ttl;
         tokio::task::spawn_blocking(move || {
             let Ok(json) = serde_json::to_string(&value) else {
                 return;
             };
-            let expires_at = Self::now_secs() + ttl.as_secs() as i64;
+            let expires_at = sqlite_now_secs() + ttl.as_secs() as i64;
             let guard = conn.lock().unwrap();
             let _ = guard.execute(
-                "INSERT OR REPLACE INTO pmc_cache (key, value, expires_at) VALUES (?1, ?2, ?3)",
+                "INSERT OR REPLACE INTO cache (key, value, expires_at) VALUES (?1, ?2, ?3)",
                 rusqlite::params![key, json, expires_at],
             );
             info!("Item cached (SQLite)");
@@ -273,23 +333,23 @@ impl SqliteCache {
         .ok();
     }
 
-    pub async fn clear(&self) {
-        let conn = std::sync::Arc::clone(&self.conn);
+    async fn clear(&self) {
+        let conn = Arc::clone(&self.conn);
         tokio::task::spawn_blocking(move || {
             let guard = conn.lock().unwrap();
-            let _ = guard.execute("DELETE FROM pmc_cache", []);
+            let _ = guard.execute("DELETE FROM cache", []);
             info!("Cache cleared (SQLite)");
         })
         .await
         .ok();
     }
 
-    pub fn entry_count(&self) -> u64 {
-        let now = Self::now_secs();
+    fn entry_count(&self) -> u64 {
+        let now = sqlite_now_secs();
         if let Ok(guard) = self.conn.try_lock() {
             guard
                 .query_row(
-                    "SELECT COUNT(*) FROM pmc_cache WHERE expires_at > ?1",
+                    "SELECT COUNT(*) FROM cache WHERE expires_at > ?1",
                     rusqlite::params![now],
                     |row| row.get::<_, i64>(0),
                 )
@@ -300,102 +360,97 @@ impl SqliteCache {
         }
     }
 
-    pub async fn sync(&self) {
+    async fn sync(&self) {
         // No-op for SQLite
     }
 }
 
 // ---------------------------------------------------------------------------
-// Unified PmcCache enum
+// TypedCache — type-erased wrapper
 // ---------------------------------------------------------------------------
 
-/// PMC response cache that dispatches to the configured backend.
+/// A type-erased, cloneable cache for values of type `V`.
+///
+/// Wraps any [`CacheBackend<V>`] behind an `Arc<dyn …>`, so it can be
+/// cloned cheaply and stored in structs without generics leaking into the
+/// public API.
+///
+/// The concrete backend is selected via [`CacheConfig::backend`].
+///
+/// # Example
+///
+/// ```no_run
+/// use pubmed_client::cache::{TypedCache, MemoryCache, CacheConfig};
+///
+/// # tokio_test::block_on(async {
+/// let config = CacheConfig::default();
+/// let cache: TypedCache<String> = TypedCache::new(MemoryCache::new(&config));
+/// cache.insert("key".to_string(), "value".to_string()).await;
+/// assert_eq!(cache.get("key").await, Some("value".to_string()));
+/// # });
+/// ```
 #[derive(Clone)]
-pub enum PmcCache {
-    Memory(MemoryCache<String, PmcFullText>),
-    #[cfg(feature = "cache-redis")]
-    Redis(RedisCache),
-    #[cfg(feature = "cache-sqlite")]
-    Sqlite(SqliteCache),
+pub struct TypedCache<V: Send + Sync + 'static> {
+    inner: Arc<dyn CacheBackend<V>>,
 }
 
-impl PmcCache {
-    pub async fn get(&self, key: &str) -> Option<PmcFullText> {
-        match self {
-            PmcCache::Memory(c) => c.get(&key.to_owned()).await,
-            #[cfg(feature = "cache-redis")]
-            PmcCache::Redis(c) => c.get(key).await,
-            #[cfg(feature = "cache-sqlite")]
-            PmcCache::Sqlite(c) => c.get(key).await,
+impl<V: Send + Sync + 'static> TypedCache<V> {
+    /// Wrap `backend` in a [`TypedCache`].
+    pub fn new(backend: impl CacheBackend<V> + 'static) -> Self {
+        Self {
+            inner: Arc::new(backend),
         }
     }
 
-    pub async fn insert(&self, key: String, value: PmcFullText) {
-        match self {
-            PmcCache::Memory(c) => c.insert(key, value).await,
-            #[cfg(feature = "cache-redis")]
-            PmcCache::Redis(c) => c.insert(key, &value).await,
-            #[cfg(feature = "cache-sqlite")]
-            PmcCache::Sqlite(c) => c.insert(key, value).await,
-        }
+    pub async fn get(&self, key: &str) -> Option<V> {
+        self.inner.get(key).await
+    }
+
+    pub async fn insert(&self, key: String, value: V) {
+        self.inner.insert(key, value).await;
     }
 
     pub async fn clear(&self) {
-        match self {
-            PmcCache::Memory(c) => c.clear().await,
-            #[cfg(feature = "cache-redis")]
-            PmcCache::Redis(c) => c.clear().await,
-            #[cfg(feature = "cache-sqlite")]
-            PmcCache::Sqlite(c) => c.clear().await,
-        }
+        self.inner.clear().await;
     }
 
     pub fn entry_count(&self) -> u64 {
-        match self {
-            PmcCache::Memory(c) => c.entry_count(),
-            #[cfg(feature = "cache-redis")]
-            PmcCache::Redis(c) => c.entry_count(),
-            #[cfg(feature = "cache-sqlite")]
-            PmcCache::Sqlite(c) => c.entry_count(),
-        }
+        self.inner.entry_count()
     }
 
     pub async fn sync(&self) {
-        match self {
-            PmcCache::Memory(c) => c.sync().await,
-            #[cfg(feature = "cache-redis")]
-            PmcCache::Redis(c) => c.sync().await,
-            #[cfg(feature = "cache-sqlite")]
-            PmcCache::Sqlite(c) => c.sync().await,
-        }
+        self.inner.sync().await;
     }
 }
+
+/// Type alias for the PMC full-text response cache.
+pub type PmcCache = TypedCache<PmcFullText>;
 
 // ---------------------------------------------------------------------------
 // Factory
 // ---------------------------------------------------------------------------
 
-/// Create a [`PmcCache`] from configuration.
+/// Create a [`PmcCache`] from `config`.
 ///
-/// Falls back to the memory backend if the configured backend cannot be
-/// initialised (error is logged via `tracing::error!`).
+/// Falls back to the in-memory backend (with a logged error) when the
+/// configured backend cannot be initialised.
 pub fn create_cache(config: &CacheConfig) -> PmcCache {
     match &config.backend {
-        CacheBackendConfig::Memory => PmcCache::Memory(MemoryCache::new(config)),
+        CacheBackendConfig::Memory => TypedCache::new(MemoryCache::new(config)),
         #[cfg(feature = "cache-redis")]
         CacheBackendConfig::Redis { url } => match RedisCache::new(url, config.time_to_live) {
-            Ok(c) => PmcCache::Redis(c),
+            Ok(c) => TypedCache::new(c),
             Err(e) => {
                 tracing::error!("Failed to create Redis cache, falling back to memory: {e}");
-                PmcCache::Memory(MemoryCache::new(config))
+                TypedCache::new(MemoryCache::new(config))
             }
         },
         #[cfg(feature = "cache-sqlite")]
         CacheBackendConfig::Sqlite { path } => match SqliteCache::new(path, config.time_to_live) {
-            Ok(c) => PmcCache::Sqlite(c),
+            Ok(c) => TypedCache::new(c),
             Err(e) => {
                 tracing::error!("Failed to create SQLite cache, falling back to memory: {e}");
-                PmcCache::Memory(MemoryCache::new(config))
+                TypedCache::new(MemoryCache::new(config))
             }
         },
     }
@@ -416,24 +471,20 @@ mod tests {
             time_to_live: Duration::from_secs(60),
             ..Default::default()
         };
-        let cache = MemoryCache::<String, String>::new(&config);
+        let cache = TypedCache::new(MemoryCache::<String>::new(&config));
 
         cache.insert("key1".to_string(), "value1".to_string()).await;
-        assert_eq!(
-            cache.get(&"key1".to_string()).await,
-            Some("value1".to_string())
-        );
-
-        assert_eq!(cache.get(&"nonexistent".to_string()).await, None);
+        assert_eq!(cache.get("key1").await, Some("value1".to_string()));
+        assert_eq!(cache.get("nonexistent").await, None);
 
         cache.clear().await;
-        assert_eq!(cache.get(&"key1".to_string()).await, None);
+        assert_eq!(cache.get("key1").await, None);
     }
 
     #[tokio::test]
     async fn test_cache_entry_count() {
         let config = CacheConfig::default();
-        let cache = MemoryCache::<String, String>::new(&config);
+        let cache = TypedCache::new(MemoryCache::<String>::new(&config));
 
         assert_eq!(cache.entry_count(), 0);
 
