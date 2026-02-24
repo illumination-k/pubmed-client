@@ -15,7 +15,7 @@ pub fn should_run_real_api_tests() -> bool {
 pub fn create_test_client() -> Client {
     let mut config = ClientConfig::new()
         .with_email("test@example.com")
-        .with_tool("pubmed-client-rs-integration-tests")
+        .with_tool("pubmed-client-integration-tests")
         .with_rate_limit(2.0); // Conservative rate limiting for tests
 
     // Use API key if available
@@ -30,7 +30,7 @@ pub fn create_test_client() -> Client {
 pub fn create_test_pubmed_client() -> PubMedClient {
     let mut config = ClientConfig::new()
         .with_email("test@example.com")
-        .with_tool("pubmed-client-rs-pubmed-integration-tests")
+        .with_tool("pubmed-client-pubmed-integration-tests")
         .with_rate_limit(2.0);
 
     if let Ok(api_key) = std::env::var("NCBI_API_KEY") {
@@ -44,7 +44,7 @@ pub fn create_test_pubmed_client() -> PubMedClient {
 pub fn create_test_pmc_client() -> PmcClient {
     let mut config = ClientConfig::new()
         .with_email("test@example.com")
-        .with_tool("pubmed-client-rs-pmc-integration-tests")
+        .with_tool("pubmed-client-pmc-integration-tests")
         .with_rate_limit(2.0);
 
     if let Ok(api_key) = std::env::var("NCBI_API_KEY") {

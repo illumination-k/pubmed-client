@@ -36,7 +36,7 @@ pub struct ClientConfig {
 
     /// Custom User-Agent string for HTTP requests
     ///
-    /// Default: "pubmed-client-rs/{version}"
+    /// Default: "pubmed-client/{version}"
     pub user_agent: Option<String>,
 
     /// Base URL for NCBI E-utilities
@@ -54,7 +54,7 @@ pub struct ClientConfig {
     /// Tool name for identification (recommended by NCBI)
     ///
     /// NCBI recommends including a tool name in requests.
-    /// Default: "pubmed-client-rs"
+    /// Default: "pubmed-client"
     pub tool: Option<String>,
 
     /// Retry configuration for handling transient failures
@@ -381,7 +381,7 @@ impl ClientConfig {
     pub fn effective_user_agent(&self) -> String {
         self.user_agent.clone().unwrap_or_else(|| {
             let version = env!("CARGO_PKG_VERSION");
-            format!("pubmed-client-rs/{version}")
+            format!("pubmed-client/{version}")
         })
     }
 
@@ -389,7 +389,7 @@ impl ClientConfig {
     ///
     /// Returns the configured tool name or the default.
     pub fn effective_tool(&self) -> &str {
-        self.tool.as_deref().unwrap_or("pubmed-client-rs")
+        self.tool.as_deref().unwrap_or("pubmed-client")
     }
 
     /// Build query parameters for NCBI API requests
@@ -498,10 +498,8 @@ mod tests {
             config.effective_base_url(),
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
         );
-        assert!(config
-            .effective_user_agent()
-            .starts_with("pubmed-client-rs/"));
-        assert_eq!(config.effective_tool(), "pubmed-client-rs");
+        assert!(config.effective_user_agent().starts_with("pubmed-client/"));
+        assert_eq!(config.effective_tool(), "pubmed-client");
     }
 
     #[test]

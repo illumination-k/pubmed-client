@@ -25,9 +25,9 @@ classifiers = [
 keywords = ["pubmed", "pmc", "biomedical", "research", "api", "bioinformatics"]
 
 [project.urls]
-Homepage = "https://github.com/illumination-k/pubmed-client-rs"
-Repository = "https://github.com/illumination-k/pubmed-client-rs"
-Documentation = "https://github.com/illumination-k/pubmed-client-rs/tree/main/pubmed-client-py"
+Homepage = "https://github.com/illumination-k/pubmed-client"
+Repository = "https://github.com/illumination-k/pubmed-client"
+Documentation = "https://github.com/illumination-k/pubmed-client/tree/main/pubmed-client-py"
 
 [tool.maturin]
 # Rust lib name is pubmed_client_py, but Python module name is pubmed_client

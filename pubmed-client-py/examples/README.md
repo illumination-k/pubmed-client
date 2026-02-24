@@ -308,4 +308,4 @@ Found an issue or have a suggestion for improving these examples? Please open an
 
 ## License
 
-These examples are part of the pubmed-client-rs project and are released under the same license as the main project.
+These examples are part of the pubmed-client project and are released under the same license as the main project.
