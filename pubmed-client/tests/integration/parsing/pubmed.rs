@@ -4,6 +4,7 @@ use tracing_test::traced_test;
 
 use pubmed_client::pubmed::parser::parse_article_from_xml;
 
+#[path = "../common/mod.rs"]
 mod common;
 use common::{pubmed_xml_test_cases, PubMedXmlTestCase};
 

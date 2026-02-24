@@ -5,6 +5,7 @@ use pubmed_client::pmc::{
     parse_pmc_xml, HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle,
 };
 
+#[path = "../common/mod.rs"]
 mod common;
 use common::{pmc_xml_test_cases, PmcXmlTestCase};
 

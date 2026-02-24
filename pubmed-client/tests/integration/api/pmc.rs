@@ -17,6 +17,7 @@
 //! PUBMED_REAL_API_TESTS=1 NCBI_API_KEY=your_key cargo test --features integration-tests --test pmc_api_tests
 //! ```
 
+#[path = "../common/mod.rs"]
 mod common;
 
 #[cfg(feature = "integration-tests")]
