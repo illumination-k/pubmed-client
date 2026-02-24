@@ -96,7 +96,7 @@ cargo llvm-cov nextest -p pubmed-client --all-features --html
 
 ```
 lib.rs                 # Entry point, re-exports, unified Client struct
-cache.rs               # Response caching (moka)
+cache.rs               # Response caching (pluggable: memory/Redis/SQLite)
 config.rs              # ClientConfig (API keys, rate limiting, caching, timeouts)
 error.rs               # PubMedError enum and Result type alias
 rate_limit.rs          # Token bucket rate limiter for NCBI API compliance
@@ -109,7 +109,15 @@ common/                # Shared types between PubMed and PMC
   xml_utils.rs         # XML parsing helpers
 
 pubmed/                # PubMed E-utilities API
-  client.rs            # PubMedClient - search, fetch, ELink, EInfo, ECitMatch, EGQuery
+  client/              # PubMedClient (split into focused modules)
+    mod.rs             # Core client, search, EFetch
+    summary.rs         # ESummary API (lightweight metadata)
+    history.rs         # EPost & History server operations
+    einfo.rs           # Database information (EInfo API)
+    elink.rs           # Cross-database linking (ELink API)
+    citmatch.rs        # Citation matching (ECitMatch API)
+    egquery.rs         # Global database queries (EGQuery API)
+    espell.rs          # Spell checking (ESpell API)
   models.rs            # PubMedArticle, SearchResult, Citations, RelatedArticles, etc.
   responses.rs         # Internal API response deserialization types
   parser/              # XML parsing for PubMed article metadata
@@ -145,13 +153,13 @@ pmc/                   # PMC (PubMed Central) API
 
 ### Key Types
 
-- `Client` - Unified client with `pubmed` and `pmc` fields; also has convenience methods (`search_with_full_text`, `fetch_articles`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`)
-- `PubMedClient` - Search, fetch metadata, ELink, EInfo, ECitMatch, EGQuery
+- `Client` - Unified client with `pubmed` and `pmc` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`
+- `PubMedClient` - Search, fetch metadata, ESummary, EPost/History, ELink, EInfo, ECitMatch, EGQuery, ESpell
 - `PmcClient` - Fetch full-text, check availability, extract figures, download tar archives
 - `SearchQuery` - Builder pattern for complex queries with filters, date ranges, boolean logic
 - `PubMedArticle` - Article metadata (title, authors, abstract, MeSH, keywords, etc.)
 - `PmcFullText` - Structured full-text (sections, references, figures, tables)
-- `ClientConfig` - API key, email, tool name, rate limit, cache, timeout, retry config
+- `ClientConfig` - API key, email, tool name, rate limit, cache (memory/Redis/SQLite), timeout, retry config; also `with_base_url()`, `with_user_agent()`
 
 ### NAPI Bindings (`pubmed-client-napi/`)
 
@@ -200,6 +208,8 @@ src/
     markdown.rs        # get_pmc_markdown tool
     citmatch.rs        # Citation matching tool
     gquery.rs          # Global query tool
+    espell.rs          # spell_check tool (ESpell API)
+    summary.rs         # fetch_summaries tool (ESummary API)
 ```
 
 ### Integration Tests (`pubmed-client/tests/integration/`)
@@ -244,6 +254,8 @@ See `.claude/skills/maturin-debugger/SKILL.md` for detailed troubleshooting.
 ### Dependencies
 
 Core: `tokio`, `reqwest`, `serde`, `quick-xml`, `thiserror`, `tracing`, `moka` (caching), `urlencoding`, `rand`, `regex`, `tar`, `flate2`, `image`, `futures-util`.
+
+Optional: `redis` (feature: `cache-redis`), `rusqlite` (feature: `cache-sqlite`).
 
 Dev: `rstest`, `tracing-test`, `wiremock`, `tempfile`.
 
