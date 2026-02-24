@@ -2,6 +2,16 @@
 //!
 //! This module provides functionality to interact with PubMed E-utilities APIs
 //! for searching biomedical literature and retrieving article metadata.
+//!
+//! The client functionality is split across focused modules under [`client`]:
+//! - `client/mod.rs` - Core client struct, constructors, search, and fetch operations
+//! - `client/summary` - ESummary API for lightweight article metadata
+//! - `client/history` - History server operations (EPost, fetch from history, streaming)
+//! - `client/einfo` - Database information (EInfo API)
+//! - `client/elink` - Cross-database linking (ELink API)
+//! - `client/citmatch` - Citation matching (ECitMatch API)
+//! - `client/egquery` - Global database queries (EGQuery API)
+//! - `client/espell` - Spell checking (ESpell API)
 
 pub mod client;
 pub mod models;
