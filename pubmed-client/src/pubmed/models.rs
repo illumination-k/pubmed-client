@@ -644,9 +644,13 @@ pub struct SpellCheckResult {
 }
 
 impl SpellCheckResult {
-    /// Check if the query had any spelling corrections
+    /// Check if the query had any spelling corrections.
+    ///
+    /// Returns `true` only when NCBI provided a non-empty corrected query that differs from
+    /// the original. The NCBI ESpell API returns an empty `<CorrectedQuery/>` element when
+    /// no corrections are available.
     pub fn has_corrections(&self) -> bool {
-        self.query != self.corrected_query
+        !self.corrected_query.is_empty() && self.query != self.corrected_query
     }
 
     /// Get only the replaced (corrected) terms

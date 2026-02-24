@@ -1,0 +1,3 @@
+proc natl acad sci u s a|1991|88|3248|mann bj|Art1|2014248
+fake journal|2000|1|1||ref2|NOT_FOUND;INVALID_JOURNAL
+n engl j med|2020|382|727|zhu n|Art4|31978945

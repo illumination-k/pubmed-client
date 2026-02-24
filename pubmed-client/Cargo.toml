@@ -78,6 +78,22 @@ path = "tests/integration/parsing/einfo.rs"
 name = "parsing_elink"
 path = "tests/integration/parsing/elink.rs"
 
+[[test]]
+name = "parsing_esearch"
+path = "tests/integration/parsing/esearch.rs"
+
+[[test]]
+name = "parsing_esummary"
+path = "tests/integration/parsing/esummary.rs"
+
+[[test]]
+name = "parsing_ecitmatch"
+path = "tests/integration/parsing/ecitmatch.rs"
+
+[[test]]
+name = "parsing_espell"
+path = "tests/integration/parsing/espell.rs"
+
 # --- Mocked tests (wiremock/offline, no network) ---
 
 [[test]]
