@@ -40,6 +40,19 @@ echo "==> Setting up Python virtual environment..."
 cd "$PROJECT_ROOT/pubmed-client-py"
 uv venv
 
+# Install pnpm dependencies for TS packages
+echo "==> Installing pnpm dependencies for TS packages..."
+if has_command "pnpm"; then
+	cd "$PROJECT_ROOT/pubmed-client-napi"
+	pnpm install --frozen-lockfile
+	cd "$PROJECT_ROOT/pubmed-client-wasm"
+	pnpm install --frozen-lockfile
+	cd "$PROJECT_ROOT/website"
+	pnpm install --frozen-lockfile
+else
+	echo "Warning: pnpm is not installed, skipping TS package setup"
+fi
+
 # Setup test environment (cargo tools)
 echo "==> Setting up test environment..."
 cd "$PROJECT_ROOT"

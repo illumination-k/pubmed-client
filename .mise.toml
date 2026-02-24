@@ -34,8 +34,15 @@ description = "Format shell scripts with shfmt"
 run = ["shfmt -w ./**/*.sh"]
 
 [tasks.fmt]
-description = "Format all code (Rust + Python + website)"
-depends = ["fmt:root", "py:format", "fmt:sh", "website:fmt"]
+description = "Format all code (Rust + Python + TS packages)"
+depends = [
+  "fmt:root",
+  "py:format",
+  "fmt:sh",
+  "napi:fmt",
+  "wasm:fmt",
+  "website:fmt",
+]
 
 [tasks."lint:root"]
 description = "Lint Rust code with dprint, cargo fmt, and clippy"
@@ -50,8 +57,8 @@ run = [
 ]
 
 [tasks.lint]
-description = "Lint all code (Rust + Python + website)"
-depends = ["lint:root", "py:lint", "website:lint"]
+description = "Lint all code (Rust + Python + TS packages)"
+depends = ["lint:root", "py:lint", "napi:lint", "wasm:lint", "website:lint"]
 
 [tasks.setup]
 description = "Run postinstall setup script"
@@ -99,10 +106,25 @@ description = "Build and run napi-rs TypeScript tests"
 dir = "pubmed-client-napi"
 run = ["pnpm run build && pnpm run test"]
 
+[tasks."napi:fmt"]
+description = "Format napi package code with Biome"
+dir = "pubmed-client-napi"
+run = ["pnpm run format"]
+
 [tasks."napi:lint"]
 description = "Run linting and type checking for napi package"
 dir = "pubmed-client-napi"
 run = ["pnpm run ci", "pnpm run typecheck"]
+
+[tasks."wasm:fmt"]
+description = "Format WASM package code with Biome"
+dir = "pubmed-client-wasm"
+run = ["pnpm run format"]
+
+[tasks."wasm:lint"]
+description = "Run Biome linting for WASM package"
+dir = "pubmed-client-wasm"
+run = ["pnpm run ci"]
 
 [tasks."website:fmt"]
 description = "Format website code with Biome"
