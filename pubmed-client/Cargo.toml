@@ -19,7 +19,9 @@ anyhow = { workspace = true }
 moka = { version = "0.12", features = ["future"] }
 quick-xml = { workspace = true }
 rand = "0.8"
+redis = { version = "0.27", features = ["tokio-comp"], optional = true }
 regex = "1.10"
+rusqlite = { version = "0.31", features = ["bundled"], optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = "0.9"
@@ -48,6 +50,8 @@ default = ["native-tls"]
 native-tls = ["reqwest/default-tls"]
 rustls-tls = ["reqwest/rustls-tls"]
 integration-tests = []
+cache-redis = ["dep:redis"]
+cache-sqlite = ["dep:rusqlite"]
 
 [dev-dependencies]
 chrono = "0.4"
