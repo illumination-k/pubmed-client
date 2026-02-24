@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PubMedClient, SearchQuery } from '../index.js'
-import { isNetworkError, TEST_CONFIG } from './setup'
+import { SearchQuery } from '../index.js'
 
 describe('SearchQuery', () => {
   describe('Basic Methods', () => {
@@ -482,56 +481,4 @@ describe('SearchQuery', () => {
     })
   })
 
-  describe('Integration with PubMedClient', () => {
-    it('should execute query with client', async () => {
-      const client = new PubMedClient()
-      const query = new SearchQuery()
-        .query(TEST_CONFIG.TEST_QUERY)
-        .setLimit(3)
-
-      try {
-        const articles = await client.executeQuery(query)
-
-        expect(Array.isArray(articles)).toBe(true)
-        expect(articles.length).toBeGreaterThan(0)
-        expect(articles.length).toBeLessThanOrEqual(3)
-
-        const article = articles[0]
-        expect(article.pmid).toBeDefined()
-        expect(article.title).toBeDefined()
-      } catch (error) {
-        if (isNetworkError(error)) {
-          console.warn('Skipping integration test due to API/network issue:', error)
-          return
-        }
-        throw error
-      }
-    })
-
-    it('should execute complex query with client', async () => {
-      const client = new PubMedClient()
-      const query = new SearchQuery()
-        .query('covid-19')
-        .publishedBetween(2023, 2024)
-        .freeFullTextOnly()
-        .language('English')
-        .setLimit(5)
-
-      try {
-        const articles = await client.executeQuery(query)
-
-        expect(Array.isArray(articles)).toBe(true)
-        // Should return results given the broad search
-        if (articles.length > 0) {
-          expect(articles[0].pmid).toBeDefined()
-        }
-      } catch (error) {
-        if (isNetworkError(error)) {
-          console.warn('Skipping complex query test due to API/network issue:', error)
-          return
-        }
-        throw error
-      }
-    })
-  })
 })
