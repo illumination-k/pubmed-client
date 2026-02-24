@@ -14,7 +14,7 @@ const docCards: DocCard[] = [
   {
     title: "🦀 Rust",
     description: "Generated rustdoc for the core pubmed-client crate",
-    href: "rust/pubmed_client/",
+    href: "https://illumination-k.github.io/pubmed-client/rust/pubmed_client/",
   },
   {
     title: "🐍 Python",
@@ -74,12 +74,12 @@ export default function Home(): React.JSX.Element {
               for Rust, Node.js, WebAssembly, and Python
             </p>
             <div className={styles.heroButtons}>
-              <Link className="button button--primary button--lg" to="rust/pubmed_client/">
+              <a className="button button--primary button--lg" href="https://illumination-k.github.io/pubmed-client/rust/pubmed_client/">
                 Rust API Docs
-              </Link>
+              </a>
               <Link
                 className="button button--secondary button--lg"
-                href="https://github.com/illumination-k/pubmed-client-rs"
+                href="https://github.com/illumination-k/pubmed-client"
               >
                 GitHub
               </Link>
@@ -94,14 +94,14 @@ export default function Home(): React.JSX.Element {
             <div className={styles.cardGrid}>
               {docCards.map(card =>
                 card.href ? (
-                  <Link key={card.title} className={styles.card} to={card.href}>
+                  <a key={card.title} className={styles.card} href={card.href}>
                     <h3>{card.title}</h3>
                     <p>{card.description}</p>
-                  </Link>
+                  </a>
                 ) : (
                   <div key={card.title} className={`${styles.card} ${styles.cardDisabled}`}>
                     <h3>
-                      {card.title}{" "}
+                      {card.title}
                       {card.comingSoon && <span className={styles.badge}>Coming soon</span>}
                     </h3>
                     <p>{card.description}</p>
