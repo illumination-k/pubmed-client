@@ -1,5 +1,6 @@
 import type * as Preset from "@docusaurus/preset-classic"
 import type { Config } from "@docusaurus/types"
+import { themes as prismThemes } from "prism-react-renderer"
 
 const config: Config = {
   title: "pubmed-client",
@@ -30,6 +31,11 @@ const config: Config = {
   ],
 
   themeConfig: {
+    prism: {
+      theme: prismThemes.github,
+      darkTheme: prismThemes.dracula,
+      additionalLanguages: ["rust", "python", "bash"],
+    },
     colorMode: {
       defaultMode: "light",
       disableSwitch: false,
