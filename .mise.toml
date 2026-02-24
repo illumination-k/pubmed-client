@@ -81,8 +81,12 @@ description = "Check entire workspace without building"
 run = ["cargo check --workspace"]
 
 [tasks.coverage]
-description = "Generate HTML coverage report for core library"
-run = ["cargo llvm-cov nextest -p pubmed-client --all-features --html"]
+description = "Generate HTML coverage report with branch coverage and per-file text summary"
+run = [
+  "cargo llvm-cov nextest -p pubmed-client --all-features --branch --no-report",
+  "cargo llvm-cov report --branch --html",
+  "cargo llvm-cov report --branch --text",
+]
 
 [tasks."wasm:build"]
 description = "Build WASM package for web target"
