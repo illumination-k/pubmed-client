@@ -51,7 +51,7 @@ async fn test_real_api_basic_rate_limiting() {
     let config = ClientConfig::new()
         .with_rate_limit(3.0) // 3 requests per second (NCBI default without API key)
         .with_email("test@example.com") // Required for NCBI API etiquette
-        .with_tool("pubmed-client-rs-test");
+        .with_tool("pubmed-client-test");
 
     let client = PubMedClient::with_config(config);
 
@@ -167,7 +167,7 @@ async fn test_real_api_concurrent_rate_limiting() {
     let config = ClientConfig::new()
         .with_rate_limit(2.0) // Conservative 2 req/sec for concurrent test
         .with_email("test@example.com")
-        .with_tool("pubmed-client-rs-concurrent-test");
+        .with_tool("pubmed-client-concurrent-test");
 
     let client = PubMedClient::with_config(config);
     let start_time = Instant::now();
@@ -295,7 +295,7 @@ async fn test_real_api_with_api_key() {
         .with_api_key(&api_key)
         .with_rate_limit(10.0) // 10 requests per second with API key
         .with_email("test@example.com")
-        .with_tool("pubmed-client-rs-apikey-test");
+        .with_tool("pubmed-client-apikey-test");
 
     let client = PubMedClient::with_config(config);
     let start_time = Instant::now();
@@ -383,7 +383,7 @@ async fn test_real_api_end_to_end_with_rate_limiting() {
     let config = ClientConfig::new()
         .with_rate_limit(2.5) // Conservative rate limit
         .with_email("test@example.com")
-        .with_tool("pubmed-client-rs-e2e-test");
+        .with_tool("pubmed-client-e2e-test");
 
     let client = PubMedClient::with_config(config);
     let start_time = Instant::now();
@@ -516,7 +516,7 @@ async fn test_real_api_server_rate_limit_handling() {
     let config = ClientConfig::new()
         .with_rate_limit(5.0) // Higher than NCBI's limit without API key
         .with_email("test@example.com")
-        .with_tool("pubmed-client-rs-server-limit-test");
+        .with_tool("pubmed-client-server-limit-test");
 
     let client = PubMedClient::with_config(config);
 

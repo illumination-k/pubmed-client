@@ -234,7 +234,7 @@ mod integration_tests {
         // Create client with very short timeout to trigger timeout errors
         let config = ClientConfig::new()
             .with_email("test@example.com")
-            .with_tool("pubmed-client-rs-timeout-test")
+            .with_tool("pubmed-client-timeout-test")
             .with_timeout(Duration::from_millis(1)) // Extremely short timeout
             .with_rate_limit(1.0);
 

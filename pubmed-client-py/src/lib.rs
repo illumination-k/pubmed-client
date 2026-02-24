@@ -1,4 +1,4 @@
-//! Python bindings for pubmed-client-rs using PyO3
+//! Python bindings for pubmed-client using PyO3
 //!
 //! This module provides Python bindings for the Rust-based PubMed client library.
 
