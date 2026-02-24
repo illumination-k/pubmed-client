@@ -9,7 +9,7 @@ const config: Config = {
   organizationName: "illumination-k",
   projectName: "pubmed-client",
   onBrokenLinks: "warn",
-  trailingSlash: false,
+  trailingSlash: true,
 
   i18n: {
     defaultLocale: "en",
