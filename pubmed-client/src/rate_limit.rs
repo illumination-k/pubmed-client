@@ -36,7 +36,7 @@ impl RateLimiter {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::RateLimiter;
+    /// use pubmed_client::RateLimiter;
     ///
     /// // Create rate limiter for NCBI API without key (3 req/sec)
     /// let limiter_default = RateLimiter::new(3.0);
@@ -78,7 +78,7 @@ impl RateLimiter {
     /// # Examples
     ///
     /// ```no_run
-    /// use pubmed_client_rs::RateLimiter;
+    /// use pubmed_client::RateLimiter;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -13,7 +13,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new().query("covid-19");
     /// assert!(query.validate().is_ok());
@@ -69,7 +69,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let optimized = SearchQuery::new()
     ///     .query("covid-19")
@@ -101,12 +101,12 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("machine learning")
     ///     .published_after(2020)
-    ///     .free_full_text();
+    ///     .free_full_text_only();
     ///
     /// let (terms, filters, complexity) = query.get_stats();
     /// ```

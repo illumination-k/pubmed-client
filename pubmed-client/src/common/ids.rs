@@ -17,7 +17,7 @@ use std::str::FromStr;
 /// # Examples
 ///
 /// ```
-/// use pubmed_client_rs::common::PubMedId;
+/// use pubmed_client::common::PubMedId;
 ///
 /// // Parse from string
 /// let pmid = PubMedId::parse("31978945").unwrap();
@@ -53,7 +53,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PubMedId;
+    /// use pubmed_client::common::PubMedId;
     ///
     /// let pmid = PubMedId::parse("31978945").unwrap();
     /// assert_eq!(pmid.as_u32(), 31978945);
@@ -103,7 +103,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PubMedId;
+    /// use pubmed_client::common::PubMedId;
     ///
     /// let pmid = PubMedId::from_u32(31978945);
     /// assert_eq!(pmid.as_u32(), 31978945);
@@ -122,7 +122,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PubMedId;
+    /// use pubmed_client::common::PubMedId;
     ///
     /// let pmid = PubMedId::try_from_u32(31978945).unwrap();
     /// assert_eq!(pmid.as_u32(), 31978945);
@@ -143,7 +143,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PubMedId;
+    /// use pubmed_client::common::PubMedId;
     ///
     /// let pmid = PubMedId::parse("31978945").unwrap();
     /// assert_eq!(pmid.as_u32(), 31978945);
@@ -160,7 +160,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PubMedId;
+    /// use pubmed_client::common::PubMedId;
     ///
     /// let pmid = PubMedId::from_u32(31978945);
     /// assert_eq!(pmid.as_str(), "31978945");
@@ -206,7 +206,7 @@ impl From<PubMedId> for u32 {
 /// # Examples
 ///
 /// ```
-/// use pubmed_client_rs::common::PmcId;
+/// use pubmed_client::common::PmcId;
 ///
 /// // Parse with PMC prefix
 /// let pmcid = PmcId::parse("PMC7906746").unwrap();
@@ -243,7 +243,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PmcId;
+    /// use pubmed_client::common::PmcId;
     ///
     /// // With PMC prefix
     /// let pmcid = PmcId::parse("PMC7906746").unwrap();
@@ -316,7 +316,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PmcId;
+    /// use pubmed_client::common::PmcId;
     ///
     /// let pmcid = PmcId::from_u32(7906746);
     /// assert_eq!(pmcid.as_str(), "PMC7906746");
@@ -336,7 +336,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PmcId;
+    /// use pubmed_client::common::PmcId;
     ///
     /// let pmcid = PmcId::try_from_u32(7906746).unwrap();
     /// assert_eq!(pmcid.numeric_part(), 7906746);
@@ -357,7 +357,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PmcId;
+    /// use pubmed_client::common::PmcId;
     ///
     /// let pmcid = PmcId::from_u32(7906746);
     /// assert_eq!(pmcid.as_str(), "PMC7906746");
@@ -371,7 +371,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PmcId;
+    /// use pubmed_client::common::PmcId;
     ///
     /// let pmcid = PmcId::parse("PMC7906746").unwrap();
     /// assert_eq!(pmcid.numeric_part(), 7906746);
@@ -385,7 +385,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client_rs::common::PmcId;
+    /// use pubmed_client::common::PmcId;
     ///
     /// let pmcid = PmcId::parse("PMC7906746").unwrap();
     /// assert_eq!(pmcid.numeric_part_str(), "7906746");

@@ -36,7 +36,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     ///
     /// let client = PmcClient::new();
     /// ```
@@ -63,7 +63,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::{PmcClient, ClientConfig};
+    /// use pubmed_client::{PmcClient, ClientConfig};
     ///
     /// let config = ClientConfig::new()
     ///     .with_api_key("your_api_key_here")
@@ -116,7 +116,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     /// use reqwest::Client;
     /// use std::time::Duration;
     ///
@@ -172,7 +172,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -275,7 +275,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -361,7 +361,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -425,7 +425,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     /// use std::path::Path;
     ///
     /// #[tokio::main]
@@ -472,7 +472,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     /// use std::path::Path;
     ///
     /// #[tokio::main]
@@ -504,7 +504,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -527,7 +527,7 @@ impl PmcClient {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::PmcClient;
+    /// use pubmed_client::PmcClient;
     ///
     /// let client = PmcClient::new();
     /// let count = client.cache_entry_count();

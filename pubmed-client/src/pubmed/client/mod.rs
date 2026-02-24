@@ -35,7 +35,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -43,7 +43,7 @@ impl PubMedClient {
     ///     let articles = client
     ///         .search()
     ///         .query("covid-19 treatment")
-    ///         .open_access_only()
+    ///         .free_full_text_only()
     ///         .published_after(2020)
     ///         .limit(10)
     ///         .search_and_fetch(&client)
@@ -65,7 +65,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// let client = PubMedClient::new();
     /// ```
@@ -83,7 +83,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::{PubMedClient, ClientConfig};
+    /// use pubmed_client::{PubMedClient, ClientConfig};
     ///
     /// let config = ClientConfig::new()
     ///     .with_api_key("your_api_key_here")
@@ -131,7 +131,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     /// use reqwest::Client;
     /// use std::time::Duration;
     ///
@@ -189,7 +189,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -240,7 +240,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -333,7 +333,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -410,7 +410,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {

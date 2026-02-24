@@ -12,7 +12,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .title_contains("machine learning");
@@ -31,7 +31,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .abstract_contains("deep learning neural networks");
@@ -50,7 +50,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .title_or_abstract("CRISPR gene editing");
@@ -69,7 +69,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer treatment")
@@ -89,7 +89,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("stem cells")
@@ -109,7 +109,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .grant_number("R01AI123456");
@@ -128,7 +128,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .isbn("978-0123456789");
@@ -147,7 +147,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .issn("1234-5678");
@@ -164,7 +164,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("cancer")
@@ -180,7 +180,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("machine learning")
@@ -196,7 +196,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("diabetes")
@@ -212,7 +212,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::SearchQuery;
+    /// use pubmed_client::pubmed::SearchQuery;
     ///
     /// let query = SearchQuery::new()
     ///     .query("genetics")
@@ -232,7 +232,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::{SearchQuery, ArticleType};
+    /// use pubmed_client::pubmed::{SearchQuery, ArticleType};
     ///
     /// let query = SearchQuery::new()
     ///     .query("hypertension")
@@ -265,7 +265,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::{SearchQuery, ArticleType};
+    /// use pubmed_client::pubmed::{SearchQuery, ArticleType};
     ///
     /// let query = SearchQuery::new()
     ///     .query("diabetes treatment")
@@ -284,7 +284,7 @@ impl SearchQuery {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::pubmed::{SearchQuery, Language};
+    /// use pubmed_client::pubmed::{SearchQuery, Language};
     ///
     /// let query = SearchQuery::new()
     ///     .query("stem cells")

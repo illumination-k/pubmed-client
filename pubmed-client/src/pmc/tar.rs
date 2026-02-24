@@ -79,8 +79,8 @@ impl PmcTarClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::pmc::tar::PmcTarClient;
-    /// use pubmed_client_rs::ClientConfig;
+    /// use pubmed_client::pmc::tar::PmcTarClient;
+    /// use pubmed_client::ClientConfig;
     /// use std::path::Path;
     ///
     /// #[tokio::main]
@@ -272,8 +272,8 @@ impl PmcTarClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::pmc::tar::PmcTarClient;
-    /// use pubmed_client_rs::ClientConfig;
+    /// use pubmed_client::pmc::tar::PmcTarClient;
+    /// use pubmed_client::ClientConfig;
     /// use std::path::Path;
     ///
     /// #[tokio::main]

@@ -48,7 +48,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -94,7 +94,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::SortOrder};
+    /// use pubmed_client::{PubMedClient, pubmed::SortOrder};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -204,7 +204,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -390,7 +390,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -482,7 +482,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -558,7 +558,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
+    /// use pubmed_client::PubMedClient;
     /// use futures_util::StreamExt;
     /// use std::pin::pin;
     ///

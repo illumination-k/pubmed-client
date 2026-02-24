@@ -61,6 +61,10 @@ run = ["bash ./etc/postinstall.sh"]
 description = "Run tests for entire workspace using nextest"
 run = ["cargo nextest run --workspace"]
 
+[tasks.doctest]
+description = "Run doc tests for core Rust library"
+run = ["cargo test --doc -p pubmed-client"]
+
 [tasks.build]
 description = "Build entire workspace"
 run = ["cargo build --workspace"]

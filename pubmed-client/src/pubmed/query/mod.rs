@@ -15,18 +15,18 @@
 //!
 //! Basic search:
 //! ```
-//! use pubmed_client_rs::pubmed::SearchQuery;
+//! use pubmed_client::pubmed::SearchQuery;
 //!
 //! let query = SearchQuery::new()
 //!     .query("covid-19 treatment")
 //!     .published_after(2020)
-//!     .free_full_text()
+//!     .free_full_text_only()
 //!     .limit(10);
 //! ```
 //!
 //! Complex boolean search:
 //! ```
-//! use pubmed_client_rs::pubmed::{SearchQuery, ArticleType, Language};
+//! use pubmed_client::pubmed::{SearchQuery, ArticleType, Language};
 //!
 //! let ai_query = SearchQuery::new()
 //!     .title_contains("machine learning")

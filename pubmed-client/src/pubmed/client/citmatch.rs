@@ -24,7 +24,7 @@ impl PubMedClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::CitationQuery};
+    /// use pubmed_client::{PubMedClient, pubmed::CitationQuery};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {

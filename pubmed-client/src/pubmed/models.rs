@@ -202,7 +202,7 @@ pub struct HistorySession {
 /// # Example
 ///
 /// ```no_run
-/// use pubmed_client_rs::PubMedClient;
+/// use pubmed_client::PubMedClient;
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -305,7 +305,7 @@ impl PubMedArticle {
     /// # Example
     ///
     /// ```
-    /// # use pubmed_client_rs::pubmed::PubMedArticle;
+    /// # use pubmed_client::pubmed::PubMedArticle;
     /// # let article = PubMedArticle {
     /// #     pmid: "123".to_string(),
     /// #     title: "Test".to_string(),
@@ -314,6 +314,7 @@ impl PubMedArticle {
     /// #     journal: "Test Journal".to_string(),
     /// #     pub_date: "2023".to_string(),
     /// #     doi: None,
+    /// #     pmc_id: None,
     /// #     abstract_text: None,
     /// #     article_types: vec![],
     /// #     mesh_headings: None,
@@ -353,7 +354,7 @@ impl PubMedArticle {
     /// # Example
     ///
     /// ```
-    /// # use pubmed_client_rs::pubmed::PubMedArticle;
+    /// # use pubmed_client::pubmed::PubMedArticle;
     /// # let article = PubMedArticle {
     /// #     pmid: "123".to_string(),
     /// #     title: "Test".to_string(),
@@ -362,6 +363,7 @@ impl PubMedArticle {
     /// #     journal: "Test Journal".to_string(),
     /// #     pub_date: "2023".to_string(),
     /// #     doi: None,
+    /// #     pmc_id: None,
     /// #     abstract_text: None,
     /// #     article_types: vec![],
     /// #     mesh_headings: None,
@@ -494,7 +496,7 @@ impl PubMedArticle {
     /// # Example
     ///
     /// ```
-    /// # use pubmed_client_rs::pubmed::PubMedArticle;
+    /// # use pubmed_client::pubmed::PubMedArticle;
     /// # let article1 = PubMedArticle {
     /// #     pmid: "123".to_string(),
     /// #     title: "Test".to_string(),
@@ -503,6 +505,7 @@ impl PubMedArticle {
     /// #     journal: "Test Journal".to_string(),
     /// #     pub_date: "2023".to_string(),
     /// #     doi: None,
+    /// #     pmc_id: None,
     /// #     abstract_text: None,
     /// #     article_types: vec![],
     /// #     mesh_headings: None,
@@ -620,7 +623,7 @@ pub enum SpelledQuerySegment {
 /// # Example
 ///
 /// ```no_run
-/// use pubmed_client_rs::PubMedClient;
+/// use pubmed_client::PubMedClient;
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -677,7 +680,7 @@ impl SpellCheckResult {
 /// # Example
 ///
 /// ```
-/// use pubmed_client_rs::pubmed::CitationQuery;
+/// use pubmed_client::pubmed::CitationQuery;
 ///
 /// let query = CitationQuery::new(
 ///     "proc natl acad sci u s a",
@@ -821,7 +824,7 @@ pub struct DatabaseCount {
 /// # Example
 ///
 /// ```no_run
-/// use pubmed_client_rs::PubMedClient;
+/// use pubmed_client::PubMedClient;
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -871,7 +874,7 @@ impl GlobalQueryResults {
 /// # Example
 ///
 /// ```no_run
-/// use pubmed_client_rs::PubMedClient;
+/// use pubmed_client::PubMedClient;
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), Box<dyn std::error::Error>> {

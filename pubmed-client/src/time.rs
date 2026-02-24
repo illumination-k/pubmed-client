@@ -28,7 +28,7 @@ impl Duration {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::time::Duration;
+    /// use pubmed_client::time::Duration;
     ///
     /// let duration = Duration::from_secs(30);
     /// assert_eq!(duration.as_secs(), 30);
@@ -48,7 +48,7 @@ impl Duration {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::time::Duration;
+    /// use pubmed_client::time::Duration;
     ///
     /// let duration = Duration::from_millis(1500);
     /// assert_eq!(duration.as_secs(), 1);
@@ -116,7 +116,7 @@ impl From<u64> for Duration {
 /// # Example
 ///
 /// ```no_run
-/// use pubmed_client_rs::time::{Duration, sleep};
+/// use pubmed_client::time::{Duration, sleep};
 ///
 /// #[tokio::main]
 /// async fn main() {

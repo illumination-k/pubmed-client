@@ -74,7 +74,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new();
     /// ```
@@ -101,7 +101,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new()
     ///     .with_api_key("your_api_key_here");
@@ -120,7 +120,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// // Custom rate limit of 5 requests per second
     /// let config = ClientConfig::new()
@@ -142,8 +142,8 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
-    /// use pubmed_client_rs::time::Duration;
+    /// use pubmed_client::config::ClientConfig;
+    /// use pubmed_client::time::Duration;
     ///
     /// let config = ClientConfig::new()
     ///     .with_timeout(Duration::from_secs(60));
@@ -162,7 +162,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new()
     ///     .with_timeout_seconds(60);
@@ -181,7 +181,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new()
     ///     .with_user_agent("MyApp/1.0");
@@ -200,7 +200,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new()
     ///     .with_base_url("https://proxy.example.com/eutils");
@@ -219,7 +219,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new()
     ///     .with_email("researcher@university.edu");
@@ -238,7 +238,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new()
     ///     .with_tool("BioinformaticsApp");
@@ -257,9 +257,9 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
-    /// use pubmed_client_rs::retry::RetryConfig;
-    /// use pubmed_client_rs::time::Duration;
+    /// use pubmed_client::config::ClientConfig;
+    /// use pubmed_client::retry::RetryConfig;
+    /// use pubmed_client::time::Duration;
     ///
     /// let retry_config = RetryConfig::new()
     ///     .with_max_retries(5)
@@ -278,7 +278,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new()
     ///     .with_cache();
@@ -297,8 +297,8 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
-    /// use pubmed_client_rs::cache::CacheConfig;
+    /// use pubmed_client::config::ClientConfig;
+    /// use pubmed_client::cache::CacheConfig;
     ///
     /// let cache_config = CacheConfig {
     ///     max_capacity: 5000,
@@ -318,7 +318,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new()
     ///     .without_cache();
@@ -357,7 +357,7 @@ impl ClientConfig {
     /// # Example
     ///
     /// ```
-    /// use pubmed_client_rs::config::ClientConfig;
+    /// use pubmed_client::config::ClientConfig;
     ///
     /// let config = ClientConfig::new().with_api_key("your_key");
     /// let rate_limiter = config.create_rate_limiter();

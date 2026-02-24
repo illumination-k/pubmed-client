@@ -51,6 +51,9 @@ jobs:
       - name: Run unit tests
         run: mise run test
 
+      - name: Run doc tests
+        run: mise run doctest
+
   wasm-tests:
     name: WASM TypeScript Tests
     runs-on: ubuntu-latest
