@@ -27,7 +27,7 @@ keywords = ["pubmed", "pmc", "biomedical", "research", "api", "bioinformatics"]
 [project.urls]
 Homepage = "https://github.com/illumination-k/pubmed-client"
 Repository = "https://github.com/illumination-k/pubmed-client"
-Documentation = "https://github.com/illumination-k/pubmed-client/tree/main/pubmed-client-py"
+Documentation = "https://illumination-k.github.io/pubmed-client/python/"
 
 [tool.maturin]
 # Rust lib name is pubmed_client_py, but Python module name is pubmed_client
@@ -38,6 +38,13 @@ include = ["pubmed_client.pyi"]
 
 [dependency-groups]
 dev = ["pytest>=8.0", "pytest-cov>=6.0", "mypy>=1.0", "ruff>=0.7"]
+docs = [
+  "sphinx>=8.0",
+  "furo>=2024.0",
+  "sphinx-autodoc-typehints>=2.0",
+  "myst-parser>=4.0",
+  "sphinx-copybutton>=0.5",
+]
 
 [tool.ruff]
 line-length = 100

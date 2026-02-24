@@ -49,6 +49,11 @@ const config: Config = {
           position: "left",
         },
         {
+          href: "https://illumination-k.github.io/pubmed-client/python/",
+          label: "Python API",
+          position: "left",
+        },
+        {
           href: "https://github.com/illumination-k/pubmed-client",
           label: "GitHub",
           position: "right",
@@ -68,6 +73,10 @@ const config: Config = {
             {
               label: "Node.js (TypeDoc)",
               href: "https://illumination-k.github.io/pubmed-client/node/",
+            },
+            {
+              label: "Python (Sphinx)",
+              href: "https://illumination-k.github.io/pubmed-client/python/",
             },
           ],
         },
