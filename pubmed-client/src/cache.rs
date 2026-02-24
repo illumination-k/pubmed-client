@@ -6,9 +6,10 @@ use tracing::{debug, info};
 use crate::pmc::models::PmcFullText;
 
 /// Selects which storage backend to use for caching
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub enum CacheBackendConfig {
     /// In-memory cache using Moka (default)
+    #[default]
     Memory,
     /// Redis-backed persistent cache
     ///
@@ -27,12 +28,6 @@ pub enum CacheBackendConfig {
         /// Path to the SQLite database file
         path: std::path::PathBuf,
     },
-}
-
-impl Default for CacheBackendConfig {
-    fn default() -> Self {
-        Self::Memory
-    }
 }
 
 /// Configuration for response caching
