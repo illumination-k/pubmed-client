@@ -1,12 +1,51 @@
 use anyhow::Result;
+use clap::{Parser, ValueEnum};
 use rmcp::{
     handler::server::wrapper::Parameters, model::*, tool, tool_handler, tool_router,
     transport::stdio, ServerHandler, ServiceExt,
 };
+use std::collections::HashSet;
+use std::sync::Arc;
 use tracing::info;
 
 mod tools;
 use tools::PubMedServer;
+
+#[derive(Parser)]
+#[command(name = "pubmed-mcp", about = "PubMed MCP Server")]
+struct Args {
+    /// HTTP port to listen on (if not set, uses stdio)
+    #[arg(short, long)]
+    port: Option<u16>,
+
+    /// Tools to enable, comma-separated (default: all).
+    /// Possible values: search, markdown, citmatch, gquery, espell, summary
+    #[arg(short, long, value_delimiter = ',', value_enum)]
+    tools: Vec<ToolName>,
+}
+
+#[derive(Clone, Debug, ValueEnum)]
+enum ToolName {
+    Search,
+    Markdown,
+    Citmatch,
+    Gquery,
+    Espell,
+    Summary,
+}
+
+impl ToolName {
+    fn as_str(&self) -> &'static str {
+        match self {
+            ToolName::Search => "search_pubmed",
+            ToolName::Markdown => "get_pmc_markdown",
+            ToolName::Citmatch => "match_citations",
+            ToolName::Gquery => "global_query",
+            ToolName::Espell => "spell_check",
+            ToolName::Summary => "fetch_summaries",
+        }
+    }
+}
 
 #[tool_router]
 impl PubMedServer {
@@ -75,12 +114,13 @@ impl PubMedServer {
 impl ServerHandler for PubMedServer {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
-            protocol_version: ProtocolVersion::V_2024_11_05,
+            protocol_version: ProtocolVersion::V_2025_03_26,
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             server_info: Implementation {
                 name: "pubmed-mcp".to_string(),
                 version: env!("CARGO_PKG_VERSION").to_string(),
                 title: None,
+                description: None,
                 icons: None,
                 website_url: None,
             },
@@ -93,6 +133,8 @@ impl ServerHandler for PubMedServer {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let args = Args::parse();
+
     // Initialize tracing to stderr to avoid interfering with JSON-RPC on stdout
     // MCP protocol uses stdin/stdout for JSON-RPC messages
     tracing_subscriber::fmt()
@@ -105,11 +147,44 @@ async fn main() -> Result<()> {
 
     info!("Starting PubMed MCP Server");
 
-    // Create and start server
-    let service = PubMedServer::new().serve(stdio()).await?;
-    info!("MCP server initialized, waiting for requests");
+    let enabled_tools: Option<Arc<HashSet<String>>> = if args.tools.is_empty() {
+        None
+    } else {
+        Some(Arc::new(
+            args.tools.iter().map(|t| t.as_str().to_string()).collect(),
+        ))
+    };
 
-    service.waiting().await?;
+    if let Some(port) = args.port {
+        let shared_client = Arc::new(pubmed_client::Client::new());
+        let et = enabled_tools.clone();
+
+        use rmcp::transport::streamable_http_server::{
+            session::local::LocalSessionManager, StreamableHttpService,
+        };
+        let service = StreamableHttpService::new(
+            move || {
+                let client = Arc::clone(&shared_client);
+                Ok(tools::PubMedServer::with_options(client, et.as_deref()))
+            },
+            LocalSessionManager::default().into(),
+            Default::default(),
+        );
+
+        let router = axum::Router::new().nest_service("/mcp", service);
+        let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
+        info!("HTTP MCP server listening on port {port}");
+        axum::serve(listener, router).await?;
+    } else {
+        let service = tools::PubMedServer::with_options(
+            Arc::new(pubmed_client::Client::new()),
+            enabled_tools.as_deref(),
+        )
+        .serve(stdio())
+        .await?;
+        info!("MCP server initialized, waiting for requests");
+        service.waiting().await?;
+    }
 
     Ok(())
 }
