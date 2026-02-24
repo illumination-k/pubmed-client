@@ -17,6 +17,11 @@ const docCards: DocCard[] = [
     href: "https://illumination-k.github.io/pubmed-client/rust/pubmed_client/",
   },
   {
+    title: "🟢 Node.js",
+    description: "TypeDoc API reference for the native Node.js bindings (pubmed-client npm package)",
+    href: "https://illumination-k.github.io/pubmed-client/node/",
+  },
+  {
     title: "🐍 Python",
     description: "Sphinx docs for pubmed-client-py",
     comingSoon: true,
@@ -76,6 +81,12 @@ export default function Home(): React.JSX.Element {
             <div className={styles.heroButtons}>
               <a className="button button--primary button--lg" href="https://illumination-k.github.io/pubmed-client/rust/pubmed_client/">
                 Rust API Docs
+              </a>
+              <a
+                className="button button--secondary button--lg"
+                href="https://illumination-k.github.io/pubmed-client/node/"
+              >
+                Node.js API Docs
               </a>
               <Link
                 className="button button--secondary button--lg"

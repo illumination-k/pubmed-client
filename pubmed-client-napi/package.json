@@ -52,6 +52,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "docs": "typedoc",
     "typecheck": "tsc --noEmit",
     "lint": "biome lint .",
     "format": "biome format --write .",
@@ -69,6 +70,7 @@
     "@vitest/coverage-v8": "^2.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.0",
+    "typedoc": "^0.28.0",
     "vitest": "^2.1.8"
   },
   "optionalDependencies": {

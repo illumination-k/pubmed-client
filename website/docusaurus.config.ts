@@ -39,8 +39,13 @@ const config: Config = {
       title: "pubmed-client",
       items: [
         {
-          href: "rust/pubmed_client/",
+          href: "https://illumination-k.github.io/pubmed-client/rust/pubmed_client/",
           label: "Rust API",
+          position: "left",
+        },
+        {
+          href: "https://illumination-k.github.io/pubmed-client/node/",
+          label: "Node.js API",
           position: "left",
         },
         {
@@ -58,7 +63,11 @@ const config: Config = {
           items: [
             {
               label: "Rust (rustdoc)",
-              href: "rust/pubmed_client/",
+              href: "https://illumination-k.github.io/pubmed-client/rust/pubmed_client/",
+            },
+            {
+              label: "Node.js (TypeDoc)",
+              href: "https://illumination-k.github.io/pubmed-client/node/",
             },
           ],
         },
@@ -97,7 +106,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} illumination-k. Built with Docusaurus.`,
+      copyright: `Copyright © 2025 - ${new Date().getFullYear()} illumination-k. Built with Docusaurus.`,
     },
   } satisfies Preset.ThemeConfig,
 }
