@@ -17,7 +17,8 @@ pubmed-client/                       # Cargo workspace root
 ├── pubmed-client-wasm/              # WASM bindings for browsers/Node.js (npm: pubmed-client-wasm)
 ├── pubmed-client-py/                # Python bindings via PyO3 (PyPI: pubmed-client-py)
 ├── pubmed-cli/                      # Command-line interface
-└── pubmed-mcp/                      # MCP server for AI assistant integration
+├── pubmed-mcp/                      # MCP server for AI assistant integration
+└── website/                         # Docusaurus v3 landing page (GitHub Pages)
 ```
 
 ## Commands
@@ -162,6 +163,24 @@ WebAssembly bindings via wasm-pack. Published as `pubmed-client-wasm` on npm. Ke
 ### Python Bindings (`pubmed-client-py/`)
 
 Python bindings via PyO3/maturin. Published as `pubmed-client-py` on PyPI. Synchronous API with internal Tokio runtime. Key types: `Client`, `PubMedClient`, `PmcClient`, `SearchQuery`, `ClientConfig`.
+
+### Website (`website/`)
+
+Docusaurus v3 landing page deployed to GitHub Pages at `https://illumination-k.github.io/pubmed-client/`.
+
+- `baseUrl: '/pubmed-client/'`, `docs: false`, `blog: false` (landing page only)
+- Linter/formatter: Biome v2 (`pnpm run check`), TypeScript: `pnpm run typecheck`
+- Links to Rust rustdoc use full absolute URLs (`https://illumination-k.github.io/pubmed-client/rust/pubmed_client/`) — use `<a href>` not `<Link to>` for rustdoc links (React Router can't route to non-Docusaurus paths)
+- CI: `.github/workflows/docs.yml` — `docs` job (cargo doc) → `build-site` job (Docusaurus build + merge rust docs into `build/rust/`) → `deploy-docs` job (GitHub Pages, main only)
+- GitHub Pages URL structure: `/` (landing) · `/rust/pubmed_client/` (rustdoc) · `/python/` (placeholder, future Sphinx)
+
+```bash
+# from website/
+pnpm run start        # local dev server
+pnpm run build        # production build
+pnpm run check        # Biome lint + format
+pnpm run typecheck    # tsc
+```
 
 ### MCP Server (`pubmed-mcp/`)
 
