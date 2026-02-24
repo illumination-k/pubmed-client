@@ -9,36 +9,28 @@ describe('SearchQuery', () => {
     })
 
     it('should add search terms with query()', () => {
-      const query = new SearchQuery()
-        .query('covid-19')
-        .query('treatment')
+      const query = new SearchQuery().query('covid-19').query('treatment')
 
       const result = query.build()
       expect(result).toBe('covid-19 treatment')
     })
 
     it('should add multiple search terms with terms()', () => {
-      const query = new SearchQuery()
-        .terms(['covid-19', 'vaccine', 'efficacy'])
+      const query = new SearchQuery().terms(['covid-19', 'vaccine', 'efficacy'])
 
       const result = query.build()
       expect(result).toBe('covid-19 vaccine efficacy')
     })
 
     it('should filter empty strings in query()', () => {
-      const query = new SearchQuery()
-        .query('covid-19')
-        .query('')
-        .query('  ')
-        .query('treatment')
+      const query = new SearchQuery().query('covid-19').query('').query('  ').query('treatment')
 
       const result = query.build()
       expect(result).toBe('covid-19 treatment')
     })
 
     it('should filter empty strings in terms()', () => {
-      const query = new SearchQuery()
-        .terms(['covid-19', '', '  ', 'vaccine'])
+      const query = new SearchQuery().terms(['covid-19', '', '  ', 'vaccine'])
 
       const result = query.build()
       expect(result).toBe('covid-19 vaccine')
@@ -50,9 +42,7 @@ describe('SearchQuery', () => {
     })
 
     it('should set and get limit', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .setLimit(100)
+      const query = new SearchQuery().query('cancer').setLimit(100)
 
       expect(query.limit).toBe(100)
     })
@@ -75,36 +65,28 @@ describe('SearchQuery', () => {
 
   describe('Date Filtering Methods', () => {
     it('should filter by published in year', () => {
-      const query = new SearchQuery()
-        .query('covid-19')
-        .publishedInYear(2024)
+      const query = new SearchQuery().query('covid-19').publishedInYear(2024)
 
       const result = query.build()
       expect(result).toContain('2024[pdat]')
     })
 
     it('should filter by published between years', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .publishedBetween(2020, 2024)
+      const query = new SearchQuery().query('cancer').publishedBetween(2020, 2024)
 
       const result = query.build()
       expect(result).toContain('2020:2024[pdat]')
     })
 
     it('should filter by published after year', () => {
-      const query = new SearchQuery()
-        .query('crispr')
-        .publishedAfter(2020)
+      const query = new SearchQuery().query('crispr').publishedAfter(2020)
 
       const result = query.build()
       expect(result).toContain('2020:3000[pdat]')
     })
 
     it('should filter by published before year', () => {
-      const query = new SearchQuery()
-        .query('genome')
-        .publishedBefore(2020)
+      const query = new SearchQuery().query('genome').publishedBefore(2020)
 
       const result = query.build()
       expect(result).toContain('1900:2020[pdat]')
@@ -124,36 +106,28 @@ describe('SearchQuery', () => {
 
   describe('Article Type and Language Filtering', () => {
     it('should filter by article type', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .articleType('Clinical Trial')
+      const query = new SearchQuery().query('cancer').articleType('Clinical Trial')
 
       const result = query.build()
       expect(result).toContain('Clinical Trial[pt]')
     })
 
     it('should filter by article type case-insensitively', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .articleType('clinical trial')
+      const query = new SearchQuery().query('cancer').articleType('clinical trial')
 
       const result = query.build()
       expect(result).toContain('Clinical Trial[pt]')
     })
 
     it('should filter by RCT shorthand', () => {
-      const query = new SearchQuery()
-        .query('treatment')
-        .articleType('RCT')
+      const query = new SearchQuery().query('treatment').articleType('RCT')
 
       const result = query.build()
       expect(result).toContain('Randomized Controlled Trial[pt]')
     })
 
     it('should filter by multiple article types', () => {
-      const query = new SearchQuery()
-        .query('treatment')
-        .articleTypes(['RCT', 'Meta-Analysis'])
+      const query = new SearchQuery().query('treatment').articleTypes(['RCT', 'Meta-Analysis'])
 
       const result = query.build()
       expect(result).toContain('Randomized Controlled Trial[pt]')
@@ -166,27 +140,21 @@ describe('SearchQuery', () => {
     })
 
     it('should filter by language', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .language('English')
+      const query = new SearchQuery().query('cancer').language('English')
 
       const result = query.build()
       expect(result).toContain('English[la]')
     })
 
     it('should filter by language case-insensitively', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .language('japanese')
+      const query = new SearchQuery().query('cancer').language('japanese')
 
       const result = query.build()
       expect(result).toContain('Japanese[la]')
     })
 
     it('should handle custom language', () => {
-      const query = new SearchQuery()
-        .query('research')
-        .language('Esperanto')
+      const query = new SearchQuery().query('research').language('Esperanto')
 
       const result = query.build()
       expect(result).toContain('Esperanto[la]')
@@ -195,36 +163,28 @@ describe('SearchQuery', () => {
 
   describe('Open Access Filtering', () => {
     it('should filter by free full text', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .freeFullTextOnly()
+      const query = new SearchQuery().query('cancer').freeFullTextOnly()
 
       const result = query.build()
       expect(result).toContain('free full text[sb]')
     })
 
     it('should filter by full text', () => {
-      const query = new SearchQuery()
-        .query('diabetes')
-        .fullTextOnly()
+      const query = new SearchQuery().query('diabetes').fullTextOnly()
 
       const result = query.build()
       expect(result).toContain('full text[sb]')
     })
 
     it('should filter by PMC only', () => {
-      const query = new SearchQuery()
-        .query('genomics')
-        .pmcOnly()
+      const query = new SearchQuery().query('genomics').pmcOnly()
 
       const result = query.build()
       expect(result).toContain('pubmed pmc[sb]')
     })
 
     it('should filter by has abstract', () => {
-      const query = new SearchQuery()
-        .query('genetics')
-        .hasAbstract()
+      const query = new SearchQuery().query('genetics').hasAbstract()
 
       const result = query.build()
       expect(result).toContain('hasabstract')
@@ -233,41 +193,35 @@ describe('SearchQuery', () => {
 
   describe('Field-Specific Search', () => {
     it('should search in title', () => {
-      const query = new SearchQuery()
-        .titleContains('machine learning')
+      const query = new SearchQuery().titleContains('machine learning')
 
       const result = query.build()
       expect(result).toContain('machine learning[ti]')
     })
 
     it('should search in abstract', () => {
-      const query = new SearchQuery()
-        .abstractContains('neural networks')
+      const query = new SearchQuery().abstractContains('neural networks')
 
       const result = query.build()
       expect(result).toContain('neural networks[tiab]')
     })
 
     it('should search in title or abstract', () => {
-      const query = new SearchQuery()
-        .titleOrAbstract('CRISPR')
+      const query = new SearchQuery().titleOrAbstract('CRISPR')
 
       const result = query.build()
       expect(result).toContain('CRISPR[tiab]')
     })
 
     it('should filter by journal', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .journal('Nature')
+      const query = new SearchQuery().query('cancer').journal('Nature')
 
       const result = query.build()
       expect(result).toContain('Nature[ta]')
     })
 
     it('should filter by grant number', () => {
-      const query = new SearchQuery()
-        .grantNumber('R01AI123456')
+      const query = new SearchQuery().grantNumber('R01AI123456')
 
       const result = query.build()
       expect(result).toContain('R01AI123456[gr]')
@@ -276,24 +230,21 @@ describe('SearchQuery', () => {
 
   describe('Advanced Search Methods', () => {
     it('should filter by MeSH term', () => {
-      const query = new SearchQuery()
-        .meshTerm('Neoplasms')
+      const query = new SearchQuery().meshTerm('Neoplasms')
 
       const result = query.build()
       expect(result).toContain('Neoplasms[mh]')
     })
 
     it('should filter by MeSH major topic', () => {
-      const query = new SearchQuery()
-        .meshMajorTopic('Diabetes Mellitus')
+      const query = new SearchQuery().meshMajorTopic('Diabetes Mellitus')
 
       const result = query.build()
       expect(result).toContain('Diabetes Mellitus[majr]')
     })
 
     it('should filter by multiple MeSH terms', () => {
-      const query = new SearchQuery()
-        .meshTerms(['Neoplasms', 'Antineoplastic Agents'])
+      const query = new SearchQuery().meshTerms(['Neoplasms', 'Antineoplastic Agents'])
 
       const result = query.build()
       expect(result).toContain('Neoplasms[mh]')
@@ -301,9 +252,7 @@ describe('SearchQuery', () => {
     })
 
     it('should filter by MeSH subheading', () => {
-      const query = new SearchQuery()
-        .meshTerm('Diabetes Mellitus')
-        .meshSubheading('drug therapy')
+      const query = new SearchQuery().meshTerm('Diabetes Mellitus').meshSubheading('drug therapy')
 
       const result = query.build()
       expect(result).toContain('Diabetes Mellitus[mh]')
@@ -311,80 +260,63 @@ describe('SearchQuery', () => {
     })
 
     it('should filter by author', () => {
-      const query = new SearchQuery()
-        .query('machine learning')
-        .author('Williams K')
+      const query = new SearchQuery().query('machine learning').author('Williams K')
 
       const result = query.build()
       expect(result).toContain('Williams K[au]')
     })
 
     it('should filter by first author', () => {
-      const query = new SearchQuery()
-        .query('cancer')
-        .firstAuthor('Smith J')
+      const query = new SearchQuery().query('cancer').firstAuthor('Smith J')
 
       const result = query.build()
       expect(result).toContain('Smith J[1au]')
     })
 
     it('should filter by last author', () => {
-      const query = new SearchQuery()
-        .query('genomics')
-        .lastAuthor('Johnson M')
+      const query = new SearchQuery().query('genomics').lastAuthor('Johnson M')
 
       const result = query.build()
       expect(result).toContain('Johnson M[lastau]')
     })
 
     it('should filter by affiliation', () => {
-      const query = new SearchQuery()
-        .query('cardiology')
-        .affiliation('Harvard Medical School')
+      const query = new SearchQuery().query('cardiology').affiliation('Harvard Medical School')
 
       const result = query.build()
       expect(result).toContain('Harvard Medical School[ad]')
     })
 
     it('should filter by ORCID', () => {
-      const query = new SearchQuery()
-        .orcid('0000-0001-2345-6789')
+      const query = new SearchQuery().orcid('0000-0001-2345-6789')
 
       const result = query.build()
       expect(result).toContain('0000-0001-2345-6789[auid]')
     })
 
     it('should filter by human studies only', () => {
-      const query = new SearchQuery()
-        .query('drug treatment')
-        .humanStudiesOnly()
+      const query = new SearchQuery().query('drug treatment').humanStudiesOnly()
 
       const result = query.build()
       expect(result).toContain('humans[mh]')
     })
 
     it('should filter by animal studies only', () => {
-      const query = new SearchQuery()
-        .query('preclinical research')
-        .animalStudiesOnly()
+      const query = new SearchQuery().query('preclinical research').animalStudiesOnly()
 
       const result = query.build()
       expect(result).toContain('animals[mh]')
     })
 
     it('should filter by age group', () => {
-      const query = new SearchQuery()
-        .query('pediatric medicine')
-        .ageGroup('Child')
+      const query = new SearchQuery().query('pediatric medicine').ageGroup('Child')
 
       const result = query.build()
       expect(result).toContain('Child[mh]')
     })
 
     it('should add custom filter', () => {
-      const query = new SearchQuery()
-        .query('research')
-        .customFilter('humans[mh]')
+      const query = new SearchQuery().query('research').customFilter('humans[mh]')
 
       const result = query.build()
       expect(result).toContain('humans[mh]')
@@ -480,5 +412,4 @@ describe('SearchQuery', () => {
       expect(result).toContain('Harvard[ad]')
     })
   })
-
 })

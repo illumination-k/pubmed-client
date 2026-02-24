@@ -122,13 +122,12 @@ jobs:
           name: python-docs
           path: pubmed-client-py/docs/build/html/
 
-  build-site:
-    name: Build GitHub Pages Site
+  website-lint:
+    name: Website Lint and Type Check
     runs-on: ubuntu-latest
-    needs: [docs, node-docs, python-docs]
     permissions:
       contents: read
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -156,6 +155,34 @@ jobs:
 
       - name: Type check website
         run: pnpm run typecheck
+        working-directory: website
+
+  build-site:
+    name: Build GitHub Pages Site
+    runs-on: ubuntu-latest
+    needs: [docs, node-docs, python-docs, website-lint]
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-repo
+        with:
+          lfs: "false"
+
+      - name: Cache pnpm store
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-website-${{ hashFiles('website/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-website-
+
+      - name: Install website dependencies
+        run: pnpm install --frozen-lockfile
         working-directory: website
 
       - name: Build Docusaurus site

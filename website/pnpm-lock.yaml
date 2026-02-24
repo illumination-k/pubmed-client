@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  "@types/react": ^18.3.0
+
 importers:
   .:
     dependencies:
@@ -35,6 +38,9 @@ importers:
       "@types/react-dom":
         specifier: ^18.3.0
         version: 18.3.7(@types/react@18.3.28)
+      prism-react-renderer:
+        specifier: ^2.4.0
+        version: 2.4.1(react@18.3.1)
       typescript:
         specifier: ^5.1.0
         version: 5.9.3
@@ -955,6 +961,7 @@ packages:
     engines: { node: ">=14.21.3" }
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   "@biomejs/cli-linux-arm64@2.4.4":
     resolution: {
@@ -963,6 +970,7 @@ packages:
     engines: { node: ">=14.21.3" }
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   "@biomejs/cli-linux-x64-musl@2.4.4":
     resolution: {
@@ -971,6 +979,7 @@ packages:
     engines: { node: ">=14.21.3" }
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   "@biomejs/cli-linux-x64@2.4.4":
     resolution: {
@@ -979,6 +988,7 @@ packages:
     engines: { node: ">=14.21.3" }
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   "@biomejs/cli-win32-arm64@2.4.4":
     resolution: {
@@ -1413,7 +1423,7 @@ packages:
       integrity: sha512-IqG3oSd529jVRQ4dWZQKwZwQLVd//bWJTz2HiL0LkiHrI4U/vLrBasKB7lwQB/69nBAcCgs3TmudxTZSLH/ZQg==,
     }
     peerDependencies:
-      "@types/react": ">= 16.8.0 < 20.0.0"
+      "@types/react": ^18.3.0
       react: ">= 16.8.0 < 20.0.0"
       react-dom: ">= 16.8.0 < 20.0.0"
     peerDependenciesMeta:
@@ -1434,7 +1444,7 @@ packages:
       integrity: sha512-j8H5B4ArGxBPBWvw3X0J0Rm/Pjv2JDa2rV5OE0DLTp5oiBCptIJ/YlNOhZxuzbO2nwge+o3Z52nJRi3hryK9cA==,
     }
     peerDependencies:
-      "@types/react": ">= 16.8.0 < 20.0.0"
+      "@types/react": ^18.3.0
       react: ">= 16.8.0 < 20.0.0"
       react-dom: ">= 16.8.0 < 20.0.0"
       search-insights: ">= 1 < 3"
@@ -1897,7 +1907,7 @@ packages:
       integrity: sha512-f++rKLQgUVYDAtECQ6fn/is15GkEH9+nZPM3MS0RcxVqoTfawHvDlSCH7JbMhAM6uJ32v3eXLvLmLvjGu7PTQw==,
     }
     peerDependencies:
-      "@types/react": ">=16"
+      "@types/react": ^18.3.0
       react: ">=16"
 
   "@noble/hashes@1.4.0":
@@ -2331,7 +2341,7 @@ packages:
       integrity: sha512-MEe3UeoENYVFXzoXEWsvcpg6ZvlrFNlOQ7EOsvhI3CfAXwzPfO8Qwuxd40nepsYKqyyVQnTdEfv68q91yLcKrQ==,
     }
     peerDependencies:
-      "@types/react": ^18.0.0
+      "@types/react": ^18.3.0
 
   "@types/react-router-config@5.0.11":
     resolution: {
