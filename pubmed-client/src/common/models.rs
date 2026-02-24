@@ -59,18 +59,6 @@ impl Display for Author {
     }
 }
 
-impl PartialEq<str> for Author {
-    fn eq(&self, other: &str) -> bool {
-        self.full_name == other
-    }
-}
-
-impl PartialEq<&str> for Author {
-    fn eq(&self, other: &&str) -> bool {
-        self.full_name == *other
-    }
-}
-
 impl Author {
     /// Create a new Author with basic information
     pub fn new(surname: Option<String>, given_names: Option<String>) -> Self {
@@ -87,11 +75,6 @@ impl Author {
             is_corresponding: false,
             roles: Vec::new(),
         }
-    }
-
-    /// Create an author from separate name components
-    pub fn with_names(surname: Option<String>, given_names: Option<String>) -> Self {
-        Self::new(surname, given_names)
     }
 
     /// Create an author from a full name string
@@ -237,12 +220,6 @@ mod tests {
         assert_eq!(author.full_name, "Jane Smith");
         assert!(!author.has_orcid());
         assert!(!author.is_corresponding);
-    }
-
-    #[test]
-    fn test_author_with_names() {
-        let author = Author::with_names(Some("Doe".to_string()), Some("John".to_string()));
-        assert_eq!(author.full_name, "John Doe");
     }
 
     #[test]

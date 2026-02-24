@@ -596,6 +596,72 @@ impl PubMedArticle {
 }
 
 // ================================================================================================
+// ESpell API types
+// ================================================================================================
+
+/// Represents a segment of the spelled query from the ESpell API
+///
+/// Each segment is either an original (unchanged) part of the query or a
+/// replacement (corrected spelling suggestion).
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub enum SpelledQuerySegment {
+    /// A term or separator that was not changed
+    Original(String),
+    /// A corrected/suggested replacement term
+    Replaced(String),
+}
+
+/// Result from the ESpell API providing spelling suggestions
+///
+/// ESpell provides spelling suggestions for terms within a single text query
+/// in a given database. It acts as a preprocessing/spell-check tool to improve
+/// search accuracy before executing actual searches.
+///
+/// # Example
+///
+/// ```no_run
+/// use pubmed_client_rs::PubMedClient;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let client = PubMedClient::new();
+///     let result = client.spell_check("asthmaa OR alergies").await?;
+///     println!("Original: {}", result.query);
+///     println!("Corrected: {}", result.corrected_query);
+///     Ok(())
+/// }
+/// ```
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SpellCheckResult {
+    /// The database that was queried
+    pub database: String,
+    /// The original query string as submitted
+    pub query: String,
+    /// The full corrected/suggested query as a plain string
+    pub corrected_query: String,
+    /// Detailed segments showing which terms were replaced vs. kept
+    pub spelled_query: Vec<SpelledQuerySegment>,
+}
+
+impl SpellCheckResult {
+    /// Check if the query had any spelling corrections
+    pub fn has_corrections(&self) -> bool {
+        self.query != self.corrected_query
+    }
+
+    /// Get only the replaced (corrected) terms
+    pub fn replacements(&self) -> Vec<&str> {
+        self.spelled_query
+            .iter()
+            .filter_map(|segment| match segment {
+                SpelledQuerySegment::Replaced(s) => Some(s.as_str()),
+                SpelledQuerySegment::Original(_) => None,
+            })
+            .collect()
+    }
+}
+
+// ================================================================================================
 // ECitMatch API types
 // ================================================================================================
 
@@ -786,6 +852,73 @@ impl GlobalQueryResults {
             .find(|r| r.db_name == db_name)
             .map(|r| r.count)
     }
+}
+
+// ================================================================================================
+// ESummary API types
+// ================================================================================================
+
+/// Lightweight article summary from the ESummary API
+///
+/// Contains basic metadata (title, authors, journal, dates) without the full
+/// abstract, MeSH terms, or chemical lists that EFetch provides. Use this when
+/// you only need basic bibliographic information for a large number of articles.
+///
+/// # Example
+///
+/// ```no_run
+/// use pubmed_client_rs::PubMedClient;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let client = PubMedClient::new();
+///     let summaries = client.fetch_summaries(&["31978945", "33515491"]).await?;
+///     for summary in &summaries {
+///         println!("{}: {} ({})", summary.pmid, summary.title, summary.pub_date);
+///     }
+///     Ok(())
+/// }
+/// ```
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ArticleSummary {
+    /// PubMed ID
+    pub pmid: String,
+    /// Article title
+    pub title: String,
+    /// Author names (e.g., ["Zhu N", "Zhang D", "Wang W"])
+    pub authors: Vec<String>,
+    /// Journal name (source field)
+    pub journal: String,
+    /// Full journal name (e.g., "The New England journal of medicine")
+    pub full_journal_name: String,
+    /// Publication date (e.g., "2020 Feb")
+    pub pub_date: String,
+    /// Electronic publication date (e.g., "2020 Jan 24")
+    pub epub_date: String,
+    /// DOI (Digital Object Identifier)
+    pub doi: Option<String>,
+    /// PMC ID if available (e.g., "PMC7092803")
+    pub pmc_id: Option<String>,
+    /// Journal volume (e.g., "382")
+    pub volume: String,
+    /// Journal issue (e.g., "8")
+    pub issue: String,
+    /// Page range (e.g., "727-733")
+    pub pages: String,
+    /// Languages (e.g., ["eng"])
+    pub languages: Vec<String>,
+    /// Publication types (e.g., ["Journal Article", "Review"])
+    pub pub_types: Vec<String>,
+    /// ISSN
+    pub issn: String,
+    /// Electronic ISSN
+    pub essn: String,
+    /// Sorted publication date (e.g., "2020/02/20 00:00")
+    pub sort_pub_date: String,
+    /// PMC reference count (number of citing articles in PMC)
+    pub pmc_ref_count: u64,
+    /// Record status (e.g., "PubMed - indexed for MEDLINE")
+    pub record_status: String,
 }
 
 #[cfg(test)]
@@ -1123,6 +1256,44 @@ mod tests {
         );
 
         assert_eq!(format_author_name(&None, &None, &None), "Unknown Author");
+    }
+
+    #[test]
+    fn test_spell_check_result_has_corrections() {
+        let result = SpellCheckResult {
+            database: "pubmed".to_string(),
+            query: "asthmaa".to_string(),
+            corrected_query: "asthma".to_string(),
+            spelled_query: vec![SpelledQuerySegment::Replaced("asthma".to_string())],
+        };
+        assert!(result.has_corrections());
+
+        let no_correction = SpellCheckResult {
+            database: "pubmed".to_string(),
+            query: "asthma".to_string(),
+            corrected_query: "asthma".to_string(),
+            spelled_query: vec![SpelledQuerySegment::Original("asthma".to_string())],
+        };
+        assert!(!no_correction.has_corrections());
+    }
+
+    #[test]
+    fn test_spell_check_result_replacements() {
+        let result = SpellCheckResult {
+            database: "pubmed".to_string(),
+            query: "asthmaa OR alergies".to_string(),
+            corrected_query: "asthma or allergies".to_string(),
+            spelled_query: vec![
+                SpelledQuerySegment::Original("".to_string()),
+                SpelledQuerySegment::Replaced("asthma".to_string()),
+                SpelledQuerySegment::Original(" OR ".to_string()),
+                SpelledQuerySegment::Replaced("allergies".to_string()),
+            ],
+        };
+        let replacements = result.replacements();
+        assert_eq!(replacements.len(), 2);
+        assert_eq!(replacements[0], "asthma");
+        assert_eq!(replacements[1], "allergies");
     }
 
     #[test]

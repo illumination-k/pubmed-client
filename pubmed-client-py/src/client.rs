@@ -12,6 +12,7 @@ use crate::config::PyClientConfig;
 use crate::pmc::{PyPmcClient, PyPmcFullText};
 use crate::pubmed::{
     PyCitations, PyDatabaseInfo, PyPmcLinks, PyPubMedArticle, PyPubMedClient, PyRelatedArticles,
+    PySpellCheckResult,
 };
 use crate::utils::{get_runtime, to_py_err};
 
@@ -163,6 +164,30 @@ impl PyClient {
                 .block_on(client.get_citations(&pmids))
                 .map_err(to_py_err)?;
             Ok(PyCitations::from(citations))
+        })
+    }
+
+    /// Check spelling of a search term using the ESpell API
+    ///
+    /// Provides spelling suggestions for terms within a single text query.
+    /// Uses the PubMed database by default.
+    ///
+    /// Args:
+    ///     term: The search term to spell-check
+    ///
+    /// Returns:
+    ///     SpellCheckResult with the corrected query and details
+    ///
+    /// Examples:
+    ///     >>> client = Client()
+    ///     >>> result = client.spell_check("asthmaa")
+    ///     >>> print(result.corrected_query)
+    fn spell_check(&self, py: Python, term: String) -> PyResult<PySpellCheckResult> {
+        let client = self.client.clone();
+        py.detach(|| {
+            let rt = get_runtime();
+            let result = rt.block_on(client.spell_check(&term)).map_err(to_py_err)?;
+            Ok(PySpellCheckResult::from(result))
         })
     }
 

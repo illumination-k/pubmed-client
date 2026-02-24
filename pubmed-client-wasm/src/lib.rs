@@ -2,7 +2,9 @@
 //!
 //! This module provides JavaScript-compatible bindings for use in Node.js and browsers.
 
-use pubmed_client::{config::ClientConfig, pmc::PmcFullText, pubmed::PubMedArticle, Client};
+use pubmed_client::{
+    config::ClientConfig, pmc::PmcFullText, pubmed::ArticleSummary, pubmed::PubMedArticle, Client,
+};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
@@ -23,6 +25,9 @@ extern "C" {
 
     /// `Promise<string[]>`
     pub type JsPromiseStringArray;
+
+    /// `Promise<JsSummary[]>`
+    pub type JsPromiseSummaries;
 }
 
 // Set up panic handler and allocator for better WASM experience
@@ -159,7 +164,7 @@ impl WasmPubMedClient {
     pub fn search_articles(&self, query: String, limit: usize) -> JsPromiseArticles {
         let client = self.client.clone();
         future_to_promise(async move {
-            match client.pubmed.search_and_fetch(&query, limit).await {
+            match client.pubmed.search_and_fetch(&query, limit, None).await {
                 Ok(articles) => {
                     let js_articles: Vec<JsArticle> =
                         articles.into_iter().map(JsArticle::from).collect();
@@ -200,6 +205,43 @@ impl WasmPubMedClient {
                     Ok(serde_wasm_bindgen::to_value(&js_article)?)
                 }
                 Err(e) => Err(JsValue::from_str(&format!("Fetch failed: {e}"))),
+            }
+        })
+        .unchecked_into()
+    }
+
+    /// Fetch lightweight article summaries by PMIDs using the ESummary API
+    pub fn fetch_summaries(&self, pmids: Vec<String>) -> JsPromiseSummaries {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.fetch_summaries(&pmid_refs).await {
+                Ok(summaries) => {
+                    let js_summaries: Vec<JsSummary> =
+                        summaries.into_iter().map(JsSummary::from).collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_summaries)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Fetch summaries failed: {e}"))),
+            }
+        })
+        .unchecked_into()
+    }
+
+    /// Search PubMed and fetch lightweight summaries
+    pub fn search_summaries(&self, query: String, limit: usize) -> JsPromiseSummaries {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client
+                .pubmed
+                .search_and_fetch_summaries(&query, limit, None)
+                .await
+            {
+                Ok(summaries) => {
+                    let js_summaries: Vec<JsSummary> =
+                        summaries.into_iter().map(JsSummary::from).collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_summaries)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Search summaries failed: {e}"))),
             }
         })
         .unchecked_into()
@@ -335,6 +377,34 @@ impl WasmPubMedClient {
         .unchecked_into()
     }
 
+    /// Check spelling of a search term using the ESpell API (PubMed database)
+    pub fn spell_check(&self, term: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.pubmed.spell_check(&term).await {
+                Ok(result) => {
+                    let js_result = JsSpellCheckResult::from(result);
+                    Ok(serde_wasm_bindgen::to_value(&js_result)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Spell check failed: {e}"))),
+            }
+        })
+    }
+
+    /// Check spelling of a search term against a specific database using the ESpell API
+    pub fn spell_check_db(&self, term: String, db: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.pubmed.spell_check_db(&term, &db).await {
+                Ok(result) => {
+                    let js_result = JsSpellCheckResult::from(result);
+                    Ok(serde_wasm_bindgen::to_value(&js_result)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Spell check failed: {e}"))),
+            }
+        })
+    }
+
     /// Convert PMC full text to markdown
     pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
         let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)
@@ -400,6 +470,58 @@ impl From<PubMedArticle> for JsArticle {
             language: article.language,
             journal_abbreviation: article.journal_abbreviation,
             issn: article.issn,
+        }
+    }
+}
+
+/// JavaScript-friendly lightweight article summary
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsSummary {
+    pub pmid: String,
+    pub title: String,
+    pub authors: Vec<String>,
+    pub journal: String,
+    pub full_journal_name: String,
+    pub pub_date: String,
+    pub epub_date: String,
+    pub doi: Option<String>,
+    pub pmc_id: Option<String>,
+    pub volume: String,
+    pub issue: String,
+    pub pages: String,
+    pub languages: Vec<String>,
+    pub pub_types: Vec<String>,
+    pub issn: String,
+    pub essn: String,
+    pub sort_pub_date: String,
+    pub pmc_ref_count: u64,
+    pub record_status: String,
+}
+
+impl From<ArticleSummary> for JsSummary {
+    fn from(s: ArticleSummary) -> Self {
+        Self {
+            pmid: s.pmid,
+            title: s.title,
+            authors: s.authors,
+            journal: s.journal,
+            full_journal_name: s.full_journal_name,
+            pub_date: s.pub_date,
+            epub_date: s.epub_date,
+            doi: s.doi,
+            pmc_id: s.pmc_id,
+            volume: s.volume,
+            issue: s.issue,
+            pages: s.pages,
+            languages: s.languages,
+            pub_types: s.pub_types,
+            issn: s.issn,
+            essn: s.essn,
+            sort_pub_date: s.sort_pub_date,
+            pmc_ref_count: s.pmc_ref_count,
+            record_status: s.record_status,
         }
     }
 }
@@ -738,6 +860,38 @@ pub struct JsDatabaseCount {
 pub struct JsGlobalQueryResults {
     pub term: String,
     pub results: Vec<JsDatabaseCount>,
+}
+
+// ================================================================================================
+// ESpell types for WASM
+// ================================================================================================
+
+/// JavaScript-friendly spell check result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsSpellCheckResult {
+    pub database: String,
+    pub query: String,
+    pub corrected_query: String,
+    pub has_corrections: bool,
+    pub replacements: Vec<String>,
+}
+
+impl From<pubmed_client::SpellCheckResult> for JsSpellCheckResult {
+    fn from(result: pubmed_client::SpellCheckResult) -> Self {
+        let has_corrections = result.has_corrections();
+        let replacements = result
+            .replacements()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
+        Self {
+            database: result.database,
+            query: result.query,
+            corrected_query: result.corrected_query,
+            has_corrections,
+            replacements,
+        }
+    }
 }
 
 impl From<pubmed_client::GlobalQueryResults> for JsGlobalQueryResults {

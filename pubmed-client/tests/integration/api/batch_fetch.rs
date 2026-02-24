@@ -11,6 +11,7 @@
 //! PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test test_batch_fetch_api
 //! ```
 
+#[path = "../common/mod.rs"]
 mod common;
 
 #[cfg(feature = "integration-tests")]
@@ -251,7 +252,7 @@ mod integration_tests {
 
         let start = Instant::now();
         let articles = client
-            .search_and_fetch("COVID-19[Title] AND 2023[PDAT]", 5)
+            .search_and_fetch("COVID-19[Title] AND 2023[PDAT]", 5, None)
             .await
             .expect("search_and_fetch should succeed");
         let duration = start.elapsed();

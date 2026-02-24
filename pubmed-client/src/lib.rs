@@ -280,10 +280,10 @@ pub use pmc::{
     PmcTarClient, Reference, ReferenceStyle, Table,
 };
 pub use pubmed::{
-    parse_article_from_xml, ArticleType, CitationMatch, CitationMatchStatus, CitationMatches,
-    CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult, FieldInfo,
+    parse_article_from_xml, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,
+    CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult, FieldInfo,
     GlobalQueryResults, HistorySession, Language, LinkInfo, PmcLinks, PubMedArticle, PubMedClient,
-    RelatedArticles, SearchQuery, SearchResult, SortOrder,
+    RelatedArticles, SearchQuery, SearchResult, SortOrder, SpellCheckResult, SpelledQuerySegment,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{sleep, Duration, Instant};
@@ -407,7 +407,7 @@ impl Client {
         query: &str,
         limit: usize,
     ) -> Result<Vec<(PubMedArticle, Option<PmcFullText>)>> {
-        let articles = self.pubmed.search_and_fetch(query, limit).await?;
+        let articles = self.pubmed.search_and_fetch(query, limit, None).await?;
         let mut results = Vec::new();
 
         for article in articles {
@@ -451,6 +451,79 @@ impl Client {
     /// ```
     pub async fn fetch_articles(&self, pmids: &[&str]) -> Result<Vec<PubMedArticle>> {
         self.pubmed.fetch_articles(pmids).await
+    }
+
+    /// Fetch lightweight article summaries by PMIDs using the ESummary API
+    ///
+    /// Returns basic metadata (title, authors, journal, dates, DOI) without
+    /// abstracts, MeSH terms, or chemical lists. Faster than `fetch_articles()`
+    /// when you only need bibliographic overview data.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<ArticleSummary>>` containing lightweight article metadata
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let summaries = client.fetch_summaries(&["31978945", "33515491"]).await?;
+    ///     for summary in &summaries {
+    ///         println!("{}: {}", summary.pmid, summary.title);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn fetch_summaries(&self, pmids: &[&str]) -> Result<Vec<ArticleSummary>> {
+        self.pubmed.fetch_summaries(pmids).await
+    }
+
+    /// Search and fetch lightweight summaries in a single operation
+    ///
+    /// Combines search and ESummary fetch. Use this when you only need basic
+    /// metadata (title, authors, journal, dates) and want faster retrieval
+    /// than `search_and_fetch()` which uses EFetch.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - Search query string
+    /// * `limit` - Maximum number of articles
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<ArticleSummary>>` containing lightweight article metadata
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let summaries = client.search_and_fetch_summaries("covid-19", 20).await?;
+    ///     for summary in &summaries {
+    ///         println!("{}: {}", summary.pmid, summary.title);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn search_and_fetch_summaries(
+        &self,
+        query: &str,
+        limit: usize,
+    ) -> Result<Vec<ArticleSummary>> {
+        self.pubmed
+            .search_and_fetch_summaries(query, limit, None)
+            .await
     }
 
     /// Get list of all available NCBI databases
@@ -696,6 +769,37 @@ impl Client {
     /// ```
     pub async fn fetch_all_by_pmids(&self, pmids: &[&str]) -> Result<Vec<PubMedArticle>> {
         self.pubmed.fetch_all_by_pmids(pmids).await
+    }
+
+    /// Check spelling of a search term using the ESpell API
+    ///
+    /// Provides spelling suggestions for terms within a single text query.
+    /// Uses the PubMed database by default. For other databases, use
+    /// `client.pubmed.spell_check_db(term, db)` directly.
+    ///
+    /// # Arguments
+    ///
+    /// * `term` - The search term to spell-check
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<SpellCheckResult>` containing spelling suggestions
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let result = client.spell_check("asthmaa").await?;
+    ///     println!("Corrected: {}", result.corrected_query);
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn spell_check(&self, term: &str) -> Result<SpellCheckResult> {
+        self.pubmed.spell_check(term).await
     }
 }
 

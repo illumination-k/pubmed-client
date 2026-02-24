@@ -185,7 +185,7 @@ impl SearchQuery {
     pub async fn search(&self, client: &PubMedClient) -> Result<Vec<String>> {
         let query_string = self.build();
         client
-            .search_articles_with_options(&query_string, self.get_limit(), self.sort.as_ref())
+            .search_articles(&query_string, self.get_limit(), self.sort.as_ref())
             .await
     }
 
@@ -222,7 +222,7 @@ impl SearchQuery {
     pub async fn search_and_fetch(&self, client: &PubMedClient) -> Result<Vec<PubMedArticle>> {
         let query_string = self.build();
         client
-            .search_and_fetch_with_options(&query_string, self.get_limit(), self.sort.as_ref())
+            .search_and_fetch(&query_string, self.get_limit(), self.sort.as_ref())
             .await
     }
 

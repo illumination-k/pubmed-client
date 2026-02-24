@@ -196,12 +196,6 @@ impl From<PubMedId> for u32 {
     }
 }
 
-impl From<&PubMedId> for u32 {
-    fn from(pmid: &PubMedId) -> Self {
-        pmid.value
-    }
-}
-
 /// A validated PubMed Central ID (PMC ID)
 ///
 /// PMC IDs are identifiers for full-text articles in the PMC database.
@@ -497,10 +491,7 @@ mod tests {
     #[test]
     fn test_pubmedid_conversions() {
         let pmid = PubMedId::from_u32(31978945);
-        let value: u32 = pmid.clone().into();
-        assert_eq!(value, 31978945);
-
-        let value: u32 = (&pmid).into();
+        let value: u32 = pmid.into();
         assert_eq!(value, 31978945);
     }
 

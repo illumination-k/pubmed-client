@@ -254,8 +254,8 @@ impl PmcClient {
 
         // Check if the response contains an error
         if xml_content.contains("<ERROR>") {
-            return Err(PubMedError::PmcNotAvailableById {
-                pmcid: normalized_pmcid,
+            return Err(PubMedError::PmcNotAvailable {
+                id: normalized_pmcid,
             });
         }
 

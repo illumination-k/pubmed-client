@@ -17,6 +17,7 @@
 //! PUBMED_REAL_API_TESTS=1 NCBI_API_KEY=your_key cargo test --features integration-tests --test pmc_api_tests
 //! ```
 
+#[path = "../common/mod.rs"]
 mod common;
 
 #[cfg(feature = "integration-tests")]
@@ -525,7 +526,7 @@ mod integration_tests {
             "Step 1: Searching for open access articles"
         );
 
-        let pmids = match pubmed_client.search_articles(search_query, 10).await {
+        let pmids = match pubmed_client.search_articles(search_query, 10, None).await {
             Ok(pmids) => {
                 info!(results_count = pmids.len(), "Search completed");
                 pmids

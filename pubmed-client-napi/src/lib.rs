@@ -4,7 +4,10 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use pubmed_client::{
     pmc::{markdown::PmcMarkdownConverter, PmcFullText},
-    pubmed::{ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery, SortOrder},
+    pubmed::{
+        ArticleSummary, ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery,
+        SortOrder,
+    },
     Client, ClientConfig,
 };
 use std::sync::Arc;
@@ -109,6 +112,78 @@ impl From<PubMedArticle> for Article {
     }
 }
 
+/// Lightweight article summary from ESummary API
+///
+/// Contains basic metadata without abstracts, MeSH terms, or chemical lists.
+/// Use fetchSummaries() for faster bulk metadata retrieval.
+#[napi(object)]
+pub struct Summary {
+    /// PubMed ID
+    pub pmid: String,
+    /// Article title
+    pub title: String,
+    /// Author names
+    pub authors: Vec<String>,
+    /// Journal name
+    pub journal: String,
+    /// Full journal name
+    pub full_journal_name: String,
+    /// Publication date
+    pub pub_date: String,
+    /// Electronic publication date
+    pub epub_date: String,
+    /// DOI if available
+    pub doi: Option<String>,
+    /// PMC ID if available
+    pub pmc_id: Option<String>,
+    /// Journal volume
+    pub volume: String,
+    /// Journal issue
+    pub issue: String,
+    /// Page range
+    pub pages: String,
+    /// Languages
+    pub languages: Vec<String>,
+    /// Publication types
+    pub pub_types: Vec<String>,
+    /// ISSN
+    pub issn: String,
+    /// Electronic ISSN
+    pub essn: String,
+    /// Sorted publication date
+    pub sort_pub_date: String,
+    /// PMC reference count
+    pub pmc_ref_count: u32,
+    /// Record status
+    pub record_status: String,
+}
+
+impl From<ArticleSummary> for Summary {
+    fn from(s: ArticleSummary) -> Self {
+        Summary {
+            pmid: s.pmid,
+            title: s.title,
+            authors: s.authors,
+            journal: s.journal,
+            full_journal_name: s.full_journal_name,
+            pub_date: s.pub_date,
+            epub_date: s.epub_date,
+            doi: s.doi,
+            pmc_id: s.pmc_id,
+            volume: s.volume,
+            issue: s.issue,
+            pages: s.pages,
+            languages: s.languages,
+            pub_types: s.pub_types,
+            issn: s.issn,
+            essn: s.essn,
+            sort_pub_date: s.sort_pub_date,
+            pmc_ref_count: s.pmc_ref_count as u32,
+            record_status: s.record_status,
+        }
+    }
+}
+
 /// Reference information from PMC articles
 #[napi(object)]
 pub struct Reference {
@@ -181,6 +256,39 @@ impl From<pubmed_client::OaSubsetInfo> for OaSubsetInfo {
             updated: info.updated,
             error_code: info.error_code,
             error_message: info.error_message,
+        }
+    }
+}
+
+/// Spelling suggestion result from the ESpell API
+#[napi(object)]
+pub struct SpellCheckResult {
+    /// The database that was queried
+    pub database: String,
+    /// The original query string as submitted
+    pub query: String,
+    /// The full corrected/suggested query as a plain string
+    pub corrected_query: String,
+    /// Whether any spelling corrections were made
+    pub has_corrections: bool,
+    /// The corrected terms (only the replaced parts)
+    pub replacements: Vec<String>,
+}
+
+impl From<pubmed_client::SpellCheckResult> for SpellCheckResult {
+    fn from(result: pubmed_client::SpellCheckResult) -> Self {
+        let has_corrections = result.has_corrections();
+        let replacements = result
+            .replacements()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
+        SpellCheckResult {
+            database: result.database,
+            query: result.query,
+            corrected_query: result.corrected_query,
+            has_corrections,
+            replacements,
         }
     }
 }
@@ -360,7 +468,7 @@ impl PubMedClient {
         let articles = self
             .client
             .pubmed
-            .search_and_fetch(&query, limit)
+            .search_and_fetch(&query, limit, None)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 
@@ -401,6 +509,51 @@ impl PubMedClient {
             .map_err(|e| Error::from_reason(e.to_string()))?;
 
         Ok(Article::from(article))
+    }
+
+    /// Fetch lightweight article summaries by PMIDs using the ESummary API
+    ///
+    /// Returns basic metadata (title, authors, journal, dates, DOI) without
+    /// abstracts, MeSH terms, or chemical lists. Faster than fetchArticles().
+    ///
+    /// @param pmids - Array of PubMed IDs
+    /// @returns Array of article summaries
+    #[napi]
+    pub async fn fetch_summaries(&self, pmids: Vec<String>) -> Result<Vec<Summary>> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let summaries = self
+            .client
+            .pubmed
+            .fetch_summaries(&pmid_refs)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(summaries.into_iter().map(Summary::from).collect())
+    }
+
+    /// Search PubMed and fetch lightweight summaries
+    ///
+    /// Combines search and ESummary fetch. Faster than search() when you
+    /// only need basic metadata.
+    ///
+    /// @param query - Search query string
+    /// @param limit - Maximum number of results
+    /// @returns Array of article summaries
+    #[napi]
+    pub async fn search_summaries(
+        &self,
+        query: String,
+        limit: Option<u32>,
+    ) -> Result<Vec<Summary>> {
+        let limit = limit.unwrap_or(10) as usize;
+        let summaries = self
+            .client
+            .pubmed
+            .search_and_fetch_summaries(&query, limit, None)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(summaries.into_iter().map(Summary::from).collect())
     }
 
     /// Fetch full-text article from PMC
@@ -505,6 +658,44 @@ impl PubMedClient {
         Ok(OaSubsetInfo::from(info))
     }
 
+    /// Check spelling of a search term using the ESpell API
+    ///
+    /// Provides spelling suggestions for terms within a single text query.
+    /// Uses the PubMed database by default.
+    ///
+    /// @param term - The search term to spell-check
+    /// @returns Spelling suggestions with corrected query
+    #[napi]
+    pub async fn spell_check(&self, term: String) -> Result<SpellCheckResult> {
+        let result = self
+            .client
+            .pubmed
+            .spell_check(&term)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(SpellCheckResult::from(result))
+    }
+
+    /// Check spelling of a search term against a specific database using the ESpell API
+    ///
+    /// Spelling suggestions are database-specific, so use the same database you plan to search.
+    ///
+    /// @param term - The search term to spell-check
+    /// @param db - The NCBI database to check against (e.g., "pubmed", "pmc")
+    /// @returns Spelling suggestions with corrected query
+    #[napi]
+    pub async fn spell_check_db(&self, term: String, db: String) -> Result<SpellCheckResult> {
+        let result = self
+            .client
+            .pubmed
+            .spell_check_db(&term, &db)
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+
+        Ok(SpellCheckResult::from(result))
+    }
+
     /// Execute a search query and return articles
     ///
     /// @param query - SearchQuery instance
@@ -516,7 +707,7 @@ impl PubMedClient {
         let articles = self
             .client
             .pubmed
-            .search_and_fetch(&query_string, limit)
+            .search_and_fetch(&query_string, limit, None)
             .await
             .map_err(|e| Error::from_reason(e.to_string()))?;
 

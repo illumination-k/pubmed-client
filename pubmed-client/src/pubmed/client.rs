@@ -4,13 +4,16 @@ use crate::common::PubMedId;
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::pubmed::models::{
-    CitationMatch, CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount,
-    DatabaseInfo, EPostResult, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, PmcLinks,
-    PubMedArticle, RelatedArticles, SearchResult,
+    ArticleSummary, CitationMatch, CitationMatchStatus, CitationMatches, CitationQuery, Citations,
+    DatabaseCount, DatabaseInfo, EPostResult, FieldInfo, GlobalQueryResults, HistorySession,
+    LinkInfo, PmcLinks, PubMedArticle, RelatedArticles, SearchResult, SpellCheckResult,
+    SpelledQuerySegment,
 };
 use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::query::SortOrder;
-use crate::pubmed::responses::{EInfoResponse, ELinkResponse, EPostResponse, ESearchResult};
+use crate::pubmed::responses::{
+    EInfoResponse, ELinkResponse, EPostResponse, ESearchResult, ESummaryDocSum, ESummaryResponse,
+};
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
 use reqwest::{Client, Response};
@@ -225,6 +228,7 @@ impl PubMedClient {
     ///
     /// * `query` - Search query string
     /// * `limit` - Maximum number of results to return
+    /// * `sort` - Optional sort order for results
     ///
     /// # Returns
     ///
@@ -243,45 +247,13 @@ impl PubMedClient {
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PubMedClient::new();
-    ///     let pmids = client.search_articles("covid-19 treatment", 10).await?;
-    ///     println!("Found {} articles", pmids.len());
-    ///     Ok(())
-    /// }
-    /// ```
-    #[instrument(skip(self), fields(query = %query, limit = limit))]
-    pub async fn search_articles(&self, query: &str, limit: usize) -> Result<Vec<String>> {
-        self.search_articles_with_options(query, limit, None).await
-    }
-
-    /// Search for articles using a query string with sort options
-    ///
-    /// # Arguments
-    ///
-    /// * `query` - Search query string
-    /// * `limit` - Maximum number of results to return
-    /// * `sort` - Optional sort order for results
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<Vec<String>>` containing PMIDs of matching articles
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::SortOrder};
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = PubMedClient::new();
-    ///     let pmids = client
-    ///         .search_articles_with_options("covid-19 treatment", 10, Some(&SortOrder::PublicationDate))
-    ///         .await?;
+    ///     let pmids = client.search_articles("covid-19 treatment", 10, None).await?;
     ///     println!("Found {} articles", pmids.len());
     ///     Ok(())
     /// }
     /// ```
     #[instrument(skip(self, sort), fields(query = %query, limit = limit))]
-    pub async fn search_articles_with_options(
+    pub async fn search_articles(
         &self,
         query: &str,
         limit: usize,
@@ -445,60 +417,272 @@ impl PubMedClient {
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PubMedClient::new();
-    ///     let articles = client.search_and_fetch("covid-19", 5).await?;
+    ///     let articles = client.search_and_fetch("covid-19", 5, None).await?;
     ///     for article in articles {
     ///         println!("{}: {}", article.pmid, article.title);
     ///     }
     ///     Ok(())
     /// }
     /// ```
-    pub async fn search_and_fetch(&self, query: &str, limit: usize) -> Result<Vec<PubMedArticle>> {
-        self.search_and_fetch_with_options(query, limit, None).await
-    }
-
-    /// Search and fetch multiple articles with metadata, with sort options
-    ///
-    /// Uses batch fetching internally for efficient retrieval.
-    ///
-    /// # Arguments
-    ///
-    /// * `query` - Search query string
-    /// * `limit` - Maximum number of articles to fetch
-    /// * `sort` - Optional sort order for results
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<Vec<PubMedArticle>>` containing articles with metadata
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use pubmed_client_rs::{PubMedClient, pubmed::SortOrder};
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = PubMedClient::new();
-    ///     let articles = client
-    ///         .search_and_fetch_with_options("covid-19", 5, Some(&SortOrder::PublicationDate))
-    ///         .await?;
-    ///     for article in articles {
-    ///         println!("{}: {}", article.pmid, article.title);
-    ///     }
-    ///     Ok(())
-    /// }
-    /// ```
-    pub async fn search_and_fetch_with_options(
+    pub async fn search_and_fetch(
         &self,
         query: &str,
         limit: usize,
         sort: Option<&SortOrder>,
     ) -> Result<Vec<PubMedArticle>> {
-        let pmids = self
-            .search_articles_with_options(query, limit, sort)
-            .await?;
+        let pmids = self.search_articles(query, limit, sort).await?;
 
         let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
         self.fetch_articles(&pmid_refs).await
+    }
+
+    /// Fetch lightweight article summaries by PMIDs using the ESummary API
+    ///
+    /// Returns basic metadata (title, authors, journal, dates, DOI) without
+    /// abstracts, MeSH terms, or chemical lists. Faster than `fetch_articles()`
+    /// when you only need bibliographic overview data.
+    ///
+    /// # Arguments
+    ///
+    /// * `pmids` - Slice of PubMed IDs as strings
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<ArticleSummary>>` containing lightweight article metadata
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let summaries = client.fetch_summaries(&["31978945", "33515491"]).await?;
+    ///     for summary in &summaries {
+    ///         println!("{}: {} ({})", summary.pmid, summary.title, summary.pub_date);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(pmids_count = pmids.len()))]
+    pub async fn fetch_summaries(&self, pmids: &[&str]) -> Result<Vec<ArticleSummary>> {
+        if pmids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        // Validate all PMIDs upfront
+        let validated: Vec<u32> = pmids
+            .iter()
+            .map(|pmid| PubMedId::parse(pmid).map(|p| p.as_u32()))
+            .collect::<Result<Vec<_>>>()?;
+
+        const BATCH_SIZE: usize = 200;
+
+        let mut all_summaries = Vec::with_capacity(pmids.len());
+
+        for chunk in validated.chunks(BATCH_SIZE) {
+            let id_list: String = chunk
+                .iter()
+                .map(|id| id.to_string())
+                .collect::<Vec<_>>()
+                .join(",");
+
+            let url = format!(
+                "{}/esummary.fcgi?db=pubmed&id={}&retmode=json",
+                self.base_url, id_list
+            );
+
+            debug!(
+                batch_size = chunk.len(),
+                "Making batch ESummary API request"
+            );
+            let response = self.make_request(&url).await?;
+            let json_text = response.text().await?;
+
+            if json_text.trim().is_empty() {
+                continue;
+            }
+
+            let summaries = Self::parse_esummary_response(&json_text)?;
+            info!(
+                requested = chunk.len(),
+                parsed = summaries.len(),
+                "ESummary batch completed"
+            );
+            all_summaries.extend(summaries);
+        }
+
+        Ok(all_summaries)
+    }
+
+    /// Fetch a single article summary by PMID using the ESummary API
+    ///
+    /// # Arguments
+    ///
+    /// * `pmid` - PubMed ID as a string
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<ArticleSummary>` containing lightweight article metadata
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let summary = client.fetch_summary("31978945").await?;
+    ///     println!("{}: {}", summary.pmid, summary.title);
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(pmid = %pmid))]
+    pub async fn fetch_summary(&self, pmid: &str) -> Result<ArticleSummary> {
+        let mut summaries = self.fetch_summaries(&[pmid]).await?;
+
+        if summaries.len() == 1 {
+            Ok(summaries.remove(0))
+        } else {
+            let idx = summaries.iter().position(|s| s.pmid == pmid);
+            match idx {
+                Some(i) => Ok(summaries.remove(i)),
+                None => Err(PubMedError::ArticleNotFound {
+                    pmid: pmid.to_string(),
+                }),
+            }
+        }
+    }
+
+    /// Search and fetch lightweight summaries in a single operation
+    ///
+    /// Combines `search_articles()` and `fetch_summaries()`. Use this when you
+    /// only need basic metadata (title, authors, journal, dates) and want faster
+    /// retrieval than `search_and_fetch()`.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - Search query string
+    /// * `limit` - Maximum number of articles to fetch
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<Vec<ArticleSummary>>` containing lightweight article metadata
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let summaries = client.search_and_fetch_summaries("covid-19 treatment", 20, None).await?;
+    ///     for summary in &summaries {
+    ///         println!("{}: {}", summary.pmid, summary.title);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn search_and_fetch_summaries(
+        &self,
+        query: &str,
+        limit: usize,
+        sort: Option<&SortOrder>,
+    ) -> Result<Vec<ArticleSummary>> {
+        let pmids = self.search_articles(query, limit, sort).await?;
+
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        self.fetch_summaries(&pmid_refs).await
+    }
+
+    /// Parse ESummary JSON response into ArticleSummary objects
+    fn parse_esummary_response(json_text: &str) -> Result<Vec<ArticleSummary>> {
+        let response: ESummaryResponse =
+            serde_json::from_str(json_text).map_err(PubMedError::from)?;
+
+        let result = &response.result;
+
+        // Get the list of UIDs
+        let uids = result
+            .get("uids")
+            .and_then(|v| v.as_array())
+            .map(|arr| {
+                arr.iter()
+                    .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default();
+
+        let mut summaries = Vec::with_capacity(uids.len());
+
+        for uid in &uids {
+            let Some(doc_value) = result.get(uid) else {
+                warn!(uid = %uid, "UID not found in ESummary response");
+                continue;
+            };
+
+            // Check for error in individual document
+            if doc_value.get("error").is_some() {
+                warn!(uid = %uid, "ESummary returned error for UID");
+                continue;
+            }
+
+            let doc: ESummaryDocSum = match serde_json::from_value(doc_value.clone()) {
+                Ok(d) => d,
+                Err(e) => {
+                    warn!(uid = %uid, error = %e, "Failed to parse ESummary document");
+                    continue;
+                }
+            };
+
+            // Extract DOI and PMC ID from articleids
+            let mut doi = None;
+            let mut pmc_id = None;
+            for aid in &doc.articleids {
+                match aid.idtype.as_str() {
+                    "doi" => {
+                        if !aid.value.is_empty() {
+                            doi = Some(aid.value.clone());
+                        }
+                    }
+                    "pmc" => {
+                        if !aid.value.is_empty() {
+                            pmc_id = Some(aid.value.clone());
+                        }
+                    }
+                    _ => {}
+                }
+            }
+
+            let author_names: Vec<String> = doc.authors.iter().map(|a| a.name.clone()).collect();
+
+            summaries.push(ArticleSummary {
+                pmid: doc.uid,
+                title: doc.title,
+                authors: author_names,
+                journal: doc.source,
+                full_journal_name: doc.fulljournalname,
+                pub_date: doc.pubdate,
+                epub_date: doc.epubdate,
+                doi,
+                pmc_id,
+                volume: doc.volume,
+                issue: doc.issue,
+                pages: doc.pages,
+                languages: doc.lang,
+                pub_types: doc.pubtype,
+                issn: doc.issn,
+                essn: doc.essn,
+                sort_pub_date: doc.sortpubdate,
+                pmc_ref_count: doc.pmcrefcount,
+                record_status: doc.recordstatus,
+            });
+        }
+
+        Ok(summaries)
     }
 
     /// Search for articles with history server support
@@ -716,30 +900,6 @@ impl PubMedClient {
     /// The returned `webenv` will be the same as the input session, and a new
     /// `query_key` will be assigned for the uploaded IDs.
     ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use pubmed_client_rs::PubMedClient;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = PubMedClient::new();
-    ///
-    ///     // First upload
-    ///     let result1 = client.epost(&["31978945", "33515491"]).await?;
-    ///
-    ///     // Append more PMIDs to the same session
-    ///     let result2 = client.epost_to_session(
-    ///         &["25760099"],
-    ///         &result1.history_session(),
-    ///     ).await?;
-    ///
-    ///     // result2 has the same webenv but a new query_key
-    ///     println!("New query key: {}", result2.query_key);
-    ///
-    ///     Ok(())
-    /// }
-    /// ```
     #[instrument(skip(self), fields(pmids_count = pmids.len()))]
     pub async fn epost_to_session(
         &self,
@@ -1827,6 +1987,226 @@ impl PubMedClient {
         Ok(GlobalQueryResults { term, results })
     }
 
+    /// Check spelling of a search term using the ESpell API
+    ///
+    /// Provides spelling suggestions for terms within a single text query.
+    /// Useful as a preprocessing step before executing actual searches to improve
+    /// search accuracy.
+    ///
+    /// # Arguments
+    ///
+    /// * `term` - The search term to spell-check
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<SpellCheckResult>` containing the original query,
+    /// corrected query, and detailed information about which terms were corrected.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let result = client.spell_check("asthmaa OR alergies").await?;
+    ///
+    ///     println!("Original: {}", result.query);
+    ///     println!("Corrected: {}", result.corrected_query);
+    ///
+    ///     if result.has_corrections() {
+    ///         println!("Replacements: {:?}", result.replacements());
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(term = %term))]
+    pub async fn spell_check(&self, term: &str) -> Result<SpellCheckResult> {
+        self.spell_check_db(term, "pubmed").await
+    }
+
+    /// Check spelling of a search term against a specific database using the ESpell API
+    ///
+    /// Spelling suggestions are database-specific, so use the same database you plan to search.
+    ///
+    /// # Arguments
+    ///
+    /// * `term` - The search term to spell-check
+    /// * `db` - The NCBI database to check against (e.g., "pubmed", "pmc")
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<SpellCheckResult>` containing spelling suggestions
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client_rs::PubMedClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     let result = client.spell_check_db("fiberblast cell grwth", "pmc").await?;
+    ///     println!("Corrected: {}", result.corrected_query);
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self), fields(term = %term, db = %db))]
+    pub async fn spell_check_db(&self, term: &str, db: &str) -> Result<SpellCheckResult> {
+        let term = term.trim();
+        if term.is_empty() {
+            return Err(PubMedError::InvalidQuery(
+                "Search term cannot be empty".to_string(),
+            ));
+        }
+
+        let db = db.trim();
+        if db.is_empty() {
+            return Err(PubMedError::ApiError {
+                status: 400,
+                message: "Database name cannot be empty".to_string(),
+            });
+        }
+
+        let url = format!(
+            "{}/espell.fcgi?db={}&term={}",
+            self.base_url,
+            urlencoding::encode(db),
+            urlencoding::encode(term)
+        );
+
+        debug!(term = %term, db = %db, "Making ESpell API request");
+        let response = self.make_request(&url).await?;
+        let xml_text = response.text().await?;
+
+        let result = Self::parse_espell_response(&xml_text, term, db)?;
+
+        info!(
+            term = %term,
+            corrected = %result.corrected_query,
+            has_corrections = result.has_corrections(),
+            "ESpell completed"
+        );
+
+        Ok(result)
+    }
+
+    /// Parse ESpell XML response into SpellCheckResult
+    fn parse_espell_response(xml: &str, query_term: &str, db: &str) -> Result<SpellCheckResult> {
+        use crate::common::xml_utils::extract_text_between;
+
+        // Check for error
+        let error = extract_text_between(xml, "<ERROR>", "</ERROR>");
+        if let Some(error_msg) = error {
+            if !error_msg.is_empty() {
+                return Err(PubMedError::ApiError {
+                    status: 200,
+                    message: format!("NCBI ESpell API error: {}", error_msg),
+                });
+            }
+        }
+
+        let database = extract_text_between(xml, "<Database>", "</Database>")
+            .unwrap_or_else(|| db.to_string());
+
+        let query = extract_text_between(xml, "<Query>", "</Query>")
+            .unwrap_or_else(|| query_term.to_string());
+
+        let corrected_query =
+            extract_text_between(xml, "<CorrectedQuery>", "</CorrectedQuery>").unwrap_or_default();
+
+        // Parse SpelledQuery segments
+        let spelled_query = if let Some(spelled_content) =
+            extract_text_between(xml, "<SpelledQuery>", "</SpelledQuery>")
+        {
+            Self::parse_spelled_query_segments(&spelled_content)
+        } else {
+            Vec::new()
+        };
+
+        Ok(SpellCheckResult {
+            database,
+            query,
+            corrected_query,
+            spelled_query,
+        })
+    }
+
+    /// Parse the interleaved <Original> and <Replaced> elements from SpelledQuery
+    fn parse_spelled_query_segments(content: &str) -> Vec<SpelledQuerySegment> {
+        let mut segments = Vec::new();
+        let mut pos = 0;
+
+        while pos < content.len() {
+            let orig_pos = content[pos..].find("<Original>");
+            let repl_pos = content[pos..].find("<Replaced>");
+
+            match (orig_pos, repl_pos) {
+                (Some(o), Some(r)) if o <= r => {
+                    // <Original> comes first
+                    let abs_start = pos + o;
+                    if let Some(end_offset) = content[abs_start..].find("</Original>") {
+                        let text_start = abs_start + "<Original>".len();
+                        let text_end = abs_start + end_offset;
+                        segments.push(SpelledQuerySegment::Original(
+                            content[text_start..text_end].to_string(),
+                        ));
+                        pos = text_end + "</Original>".len();
+                    } else {
+                        break;
+                    }
+                }
+                (Some(_), Some(r)) => {
+                    // <Replaced> comes first
+                    let abs_start = pos + r;
+                    if let Some(end_offset) = content[abs_start..].find("</Replaced>") {
+                        let text_start = abs_start + "<Replaced>".len();
+                        let text_end = abs_start + end_offset;
+                        segments.push(SpelledQuerySegment::Replaced(
+                            content[text_start..text_end].to_string(),
+                        ));
+                        pos = text_end + "</Replaced>".len();
+                    } else {
+                        break;
+                    }
+                }
+                (Some(o), None) => {
+                    // Only <Original> remaining
+                    let abs_start = pos + o;
+                    if let Some(end_offset) = content[abs_start..].find("</Original>") {
+                        let text_start = abs_start + "<Original>".len();
+                        let text_end = abs_start + end_offset;
+                        segments.push(SpelledQuerySegment::Original(
+                            content[text_start..text_end].to_string(),
+                        ));
+                        pos = text_end + "</Original>".len();
+                    } else {
+                        break;
+                    }
+                }
+                (None, Some(r)) => {
+                    // Only <Replaced> remaining
+                    let abs_start = pos + r;
+                    if let Some(end_offset) = content[abs_start..].find("</Replaced>") {
+                        let text_start = abs_start + "<Replaced>".len();
+                        let text_end = abs_start + end_offset;
+                        segments.push(SpelledQuerySegment::Replaced(
+                            content[text_start..text_end].to_string(),
+                        ));
+                        pos = text_end + "</Replaced>".len();
+                    } else {
+                        break;
+                    }
+                }
+                (None, None) => break,
+            }
+        }
+
+        segments
+    }
+
     /// Internal helper method for making HTTP requests with retry logic
     /// Automatically appends API parameters (api_key, email, tool) to the URL
     async fn make_request(&self, url: &str) -> Result<Response> {
@@ -2243,6 +2623,134 @@ mod tests {
     }
 
     // ========================================================================================
+    // ESpell parsing tests
+    // ========================================================================================
+
+    #[test]
+    fn test_parse_espell_response_with_corrections() {
+        let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+<eSpellResult>
+  <Database>pubmed</Database>
+  <Query>asthmaa OR alergies</Query>
+  <CorrectedQuery>asthma or allergies</CorrectedQuery>
+  <SpelledQuery>
+    <Original></Original>
+    <Replaced>asthma</Replaced>
+    <Original> OR </Original>
+    <Replaced>allergies</Replaced>
+  </SpelledQuery>
+  <ERROR/>
+</eSpellResult>"#;
+
+        let result =
+            PubMedClient::parse_espell_response(xml, "asthmaa OR alergies", "pubmed").unwrap();
+        assert_eq!(result.database, "pubmed");
+        assert_eq!(result.query, "asthmaa OR alergies");
+        assert_eq!(result.corrected_query, "asthma or allergies");
+        assert!(result.has_corrections());
+
+        let replacements = result.replacements();
+        assert_eq!(replacements.len(), 2);
+        assert_eq!(replacements[0], "asthma");
+        assert_eq!(replacements[1], "allergies");
+
+        assert_eq!(result.spelled_query.len(), 4);
+        assert_eq!(
+            result.spelled_query[0],
+            SpelledQuerySegment::Original("".to_string())
+        );
+        assert_eq!(
+            result.spelled_query[1],
+            SpelledQuerySegment::Replaced("asthma".to_string())
+        );
+        assert_eq!(
+            result.spelled_query[2],
+            SpelledQuerySegment::Original(" OR ".to_string())
+        );
+        assert_eq!(
+            result.spelled_query[3],
+            SpelledQuerySegment::Replaced("allergies".to_string())
+        );
+    }
+
+    #[test]
+    fn test_parse_espell_response_no_corrections() {
+        let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+<eSpellResult>
+  <Database>pubmed</Database>
+  <Query>asthma</Query>
+  <CorrectedQuery>asthma</CorrectedQuery>
+  <SpelledQuery>
+    <Original>asthma</Original>
+  </SpelledQuery>
+  <ERROR/>
+</eSpellResult>"#;
+
+        let result = PubMedClient::parse_espell_response(xml, "asthma", "pubmed").unwrap();
+        assert_eq!(result.query, "asthma");
+        assert_eq!(result.corrected_query, "asthma");
+        assert!(!result.has_corrections());
+        assert!(result.replacements().is_empty());
+    }
+
+    #[test]
+    fn test_parse_espell_response_empty_corrected() {
+        let xml = r#"<eSpellResult>
+  <Database>pubmed</Database>
+  <Query>xyznonexistent</Query>
+  <CorrectedQuery></CorrectedQuery>
+  <SpelledQuery/>
+  <ERROR/>
+</eSpellResult>"#;
+
+        let result = PubMedClient::parse_espell_response(xml, "xyznonexistent", "pubmed").unwrap();
+        assert_eq!(result.query, "xyznonexistent");
+        assert_eq!(result.corrected_query, "");
+    }
+
+    #[test]
+    fn test_parse_espell_response_pmc_database() {
+        let xml = r#"<eSpellResult>
+  <Database>pmc</Database>
+  <Query>fiberblast</Query>
+  <CorrectedQuery>fibroblast</CorrectedQuery>
+  <SpelledQuery>
+    <Replaced>fibroblast</Replaced>
+  </SpelledQuery>
+  <ERROR/>
+</eSpellResult>"#;
+
+        let result = PubMedClient::parse_espell_response(xml, "fiberblast", "pmc").unwrap();
+        assert_eq!(result.database, "pmc");
+        assert_eq!(result.corrected_query, "fibroblast");
+        assert!(result.has_corrections());
+    }
+
+    #[test]
+    fn test_spell_check_empty_term() {
+        use tokio_test;
+        let client = PubMedClient::new();
+        let result = tokio_test::block_on(client.spell_check(""));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_spell_check_whitespace_term() {
+        use tokio_test;
+        let client = PubMedClient::new();
+        let result = tokio_test::block_on(client.spell_check("   "));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_spell_check_db_empty_db() {
+        use tokio_test;
+        let client = PubMedClient::new();
+        let result = tokio_test::block_on(client.spell_check_db("asthma", ""));
+        assert!(result.is_err());
+    }
+
+    // ========================================================================================
     // fetch_articles tests
     // ========================================================================================
 
@@ -2279,10 +2787,6 @@ mod tests {
         assert!(elapsed < Duration::from_millis(100));
     }
 
-    // ========================================================================================
-    // EPost tests
-    // ========================================================================================
-
     #[tokio::test]
     async fn test_epost_empty_input() {
         let client = PubMedClient::new();
@@ -2304,19 +2808,12 @@ mod tests {
     async fn test_epost_validates_all_pmids_before_request() {
         let client = PubMedClient::new();
 
-        // Mix of valid and invalid - should fail on validation before any network request
         let start = Instant::now();
         let result = client.epost(&["31978945", "invalid", "33515491"]).await;
         assert!(result.is_err());
-
-        // Should fail quickly (validation only, no network)
         let elapsed = start.elapsed();
         assert!(elapsed < Duration::from_millis(100));
     }
-
-    // ========================================================================================
-    // fetch_all_by_pmids tests
-    // ========================================================================================
 
     #[tokio::test]
     async fn test_fetch_all_by_pmids_empty_input() {
@@ -2330,6 +2827,94 @@ mod tests {
     async fn test_fetch_all_by_pmids_invalid_pmid() {
         let client = PubMedClient::new();
         let result = client.fetch_all_by_pmids(&["not_a_number"]).await;
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_parse_esummary_response_basic() {
+        let json = r#"{"result":{"uids":["31978945"],"31978945":{"uid":"31978945","pubdate":"2020 Feb","epubdate":"2020 Jan 24","source":"N Engl J Med","authors":[{"name":"Zhu N","authtype":"Author","clusterid":""},{"name":"Zhang D","authtype":"Author","clusterid":""}],"title":"A Novel Coronavirus from Patients with Pneumonia in China, 2019.","sorttitle":"novel coronavirus","volume":"382","issue":"8","pages":"727-733","lang":["eng"],"issn":"0028-4793","essn":"1533-4406","pubtype":["Journal Article"],"articleids":[{"idtype":"pubmed","idtypen":1,"value":"31978945"},{"idtype":"doi","idtypen":3,"value":"10.1056/NEJMoa2001017"},{"idtype":"pmc","idtypen":8,"value":"PMC7092803"}],"fulljournalname":"The New England journal of medicine","sortpubdate":"2020/02/20 00:00","pmcrefcount":14123,"recordstatus":"PubMed - indexed for MEDLINE"}}}"#;
+
+        let summaries = PubMedClient::parse_esummary_response(json).unwrap();
+        assert_eq!(summaries.len(), 1);
+
+        let s = &summaries[0];
+        assert_eq!(s.pmid, "31978945");
+        assert_eq!(
+            s.title,
+            "A Novel Coronavirus from Patients with Pneumonia in China, 2019."
+        );
+        assert_eq!(s.authors, vec!["Zhu N", "Zhang D"]);
+        assert_eq!(s.journal, "N Engl J Med");
+        assert_eq!(s.full_journal_name, "The New England journal of medicine");
+        assert_eq!(s.pub_date, "2020 Feb");
+        assert_eq!(s.epub_date, "2020 Jan 24");
+        assert_eq!(s.doi.as_deref(), Some("10.1056/NEJMoa2001017"));
+        assert_eq!(s.pmc_id.as_deref(), Some("PMC7092803"));
+        assert_eq!(s.volume, "382");
+        assert_eq!(s.issue, "8");
+        assert_eq!(s.pages, "727-733");
+        assert_eq!(s.languages, vec!["eng"]);
+        assert_eq!(s.pub_types, vec!["Journal Article"]);
+        assert_eq!(s.issn, "0028-4793");
+        assert_eq!(s.essn, "1533-4406");
+        assert_eq!(s.sort_pub_date, "2020/02/20 00:00");
+        assert_eq!(s.pmc_ref_count, 14123);
+        assert_eq!(s.record_status, "PubMed - indexed for MEDLINE");
+    }
+
+    #[test]
+    fn test_parse_esummary_response_multiple_uids() {
+        let json = r#"{"result":{"uids":["31978945","33515491"],"31978945":{"uid":"31978945","pubdate":"2020 Feb","epubdate":"","source":"N Engl J Med","authors":[{"name":"Zhu N","authtype":"Author","clusterid":""}],"title":"Article One","volume":"382","issue":"8","pages":"727-733","lang":["eng"],"issn":"","essn":"","pubtype":[],"articleids":[],"fulljournalname":"N Engl J Med","sortpubdate":"","pmcrefcount":0,"recordstatus":""},"33515491":{"uid":"33515491","pubdate":"2021 Jan","epubdate":"","source":"Science","authors":[{"name":"Smith J","authtype":"Author","clusterid":""}],"title":"Article Two","volume":"371","issue":"6526","pages":"120-125","lang":["eng"],"issn":"","essn":"","pubtype":[],"articleids":[{"idtype":"doi","idtypen":3,"value":"10.1126/science.abc123"}],"fulljournalname":"Science","sortpubdate":"","pmcrefcount":100,"recordstatus":""}}}"#;
+
+        let summaries = PubMedClient::parse_esummary_response(json).unwrap();
+        assert_eq!(summaries.len(), 2);
+        assert_eq!(summaries[0].pmid, "31978945");
+        assert_eq!(summaries[0].title, "Article One");
+        assert_eq!(summaries[1].pmid, "33515491");
+        assert_eq!(summaries[1].title, "Article Two");
+        assert_eq!(summaries[1].doi.as_deref(), Some("10.1126/science.abc123"));
+    }
+
+    #[test]
+    fn test_parse_esummary_response_empty() {
+        let json = r#"{"result": {"uids": []}}"#;
+        let summaries = PubMedClient::parse_esummary_response(json).unwrap();
+        assert!(summaries.is_empty());
+    }
+
+    #[test]
+    fn test_parse_esummary_response_with_error_uid() {
+        let json = r#"{"result":{"uids":["99999999999"],"99999999999":{"uid":"99999999999","error":"cannot get document summary"}}}"#;
+
+        let summaries = PubMedClient::parse_esummary_response(json).unwrap();
+        assert!(summaries.is_empty());
+    }
+
+    #[test]
+    fn test_parse_esummary_response_no_doi_no_pmc() {
+        let json = r#"{"result":{"uids":["12345678"],"12345678":{"uid":"12345678","pubdate":"2020","epubdate":"","source":"Some Journal","authors":[],"title":"Test Article","volume":"","issue":"","pages":"","lang":[],"issn":"","essn":"","pubtype":[],"articleids":[{"idtype":"pubmed","idtypen":1,"value":"12345678"}],"fulljournalname":"Some Journal","sortpubdate":"","pmcrefcount":0,"recordstatus":""}}}"#;
+
+        let summaries = PubMedClient::parse_esummary_response(json).unwrap();
+        assert_eq!(summaries.len(), 1);
+        assert!(summaries[0].doi.is_none());
+        assert!(summaries[0].pmc_id.is_none());
+        assert!(summaries[0].authors.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_summaries_empty_input() {
+        let client = PubMedClient::new();
+        let result = client.fetch_summaries(&[]).await;
+        assert!(result.is_ok());
+        assert!(result
+            .expect("empty input should return empty summaries")
+            .is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_summaries_invalid_pmid() {
+        let client = PubMedClient::new();
+        let result = client.fetch_summaries(&["not_a_number"]).await;
         assert!(result.is_err());
     }
 }
