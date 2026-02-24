@@ -14,6 +14,14 @@ inputs:
     description: "Whether to setup mise"
     required: false
     default: "true"
+  skip-postinstall:
+    description: "Whether to skip the mise postinstall hook (etc/postinstall.sh)"
+    required: false
+    default: "false"
+  mise-install-args:
+    description: "Extra args passed to mise install (e.g. 'node pnpm' to install only specific tools)"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -26,10 +34,13 @@ runs:
     - name: Setup mise
       if: inputs.setup-mise == 'true'
       uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+      env:
+        SKIP_POSTINSTALL: ${{ inputs.skip-postinstall == 'true' && '1' || '' }}
       with:
         experimental: true
         cache: true
         log_level: debug
+        install_args: ${{ inputs.mise-install-args }}
 
     - name: Install Rust
       uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
