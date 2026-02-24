@@ -14,12 +14,12 @@ Search and retrieve biomedical literature from [PubMed](https://pubmed.ncbi.nlm.
 ## Features
 
 - **Multi-language** — Rust, Node.js (native), WebAssembly, Python
-- **Full API coverage** — ESearch, EFetch, ELink, EInfo, PMC OAI
+- **Full API coverage** — ESearch, EFetch, ESummary, EPost, ELink, EInfo, ECitMatch, EGQuery, ESpell, PMC OAI
 - **Advanced search builder** — filters, date ranges, MeSH terms, boolean logic
 - **Full-text retrieval** — structured PMC articles with sections, figures, and tables
 - **Markdown export** — convert PMC articles to well-formatted Markdown
 - **Rate limiting & retry** — automatic NCBI compliance (3–10 req/sec)
-- **Caching** — configurable response caching with moka
+- **Caching** — pluggable backends: in-memory (moka), Redis (`cache-redis` feature), SQLite (`cache-sqlite` feature)
 - **MCP server** — integrate with AI assistants
 
 ## Installation
