@@ -24,5 +24,3 @@ artifacts/
 
 # TypeDoc output
 docs/
-
-pnpm-lock.yaml
