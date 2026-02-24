@@ -116,6 +116,95 @@
   margin-left: 0.4rem;
 }
 
+/* Section intro text */
+.sectionIntro {
+  font-size: 1rem;
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 1.5rem;
+}
+
+/* Tab bar */
+.tabBar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--ifm-color-emphasis-300);
+  margin-bottom: 0;
+}
+
+.tab {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  color: var(--ifm-color-emphasis-700);
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.tab:hover {
+  color: var(--ifm-color-primary);
+}
+
+.tabActive {
+  color: var(--ifm-color-primary);
+  border-bottom-color: var(--ifm-color-primary);
+}
+
+/* Code block */
+.codeBlock {
+  position: relative;
+  background: #1e1e2e;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+[data-theme="light"] .codeBlock {
+  background: #282c34;
+}
+
+.codePre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.codePre code {
+  font-family: var(--ifm-font-family-monospace);
+  color: #abb2bf;
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.copyBtn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  color: #abb2bf;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.copyBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
 /* Packages table */
 .table {
   width: 100%;
