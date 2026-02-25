@@ -192,4 +192,39 @@ mod tests {
         assert_eq!(day_precision.month, Some(6));
         assert_eq!(day_precision.day, Some(15));
     }
+
+    mod proptest_suite {
+        use super::*;
+        use proptest::prelude::*;
+
+        proptest! {
+            #[test]
+            fn year_only_format_is_all_digits(year in 1u32..=9999u32) {
+                let s = PubDate::new(year).to_pubmed_string();
+                prop_assert!(s.chars().all(|c| c.is_ascii_digit()), "year-only should be all digits: {}", s);
+                prop_assert!(!s.contains('/'), "year-only should not contain '/': {}", s);
+            }
+
+            #[test]
+            fn year_month_zero_pads_month(year in 1u32..=9999u32, month in 1u32..=12u32) {
+                let s = PubDate::with_month(year, month).to_pubmed_string();
+                let parts: Vec<&str> = s.split('/').collect();
+                prop_assert_eq!(parts.len(), 2, "expected YYYY/MM format: {}", s);
+                prop_assert_eq!(parts[1].len(), 2, "month should be zero-padded: {}", s);
+            }
+
+            #[test]
+            fn full_date_zero_pads_month_and_day(
+                year in 1u32..=9999u32,
+                month in 1u32..=12u32,
+                day in 1u32..=31u32,
+            ) {
+                let s = PubDate::with_day(year, month, day).to_pubmed_string();
+                let parts: Vec<&str> = s.split('/').collect();
+                prop_assert_eq!(parts.len(), 3, "expected YYYY/MM/DD format: {}", s);
+                prop_assert_eq!(parts[1].len(), 2, "month should be zero-padded: {}", s);
+                prop_assert_eq!(parts[2].len(), 2, "day should be zero-padded: {}", s);
+            }
+        }
+    }
 }

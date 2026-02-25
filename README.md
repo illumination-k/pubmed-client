@@ -6,7 +6,7 @@
 [![npm](https://img.shields.io/npm/v/pubmed-client)](https://www.npmjs.com/package/pubmed-client)
 [![PyPI](https://img.shields.io/pypi/v/pubmed-client-py)](https://pypi.org/project/pubmed-client-py/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/illumination-k/pubmed-client/actions/workflows/test.yml/badge.svg)](https://github.com/illumination-k/pubmed-client/actions/workflows/test.yml)
+[![CI](https://github.com/illumination-k/pubmed-client/actions/workflows/test.yml/badge.svg)](https://github.com/illumination-k/pubmed-client/actions/workflows/core.yml)
 [![codecov](https://codecov.io/gh/illumination-k/pubmed-client/graph/badge.svg)](https://codecov.io/gh/illumination-k/pubmed-client)
 
 Search and retrieve biomedical literature from [PubMed](https://pubmed.ncbi.nlm.nih.gov/) and [PMC](https://www.ncbi.nlm.nih.gov/pmc/) across multiple languages and runtimes.
