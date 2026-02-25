@@ -29,16 +29,16 @@ echo "==> Running postinstall setup..."
 
 # Setup pre-commit hooks
 echo "==> Installing pre-commit hooks..."
-if has_command "pre-commit"; then
-	pre-commit install --install-hooks
+if has_command "prek"; then
+	prek install -f
 else
-	echo "Warning: pre-commit is not installed, skipping hooks installation"
+	echo "Warning: prek is not installed, skipping hooks installation"
 fi
 
 # Setup Python virtual environment for PyO3
 echo "==> Setting up Python virtual environment..."
 cd "$PROJECT_ROOT/pubmed-client-py"
-uv venv
+uv venv --allow-existing
 
 # Install pnpm dependencies for TS packages
 echo "==> Installing pnpm dependencies for TS packages..."

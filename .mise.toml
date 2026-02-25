@@ -1,5 +1,5 @@
 [tools]
-pre-commit = "latest"
+prek = "latest"
 dprint = "latest"
 
 pnpm = "10"
