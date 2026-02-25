@@ -1,0 +1,38 @@
+name: Claude Hooks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - ".claude/settings.json"
+      - "etc/setup-claude-web.sh"
+      - ".mise.toml"
+      - ".github/workflows/claude-hooks.yml"
+      - ".github/actions/setup-repo/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  MISE_EXPERIMENTAL: true
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
+
+jobs:
+  verify-setup-script:
+    name: Verify setup-claude-web.sh
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run start hook (CLAUDE_CODE_REMOTE=true)
+        env:
+          CLAUDE_CODE_REMOTE: "true"
+        run: bash .claude/hooks/session-start.sh
+
+      - name: Run stop hook
+        run: bash .claude/hooks/session-stop.sh
