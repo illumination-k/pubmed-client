@@ -54,8 +54,8 @@ jobs:
 
       - uses: ./.github/actions/setup-repo
 
-      - name: Add llvm-tools-preview component
-        run: rustup component add llvm-tools-preview
+      - name: Install nightly toolchain for branch coverage
+        run: rustup toolchain install nightly --component llvm-tools-preview
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cfdb446e391c69574ebc316dfb7d7849ec12b940 # v2.68.8
@@ -63,13 +63,13 @@ jobs:
           tool: cargo-llvm-cov
 
       - name: Run tests with coverage instrumentation
-        run: cargo llvm-cov nextest -p pubmed-client --all-features --branch --no-report
+        run: cargo +nightly llvm-cov nextest -p pubmed-client --all-features --branch --no-report
 
       - name: Generate LCOV report
-        run: cargo llvm-cov report --branch --lcov --output-path lcov.info
+        run: cargo +nightly llvm-cov report --branch --lcov --output-path lcov.info
 
       - name: Print per-file coverage summary
-        run: cargo llvm-cov report --branch --text
+        run: cargo +nightly llvm-cov report --branch --text
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
