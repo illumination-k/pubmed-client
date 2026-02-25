@@ -3,6 +3,30 @@ use serde::{Deserialize, Serialize};
 // Re-export common types
 pub use crate::common::{Affiliation, Author};
 
+/// A labeled section within a structured abstract
+///
+/// PubMed articles may have structured abstracts with labeled sections such as
+/// "BACKGROUND", "METHODS", "RESULTS", and "CONCLUSIONS". This type represents
+/// a single section of such a structured abstract.
+///
+/// # Example
+///
+/// ```
+/// use pubmed_client::pubmed::AbstractSection;
+///
+/// let section = AbstractSection {
+///     label: "BACKGROUND".to_string(),
+///     text: "This study investigates...".to_string(),
+/// };
+/// ```
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct AbstractSection {
+    /// Section label (e.g., "BACKGROUND", "METHODS", "RESULTS", "CONCLUSIONS")
+    pub label: String,
+    /// Text content of the section
+    pub text: String,
+}
+
 /// Represents a PubMed article with metadata
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PubMedArticle {
@@ -24,6 +48,13 @@ pub struct PubMedArticle {
     pub pmc_id: Option<String>,
     /// Abstract text (if available)
     pub abstract_text: Option<String>,
+    /// Structured abstract sections with labels (if available)
+    ///
+    /// Some PubMed articles have structured abstracts with labeled sections like
+    /// "BACKGROUND", "METHODS", "RESULTS", "CONCLUSIONS". When available, this
+    /// field contains each section separately. The `abstract_text` field still
+    /// contains the full concatenated text.
+    pub structured_abstract: Option<Vec<AbstractSection>>,
     /// Article types (e.g., "Clinical Trial", "Review", etc.)
     pub article_types: Vec<String>,
     /// MeSH headings associated with the article
@@ -316,6 +347,7 @@ impl PubMedArticle {
     /// #     doi: None,
     /// #     pmc_id: None,
     /// #     abstract_text: None,
+    /// #     structured_abstract: None,
     /// #     article_types: vec![],
     /// #     mesh_headings: None,
     /// #     keywords: None,
@@ -365,6 +397,7 @@ impl PubMedArticle {
     /// #     doi: None,
     /// #     pmc_id: None,
     /// #     abstract_text: None,
+    /// #     structured_abstract: None,
     /// #     article_types: vec![],
     /// #     mesh_headings: None,
     /// #     keywords: None,
@@ -507,6 +540,7 @@ impl PubMedArticle {
     /// #     doi: None,
     /// #     pmc_id: None,
     /// #     abstract_text: None,
+    /// #     structured_abstract: None,
     /// #     article_types: vec![],
     /// #     mesh_headings: None,
     /// #     keywords: None,
@@ -977,6 +1011,7 @@ mod tests {
             doi: None,
             pmc_id: None,
             abstract_text: None,
+            structured_abstract: None,
             article_types: vec![],
             mesh_headings: Some(vec![
                 MeshHeading {
@@ -1097,6 +1132,7 @@ mod tests {
             doi: None,
             pmc_id: None,
             abstract_text: None,
+            structured_abstract: None,
             article_types: vec![],
             mesh_headings: None,
             keywords: None,

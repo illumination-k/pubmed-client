@@ -19,7 +19,9 @@ struct Args {
     port: Option<u16>,
 
     /// Tools to enable, comma-separated (default: all).
-    /// Possible values: search, markdown, citmatch, gquery, espell, summary
+    /// Possible values: search, markdown, citmatch, gquery, espell, summary,
+    /// related-articles, citations, pmc-links, list-databases, database-info,
+    /// fulltext, figures, convert-id, export
     #[arg(short, long, value_delimiter = ',', value_enum)]
     tools: Vec<ToolName>,
 }
@@ -32,6 +34,15 @@ enum ToolName {
     Gquery,
     Espell,
     Summary,
+    RelatedArticles,
+    Citations,
+    PmcLinks,
+    ListDatabases,
+    DatabaseInfo,
+    Fulltext,
+    Figures,
+    ConvertId,
+    Export,
 }
 
 impl ToolName {
@@ -43,6 +54,15 @@ impl ToolName {
             ToolName::Gquery => "global_query",
             ToolName::Espell => "spell_check",
             ToolName::Summary => "fetch_summaries",
+            ToolName::RelatedArticles => "get_related_articles",
+            ToolName::Citations => "get_citations",
+            ToolName::PmcLinks => "get_pmc_links",
+            ToolName::ListDatabases => "list_databases",
+            ToolName::DatabaseInfo => "get_database_info",
+            ToolName::Fulltext => "get_pmc_fulltext",
+            ToolName::Figures => "get_pmc_figures",
+            ToolName::ConvertId => "pmid_to_pmcid",
+            ToolName::Export => "export_citations",
         }
     }
 }
@@ -107,6 +127,96 @@ impl PubMedServer {
         params: Parameters<tools::summary::SummaryRequest>,
     ) -> Result<CallToolResult, ErrorData> {
         tools::summary::fetch_summaries(self, params).await
+    }
+
+    #[tool(
+        description = "Find related articles for given PubMed IDs using the ELink API. Returns PMIDs of articles that PubMed considers related based on content similarity."
+    )]
+    async fn get_related_articles(
+        &self,
+        params: Parameters<tools::elink::RelatedArticlesRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::elink::get_related_articles(self, params).await
+    }
+
+    #[tool(
+        description = "Get articles that cite the given PubMed IDs. Returns PMIDs of citing articles from the PubMed database. Note: counts may be lower than Google Scholar as this only includes PubMed-indexed articles."
+    )]
+    async fn get_citations(
+        &self,
+        params: Parameters<tools::elink::CitationsRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::elink::get_citations(self, params).await
+    }
+
+    #[tool(
+        description = "Check PMC (PubMed Central) full-text availability for given PubMed IDs. Returns PMC IDs for articles that have free full-text versions available."
+    )]
+    async fn get_pmc_links(
+        &self,
+        params: Parameters<tools::elink::PmcLinksRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::elink::get_pmc_links(self, params).await
+    }
+
+    #[tool(
+        description = "List all available NCBI Entrez databases (PubMed, PMC, Nucleotide, Protein, Gene, etc.). Optionally filter by name."
+    )]
+    async fn list_databases(
+        &self,
+        params: Parameters<tools::einfo::ListDatabasesRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::einfo::list_databases(self, params).await
+    }
+
+    #[tool(
+        description = "Get detailed information about a specific NCBI database including description, record count, searchable fields, and cross-database links."
+    )]
+    async fn get_database_info(
+        &self,
+        params: Parameters<tools::einfo::DatabaseInfoRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::einfo::get_database_info(self, params).await
+    }
+
+    #[tool(
+        description = "Get structured full-text content from a PMC article. Returns title, authors, abstract, sections, figures, tables, and optionally references. Use get_pmc_markdown for formatted markdown output instead."
+    )]
+    async fn get_pmc_fulltext(
+        &self,
+        params: Parameters<tools::fulltext::FullTextRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::fulltext::get_pmc_fulltext(self, params).await
+    }
+
+    #[tool(
+        description = "Extract figure and table metadata from a PMC article. Returns figure IDs, labels, captions, and graphic URLs. Useful for understanding visual content without downloading full text."
+    )]
+    async fn get_pmc_figures(
+        &self,
+        params: Parameters<tools::figures::FiguresRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::figures::get_pmc_figures(self, params).await
+    }
+
+    #[tool(
+        description = "Convert a PubMed ID (PMID) to a PMC ID (PMCID). Checks whether a full-text version is available in PubMed Central."
+    )]
+    async fn pmid_to_pmcid(
+        &self,
+        params: Parameters<tools::convert::ConvertIdRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::convert::pmid_to_pmcid(self, params).await
+    }
+
+    #[tool(
+        description = "Export article citations in standard formats: BibTeX (for LaTeX), RIS (for Zotero/Mendeley/EndNote), CSL-JSON (for citation processors), or NBIB (PubMed native). Fetches article metadata and formats it for direct import into reference managers."
+    )]
+    async fn export_citations(
+        &self,
+        params: Parameters<tools::export::ExportRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::export::export_citations(self, params).await
     }
 }
 

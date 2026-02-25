@@ -6,7 +6,13 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 pub mod citmatch;
+pub mod convert;
+pub mod einfo;
+pub mod elink;
 pub mod espell;
+pub mod export;
+pub mod figures;
+pub mod fulltext;
 pub mod gquery;
 pub mod markdown;
 pub mod search;

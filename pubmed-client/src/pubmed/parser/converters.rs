@@ -105,7 +105,11 @@ impl PubmedArticleXml {
             })
             .or_else(|| Self::extract_article_id(&self.pubmed_data, "doi"));
 
-        // Extract abstract
+        // Extract abstract (both plain text and structured sections)
+        let structured_abstract = article
+            .abstract_section
+            .as_ref()
+            .and_then(|s| s.to_labeled_sections());
         let abstract_text = article.abstract_section.and_then(|s| s.to_string_opt());
 
         // Extract article types
@@ -146,6 +150,7 @@ impl PubmedArticleXml {
             doi,
             pmc_id,
             abstract_text,
+            structured_abstract,
             article_types,
             mesh_headings,
             keywords,

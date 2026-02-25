@@ -6,7 +6,7 @@
 //! The structs in this module use quick-xml's serde deserializer with field renaming
 //! to match the XML element and attribute names.
 
-use super::deserializers::{deserialize_abstract_text, deserialize_bool_yn};
+use super::deserializers::{deserialize_abstract_text_with_label, deserialize_bool_yn};
 use serde::{Deserialize, Deserializer};
 use std::fmt;
 use std::result;
@@ -193,11 +193,38 @@ impl AbstractSection {
             )
         }
     }
+
+    /// Check if this abstract has labeled sections (structured abstract)
+    pub fn is_structured(&self) -> bool {
+        self.abstract_texts.iter().any(|e| e.label.is_some())
+    }
+
+    /// Convert to labeled sections for structured abstracts
+    ///
+    /// Returns None if the abstract has no labeled sections.
+    pub fn to_labeled_sections(&self) -> Option<Vec<crate::pubmed::models::AbstractSection>> {
+        if !self.is_structured() {
+            return None;
+        }
+        Some(
+            self.abstract_texts
+                .iter()
+                .filter(|e| e.label.is_some())
+                .map(|e| crate::pubmed::models::AbstractSection {
+                    label: e.label.clone().unwrap_or_default(),
+                    text: e.text.clone(),
+                })
+                .collect(),
+        )
+    }
 }
 
 /// Abstract text element (may include Label attribute for structured abstracts)
 #[derive(Debug)]
 pub(super) struct AbstractTextElement {
+    /// Optional label for structured abstracts (e.g., "BACKGROUND", "METHODS", "RESULTS", "CONCLUSIONS")
+    pub label: Option<String>,
+    /// The text content
     pub text: String,
 }
 
@@ -206,8 +233,11 @@ impl<'de> Deserialize<'de> for AbstractTextElement {
     where
         D: Deserializer<'de>,
     {
-        let text = deserialize_abstract_text(deserializer)?;
-        Ok(AbstractTextElement { text })
+        let result = deserialize_abstract_text_with_label(deserializer)?;
+        Ok(AbstractTextElement {
+            label: result.label,
+            text: result.text,
+        })
     }
 }
 
