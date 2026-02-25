@@ -3,6 +3,7 @@
 //! This module provides specialized deserializers for handling complex XML structures
 //! that don't map cleanly to standard serde deserialization patterns.
 
+use serde::de::IgnoredAny;
 use serde::{Deserialize, Deserializer};
 use std::fmt;
 use std::result;
@@ -73,7 +74,7 @@ where
                     label = Some(value);
                 } else {
                     // Skip other attributes like @NlmCategory
-                    let _: serde::de::IgnoredAny = map.next_value()?;
+                    let _: IgnoredAny = map.next_value()?;
                 }
             }
             // Join all text parts (handles mixed content with inline tags)
