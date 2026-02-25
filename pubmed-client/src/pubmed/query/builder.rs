@@ -415,4 +415,24 @@ mod tests {
         assert_eq!(query.get_limit(), 50);
         assert_eq!(query.get_sort(), Some(&SortOrder::JournalName));
     }
+
+    mod proptest_suite {
+        use super::*;
+        use proptest::prelude::*;
+
+        proptest! {
+            #[test]
+            fn build_is_deterministic(term in "[a-z]+") {
+                let q = SearchQuery::new().query(term);
+                prop_assert_eq!(q.build(), q.build());
+            }
+
+            #[test]
+            fn limit_does_not_affect_build(term in "[a-z]+", limit in 1usize..=10000usize) {
+                let without_limit = SearchQuery::new().query(term.clone()).build();
+                let with_limit    = SearchQuery::new().query(term).limit(limit).build();
+                prop_assert_eq!(without_limit, with_limit);
+            }
+        }
+    }
 }

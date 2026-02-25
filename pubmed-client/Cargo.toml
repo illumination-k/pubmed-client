@@ -58,6 +58,7 @@ cache-sqlite = ["dep:rusqlite"]
 chrono = "0.4"
 clap = { version = "3.2", features = ["derive"] }
 paste = "1.0"
+proptest = "1"
 rstest = "0.18"
 tempfile = "3.0"
 tokio-test = "0.4"
