@@ -92,6 +92,14 @@ enum Commands {
     /// Check spelling of a search term using the ESpell API
     #[command(name = "spell-check")]
     SpellCheck(commands::espell::ESpell),
+    /// Find related articles for given PMIDs
+    Related(commands::related::Related),
+    /// Find articles that cite the given PMIDs
+    Citations(commands::citations::Citations),
+    /// List NCBI databases or get detailed database information
+    Info(commands::info::Info),
+    /// Export article citations in various formats (BibTeX, RIS, CSL-JSON, NBIB)
+    Export(commands::export::Export),
 }
 
 #[tokio::main]
@@ -183,6 +191,30 @@ async fn main() -> Result<()> {
             cmd.execute_with_config(api_key, email, tool).await
         }
         Commands::SpellCheck(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::Related(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::Citations(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::Info(cmd) => {
+            let api_key = cli.api_key.as_deref();
+            let email = cli.email.as_deref();
+            let tool = &cli.tool;
+            cmd.execute_with_config(api_key, email, tool).await
+        }
+        Commands::Export(cmd) => {
             let api_key = cli.api_key.as_deref();
             let email = cli.email.as_deref();
             let tool = &cli.tool;

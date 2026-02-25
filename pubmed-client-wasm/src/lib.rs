@@ -405,6 +405,82 @@ impl WasmPubMedClient {
         })
     }
 
+    /// Get citing articles for given PMIDs
+    pub fn get_citations(&self, pmids: Vec<u32>) -> JsPromiseStringArray {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.get_citations(&pmids).await {
+                Ok(citations) => Ok(serde_wasm_bindgen::to_value(&citations)?),
+                Err(e) => Err(JsValue::from_str(&format!("Get citations failed: {e}"))),
+            }
+        })
+        .unchecked_into()
+    }
+
+    /// Get PMC links for given PMIDs (check full-text availability)
+    pub fn get_pmc_links(&self, pmids: Vec<u32>) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.get_pmc_links(&pmids).await {
+                Ok(links) => Ok(serde_wasm_bindgen::to_value(&links)?),
+                Err(e) => Err(JsValue::from_str(&format!("Get PMC links failed: {e}"))),
+            }
+        })
+    }
+
+    /// List all available NCBI databases
+    pub fn get_database_list(&self) -> JsPromiseStringArray {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.get_database_list().await {
+                Ok(databases) => Ok(serde_wasm_bindgen::to_value(&databases)?),
+                Err(e) => Err(JsValue::from_str(&format!("Get database list failed: {e}"))),
+            }
+        })
+        .unchecked_into()
+    }
+
+    /// Get detailed information about a specific NCBI database
+    pub fn get_database_info(&self, database: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.get_database_info(&database).await {
+                Ok(info) => Ok(serde_wasm_bindgen::to_value(&info)?),
+                Err(e) => Err(JsValue::from_str(&format!("Get database info failed: {e}"))),
+            }
+        })
+    }
+
+    /// Export articles as BibTeX format
+    pub fn export_bibtex(&self, pmids: Vec<String>) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.fetch_articles(&pmid_refs).await {
+                Ok(articles) => {
+                    let bibtex = pubmed_client::export::articles_to_bibtex(&articles);
+                    Ok(JsValue::from_str(&bibtex))
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Export failed: {e}"))),
+            }
+        })
+    }
+
+    /// Export articles as RIS format
+    pub fn export_ris(&self, pmids: Vec<String>) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.fetch_articles(&pmid_refs).await {
+                Ok(articles) => {
+                    let ris = pubmed_client::export::articles_to_ris(&articles);
+                    Ok(JsValue::from_str(&ris))
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Export failed: {e}"))),
+            }
+        })
+    }
+
     /// Convert PMC full text to markdown
     pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
         let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)
@@ -542,6 +618,19 @@ pub struct JsFullText {
     pub references: Vec<JsReference>,
     pub article_type: Option<String>,
     pub keywords: Vec<String>,
+    pub funding: Vec<JsFunding>,
+    pub conflict_of_interest: Option<String>,
+    pub acknowledgments: Option<String>,
+    pub data_availability: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsFunding {
+    pub source: String,
+    pub award_id: Option<String>,
+    pub statement: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -574,6 +663,29 @@ pub struct JsSection {
     pub section_type: String,
     pub title: Option<String>,
     pub content: String,
+    pub subsections: Vec<JsSection>,
+    pub figures: Vec<JsFigure>,
+    pub tables: Vec<JsTable>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsFigure {
+    pub id: String,
+    pub label: Option<String>,
+    pub caption: String,
+    pub file_name: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsTable {
+    pub id: String,
+    pub label: Option<String>,
+    pub caption: String,
+    pub footnotes: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -611,6 +723,18 @@ impl From<PmcFullText> for JsFullText {
                 .collect(),
             article_type: full_text.article_type,
             keywords: full_text.keywords,
+            funding: full_text
+                .funding
+                .into_iter()
+                .map(|f| JsFunding {
+                    source: f.source,
+                    award_id: f.award_id,
+                    statement: f.statement,
+                })
+                .collect(),
+            conflict_of_interest: full_text.conflict_of_interest,
+            acknowledgments: full_text.acknowledgments,
+            data_availability: full_text.data_availability,
         }
     }
 }
@@ -629,10 +753,18 @@ impl From<JsFullText> for PmcFullText {
             references: js.references.into_iter().map(|r| r.into()).collect(),
             article_type: js.article_type,
             keywords: js.keywords,
-            funding: Vec::new(),
-            conflict_of_interest: None,
-            acknowledgments: None,
-            data_availability: None,
+            funding: js
+                .funding
+                .into_iter()
+                .map(|f| pubmed_client::pmc::FundingInfo {
+                    source: f.source,
+                    award_id: f.award_id,
+                    statement: f.statement,
+                })
+                .collect(),
+            conflict_of_interest: js.conflict_of_interest,
+            acknowledgments: js.acknowledgments,
+            data_availability: js.data_availability,
             supplementary_materials: Vec::new(),
         }
     }
@@ -719,6 +851,31 @@ impl From<pubmed_client::pmc::ArticleSection> for JsSection {
             section_type: section.section_type,
             title: section.title,
             content: section.content,
+            subsections: section
+                .subsections
+                .into_iter()
+                .map(JsSection::from)
+                .collect(),
+            figures: section
+                .figures
+                .into_iter()
+                .map(|f| JsFigure {
+                    id: f.id,
+                    label: f.label,
+                    caption: f.caption,
+                    file_name: f.file_name,
+                })
+                .collect(),
+            tables: section
+                .tables
+                .into_iter()
+                .map(|t| JsTable {
+                    id: t.id,
+                    label: t.label,
+                    caption: t.caption,
+                    footnotes: t.footnotes,
+                })
+                .collect(),
         }
     }
 }
@@ -729,10 +886,31 @@ impl From<JsSection> for pubmed_client::pmc::ArticleSection {
             section_type: js.section_type,
             title: js.title,
             content: js.content,
-            subsections: Vec::new(),
+            subsections: js.subsections.into_iter().map(|s| s.into()).collect(),
             id: None,
-            figures: Vec::new(),
-            tables: Vec::new(),
+            figures: js
+                .figures
+                .into_iter()
+                .map(|f| pubmed_client::pmc::Figure {
+                    id: f.id,
+                    label: f.label,
+                    caption: f.caption,
+                    alt_text: None,
+                    fig_type: None,
+                    file_path: None,
+                    file_name: f.file_name,
+                })
+                .collect(),
+            tables: js
+                .tables
+                .into_iter()
+                .map(|t| pubmed_client::pmc::Table {
+                    id: t.id,
+                    label: t.label,
+                    caption: t.caption,
+                    footnotes: t.footnotes,
+                })
+                .collect(),
         }
     }
 }
@@ -891,6 +1069,191 @@ impl From<pubmed_client::SpellCheckResult> for JsSpellCheckResult {
             has_corrections,
             replacements,
         }
+    }
+}
+
+// ================================================================================================
+// WasmSearchQuery builder
+// ================================================================================================
+
+/// Search query builder for constructing complex PubMed queries
+///
+/// Provides a fluent API for building PubMed search queries with filters,
+/// date ranges, article types, and boolean logic.
+#[wasm_bindgen]
+pub struct WasmSearchQuery {
+    inner: pubmed_client::SearchQuery,
+}
+
+#[wasm_bindgen]
+impl WasmSearchQuery {
+    /// Create a new empty search query builder
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        Self {
+            inner: pubmed_client::SearchQuery::new(),
+        }
+    }
+
+    /// Set the main search query text
+    pub fn query(mut self, query: &str) -> Self {
+        self.inner = self.inner.query(query);
+        self
+    }
+
+    /// Search in article titles only
+    pub fn title(mut self, title: &str) -> Self {
+        self.inner = self.inner.title_contains(title);
+        self
+    }
+
+    /// Search in title and abstract
+    pub fn title_abstract(mut self, text: &str) -> Self {
+        self.inner = self.inner.title_or_abstract(text);
+        self
+    }
+
+    /// Search by author name
+    pub fn author(mut self, author: &str) -> Self {
+        self.inner = self.inner.author(author);
+        self
+    }
+
+    /// Search by first author name
+    pub fn first_author(mut self, author: &str) -> Self {
+        self.inner = self.inner.first_author(author);
+        self
+    }
+
+    /// Search by journal name
+    pub fn journal(mut self, journal: &str) -> Self {
+        self.inner = self.inner.journal(journal);
+        self
+    }
+
+    /// Search by MeSH term
+    pub fn mesh_term(mut self, term: &str) -> Self {
+        self.inner = self.inner.mesh_term(term);
+        self
+    }
+
+    /// Search by MeSH major topic
+    pub fn mesh_major_topic(mut self, term: &str) -> Self {
+        self.inner = self.inner.mesh_major_topic(term);
+        self
+    }
+
+    /// Filter to only free full text articles
+    pub fn free_full_text_only(mut self) -> Self {
+        self.inner = self.inner.free_full_text_only();
+        self
+    }
+
+    /// Filter to only articles available in PMC
+    pub fn pmc_only(mut self) -> Self {
+        self.inner = self.inner.pmc_only();
+        self
+    }
+
+    /// Filter to only articles with full text available
+    pub fn full_text_only(mut self) -> Self {
+        self.inner = self.inner.full_text_only();
+        self
+    }
+
+    /// Filter to articles published after a given year
+    pub fn published_after(mut self, year: u32) -> Self {
+        self.inner = self.inner.published_after(year);
+        self
+    }
+
+    /// Filter to articles published in a date range
+    pub fn date_range(mut self, start_year: u32, end_year: Option<u32>) -> Self {
+        self.inner = self.inner.date_range(start_year, end_year);
+        self
+    }
+
+    /// Filter by article type (e.g., "review", "clinical_trial", "meta_analysis")
+    pub fn article_type_str(mut self, article_type: &str) -> Self {
+        let at = match article_type {
+            "review" => pubmed_client::ArticleType::Review,
+            "clinical_trial" => pubmed_client::ArticleType::ClinicalTrial,
+            "meta_analysis" => pubmed_client::ArticleType::MetaAnalysis,
+            "randomized_controlled_trial" => pubmed_client::ArticleType::RandomizedControlledTrial,
+            "systematic_review" => pubmed_client::ArticleType::SystematicReview,
+            "case_report" => pubmed_client::ArticleType::CaseReport,
+            "observational_study" => pubmed_client::ArticleType::ObservationalStudy,
+            _ => return self,
+        };
+        self.inner = self.inner.article_type(at);
+        self
+    }
+
+    /// Filter to human-only studies
+    pub fn humans_only(mut self) -> Self {
+        self.inner = self.inner.human_studies_only();
+        self
+    }
+
+    /// Filter by language (e.g., "english", "french")
+    pub fn language_str(mut self, language: &str) -> Self {
+        let lang = match language.to_lowercase().as_str() {
+            "english" | "eng" => pubmed_client::Language::English,
+            "french" | "fre" => pubmed_client::Language::French,
+            "german" | "ger" => pubmed_client::Language::German,
+            "spanish" | "spa" => pubmed_client::Language::Spanish,
+            "japanese" | "jpn" => pubmed_client::Language::Japanese,
+            "chinese" | "chi" => pubmed_client::Language::Chinese,
+            _ => return self,
+        };
+        self.inner = self.inner.language(lang);
+        self
+    }
+
+    /// Set the sort order for results
+    pub fn sort_str(mut self, sort: &str) -> Self {
+        let order = match sort {
+            "relevance" => pubmed_client::SortOrder::Relevance,
+            "publication_date" | "date" => pubmed_client::SortOrder::PublicationDate,
+            "first_author" | "author" => pubmed_client::SortOrder::FirstAuthor,
+            "journal_name" | "journal" => pubmed_client::SortOrder::JournalName,
+            _ => return self,
+        };
+        self.inner = self.inner.sort(order);
+        self
+    }
+
+    /// Build the query string
+    pub fn build(&self) -> String {
+        self.inner.build()
+    }
+
+    /// Search and fetch articles using this query
+    pub fn search_and_fetch(&self, client: &WasmPubMedClient, limit: usize) -> JsPromiseArticles {
+        let query_string = self.inner.build();
+        let sort = self.inner.get_sort().cloned();
+        let rust_client = client.client.clone();
+        future_to_promise(async move {
+            match rust_client
+                .pubmed
+                .search_and_fetch(&query_string, limit, sort.as_ref())
+                .await
+            {
+                Ok(articles) => {
+                    let js_articles: Vec<JsArticle> =
+                        articles.into_iter().map(JsArticle::from).collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_articles)?)
+                }
+                Err(e) => Err(JsValue::from_str(&format!("Search failed: {e}"))),
+            }
+        })
+        .unchecked_into()
+    }
+}
+
+impl Default for WasmSearchQuery {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

@@ -14,6 +14,7 @@
 //! - `client/espell` - Spell checking (ESpell API)
 
 pub mod client;
+pub mod export;
 pub mod models;
 pub mod parser;
 pub mod query;
@@ -22,11 +23,11 @@ pub mod responses;
 // Re-export public types
 pub use client::PubMedClient;
 pub use models::{
-    Affiliation, ArticleSummary, Author, ChemicalConcept, CitationMatch, CitationMatchStatus,
-    CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult, FieldInfo,
-    GlobalQueryResults, HistorySession, LinkInfo, MeshHeading, MeshQualifier, MeshTerm, PmcLinks,
-    PubMedArticle, RelatedArticles, SearchResult, SpellCheckResult, SpelledQuerySegment,
-    SupplementalConcept,
+    AbstractSection, Affiliation, ArticleSummary, Author, ChemicalConcept, CitationMatch,
+    CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo,
+    EPostResult, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, MeshHeading,
+    MeshQualifier, MeshTerm, PmcLinks, PubMedArticle, RelatedArticles, SearchResult,
+    SpellCheckResult, SpelledQuerySegment, SupplementalConcept,
 };
 pub use parser::{parse_article_from_xml, parse_articles_from_xml};
 pub use query::{ArticleType, Language, PubDate, SearchQuery, SortOrder};

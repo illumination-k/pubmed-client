@@ -3,9 +3,16 @@
 //! This module provides specialized deserializers for handling complex XML structures
 //! that don't map cleanly to standard serde deserialization patterns.
 
+use serde::de::IgnoredAny;
 use serde::{Deserialize, Deserializer};
 use std::fmt;
 use std::result;
+
+/// Represents a deserialized abstract text element with optional label
+pub(super) struct AbstractTextWithLabel {
+    pub label: Option<String>,
+    pub text: String,
+}
 
 /// Custom deserializer for AbstractTextElement that handles all content including inline tags
 ///
@@ -15,51 +22,66 @@ use std::result;
 ///
 /// This deserializer handles both simple string content and complex map structures with
 /// `$text` or `$value` keys, as well as attributes like `@Label` for structured abstracts.
-pub(super) fn deserialize_abstract_text<'de, D>(deserializer: D) -> result::Result<String, D::Error>
+pub(super) fn deserialize_abstract_text_with_label<'de, D>(
+    deserializer: D,
+) -> result::Result<AbstractTextWithLabel, D::Error>
 where
     D: Deserializer<'de>,
 {
-    use serde::de::{self, IgnoredAny, MapAccess, Visitor};
+    use serde::de::{self, MapAccess, Visitor};
 
     struct AbstractTextVisitor;
 
     impl<'de> Visitor<'de> for AbstractTextVisitor {
-        type Value = String;
+        type Value = AbstractTextWithLabel;
 
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
             formatter.write_str("abstract text content")
         }
 
-        fn visit_str<E>(self, value: &str) -> result::Result<String, E>
+        fn visit_str<E>(self, value: &str) -> result::Result<AbstractTextWithLabel, E>
         where
             E: de::Error,
         {
-            Ok(value.to_string())
+            Ok(AbstractTextWithLabel {
+                label: None,
+                text: value.to_string(),
+            })
         }
 
-        fn visit_string<E>(self, value: String) -> result::Result<String, E>
+        fn visit_string<E>(self, value: String) -> result::Result<AbstractTextWithLabel, E>
         where
             E: de::Error,
         {
-            Ok(value)
+            Ok(AbstractTextWithLabel {
+                label: None,
+                text: value,
+            })
         }
 
-        fn visit_map<M>(self, mut map: M) -> result::Result<String, M::Error>
+        fn visit_map<M>(self, mut map: M) -> result::Result<AbstractTextWithLabel, M::Error>
         where
             M: MapAccess<'de>,
         {
             let mut text_parts = Vec::new();
+            let mut label = None;
             while let Some(key) = map.next_key::<String>()? {
                 if key == "$text" || key == "$value" {
                     let value: String = map.next_value()?;
                     text_parts.push(value);
+                } else if key == "@Label" {
+                    let value: String = map.next_value()?;
+                    label = Some(value);
                 } else {
-                    // Skip other fields like @Label
+                    // Skip other attributes like @NlmCategory
                     let _: IgnoredAny = map.next_value()?;
                 }
             }
             // Join all text parts (handles mixed content with inline tags)
-            Ok(text_parts.join(""))
+            Ok(AbstractTextWithLabel {
+                label,
+                text: text_parts.join(""),
+            })
         }
     }
 
