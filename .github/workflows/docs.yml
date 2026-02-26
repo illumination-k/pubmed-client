@@ -33,7 +33,6 @@ jobs:
 
       - uses: ./.github/actions/setup-repo
         with:
-          lfs: "false"
           setup-mise: "false"
 
       - name: Build docs
@@ -204,8 +203,6 @@ jobs:
           persist-credentials: false
 
       - uses: ./.github/actions/setup-repo
-        with:
-          lfs: "false"
 
       - name: Cache pnpm store
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0

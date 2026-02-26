@@ -10,6 +10,7 @@ on:
       - "Cargo.toml"
       - "Cargo.lock"
       - ".github/workflows/python.yml"
+      - ".github/actions/setup-repo/**"
   pull_request:
     branches: [main]
     paths:
@@ -19,9 +20,12 @@ on:
       - "Cargo.toml"
       - "Cargo.lock"
       - ".github/workflows/python.yml"
+      - ".github/actions/setup-repo/**"
 
 env:
   CARGO_TERM_COLOR: always
+  MISE_EXPERIMENTAL: true
+  MISE_ENV: python
 
 jobs:
   lint:
@@ -36,43 +40,26 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-        with:
-          python-version: "3.12"
+      - uses: ./.github/actions/setup-repo
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
-        with:
-          version: "0.8.x"
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
-        with:
-          workspaces: pubmed-client-py
+      - name: Pin Python version
+        run: uv python pin 3.12
 
       - name: Install dependencies
         working-directory: pubmed-client-py
-        run: |
-          uv sync --dev
+        run: uv sync --dev
 
       - name: Run ruff check
         working-directory: pubmed-client-py
-        run: |
-          uv run ruff check .
+        run: uv run ruff check .
 
       - name: Run ruff format check
         working-directory: pubmed-client-py
-        run: |
-          uv run ruff format --check .
+        run: uv run ruff format --check .
 
       - name: Run mypy
         working-directory: pubmed-client-py
-        run: |
-          uv run mypy .
+        run: uv run mypy .
 
   test:
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -92,38 +79,22 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-        with:
-          python-version: ${{ matrix.python-version }}
+      - uses: ./.github/actions/setup-repo
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
-        with:
-          version: "0.8.x"
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
-        with:
-          workspaces: pubmed-client-py
+      - name: Pin Python version
+        run: uv python pin ${{ matrix.python-version }}
 
       - name: Install dependencies
         working-directory: pubmed-client-py
-        run: |
-          uv sync --dev
+        run: uv sync --dev
 
       - name: Build Python package with maturin
         working-directory: pubmed-client-py
-        run: |
-          uv run --with maturin maturin develop
+        run: uv run --with maturin maturin develop
 
       - name: Run tests
         working-directory: pubmed-client-py
-        run: |
-          uv run pytest -v -m "not integration"
+        run: uv run pytest -v -m "not integration"
 
   coverage:
     name: Python Test Coverage
@@ -137,23 +108,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-        with:
-          python-version: "3.12"
+      - uses: ./.github/actions/setup-repo
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
-        with:
-          version: "0.8.x"
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
-        with:
-          workspaces: pubmed-client-py
+      - name: Pin Python version
+        run: uv python pin 3.12
 
       - name: Install dependencies
         working-directory: pubmed-client-py
@@ -163,10 +121,8 @@ jobs:
 
       - name: Build Python package with maturin
         working-directory: pubmed-client-py
-        run: |
-          uv run --with maturin maturin develop
+        run: uv run --with maturin maturin develop
 
       - name: Run tests with coverage
         working-directory: pubmed-client-py
-        run: |
-          uv run pytest --cov=pubmed_client --cov-report=xml --cov-report=html -m "not integration"
+        run: uv run pytest --cov=pubmed_client --cov-report=xml --cov-report=html -m "not integration"
