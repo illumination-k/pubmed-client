@@ -38,11 +38,11 @@ fn load_all_pubmed_xmls() -> Vec<(String, String)> {
 fn build_batch_xml(files: &[(String, String)]) -> String {
     let mut combined = String::from("<?xml version=\"1.0\" ?>\n<PubmedArticleSet>\n");
     for (_, content) in files {
-        if let Some(start) = content.find("<PubmedArticle>") {
-            if let Some(end) = content.rfind("</PubmedArticle>") {
-                combined.push_str(&content[start..end + "</PubmedArticle>".len()]);
-                combined.push('\n');
-            }
+        if let Some(start) = content.find("<PubmedArticle>")
+            && let Some(end) = content.rfind("</PubmedArticle>")
+        {
+            combined.push_str(&content[start..end + "</PubmedArticle>".len()]);
+            combined.push('\n');
         }
     }
     combined.push_str("</PubmedArticleSet>");

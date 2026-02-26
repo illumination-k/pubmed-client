@@ -41,6 +41,25 @@ run = [
   "cargo llvm-cov report --text",
 ]
 
+[tasks."bench:rs"]
+description = "Run all pubmed-parser criterion benchmarks"
+run = ["cargo bench -p pubmed-parser"]
+
+[tasks."bench:save"]
+description = "Run benchmarks and save as a named baseline (usage: mise r bench:save <name>)"
+run = "cargo bench -p pubmed-parser -- --save-baseline {{arg(i=0, name='baseline_name')}}"
+
+[tasks."bench:compare"]
+description = "Run benchmarks comparing against a saved baseline (usage: mise r bench:compare <name>)"
+run = "cargo bench -p pubmed-parser -- --baseline {{arg(i=0, name='baseline_name')}}"
+
+[tasks."profile:rs"]
+description = "Build and profile parsing with samply (usage: mise r profile:rs [pmc|pubmed|all])"
+run = """
+cargo build --profile profiling --example profile_parsing -p pubmed-parser
+samply record target/profiling/examples/profile_parsing {{arg(i=0, name='mode', default='all')}}
+"""
+
 [tasks."ci:rs"]
 description = "Equivalent to rust.yml: unit tests + doc tests"
 depends = ["lint:rs", "test:rs", "doctest:rs"]
