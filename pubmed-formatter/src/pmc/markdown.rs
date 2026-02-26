@@ -744,12 +744,10 @@ impl PmcMarkdownConverter {
                 }
             }
             ReferenceStyle::AuthorYear => {
-                if !reference.authors.is_empty() && reference.year.is_some() {
-                    format!(
-                        "{} ({})",
-                        reference.authors.first().unwrap().full_name,
-                        reference.year.as_ref().unwrap()
-                    )
+                if let (Some(first_author), Some(year)) =
+                    (reference.authors.first(), reference.year.as_ref())
+                {
+                    format!("{} ({})", first_author.full_name, year)
                 } else {
                     reference.format_citation()
                 }
