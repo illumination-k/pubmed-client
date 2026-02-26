@@ -109,22 +109,22 @@ pub fn parse_oa_response(xml: &str, pmcid: &str) -> Result<OaSubsetInfo> {
     }
 
     // Check for records
-    if let Some(records) = oa_response.records {
-        if let Some(record) = records.record.into_iter().next() {
-            let mut info = OaSubsetInfo::available(pmcid.to_string());
+    if let Some(records) = oa_response.records
+        && let Some(record) = records.record.into_iter().next()
+    {
+        let mut info = OaSubsetInfo::available(pmcid.to_string());
 
-            info.citation = record.citation;
-            info.license = record.license;
-            info.retracted = record.retracted.is_some_and(|r| r == "yes");
+        info.citation = record.citation;
+        info.license = record.license;
+        info.retracted = record.retracted.is_some_and(|r| r == "yes");
 
-            if let Some(link) = record.link {
-                info.download_format = link.format;
-                info.updated = link.updated;
-                info.download_link = link.href;
-            }
-
-            return Ok(info);
+        if let Some(link) = record.link {
+            info.download_format = link.format;
+            info.updated = link.updated;
+            info.download_link = link.href;
         }
+
+        return Ok(info);
     }
 
     // No error and no records - unexpected format

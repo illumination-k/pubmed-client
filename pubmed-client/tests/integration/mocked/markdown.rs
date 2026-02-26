@@ -177,16 +177,16 @@ fn test_markdown_conversion_with_different_configs(
                         let lines: Vec<&str> = markdown.lines().collect();
                         let title_line_idx =
                             lines.iter().position(|&line| line.contains(&article.title));
-                        if let Some(idx) = title_line_idx {
-                            if idx + 1 < lines.len() {
-                                let next_line = lines[idx + 1];
-                                if !next_line.is_empty() {
-                                    assert!(
-                                        next_line.chars().all(|c| c == '=' || c == '-'),
-                                        "Setext headers should be underlined for {}",
-                                        config_name
-                                    );
-                                }
+                        if let Some(idx) = title_line_idx
+                            && idx + 1 < lines.len()
+                        {
+                            let next_line = lines[idx + 1];
+                            if !next_line.is_empty() {
+                                assert!(
+                                    next_line.chars().all(|c| c == '=' || c == '-'),
+                                    "Setext headers should be underlined for {}",
+                                    config_name
+                                );
                             }
                         }
                     }
@@ -539,15 +539,15 @@ fn test_markdown_config_builder() {
     // Test Setext headers - title should be underlined
     let lines: Vec<&str> = markdown.lines().collect();
     let title_line_idx = lines.iter().position(|&line| line.contains("Test Article"));
-    if let Some(idx) = title_line_idx {
-        if idx + 1 < lines.len() {
-            let next_line = lines[idx + 1];
-            if !next_line.is_empty() {
-                assert!(
-                    next_line.chars().all(|c| c == '=' || c == '-'),
-                    "Setext headers should be underlined"
-                );
-            }
+    if let Some(idx) = title_line_idx
+        && idx + 1 < lines.len()
+    {
+        let next_line = lines[idx + 1];
+        if !next_line.is_empty() {
+            assert!(
+                next_line.chars().all(|c| c == '=' || c == '-'),
+                "Setext headers should be underlined"
+            );
         }
     }
 }

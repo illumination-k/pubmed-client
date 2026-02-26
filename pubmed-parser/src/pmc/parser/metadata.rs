@@ -105,14 +105,14 @@ pub fn extract_pmid(content: &str) -> Option<String> {
 /// Extract article type from article metadata
 pub fn extract_article_type(content: &str) -> Option<String> {
     // Look for article-type attribute in article tag
-    if let Some(article_start) = content.find("<article") {
-        if let Some(article_end) = content[article_start..].find(">") {
-            let article_tag = &content[article_start..article_start + article_end];
-            if let Some(type_start) = article_tag.find("article-type=\"") {
-                let type_start = type_start + 14; // Length of "article-type=\""
-                if let Some(type_end) = article_tag[type_start..].find('"') {
-                    return Some(article_tag[type_start..type_start + type_end].to_string());
-                }
+    if let Some(article_start) = content.find("<article")
+        && let Some(article_end) = content[article_start..].find(">")
+    {
+        let article_tag = &content[article_start..article_start + article_end];
+        if let Some(type_start) = article_tag.find("article-type=\"") {
+            let type_start = type_start + 14; // Length of "article-type=\""
+            if let Some(type_end) = article_tag[type_start..].find('"') {
+                return Some(article_tag[type_start..type_start + type_end].to_string());
             }
         }
     }
@@ -125,24 +125,24 @@ pub fn extract_article_type(content: &str) -> Option<String> {
 pub fn extract_keywords(content: &str) -> Vec<String> {
     let mut keywords = Vec::new();
 
-    if let Some(kwd_start) = content.find("<kwd-group") {
-        if let Some(kwd_end) = content[kwd_start..].find("</kwd-group>") {
-            let kwd_section = &content[kwd_start..kwd_start + kwd_end];
+    if let Some(kwd_start) = content.find("<kwd-group")
+        && let Some(kwd_end) = content[kwd_start..].find("</kwd-group>")
+    {
+        let kwd_section = &content[kwd_start..kwd_start + kwd_end];
 
-            let mut pos = 0;
-            while let Some(kwd_start) = kwd_section[pos..].find("<kwd>") {
-                let kwd_start = pos + kwd_start + 5; // Length of "<kwd>"
-                if let Some(kwd_end) = kwd_section[kwd_start..].find("</kwd>") {
-                    let raw_keyword = kwd_section[kwd_start..kwd_start + kwd_end].trim();
-                    // Strip any nested XML tags from the keyword
-                    let keyword = xml_utils::strip_xml_tags(raw_keyword);
-                    if !keyword.is_empty() {
-                        keywords.push(keyword);
-                    }
-                    pos = kwd_start + kwd_end;
-                } else {
-                    break;
+        let mut pos = 0;
+        while let Some(kwd_start) = kwd_section[pos..].find("<kwd>") {
+            let kwd_start = pos + kwd_start + 5; // Length of "<kwd>"
+            if let Some(kwd_end) = kwd_section[kwd_start..].find("</kwd>") {
+                let raw_keyword = kwd_section[kwd_start..kwd_start + kwd_end].trim();
+                // Strip any nested XML tags from the keyword
+                let keyword = xml_utils::strip_xml_tags(raw_keyword);
+                if !keyword.is_empty() {
+                    keywords.push(keyword);
                 }
+                pos = kwd_start + kwd_end;
+            } else {
+                break;
             }
         }
     }
@@ -154,33 +154,33 @@ pub fn extract_keywords(content: &str) -> Vec<String> {
 pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
     let mut funding = Vec::new();
 
-    if let Some(funding_start) = content.find("<funding-group>") {
-        if let Some(funding_end) = content[funding_start..].find("</funding-group>") {
-            let funding_section = &content[funding_start..funding_start + funding_end];
+    if let Some(funding_start) = content.find("<funding-group>")
+        && let Some(funding_end) = content[funding_start..].find("</funding-group>")
+    {
+        let funding_section = &content[funding_start..funding_start + funding_end];
 
-            let mut pos = 0;
-            while let Some(award_start) = funding_section[pos..].find("<award-group") {
-                let award_start = pos + award_start;
-                if let Some(award_end) = funding_section[award_start..].find("</award-group>") {
-                    let award_end = award_start + award_end;
-                    let award_section = &funding_section[award_start..award_end];
+        let mut pos = 0;
+        while let Some(award_start) = funding_section[pos..].find("<award-group") {
+            let award_start = pos + award_start;
+            if let Some(award_end) = funding_section[award_start..].find("</award-group>") {
+                let award_end = award_start + award_end;
+                let award_section = &funding_section[award_start..award_end];
 
-                    let source = xml_utils::extract_text_between(
-                        award_section,
-                        "<funding-source>",
-                        "</funding-source>",
-                    )
-                    .unwrap_or_else(|| "Unknown Source".to_string());
+                let source = xml_utils::extract_text_between(
+                    award_section,
+                    "<funding-source>",
+                    "</funding-source>",
+                )
+                .unwrap_or_else(|| "Unknown Source".to_string());
 
-                    let mut funding_info = FundingInfo::new(source);
-                    funding_info.award_id =
-                        xml_utils::extract_text_between(award_section, "<award-id>", "</award-id>");
+                let mut funding_info = FundingInfo::new(source);
+                funding_info.award_id =
+                    xml_utils::extract_text_between(award_section, "<award-id>", "</award-id>");
 
-                    funding.push(funding_info);
-                    pos = award_end;
-                } else {
-                    break;
-                }
+                funding.push(funding_info);
+                pos = award_end;
+            } else {
+                break;
             }
         }
     }
@@ -191,54 +191,50 @@ pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
 /// Extract conflict of interest statement
 pub fn extract_conflict_of_interest(content: &str) -> Option<String> {
     // Look for conflict of interest in fn-group
-    if let Some(fn_start) = content.find("<fn-group") {
-        if let Some(fn_end) = content[fn_start..].find("</fn-group>") {
-            let fn_section = &content[fn_start..fn_start + fn_end];
+    if let Some(fn_start) = content.find("<fn-group")
+        && let Some(fn_end) = content[fn_start..].find("</fn-group>")
+    {
+        let fn_section = &content[fn_start..fn_start + fn_end];
 
-            // Look for conflict or competing interest
-            let mut pos = 0;
-            while let Some(fn_start) = fn_section[pos..].find("<fn") {
-                let fn_start = pos + fn_start;
-                if let Some(fn_end) = fn_section[fn_start..].find("</fn>") {
-                    let fn_end = fn_start + fn_end;
-                    let fn_content = &fn_section[fn_start..fn_end];
+        // Look for conflict or competing interest
+        let mut pos = 0;
+        while let Some(fn_start) = fn_section[pos..].find("<fn") {
+            let fn_start = pos + fn_start;
+            if let Some(fn_end) = fn_section[fn_start..].find("</fn>") {
+                let fn_end = fn_start + fn_end;
+                let fn_content = &fn_section[fn_start..fn_end];
 
-                    if fn_content.contains("conflict") || fn_content.contains("competing") {
-                        if let Some(p_start) = fn_content.find("<p>") {
-                            if let Some(p_end) = fn_content[p_start..].find("</p>") {
-                                let coi = &fn_content[p_start + 3..p_start + p_end];
-                                return Some(xml_utils::strip_xml_tags(coi));
-                            }
-                        }
-                    }
-                    pos = fn_end;
-                } else {
-                    break;
+                if (fn_content.contains("conflict") || fn_content.contains("competing"))
+                    && let Some(p_start) = fn_content.find("<p>")
+                    && let Some(p_end) = fn_content[p_start..].find("</p>")
+                {
+                    let coi = &fn_content[p_start + 3..p_start + p_end];
+                    return Some(xml_utils::strip_xml_tags(coi));
                 }
+                pos = fn_end;
+            } else {
+                break;
             }
         }
     }
 
     // Look for conflict statement in dedicated section
-    if let Some(coi_start) = content.find("<sec") {
-        if let Some(coi_end) = content[coi_start..].find("</sec>") {
-            let coi_section = &content[coi_start..coi_start + coi_end];
-            if coi_section.contains("conflict") || coi_section.contains("competing") {
-                if let Some(title_start) = coi_section.find("<title>") {
-                    if let Some(title_end) = coi_section[title_start..].find("</title>") {
-                        let title = &coi_section[title_start + 7..title_start + title_end];
-                        if title.to_lowercase().contains("conflict")
-                            || title.to_lowercase().contains("competing")
-                        {
-                            if let Some(p_start) = coi_section.find("<p>") {
-                                if let Some(p_end) = coi_section[p_start..].find("</p>") {
-                                    let coi = &coi_section[p_start + 3..p_start + p_end];
-                                    return Some(xml_utils::strip_xml_tags(coi));
-                                }
-                            }
-                        }
-                    }
-                }
+    if let Some(coi_start) = content.find("<sec")
+        && let Some(coi_end) = content[coi_start..].find("</sec>")
+    {
+        let coi_section = &content[coi_start..coi_start + coi_end];
+        if (coi_section.contains("conflict") || coi_section.contains("competing"))
+            && let Some(title_start) = coi_section.find("<title>")
+            && let Some(title_end) = coi_section[title_start..].find("</title>")
+        {
+            let title = &coi_section[title_start + 7..title_start + title_end];
+            if (title.to_lowercase().contains("conflict")
+                || title.to_lowercase().contains("competing"))
+                && let Some(p_start) = coi_section.find("<p>")
+                && let Some(p_end) = coi_section[p_start..].find("</p>")
+            {
+                let coi = &coi_section[p_start + 3..p_start + p_end];
+                return Some(xml_utils::strip_xml_tags(coi));
             }
         }
     }
@@ -255,22 +251,22 @@ pub fn extract_acknowledgments(content: &str) -> Option<String> {
 /// Extract data availability statement
 pub fn extract_data_availability(content: &str) -> Option<String> {
     // Look for data availability in dedicated section
-    if let Some(data_start) = content.find("<sec") {
-        if let Some(data_end) = content[data_start..].find("</sec>") {
-            let data_section = &content[data_start..data_start + data_end];
-            if data_section.contains("data") && data_section.contains("availab") {
-                return Some(xml_utils::strip_xml_tags(data_section));
-            }
+    if let Some(data_start) = content.find("<sec")
+        && let Some(data_end) = content[data_start..].find("</sec>")
+    {
+        let data_section = &content[data_start..data_start + data_end];
+        if data_section.contains("data") && data_section.contains("availab") {
+            return Some(xml_utils::strip_xml_tags(data_section));
         }
     }
 
     // Look for data availability statement in supplementary material
-    if let Some(supp_start) = content.find("<supplementary-material") {
-        if let Some(supp_end) = content[supp_start..].find("</supplementary-material>") {
-            let supp_section = &content[supp_start..supp_start + supp_end];
-            if supp_section.contains("data") && supp_section.contains("availab") {
-                return Some(xml_utils::strip_xml_tags(supp_section));
-            }
+    if let Some(supp_start) = content.find("<supplementary-material")
+        && let Some(supp_end) = content[supp_start..].find("</supplementary-material>")
+    {
+        let supp_section = &content[supp_start..supp_start + supp_end];
+        if supp_section.contains("data") && supp_section.contains("availab") {
+            return Some(xml_utils::strip_xml_tags(supp_section));
         }
     }
 
@@ -352,12 +348,12 @@ pub fn extract_title(content: &str) -> String {
 /// Extract article language
 pub fn extract_language(content: &str) -> Option<String> {
     // Look for language in article tag
-    if let Some(article_start) = content.find("<article") {
-        if let Some(article_end) = content[article_start..].find(">") {
-            let article_tag = &content[article_start..article_start + article_end];
-            if let Some(lang) = xml_utils::extract_attribute_value(article_tag, "xml:lang") {
-                return Some(lang);
-            }
+    if let Some(article_start) = content.find("<article")
+        && let Some(article_end) = content[article_start..].find(">")
+    {
+        let article_tag = &content[article_start..article_start + article_end];
+        if let Some(lang) = xml_utils::extract_attribute_value(article_tag, "xml:lang") {
+            return Some(lang);
         }
     }
     None
@@ -369,10 +365,10 @@ pub fn extract_article_ids(content: &str) -> Vec<(String, String)> {
 
     let id_tags = xml_utils::find_all_tags(content, "article-id");
     for id_tag in id_tags {
-        if let Some(id_type) = xml_utils::extract_attribute_value(&id_tag, "pub-id-type") {
-            if let Some(id_value) = xml_utils::extract_element_content(&id_tag, "article-id") {
-                ids.push((id_type, id_value.trim().to_string()));
-            }
+        if let Some(id_type) = xml_utils::extract_attribute_value(&id_tag, "pub-id-type")
+            && let Some(id_value) = xml_utils::extract_element_content(&id_tag, "article-id")
+        {
+            ids.push((id_type, id_value.trim().to_string()));
         }
     }
 

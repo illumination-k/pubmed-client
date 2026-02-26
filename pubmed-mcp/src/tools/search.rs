@@ -251,15 +251,13 @@ pub async fn search_pubmed(
         }
 
         // Add abstract preview if available and requested
-        if include_abstract {
-            if let Some(ref abstract_text) = article.abstract_text {
-                let preview = if abstract_text.len() > 200 {
-                    format!("{}...", &abstract_text[..200])
-                } else {
-                    abstract_text.clone()
-                };
-                result.push_str(&format!("   Abstract: {}\n", preview));
-            }
+        if include_abstract && let Some(ref abstract_text) = article.abstract_text {
+            let preview = if abstract_text.len() > 200 {
+                format!("{}...", &abstract_text[..200])
+            } else {
+                abstract_text.clone()
+            };
+            result.push_str(&format!("   Abstract: {}\n", preview));
         }
         result.push('\n');
     }

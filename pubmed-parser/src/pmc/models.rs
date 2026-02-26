@@ -125,12 +125,11 @@ impl SupplementaryMaterial {
 
     /// Get the file extension from the URL
     pub fn get_file_extension(&self) -> Option<String> {
-        if let Some(url) = &self.file_url {
-            if let Some(filename) = url.split('/').next_back() {
-                if let Some(dot_index) = filename.rfind('.') {
-                    return Some(filename[dot_index + 1..].to_lowercase());
-                }
-            }
+        if let Some(url) = &self.file_url
+            && let Some(filename) = url.split('/').next_back()
+            && let Some(dot_index) = filename.rfind('.')
+        {
+            return Some(filename[dot_index + 1..].to_lowercase());
         }
         None
     }
@@ -436,37 +435,38 @@ impl Reference {
             }
         }
 
-        if let Some(title) = &self.title {
-            if !title.trim().is_empty() {
-                parts.push(title.clone());
-            }
+        if let Some(title) = &self.title
+            && !title.trim().is_empty()
+        {
+            parts.push(title.clone());
         }
 
-        if let Some(journal) = &self.journal {
-            if !journal.trim().is_empty() {
-                let mut journal_part = journal.clone();
-                if let Some(year) = &self.year {
-                    if !year.trim().is_empty() && year != "n.d." {
-                        journal_part.push_str(&format!(" ({year})"));
-                    }
-                }
-                if let Some(volume) = &self.volume {
-                    if !volume.trim().is_empty() {
-                        journal_part.push_str(&format!(" {volume}"));
-                        if let Some(issue) = &self.issue {
-                            if !issue.trim().is_empty() {
-                                journal_part.push_str(&format!("({issue})"));
-                            }
-                        }
-                    }
-                }
-                if let Some(pages) = &self.pages {
-                    if !pages.trim().is_empty() {
-                        journal_part.push_str(&format!(": {pages}"));
-                    }
-                }
-                parts.push(journal_part);
+        if let Some(journal) = &self.journal
+            && !journal.trim().is_empty()
+        {
+            let mut journal_part = journal.clone();
+            if let Some(year) = &self.year
+                && !year.trim().is_empty()
+                && year != "n.d."
+            {
+                journal_part.push_str(&format!(" ({year})"));
             }
+            if let Some(volume) = &self.volume
+                && !volume.trim().is_empty()
+            {
+                journal_part.push_str(&format!(" {volume}"));
+                if let Some(issue) = &self.issue
+                    && !issue.trim().is_empty()
+                {
+                    journal_part.push_str(&format!("({issue})"));
+                }
+            }
+            if let Some(pages) = &self.pages
+                && !pages.trim().is_empty()
+            {
+                journal_part.push_str(&format!(": {pages}"));
+            }
+            parts.push(journal_part);
         }
 
         // If no meaningful parts found, use the reference ID as fallback

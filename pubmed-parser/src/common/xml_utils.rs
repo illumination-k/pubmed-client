@@ -216,13 +216,13 @@ pub fn extract_element_content(content: &str, tag: &str) -> Option<String> {
     let start_tag = format!("<{}", tag);
     let end_tag = format!("</{}>", tag);
 
-    if let Some(start_pos) = content.find(&start_tag) {
-        if let Some(tag_end) = content[start_pos..].find(">") {
-            let content_start = start_pos + tag_end + 1;
-            if let Some(end_pos) = content[content_start..].find(&end_tag) {
-                let content_end = content_start + end_pos;
-                return Some(content[content_start..content_end].to_string());
-            }
+    if let Some(start_pos) = content.find(&start_tag)
+        && let Some(tag_end) = content[start_pos..].find(">")
+    {
+        let content_start = start_pos + tag_end + 1;
+        if let Some(end_pos) = content[content_start..].find(&end_tag) {
+            let content_end = content_start + end_pos;
+            return Some(content[content_start..content_end].to_string());
         }
     }
 
@@ -244,83 +244,81 @@ pub fn extract_all_attributes(tag: &str) -> HashMap<String, String> {
     let mut attributes = HashMap::new();
 
     // Find the opening tag
-    if let Some(start) = tag.find('<') {
-        if let Some(end) = tag[start..].find('>') {
-            let tag_content = &tag[start + 1..start + end];
+    if let Some(start) = tag.find('<')
+        && let Some(end) = tag[start..].find('>')
+    {
+        let tag_content = &tag[start + 1..start + end];
 
-            // Skip the tag name
-            if let Some(space_pos) = tag_content.find(' ') {
-                let attrs_part = &tag_content[space_pos + 1..];
+        // Skip the tag name
+        if let Some(space_pos) = tag_content.find(' ') {
+            let attrs_part = &tag_content[space_pos + 1..];
 
-                // Parse attributes
-                let mut pos = 0;
+            // Parse attributes
+            let mut pos = 0;
+            while pos < attrs_part.len() {
+                // Skip whitespace
+                while pos < attrs_part.len() && attrs_part.chars().nth(pos).unwrap().is_whitespace()
+                {
+                    pos += 1;
+                }
+
+                if pos >= attrs_part.len() {
+                    break;
+                }
+
+                // Find attribute name
+                let name_start = pos;
                 while pos < attrs_part.len() {
-                    // Skip whitespace
-                    while pos < attrs_part.len()
-                        && attrs_part.chars().nth(pos).unwrap().is_whitespace()
-                    {
-                        pos += 1;
-                    }
-
-                    if pos >= attrs_part.len() {
+                    let ch = attrs_part.chars().nth(pos).unwrap();
+                    if ch == '=' || ch.is_whitespace() {
                         break;
                     }
+                    pos += 1;
+                }
 
-                    // Find attribute name
-                    let name_start = pos;
+                if pos >= attrs_part.len() {
+                    break;
+                }
+
+                let attr_name = attrs_part[name_start..pos].to_string();
+
+                // Skip whitespace and '='
+                while pos < attrs_part.len() {
+                    let ch = attrs_part.chars().nth(pos).unwrap();
+                    if ch == '=' {
+                        pos += 1;
+                        break;
+                    } else if ch.is_whitespace() {
+                        pos += 1;
+                    } else {
+                        break;
+                    }
+                }
+
+                // Skip whitespace after '='
+                while pos < attrs_part.len() && attrs_part.chars().nth(pos).unwrap().is_whitespace()
+                {
+                    pos += 1;
+                }
+
+                if pos >= attrs_part.len() {
+                    break;
+                }
+
+                // Extract quoted value
+                if let Some(quote_char) = attrs_part.chars().nth(pos)
+                    && (quote_char == '"' || quote_char == '\'')
+                {
+                    pos += 1; // Skip opening quote
+                    let value_start = pos;
                     while pos < attrs_part.len() {
-                        let ch = attrs_part.chars().nth(pos).unwrap();
-                        if ch == '=' || ch.is_whitespace() {
+                        if attrs_part.chars().nth(pos).unwrap() == quote_char {
+                            let attr_value = attrs_part[value_start..pos].to_string();
+                            attributes.insert(attr_name, attr_value);
+                            pos += 1; // Skip closing quote
                             break;
                         }
                         pos += 1;
-                    }
-
-                    if pos >= attrs_part.len() {
-                        break;
-                    }
-
-                    let attr_name = attrs_part[name_start..pos].to_string();
-
-                    // Skip whitespace and '='
-                    while pos < attrs_part.len() {
-                        let ch = attrs_part.chars().nth(pos).unwrap();
-                        if ch == '=' {
-                            pos += 1;
-                            break;
-                        } else if ch.is_whitespace() {
-                            pos += 1;
-                        } else {
-                            break;
-                        }
-                    }
-
-                    // Skip whitespace after '='
-                    while pos < attrs_part.len()
-                        && attrs_part.chars().nth(pos).unwrap().is_whitespace()
-                    {
-                        pos += 1;
-                    }
-
-                    if pos >= attrs_part.len() {
-                        break;
-                    }
-
-                    // Extract quoted value
-                    if let Some(quote_char) = attrs_part.chars().nth(pos) {
-                        if quote_char == '"' || quote_char == '\'' {
-                            pos += 1; // Skip opening quote
-                            let value_start = pos;
-                            while pos < attrs_part.len() {
-                                if attrs_part.chars().nth(pos).unwrap() == quote_char {
-                                    let attr_value = attrs_part[value_start..pos].to_string();
-                                    attributes.insert(attr_name, attr_value);
-                                    pos += 1; // Skip closing quote
-                                    break;
-                                }
-                                pos += 1;
-                            }
-                        }
                     }
                 }
             }

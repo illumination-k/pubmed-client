@@ -16,7 +16,7 @@ use pubmed_client::{ExtractedFigure, PmcFullText};
 
 /// Python wrapper for PMC Affiliation
 #[gen_stub_pyclass]
-#[pyclass(name = "PmcAffiliation")]
+#[pyclass(name = "PmcAffiliation", from_py_object)]
 #[derive(Clone)]
 pub struct PyPmcAffiliation {
     #[pyo3(get)]
@@ -53,7 +53,7 @@ impl PyPmcAffiliation {
 
 /// Python wrapper for PMC Author
 #[gen_stub_pyclass]
-#[pyclass(name = "PmcAuthor")]
+#[pyclass(name = "PmcAuthor", from_py_object)]
 #[derive(Clone)]
 pub struct PyPmcAuthor {
     #[pyo3(get)]
@@ -111,7 +111,7 @@ impl PyPmcAuthor {
 
 /// Python wrapper for Figure
 #[gen_stub_pyclass]
-#[pyclass(name = "Figure")]
+#[pyclass(name = "Figure", from_py_object)]
 #[derive(Clone)]
 pub struct PyFigure {
     #[pyo3(get)]
@@ -157,7 +157,7 @@ impl PyFigure {
 /// Represents a figure that has been extracted from a PMC tar.gz archive,
 /// combining XML metadata with actual file information.
 #[gen_stub_pyclass]
-#[pyclass(name = "ExtractedFigure")]
+#[pyclass(name = "ExtractedFigure", from_py_object)]
 #[derive(Clone)]
 pub struct PyExtractedFigure {
     /// Figure metadata from XML (caption, label, etc.)
@@ -198,7 +198,7 @@ impl PyExtractedFigure {
 
 /// Python wrapper for Table
 #[gen_stub_pyclass]
-#[pyclass(name = "Table")]
+#[pyclass(name = "Table", from_py_object)]
 #[derive(Clone)]
 pub struct PyTable {
     #[pyo3(get)]
@@ -229,7 +229,7 @@ impl PyTable {
 
 /// Python wrapper for Reference
 #[gen_stub_pyclass]
-#[pyclass(name = "Reference")]
+#[pyclass(name = "Reference", from_py_object)]
 #[derive(Clone)]
 pub struct PyReference {
     #[pyo3(get)]
@@ -269,7 +269,7 @@ impl PyReference {
 
 /// Python wrapper for ArticleSection
 #[gen_stub_pyclass]
-#[pyclass(name = "ArticleSection")]
+#[pyclass(name = "ArticleSection", from_py_object)]
 #[derive(Clone)]
 pub struct PyArticleSection {
     #[pyo3(get)]
@@ -300,7 +300,7 @@ impl PyArticleSection {
 
 /// Python wrapper for PmcFullText
 #[gen_stub_pyclass]
-#[pyclass(name = "PmcFullText")]
+#[pyclass(name = "PmcFullText", from_py_object)]
 #[derive(Clone)]
 pub struct PyPmcFullText {
     #[pyo3(get)]
@@ -432,7 +432,7 @@ impl PyPmcFullText {
 /// Information about OA (Open Access) subset availability for a PMC article.
 /// The OA subset contains articles with programmatic access to full-text XML.
 #[gen_stub_pyclass]
-#[pyclass(name = "OaSubsetInfo")]
+#[pyclass(name = "OaSubsetInfo", from_py_object)]
 #[derive(Clone)]
 pub struct PyOaSubsetInfo {
     /// PMC ID (e.g., "PMC7906746")

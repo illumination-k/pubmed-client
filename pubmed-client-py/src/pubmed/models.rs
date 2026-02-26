@@ -15,7 +15,7 @@ use pubmed_client::{ArticleSummary, PubMedArticle, pubmed};
 
 /// Python wrapper for Author affiliation
 #[gen_stub_pyclass]
-#[pyclass(name = "Affiliation")]
+#[pyclass(name = "Affiliation", from_py_object)]
 #[derive(Clone)]
 pub struct PyAffiliation {
     #[pyo3(get)]
@@ -55,7 +55,7 @@ impl PyAffiliation {
 
 /// Python wrapper for Author
 #[gen_stub_pyclass]
-#[pyclass(name = "Author")]
+#[pyclass(name = "Author", from_py_object)]
 #[derive(Clone)]
 pub struct PyAuthor {
     #[pyo3(get)]
@@ -119,7 +119,7 @@ impl PyAuthor {
 
 /// Python wrapper for PubMedArticle
 #[gen_stub_pyclass]
-#[pyclass(name = "PubMedArticle")]
+#[pyclass(name = "PubMedArticle", from_py_object)]
 #[derive(Clone)]
 pub struct PyPubMedArticle {
     #[pyo3(get)]
@@ -227,7 +227,7 @@ impl PyPubMedArticle {
 ///     >>> result = client.epost(["31978945", "33515491"])
 ///     >>> print(f"WebEnv: {result.webenv}, Query Key: {result.query_key}")
 #[gen_stub_pyclass]
-#[pyclass(name = "EPostResult")]
+#[pyclass(name = "EPostResult", from_py_object)]
 #[derive(Clone)]
 pub struct PyEPostResult {
     #[pyo3(get)]
@@ -258,7 +258,7 @@ impl PyEPostResult {
 
 /// Python wrapper for RelatedArticles
 #[gen_stub_pyclass]
-#[pyclass(name = "RelatedArticles")]
+#[pyclass(name = "RelatedArticles", from_py_object)]
 #[derive(Clone)]
 pub struct PyRelatedArticles {
     #[pyo3(get)]
@@ -297,7 +297,7 @@ impl PyRelatedArticles {
 
 /// Python wrapper for PmcLinks
 #[gen_stub_pyclass]
-#[pyclass(name = "PmcLinks")]
+#[pyclass(name = "PmcLinks", from_py_object)]
 #[derive(Clone)]
 pub struct PyPmcLinks {
     #[pyo3(get)]
@@ -333,7 +333,7 @@ impl PyPmcLinks {
 
 /// Python wrapper for Citations
 #[gen_stub_pyclass]
-#[pyclass(name = "Citations")]
+#[pyclass(name = "Citations", from_py_object)]
 #[derive(Clone)]
 pub struct PyCitations {
     #[pyo3(get)]
@@ -369,7 +369,7 @@ impl PyCitations {
 
 /// Python wrapper for DatabaseInfo
 #[gen_stub_pyclass]
-#[pyclass(name = "DatabaseInfo")]
+#[pyclass(name = "DatabaseInfo", from_py_object)]
 #[derive(Clone)]
 pub struct PyDatabaseInfo {
     #[pyo3(get)]
@@ -431,7 +431,7 @@ impl PyDatabaseInfo {
 ///     >>> result.has_corrections
 ///     True
 #[gen_stub_pyclass]
-#[pyclass(name = "SpellCheckResult")]
+#[pyclass(name = "SpellCheckResult", from_py_object)]
 #[derive(Clone)]
 pub struct PySpellCheckResult {
     #[pyo3(get)]
@@ -494,7 +494,7 @@ impl PySpellCheckResult {
 ///     ...     key="Art1",
 ///     ... )
 #[gen_stub_pyclass]
-#[pyclass(name = "CitationQuery")]
+#[pyclass(name = "CitationQuery", from_py_object)]
 #[derive(Clone)]
 pub struct PyCitationQuery {
     #[pyo3(get)]
@@ -566,7 +566,7 @@ impl PyCitationQuery {
 ///     pmid: Matched PMID (None if not found)
 ///     status: Match status ("found", "not_found", or "ambiguous")
 #[gen_stub_pyclass]
-#[pyclass(name = "CitationMatch")]
+#[pyclass(name = "CitationMatch", from_py_object)]
 #[derive(Clone)]
 pub struct PyCitationMatch {
     #[pyo3(get)]
@@ -623,7 +623,7 @@ impl PyCitationMatch {
 /// Attributes:
 ///     matches: List of CitationMatch results
 #[gen_stub_pyclass]
-#[pyclass(name = "CitationMatches")]
+#[pyclass(name = "CitationMatches", from_py_object)]
 #[derive(Clone)]
 pub struct PyCitationMatches {
     inner_matches: Vec<PyCitationMatch>,
@@ -683,7 +683,7 @@ impl PyCitationMatches {
 ///     count: Number of matching records
 ///     status: Query status (e.g., "Ok")
 #[gen_stub_pyclass]
-#[pyclass(name = "DatabaseCount")]
+#[pyclass(name = "DatabaseCount", from_py_object)]
 #[derive(Clone)]
 pub struct PyDatabaseCount {
     #[pyo3(get)]
@@ -724,7 +724,7 @@ impl PyDatabaseCount {
 ///     term: The query term that was searched
 ///     results: List of DatabaseCount results for each database
 #[gen_stub_pyclass]
-#[pyclass(name = "GlobalQueryResults")]
+#[pyclass(name = "GlobalQueryResults", from_py_object)]
 #[derive(Clone)]
 pub struct PyGlobalQueryResults {
     #[pyo3(get)]
@@ -801,7 +801,7 @@ impl PyGlobalQueryResults {
 ///     >>> for s in summaries:
 ///     ...     print(f"{s.pmid}: {s.title} ({s.pub_date})")
 #[gen_stub_pyclass]
-#[pyclass(name = "ArticleSummary")]
+#[pyclass(name = "ArticleSummary", from_py_object)]
 #[derive(Clone)]
 pub struct PyArticleSummary {
     #[pyo3(get)]

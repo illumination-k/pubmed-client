@@ -14,11 +14,11 @@ pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
     }
 
     // Extract body sections with enhanced parsing
-    if let Some(body_start) = content.find("<body>") {
-        if let Some(body_end) = content[body_start..].find("</body>") {
-            let body_content = &content[body_start + 6..body_start + body_end];
-            sections.extend(extract_body_sections_enhanced(body_content));
-        }
+    if let Some(body_start) = content.find("<body>")
+        && let Some(body_end) = content[body_start..].find("</body>")
+    {
+        let body_content = &content[body_start + 6..body_start + body_end];
+        sections.extend(extract_body_sections_enhanced(body_content));
     }
 
     // Distribute global figures to sections based on references
@@ -29,30 +29,30 @@ pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
 
 /// Enhanced abstract section extraction
 fn extract_abstract_section_enhanced(content: &str) -> Option<ArticleSection> {
-    if let Some(abstract_start) = content.find("<abstract") {
-        if let Some(abstract_end) = content[abstract_start..].find("</abstract>") {
-            let abstract_content = &content[abstract_start..abstract_start + abstract_end];
+    if let Some(abstract_start) = content.find("<abstract")
+        && let Some(abstract_end) = content[abstract_start..].find("</abstract>")
+    {
+        let abstract_content = &content[abstract_start..abstract_start + abstract_end];
 
-            // Find the actual content start (after the opening tag)
-            if let Some(content_start) = abstract_content.find(">") {
-                let content_part = &abstract_content[content_start + 1..];
+        // Find the actual content start (after the opening tag)
+        if let Some(content_start) = abstract_content.find(">") {
+            let content_part = &abstract_content[content_start + 1..];
 
-                // Extract figures and tables from abstract
-                let figures = extract_figures_from_section(content_part);
-                let tables = extract_tables_from_section(content_part);
+            // Extract figures and tables from abstract
+            let figures = extract_figures_from_section(content_part);
+            let tables = extract_tables_from_section(content_part);
 
-                let clean_content = xml_utils::strip_xml_tags(content_part);
+            let clean_content = xml_utils::strip_xml_tags(content_part);
 
-                if !clean_content.trim().is_empty() {
-                    let mut section = ArticleSection::with_title(
-                        "abstract".to_string(),
-                        "Abstract".to_string(),
-                        clean_content,
-                    );
-                    section.figures = figures;
-                    section.tables = tables;
-                    return Some(section);
-                }
+            if !clean_content.trim().is_empty() {
+                let mut section = ArticleSection::with_title(
+                    "abstract".to_string(),
+                    "Abstract".to_string(),
+                    clean_content,
+                );
+                section.figures = figures;
+                section.tables = tables;
+                return Some(section);
             }
         }
     }
@@ -82,10 +82,10 @@ fn extract_body_sections_enhanced(content: &str) -> Vec<ArticleSection> {
     }
 
     // If no sections found, extract paragraphs as a single section
-    if sections.is_empty() {
-        if let Some(body_section) = extract_paragraphs_as_section_enhanced(content) {
-            sections.push(body_section);
-        }
+    if sections.is_empty()
+        && let Some(body_section) = extract_paragraphs_as_section_enhanced(content)
+    {
+        sections.push(body_section);
     }
 
     sections

@@ -699,16 +699,16 @@ impl PmcMarkdownConverter {
                 }
 
                 // Add simple ORCID link if available and enabled
-                if self.config.include_orcid_links {
-                    if let Some(orcid) = &author.orcid {
-                        // Clean the ORCID string first to remove any XML tags
-                        let cleaned_orcid = self.clean_content(orcid);
-                        let clean_orcid = cleaned_orcid.trim_start_matches("https://orcid.org/");
+                if self.config.include_orcid_links
+                    && let Some(orcid) = &author.orcid
+                {
+                    // Clean the ORCID string first to remove any XML tags
+                    let cleaned_orcid = self.clean_content(orcid);
+                    let clean_orcid = cleaned_orcid.trim_start_matches("https://orcid.org/");
 
-                        // Basic ORCID format validation (should be like 0000-0000-0000-0000)
-                        if clean_orcid.len() >= 19 && clean_orcid.matches('-').count() == 3 {
-                            name.push_str(&format!(" ([ORCID](https://orcid.org/{clean_orcid}))"));
-                        }
+                    // Basic ORCID format validation (should be like 0000-0000-0000-0000)
+                    if clean_orcid.len() >= 19 && clean_orcid.matches('-').count() == 3 {
+                        name.push_str(&format!(" ([ORCID](https://orcid.org/{clean_orcid}))"));
                     }
                 }
 
@@ -779,15 +779,15 @@ impl PmcMarkdownConverter {
         let mut content = String::new();
 
         // Add image if path is provided and include_local_figures is enabled
-        if self.config.include_local_figures {
-            if let Some(path) = figure_path {
-                let alt_text = figure
-                    .alt_text
-                    .as_deref()
-                    .or(figure.label.as_deref())
-                    .unwrap_or(&figure.id);
-                content.push_str(&format!("![{alt_text}]({path})\n\n"));
-            }
+        if self.config.include_local_figures
+            && let Some(path) = figure_path
+        {
+            let alt_text = figure
+                .alt_text
+                .as_deref()
+                .or(figure.label.as_deref())
+                .unwrap_or(&figure.id);
+            content.push_str(&format!("![{alt_text}]({path})\n\n"));
         }
 
         if let Some(label) = &figure.label {
