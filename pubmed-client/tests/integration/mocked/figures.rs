@@ -1,5 +1,4 @@
 use pubmed_client::{ClientConfig, ParseError, PmcClient, PmcTarClient, PubMedError};
-use std::path::Path;
 use tempfile::tempdir;
 use tracing::info;
 use tracing_test::traced_test;
@@ -7,7 +6,7 @@ use tracing_test::traced_test;
 /// Macro to test figure extraction from PMCID
 ///
 /// This macro takes a PMCID as input and:
-/// 1. Checks if a test XML file exists in tests/integration/test_data/pmc_xml/
+/// 1. Checks if a test XML file exists in test_data/pmc_xml/
 /// 2. If found, uses the local file; otherwise downloads and saves from API
 /// 3. Parses the XML to extract figure metadata
 /// 4. Asserts that at least one figure is found
@@ -21,23 +20,26 @@ macro_rules! test_pmcid_figure_extraction {
                 let pmcid = $pmcid;
                 info!(pmcid = %pmcid, "Testing figure extraction");
 
-                // Construct path to test data file
-                let test_data_path = format!(
-                    "tests/integration/test_data/pmc_xml/PMC{}.xml",
+                // Construct path to test data file (relative to workspace root)
+                let workspace_root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .parent()
+                    .expect("CARGO_MANIFEST_DIR has no parent");
+                let test_data_path = workspace_root.join(format!(
+                    "test_data/pmc_xml/PMC{}.xml",
                     pmcid.trim_start_matches("PMC")
-                );
+                ));
 
-                let xml_content = if Path::new(&test_data_path).exists() {
-                    info!(pmcid = %pmcid, path = %test_data_path, "Using local test data file");
+                let xml_content = if test_data_path.exists() {
+                    info!(pmcid = %pmcid, path = %test_data_path.display(), "Using local test data file");
                     std::fs::read_to_string(&test_data_path)
-                        .unwrap_or_else(|e| panic!("Failed to read test data file {}: {}", test_data_path, e))
+                        .unwrap_or_else(|e| panic!("Failed to read test data file {:?}: {}", test_data_path, e))
                 } else {
                     info!(pmcid = %pmcid, "Local test data not found, downloading from API");
                     let config = ClientConfig::new();
                     let client = PmcClient::with_config(config);
                     let raw_xml = client.fetch_xml(pmcid).await
                         .unwrap_or_else(|e| panic!("Failed to download XML for {}: {}", pmcid, e));
-                    std::fs::write(&test_data_path, &raw_xml).unwrap_or_else(|e| panic!("Failed to save test data file {}: {}", test_data_path, e));
+                    std::fs::write(&test_data_path, &raw_xml).unwrap_or_else(|e| panic!("Failed to save test data file {:?}: {}", test_data_path, e));
                     raw_xml
                 };
 

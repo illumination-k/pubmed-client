@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Directory to store PubMed XML files
-XML_DIR="tests/integration/test_data/pubmed_xml"
+XML_DIR="test_data/pubmed_xml"
 
 # Create directory if it doesn't exist
 mkdir -p "$XML_DIR"

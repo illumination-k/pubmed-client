@@ -4,6 +4,14 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+/// Get the workspace root directory
+fn workspace_root() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("CARGO_MANIFEST_DIR has no parent")
+        .to_path_buf()
+}
+
 /// Test case structure for PMC XML files
 #[derive(Debug, Clone)]
 pub struct PmcXmlTestCase {
@@ -32,7 +40,6 @@ impl PmcXmlTestCase {
         fs::read_to_string(&self.file_path)
     }
 
-    #[allow(dead_code)]
     pub fn read_xml_content_or_panic(&self) -> String {
         self.read_xml_content()
             .unwrap_or_else(|_| panic!("Failed to read XML file: {:?}", self.file_path))
@@ -41,14 +48,7 @@ impl PmcXmlTestCase {
 
 /// Get all PMC XML test files from the test data directory
 pub fn get_pmc_xml_test_cases() -> Vec<PmcXmlTestCase> {
-    let xml_dir_workspace = Path::new("pubmed-parser/tests/integration/test_data/pmc_xml");
-    let xml_dir_local = Path::new("tests/integration/test_data/pmc_xml");
-
-    let xml_dir = if xml_dir_workspace.exists() {
-        xml_dir_workspace
-    } else {
-        xml_dir_local
-    };
+    let xml_dir = workspace_root().join("test_data/pmc_xml");
 
     if !xml_dir.exists() {
         return Vec::new();
@@ -69,20 +69,15 @@ pub fn get_pmc_xml_test_cases() -> Vec<PmcXmlTestCase> {
 
 /// Get a specific PMC XML test case by filename
 pub fn get_pmc_xml_test_case(filename: &str) -> Option<PmcXmlTestCase> {
-    let xml_path_workspace =
-        Path::new("pubmed-parser/tests/integration/test_data/pmc_xml").join(filename);
-    let xml_path_local = Path::new("tests/integration/test_data/pmc_xml").join(filename);
+    let xml_path = workspace_root().join("test_data/pmc_xml").join(filename);
 
-    if xml_path_workspace.exists() {
-        Some(PmcXmlTestCase::new(xml_path_workspace))
-    } else if xml_path_local.exists() {
-        Some(PmcXmlTestCase::new(xml_path_local))
+    if xml_path.exists() {
+        Some(PmcXmlTestCase::new(xml_path))
     } else {
         None
     }
 }
 
-#[allow(dead_code)]
 pub fn pmc_xml_test_cases() -> Vec<PmcXmlTestCase> {
     get_pmc_xml_test_cases()
 }
@@ -115,7 +110,6 @@ impl PubMedXmlTestCase {
         fs::read_to_string(&self.file_path)
     }
 
-    #[allow(dead_code)]
     pub fn read_xml_content_or_panic(&self) -> String {
         self.read_xml_content()
             .unwrap_or_else(|_| panic!("Failed to read XML file: {:?}", self.file_path))
@@ -124,14 +118,7 @@ impl PubMedXmlTestCase {
 
 /// Get all PubMed XML test files from the test data directory
 pub fn get_pubmed_xml_test_cases() -> Vec<PubMedXmlTestCase> {
-    let xml_dir_workspace = Path::new("pubmed-parser/tests/integration/test_data/pubmed_xml");
-    let xml_dir_local = Path::new("tests/integration/test_data/pubmed_xml");
-
-    let xml_dir = if xml_dir_workspace.exists() {
-        xml_dir_workspace
-    } else {
-        xml_dir_local
-    };
+    let xml_dir = workspace_root().join("test_data/pubmed_xml");
 
     if !xml_dir.exists() {
         return Vec::new();
@@ -152,21 +139,17 @@ pub fn get_pubmed_xml_test_cases() -> Vec<PubMedXmlTestCase> {
 
 /// Get a specific PubMed XML test case by PMID
 pub fn get_pubmed_xml_test_case(pmid: &str) -> Option<PubMedXmlTestCase> {
-    let xml_path_workspace = Path::new("pubmed-parser/tests/integration/test_data/pubmed_xml")
+    let xml_path = workspace_root()
+        .join("test_data/pubmed_xml")
         .join(format!("{pmid}.xml"));
-    let xml_path_local =
-        Path::new("tests/integration/test_data/pubmed_xml").join(format!("{pmid}.xml"));
 
-    if xml_path_workspace.exists() {
-        Some(PubMedXmlTestCase::new(xml_path_workspace))
-    } else if xml_path_local.exists() {
-        Some(PubMedXmlTestCase::new(xml_path_local))
+    if xml_path.exists() {
+        Some(PubMedXmlTestCase::new(xml_path))
     } else {
         None
     }
 }
 
-#[allow(dead_code)]
 pub fn pubmed_xml_test_cases() -> Vec<PubMedXmlTestCase> {
     get_pubmed_xml_test_cases()
 }

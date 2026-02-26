@@ -3,7 +3,10 @@ use std::fs;
 
 #[test]
 fn test_supplementary_material_extraction_from_real_xml() {
-    let test_data_dir = "tests/integration/test_data/pmc_xml";
+    let workspace_root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("CARGO_MANIFEST_DIR has no parent");
+    let test_data_dir = workspace_root.join("test_data/pmc_xml");
 
     // Read PMC XML files that contain supplementary materials
     let test_files = vec![
@@ -11,7 +14,7 @@ fn test_supplementary_material_extraction_from_real_xml() {
     ];
 
     for file_name in test_files {
-        let file_path = format!("{}/{}", test_data_dir, file_name);
+        let file_path = test_data_dir.join(file_name);
 
         if let Ok(xml_content) = fs::read_to_string(&file_path) {
             let pmcid = file_name.replace(".xml", "");
@@ -60,7 +63,7 @@ fn test_supplementary_material_extraction_from_real_xml() {
                 println!("  Article has no supplementary materials");
             }
         } else {
-            println!("Warning: Could not read test file {}", file_path);
+            println!("Warning: Could not read test file {}", file_path.display());
         }
     }
 }
