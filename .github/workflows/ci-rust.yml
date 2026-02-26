@@ -40,8 +40,9 @@ jobs:
       - name: Run unit tests
         run: mise run test
 
+      # pubmed-client-py is excluded from doc tests since its doc written for Python Users
       - name: Run doc tests
-        run: cargo test --doc --workspace
+        run: cargo test --doc --workspace --exclude pubmed-client-py
 
   coverage:
     name: Code Coverage
