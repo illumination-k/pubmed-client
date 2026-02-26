@@ -83,20 +83,3 @@ run = ["mise run lint:napi", "mise run napi:test"]
 [tasks."ci:wasm"]
 description = "Equivalent to wasm.yml: test + lint"
 run = ["mise run wasm:test", "mise run lint:wasm"]
-
-# ── Setup tasks ───────────────────────────────────────────────────────────────
-
-[tasks."setup:napi"]
-description = "Setup NAPI dev environment (pnpm install)"
-dir = "pubmed-client-napi"
-run = ["pnpm install"]
-
-[tasks."setup:wasm"]
-description = "Setup WASM dev environment (pnpm install)"
-dir = "pubmed-client-wasm"
-run = ["pnpm install"]
-
-[tasks."setup:website"]
-description = "Setup website dev environment (pnpm install)"
-dir = "website"
-run = ["pnpm install"]

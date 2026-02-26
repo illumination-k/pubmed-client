@@ -16,7 +16,7 @@ description = "Lint Python code with ruff and mypy"
 dir = "pubmed-client-py"
 run = ["uv run --frozen ruff check", "uv run --frozen mypy ."]
 
-[tasks."py:test"]
+[tasks."test:py"]
 description = "Run Python tests with pytest"
 dir = "pubmed-client-py"
 run = ["uv run --frozen pytest"]
@@ -26,19 +26,19 @@ description = "Format Python code with ruff"
 dir = "pubmed-client-py"
 run = ["uv run --frozen ruff format"]
 
-[tasks."py:coverage"]
+[tasks."coverage:py"]
 description = "Generate Python coverage report"
 dir = "pubmed-client-py"
 run = [
   "uv run --frozen pytest --cov=pubmed_client --cov-report=html --cov-report=term",
 ]
 
-[tasks."py:build"]
+[tasks."build:py"]
 description = "Build Python package with maturin"
 dir = "pubmed-client-py"
 run = ["uv run maturin build"]
 
-[tasks."py:clean"]
+[tasks."clean:py"]
 description = "Clean Python build artifacts"
 dir = "pubmed-client-py"
 run = [
@@ -49,7 +49,7 @@ run = [
 
 [tasks."ci:py"]
 description = "Equivalent to python.yml: lint + test"
-run = ["mise run lint:py", "mise run py:test"]
+run = ["mise run lint:py", "mise run test:py"]
 
 # ── Setup tasks ───────────────────────────────────────────────────────────────
 
