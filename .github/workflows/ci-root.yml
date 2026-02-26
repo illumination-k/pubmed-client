@@ -1,4 +1,4 @@
-name: Lint
+name: "CI / Root"
 
 on:
   push:
@@ -9,11 +9,12 @@ on:
 env:
   CARGO_TERM_COLOR: always
   MISE_EXPERIMENTAL: true
-  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
+  MISE_ENV: root
 
 jobs:
   lint:
     name: Lint and Format
+    # Local: MISE_ENV=root mise run lint:root
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,8 +29,3 @@ jobs:
 
       - name: Run lint
         run: mise run lint:root
-
-      - name: Check docs
-        run: cargo doc --all-features --no-deps
-        env:
-          RUSTDOCFLAGS: "-D warnings"

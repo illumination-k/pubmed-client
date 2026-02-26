@@ -1,0 +1,59 @@
+# Loaded with MISE_ENV=python
+# Python ecosystem tools, environment, and tasks
+# Used by: python.yml, docs.yml (Python docs)
+
+[tools]
+uv = "0.8"
+
+[env]
+PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"
+PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
+
+# ── Python tasks ──────────────────────────────────────────────────────────────
+
+[tasks."lint:py"]
+description = "Lint Python code with ruff and mypy"
+dir = "pubmed-client-py"
+run = ["uv run --frozen ruff check", "uv run --frozen mypy ."]
+
+[tasks."py:test"]
+description = "Run Python tests with pytest"
+dir = "pubmed-client-py"
+run = ["uv run --frozen pytest"]
+
+[tasks."fmt:py"]
+description = "Format Python code with ruff"
+dir = "pubmed-client-py"
+run = ["uv run --frozen ruff format"]
+
+[tasks."py:coverage"]
+description = "Generate Python coverage report"
+dir = "pubmed-client-py"
+run = [
+  "uv run --frozen pytest --cov=pubmed_client --cov-report=html --cov-report=term",
+]
+
+[tasks."py:build"]
+description = "Build Python package with maturin"
+dir = "pubmed-client-py"
+run = ["uv run maturin build"]
+
+[tasks."py:clean"]
+description = "Clean Python build artifacts"
+dir = "pubmed-client-py"
+run = [
+  "rm -rf target/ .pytest_cache/ .mypy_cache/ .ruff_cache/ htmlcov/ .coverage",
+]
+
+# ── CI-equivalent tasks ───────────────────────────────────────────────────────
+
+[tasks."ci:py"]
+description = "Equivalent to python.yml: lint + test"
+run = ["mise run lint:py", "mise run py:test"]
+
+# ── Setup tasks ───────────────────────────────────────────────────────────────
+
+[tasks."setup:py"]
+description = "Setup Python binding dev environment (uv sync)"
+dir = "pubmed-client-py"
+run = ["uv sync --all-extras"]

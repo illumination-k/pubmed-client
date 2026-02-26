@@ -1,0 +1,32 @@
+# Minimal base: hooks + developer onboarding entry points.
+# Use MISE_ENV to load area-specific tools and tasks:
+#   MISE_ENV=root        → mise.root.toml  (dprint, actionlint, fmt/lint tasks)
+#   MISE_ENV=rust        → mise.rust.toml  (cargo-nextest, cargo-llvm-cov + Rust tasks)
+#   MISE_ENV=node        → mise.node.toml  (node, pnpm + NAPI/WASM/website tasks)
+#   MISE_ENV=python      → mise.python.toml (uv + PYO3 env + Python tasks)
+#
+# For full local setup: mise run setup:all
+
+[hooks]
+postinstall = ["bash ./etc/postinstall.sh"]
+
+[env]
+# Suppress verbose Rust tool output (affects all Rust-based CLIs like cargo, dprint, etc.)
+RUST_LOG = "warn"
+
+# Entry points always available (even before running mise install with MISE_ENV)
+
+[tasks."setup:tools"]
+description = "Install all tools (MISE_ENV=root,rust,node,python)"
+run = ["MISE_ENV=root,rust,node,python mise install"]
+
+[tasks."setup:all"]
+description = "Full setup: install all tools + all dev environments"
+run = [
+  "mise run setup:tools",
+  "bash ./etc/postinstall.sh",
+  "MISE_ENV=python mise run setup:py",
+  "MISE_ENV=node mise run setup:napi",
+  "MISE_ENV=node mise run setup:wasm",
+  "MISE_ENV=node mise run setup:website",
+]

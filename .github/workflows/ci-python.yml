@@ -1,0 +1,128 @@
+name: "CI / Python"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pubmed-client-py/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/ci-python.yml"
+      - ".github/actions/setup-repo/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "pubmed-client-py/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/ci-python.yml"
+      - ".github/actions/setup-repo/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  MISE_EXPERIMENTAL: true
+  MISE_ENV: python
+
+jobs:
+  lint:
+    name: Python Lint & Format
+    # Local: MISE_ENV=python mise run lint:py
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-repo
+
+      - name: Pin Python version
+        run: uv python pin 3.12
+
+      - name: Install dependencies
+        working-directory: pubmed-client-py
+        run: uv sync --dev
+
+      - name: Run ruff check
+        working-directory: pubmed-client-py
+        run: uv run ruff check .
+
+      - name: Run ruff format check
+        working-directory: pubmed-client-py
+        run: uv run ruff format --check .
+
+      - name: Run mypy
+        working-directory: pubmed-client-py
+        run: uv run mypy .
+
+  test:
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    # Local: MISE_ENV=python mise run py:test
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-repo
+
+      - name: Pin Python version
+        run: uv python pin ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        working-directory: pubmed-client-py
+        run: uv sync --dev
+
+      - name: Build Python package with maturin
+        working-directory: pubmed-client-py
+        run: uv run --with maturin maturin develop
+
+      - name: Run tests
+        working-directory: pubmed-client-py
+        run: uv run pytest -v -m "not integration"
+
+  coverage:
+    name: Python Test Coverage
+    # Local: MISE_ENV=python mise run py:coverage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-repo
+
+      - name: Pin Python version
+        run: uv python pin 3.12
+
+      - name: Install dependencies
+        working-directory: pubmed-client-py
+        run: |
+          uv sync --dev
+          uv add --dev pytest-cov
+
+      - name: Build Python package with maturin
+        working-directory: pubmed-client-py
+        run: uv run --with maturin maturin develop
+
+      - name: Run tests with coverage
+        working-directory: pubmed-client-py
+        run: uv run pytest --cov=pubmed_client --cov-report=xml --cov-report=html -m "not integration"

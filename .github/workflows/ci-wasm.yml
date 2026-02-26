@@ -1,4 +1,4 @@
-name: WASM
+name: "CI / WASM"
 
 on:
   push:
@@ -11,15 +11,17 @@ on:
       - "pubmed-client/Cargo.toml"
       - "Cargo.toml"
       - "Cargo.lock"
-      - ".github/workflows/wasm.yml"
+      - ".github/workflows/ci-wasm.yml"
       - ".github/actions/setup-repo/**"
 
 env:
   CARGO_TERM_COLOR: always
+  MISE_ENV: node
 
 jobs:
   wasm-tests:
     name: WASM TypeScript Tests
+    # Local: MISE_ENV=node mise run ci:wasm
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,20 +36,11 @@ jobs:
         with:
           rust-target: wasm32-unknown-unknown
           skip-postinstall: "true"
-          mise-install-args: "node pnpm"
 
       - name: Install wasm-pack
         uses: jetli/wasm-pack-action@0d096b08b4e5a7de8c28de67e11e945404e9eefa # v0.4.0
         with:
           version: latest
-
-      - name: Cache pnpm dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.pnpm-store
-          key: pnpm-${{ hashFiles('pubmed-client-wasm/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-
 
       - name: Build WASM package
         working-directory: pubmed-client-wasm

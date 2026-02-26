@@ -1,4 +1,4 @@
-name: NAPI-RS CI
+name: "CI / Node.js (NAPI)"
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - "pubmed-client/Cargo.toml"
       - "Cargo.toml"
       - "Cargo.lock"
-      - ".github/workflows/napi.yml"
+      - ".github/workflows/ci-napi.yml"
       - ".github/actions/setup-repo/**"
   pull_request:
     branches: [main]
@@ -21,7 +21,7 @@ on:
       - "pubmed-client/Cargo.toml"
       - "Cargo.toml"
       - "Cargo.lock"
-      - ".github/workflows/napi.yml"
+      - ".github/workflows/ci-napi.yml"
       - ".github/actions/setup-repo/**"
   workflow_dispatch: # Allow manual trigger for testing
 
@@ -31,6 +31,7 @@ env:
   APP_NAME: pubmed-client
   MACOSX_DEPLOYMENT_TARGET: "10.13"
   SKIP_POSTINSTALL: "1"
+  MISE_ENV: node
 
 permissions:
   contents: read
@@ -42,6 +43,7 @@ jobs:
       contents: read
     timeout-minutes: 10
     name: Lint
+    # Local: MISE_ENV=node mise run lint:napi
     runs-on: ubuntu-latest
     defaults:
       run:

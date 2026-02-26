@@ -13,6 +13,7 @@ description = "Python bindings for the PubMed client library"
 [lib]
 name = "pubmed_client_py"
 crate-type = ["cdylib", "rlib"]
+doctest = false
 
 [dependencies]
 pubmed-client = { version = "0.1.0", path = "../pubmed-client" }

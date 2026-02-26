@@ -4,7 +4,7 @@ node_modules/
 # Build artifacts
 *.node
 index.js
-index.d.ts
+# index.d.ts is committed to enable typecheck without building
 
 # npm/pnpm
 npm-debug.log*

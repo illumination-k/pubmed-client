@@ -21,10 +21,6 @@ function has_command() {
 	command -v "$1" >/dev/null 2>&1
 }
 
-function has_cargo_subcommand() {
-	cargo "$1" --version >/dev/null 2>&1
-}
-
 echo "==> Running postinstall setup..."
 
 # Setup pre-commit hooks
@@ -33,14 +29,22 @@ if has_command "pre-commit"; then
 	pre-commit install --install-hooks
 else
 	echo "Warning: pre-commit is not installed, skipping hooks installation"
+	echo "         Run with MISE_ENV=root to install pre-commit"
 fi
 
 # Setup Python virtual environment for PyO3
+# uv is only available when MISE_ENV includes 'python'
 echo "==> Setting up Python virtual environment..."
-cd "$PROJECT_ROOT/pubmed-client-py"
-uv venv
+if has_command "uv"; then
+	cd "$PROJECT_ROOT/pubmed-client-py"
+	uv venv
+else
+	echo "Warning: uv is not installed, skipping Python venv setup"
+	echo "         Run with MISE_ENV=python to install uv"
+fi
 
 # Install pnpm dependencies for TS packages
+# pnpm is only available when MISE_ENV includes 'node'
 echo "==> Installing pnpm dependencies for TS packages..."
 if has_command "pnpm"; then
 	cd "$PROJECT_ROOT/pubmed-client-napi"
@@ -51,41 +55,7 @@ if has_command "pnpm"; then
 	pnpm install --frozen-lockfile
 else
 	echo "Warning: pnpm is not installed, skipping TS package setup"
-fi
-
-# Setup test environment (cargo tools)
-echo "==> Setting up test environment..."
-cd "$PROJECT_ROOT"
-
-if ! has_command "cargo"; then
-	echo "Error: cargo is not installed. Please install Rust from https://www.rust-lang.org/tools/install"
-	exit 1
-fi
-
-# Check and install cargo-nextest if not present
-if ! has_cargo_subcommand "nextest"; then
-	echo "cargo-nextest is not installed. Installing..."
-	cargo install cargo-nextest --locked
-	if [ $? -ne 0 ]; then
-		echo "Error: Failed to install cargo-nextest"
-		exit 1
-	fi
-	echo "cargo-nextest installed successfully"
-else
-	echo "cargo-nextest is already installed"
-fi
-
-# Check and install cargo-llvm-cov if not present (for coverage)
-if ! has_cargo_subcommand "llvm-cov"; then
-	echo "cargo-llvm-cov is not installed. Installing..."
-	cargo install cargo-llvm-cov --locked
-	if [ $? -ne 0 ]; then
-		echo "Error: Failed to install cargo-llvm-cov"
-		exit 1
-	fi
-	echo "cargo-llvm-cov installed successfully"
-else
-	echo "cargo-llvm-cov is already installed"
+	echo "         Run with MISE_ENV=node to install pnpm"
 fi
 
 echo "==> Postinstall setup complete!"
