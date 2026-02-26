@@ -43,7 +43,7 @@ jobs:
       contents: read
     timeout-minutes: 10
     name: Lint
-    # Local: MISE_ENV=node mise run napi:lint
+    # Local: MISE_ENV=node mise run lint:napi
     runs-on: ubuntu-latest
     defaults:
       run:

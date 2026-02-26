@@ -18,12 +18,12 @@ description = "Build and run napi-rs TypeScript tests"
 dir = "pubmed-client-napi"
 run = ["pnpm run build && pnpm run test"]
 
-[tasks."napi:fmt"]
+[tasks."fmt:napi"]
 description = "Format napi package with Biome"
 dir = "pubmed-client-napi"
 run = ["pnpm run format"]
 
-[tasks."napi:lint"]
+[tasks."lint:napi"]
 description = "Lint and typecheck napi package (index.d.ts committed, no build needed)"
 dir = "pubmed-client-napi"
 run = ["pnpm run ci", "pnpm run typecheck"]
@@ -42,24 +42,24 @@ run = ["cd pubmed-client-wasm && wasm-pack build --target nodejs"]
 description = "Build and test WASM package"
 run = ["cd pubmed-client-wasm && pnpm run build && pnpm run test"]
 
-[tasks."wasm:lint"]
+[tasks."lint:wasm"]
 description = "Lint WASM package with Biome"
 dir = "pubmed-client-wasm"
 run = ["pnpm run ci"]
 
-[tasks."wasm:fmt"]
+[tasks."fmt:wasm"]
 description = "Format WASM package with Biome"
 dir = "pubmed-client-wasm"
 run = ["pnpm run format"]
 
 # ── Website tasks ─────────────────────────────────────────────────────────────
 
-[tasks."website:lint"]
+[tasks."lint:website"]
 description = "Lint and typecheck website"
 dir = "website"
 run = ["pnpm run ci", "pnpm run typecheck"]
 
-[tasks."website:fmt"]
+[tasks."fmt:website"]
 description = "Format website with Biome"
 dir = "website"
 run = ["pnpm run format"]
@@ -78,11 +78,11 @@ run = ["pnpm run build"]
 
 [tasks."ci:napi"]
 description = "Equivalent to napi.yml: lint + test"
-run = ["mise run napi:lint", "mise run napi:test"]
+run = ["mise run lint:napi", "mise run napi:test"]
 
 [tasks."ci:wasm"]
 description = "Equivalent to wasm.yml: test + lint"
-run = ["mise run wasm:test", "mise run wasm:lint"]
+run = ["mise run wasm:test", "mise run lint:wasm"]
 
 # ── Setup tasks ───────────────────────────────────────────────────────────────
 

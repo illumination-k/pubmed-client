@@ -23,15 +23,8 @@ description = "Format shell scripts with shfmt"
 run = ["shfmt -w ./**/*.sh"]
 
 [tasks.fmt]
-description = "Format all code (requires MISE_ENV=root,node,python)"
-run = [
-  "mise run fmt:root",
-  "mise run fmt:sh",
-  "MISE_ENV=python mise run py:format",
-  "MISE_ENV=node mise run napi:fmt",
-  "MISE_ENV=node mise run wasm:fmt",
-  "MISE_ENV=node mise run website:fmt",
-]
+description = "Format all code (runs fmt:* tasks from active environments)"
+depends = ["fmt:*"]
 
 # ── Lint tasks ────────────────────────────────────────────────────────────────
 
@@ -48,14 +41,8 @@ run = [
 ]
 
 [tasks.lint]
-description = "Lint all code (requires MISE_ENV=root,node,python)"
-run = [
-  "mise run lint:root",
-  "MISE_ENV=python mise run py:lint",
-  "MISE_ENV=node mise run napi:lint",
-  "MISE_ENV=node mise run wasm:lint",
-  "MISE_ENV=node mise run website:lint",
-]
+description = "Lint all code (runs lint:* tasks from active environments)"
+depends = ["lint:*"]
 
 # ── CI-equivalent aggregate task ──────────────────────────────────────────────
 
