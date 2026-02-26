@@ -63,14 +63,8 @@ run = [
 description = "Run all CI checks locally (requires MISE_ENV=root,rust,node,python)"
 run = [
   "mise run lint",
-  "MISE_ENV=rust mise run ci:core",
+  "MISE_ENV=rust mise run ci:rust",
   "MISE_ENV=python mise run ci:py",
   "MISE_ENV=node mise run ci:napi",
   "MISE_ENV=node mise run ci:wasm",
-  "mise run ci:mcp",
 ]
-
-# ci:mcp uses cargo test (from rustup, no extra MISE_ENV needed)
-[tasks."ci:mcp"]
-description = "Equivalent to test-mcp-server.yml"
-run = ["cargo test -p pubmed-mcp"]

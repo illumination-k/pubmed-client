@@ -1,4 +1,4 @@
-name: Core
+name: Rust
 
 on:
   push:
@@ -6,12 +6,14 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "pubmed-client/src/**"
-      - "pubmed-client/tests/**"
-      - "pubmed-client/Cargo.toml"
+      - "pubmed-client/**"
+      - "pubmed-parser/**"
+      - "pubmed-formatter/**"
+      - "pubmed-mcp/**"
+      - "pubmed-cli/**"
       - "Cargo.toml"
       - "Cargo.lock"
-      - ".github/workflows/core.yml"
+      - ".github/workflows/rust.yml"
       - ".github/actions/setup-repo/**"
 
 env:
@@ -22,7 +24,7 @@ env:
 jobs:
   test:
     name: Test Suite
-    # Local: MISE_ENV=rust mise run ci:core
+    # Local: MISE_ENV=rust mise run ci:rust
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -39,7 +41,7 @@ jobs:
         run: mise run test
 
       - name: Run doc tests
-        run: mise run doctest
+        run: cargo test --doc --workspace
 
   coverage:
     name: Code Coverage
@@ -60,7 +62,7 @@ jobs:
         run: rustup component add llvm-tools-preview
 
       - name: Run tests with coverage instrumentation
-        run: cargo llvm-cov nextest -p pubmed-client --all-features --no-report
+        run: cargo llvm-cov nextest --workspace --all-features --no-report
 
       - name: Generate LCOV report
         run: cargo llvm-cov report --lcov --output-path lcov.info

@@ -1,6 +1,6 @@
 # Loaded with MISE_ENV=rust
 # Rust-specific test tooling and workspace tasks
-# Used by: core.yml, integration-tests.yml
+# Used by: rust.yml, integration-tests.yml
 
 [tools]
 "cargo:cargo-nextest" = "latest"
@@ -13,8 +13,8 @@ description = "Run tests for entire workspace using nextest"
 run = ["cargo nextest run --workspace"]
 
 [tasks.doctest]
-description = "Run doc tests for core Rust library"
-run = ["cargo test --doc -p pubmed-client"]
+description = "Run doc tests for entire workspace"
+run = ["cargo test --doc --workspace"]
 
 [tasks.build]
 description = "Build entire workspace"
@@ -27,13 +27,13 @@ run = ["cargo check --workspace"]
 [tasks.coverage]
 description = "Generate HTML coverage report (llvm-cov)"
 run = [
-  "cargo llvm-cov nextest -p pubmed-client --all-features --no-report",
+  "cargo llvm-cov nextest --workspace --all-features --no-report",
   "cargo llvm-cov report --html",
   "cargo llvm-cov report --text",
 ]
 
 # ── CI-equivalent tasks ───────────────────────────────────────────────────────
 
-[tasks."ci:core"]
-description = "Equivalent to core.yml: unit tests + doc tests"
-run = ["cargo nextest run --workspace", "cargo test --doc -p pubmed-client"]
+[tasks."ci:rust"]
+description = "Equivalent to rust.yml: unit tests + doc tests"
+run = ["cargo nextest run --workspace", "cargo test --doc --workspace"]

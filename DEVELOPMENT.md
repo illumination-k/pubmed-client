@@ -47,30 +47,31 @@ Tools and tasks are split by area using [mise environments](https://mise.jdx.dev
 
 | Local command                                    | CI workflow                         |
 | ------------------------------------------------ | ----------------------------------- |
-| `MISE_ENV=rust mise run ci:core`                 | `core.yml` – Test Suite + Doc Tests |
-| `MISE_ENV=rust mise run coverage`                | `core.yml` – Code Coverage          |
+| `MISE_ENV=rust mise run ci:rust`                 | `rust.yml` – Test Suite + Doc Tests |
+| `MISE_ENV=rust mise run coverage`                | `rust.yml` – Code Coverage          |
 | `MISE_ENV=root mise run lint:root`               | `lint.yml` – Lint and Format        |
 | `MISE_ENV=python mise run ci:py`                 | `python.yml` – lint + test          |
 | `MISE_ENV=python mise run py:coverage`           | `python.yml` – Python Test Coverage |
 | `MISE_ENV=node mise run ci:napi`                 | `napi.yml` – lint + test            |
 | `MISE_ENV=node mise run ci:wasm`                 | `wasm.yml`                          |
-| `mise run ci:mcp`                                | `test-mcp-server.yml`               |
 | `MISE_ENV=root,rust,node,python mise run ci:all` | all of the above                    |
 
 ## CI Trigger Map
 
 Which CI workflows run when you change a file:
 
-| Changed path                | core |  lint  | docs | napi | python | wasm | mcp |
-| --------------------------- | :--: | :----: | :--: | :--: | :----: | :--: | :-: |
-| `pubmed-client/src/**`      |  ✅  | always |  ✅  |  ✅  |   ✅   |  ✅  | ✅  |
-| `pubmed-client/tests/**`    |  ✅  | always |  —   |  —   |   —    |  —   | ✅  |
-| `pubmed-client-napi/**`     |  —   | always |  ✅  |  ✅  |   —    |  —   |  —  |
-| `pubmed-client-py/**`       |  —   | always |  ✅  |  —   |   ✅   |  —   |  —  |
-| `pubmed-client-wasm/**`     |  —   | always |  —   |  —   |   —    |  ✅  |  —  |
-| `pubmed-mcp/**`             |  —   | always |  —   |  —   |   —    |  —   | ✅  |
-| `website/**`                |  —   | always |  ✅  |  —   |   —    |  —   |  —  |
-| `Cargo.toml` / `Cargo.lock` |  ✅  | always |  ✅  |  ✅  |   ✅   |  ✅  | ✅  |
+| Changed path                | rust |  lint  | docs | napi | python | wasm |
+| --------------------------- | :--: | :----: | :--: | :--: | :----: | :--: |
+| `pubmed-client/**`          |  ✅  | always |  ✅  |  ✅  |   ✅   |  ✅  |
+| `pubmed-parser/**`          |  ✅  | always |  —   |  —   |   —    |  —   |
+| `pubmed-formatter/**`       |  ✅  | always |  —   |  —   |   —    |  —   |
+| `pubmed-mcp/**`             |  ✅  | always |  —   |  —   |   —    |  —   |
+| `pubmed-cli/**`             |  ✅  | always |  —   |  —   |   —    |  —   |
+| `pubmed-client-napi/**`     |  —   | always |  ✅  |  ✅  |   —    |  —   |
+| `pubmed-client-py/**`       |  —   | always |  ✅  |  —   |   ✅   |  —   |
+| `pubmed-client-wasm/**`     |  —   | always |  —   |  —   |   —    |  ✅  |
+| `website/**`                |  —   | always |  ✅  |  —   |   —    |  —   |
+| `Cargo.toml` / `Cargo.lock` |  ✅  | always |  ✅  |  ✅  |   ✅   |  ✅  |
 
 > **Note**: `lint.yml` always runs on every push/PR (no path filter).
 
