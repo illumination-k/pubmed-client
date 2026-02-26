@@ -279,19 +279,19 @@ pub use common::{Affiliation, Author, PmcId, PubMedId};
 pub use config::ClientConfig;
 pub use error::{ParseError, PubMedError, Result};
 pub use pmc::{
-    models::ExtractedFigure, parse_pmc_xml, ArticleSection, Figure, FundingInfo, HeadingStyle,
-    JournalInfo, MarkdownConfig, OaSubsetInfo, PmcClient, PmcFullText, PmcMarkdownConverter,
-    PmcTarClient, Reference, ReferenceStyle, Table,
+    ArticleSection, Figure, FundingInfo, HeadingStyle, JournalInfo, MarkdownConfig, OaSubsetInfo,
+    PmcClient, PmcFullText, PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Table,
+    models::ExtractedFigure, parse_pmc_xml,
 };
 pub use pubmed::{
-    export, parse_article_from_xml, AbstractSection, ArticleSummary, ArticleType, CitationMatch,
-    CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo,
-    EPostResult, ExportFormat, FieldInfo, GlobalQueryResults, HistorySession, Language, LinkInfo,
-    PmcLinks, PubMedArticle, PubMedClient, RelatedArticles, SearchQuery, SearchResult, SortOrder,
-    SpellCheckResult, SpelledQuerySegment,
+    AbstractSection, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,
+    CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult,
+    ExportFormat, FieldInfo, GlobalQueryResults, HistorySession, Language, LinkInfo, PmcLinks,
+    PubMedArticle, PubMedClient, RelatedArticles, SearchQuery, SearchResult, SortOrder,
+    SpellCheckResult, SpelledQuerySegment, export, parse_article_from_xml,
 };
 pub use rate_limit::RateLimiter;
-pub use time::{sleep, Duration, Instant};
+pub use time::{Duration, Instant, sleep};
 
 /// Convenience client that combines both PubMed and PMC functionality
 #[derive(Clone)]

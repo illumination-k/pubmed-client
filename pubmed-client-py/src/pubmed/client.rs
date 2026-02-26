@@ -7,8 +7,8 @@ use pyo3_stub_gen::PyStubType;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
-use pubmed_client::pubmed::SortOrder;
 use pubmed_client::PubMedClient as RustPubMedClient;
+use pubmed_client::pubmed::SortOrder;
 
 use crate::config::PyClientConfig;
 use crate::query::PySearchQuery;

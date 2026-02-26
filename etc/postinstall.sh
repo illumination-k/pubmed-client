@@ -23,13 +23,12 @@ function has_command() {
 
 echo "==> Running postinstall setup..."
 
-# Setup pre-commit hooks
-echo "==> Installing pre-commit hooks..."
-if has_command "pre-commit"; then
-	pre-commit install --install-hooks
+echo "==> Installing prek hooks..."
+if has_command "prek"; then
+	prek install -f
 else
-	echo "Warning: pre-commit is not installed, skipping hooks installation"
-	echo "         Run with MISE_ENV=root to install pre-commit"
+	echo "Warning: prek is not installed, skipping hooks installation"
+	echo "         Run with MISE_ENV=root to install prek"
 fi
 
 # Setup Python virtual environment for PyO3

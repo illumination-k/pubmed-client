@@ -6,25 +6,34 @@
 "cargo:cargo-nextest" = "latest"
 "cargo:cargo-llvm-cov" = "latest"
 
-# ── Rust workspace tasks ──────────────────────────────────────────────────────
+[tasks."fmt:rs"]
+description = "Format Rust code with cargo fmt"
+run = ["cargo fmt --all"]
 
-[tasks.test]
+[tasks."lint:rs"]
+description = "Lint Rust code with cargo clippy"
+run = [
+  "cargo fmt --all -- --check",
+  "cargo clippy --workspace --all-targets -- -D warnings",
+]
+
+[tasks."test:rs"]
 description = "Run tests for entire workspace using nextest"
 run = ["cargo nextest run --workspace"]
 
-[tasks.doctest]
+[tasks."doctest:rs"]
 description = "Run doc tests for entire workspace"
-run = ["cargo test --doc --workspace"]
+run = ["cargo test --doc --workspace --exclude pubmed-client-py"]
 
-[tasks.build]
+[tasks."build:rs"]
 description = "Build entire workspace"
 run = ["cargo build --workspace"]
 
-[tasks.check]
+[tasks."check:rs"]
 description = "Check entire workspace without building"
 run = ["cargo check --workspace"]
 
-[tasks.coverage]
+[tasks."coverage:rs"]
 description = "Generate HTML coverage report (llvm-cov)"
 run = [
   "cargo llvm-cov nextest --workspace --all-features --no-report",
@@ -32,8 +41,6 @@ run = [
   "cargo llvm-cov report --text",
 ]
 
-# ── CI-equivalent tasks ───────────────────────────────────────────────────────
-
-[tasks."ci:rust"]
+[tasks."ci:rs"]
 description = "Equivalent to rust.yml: unit tests + doc tests"
-run = ["cargo nextest run --workspace", "cargo test --doc --workspace"]
+depends = ["lint:rs", "test:rs", "doctest:rs"]

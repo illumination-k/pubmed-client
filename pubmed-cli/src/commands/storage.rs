@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use aws_config::BehaviorVersion;
 use aws_sdk_s3::Client as S3Client;
@@ -145,10 +145,10 @@ impl StorageBackend for S3Storage {
             Ok(_) => Ok(true),
             Err(e) => {
                 // If it's a "Not Found" error, the file doesn't exist
-                if let aws_sdk_s3::error::SdkError::ServiceError(ref service_err) = e {
-                    if service_err.err().is_not_found() {
-                        return Ok(false);
-                    }
+                if let aws_sdk_s3::error::SdkError::ServiceError(ref service_err) = e
+                    && service_err.err().is_not_found()
+                {
+                    return Ok(false);
                 }
                 // For other errors, propagate the error
                 Err(anyhow!("Failed to check S3 object existence: {}", e))

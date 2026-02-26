@@ -6,4 +6,4 @@ pub mod xml_utils;
 
 // Re-export common types
 pub use ids::{PmcId, PubMedId};
-pub use models::{format_author_name, Affiliation, Author};
+pub use models::{Affiliation, Author, format_author_name};

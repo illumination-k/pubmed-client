@@ -156,15 +156,14 @@ fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
 
     // Extract ORCID from contrib-id tags
     for contrib_id in &contrib.contrib_ids {
-        if let Some(id_type) = &contrib_id.contrib_id_type {
-            if id_type == "orcid" {
-                if let Some(value) = &contrib_id.value {
-                    let clean_orcid = value.trim();
-                    if clean_orcid.contains("orcid.org") || !clean_orcid.is_empty() {
-                        author.orcid = Some(clean_orcid.to_string());
-                        break;
-                    }
-                }
+        if let Some(id_type) = &contrib_id.contrib_id_type
+            && id_type == "orcid"
+            && let Some(value) = &contrib_id.value
+        {
+            let clean_orcid = value.trim();
+            if clean_orcid.contains("orcid.org") || !clean_orcid.is_empty() {
+                author.orcid = Some(clean_orcid.to_string());
+                break;
             }
         }
     }
@@ -188,18 +187,17 @@ fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
 
     // Process xref affiliations
     for xref in &contrib.xrefs {
-        if let Some(ref_type) = &xref.ref_type {
-            if ref_type == "aff" {
-                if let Some(rid) = &xref.rid {
-                    affiliations.push(Affiliation {
-                        id: Some(rid.clone()),
-                        institution: Some(rid.clone()), // Use rid as institution for now
-                        department: None,
-                        address: None,
-                        country: None,
-                    });
-                }
-            }
+        if let Some(ref_type) = &xref.ref_type
+            && ref_type == "aff"
+            && let Some(rid) = &xref.rid
+        {
+            affiliations.push(Affiliation {
+                id: Some(rid.clone()),
+                institution: Some(rid.clone()), // Use rid as institution for now
+                department: None,
+                address: None,
+                country: None,
+            });
         }
     }
 
@@ -230,76 +228,75 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
 
     // Try to parse as element-citation
     if ref_content.contains("<element-citation") {
-        if let Some(start) = ref_content.find("<element-citation") {
-            if let Some(end) = ref_content[start..].find("</element-citation>") {
-                let citation_content =
-                    &ref_content[start..start + end + "</element-citation>".len()];
-                let cleaned_citation = strip_inline_html_tags(citation_content);
-                match from_str::<Citation>(&cleaned_citation) {
-                    Ok(citation) => {
-                        // Extract names from person-groups first
-                        for person_group in citation.person_groups {
-                            for name in person_group.names {
-                                authors.push(Author::new(name.surname, name.given_names));
-                            }
-                        }
-                        // Also check for direct names (without person-group wrapper)
-                        for name in citation.names {
+        if let Some(start) = ref_content.find("<element-citation")
+            && let Some(end) = ref_content[start..].find("</element-citation>")
+        {
+            let citation_content = &ref_content[start..start + end + "</element-citation>".len()];
+            let cleaned_citation = strip_inline_html_tags(citation_content);
+            match from_str::<Citation>(&cleaned_citation) {
+                Ok(citation) => {
+                    // Extract names from person-groups first
+                    for person_group in citation.person_groups {
+                        for name in person_group.names {
                             authors.push(Author::new(name.surname, name.given_names));
                         }
-                        if !authors.is_empty() {
-                            return Ok(authors);
-                        }
                     }
-                    Err(e) => {
-                        return Err(ParseError::XmlError(format!(
-                            "Failed to parse element-citation XML: {}",
-                            e
-                        )));
+                    // Also check for direct names (without person-group wrapper)
+                    for name in citation.names {
+                        authors.push(Author::new(name.surname, name.given_names));
+                    }
+                    if !authors.is_empty() {
+                        return Ok(authors);
                     }
                 }
-            } else {
-                return Err(ParseError::XmlError(
-                    "Found element-citation start tag but no matching end tag".to_string(),
-                ));
+                Err(e) => {
+                    return Err(ParseError::XmlError(format!(
+                        "Failed to parse element-citation XML: {}",
+                        e
+                    )));
+                }
             }
+        } else {
+            return Err(ParseError::XmlError(
+                "Found element-citation start tag but no matching end tag".to_string(),
+            ));
         }
     }
 
     // Try to parse as mixed-citation
     if ref_content.contains("<mixed-citation") {
-        if let Some(start) = ref_content.find("<mixed-citation") {
-            if let Some(end) = ref_content[start..].find("</mixed-citation>") {
-                let citation_content = &ref_content[start..start + end + "</mixed-citation>".len()];
-                let cleaned_citation = strip_inline_html_tags(citation_content);
-                match from_str::<Citation>(&cleaned_citation) {
-                    Ok(citation) => {
-                        // Extract names from person-groups first
-                        for person_group in citation.person_groups {
-                            for name in person_group.names {
-                                authors.push(Author::new(name.surname, name.given_names));
-                            }
-                        }
-                        // Also check for direct names (without person-group wrapper)
-                        for name in citation.names {
+        if let Some(start) = ref_content.find("<mixed-citation")
+            && let Some(end) = ref_content[start..].find("</mixed-citation>")
+        {
+            let citation_content = &ref_content[start..start + end + "</mixed-citation>".len()];
+            let cleaned_citation = strip_inline_html_tags(citation_content);
+            match from_str::<Citation>(&cleaned_citation) {
+                Ok(citation) => {
+                    // Extract names from person-groups first
+                    for person_group in citation.person_groups {
+                        for name in person_group.names {
                             authors.push(Author::new(name.surname, name.given_names));
                         }
-                        if !authors.is_empty() {
-                            return Ok(authors);
-                        }
                     }
-                    Err(e) => {
-                        return Err(ParseError::XmlError(format!(
-                            "Failed to parse mixed-citation XML: {}",
-                            e
-                        )));
+                    // Also check for direct names (without person-group wrapper)
+                    for name in citation.names {
+                        authors.push(Author::new(name.surname, name.given_names));
+                    }
+                    if !authors.is_empty() {
+                        return Ok(authors);
                     }
                 }
-            } else {
-                return Err(ParseError::XmlError(
-                    "Found mixed-citation start tag but no matching end tag".to_string(),
-                ));
+                Err(e) => {
+                    return Err(ParseError::XmlError(format!(
+                        "Failed to parse mixed-citation XML: {}",
+                        e
+                    )));
+                }
             }
+        } else {
+            return Err(ParseError::XmlError(
+                "Found mixed-citation start tag but no matching end tag".to_string(),
+            ));
         }
     }
 

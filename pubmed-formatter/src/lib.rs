@@ -20,4 +20,4 @@ pub mod pubmed;
 
 // Re-export main types for convenience
 pub use pmc::markdown::{HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle};
-pub use pubmed::export::{articles_to_bibtex, articles_to_csl_json, articles_to_ris, ExportFormat};
+pub use pubmed::export::{ExportFormat, articles_to_bibtex, articles_to_csl_json, articles_to_ris};

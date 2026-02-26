@@ -123,13 +123,13 @@ impl PubMedClient {
 
         // Check for error
         let error = extract_text_between(xml, "<ERROR>", "</ERROR>");
-        if let Some(error_msg) = error {
-            if !error_msg.is_empty() {
-                return Err(PubMedError::ApiError {
-                    status: 200,
-                    message: format!("NCBI ESpell API error: {}", error_msg),
-                });
-            }
+        if let Some(error_msg) = error
+            && !error_msg.is_empty()
+        {
+            return Err(PubMedError::ApiError {
+                status: 200,
+                message: format!("NCBI ESpell API error: {}", error_msg),
+            });
         }
 
         let database = extract_text_between(xml, "<Database>", "</Database>")

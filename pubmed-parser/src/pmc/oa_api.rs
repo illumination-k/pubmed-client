@@ -109,22 +109,22 @@ pub fn parse_oa_response(xml: &str, pmcid: &str) -> Result<OaSubsetInfo> {
     }
 
     // Check for records
-    if let Some(records) = oa_response.records {
-        if let Some(record) = records.record.into_iter().next() {
-            let mut info = OaSubsetInfo::available(pmcid.to_string());
+    if let Some(records) = oa_response.records
+        && let Some(record) = records.record.into_iter().next()
+    {
+        let mut info = OaSubsetInfo::available(pmcid.to_string());
 
-            info.citation = record.citation;
-            info.license = record.license;
-            info.retracted = record.retracted.is_some_and(|r| r == "yes");
+        info.citation = record.citation;
+        info.license = record.license;
+        info.retracted = record.retracted.is_some_and(|r| r == "yes");
 
-            if let Some(link) = record.link {
-                info.download_format = link.format;
-                info.updated = link.updated;
-                info.download_link = link.href;
-            }
-
-            return Ok(info);
+        if let Some(link) = record.link {
+            info.download_format = link.format;
+            info.updated = link.updated;
+            info.download_link = link.href;
         }
+
+        return Ok(info);
     }
 
     // No error and no records - unexpected format
@@ -164,11 +164,13 @@ mod tests {
         assert!(!result.is_oa_subset);
         assert_eq!(result.pmcid, "PMC8550608");
         assert_eq!(result.error_code, Some("idIsNotOpenAccess".to_string()));
-        assert!(result
-            .error_message
-            .as_ref()
-            .unwrap()
-            .contains("is not Open Access"));
+        assert!(
+            result
+                .error_message
+                .as_ref()
+                .unwrap()
+                .contains("is not Open Access")
+        );
         assert!(result.download_link.is_none());
     }
 

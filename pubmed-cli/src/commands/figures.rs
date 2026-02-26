@@ -8,9 +8,9 @@ use tempfile::TempDir;
 use thiserror::Error;
 use tracing::{debug, error, info, warn};
 
-use crate::commands::create_pmc_client_with_timeout;
-use crate::commands::storage::{create_storage_backend, StorageBackend};
 use crate::Cli;
+use crate::commands::create_pmc_client_with_timeout;
+use crate::commands::storage::{StorageBackend, create_storage_backend};
 
 #[derive(Error, Debug)]
 pub enum FiguresError {

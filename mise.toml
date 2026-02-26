@@ -14,19 +14,10 @@ postinstall = ["bash ./etc/postinstall.sh"]
 # Suppress verbose Rust tool output (affects all Rust-based CLIs like cargo, dprint, etc.)
 RUST_LOG = "warn"
 
-# Entry points always available (even before running mise install with MISE_ENV)
+[tasks.fmt]
+description = "Format all code (runs fmt:* tasks from active environments)"
+depends = ["fmt:*"]
 
-[tasks."setup:tools"]
-description = "Install all tools (MISE_ENV=root,rust,node,python)"
-run = ["MISE_ENV=root,rust,node,python mise install"]
-
-[tasks."setup:all"]
-description = "Full setup: install all tools + all dev environments"
-run = [
-  "mise run setup:tools",
-  "bash ./etc/postinstall.sh",
-  "MISE_ENV=python mise run setup:py",
-  "MISE_ENV=node mise run setup:napi",
-  "MISE_ENV=node mise run setup:wasm",
-  "MISE_ENV=node mise run setup:website",
-]
+[tasks.lint]
+description = "Lint all code (runs lint:* tasks from active environments)"
+depends = ["lint:*"]

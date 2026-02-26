@@ -19,7 +19,7 @@ use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 ///     >>> config.with_api_key("your_api_key").with_email("you@example.com")
 ///     >>> client = Client.with_config(config)
 #[gen_stub_pyclass]
-#[pyclass(name = "ClientConfig")]
+#[pyclass(name = "ClientConfig", from_py_object)]
 #[derive(Clone)]
 pub struct PyClientConfig {
     pub inner: ClientConfig,

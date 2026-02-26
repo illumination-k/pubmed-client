@@ -23,7 +23,7 @@ mod integration_tests {
     use tracing_test::traced_test;
 
     use crate::common::integration_test_utils::{
-        create_test_pubmed_client, should_run_real_api_tests, TEST_PMIDS_STR,
+        TEST_PMIDS_STR, create_test_pubmed_client, should_run_real_api_tests,
     };
 
     /// Test batch fetch with known PMIDs returns correct articles

@@ -5,7 +5,7 @@
 
 use std::{fmt::Display, future::Future};
 
-use crate::time::{sleep, Duration};
+use crate::time::{Duration, sleep};
 use rand::Rng;
 use tracing::{debug, warn};
 
@@ -196,8 +196,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
+    use std::sync::atomic::{AtomicUsize, Ordering};
 
     #[derive(Debug, thiserror::Error)]
     enum TestError {

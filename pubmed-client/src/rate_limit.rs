@@ -3,7 +3,7 @@
 //! This module provides rate limiting functionality that respects NCBI E-utilities guidelines.
 //! Uses a unified implementation that works across both native and WASM targets.
 
-use crate::time::{sleep, Duration, Instant};
+use crate::time::{Duration, Instant, sleep};
 use std::sync::Arc;
 use std::sync::Mutex;
 use tracing::{debug, instrument};

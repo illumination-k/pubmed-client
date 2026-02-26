@@ -3,12 +3,12 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use pubmed_client::{
-    pmc::{markdown::PmcMarkdownConverter, PmcFullText},
+    Client, ClientConfig,
+    pmc::{PmcFullText, markdown::PmcMarkdownConverter},
     pubmed::{
         ArticleSummary, ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery,
         SortOrder,
     },
-    Client, ClientConfig,
 };
 use std::sync::Arc;
 

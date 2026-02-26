@@ -6,7 +6,7 @@ use pubmed_parser::pubmed::parser::parse_article_from_xml;
 
 #[path = "../common/mod.rs"]
 mod common;
-use common::{pubmed_xml_test_cases, PubMedXmlTestCase};
+use common::{PubMedXmlTestCase, pubmed_xml_test_cases};
 
 /// Fixture for all PubMed XML test cases
 #[fixture]
@@ -212,23 +212,23 @@ fn test_pubmed_parsing_statistics(#[from(xml_test_cases)] test_cases: Vec<PubMed
             if article.abstract_text.is_some() {
                 articles_with_abstract += 1;
             }
-            if let Some(mesh_headings) = &article.mesh_headings {
-                if !mesh_headings.is_empty() {
-                    articles_with_mesh += 1;
-                    for heading in mesh_headings {
-                        total_mesh_terms += heading.mesh_terms.len();
-                    }
+            if let Some(mesh_headings) = &article.mesh_headings
+                && !mesh_headings.is_empty()
+            {
+                articles_with_mesh += 1;
+                for heading in mesh_headings {
+                    total_mesh_terms += heading.mesh_terms.len();
                 }
             }
-            if let Some(keywords) = &article.keywords {
-                if !keywords.is_empty() {
-                    articles_with_keywords += 1;
-                }
+            if let Some(keywords) = &article.keywords
+                && !keywords.is_empty()
+            {
+                articles_with_keywords += 1;
             }
-            if let Some(chemicals) = &article.chemical_list {
-                if !chemicals.is_empty() {
-                    articles_with_chemicals += 1;
-                }
+            if let Some(chemicals) = &article.chemical_list
+                && !chemicals.is_empty()
+            {
+                articles_with_chemicals += 1;
             }
             if article.volume.is_some() {
                 articles_with_volume += 1;
@@ -697,46 +697,45 @@ fn test_pubmed_chemical_substances(#[from(xml_test_cases)] test_cases: Vec<PubMe
 
         let result = parse_article_from_xml(&xml_content, &test_case.pmid);
 
-        if let Ok(article) = result {
-            if let Some(chemical_list) = &article.chemical_list {
-                if !chemical_list.is_empty() {
-                    articles_with_chemicals += 1;
-                    total_chemicals += chemical_list.len();
+        if let Ok(article) = result
+            && let Some(chemical_list) = &article.chemical_list
+            && !chemical_list.is_empty()
+        {
+            articles_with_chemicals += 1;
+            total_chemicals += chemical_list.len();
 
-                    // Validate chemical structures
-                    for chemical in chemical_list {
-                        assert!(
-                            !chemical.name.is_empty(),
-                            "Chemical name should not be empty"
-                        );
+            // Validate chemical structures
+            for chemical in chemical_list {
+                assert!(
+                    !chemical.name.is_empty(),
+                    "Chemical name should not be empty"
+                );
 
-                        // Registry numbers are optional but should be valid if present
-                        if let Some(registry_number) = &chemical.registry_number {
-                            assert!(
-                                !registry_number.is_empty(),
-                                "Registry number should not be empty if present"
-                            );
-                        }
-                    }
-
-                    // Test utility method
-                    let chemical_names = article.get_chemical_names();
-                    assert_eq!(
-                        chemical_names.len(),
-                        chemical_list.len(),
-                        "Chemical names should match chemical list"
-                    );
-
-                    debug!(
-                        chemicals_count = chemical_list.len(),
-                        first_chemical = chemical_list
-                            .first()
-                            .map(|c| &c.name)
-                            .unwrap_or(&"None".to_string()),
-                        "Chemical substances analysis"
+                // Registry numbers are optional but should be valid if present
+                if let Some(registry_number) = &chemical.registry_number {
+                    assert!(
+                        !registry_number.is_empty(),
+                        "Registry number should not be empty if present"
                     );
                 }
             }
+
+            // Test utility method
+            let chemical_names = article.get_chemical_names();
+            assert_eq!(
+                chemical_names.len(),
+                chemical_list.len(),
+                "Chemical names should match chemical list"
+            );
+
+            debug!(
+                chemicals_count = chemical_list.len(),
+                first_chemical = chemical_list
+                    .first()
+                    .map(|c| &c.name)
+                    .unwrap_or(&"None".to_string()),
+                "Chemical substances analysis"
+            );
         }
     }
 

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::cache::{create_cache, PmcCache};
+use crate::cache::{PmcCache, create_cache};
 use crate::common::{PmcId, PubMedId};
 use crate::config::ClientConfig;
 use crate::error::{ParseError, PubMedError, Result};
@@ -188,11 +188,11 @@ impl PmcClient {
         let cache_key = format!("pmc:{}", normalized_pmcid);
 
         // Check cache first if available
-        if let Some(cache) = &self.cache {
-            if let Some(cached) = cache.get(&cache_key).await {
-                info!(pmcid = %normalized_pmcid, "Cache hit for PMC full text");
-                return Ok(cached);
-            }
+        if let Some(cache) = &self.cache
+            && let Some(cached) = cache.get(&cache_key).await
+        {
+            info!(pmcid = %normalized_pmcid, "Cache hit for PMC full text");
+            return Ok(cached);
         }
 
         // Fetch from API if not cached
@@ -331,12 +331,11 @@ impl PmcClient {
             for linkset in linksets {
                 if let Some(linksetdbs) = linkset["linksetdbs"].as_array() {
                     for linksetdb in linksetdbs {
-                        if linksetdb["dbto"] == "pmc" {
-                            if let Some(links) = linksetdb["links"].as_array() {
-                                if let Some(pmcid) = links.first() {
-                                    return Ok(Some(format!("PMC{pmcid}")));
-                                }
-                            }
+                        if linksetdb["dbto"] == "pmc"
+                            && let Some(links) = linksetdb["links"].as_array()
+                            && let Some(pmcid) = links.first()
+                        {
+                            return Ok(Some(format!("PMC{pmcid}")));
                         }
                     }
                 }

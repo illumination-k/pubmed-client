@@ -9,7 +9,7 @@
 //! - **NBIB** - MEDLINE/PubMed native format
 
 use pubmed_parser::pubmed::models::PubMedArticle;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 /// Generate a BibTeX citation key from article metadata
 fn generate_bibtex_key(article: &PubMedArticle) -> String {

@@ -8,8 +8,8 @@ use thiserror::Error;
 use tokio::io::AsyncWriteExt;
 use tracing::{debug, error, info};
 
-use crate::commands::create_pmc_client_with_timeout;
 use crate::Cli;
+use crate::commands::create_pmc_client_with_timeout;
 
 #[derive(Error, Debug)]
 pub enum MetadataError {

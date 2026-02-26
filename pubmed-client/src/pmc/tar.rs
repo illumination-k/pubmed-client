@@ -376,8 +376,8 @@ impl PmcTarClient {
     /// Parse OA API XML response to extract download URL
     #[cfg(not(target_arch = "wasm32"))]
     fn parse_oa_response(&self, xml_content: &str, pmcid: &str) -> Result<String> {
-        use quick_xml::events::Event;
         use quick_xml::Reader;
+        use quick_xml::events::Event;
 
         debug!("Parsing OA API XML response: {}", xml_content);
 
@@ -499,10 +499,10 @@ impl PmcTarClient {
         // First try to match by figure file_name if available
         if let Some(file_name) = &figure.file_name {
             for file_path in extracted_files {
-                if let Some(filename) = Path::new(file_path).file_name() {
-                    if filename.to_string_lossy().contains(file_name) {
-                        return Some(file_path.clone());
-                    }
+                if let Some(filename) = Path::new(file_path).file_name()
+                    && filename.to_string_lossy().contains(file_name)
+                {
+                    return Some(file_path.clone());
                 }
             }
         }
@@ -514,12 +514,12 @@ impl PmcTarClient {
                 let figure_id_lower = figure.id.to_lowercase();
 
                 // Check if filename contains figure ID and has image extension
-                if filename_str.contains(&figure_id_lower) {
-                    if let Some(extension) = Path::new(file_path).extension() {
-                        let ext_str = extension.to_string_lossy().to_lowercase();
-                        if image_extensions.contains(&ext_str.as_str()) {
-                            return Some(file_path.clone());
-                        }
+                if filename_str.contains(&figure_id_lower)
+                    && let Some(extension) = Path::new(file_path).extension()
+                {
+                    let ext_str = extension.to_string_lossy().to_lowercase();
+                    if image_extensions.contains(&ext_str.as_str()) {
+                        return Some(file_path.clone());
                     }
                 }
             }
@@ -531,12 +531,12 @@ impl PmcTarClient {
             for file_path in extracted_files {
                 if let Some(filename) = Path::new(file_path).file_name() {
                     let filename_str = filename.to_string_lossy().to_lowercase();
-                    if filename_str.contains(&label_clean) {
-                        if let Some(extension) = Path::new(file_path).extension() {
-                            let ext_str = extension.to_string_lossy().to_lowercase();
-                            if image_extensions.contains(&ext_str.as_str()) {
-                                return Some(file_path.clone());
-                            }
+                    if filename_str.contains(&label_clean)
+                        && let Some(extension) = Path::new(file_path).extension()
+                    {
+                        let ext_str = extension.to_string_lossy().to_lowercase();
+                        if image_extensions.contains(&ext_str.as_str()) {
+                            return Some(file_path.clone());
                         }
                     }
                 }

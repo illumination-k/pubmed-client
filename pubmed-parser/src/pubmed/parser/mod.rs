@@ -206,11 +206,13 @@ mod tests {
         assert_eq!(author.full_name, "John Doe");
         assert_eq!(author.orcid, Some("0000-0001-2345-6789".to_string()));
         assert_eq!(author.affiliations.len(), 1);
-        assert!(author.affiliations[0]
-            .institution
-            .as_ref()
-            .unwrap()
-            .contains("Harvard Medical School"));
+        assert!(
+            author.affiliations[0]
+                .institution
+                .as_ref()
+                .unwrap()
+                .contains("Harvard Medical School")
+        );
 
         // Test keywords
         assert!(article.keywords.is_some());

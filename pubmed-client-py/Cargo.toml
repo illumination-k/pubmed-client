@@ -19,11 +19,11 @@ doctest = false
 pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
 
 # PyO3 for Python bindings
-pyo3 = { version = "0.27.1", features = ["extension-module"] }
+pyo3 = { version = "0.28.2", features = ["extension-module"] }
 
 # pyo3-stub-gen for automatic type stub generation
-pyo3-stub-gen = "0.9"
-pyo3-stub-gen-derive = "0.9"
+pyo3-stub-gen = "0.19"
+pyo3-stub-gen-derive = "0.19"
 
 # Re-export some core dependencies
 anyhow = { workspace = true }

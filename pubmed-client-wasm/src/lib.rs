@@ -3,7 +3,7 @@
 //! This module provides JavaScript-compatible bindings for use in Node.js and browsers.
 
 use pubmed_client::{
-    config::ClientConfig, pmc::PmcFullText, pubmed::ArticleSummary, pubmed::PubMedArticle, Client,
+    Client, config::ClientConfig, pmc::PmcFullText, pubmed::ArticleSummary, pubmed::PubMedArticle,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;

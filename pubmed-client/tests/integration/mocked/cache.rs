@@ -1,8 +1,8 @@
-use pubmed_client::{cache::CacheConfig, ClientConfig, PmcClient};
+use pubmed_client::{ClientConfig, PmcClient, cache::CacheConfig};
 use std::time::Duration;
 use wiremock::{
-    matchers::{method, path_regex},
     Mock, MockServer, ResponseTemplate,
+    matchers::{method, path_regex},
 };
 
 /// Test data for a simple PMC article

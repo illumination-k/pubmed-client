@@ -91,7 +91,7 @@ fn str_to_article_type(s: &str) -> PyResult<ArticleType> {
 ///     >>> print(query_string)
 ///     covid-19
 #[gen_stub_pyclass]
-#[pyclass(name = "SearchQuery")]
+#[pyclass(name = "SearchQuery", from_py_object)]
 #[derive(Clone)]
 pub struct PySearchQuery {
     pub inner: SearchQuery,
