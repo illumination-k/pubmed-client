@@ -49,11 +49,4 @@ run = [
 
 [tasks."ci:py"]
 description = "Equivalent to python.yml: lint + test"
-run = ["mise run lint:py", "mise run test:py"]
-
-# ── Setup tasks ───────────────────────────────────────────────────────────────
-
-[tasks."setup:py"]
-description = "Setup Python binding dev environment (uv sync)"
-dir = "pubmed-client-py"
-run = ["uv sync --all-extras"]
+depends = ["lint:py", "test:py"]

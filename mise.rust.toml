@@ -43,4 +43,4 @@ run = [
 
 [tasks."ci:rs"]
 description = "Equivalent to rust.yml: unit tests + doc tests"
-run = ["cargo nextest run --workspace", "cargo test --doc --workspace"]
+depends = ["lint:rs", "test:rs", "doctest:rs"]
