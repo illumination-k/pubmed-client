@@ -4,6 +4,7 @@
 
 # Local mise overrides (per-developer, not committed)
 mise.local.toml
+.miserc.toml
 
 .vscode/
 
