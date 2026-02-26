@@ -1,7 +1,7 @@
 use anyhow::Result;
 use rmcp::{
-    transport::{ConfigureCommandExt, TokioChildProcess},
     ServiceExt,
+    transport::{ConfigureCommandExt, TokioChildProcess},
 };
 use tokio::process::Command;
 

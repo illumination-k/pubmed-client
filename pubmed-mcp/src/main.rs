@@ -1,8 +1,8 @@
 use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use rmcp::{
-    handler::server::wrapper::Parameters, model::*, tool, tool_handler, tool_router,
-    transport::stdio, ServerHandler, ServiceExt,
+    ServerHandler, ServiceExt, handler::server::wrapper::Parameters, model::*, tool, tool_handler,
+    tool_router, transport::stdio,
 };
 use std::collections::HashSet;
 use std::sync::Arc;
@@ -270,7 +270,7 @@ async fn main() -> Result<()> {
         let et = enabled_tools.clone();
 
         use rmcp::transport::streamable_http_server::{
-            session::local::LocalSessionManager, StreamableHttpService,
+            StreamableHttpService, session::local::LocalSessionManager,
         };
         let service = StreamableHttpService::new(
             move || {

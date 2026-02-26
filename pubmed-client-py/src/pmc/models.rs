@@ -7,7 +7,7 @@ use pyo3::types::PyList;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
-use pubmed_client::pmc::{self, markdown::PmcMarkdownConverter, OaSubsetInfo};
+use pubmed_client::pmc::{self, OaSubsetInfo, markdown::PmcMarkdownConverter};
 use pubmed_client::{ExtractedFigure, PmcFullText};
 
 // ================================================================================================

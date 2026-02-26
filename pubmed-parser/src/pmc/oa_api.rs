@@ -164,11 +164,13 @@ mod tests {
         assert!(!result.is_oa_subset);
         assert_eq!(result.pmcid, "PMC8550608");
         assert_eq!(result.error_code, Some("idIsNotOpenAccess".to_string()));
-        assert!(result
-            .error_message
-            .as_ref()
-            .unwrap()
-            .contains("is not Open Access"));
+        assert!(
+            result
+                .error_message
+                .as_ref()
+                .unwrap()
+                .contains("is not Open Access")
+        );
         assert!(result.download_link.is_none());
     }
 

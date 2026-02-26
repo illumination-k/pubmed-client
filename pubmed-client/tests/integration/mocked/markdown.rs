@@ -2,12 +2,12 @@ use rstest::*;
 use tracing::{debug, info, warn};
 
 use pubmed_client::pmc::{
-    parse_pmc_xml, HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle,
+    HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle, parse_pmc_xml,
 };
 
 #[path = "../common/mod.rs"]
 mod common;
-use common::{pmc_xml_test_cases, PmcXmlTestCase};
+use common::{PmcXmlTestCase, pmc_xml_test_cases};
 
 /// 全XMLファイルを返すフィクスチャ
 #[fixture]

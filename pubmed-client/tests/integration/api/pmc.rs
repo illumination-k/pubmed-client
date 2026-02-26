@@ -31,7 +31,7 @@ mod integration_tests {
 
     // Import test utilities
     use crate::common::integration_test_utils::{
-        create_test_pmc_client, create_test_pubmed_client, should_run_real_api_tests, TEST_PMCIDS,
+        TEST_PMCIDS, create_test_pmc_client, create_test_pubmed_client, should_run_real_api_tests,
     };
 
     /// Test fetching PMC full-text articles

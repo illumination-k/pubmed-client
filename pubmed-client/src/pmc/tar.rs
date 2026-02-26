@@ -376,8 +376,8 @@ impl PmcTarClient {
     /// Parse OA API XML response to extract download URL
     #[cfg(not(target_arch = "wasm32"))]
     fn parse_oa_response(&self, xml_content: &str, pmcid: &str) -> Result<String> {
-        use quick_xml::events::Event;
         use quick_xml::Reader;
+        use quick_xml::events::Event;
 
         debug!("Parsing OA API XML response: {}", xml_content);
 

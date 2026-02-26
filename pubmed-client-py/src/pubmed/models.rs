@@ -7,7 +7,7 @@ use pyo3::types::PyList;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
-use pubmed_client::{pubmed, ArticleSummary, PubMedArticle};
+use pubmed_client::{ArticleSummary, PubMedArticle, pubmed};
 
 // ================================================================================================
 // PubMed Data Models

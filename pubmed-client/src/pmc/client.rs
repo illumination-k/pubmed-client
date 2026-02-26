@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::cache::{create_cache, PmcCache};
+use crate::cache::{PmcCache, create_cache};
 use crate::common::{PmcId, PubMedId};
 use crate::config::ClientConfig;
 use crate::error::{ParseError, PubMedError, Result};

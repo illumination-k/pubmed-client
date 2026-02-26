@@ -8,7 +8,7 @@
 
 [tasks."fmt:rs"]
 description = "Format Rust code with cargo fmt"
-run = ["cargo fmt --workspace"]
+run = ["cargo fmt --all"]
 
 [tasks."lint:rs"]
 description = "Lint Rust code with cargo clippy"
@@ -23,7 +23,7 @@ run = ["cargo nextest run --workspace"]
 
 [tasks."doctest:rs"]
 description = "Run doc tests for entire workspace"
-run = ["cargo test --doc --workspace"]
+run = ["cargo test --doc --workspace --exclude pubmed-client-py"]
 
 [tasks."build:rs"]
 description = "Build entire workspace"

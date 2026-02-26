@@ -6,7 +6,7 @@ use pubmed_parser::pubmed::parser::parse_article_from_xml;
 
 #[path = "../common/mod.rs"]
 mod common;
-use common::{pubmed_xml_test_cases, PubMedXmlTestCase};
+use common::{PubMedXmlTestCase, pubmed_xml_test_cases};
 
 /// Fixture for all PubMed XML test cases
 #[fixture]

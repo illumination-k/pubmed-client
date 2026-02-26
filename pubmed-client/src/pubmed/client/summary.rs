@@ -345,9 +345,11 @@ mod tests {
         let client = PubMedClient::new();
         let result = client.fetch_summaries(&[]).await;
         assert!(result.is_ok());
-        assert!(result
-            .expect("empty input should return empty summaries")
-            .is_empty());
+        assert!(
+            result
+                .expect("empty input should return empty summaries")
+                .is_empty()
+        );
     }
 
     #[tokio::test]

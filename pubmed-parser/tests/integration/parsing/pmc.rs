@@ -5,7 +5,7 @@ use pubmed_parser::pmc::parse_pmc_xml;
 
 #[path = "../common/mod.rs"]
 mod common;
-use common::{pmc_xml_test_cases, PmcXmlTestCase};
+use common::{PmcXmlTestCase, pmc_xml_test_cases};
 
 /// 全XMLファイルを返すフィクスチャ
 #[fixture]
