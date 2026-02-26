@@ -27,16 +27,6 @@ runs:
       run: git lfs pull
       shell: bash
 
-    - name: Setup mise
-      if: inputs.setup-mise == 'true'
-      uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
-      env:
-        SKIP_POSTINSTALL: ${{ inputs.skip-postinstall == 'true' && '1' || '' }}
-      with:
-        experimental: true
-        cache: true
-        log_level: debug
-
     - name: Install Rust
       uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
 
@@ -51,3 +41,13 @@ runs:
       uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
       with:
         shared-key: ${{ inputs.rust-target || 'default' }}
+
+    - name: Setup mise
+      if: inputs.setup-mise == 'true'
+      uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+      env:
+        SKIP_POSTINSTALL: ${{ inputs.skip-postinstall == 'true' && '1' || '' }}
+      with:
+        experimental: true
+        cache: true
+        log_level: debug
