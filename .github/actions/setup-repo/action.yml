@@ -42,3 +42,18 @@ runs:
         experimental: true
         cache: true
         log_level: debug
+
+    - name: Get pnpm store directory
+      if: inputs.setup-mise == 'true' && contains(env.MISE_ENV, 'node')
+      id: pnpm-store
+      run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Cache pnpm store
+      if: steps.pnpm-store.outcome == 'success'
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: pnpm-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-${{ runner.os }}-

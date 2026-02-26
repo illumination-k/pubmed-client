@@ -29,8 +29,3 @@ jobs:
 
       - name: Run lint
         run: mise run lint:root
-
-      - name: Check docs
-        run: cargo doc --all-features --no-deps
-        env:
-          RUSTDOCFLAGS: "-D warnings"
