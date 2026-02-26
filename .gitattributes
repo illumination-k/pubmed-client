@@ -3,5 +3,5 @@
 # XML test fixtures (PubMed and PMC articles)
 test_data/**/*.xml filter=lfs diff=lfs merge=lfs -text
 
-# API response test fixtures
-pubmed-client/tests/integration/test_data/**/*.json filter=lfs diff=lfs merge=lfs -text
+# API response test fixtures (JSON, XML, TXT)
+pubmed-client/tests/integration/test_data/api_responses/** filter=lfs diff=lfs merge=lfs -text
