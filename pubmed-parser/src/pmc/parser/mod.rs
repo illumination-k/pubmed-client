@@ -7,34 +7,53 @@ pub mod reference;
 pub mod section;
 pub mod xml_utils;
 
+/// Extract a section slice from XML content without allocating.
+///
+/// Returns a `&str` slice covering `start_tag..end_tag` (inclusive),
+/// or `None` if the tags are not found.
+fn extract_section_slice<'a>(content: &'a str, start_tag: &str, end_tag: &str) -> Option<&'a str> {
+    let start = content.find(start_tag)?;
+    let end_offset = content[start..].find(end_tag)?;
+    Some(&content[start..start + end_offset + end_tag.len()])
+}
+
 /// Parse PMC XML content into structured data
 ///
 /// This function acts as a coordinator that delegates parsing tasks
 /// to specialized parser modules for better maintainability and separation of concerns.
 pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
-    // Delegate to specialized parsers for clean separation of concerns
+    // Pre-extract major XML sections once to avoid scanning the full document repeatedly.
+    // PMC JATS XML structure: <article> <front>...</front> <body>...</body> <back>...</back> </article>
+    let front = extract_section_slice(xml_content, "<front>", "</front>").unwrap_or(xml_content);
+    let back = extract_section_slice(xml_content, "<back>", "</back>").unwrap_or("");
 
-    // Extract metadata using metadata module functions
-    let title = metadata::extract_title(xml_content);
-    let journal = metadata::extract_journal_info(xml_content);
-    let pub_date = metadata::extract_pub_date(xml_content);
-    let doi = metadata::extract_doi(xml_content);
-    let pmid = metadata::extract_pmid(xml_content);
+    // Metadata from <front> (title, journal, dates, IDs, keywords, funding are all in <front>)
+    let title = metadata::extract_title(front);
+    let journal = metadata::extract_journal_info(front);
+    let pub_date = metadata::extract_pub_date(front);
+    let doi = metadata::extract_doi(front);
+    let pmid = metadata::extract_pmid(front);
+    let keywords = metadata::extract_keywords(front);
+    let funding = metadata::extract_funding(front);
+
+    // Article type is an attribute on the <article> tag itself (before <front>)
     let article_type = metadata::extract_article_type(xml_content);
-    let keywords = metadata::extract_keywords(xml_content);
-    let funding = metadata::extract_funding(xml_content);
-    let conflict_of_interest = metadata::extract_conflict_of_interest(xml_content);
-    let acknowledgments = metadata::extract_acknowledgments(xml_content);
+
+    // Back matter
+    let conflict_of_interest = metadata::extract_conflict_of_interest(back);
+    let acknowledgments = metadata::extract_acknowledgments(back);
+
+    // These can appear in body or back, so search full content
     let data_availability = metadata::extract_data_availability(xml_content);
     let supplementary_materials = metadata::extract_supplementary_materials(xml_content);
 
-    // Extract authors
-    let authors = author::extract_authors(xml_content)?;
+    // Authors from <front> (contrib-group is in article-meta)
+    let authors = author::extract_authors(front)?;
 
-    // Extract sections using section module functions
+    // Sections from <body> (extract_sections_enhanced finds <body> internally)
     let sections = section::extract_sections_enhanced(xml_content);
 
-    // Extract references using reference module functions
+    // References from <back> (extract_references_detailed finds <ref-list>/<back> internally)
     let references = reference::extract_references_detailed(xml_content).unwrap_or_default();
 
     Ok(PmcFullText {

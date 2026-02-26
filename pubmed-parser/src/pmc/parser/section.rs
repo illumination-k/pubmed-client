@@ -5,9 +5,6 @@ use crate::pmc::models::{ArticleSection, Figure, Table};
 pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
     let mut sections = Vec::new();
 
-    // First extract all figures from the entire document (including floats, back section, etc.)
-    let global_figures = extract_all_figures_from_document(content);
-
     // Extract abstract first
     if let Some(abstract_section) = extract_abstract_section_enhanced(content) {
         sections.push(abstract_section);
@@ -21,8 +18,23 @@ pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
         sections.extend(extract_body_sections_enhanced(body_content));
     }
 
-    // Distribute global figures to sections based on references
-    distribute_figures_to_sections(&mut sections, &global_figures, content);
+    // Extract figures from floats-group (outside body sections) and add to first section
+    if let Some(floats_start) = content.find("<floats-group>")
+        && let Some(floats_end) = content[floats_start..].find("</floats-group>")
+    {
+        let floats_content = &content[floats_start..floats_start + floats_end];
+        let float_figures = extract_figures_from_section(floats_content);
+        if !float_figures.is_empty() {
+            if let Some(first_section) = sections.first_mut() {
+                first_section.figures.extend(float_figures);
+            } else {
+                let mut figures_section =
+                    ArticleSection::new("figures".to_string(), "Figures section".to_string());
+                figures_section.figures = float_figures;
+                sections.push(figures_section);
+            }
+        }
+    }
 
     sections
 }
@@ -351,76 +363,6 @@ pub fn extract_paragraph_content(content: &str) -> Vec<String> {
     }
 
     paragraphs
-}
-
-/// Extract all figures from the entire XML document, including floats, back sections, etc.
-fn extract_all_figures_from_document(content: &str) -> Vec<Figure> {
-    let mut figures = Vec::new();
-
-    let mut pos = 0;
-    while let Some(fig_start) = content[pos..].find("<fig") {
-        let fig_start = pos + fig_start;
-        if let Some(fig_end) = content[fig_start..].find("</fig>") {
-            let fig_end = fig_start + fig_end;
-            let fig_content = &content[fig_start..fig_end];
-
-            let id = xml_utils::extract_attribute_value(fig_content, "id").unwrap_or_else(|| {
-                let fig_num = figures.len() + 1;
-                format!("fig_{fig_num}")
-            });
-
-            let label = xml_utils::extract_text_between(fig_content, "<label>", "</label>");
-            let caption = xml_utils::extract_text_between(fig_content, "<caption>", "</caption>")
-                .map(|c| xml_utils::strip_xml_tags(&c))
-                .unwrap_or_else(|| "No caption available".to_string());
-
-            let alt_text =
-                xml_utils::extract_text_between(fig_content, "<alt-text>", "</alt-text>");
-            let fig_type = xml_utils::extract_attribute_value(fig_content, "fig-type");
-
-            // Extract file name from graphic element
-            let file_name = xml_utils::extract_attribute_value(fig_content, "xlink:href")
-                .or_else(|| xml_utils::extract_attribute_value(fig_content, "href"));
-
-            let mut figure = Figure::new(id, caption);
-            figure.label = label;
-            figure.alt_text = alt_text;
-            figure.fig_type = fig_type;
-            figure.file_name = file_name;
-
-            figures.push(figure);
-            pos = fig_end;
-        } else {
-            break;
-        }
-    }
-
-    figures
-}
-
-/// Distribute global figures to sections based on figure references in the text
-fn distribute_figures_to_sections(
-    sections: &mut Vec<ArticleSection>,
-    global_figures: &[Figure],
-    _content: &str,
-) {
-    if global_figures.is_empty() {
-        return;
-    }
-
-    // For now, add all global figures to the first section if no specific mapping can be determined
-    // This could be enhanced in the future to do more sophisticated matching based on xref patterns
-    if let Some(first_section) = sections.first_mut() {
-        first_section.figures.extend(global_figures.iter().cloned());
-    } else if !global_figures.is_empty() {
-        // If no sections exist but we have figures, create a special figures section
-        let mut figures_section =
-            ArticleSection::new("figures".to_string(), "Figures section".to_string());
-        figures_section
-            .figures
-            .extend(global_figures.iter().cloned());
-        sections.push(figures_section);
-    }
 }
 
 #[cfg(test)]
