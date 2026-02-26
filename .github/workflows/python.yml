@@ -26,6 +26,7 @@ env:
 jobs:
   lint:
     name: Python Lint & Format
+    # Local: MISE_ENV=python mise run py:lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -75,6 +76,7 @@ jobs:
 
   test:
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    # Local: MISE_ENV=python mise run py:test
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -125,6 +127,7 @@ jobs:
 
   coverage:
     name: Python Test Coverage
+    # Local: MISE_ENV=python mise run py:coverage
     runs-on: ubuntu-latest
     permissions:
       contents: read

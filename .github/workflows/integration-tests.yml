@@ -34,6 +34,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  MISE_ENV: rust
 
 jobs:
   # Check if integration tests should run

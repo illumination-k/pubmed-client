@@ -18,10 +18,6 @@ inputs:
     description: "Whether to skip the mise postinstall hook (etc/postinstall.sh)"
     required: false
     default: "false"
-  mise-install-args:
-    description: "Extra args passed to mise install (e.g. 'node pnpm' to install only specific tools)"
-    required: false
-    default: ""
 
 runs:
   using: "composite"
@@ -40,7 +36,6 @@ runs:
         experimental: true
         cache: true
         log_level: debug
-        install_args: ${{ inputs.mise-install-args }}
 
     - name: Install Rust
       uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable

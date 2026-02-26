@@ -17,11 +17,12 @@ on:
 env:
   CARGO_TERM_COLOR: always
   MISE_EXPERIMENTAL: true
-  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
+  MISE_ENV: rust
 
 jobs:
   test:
     name: Test Suite
+    # Local: MISE_ENV=rust mise run ci:core
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,6 +43,7 @@ jobs:
 
   coverage:
     name: Code Coverage
+    # Local: MISE_ENV=rust mise run coverage
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -56,11 +58,6 @@ jobs:
 
       - name: Add llvm-tools-preview component
         run: rustup component add llvm-tools-preview
-
-      - name: Install cargo-llvm-cov
-        uses: taiki-e/install-action@cfdb446e391c69574ebc316dfb7d7849ec12b940 # v2.68.8
-        with:
-          tool: cargo-llvm-cov
 
       - name: Run tests with coverage instrumentation
         run: cargo llvm-cov nextest -p pubmed-client --all-features --no-report

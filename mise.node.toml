@@ -1,0 +1,102 @@
+# Loaded with MISE_ENV=node
+# Node.js ecosystem tools and tasks for NAPI, WASM, and website
+# Used by: napi.yml, wasm.yml, docs.yml (TypeDoc)
+
+[tools]
+node = "20"
+pnpm = "10"
+
+# ── NAPI tasks ────────────────────────────────────────────────────────────────
+
+[tasks."napi:build"]
+description = "Build napi-rs native Node.js bindings"
+dir = "pubmed-client-napi"
+run = ["pnpm run build"]
+
+[tasks."napi:test"]
+description = "Build and run napi-rs TypeScript tests"
+dir = "pubmed-client-napi"
+run = ["pnpm run build && pnpm run test"]
+
+[tasks."napi:fmt"]
+description = "Format napi package with Biome"
+dir = "pubmed-client-napi"
+run = ["pnpm run format"]
+
+[tasks."napi:lint"]
+description = "Lint and typecheck napi package (index.d.ts committed, no build needed)"
+dir = "pubmed-client-napi"
+run = ["pnpm run ci", "pnpm run typecheck"]
+
+# ── WASM tasks ────────────────────────────────────────────────────────────────
+
+[tasks."wasm:build"]
+description = "Build WASM package for web target"
+run = ["cd pubmed-client-wasm && wasm-pack build --target web"]
+
+[tasks."wasm:build:node"]
+description = "Build WASM package for Node.js target"
+run = ["cd pubmed-client-wasm && wasm-pack build --target nodejs"]
+
+[tasks."wasm:test"]
+description = "Build and test WASM package"
+run = ["cd pubmed-client-wasm && pnpm run build && pnpm run test"]
+
+[tasks."wasm:lint"]
+description = "Lint WASM package with Biome"
+dir = "pubmed-client-wasm"
+run = ["pnpm run ci"]
+
+[tasks."wasm:fmt"]
+description = "Format WASM package with Biome"
+dir = "pubmed-client-wasm"
+run = ["pnpm run format"]
+
+# ── Website tasks ─────────────────────────────────────────────────────────────
+
+[tasks."website:lint"]
+description = "Lint and typecheck website"
+dir = "website"
+run = ["pnpm run ci", "pnpm run typecheck"]
+
+[tasks."website:fmt"]
+description = "Format website with Biome"
+dir = "website"
+run = ["pnpm run format"]
+
+[tasks."website:start"]
+description = "Start Docusaurus dev server"
+dir = "website"
+run = ["pnpm run start"]
+
+[tasks."website:build"]
+description = "Build Docusaurus for production"
+dir = "website"
+run = ["pnpm run build"]
+
+# ── CI-equivalent tasks ───────────────────────────────────────────────────────
+
+[tasks."ci:napi"]
+description = "Equivalent to napi.yml: lint + test"
+run = ["mise run napi:lint", "mise run napi:test"]
+
+[tasks."ci:wasm"]
+description = "Equivalent to wasm.yml: test + lint"
+run = ["mise run wasm:test", "mise run wasm:lint"]
+
+# ── Setup tasks ───────────────────────────────────────────────────────────────
+
+[tasks."setup:napi"]
+description = "Setup NAPI dev environment (pnpm install)"
+dir = "pubmed-client-napi"
+run = ["pnpm install"]
+
+[tasks."setup:wasm"]
+description = "Setup WASM dev environment (pnpm install)"
+dir = "pubmed-client-wasm"
+run = ["pnpm install"]
+
+[tasks."setup:website"]
+description = "Setup website dev environment (pnpm install)"
+dir = "website"
+run = ["pnpm install"]

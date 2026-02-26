@@ -2,6 +2,9 @@
 
 .claude/*.local*
 
+# Local mise overrides (per-developer, not committed)
+mise.local.toml
+
 .vscode/
 
 # Coverage reports

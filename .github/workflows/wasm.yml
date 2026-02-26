@@ -16,10 +16,12 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  MISE_ENV: node
 
 jobs:
   wasm-tests:
     name: WASM TypeScript Tests
+    # Local: MISE_ENV=node mise run ci:wasm
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,7 +36,6 @@ jobs:
         with:
           rust-target: wasm32-unknown-unknown
           skip-postinstall: "true"
-          mise-install-args: "node pnpm"
 
       - name: Install wasm-pack
         uses: jetli/wasm-pack-action@0d096b08b4e5a7de8c28de67e11e945404e9eefa # v0.4.0

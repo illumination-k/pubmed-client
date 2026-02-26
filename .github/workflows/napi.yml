@@ -31,6 +31,7 @@ env:
   APP_NAME: pubmed-client
   MACOSX_DEPLOYMENT_TARGET: "10.13"
   SKIP_POSTINSTALL: "1"
+  MISE_ENV: node
 
 permissions:
   contents: read
@@ -42,6 +43,7 @@ jobs:
       contents: read
     timeout-minutes: 10
     name: Lint
+    # Local: MISE_ENV=node mise run napi:lint
     runs-on: ubuntu-latest
     defaults:
       run:

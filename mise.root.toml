@@ -1,0 +1,76 @@
+# Loaded with MISE_ENV=root
+# Repository infrastructure tools: formatting, linting, CI auditing
+# Used by: lint.yml, and local development
+
+[tools]
+pre-commit = "latest"
+dprint = "latest"
+shfmt = "3"
+actionlint = "1.7.7"
+"pipx:zizmor" = "1.9.0"
+shellcheck = "0.10.0"
+"aqua:suzuki-shunsuke/ghalint" = "1.4.1"
+"aqua:suzuki-shunsuke/pinact" = "3.3.0"
+
+# ── Format tasks ──────────────────────────────────────────────────────────────
+
+[tasks."fmt:root"]
+description = "Format Rust code (dprint + cargo fmt + pinact)"
+run = ["mise fmt", "dprint fmt", "cargo fmt --all", "pinact run"]
+
+[tasks."fmt:sh"]
+description = "Format shell scripts with shfmt"
+run = ["shfmt -w ./**/*.sh"]
+
+[tasks.fmt]
+description = "Format all code (requires MISE_ENV=root,node,python)"
+run = [
+  "mise run fmt:root",
+  "mise run fmt:sh",
+  "MISE_ENV=python mise run py:format",
+  "MISE_ENV=node mise run napi:fmt",
+  "MISE_ENV=node mise run wasm:fmt",
+  "MISE_ENV=node mise run website:fmt",
+]
+
+# ── Lint tasks ────────────────────────────────────────────────────────────────
+
+[tasks."lint:root"]
+description = "Lint Rust and GitHub Actions (dprint, clippy, actionlint, ghalint, zizmor)"
+run = [
+  "actionlint",
+  "ghalint run",
+  "zizmor .",
+  "dprint check",
+  "cargo fmt --all -- --check",
+  "cargo clippy --workspace --all-targets -- -D warnings",
+  "cargo clippy -p pubmed-client --all-targets --features integration-tests -- -D warnings",
+]
+
+[tasks.lint]
+description = "Lint all code (requires MISE_ENV=root,node,python)"
+run = [
+  "mise run lint:root",
+  "MISE_ENV=python mise run py:lint",
+  "MISE_ENV=node mise run napi:lint",
+  "MISE_ENV=node mise run wasm:lint",
+  "MISE_ENV=node mise run website:lint",
+]
+
+# ── CI-equivalent aggregate task ──────────────────────────────────────────────
+
+[tasks."ci:all"]
+description = "Run all CI checks locally (requires MISE_ENV=root,rust,node,python)"
+run = [
+  "mise run lint",
+  "MISE_ENV=rust mise run ci:core",
+  "MISE_ENV=python mise run ci:py",
+  "MISE_ENV=node mise run ci:napi",
+  "MISE_ENV=node mise run ci:wasm",
+  "mise run ci:mcp",
+]
+
+# ci:mcp uses cargo test (from rustup, no extra MISE_ENV needed)
+[tasks."ci:mcp"]
+description = "Equivalent to test-mcp-server.yml"
+run = ["cargo test -p pubmed-mcp"]

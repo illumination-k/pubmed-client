@@ -16,6 +16,9 @@ on:
       - ".github/workflows/docs.yml"
       - ".github/actions/setup-repo/**"
 
+env:
+  MISE_ENV: "node,python"
+
 jobs:
   docs:
     name: Build Rust Documentation
