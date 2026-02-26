@@ -1,4 +1,4 @@
-name: Python Package Publish
+name: "Release / Python (PyPI)"
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Release
+name: "Release / Rust (crates.io)"
 
 on:
   push:
@@ -134,7 +134,7 @@ jobs:
     if: ${{ needs.should-publish.outputs.core == 'true' }}
     permissions:
       contents: read
-    uses: ./.github/workflows/publish-crates.yml
+    uses: ./.github/workflows/_publish-crate.yml
     with:
       package: pubmed-client
       package-path: pubmed-client
@@ -151,7 +151,7 @@ jobs:
     if: ${{ needs.should-publish.outputs.cli == 'true' }}
     permissions:
       contents: read
-    uses: ./.github/workflows/publish-crates.yml
+    uses: ./.github/workflows/_publish-crate.yml
     with:
       package: pubmed-cli
       package-path: pubmed-cli
@@ -168,7 +168,7 @@ jobs:
     if: ${{ needs.should-publish.outputs.mcp == 'true' }}
     permissions:
       contents: read
-    uses: ./.github/workflows/publish-crates.yml
+    uses: ./.github/workflows/_publish-crate.yml
     with:
       package: pubmed-mcp
       package-path: pubmed-mcp

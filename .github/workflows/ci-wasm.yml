@@ -1,4 +1,4 @@
-name: WASM
+name: "CI / WASM"
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - "pubmed-client/Cargo.toml"
       - "Cargo.toml"
       - "Cargo.lock"
-      - ".github/workflows/wasm.yml"
+      - ".github/workflows/ci-wasm.yml"
       - ".github/actions/setup-repo/**"
 
 env:
