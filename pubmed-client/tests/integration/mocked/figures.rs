@@ -1,4 +1,4 @@
-use pubmed_client::{ClientConfig, PmcClient, PmcTarClient, PubMedError};
+use pubmed_client::{ClientConfig, ParseError, PmcClient, PmcTarClient, PubMedError};
 use std::path::Path;
 use tempfile::tempdir;
 use tracing::info;
@@ -187,7 +187,7 @@ async fn test_extract_figures_with_captions_invalid_pmcid() {
         .await;
 
     assert!(result.is_err());
-    if let Err(PubMedError::InvalidPmcid { pmcid }) = result {
+    if let Err(PubMedError::ParseError(ParseError::InvalidPmcid { pmcid })) = result {
         assert_eq!(pmcid, "PMCinvalid_pmcid");
     } else {
         panic!("Expected InvalidPmcid error, got: {:?}", result);
@@ -207,7 +207,7 @@ async fn test_extract_figures_with_captions_empty_pmcid() {
         .await;
 
     assert!(result.is_err());
-    if let Err(PubMedError::InvalidPmcid { pmcid }) = result {
+    if let Err(PubMedError::ParseError(ParseError::InvalidPmcid { pmcid })) = result {
         assert_eq!(pmcid, "PMC");
     } else {
         panic!("Expected InvalidPmcid error, got: {:?}", result);
@@ -233,13 +233,13 @@ async fn test_extract_figures_with_captions_directory_creation() {
     // Should fail with error but directory creation should succeed
     assert!(result.is_err());
     match result.unwrap_err() {
-        PubMedError::PmcNotAvailable { id } => {
+        PubMedError::ParseError(ParseError::PmcNotAvailable { id }) => {
             assert_eq!(id, "PMC1234567");
         }
         PubMedError::ApiError { status, .. } => {
             assert!(status == 404 || status >= 400);
         }
-        PubMedError::IoError { .. } => {
+        PubMedError::ParseError(ParseError::IoError { .. }) => {
             // Could fail with IO error if the response isn't valid
         }
         other => panic!("Unexpected error type: {:?}", other),

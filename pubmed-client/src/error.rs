@@ -3,36 +3,19 @@ use std::result;
 use crate::retry::RetryableError;
 use thiserror::Error;
 
+// Re-export ParseError for convenience
+pub use pubmed_parser::ParseError;
+
 /// Error types for PubMed client operations
 #[derive(Error, Debug)]
 pub enum PubMedError {
+    /// Parsing error (XML, JSON, article not found, etc.)
+    #[error(transparent)]
+    ParseError(#[from] pubmed_parser::ParseError),
+
     /// HTTP request failed
     #[error("HTTP request failed: {0}")]
     RequestError(#[from] reqwest::Error),
-
-    /// JSON parsing failed
-    #[error("JSON parsing failed: {0}")]
-    JsonError(#[from] serde_json::Error),
-
-    /// XML parsing failed
-    #[error("XML parsing failed: {0}")]
-    XmlError(String),
-
-    /// Article not found
-    #[error("Article not found: PMID {pmid}")]
-    ArticleNotFound { pmid: String },
-
-    /// PMC full text not available
-    #[error("PMC full text not available for {id}")]
-    PmcNotAvailable { id: String },
-
-    /// Invalid PMID format
-    #[error("Invalid PMID format: {pmid}")]
-    InvalidPmid { pmid: String },
-
-    /// Invalid PMC ID format
-    #[error("Invalid PMC ID format: {pmcid}")]
-    InvalidPmcid { pmcid: String },
 
     /// Invalid query structure or parameters
     #[error("Invalid query: {0}")]
@@ -45,10 +28,6 @@ pub enum PubMedError {
     /// Generic API error with HTTP status code
     #[error("API error {status}: {message}")]
     ApiError { status: u16, message: String },
-
-    /// IO error for file operations
-    #[error("IO error: {message}")]
-    IoError { message: String },
 
     /// Search limit exceeded
     /// This error is returned when a search query requests more results than the maximum retrievable limit.
@@ -114,14 +93,8 @@ impl RetryableError for PubMedError {
             }
 
             // All other errors are not retryable
-            PubMedError::JsonError(_)
-            | PubMedError::XmlError(_)
-            | PubMedError::ArticleNotFound { .. }
-            | PubMedError::PmcNotAvailable { .. }
-            | PubMedError::InvalidPmid { .. }
-            | PubMedError::InvalidPmcid { .. }
+            PubMedError::ParseError(_)
             | PubMedError::InvalidQuery(_)
-            | PubMedError::IoError { .. }
             | PubMedError::SearchLimitExceeded { .. }
             | PubMedError::HistorySessionError(_)
             | PubMedError::WebEnvNotAvailable => false,
@@ -145,15 +118,16 @@ impl RetryableError for PubMedError {
             }
         } else {
             match self {
-                PubMedError::JsonError(_) => "Invalid JSON response",
-                PubMedError::XmlError(_) => "Invalid XML response",
-                PubMedError::ArticleNotFound { .. } => "Article does not exist",
-                PubMedError::PmcNotAvailable { .. } => "Content not available",
-                PubMedError::InvalidPmid { .. } | PubMedError::InvalidPmcid { .. } => {
-                    "Invalid input"
-                }
+                PubMedError::ParseError(e) => match e {
+                    pubmed_parser::ParseError::JsonError(_) => "Invalid JSON response",
+                    pubmed_parser::ParseError::XmlError(_) => "Invalid XML response",
+                    pubmed_parser::ParseError::ArticleNotFound { .. } => "Article does not exist",
+                    pubmed_parser::ParseError::PmcNotAvailable { .. } => "Content not available",
+                    pubmed_parser::ParseError::InvalidPmid { .. }
+                    | pubmed_parser::ParseError::InvalidPmcid { .. } => "Invalid input",
+                    pubmed_parser::ParseError::IoError { .. } => "File system error",
+                },
                 PubMedError::InvalidQuery(_) => "Invalid query",
-                PubMedError::IoError { .. } => "File system error",
                 PubMedError::HistorySessionError(_) => "History session expired",
                 PubMedError::WebEnvNotAvailable => "WebEnv not available",
                 _ => "Non-transient error",
@@ -169,17 +143,19 @@ mod tests {
     // Tests for non-retryable errors
 
     #[test]
-    fn test_json_error_not_retryable() {
+    fn test_parse_error_json_not_retryable() {
         let json_err = serde_json::from_str::<serde_json::Value>("invalid json").unwrap_err();
-        let err = PubMedError::JsonError(json_err);
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::JsonError(json_err));
 
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "Invalid JSON response");
     }
 
     #[test]
-    fn test_xml_error_not_retryable() {
-        let err = PubMedError::XmlError("Invalid XML format".to_string());
+    fn test_parse_error_xml_not_retryable() {
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::XmlError(
+            "Invalid XML format".to_string(),
+        ));
 
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "Invalid XML response");
@@ -187,9 +163,9 @@ mod tests {
 
     #[test]
     fn test_article_not_found_not_retryable() {
-        let err = PubMedError::ArticleNotFound {
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::ArticleNotFound {
             pmid: "12345".to_string(),
-        };
+        });
 
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "Article does not exist");
@@ -198,9 +174,9 @@ mod tests {
 
     #[test]
     fn test_pmc_not_available_not_retryable() {
-        let err = PubMedError::PmcNotAvailable {
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::PmcNotAvailable {
             id: "67890".to_string(),
-        };
+        });
 
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "Content not available");
@@ -209,9 +185,9 @@ mod tests {
 
     #[test]
     fn test_pmc_not_available_by_pmcid_not_retryable() {
-        let err = PubMedError::PmcNotAvailable {
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::PmcNotAvailable {
             id: "PMC123456".to_string(),
-        };
+        });
 
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "Content not available");
@@ -220,9 +196,9 @@ mod tests {
 
     #[test]
     fn test_invalid_pmid_not_retryable() {
-        let err = PubMedError::InvalidPmid {
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::InvalidPmid {
             pmid: "invalid".to_string(),
-        };
+        });
 
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "Invalid input");
@@ -231,9 +207,9 @@ mod tests {
 
     #[test]
     fn test_invalid_pmcid_not_retryable() {
-        let err = PubMedError::InvalidPmcid {
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::InvalidPmcid {
             pmcid: "PMCinvalid".to_string(),
-        };
+        });
 
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "Invalid input");
@@ -252,9 +228,9 @@ mod tests {
 
     #[test]
     fn test_io_error_not_retryable() {
-        let err = PubMedError::IoError {
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::IoError {
             message: "File not found".to_string(),
-        };
+        });
 
         assert!(!err.is_retryable());
         assert_eq!(err.retry_reason(), "File system error");
@@ -376,7 +352,7 @@ mod tests {
     fn test_error_display_messages() {
         let test_cases = vec![
             (
-                PubMedError::XmlError("test".to_string()),
+                PubMedError::ParseError(pubmed_parser::ParseError::XmlError("test".to_string())),
                 "XML parsing failed: test",
             ),
             (
@@ -393,9 +369,9 @@ mod tests {
 
     #[test]
     fn test_error_display_with_fields() {
-        let err = PubMedError::ArticleNotFound {
+        let err = PubMedError::ParseError(pubmed_parser::ParseError::ArticleNotFound {
             pmid: "12345".to_string(),
-        };
+        });
         let display = format!("{}", err);
         assert!(display.contains("Article not found"));
         assert!(display.contains("12345"));

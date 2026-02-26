@@ -1,0 +1,42 @@
+[package]
+name = "pubmed-parser"
+version.workspace = true
+authors.workspace = true
+autotests = false
+categories = ["parser-implementations", "science"]
+edition.workspace = true
+keywords = ["pubmed", "biomedical", "research", "parser", "pmc"]
+license.workspace = true
+repository.workspace = true
+description = "XML parsers and data models for PubMed and PMC (PubMed Central) articles"
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+quick-xml = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+urlencoding = { workspace = true }
+
+[dev-dependencies]
+rstest = "0.18"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-test = "0.2"
+
+# --- Parsing tests (fixture-based, no network) ---
+
+[[test]]
+name = "parsing_pubmed"
+path = "tests/integration/parsing/pubmed.rs"
+
+[[test]]
+name = "parsing_pmc"
+path = "tests/integration/parsing/pmc.rs"
+
+[[test]]
+name = "mocked_supplementary"
+path = "tests/integration/mocked/supplementary.rs"

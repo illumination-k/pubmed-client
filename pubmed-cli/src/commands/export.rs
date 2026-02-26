@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Args;
+use pubmed_client::ExportFormat;
 
 use super::create_pubmed_client;
 

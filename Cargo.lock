@@ -3250,6 +3250,8 @@ dependencies = [
  "moka",
  "paste",
  "proptest",
+ "pubmed-formatter",
+ "pubmed-parser",
  "quick-xml",
  "rand 0.8.5",
  "redis",
@@ -3259,7 +3261,6 @@ dependencies = [
  "rusqlite",
  "serde",
  "serde_json",
- "serde_yaml",
  "tar",
  "tempfile",
  "thiserror 1.0.69",
@@ -3321,6 +3322,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pubmed-formatter"
+version = "0.1.0"
+dependencies = [
+ "pubmed-parser",
+ "regex",
+ "rstest",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tracing",
+ "tracing-subscriber",
+ "tracing-test",
+]
+
+[[package]]
 name = "pubmed-mcp"
 version = "0.1.0"
 dependencies = [
@@ -3336,6 +3352,22 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "pubmed-parser"
+version = "0.1.0"
+dependencies = [
+ "quick-xml",
+ "regex",
+ "rstest",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "tracing",
+ "tracing-subscriber",
+ "tracing-test",
+ "urlencoding",
 ]
 
 [[package]]

@@ -21,7 +21,7 @@ mod integration_tests {
     use tracing::{debug, info, warn};
     use tracing_test::traced_test;
 
-    use pubmed_client::{ClientConfig, PubMedClient, PubMedError};
+    use pubmed_client::{ClientConfig, ParseError, PubMedClient, PubMedError};
 
     // Import test utilities
     use crate::common::integration_test_utils::{
@@ -142,14 +142,14 @@ mod integration_tests {
 
                     // Verify error handling
                     match &e {
-                        PubMedError::ArticleNotFound { pmid: _ } => {
+                        PubMedError::ParseError(ParseError::ArticleNotFound { pmid: _ }) => {
                             info!("Article not found error (expected)");
                         }
                         PubMedError::ApiError { status, message } => {
                             assert!(!message.is_empty(), "Error message should not be empty");
                             debug!(status = status, message = message, "API error details");
                         }
-                        PubMedError::InvalidPmid { pmid: _ } => {
+                        PubMedError::ParseError(ParseError::InvalidPmid { pmid: _ }) => {
                             info!("Invalid PMID error (expected)");
                         }
                         _ => {
@@ -346,7 +346,9 @@ mod integration_tests {
                     let error_type = match &e {
                         PubMedError::ApiError { .. } => "api_error",
                         PubMedError::InvalidQuery(_) => "invalid_query",
-                        PubMedError::ArticleNotFound { pmid: _ } => "article_not_found",
+                        PubMedError::ParseError(ParseError::ArticleNotFound { pmid: _ }) => {
+                            "article_not_found"
+                        }
                         PubMedError::RateLimitExceeded => "rate_limit",
                         _ => "other",
                     };

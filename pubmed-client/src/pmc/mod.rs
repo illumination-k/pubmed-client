@@ -4,11 +4,15 @@
 //! full-text articles, check availability, and parse structured content.
 
 pub mod client;
-pub mod markdown;
-pub mod models;
-pub mod oa_api;
-pub mod parser;
 pub mod tar;
+
+// Re-export parser types from pubmed-parser
+pub use pubmed_parser::pmc::models;
+pub use pubmed_parser::pmc::oa_api;
+pub use pubmed_parser::pmc::parser;
+
+// Re-export formatter types from pubmed-formatter
+pub use pubmed_formatter::pmc::markdown;
 
 // Re-export public types
 pub use client::PmcClient;

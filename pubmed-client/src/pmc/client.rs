@@ -3,7 +3,7 @@ use std::time::Duration;
 use crate::cache::{create_cache, PmcCache};
 use crate::common::{PmcId, PubMedId};
 use crate::config::ClientConfig;
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, PubMedError, Result};
 use crate::pmc::models::{ExtractedFigure, OaSubsetInfo, PmcFullText};
 use crate::pmc::oa_api;
 use crate::pmc::parser::parse_pmc_xml;
@@ -165,9 +165,9 @@ impl PmcClient {
     ///
     /// # Errors
     ///
-    /// * `PubMedError::PmcNotAvailable` - If PMC full text is not available
+    /// * `ParseError::PmcNotAvailable` - If PMC full text is not available
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::XmlError` - If XML parsing fails
+    /// * `ParseError::XmlError` - If XML parsing fails
     ///
     /// # Example
     ///
@@ -254,9 +254,10 @@ impl PmcClient {
 
         // Check if the response contains an error
         if xml_content.contains("<ERROR>") {
-            return Err(PubMedError::PmcNotAvailable {
+            return Err(ParseError::PmcNotAvailable {
                 id: normalized_pmcid,
-            });
+            }
+            .into());
         }
 
         Ok(xml_content)
@@ -401,7 +402,7 @@ impl PmcClient {
         let xml_content = response.text().await?;
 
         // Parse the OA API XML response
-        oa_api::parse_oa_response(&xml_content, pmcid)
+        Ok(oa_api::parse_oa_response(&xml_content, pmcid)?)
     }
 
     /// Download and extract tar.gz file for a PMC article using the OA API
@@ -417,10 +418,10 @@ impl PmcClient {
     ///
     /// # Errors
     ///
-    /// * `PubMedError::InvalidPmid` - If the PMCID format is invalid
+    /// * `ParseError::InvalidPmid` - If the PMCID format is invalid
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::IoError` - If file operations fail
-    /// * `PubMedError::PmcNotAvailable` - If the article is not available in OA
+    /// * `ParseError::IoError` - If file operations fail
+    /// * `ParseError::PmcNotAvailable` - If the article is not available in OA
     ///
     /// # Example
     ///
@@ -464,10 +465,10 @@ impl PmcClient {
     ///
     /// # Errors
     ///
-    /// * `PubMedError::InvalidPmid` - If the PMCID format is invalid
+    /// * `ParseError::InvalidPmid` - If the PMCID format is invalid
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::IoError` - If file operations fail
-    /// * `PubMedError::PmcNotAvailable` - If the article is not available in OA
+    /// * `ParseError::IoError` - If file operations fail
+    /// * `ParseError::PmcNotAvailable` - If the article is not available in OA
     ///
     /// # Example
     ///

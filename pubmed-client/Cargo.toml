@@ -18,14 +18,15 @@ crate-type = ["rlib"]
 anyhow = { workspace = true }
 async-trait = "0.1"
 moka = { version = "0.12", features = ["future"] }
+pubmed-formatter = { workspace = true }
+pubmed-parser = { workspace = true }
 quick-xml = { workspace = true }
 rand = "0.8"
 redis = { version = "0.27", features = ["tokio-comp"], optional = true }
-regex = "1.10"
+regex = { workspace = true }
 rusqlite = { version = "0.31", features = ["bundled"], optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-serde_yaml = "0.9"
 thiserror = { workspace = true }
 time = "0.3"
 tracing = { workspace = true }
