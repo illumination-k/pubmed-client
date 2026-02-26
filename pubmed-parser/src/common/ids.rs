@@ -3,7 +3,7 @@
 //! This module provides strongly-typed, validated ID types for PubMed IDs (PMIDs)
 //! and PubMed Central IDs (PMC IDs).
 
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, Result};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
@@ -17,7 +17,7 @@ use std::str::FromStr;
 /// # Examples
 ///
 /// ```
-/// use pubmed_client::common::PubMedId;
+/// use pubmed_parser::common::PubMedId;
 ///
 /// // Parse from string
 /// let pmid = PubMedId::parse("31978945").unwrap();
@@ -44,7 +44,7 @@ impl PubMedId {
     ///
     /// # Errors
     ///
-    /// Returns `PubMedError::InvalidPmid` if:
+    /// Returns `ParseError::InvalidPmid` if:
     /// - The string is empty after trimming
     /// - The string contains non-numeric characters
     /// - The number is zero
@@ -53,7 +53,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PubMedId;
+    /// use pubmed_parser::common::PubMedId;
     ///
     /// let pmid = PubMedId::parse("31978945").unwrap();
     /// assert_eq!(pmid.as_u32(), 31978945);
@@ -72,7 +72,7 @@ impl PubMedId {
         let trimmed = s.trim();
 
         if trimmed.is_empty() {
-            return Err(PubMedError::InvalidPmid {
+            return Err(ParseError::InvalidPmid {
                 pmid: s.to_string(),
             });
         }
@@ -80,13 +80,13 @@ impl PubMedId {
         // Parse as u32
         let value = trimmed
             .parse::<u32>()
-            .map_err(|_| PubMedError::InvalidPmid {
+            .map_err(|_| ParseError::InvalidPmid {
                 pmid: s.to_string(),
             })?;
 
         // PMIDs should be positive (non-zero)
         if value == 0 {
-            return Err(PubMedError::InvalidPmid {
+            return Err(ParseError::InvalidPmid {
                 pmid: s.to_string(),
             });
         }
@@ -103,7 +103,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PubMedId;
+    /// use pubmed_parser::common::PubMedId;
     ///
     /// let pmid = PubMedId::from_u32(31978945);
     /// assert_eq!(pmid.as_u32(), 31978945);
@@ -117,12 +117,12 @@ impl PubMedId {
     ///
     /// # Errors
     ///
-    /// Returns `PubMedError::InvalidPmid` if the value is zero.
+    /// Returns `ParseError::InvalidPmid` if the value is zero.
     ///
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PubMedId;
+    /// use pubmed_parser::common::PubMedId;
     ///
     /// let pmid = PubMedId::try_from_u32(31978945).unwrap();
     /// assert_eq!(pmid.as_u32(), 31978945);
@@ -131,7 +131,7 @@ impl PubMedId {
     /// ```
     pub fn try_from_u32(value: u32) -> Result<Self> {
         if value == 0 {
-            return Err(PubMedError::InvalidPmid {
+            return Err(ParseError::InvalidPmid {
                 pmid: value.to_string(),
             });
         }
@@ -143,7 +143,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PubMedId;
+    /// use pubmed_parser::common::PubMedId;
     ///
     /// let pmid = PubMedId::parse("31978945").unwrap();
     /// assert_eq!(pmid.as_u32(), 31978945);
@@ -160,7 +160,7 @@ impl PubMedId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PubMedId;
+    /// use pubmed_parser::common::PubMedId;
     ///
     /// let pmid = PubMedId::from_u32(31978945);
     /// assert_eq!(pmid.as_str(), "31978945");
@@ -177,7 +177,7 @@ impl fmt::Display for PubMedId {
 }
 
 impl FromStr for PubMedId {
-    type Err = PubMedError;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self> {
         Self::parse(s)
@@ -206,7 +206,7 @@ impl From<PubMedId> for u32 {
 /// # Examples
 ///
 /// ```
-/// use pubmed_client::common::PmcId;
+/// use pubmed_parser::common::PmcId;
 ///
 /// // Parse with PMC prefix
 /// let pmcid = PmcId::parse("PMC7906746").unwrap();
@@ -234,7 +234,7 @@ impl PmcId {
     ///
     /// # Errors
     ///
-    /// Returns `PubMedError::InvalidPmcid` if:
+    /// Returns `ParseError::InvalidPmcid` if:
     /// - The string is empty after trimming
     /// - The numeric part contains non-numeric characters
     /// - The numeric part is zero
@@ -243,7 +243,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PmcId;
+    /// use pubmed_parser::common::PmcId;
     ///
     /// // With PMC prefix
     /// let pmcid = PmcId::parse("PMC7906746").unwrap();
@@ -271,7 +271,7 @@ impl PmcId {
         let trimmed = s.trim();
 
         if trimmed.is_empty() {
-            return Err(PubMedError::InvalidPmcid {
+            return Err(ParseError::InvalidPmcid {
                 pmcid: s.to_string(),
             });
         }
@@ -285,7 +285,7 @@ impl PmcId {
 
         // Check if numeric part is empty
         if numeric_part.is_empty() {
-            return Err(PubMedError::InvalidPmcid {
+            return Err(ParseError::InvalidPmcid {
                 pmcid: s.to_string(),
             });
         }
@@ -293,13 +293,13 @@ impl PmcId {
         // Parse numeric part as u32
         let value = numeric_part
             .parse::<u32>()
-            .map_err(|_| PubMedError::InvalidPmcid {
+            .map_err(|_| ParseError::InvalidPmcid {
                 pmcid: s.to_string(),
             })?;
 
         // PMC IDs should be positive (non-zero)
         if value == 0 {
-            return Err(PubMedError::InvalidPmcid {
+            return Err(ParseError::InvalidPmcid {
                 pmcid: s.to_string(),
             });
         }
@@ -316,7 +316,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PmcId;
+    /// use pubmed_parser::common::PmcId;
     ///
     /// let pmcid = PmcId::from_u32(7906746);
     /// assert_eq!(pmcid.as_str(), "PMC7906746");
@@ -331,12 +331,12 @@ impl PmcId {
     ///
     /// # Errors
     ///
-    /// Returns `PubMedError::InvalidPmcid` if the value is zero.
+    /// Returns `ParseError::InvalidPmcid` if the value is zero.
     ///
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PmcId;
+    /// use pubmed_parser::common::PmcId;
     ///
     /// let pmcid = PmcId::try_from_u32(7906746).unwrap();
     /// assert_eq!(pmcid.numeric_part(), 7906746);
@@ -345,7 +345,7 @@ impl PmcId {
     /// ```
     pub fn try_from_u32(value: u32) -> Result<Self> {
         if value == 0 {
-            return Err(PubMedError::InvalidPmcid {
+            return Err(ParseError::InvalidPmcid {
                 pmcid: value.to_string(),
             });
         }
@@ -357,7 +357,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PmcId;
+    /// use pubmed_parser::common::PmcId;
     ///
     /// let pmcid = PmcId::from_u32(7906746);
     /// assert_eq!(pmcid.as_str(), "PMC7906746");
@@ -371,7 +371,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PmcId;
+    /// use pubmed_parser::common::PmcId;
     ///
     /// let pmcid = PmcId::parse("PMC7906746").unwrap();
     /// assert_eq!(pmcid.numeric_part(), 7906746);
@@ -385,7 +385,7 @@ impl PmcId {
     /// # Examples
     ///
     /// ```
-    /// use pubmed_client::common::PmcId;
+    /// use pubmed_parser::common::PmcId;
     ///
     /// let pmcid = PmcId::parse("PMC7906746").unwrap();
     /// assert_eq!(pmcid.numeric_part_str(), "7906746");
@@ -402,7 +402,7 @@ impl fmt::Display for PmcId {
 }
 
 impl FromStr for PmcId {
-    type Err = PubMedError;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self> {
         Self::parse(s)

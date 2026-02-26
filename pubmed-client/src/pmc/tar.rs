@@ -2,7 +2,7 @@ use std::{path::Path, str, time::Duration};
 
 use crate::common::PmcId;
 use crate::config::ClientConfig;
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, PubMedError, Result};
 use crate::pmc::models::{ArticleSection, ExtractedFigure, Figure, PmcFullText};
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
@@ -71,10 +71,10 @@ impl PmcTarClient {
     ///
     /// # Errors
     ///
-    /// * `PubMedError::InvalidPmid` - If the PMCID format is invalid
+    /// * `ParseError::InvalidPmid` - If the PMCID format is invalid
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::IoError` - If file operations fail
-    /// * `PubMedError::PmcNotAvailable` - If the article is not available in OA
+    /// * `ParseError::IoError` - If file operations fail
+    /// * `ParseError::PmcNotAvailable` - If the article is not available in OA
     ///
     /// # Example
     ///
@@ -110,7 +110,7 @@ impl PmcTarClient {
         let output_path = output_dir.as_ref();
         tokio_fs::create_dir_all(output_path)
             .await
-            .map_err(|e| PubMedError::IoError {
+            .map_err(|e| ParseError::IoError {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
@@ -178,14 +178,16 @@ impl PmcTarClient {
                 // Check if it's an error response
                 let error_text = response.text().await?;
                 if error_text.contains("error") || error_text.contains("Error") {
-                    return Err(PubMedError::PmcNotAvailable {
+                    return Err(ParseError::PmcNotAvailable {
                         id: pmcid.to_string(),
-                    });
+                    }
+                    .into());
                 }
                 // If we get here, it's likely still an error but we consumed the response
-                return Err(PubMedError::PmcNotAvailable {
+                return Err(ParseError::PmcNotAvailable {
                     id: pmcid.to_string(),
-                });
+                }
+                .into());
             };
 
         // Now download the actual tar.gz file
@@ -206,7 +208,7 @@ impl PmcTarClient {
         let output_path = output_dir.as_ref();
         tokio_fs::create_dir_all(output_path)
             .await
-            .map_err(|e| PubMedError::IoError {
+            .map_err(|e| ParseError::IoError {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
@@ -215,7 +217,7 @@ impl PmcTarClient {
         let mut temp_file =
             tokio_fs::File::create(&temp_file_path)
                 .await
-                .map_err(|e| PubMedError::IoError {
+                .map_err(|e| ParseError::IoError {
                     message: format!("Failed to create temporary file: {}", e),
                 })?;
 
@@ -225,12 +227,12 @@ impl PmcTarClient {
             temp_file
                 .write_all(&chunk)
                 .await
-                .map_err(|e| PubMedError::IoError {
+                .map_err(|e| ParseError::IoError {
                     message: format!("Failed to write to temporary file: {}", e),
                 })?;
         }
 
-        temp_file.flush().await.map_err(|e| PubMedError::IoError {
+        temp_file.flush().await.map_err(|e| ParseError::IoError {
             message: format!("Failed to flush temporary file: {}", e),
         })?;
 
@@ -244,7 +246,7 @@ impl PmcTarClient {
         // Clean up temporary file
         tokio_fs::remove_file(&temp_file_path)
             .await
-            .map_err(|e| PubMedError::IoError {
+            .map_err(|e| ParseError::IoError {
                 message: format!("Failed to remove temporary file: {}", e),
             })?;
 
@@ -264,10 +266,10 @@ impl PmcTarClient {
     ///
     /// # Errors
     ///
-    /// * `PubMedError::InvalidPmid` - If the PMCID format is invalid
+    /// * `ParseError::InvalidPmid` - If the PMCID format is invalid
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::IoError` - If file operations fail
-    /// * `PubMedError::PmcNotAvailable` - If the article is not available in OA
+    /// * `ParseError::IoError` - If file operations fail
+    /// * `ParseError::PmcNotAvailable` - If the article is not available in OA
     ///
     /// # Example
     ///
@@ -302,7 +304,7 @@ impl PmcTarClient {
         let output_path = output_dir.as_ref();
         tokio_fs::create_dir_all(output_path)
             .await
-            .map_err(|e| PubMedError::IoError {
+            .map_err(|e| ParseError::IoError {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
@@ -362,9 +364,10 @@ impl PmcTarClient {
 
         // Check if the response contains an error
         if xml_content.contains("<ERROR>") {
-            return Err(PubMedError::PmcNotAvailable {
+            return Err(ParseError::PmcNotAvailable {
                 id: normalized_pmcid,
-            });
+            }
+            .into());
         }
 
         Ok(xml_content)
@@ -398,7 +401,7 @@ impl PmcTarClient {
                         );
                         if attr.key.as_ref() == b"href" {
                             let href = str::from_utf8(&attr.value).map_err(|e| {
-                                PubMedError::XmlError(format!("Invalid UTF-8 in href: {}", e))
+                                ParseError::XmlError(format!("Invalid UTF-8 in href: {}", e))
                             })?;
                             debug!("Found href: {}", href);
                             return Ok(href.to_string());
@@ -407,7 +410,7 @@ impl PmcTarClient {
                 }
                 Ok(Event::Eof) => break,
                 Err(e) => {
-                    return Err(PubMedError::XmlError(format!("XML parsing error: {}", e)));
+                    return Err(ParseError::XmlError(format!("XML parsing error: {}", e)).into());
                 }
                 _ => {}
             }
@@ -415,9 +418,10 @@ impl PmcTarClient {
         }
 
         debug!("No href attribute found in XML response");
-        Err(PubMedError::PmcNotAvailable {
+        Err(ParseError::PmcNotAvailable {
             id: pmcid.to_string(),
-        })
+        }
+        .into())
     }
 
     /// Match figures from XML with extracted files
@@ -578,7 +582,7 @@ impl PmcTarClient {
         let output_dir = output_dir.as_ref();
 
         // Read the tar.gz file
-        let tar_file = File::open(tar_path).map_err(|e| PubMedError::IoError {
+        let tar_file = File::open(tar_path).map_err(|e| ParseError::IoError {
             message: format!("Failed to open tar.gz file: {}", e),
         })?;
 
@@ -588,14 +592,14 @@ impl PmcTarClient {
         let mut extracted_files = Vec::new();
 
         // Extract all entries
-        for entry in archive.entries().map_err(|e| PubMedError::IoError {
+        for entry in archive.entries().map_err(|e| ParseError::IoError {
             message: format!("Failed to read tar entries: {}", e),
         })? {
-            let mut entry = entry.map_err(|e| PubMedError::IoError {
+            let mut entry = entry.map_err(|e| ParseError::IoError {
                 message: format!("Failed to read tar entry: {}", e),
             })?;
 
-            let path = entry.path().map_err(|e| PubMedError::IoError {
+            let path = entry.path().map_err(|e| ParseError::IoError {
                 message: format!("Failed to get entry path: {}", e),
             })?;
 
@@ -603,7 +607,7 @@ impl PmcTarClient {
 
             // Create parent directories if they don't exist
             if let Some(parent) = output_path.parent() {
-                fs::create_dir_all(parent).map_err(|e| PubMedError::IoError {
+                fs::create_dir_all(parent).map_err(|e| ParseError::IoError {
                     message: format!("Failed to create parent directories: {}", e),
                 })?;
             }
@@ -611,7 +615,7 @@ impl PmcTarClient {
             // Extract the entry
             entry
                 .unpack(&output_path)
-                .map_err(|e| PubMedError::IoError {
+                .map_err(|e| ParseError::IoError {
                     message: format!("Failed to extract entry: {}", e),
                 })?;
 

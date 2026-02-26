@@ -263,7 +263,6 @@
 //! ```
 
 pub mod cache;
-pub mod common;
 pub mod config;
 pub mod error;
 pub mod pmc;
@@ -272,10 +271,13 @@ pub mod rate_limit;
 pub mod retry;
 pub mod time;
 
+// Re-export common module from pubmed-parser
+pub use pubmed_parser::common;
+
 // Re-export main types for convenience
 pub use common::{Affiliation, Author, PmcId, PubMedId};
 pub use config::ClientConfig;
-pub use error::{PubMedError, Result};
+pub use error::{ParseError, PubMedError, Result};
 pub use pmc::{
     models::ExtractedFigure, parse_pmc_xml, ArticleSection, Figure, FundingInfo, HeadingStyle,
     JournalInfo, MarkdownConfig, OaSubsetInfo, PmcClient, PmcFullText, PmcMarkdownConverter,
@@ -284,8 +286,8 @@ pub use pmc::{
 pub use pubmed::{
     export, parse_article_from_xml, AbstractSection, ArticleSummary, ArticleType, CitationMatch,
     CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo,
-    EPostResult, FieldInfo, GlobalQueryResults, HistorySession, Language, LinkInfo, PmcLinks,
-    PubMedArticle, PubMedClient, RelatedArticles, SearchQuery, SearchResult, SortOrder,
+    EPostResult, ExportFormat, FieldInfo, GlobalQueryResults, HistorySession, Language, LinkInfo,
+    PmcLinks, PubMedArticle, PubMedClient, RelatedArticles, SearchQuery, SearchResult, SortOrder,
     SpellCheckResult, SpelledQuerySegment,
 };
 pub use rate_limit::RateLimiter;

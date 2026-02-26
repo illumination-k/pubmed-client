@@ -5,7 +5,7 @@
 
 use super::preprocessing::strip_inline_html_tags;
 use super::xml_types::PubmedArticleSet;
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, Result};
 use crate::pubmed::models::PubMedArticle;
 use quick_xml::de::from_str;
 use tracing::{instrument, warn};
@@ -45,7 +45,7 @@ pub fn parse_articles_from_xml(xml: &str) -> Result<Vec<PubMedArticle>> {
 
     // Parse the XML using quick-xml serde
     let article_set: PubmedArticleSet = from_str(&cleaned_xml)
-        .map_err(|e| PubMedError::XmlError(format!("Failed to deserialize XML: {}", e)))?;
+        .map_err(|e| ParseError::XmlError(format!("Failed to deserialize XML: {}", e)))?;
 
     // Convert all articles, skipping those that fail
     let articles: Vec<PubMedArticle> = article_set

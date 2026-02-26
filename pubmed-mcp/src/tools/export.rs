@@ -1,5 +1,6 @@
 //! Citation export tool for PubMed MCP server
 
+use pubmed_client::ExportFormat as _;
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
 use std::borrow::Cow;

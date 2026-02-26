@@ -1,4 +1,4 @@
-use pubmed_client::{PmcClient, PubMedError};
+use pubmed_client::{ParseError, PmcClient, PubMedError};
 use tempfile::tempdir;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -13,7 +13,7 @@ async fn test_download_and_extract_tar_invalid_pmcid() {
         .await;
 
     assert!(result.is_err());
-    if let Err(PubMedError::InvalidPmcid { pmcid }) = result {
+    if let Err(PubMedError::ParseError(ParseError::InvalidPmcid { pmcid })) = result {
         assert_eq!(pmcid, "invalid_pmcid");
     } else {
         panic!("Expected InvalidPmcid error, got: {:?}", result);
@@ -30,7 +30,7 @@ async fn test_download_and_extract_tar_empty_pmcid() {
     let result = client.download_and_extract_tar("", temp_dir.path()).await;
 
     assert!(result.is_err());
-    if let Err(PubMedError::InvalidPmcid { pmcid }) = result {
+    if let Err(PubMedError::ParseError(ParseError::InvalidPmcid { pmcid })) = result {
         assert_eq!(pmcid, "");
     } else {
         panic!("Expected InvalidPmcid error, got: {:?}", result);
@@ -56,14 +56,14 @@ async fn test_download_and_extract_tar_directory_creation() {
     // Should fail with not available error
     assert!(result.is_err());
     match result.unwrap_err() {
-        PubMedError::PmcNotAvailable { id } => {
+        PubMedError::ParseError(ParseError::PmcNotAvailable { id }) => {
             assert_eq!(id, "PMC1234567");
         }
         PubMedError::ApiError { status, .. } => {
             // Could also be a 404 or similar API error
             assert!(status == 404 || status >= 400);
         }
-        PubMedError::IoError { .. } => {
+        PubMedError::ParseError(ParseError::IoError { .. }) => {
             // Could fail with IO error if the response isn't a valid tar.gz
             // This is expected for non-existent PMCIDs
         }
@@ -92,7 +92,10 @@ async fn test_pmcid_normalization() {
 
     // The errors should be similar (both should reference PMC1234567)
     match (result1.unwrap_err(), result2.unwrap_err()) {
-        (PubMedError::PmcNotAvailable { id: id1 }, PubMedError::PmcNotAvailable { id: id2 }) => {
+        (
+            PubMedError::ParseError(ParseError::PmcNotAvailable { id: id1 }),
+            PubMedError::ParseError(ParseError::PmcNotAvailable { id: id2 }),
+        ) => {
             assert_eq!(id1, "1234567");
             assert_eq!(id2, "PMC1234567");
         }

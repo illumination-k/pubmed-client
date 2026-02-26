@@ -1,0 +1,33 @@
+[package]
+name = "pubmed-formatter"
+version.workspace = true
+authors.workspace = true
+autotests = false
+categories = ["text-processing", "science"]
+edition.workspace = true
+keywords = ["pubmed", "biomedical", "citation", "bibtex", "markdown"]
+license.workspace = true
+repository.workspace = true
+description = "Citation export and markdown conversion for PubMed and PMC articles"
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+pubmed-parser = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = "0.9"
+tracing = { workspace = true }
+
+[dev-dependencies]
+rstest = "0.18"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-test = "0.2"
+
+# --- Markdown conversion tests ---
+
+[[test]]
+name = "mocked_markdown"
+path = "tests/integration/mocked/markdown.rs"

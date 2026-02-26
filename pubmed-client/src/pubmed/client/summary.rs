@@ -1,7 +1,7 @@
 //! ESummary API operations for fetching lightweight article metadata
 
 use crate::common::PubMedId;
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, PubMedError, Result};
 use crate::pubmed::models::ArticleSummary;
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::{ESummaryDocSum, ESummaryResponse};
@@ -48,7 +48,11 @@ impl PubMedClient {
         // Validate all PMIDs upfront
         let validated: Vec<u32> = pmids
             .iter()
-            .map(|pmid| PubMedId::parse(pmid).map(|p| p.as_u32()))
+            .map(|pmid| {
+                PubMedId::parse(pmid)
+                    .map(|p| p.as_u32())
+                    .map_err(PubMedError::from)
+            })
             .collect::<Result<Vec<_>>>()?;
 
         const BATCH_SIZE: usize = 200;
@@ -123,9 +127,10 @@ impl PubMedClient {
             let idx = summaries.iter().position(|s| s.pmid == pmid);
             match idx {
                 Some(i) => Ok(summaries.remove(i)),
-                None => Err(PubMedError::ArticleNotFound {
+                None => Err(ParseError::ArticleNotFound {
                     pmid: pmid.to_string(),
-                }),
+                }
+                .into()),
             }
         }
     }
@@ -175,7 +180,7 @@ impl PubMedClient {
     /// Parse ESummary JSON response into ArticleSummary objects
     pub(crate) fn parse_esummary_response(json_text: &str) -> Result<Vec<ArticleSummary>> {
         let response: ESummaryResponse =
-            serde_json::from_str(json_text).map_err(PubMedError::from)?;
+            serde_json::from_str(json_text).map_err(|e| PubMedError::from(ParseError::from(e)))?;
 
         let result = &response.result;
 

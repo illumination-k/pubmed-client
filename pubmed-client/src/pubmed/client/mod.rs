@@ -10,7 +10,7 @@ use std::time::Duration;
 
 use crate::common::PubMedId;
 use crate::config::ClientConfig;
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, PubMedError, Result};
 use crate::pubmed::models::PubMedArticle;
 use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::query::SortOrder;
@@ -182,9 +182,9 @@ impl PubMedClient {
     ///
     /// # Errors
     ///
-    /// * `PubMedError::ArticleNotFound` - If the article is not found
+    /// * `ParseError::ArticleNotFound` - If the article is not found
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::JsonError` - If JSON parsing fails
+    /// * `ParseError::JsonError` - If JSON parsing fails
     ///
     /// # Example
     ///
@@ -213,9 +213,10 @@ impl PubMedClient {
             let idx = articles.iter().position(|a| a.pmid == pmid);
             match idx {
                 Some(i) => Ok(articles.remove(i)),
-                None => Err(PubMedError::ArticleNotFound {
+                None => Err(ParseError::ArticleNotFound {
                     pmid: pmid.to_string(),
-                }),
+                }
+                .into()),
             }
         }
     }
@@ -235,7 +236,7 @@ impl PubMedClient {
     /// # Errors
     ///
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::JsonError` - If JSON parsing fails
+    /// * `ParseError::JsonError` - If JSON parsing fails
     ///
     /// # Example
     ///
@@ -354,7 +355,11 @@ impl PubMedClient {
         // Validate all PMIDs upfront
         let validated: Vec<u32> = pmids
             .iter()
-            .map(|pmid| PubMedId::parse(pmid).map(|p| p.as_u32()))
+            .map(|pmid| {
+                PubMedId::parse(pmid)
+                    .map(|p| p.as_u32())
+                    .map_err(PubMedError::from)
+            })
             .collect::<Result<Vec<_>>>()?;
 
         // NCBI recommends batches of up to 200 IDs per request

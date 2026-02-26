@@ -8,9 +8,8 @@
 //! - **CSL-JSON** - Citation Style Language JSON format
 //! - **NBIB** - MEDLINE/PubMed native format
 
+use pubmed_parser::pubmed::models::PubMedArticle;
 use serde_json::{json, Value};
-
-use super::models::PubMedArticle;
 
 /// Generate a BibTeX citation key from article metadata
 fn generate_bibtex_key(article: &PubMedArticle) -> String {
@@ -45,25 +44,23 @@ fn escape_bibtex(s: &str) -> String {
         .replace('}', r"\}")
 }
 
-impl PubMedArticle {
+/// Trait for exporting PubMed articles to various citation formats
+pub trait ExportFormat {
     /// Export the article metadata as a BibTeX entry
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use pubmed_client::PubMedClient;
-    ///
-    /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = PubMedClient::new();
-    /// let articles = client.search_and_fetch("covid-19 treatment", 5, None).await?;
-    /// for article in &articles {
-    ///     println!("{}", article.to_bibtex());
-    /// }
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn to_bibtex(&self) -> String {
+    fn to_bibtex(&self) -> String;
+
+    /// Export the article metadata in RIS format
+    fn to_ris(&self) -> String;
+
+    /// Export the article metadata as CSL-JSON
+    fn to_csl_json(&self) -> Value;
+
+    /// Export the article metadata in MEDLINE/NBIB format
+    fn to_nbib(&self) -> String;
+}
+
+impl ExportFormat for PubMedArticle {
+    fn to_bibtex(&self) -> String {
         let key = generate_bibtex_key(self);
         let mut lines = Vec::new();
 
@@ -118,26 +115,7 @@ impl PubMedArticle {
         lines.join("\n")
     }
 
-    /// Export the article metadata in RIS format
-    ///
-    /// RIS is supported by Zotero, Mendeley, EndNote, and many other reference managers.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use pubmed_client::PubMedClient;
-    ///
-    /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = PubMedClient::new();
-    /// let articles = client.search_and_fetch("covid-19 treatment", 5, None).await?;
-    /// for article in &articles {
-    ///     println!("{}", article.to_ris());
-    /// }
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn to_ris(&self) -> String {
+    fn to_ris(&self) -> String {
         let mut lines = Vec::new();
 
         lines.push("TY  - JOUR".to_string());
@@ -198,28 +176,7 @@ impl PubMedArticle {
         lines.join("\n")
     }
 
-    /// Export the article metadata as CSL-JSON (Citation Style Language JSON)
-    ///
-    /// CSL-JSON is the standard format used by citation processors like
-    /// citeproc-js, pandoc-citeproc, and citation.js.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use pubmed_client::PubMedClient;
-    ///
-    /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = PubMedClient::new();
-    /// let articles = client.search_and_fetch("covid-19 treatment", 5, None).await?;
-    /// for article in &articles {
-    ///     let csl = article.to_csl_json();
-    ///     println!("{}", serde_json::to_string_pretty(&csl).unwrap());
-    /// }
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn to_csl_json(&self) -> Value {
+    fn to_csl_json(&self) -> Value {
         let mut csl = json!({
             "type": "article-journal",
             "id": format!("pmid:{}", self.pmid),
@@ -305,11 +262,7 @@ impl PubMedArticle {
         csl
     }
 
-    /// Export the article metadata in MEDLINE/NBIB format
-    ///
-    /// NBIB is the native PubMed export format, compatible with PubMed's own
-    /// "Save citation to file" feature.
-    pub fn to_nbib(&self) -> String {
+    fn to_nbib(&self) -> String {
         let mut lines = Vec::new();
 
         lines.push(format!("PMID- {}", self.pmid));
@@ -388,7 +341,7 @@ pub fn articles_to_csl_json(articles: &[PubMedArticle]) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::common::{Affiliation, Author};
+    use pubmed_parser::common::{Affiliation, Author};
 
     fn create_test_article() -> PubMedArticle {
         PubMedArticle {

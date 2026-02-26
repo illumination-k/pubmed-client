@@ -1,6 +1,6 @@
-use crate::error::{PubMedError, Result};
+use crate::common::xml_utils::strip_inline_html_tags;
+use crate::error::{ParseError, Result};
 use crate::pmc::models::{Affiliation, Author};
-use crate::pubmed::parser::strip_inline_html_tags;
 use quick_xml::de::from_str;
 use serde::Deserialize;
 
@@ -138,7 +138,7 @@ pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
                 }
             }
         } else {
-            Err(PubMedError::XmlError(
+            Err(ParseError::XmlError(
                 "Found contrib-group start tag but no matching end tag".to_string(),
             ))
         }
@@ -252,14 +252,14 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
                         }
                     }
                     Err(e) => {
-                        return Err(PubMedError::XmlError(format!(
+                        return Err(ParseError::XmlError(format!(
                             "Failed to parse element-citation XML: {}",
                             e
                         )));
                     }
                 }
             } else {
-                return Err(PubMedError::XmlError(
+                return Err(ParseError::XmlError(
                     "Found element-citation start tag but no matching end tag".to_string(),
                 ));
             }
@@ -289,14 +289,14 @@ pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
                         }
                     }
                     Err(e) => {
-                        return Err(PubMedError::XmlError(format!(
+                        return Err(ParseError::XmlError(format!(
                             "Failed to parse mixed-citation XML: {}",
                             e
                         )));
                     }
                 }
             } else {
-                return Err(PubMedError::XmlError(
+                return Err(ParseError::XmlError(
                     "Found mixed-citation start tag but no matching end tag".to_string(),
                 ));
             }

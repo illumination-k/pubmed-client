@@ -17,7 +17,7 @@ impl PubMedClient {
     /// # Errors
     ///
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::JsonError` - If JSON parsing fails
+    /// * `ParseError::JsonError` - If JSON parsing fails
     ///
     /// # Example
     ///
@@ -65,7 +65,7 @@ impl PubMedClient {
     /// # Errors
     ///
     /// * `PubMedError::RequestError` - If the HTTP request fails
-    /// * `PubMedError::JsonError` - If JSON parsing fails
+    /// * `ParseError::JsonError` - If JSON parsing fails
     /// * `PubMedError::ApiError` - If the database doesn't exist
     ///
     /// # Example

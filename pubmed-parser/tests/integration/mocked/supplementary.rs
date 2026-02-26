@@ -1,4 +1,4 @@
-use pubmed_client::pmc::parser::parse_pmc_xml;
+use pubmed_parser::pmc::parser::parse_pmc_xml;
 use std::fs;
 
 #[test]

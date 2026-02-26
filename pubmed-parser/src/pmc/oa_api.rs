@@ -8,7 +8,7 @@
 //! even though the article may be viewable on the PMC website.
 
 use crate::common::PmcId;
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, Result};
 use crate::pmc::models::OaSubsetInfo;
 use quick_xml::de::from_str;
 use serde::Deserialize;
@@ -96,7 +96,7 @@ pub fn build_oa_api_url(pmcid: &str) -> Result<String> {
 pub fn parse_oa_response(xml: &str, pmcid: &str) -> Result<OaSubsetInfo> {
     let oa_response: OaResponse = from_str(xml).map_err(|e| {
         debug!(pmcid = %pmcid, error = %e, "Failed to parse OA API response");
-        PubMedError::XmlError(format!("Failed to parse OA API response: {e}"))
+        ParseError::XmlError(format!("Failed to parse OA API response: {e}"))
     })?;
 
     // Check for error response

@@ -14,14 +14,19 @@
 //! - `client/espell` - Spell checking (ESpell API)
 
 pub mod client;
-pub mod export;
-pub mod models;
-pub mod parser;
 pub mod query;
 pub mod responses;
 
+// Re-export parser types from pubmed-parser
+pub use pubmed_parser::pubmed::models;
+pub use pubmed_parser::pubmed::parser;
+
+// Re-export formatter types from pubmed-formatter
+pub use pubmed_formatter::pubmed::export;
+
 // Re-export public types
 pub use client::PubMedClient;
+pub use export::ExportFormat;
 pub use models::{
     AbstractSection, Affiliation, ArticleSummary, Author, ChemicalConcept, CitationMatch,
     CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo,

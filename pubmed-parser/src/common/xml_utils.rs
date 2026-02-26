@@ -24,7 +24,7 @@ use tracing::debug;
 /// # Example
 ///
 /// ```ignore
-/// use pubmed_client::common::xml_utils::strip_inline_html_tags;
+/// use pubmed_parser::common::xml_utils::strip_inline_html_tags;
 ///
 /// let xml = "<AbstractText>CO<sup>2</sup> levels</AbstractText>";
 /// let cleaned = strip_inline_html_tags(xml);

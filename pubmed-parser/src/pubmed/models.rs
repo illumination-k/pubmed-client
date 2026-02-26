@@ -12,7 +12,7 @@ pub use crate::common::{Affiliation, Author};
 /// # Example
 ///
 /// ```
-/// use pubmed_client::pubmed::AbstractSection;
+/// use pubmed_parser::pubmed::AbstractSection;
 ///
 /// let section = AbstractSection {
 ///     label: "BACKGROUND".to_string(),
@@ -232,7 +232,7 @@ pub struct HistorySession {
 ///
 /// # Example
 ///
-/// ```no_run
+/// ```ignore
 /// use pubmed_client::PubMedClient;
 ///
 /// #[tokio::main]
@@ -336,7 +336,7 @@ impl PubMedArticle {
     /// # Example
     ///
     /// ```
-    /// # use pubmed_client::pubmed::PubMedArticle;
+    /// # use pubmed_parser::pubmed::PubMedArticle;
     /// # let article = PubMedArticle {
     /// #     pmid: "123".to_string(),
     /// #     title: "Test".to_string(),
@@ -386,7 +386,7 @@ impl PubMedArticle {
     /// # Example
     ///
     /// ```
-    /// # use pubmed_client::pubmed::PubMedArticle;
+    /// # use pubmed_parser::pubmed::PubMedArticle;
     /// # let article = PubMedArticle {
     /// #     pmid: "123".to_string(),
     /// #     title: "Test".to_string(),
@@ -529,7 +529,7 @@ impl PubMedArticle {
     /// # Example
     ///
     /// ```
-    /// # use pubmed_client::pubmed::PubMedArticle;
+    /// # use pubmed_parser::pubmed::PubMedArticle;
     /// # let article1 = PubMedArticle {
     /// #     pmid: "123".to_string(),
     /// #     title: "Test".to_string(),
@@ -656,7 +656,7 @@ pub enum SpelledQuerySegment {
 ///
 /// # Example
 ///
-/// ```no_run
+/// ```ignore
 /// use pubmed_client::PubMedClient;
 ///
 /// #[tokio::main]
@@ -714,7 +714,7 @@ impl SpellCheckResult {
 /// # Example
 ///
 /// ```
-/// use pubmed_client::pubmed::CitationQuery;
+/// use pubmed_parser::pubmed::CitationQuery;
 ///
 /// let query = CitationQuery::new(
 ///     "proc natl acad sci u s a",
@@ -762,7 +762,7 @@ impl CitationQuery {
     }
 
     /// Format this citation as a bdata string for the ECitMatch API
-    pub(crate) fn to_bdata(&self) -> String {
+    pub fn to_bdata(&self) -> String {
         format!(
             "{}|{}|{}|{}|{}|{}|",
             self.journal.replace(' ', "+"),
@@ -857,7 +857,7 @@ pub struct DatabaseCount {
 ///
 /// # Example
 ///
-/// ```no_run
+/// ```ignore
 /// use pubmed_client::PubMedClient;
 ///
 /// #[tokio::main]
@@ -907,7 +907,7 @@ impl GlobalQueryResults {
 ///
 /// # Example
 ///
-/// ```no_run
+/// ```ignore
 /// use pubmed_client::PubMedClient;
 ///
 /// #[tokio::main]

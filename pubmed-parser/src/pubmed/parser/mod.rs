@@ -30,7 +30,7 @@ pub(crate) use preprocessing::strip_inline_html_tags;
 // Re-export batch parsing function
 pub use batch::parse_articles_from_xml;
 
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, Result};
 use crate::pubmed::models::PubMedArticle;
 use quick_xml::de::from_str;
 use tracing::instrument;
@@ -86,7 +86,7 @@ pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {
 
     // Parse the XML using quick-xml serde
     let article_set: PubmedArticleSet = from_str(&cleaned_xml)
-        .map_err(|e| PubMedError::XmlError(format!("Failed to deserialize XML: {}", e)))?;
+        .map_err(|e| ParseError::XmlError(format!("Failed to deserialize XML: {}", e)))?;
 
     // Find the article with the matching PMID
     let article_xml = article_set
@@ -98,7 +98,7 @@ pub fn parse_article_from_xml(xml: &str, pmid: &str) -> Result<PubMedArticle> {
                 .as_ref()
                 .is_some_and(|p| p.value == pmid)
         })
-        .ok_or_else(|| PubMedError::ArticleNotFound {
+        .ok_or_else(|| ParseError::ArticleNotFound {
             pmid: pmid.to_string(),
         })?;
 
@@ -905,7 +905,7 @@ mod tests {
         assert!(
             matches!(
                 result,
-                Err(PubMedError::ArticleNotFound { ref pmid }) if pmid == "12345"
+                Err(ParseError::ArticleNotFound { ref pmid }) if pmid == "12345"
             ),
             "Expected ArticleNotFound error for PMID 12345"
         );

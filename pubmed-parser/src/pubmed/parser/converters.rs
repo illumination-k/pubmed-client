@@ -5,7 +5,7 @@
 
 use super::extractors::{extract_country_from_text, extract_email_from_text, format_author_name};
 use super::xml_types::*;
-use crate::error::{PubMedError, Result};
+use crate::error::{ParseError, Result};
 use crate::pubmed::models::{
     Affiliation, Author, ChemicalConcept, MeshHeading, MeshQualifier, MeshTerm, PubMedArticle,
 };
@@ -35,7 +35,7 @@ impl PubmedArticleXml {
         // Extract title
         let title = article
             .article_title
-            .ok_or_else(|| PubMedError::ArticleNotFound {
+            .ok_or_else(|| ParseError::ArticleNotFound {
                 pmid: pmid.to_string(),
             })?;
 

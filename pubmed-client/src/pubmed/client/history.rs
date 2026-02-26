@@ -197,7 +197,7 @@ impl PubMedClient {
     ///
     /// # Errors
     ///
-    /// * `PubMedError::InvalidPmid` - If any PMID is invalid
+    /// * `ParseError::InvalidPmid` - If any PMID is invalid
     /// * `PubMedError::RequestError` - If the HTTP request fails
     /// * `PubMedError::ApiError` - If the NCBI API returns an error
     ///
@@ -269,7 +269,11 @@ impl PubMedClient {
         // Validate all PMIDs upfront
         let validated: Vec<u32> = pmids
             .iter()
-            .map(|pmid| PubMedId::parse(pmid).map(|p| p.as_u32()))
+            .map(|pmid| {
+                PubMedId::parse(pmid)
+                    .map(|p| p.as_u32())
+                    .map_err(PubMedError::from)
+            })
             .collect::<Result<Vec<_>>>()?;
 
         let id_list: String = validated

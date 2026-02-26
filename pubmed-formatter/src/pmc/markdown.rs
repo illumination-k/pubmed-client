@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 use serde::Serialize;
 
-use crate::pmc::models::{
+use pubmed_parser::pmc::models::{
     ArticleSection, Author, Figure, FundingInfo, PmcFullText, Reference, Table,
 };
 
@@ -905,7 +905,7 @@ impl Default for PmcMarkdownConverter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::pmc::models::{Author, JournalInfo, PmcFullText};
+    use pubmed_parser::pmc::models::{Author, JournalInfo, PmcFullText};
 
     #[test]
     fn test_markdown_converter_creation() {
