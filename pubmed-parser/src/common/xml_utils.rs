@@ -3,6 +3,7 @@
 //! This module provides reusable XML parsing functions for both string-based
 //! and serde-based XML parsing workflows.
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use tracing::debug;
 
@@ -30,7 +31,7 @@ use tracing::debug;
 /// let cleaned = strip_inline_html_tags(xml);
 /// assert_eq!(cleaned, "<AbstractText>CO2 levels</AbstractText>");
 /// ```
-pub fn strip_inline_html_tags(xml: &str) -> String {
+pub fn strip_inline_html_tags(xml: &str) -> Cow<'_, str> {
     use regex::Regex;
     use std::sync::OnceLock;
 
@@ -45,7 +46,7 @@ pub fn strip_inline_html_tags(xml: &str) -> String {
     let cleaned = re.replace_all(xml, "");
 
     // Log if any tags were stripped
-    if cleaned.len() != xml.len() {
+    if let Cow::Owned(ref _s) = cleaned {
         debug!(
             "Stripped inline HTML tags: original {} bytes -> cleaned {} bytes (removed {} bytes)",
             xml.len(),
@@ -54,7 +55,7 @@ pub fn strip_inline_html_tags(xml: &str) -> String {
         );
     }
 
-    cleaned.into_owned()
+    cleaned
 }
 
 /// Extract text between two XML tags
@@ -71,9 +72,16 @@ pub fn strip_inline_html_tags(xml: &str) -> String {
 ///
 /// Some(String) with the text between tags, or None if not found
 pub fn extract_text_between(content: &str, start: &str, end: &str) -> Option<String> {
+    extract_text_between_ref(content, start, end).map(|s| s.to_string())
+}
+
+/// Extract text between two XML tags as a borrowed string slice
+///
+/// Same as [`extract_text_between`] but returns a `&str` slice to avoid allocation.
+pub fn extract_text_between_ref<'a>(content: &'a str, start: &str, end: &str) -> Option<&'a str> {
     let start_pos = content.find(start)? + start.len();
     let end_pos = content[start_pos..].find(end)? + start_pos;
-    Some(content[start_pos..end_pos].trim().to_string())
+    Some(content[start_pos..end_pos].trim())
 }
 
 /// Extract attribute value from XML tag
@@ -109,22 +117,28 @@ pub fn extract_attribute_value(content: &str, attribute: &str) -> Option<String>
 ///
 /// A string with all XML tags removed
 pub fn strip_xml_tags(content: &str) -> String {
-    let mut result = String::with_capacity(content.len());
+    let bytes = content.as_bytes();
+    let mut result = Vec::with_capacity(bytes.len());
     let mut in_tag = false;
 
-    for ch in content.chars() {
-        match ch {
-            '<' => in_tag = true,
-            '>' => in_tag = false,
-            _ if !in_tag => result.push(ch),
+    for &b in bytes {
+        match b {
+            b'<' => in_tag = true,
+            b'>' => in_tag = false,
+            _ if !in_tag => result.push(b),
             _ => {}
         }
     }
 
+    // SAFETY: Input is valid UTF-8 and we only remove complete XML tags
+    // (ASCII byte sequences between '<' and '>'). Since '<' and '>' are single-byte
+    // ASCII and never appear as UTF-8 continuation bytes, this preserves valid UTF-8.
+    let s = unsafe { String::from_utf8_unchecked(result) };
+
     // Trim in-place without re-allocating
-    let trimmed = result.trim();
-    if trimmed.len() == result.len() {
-        result
+    let trimmed = s.trim();
+    if trimmed.len() == s.len() {
+        s
     } else {
         trimmed.to_string()
     }

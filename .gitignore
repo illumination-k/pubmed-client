@@ -40,3 +40,5 @@ build/
 
 # speckit
 specs/
+
+parser_improve_logs.md

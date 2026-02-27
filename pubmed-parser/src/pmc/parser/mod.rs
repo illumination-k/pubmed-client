@@ -3,6 +3,7 @@ use crate::pmc::models::PmcFullText;
 
 pub mod author;
 pub mod metadata;
+pub(crate) mod reader_utils;
 pub mod reference;
 pub mod section;
 pub mod xml_utils;

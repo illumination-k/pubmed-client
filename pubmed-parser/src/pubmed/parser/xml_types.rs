@@ -151,22 +151,18 @@ pub(super) struct PubDate {
 
 impl fmt::Display for PubDate {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let result = if let Some(ref medline_date) = self.medline_date {
-            medline_date.clone()
-        } else {
-            let mut date_parts = Vec::new();
-            if let Some(ref year) = self.year {
-                date_parts.push(year.clone());
+        if let Some(ref medline_date) = self.medline_date {
+            return write!(f, "{}", medline_date);
+        }
+        let mut first = true;
+        for part in [&self.year, &self.month, &self.day].into_iter().flatten() {
+            if !first {
+                f.write_str(" ")?;
             }
-            if let Some(ref month) = self.month {
-                date_parts.push(month.clone());
-            }
-            if let Some(ref day) = self.day {
-                date_parts.push(day.clone());
-            }
-            date_parts.join(" ")
-        };
-        write!(f, "{}", result)
+            f.write_str(part)?;
+            first = false;
+        }
+        Ok(())
     }
 }
 
