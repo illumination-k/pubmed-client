@@ -12,6 +12,7 @@ description = "XML parsers and data models for PubMed and PMC (PubMed Central) a
 
 [lib]
 crate-type = ["rlib"]
+bench = false
 
 [dependencies]
 quick-xml = { workspace = true }
