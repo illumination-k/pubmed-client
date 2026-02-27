@@ -103,6 +103,7 @@ pub fn skip_element(reader: &mut Reader<&[u8]>, tag: QName, buf: &mut Vec<u8>) -
 }
 
 #[cfg(test)]
+#[allow(clippy::panic)]
 mod tests {
     use super::*;
 

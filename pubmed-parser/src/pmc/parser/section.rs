@@ -155,7 +155,7 @@ fn extract_body_sections(content: &str) -> Vec<ArticleSection> {
         match action {
             SectionAction::ReadSection(id) => {
                 has_sec_tags = true;
-                if let Some(section) = parse_section_from_body(content, &mut reader, id, &mut buf) {
+                if let Some(section) = parse_section_from_body(&mut reader, id, &mut buf) {
                     sections.push(section);
                 }
             }
@@ -202,7 +202,6 @@ fn extract_body_sections(content: &str) -> Vec<ArticleSection> {
 /// Figures and tables are detected both as direct children of `<sec>` and
 /// inline within `<p>` tags via `read_paragraph_with_inline`.
 fn parse_section_from_body(
-    body_content: &str,
     reader: &mut quick_xml::Reader<&[u8]>,
     id: Option<String>,
     buf: &mut Vec<u8>,
@@ -255,7 +254,7 @@ fn parse_section_from_body(
             }
             SectionAction::ReadSection(sub_id) => {
                 // Recursive: properly handles nested sections
-                if let Some(sub) = parse_section_from_body(body_content, reader, sub_id, buf) {
+                if let Some(sub) = parse_section_from_body(reader, sub_id, buf) {
                     subsections.push(sub);
                 }
             }
@@ -401,10 +400,10 @@ fn extract_figures_from_content(content: &str) -> Vec<Figure> {
         };
         buf.clear();
 
-        if let Some(attrs) = attrs {
-            if let Some(fig) = parse_figure_inner(&mut reader, attrs, &mut buf) {
-                figures.push(fig);
-            }
+        if let Some(attrs) = attrs
+            && let Some(fig) = parse_figure_inner(&mut reader, attrs, &mut buf)
+        {
+            figures.push(fig);
         }
     }
 
@@ -428,10 +427,10 @@ fn extract_tables_from_content(content: &str) -> Vec<Table> {
         };
         buf.clear();
 
-        if let Some(attrs) = attrs {
-            if let Some(table) = parse_table_inner(&mut reader, attrs, &mut buf) {
-                tables.push(table);
-            }
+        if let Some(attrs) = attrs
+            && let Some(table) = parse_table_inner(&mut reader, attrs, &mut buf)
+        {
+            tables.push(table);
         }
     }
 
@@ -619,12 +618,10 @@ pub fn extract_paragraph_content(content: &str) -> Vec<String> {
         };
         buf.clear();
 
-        if is_p {
-            if let Ok(text) = read_text_content(&mut reader, b"p", &mut buf) {
-                let trimmed = text.trim().to_string();
-                if !trimmed.is_empty() {
-                    paragraphs.push(trimmed);
-                }
+        if is_p && let Ok(text) = read_text_content(&mut reader, b"p", &mut buf) {
+            let trimmed = text.trim().to_string();
+            if !trimmed.is_empty() {
+                paragraphs.push(trimmed);
             }
         }
     }
