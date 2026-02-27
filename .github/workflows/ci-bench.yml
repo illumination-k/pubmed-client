@@ -35,18 +35,22 @@ jobs:
 
       # 1. Run benchmarks on base branch and save as baseline
       - name: Checkout base branch
-        run: git checkout ${{ github.base_ref }}
+        run: git checkout "$BASE_REF"
+        env:
+          BASE_REF: ${{ github.base_ref }}
 
       - name: Run base benchmarks
-        run: cargo bench -p pubmed-parser -- --save-baseline base
+        run: cargo bench -p pubmed-parser --benches -- --save-baseline base
 
       # 2. Run benchmarks on PR branch, comparing against base
       - name: Checkout PR branch
-        run: git checkout ${{ github.event.pull_request.head.sha }}
+        run: git checkout "$HEAD_SHA"
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
 
       - name: Run PR benchmarks
         run: |
-          cargo bench -p pubmed-parser -- --baseline base 2>&1 | tee bench_output.txt
+          cargo bench -p pubmed-parser --benches -- --baseline base 2>&1 | tee bench_output.txt
 
       # 3. Extract comparison results and post as PR comment
       - name: Post benchmark comment
