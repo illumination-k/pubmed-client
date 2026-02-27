@@ -51,9 +51,9 @@ pub fn extract_journal_info(content: &str) -> JournalInfo {
 
 /// Extract publication date in YYYY-MM-DD format
 pub fn extract_pub_date(content: &str) -> String {
-    if let Some(year) = xml_utils::extract_text_between(content, "<year>", "</year>") {
-        if let Some(month) = xml_utils::extract_text_between(content, "<month>", "</month>") {
-            if let Some(day) = xml_utils::extract_text_between(content, "<day>", "</day>") {
+    if let Some(year) = xml_utils::extract_text_between_ref(content, "<year>", "</year>") {
+        if let Some(month) = xml_utils::extract_text_between_ref(content, "<month>", "</month>") {
+            if let Some(day) = xml_utils::extract_text_between_ref(content, "<day>", "</day>") {
                 return format!(
                     "{}-{:02}-{:02}",
                     year,
@@ -63,7 +63,7 @@ pub fn extract_pub_date(content: &str) -> String {
             }
             return format!("{}-{:02}", year, month.parse::<u32>().unwrap_or(1));
         }
-        return year;
+        return year.to_string();
     }
     "Unknown Date".to_string()
 }
@@ -135,10 +135,14 @@ pub fn extract_keywords(content: &str) -> Vec<String> {
             let kwd_start = pos + kwd_start + 5; // Length of "<kwd>"
             if let Some(kwd_end) = kwd_section[kwd_start..].find("</kwd>") {
                 let raw_keyword = kwd_section[kwd_start..kwd_start + kwd_end].trim();
-                // Strip any nested XML tags from the keyword
-                let keyword = xml_utils::strip_xml_tags(raw_keyword);
-                if !keyword.is_empty() {
-                    keywords.push(keyword);
+                // Only strip XML tags if the keyword actually contains tags
+                if raw_keyword.contains('<') {
+                    let keyword = xml_utils::strip_xml_tags(raw_keyword);
+                    if !keyword.is_empty() {
+                        keywords.push(keyword);
+                    }
+                } else if !raw_keyword.is_empty() {
+                    keywords.push(raw_keyword.to_string());
                 }
                 pos = kwd_start + kwd_end;
             } else {
@@ -341,7 +345,8 @@ pub fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMateri
 
 /// Extract article title
 pub fn extract_title(content: &str) -> String {
-    xml_utils::extract_text_between(content, "<article-title>", "</article-title>")
+    xml_utils::extract_text_between_ref(content, "<article-title>", "</article-title>")
+        .map(|s| s.to_string())
         .unwrap_or_else(|| "Unknown Title".to_string())
 }
 

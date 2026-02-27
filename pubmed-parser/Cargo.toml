@@ -12,6 +12,7 @@ description = "XML parsers and data models for PubMed and PMC (PubMed Central) a
 
 [lib]
 crate-type = ["rlib"]
+bench = false
 
 [dependencies]
 quick-xml = { workspace = true }
@@ -23,6 +24,7 @@ tracing = { workspace = true }
 urlencoding = { workspace = true }
 
 [dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
 rstest = "0.18"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-test = "0.2"
@@ -40,3 +42,13 @@ path = "tests/integration/parsing/pmc.rs"
 [[test]]
 name = "mocked_supplementary"
 path = "tests/integration/mocked/supplementary.rs"
+
+# --- Benchmarks ---
+
+[[bench]]
+name = "pubmed_parsing"
+harness = false
+
+[[bench]]
+name = "pmc_parsing"
+harness = false

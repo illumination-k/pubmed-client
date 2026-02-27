@@ -93,16 +93,29 @@ pub(super) fn extract_country_from_text(text: &str) -> Option<String> {
         "Mexico",
     ];
 
-    let text_lower = text.to_lowercase();
     COUNTRIES.iter().find_map(|&country| {
-        let country_lower = country.to_lowercase();
-        if text_lower.ends_with(&country_lower)
-            || text_lower.contains(&format!(", {}", country_lower))
+        let clen = country.len();
+        // Check if text ends with country (case-insensitive)
+        if text.len() >= clen
+            && text.is_char_boundary(text.len() - clen)
+            && text[text.len() - clen..].eq_ignore_ascii_case(country)
         {
-            Some(country.to_string())
-        } else {
-            None
+            return Some(country.to_string());
         }
+        // Check if ", country" appears anywhere (case-insensitive)
+        let mut search_pos = 0;
+        while let Some(comma_pos) = text[search_pos..].find(", ") {
+            let candidate_start = search_pos + comma_pos + 2;
+            let candidate_end = candidate_start + clen;
+            if candidate_end <= text.len()
+                && text.is_char_boundary(candidate_end)
+                && text[candidate_start..candidate_end].eq_ignore_ascii_case(country)
+            {
+                return Some(country.to_string());
+            }
+            search_pos = candidate_start;
+        }
+        None
     })
 }
 
