@@ -990,6 +990,15 @@ mod tests {
             acknowledgments: None,
             data_availability: None,
             supplementary_materials: vec![],
+            abstract_text: None,
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: vec![],
+            categories: vec![],
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
         };
 
         let markdown = converter.convert(&article);
@@ -1024,6 +1033,15 @@ mod tests {
             acknowledgments: None,
             data_availability: None,
             supplementary_materials: vec![],
+            abstract_text: None,
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: vec![],
+            categories: vec![],
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
         };
 
         let markdown = converter.convert(&article);
@@ -1078,6 +1096,15 @@ mod tests {
             acknowledgments: None,
             data_availability: None,
             supplementary_materials: vec![],
+            abstract_text: None,
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: vec![],
+            categories: vec![],
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
         };
 
         let markdown = converter.convert(&article);
@@ -1120,6 +1147,15 @@ mod tests {
             acknowledgments: None,
             data_availability: None,
             supplementary_materials: vec![],
+            abstract_text: None,
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: vec![],
+            categories: vec![],
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
         };
 
         let markdown = converter.convert(&article);

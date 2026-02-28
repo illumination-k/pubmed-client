@@ -161,7 +161,15 @@ pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
     if let Some(funding_start) = content.find("<funding-group>")
         && let Some(funding_end) = content[funding_start..].find("</funding-group>")
     {
-        let funding_section = &content[funding_start..funding_start + funding_end];
+        let funding_section =
+            &content[funding_start..funding_start + funding_end + "</funding-group>".len()];
+
+        // Extract funding statement (applies to the funding group as a whole)
+        let statement = xml_utils::extract_text_between(
+            funding_section,
+            "<funding-statement>",
+            "</funding-statement>",
+        );
 
         let mut pos = 0;
         while let Some(award_start) = funding_section[pos..].find("<award-group") {
@@ -180,6 +188,7 @@ pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
                 let mut funding_info = FundingInfo::new(source);
                 funding_info.award_id =
                     xml_utils::extract_text_between(award_section, "<award-id>", "</award-id>");
+                funding_info.statement = statement.clone();
 
                 funding.push(funding_info);
                 pos = award_end;
@@ -247,9 +256,12 @@ pub fn extract_conflict_of_interest(content: &str) -> Option<String> {
 }
 
 /// Extract acknowledgments
+///
+/// Strips XML tags and decodes XML entities (e.g., `&#231;` → `ç`).
 pub fn extract_acknowledgments(content: &str) -> Option<String> {
     xml_utils::extract_text_between(content, "<ack>", "</ack>")
         .map(|ack| xml_utils::strip_xml_tags(&ack))
+        .map(|s| xml_utils::decode_xml_entities(&s).into_owned())
 }
 
 /// Extract data availability statement
@@ -381,11 +393,14 @@ pub fn extract_article_ids(content: &str) -> Vec<(String, String)> {
 }
 
 /// Extract copyright information
+///
+/// Decodes XML entities (e.g., `&#169;` → `©`).
 pub fn extract_copyright(content: &str) -> Option<String> {
     xml_utils::extract_text_between(content, "<copyright-statement>", "</copyright-statement>")
         .or_else(|| {
             xml_utils::extract_text_between(content, "<copyright-year>", "</copyright-year>")
         })
+        .map(|s| xml_utils::decode_xml_entities(&s).into_owned())
 }
 
 /// Extract license information
@@ -490,25 +505,42 @@ pub fn extract_categories(content: &str) -> Vec<String> {
 }
 
 /// Extract license URL from `<license xlink:href="...">` attribute
+/// or from `<ali:license_ref>` element content
 pub fn extract_license_url(content: &str) -> Option<String> {
-    if let Some(license_start) = content.find("<license") {
-        if let Some(tag_end) = content[license_start..].find('>') {
-            let license_tag = &content[license_start..license_start + tag_end + 1];
-            return xml_utils::extract_attribute_value(license_tag, "xlink:href")
-                .or_else(|| xml_utils::extract_attribute_value(license_tag, "href"));
+    // Try <license xlink:href="..."> first
+    if let Some(license_start) = content.find("<license")
+        && let Some(tag_end) = content[license_start..].find('>')
+    {
+        let license_tag = &content[license_start..license_start + tag_end + 1];
+        let url = xml_utils::extract_attribute_value(license_tag, "xlink:href")
+            .or_else(|| xml_utils::extract_attribute_value(license_tag, "href"));
+        if url.is_some() {
+            return url;
         }
     }
-    None
+
+    // Fallback: extract URL from <ali:license_ref> element content
+    xml_utils::extract_element_content(content, "ali:license_ref")
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
 }
 
 /// Extract first page number from `<fpage>` element
+///
+/// Handles `<fpage>` with or without attributes (e.g., `<fpage seq="b">54</fpage>`).
 pub fn extract_fpage(content: &str) -> Option<String> {
-    xml_utils::extract_text_between(content, "<fpage>", "</fpage>")
+    xml_utils::extract_element_content(content, "fpage")
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
 }
 
 /// Extract last page number from `<lpage>` element
+///
+/// Handles `<lpage>` with or without attributes.
 pub fn extract_lpage(content: &str) -> Option<String> {
-    xml_utils::extract_text_between(content, "<lpage>", "</lpage>")
+    xml_utils::extract_element_content(content, "lpage")
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
 }
 
 /// Extract electronic location identifier from `<elocation-id>` element

@@ -1,0 +1,3892 @@
+---
+source: pubmed-parser/tests/integration/parsing/pmc_snapshots.rs
+assertion_line: 47
+expression: article
+---
+{
+  "pmcid": "PMC10821037",
+  "pmid": "38250885",
+  "title": "Differences in the Evolution of Clinical, Biochemical, and Hematological Indicators in Hospitalized Patients with COVID-19 According to Their Vaccination Scheme: A Cohort Study in One of the World’s Highest Hospital Mortality Populations",
+  "authors": [
+    {
+      "surname": "Mendoza-Hernandez",
+      "given_names": "Martha A.",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Martha A. Mendoza-Hernandez",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        },
+        {
+          "id": "af2-vaccines-12-00072",
+          "institution": "af2-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": "https://orcid.org/0000-0002-7646-0842",
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Conceptualization",
+        "Software",
+        "Formal analysis",
+        "Investigation",
+        "Resources",
+        "Data curation",
+        "Writing – original draft",
+        "Visualization",
+        "Supervision",
+        "Project administration",
+        "Funding acquisition"
+      ]
+    },
+    {
+      "surname": "Guzman-Esquivel",
+      "given_names": "Jose",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Jose Guzman-Esquivel",
+      "affiliations": [
+        {
+          "id": "af3-vaccines-12-00072",
+          "institution": "af3-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": "https://orcid.org/0000-0002-6727-0051",
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Ramos-Rojas",
+      "given_names": "Marco A.",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Marco A. Ramos-Rojas",
+      "affiliations": [
+        {
+          "id": "af2-vaccines-12-00072",
+          "institution": "af2-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Methodology",
+        "Validation",
+        "Writing – review & editing"
+      ]
+    },
+    {
+      "surname": "Santillan-Luna",
+      "given_names": "Vanessa V.",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Vanessa V. Santillan-Luna",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Sanchez-Ramirez",
+      "given_names": "Carmen A.",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Carmen A. Sanchez-Ramirez",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Methodology",
+        "Validation",
+        "Writing – review & editing"
+      ]
+    },
+    {
+      "surname": "Hernandez-Fuentes",
+      "given_names": "Gustavo A.",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Gustavo A. Hernandez-Fuentes",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        },
+        {
+          "id": "af4-vaccines-12-00072",
+          "institution": "af4-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": "https://orcid.org/0000-0003-4685-3095",
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Methodology",
+        "Validation",
+        "Data curation",
+        "Writing – original draft",
+        "Writing – review & editing"
+      ]
+    },
+    {
+      "surname": "Diaz-Martinez",
+      "given_names": "Janet",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Janet Diaz-Martinez",
+      "affiliations": [
+        {
+          "id": "af5-vaccines-12-00072",
+          "institution": "af5-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Methodology",
+        "Validation",
+        "Writing – original draft"
+      ]
+    },
+    {
+      "surname": "Melnikov",
+      "given_names": "Valery",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Valery Melnikov",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Methodology",
+        "Validation",
+        "Writing – review & editing"
+      ]
+    },
+    {
+      "surname": "Rojas-Larios",
+      "given_names": "Fabian",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Fabian Rojas-Larios",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": "https://orcid.org/0000-0003-1744-9173",
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Methodology",
+        "Validation",
+        "Writing – review & editing"
+      ]
+    },
+    {
+      "surname": "Martinez-Fierro",
+      "given_names": "Margarita L.",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Margarita L. Martinez-Fierro",
+      "affiliations": [
+        {
+          "id": "af6-vaccines-12-00072",
+          "institution": "af6-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": "https://orcid.org/0000-0003-1478-9068",
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Tiburcio-Jimenez",
+      "given_names": "Daniel",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Daniel Tiburcio-Jimenez",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Formal analysis",
+        "Writing – review & editing"
+      ]
+    },
+    {
+      "surname": "Rodriguez-Sanchez",
+      "given_names": "Iram P.",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Iram P. Rodriguez-Sanchez",
+      "affiliations": [
+        {
+          "id": "af7-vaccines-12-00072",
+          "institution": "af7-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": "https://orcid.org/0000-0002-5988-4168",
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Delgado-Enciso",
+      "given_names": "Osiris G.",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Osiris G. Delgado-Enciso",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Formal analysis",
+        "Writing – review & editing"
+      ]
+    },
+    {
+      "surname": "Cabrera-Licona",
+      "given_names": "Ariana",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Ariana Cabrera-Licona",
+      "affiliations": [
+        {
+          "id": "af4-vaccines-12-00072",
+          "institution": "af4-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": [
+        "Methodology",
+        "Writing – review & editing"
+      ]
+    },
+    {
+      "surname": "Delgado-Enciso",
+      "given_names": "Ivan",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Ivan Delgado-Enciso",
+      "affiliations": [
+        {
+          "id": "af1-vaccines-12-00072",
+          "institution": "af1-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        },
+        {
+          "id": "af4-vaccines-12-00072",
+          "institution": "af4-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        },
+        {
+          "id": "af8-vaccines-12-00072",
+          "institution": "af8-vaccines-12-00072",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": "https://orcid.org/0000-0001-9848-862X",
+      "email": null,
+      "is_corresponding": true,
+      "roles": [
+        "Conceptualization",
+        "Methodology",
+        "Software",
+        "Validation",
+        "Formal analysis",
+        "Investigation",
+        "Resources",
+        "Data curation",
+        "Writing – original draft",
+        "Writing – review & editing"
+      ]
+    }
+  ],
+  "journal": {
+    "title": "Vaccines",
+    "abbreviation": "Vaccines (Basel)",
+    "issn_print": null,
+    "issn_electronic": "2076-393X",
+    "publisher": "MDPI",
+    "volume": "12",
+    "issue": "1"
+  },
+  "pub_date": "2024-01-11",
+  "doi": "10.3390/vaccines12010072",
+  "sections": [
+    {
+      "section_type": "abstract",
+      "title": "Abstract",
+      "content": "COVID-19 vaccines primarily prevent severe illnesses or hospitalization, but there is limited data on their impact during hospitalization for seriously ill patients. In a Mexican cohort with high COVID-19 mortality, a study assessed vaccination’s effects. From 2021 to 2022, 462 patients with 4455 hospital days were analyzed. The generalized multivariate linear mixed model (GENLINMIXED) with binary logistic regression link, survival analysis and ROC curves were used to identify risk factors for death. The results showed that the vaccinated individuals were almost half as likely to die (adRR = 0.54, 95% CI = 0.30–0.97, p = 0.041). When stratifying by vaccine, the Pfizer group (BNT162b2) had a 2.4-times lower risk of death (adRR = 0.41, 95% CI = 0.2–0.8, p = 0.008), while the AstraZeneca group (ChAdOx1-S) group did not significantly differ from the non-vaccinated (adRR = 1.04, 95% CI = 0.5–2.3, p = 0.915). The Pfizer group exhibited a higher survival, the unvaccinated showed increasing mortality, and the AstraZeneca group remained intermediate (p = 0.003, multigroup log-rank test). Additionally, BNT162b2-vaccinated individuals had lower values for markers, such as ferritin and D-dimer. Biochemical and hematological indicators suggested a protective effect of both types of vaccines, possibly linked to higher lymphocyte counts and lower platelet-to-lymphocyte ratio (PLR). It is imperative to highlight that these results reinforce the efficacy of COVID-19 vaccines. However, further studies are warranted for a comprehensive understanding of these findings.",
+      "subsections": [],
+      "id": null,
+      "figures": [
+        {
+          "id": "vaccines-12-00072-f001",
+          "label": "Figure 1",
+          "caption": "Flowchart depicting the selection process from a total of 1747 hospitalized individuals according to inclusion and exclusion criteria.",
+          "alt_text": null,
+          "fig_type": null,
+          "file_path": null,
+          "file_name": "vaccines-12-00072-g001"
+        },
+        {
+          "id": "vaccines-12-00072-f002",
+          "label": "Figure 2",
+          "caption": "Pneumonia Severity Index of patients with different vaccination schemes according to the pandemic period. It is observed that vaccinated patients show variations in severity depending on the pandemic period, while the severity of the non-vaccinated remained constant. In the period when the Delta variant was predominant, vaccinated patients experienced higher severity than the non-vaccinated, exhibiting the opposite trend in other periods. Periods were established based on the predominant variants in the general population of Mexico ([24,25,26]; January–July 2021: B.1.1.222; B.1.1.519; and Gamma. August–December 2021: Delta. January–April 2022: Delta, Omicron BA.1; Omicron BA.1.1, Omicron BA.1.15. May–December 2022: Omicron, others. * p < 0.01. Mean + 95% CI is shown.",
+          "alt_text": null,
+          "fig_type": null,
+          "file_path": null,
+          "file_name": "vaccines-12-00072-g002"
+        },
+        {
+          "id": "vaccines-12-00072-f003",
+          "label": "Figure 3",
+          "caption": "Kaplan-Meier curves for 40 days based on vaccination scheme. (A) Overall, BNT162b2-vaccinated patients show better survival than the other groups (multiple comparisons p = 0.003. Post-hoc analysis: p = BNT162b2 vs. unvaccinated p = 0.001. ChAdOx1-S vs. unvaccinated p = 0.130. BNT162b2 vs. ChAdOx1-S p = 0.223). (B) Among those hospitalized in advanced stages (pulmonary and hyperinflammatory phase), a similar trend is observed (multiple comparisons p = 0.036. Post-hoc analysis: BNT162b2 vs. unvaccinated p = 0.076. ChAdOx1-S vs. unvaccinated p = 0.120. BNT162b2 vs. ChAdOx1-S p = 0.014. (C) In patients hospitalized in an early stage (viral phase), no significant differences were found between the groups (multiple comparisons p = 0.124). (D) In patients hospitalized with PSI values < 120, BNT162b2-vaccinated individuals had higher survival (multiple comparisons p = 0.001. Post-hoc analysis: BNT162b2 vs. unvaccinated p = 0.002. ChAdOx1-S vs. unvaccinated p = 0.161. BNT162b2 vs. ChAdOx1-S p = 0.137). (E) When having a PSI > 120 at hospital admission, the groups did not differ (multiple comparisons p = 0.395). (F) Among patients aged 60 years or older, BNT162b2-vaccinated individuals had higher survival than the other groups (multiple comparisons p < 0.001. Post-hoc analysis: BNT162b2 vs. unvaccinated p = 0.002. ChAdOx1-S vs. unvaccinated p = 0.161. BNT162b2 vs. ChAdOx1-S p = 0.137), while in those under 60 years, no differences were found between the groups (multiple comparisons p = 0.386). The log-rank test was applied to compare curves in multiple comparisons or post-hoc analysis.",
+          "alt_text": null,
+          "fig_type": null,
+          "file_path": null,
+          "file_name": "vaccines-12-00072-g003"
+        },
+        {
+          "id": "vaccines-12-00072-f004",
+          "label": "Figure 4",
+          "caption": "Evolution of some clinical parameters during the first 6 days of hospitalization for patients based on the type of vaccine received. It is observed that the National Early Warning Score 2 (NEWS-2) is lower in the vaccinated groups compared to the non-vaccinated group (A). In contrast, regarding the Pneumonia Severity Index (PSI), BNT162b2-vaccinated individuals show higher severity (B). However, it is noticeable that both ChAdOx1-S-vaccinated individuals (in (A,B)) and the non-vaccinated group experience an increase over the course of days (B). The lymphocyte count (C) is higher in vaccinated individuals, with a markedly lower platelet-to-lymphocyte ratio (D) in these groups compared to the non-vaccinated group. Ferritin levels (E) are lower in BNT162b2-vaccinated individuals compared to those vaccinated with ChAdOx1-S and the non-vaccinated group. Average values and 95% confidence intervals are presented.",
+          "alt_text": null,
+          "fig_type": null,
+          "file_path": null,
+          "file_name": "vaccines-12-00072-g004"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "section_type": "section",
+      "title": "1. Introduction",
+      "content": "Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) is the causative agent of coronavirus disease (COVID-19), a genuinely multisystemic illness despite its primary impact on the respiratory system [1,2]. While most infections are self-limiting or necessitate ambulatory care, 20% of symptomatic, unvaccinated adults may require hospitalization [2]. Vaccination has been shown to reduce this hospitalization rate by up to 10 times [3,4]. Regional and country-specific factors can influence the proportion of patients developing severe/critical COVID-19 and requiring hospitalization [5].\nDuring the initial years of the pandemic, various types of COVID-19 vaccines were developed. The most widely distributed include: (1) mRNA-based vaccines such as BNT162b2 (Pfizer—BioNTech) and mRNA-1273 (Moderna—NIAID); (2) adenoviral vector-based vaccines like ChAdOx1-S (Oxford—AstraZeneca), Ad26.COV2.S (Johnson & Johnson), Gam-COVID-Vac (Gamaleya), and Ad5nCoV (CanSino); and (3) inactivated coronavirus-based vaccines like CorovaVac (Sinovac) and BBIBP-CorV (Sinopharm) [1,3,6,7]. From a global public health perspective, the primary and extensively studied benefit of vaccines is their efficacy in preventing disease or severe outcomes (reducing hospitalizations), ranging from 70 to 95% [3], varying based on the population and the investigated vaccine type [3].\nWhen vaccination fails to prevent hospitalization in vaccinated individuals, an understudied scenario arises, and existing reports contradict whether being vaccinated modifies the mortality of these patients [7,8,9,10,11,12]. Additionally, how vaccines alter the clinical course and predictors of death in patients with severe/critical COVID-19 remains unknown. This is a pertinent topic that may vary not only with the type of vaccine but also in the context of the analyzed population. Mortality in hospitalized COVID-19 patients worldwide has varied from 1% to 52% [13], greatly influenced by the pandemic’s temporality, ethnic and sociocultural characteristics of each population, and the diverse therapeutic strategies applied in different regions [14].\nFrom March 2020 to August 2022, in Mexico, the overall hospital case fatality rate was 45.1% (95% CI 44.9, 45.3), with variations depending on the pandemic period, reaching a maximum peak of 50.8% overall [6], including a peak mortality rate of 60% in hospitalized individuals aged 60 or older [6]. This places Mexico among the populations with the highest mortality in hospitalized COVID-19 patients globally. In this challenging population context, a cohort study was conducted to understand the effects of administering different types of vaccines on the clinical evolution of hospitalized patients and whether such vaccines induce changes capable of modifying the risk of death.",
+      "subsections": [],
+      "id": "sec1-vaccines-12-00072",
+      "figures": [],
+      "tables": []
+    },
+    {
+      "section_type": "section",
+      "title": "2. Materials and Methods",
+      "content": "",
+      "subsections": [
+        {
+          "section_type": "section",
+          "title": "2.1. Study Subjects",
+          "content": "An ambispective cohort study was conducted with patients admitted to the COVID-19 unit at General Hospital Number 1 of IMSS-Colima, Mexico, experiencing severe or critical COVID-19 between January 2021 and December 2022. Inclusion criteria encompassed men and nonpregnant women, aged ≥ 18, with confirmed severe or critical COVID-19 through positive SARS-CoV-2 RT-PCR or antigen test results. Patients admitted to regular hospital floors, high-flow oxygen rooms, or intensive care units (ICUs) were included, while those solely receiving care in the emergency room without admission were excluded. Subjects lacking information on vaccination status or with incomplete clinical records were eliminated. Considering the above in a cohort of 1747 hospitalized individuals, 514 were included based on predetermined inclusion and exclusion criteria. Notably, 288 of these patients (56.1%) had not received vaccination, while the remaining 226 (43.9%) had been vaccinated (Figure 1).\nThe study received approval from the local health research committee of IMSS-Colima, Mexico (approval number R-2020-601-041, 24 September 2020). As data were obtained from clinical records, and not directly from patients, the ethics committee waived the requirement for signed consent from each subject. Anonymity was ensured, and personal identification was concealed in the collected databases used for analysis.",
+          "subsections": [],
+          "id": "sec2dot1-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "2.2. Measures and Follow-Up",
+          "content": "Data were extracted from patients’ clinical records, encompassing personal history, vaccination history against COVID-19, and clinical parameters throughout their hospitalization until discharge, either due to improvement or death. The following variables were universally collected: age, sex, personal history (comorbidities, Charlson comorbidity index score), COVID-19 vaccination history (brand, number of doses, time since last dose), history of previous COVID-19 infections, smoking status (considering only current smokers per the Glossary of the National Health Interview Survey of the United States of America) [15], admission disease phase (viral/pulmonary/hyperinflammatory) [16], and clinical, laboratory, and imaging data for each day of hospital stay, along with the reason for discharge (death or improvement).\nRepetitively collected data during hospitalization included: blood cell counts (neutrophils, lymphocytes, platelets), inflammation markers (neutrophil/lymphocyte ratio—NLR, Ferritin, Erythrocyte Sedimentation Rate, and C-Reactive Protein Level), glucose, creatinine, liver enzymes (alkaline phosphatase—ALP, aspartate amino transferase—AST, alanine aminotransferase—ALT, and Lactate Dehydrogenase—LDH), prothrombin time expressed as an international normalized ratio (INR), development of acute kidney disease (AKI), use of mechanical ventilation or hemodialysis, administration of medications (paracetamol, anticoagulants, antibiotics, amine support, steroids, and diuretics), and the calculation of risk scores using various clinical parameters such as COVID-GRAM, National Early Warning Score 2 (NEWS-2), and Pneumonia Severity Index (PSI). The estimated glomerular filtration rate (eGFR) was determined from serum creatinine, following the CKD-EPI 2021 equation [17]. These data were repeatedly collected throughout the entire hospital stay.",
+          "subsections": [],
+          "id": "sec2dot2-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "2.3. Sample Size",
+          "content": "The sample size for this study was determined based on the observation of mortality differences between various groups, akin to effective pharmacological interventions. The calculation was derived from previously reported mortality rates following the use or non-use of corticosteroids (41.3% and 24.8%, respectively) in hospitalized COVID-19 patients requiring high-flow oxygen [18]. To achieve the required power of 0.8, 126 patients were needed in each group (vaccinated and unvaccinated). Following the study’s completion, a post hoc statistical power analysis was conducted, revealing that being vaccinated (with two doses of BNT162b2 (Pfizer—BioNTech) or ChAdOx1-S (AstraZeneca) vaccines) reduces mortality in hospitalized COVID-19 patients, resulting in a statistical power of 93.3% for the vaccinated group and 96% for the subgroup vaccinated with BNT162b2.",
+          "subsections": [],
+          "id": "sec2dot3-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "2.4. Statistical Analysis",
+          "content": "Data representation utilized percentages and mean ± standard deviation. The normality of data was assessed with Kolmogorov-Smirnov tests. Fisher’s exact tests or likelihood ratio chi-square tests were employed for comparing categorical data among groups. When applicable, independent Student’s t-tests or ANOVA were used to compare numerical data between two or three groups. The values of various clinical characteristics throughout the entire hospitalization period were analyzed for their predictive ability regarding patient death, utilizing the area under the Receiver Operating Characteristic (ROC) curve (AUC), confidence interval, cut-off point, sensitivity, and specificity.\nAssociation analysis was conducted using multivariate generalized linear mixed models (GLMM, GENLINMIXED in SPSS) with a binary logistic regression link and separate random intercepts (SPRI), as previously described [19,20,21]. Data were summarized as relative risks (RRs) with 95% confidence intervals (CIs) and p-values, adjusted for multiple variables. GLMM is a valid strategy for estimating RRs in multivariate analysis [21,22].\nTwo random variables were incorporated to account for the longitudinal nature of the data: (I) day of hospital stay, and (II) month of hospital admission (pandemic time, month 1 January 2021, to month 24 December 2022). The target variable was the patient’s death during hospital stays (dichotomous; yes or no). Fixed effects included continuous variables (Charlson Index) and dichotomous variables indicating various clinical characteristics and vaccine types. Numerical clinical variables were dichotomized based on the cut-off point obtained from ROC curve calculations predicting patient death. Covariance structures were selected based on Akaike’s Information Criterion (AIC). The primary objective of the model was to obtain marginal risk by summarizing binomial regression parameters into relative risk (RR) with 95% confidence intervals (CI) and p-values. Univariate linear mixed effects model tests were used to compare the evolution of clinical parameters between different vaccine groups (fixed effects) during the hospitalization period (repeated observations), employing the two random variables described earlier ). Statistical power and sample size were calculated using CinCalc version 1 (https://clincalc.com/stats/Power.aspx (16 September 2023)) [21]. All other analyses were performed using SPSS Statistics version 20 software (IBM Corp., Armonk, NY, USA). A significance level of p < 0.05 was considered statistically significant.",
+          "subsections": [],
+          "id": "sec2dot4-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        }
+      ],
+      "id": "sec2-vaccines-12-00072",
+      "figures": [],
+      "tables": []
+    },
+    {
+      "section_type": "section",
+      "title": "3. Results",
+      "content": "",
+      "subsections": [
+        {
+          "section_type": "section",
+          "title": "3.1. Patient Characteristics",
+          "content": "Five hundred and fourteen hospitalized patients were enrolled in the study. Among them, 288 (56.1%) had not received any COVID-19 vaccination, while 226 (43.9%) had received at least one vaccine dose. Table 1 illustrates the vaccination schemes received. It is evident that most patients were unvaccinated, followed by those vaccinated with ChAdOx1-S (Oxford-AstraZeneca) and BNT162b2 (Pfizer—BioNTech). For the analyses of clinical evolution and prognosis, only these three patient subgroups were considered, excluding those with an incomplete vaccination regimen (such as a single dose of ChAdOx1-S or BNT162b2 or less than 14 days since their second vaccine dose) or those who received other minimally represented vaccine types. Table 2 displays the key clinical characteristics of the 462 patients included in subsequent analyses (Table 2). These patients collectively accounted for a total of 4455 days of hospital stay. Only two (0.43%) of these 462 patients reported having had a previous COVID-19 infection, so this characteristic was not included as a variable in the analyses.",
+          "subsections": [],
+          "id": "sec3dot1-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "3.2. Differences in Clinical Characteristics between Vaccinated and Unvaccinated Individuals",
+          "content": "Table 2 compares various clinical characteristics at admission and during hospital stay between the groups of patients who were unvaccinated and those vaccinated with ChAdOx1-S or BNT162b2 (complete regimen, at least two doses). Vaccinated individuals exhibit more comorbidities (diabetes, hypertension, CKD, Charlson index, and low eGFR) than the unvaccinated. Notably, up to 90% of BNT162b2-vaccinated patients are aged over 60, whereas, in the unvaccinated or ChAdOx1-S-vaccinated groups, this age group represents 57% of patients. This aligns to the vaccination strategy in Mexico, where BNT162b2 vaccine was initially exclusively administered to healthcare personnel and those over 60, followed by the widespread administration of the ChAdOx1-S vaccine, with initial preference given to patients with comorbidities and those over 60 [23]. The body mass index (BMI) was not different between the three groups (p = 0.264, ANOVA test) (Table 2), so it would not be a factor that could differentiate the clinical evolution between them.\nIn respect to the disease stage at hospital admission, ChAdOx1-S or BNT162b2-vaccinated individuals had a higher proportion of patients in the viral (early) stage compared to the unvaccinated (viral stage at 27.7%, 60.3%, and 45.0%, respectively, ANOVA p < 0.001). They also have lower severity according to the NEWS-2 scale (7.7 ± 3.5, 6.5 ± 3.1, 6.6 ± 3.0, respectively, ANOVA p = 0.003) (Table 2). However, BNT162b2-vaccinated patients tend to have a higher proportion of patients admitted in the hyperinflammatory stage and a higher PSI score than the other groups, although, these differences were not statistically significant (see Table 2).\nRegarding the treatment regimens received during hospitalization, there were no differences between the groups in the use of paracetamol, anticoagulants, antibiotics, steroids, diuretics, or amine support. However, unvaccinated individuals were more frequently required mechanical ventilation compared to those vaccinated with ChAdOx1-S or BNT162b2 (38.1%, 23.3%, 21.8%, respectively, p = 0.002, ANOVA test). ChAdOx1-S-vaccinated patients had a higher incidence of AKI compared to the unvaccinated (p = 0.001) and BNT162b2-vaccinated (p = 0.004) individuals (35.6%, 16.7%, 18.7%, respectively), while the latter two groups did not significantly differ (p = 0.545). Consequently, the need for hemodialysis was more frequent in ChAdOx1-S-vaccinated patients (ChAdOx1-S vs. unvaccinated p = 0.015, ChAdOx1-S vs. BNT162b2 p = 0.003, BNT162b2 vs. unvaccinated p = 0.139) (see Table 2).\nDuring the study period (January 2021 to December 2022), various variants of COVID-19 affected the population of Mexico (research site) [24,25,26]. Considering the predominant variants, Figure 2 shows that the severity of the disease did not vary significantly in non-vaccinated patients during different periods (p = 0.080, ANOVA test). However, in individuals vaccinated with ChAdOx1-S (p < 0.001, ANOVA test) and BNT162b2 (p < 0.001, ANOVA test), there were significant variations between periods, with higher severity observed during periods when the Delta variant was predominant in the population.",
+          "subsections": [],
+          "id": "sec3dot2-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "3.3. Hospitalization Days and Survival",
+          "content": "The mortality among fully vaccinated individuals was 36.2%, compared to 52.2% among the unvaccinated (p < 0.001). Table 3 displays the hospital stay details. The number of hospitalization days did not differ significantly among the three groups (p = 0.207). Overall, the highest mortality was observed in the unvaccinated group (52.6%), followed by those vaccinated with ChAdOx1-S (41.1%) and BNT162b2 (31.7%) (see Table 3). In patients aged ≥ 60 years, BNT162b2-vaccinated individuals had significantly lower mortality (33.0%) compared to those vaccinated with ChAdOx1-S (50.0%) or the unvaccinated (61.8%) (see Table 3).\nBNT162b2-vaccinated individuals also experienced lower mortality than the unvaccinated when their admission disease was severe (pulmonary or hyperinflammatory phase) (43.4% vs. 59.8%, p = 0.010) or with a worse prognosis (PSI score > 120) (67.6% vs. 85.8%, p = 0.016) (see Table 3). In contrast, among patients with these characteristics, those vaccinated with ChAdOx1-S did not statistically differ from the unvaccinated (see Table 3).\nIn a 40-day survival follow-up (Kaplan-Meier curves), significant differences were observed among various vaccination schemes (p = 0.003, multigroup log-rank test). BNT162b2-vaccinated individuals exhibited higher survival rate (mean 30.3 days, 95% CI 27.3–33.2, survivors 68.3%), while the unvaccinated had lower survival rate (mean 24.3 days, 95% CI 22.5–26.1, survivors 47.4%), with ChAdOx1-S-vaccinated individuals falling in between (mean 27.2 days, 95% CI 23.6–30.8, survivors 58.9%) (see Figure 3A). Stratifying patients based on different characteristics revealed differences among groups for those hospitalized in advanced stages of the disease (pulmonary and hyperinflammatory) (p = 0.036, multigroup log-rank test). BNT162b2-vaccinated individuals showed higher survival rate (mean 26.6 days, 95% CI 22.3–31.1, survivors 56.6%), while ChAdOx1-S-vaccinated individuals had lower survival rate (mean 17.4 days, 95% CI 11.9–22.8, survivors 27.6%), and the unvaccinated drop in between (median 22.0 days, 95% CI 19.9–24.1, survivors 40.2%) (see Figure 3B).\nOn the other hand, among patients hospitalized at an early stage (viral phase), no significant differences in survival were found based on their vaccination scheme (p = 0.124, multigroup log-rank test). However, BNT162b2 or ChAdOx1-S-vaccinated patients had higher survival rate (not statistically significant) than the unvaccinated (80.9%, 79.5%, and 65.8%, respectively) (see Figure 3C). According to the PSI score, in patients hospitalized with values below 120 (indicating a better prognosis than higher scores, Figure 3D), BNT162b2-vaccinated individuals had higher survival rate (mean 36.7 days, 95% CI 34.3–39.1, survivors 88.9%), while the unvaccinated had lower survival (mean 30.1 days, 95% CI 27.9–32.3, survivors 67.8%), with ChAdOx1-S-vaccinated individuals falling in between (median 33.6 days, 95% CI 30.0–37.2, survivors 78.3%) (p = 0.001, multigroup log-rank test). Among patients with a very poor prognosis at admission (PSI > 120), no significant differences in survival were found based on their vaccination scheme (p = 0.395, multigroup log-rank test). However, BNT162b2 or ChAdOx1-S-vaccinated patients had better survival rates than the unvaccinated (32.4%, 24.0%, and 14.2%, respectively) (see Figure 3E).\nAmong patients aged 60 years or older (Figure 3F), BNT162b2-vaccinated individuals had the highest survival (mean 29.9 days, 95% CI 26.8–33.2, survivors 67.0%), while the unvaccinated had the lowest survival (mean 21.7 days, 95% CI 19.3–24.0, survivors 38.2%), with ChAdOx1-S-vaccinated individuals falling in between (mean 25.0 days, 95% CI 20.3–29.7, survivors 50.0%) (p < 0.001, multigroup log-rank test). Among patients younger than 60 years (Figure 3F), no significant differences were found based on their vaccination scheme (p = 0.386, log-rank test), although once again, BNT162b2 or ChAdOx1-S-vaccinated patients had better survival rates than the unvaccinated (80.0%, 71.0%, and 59.7%, respectively).",
+          "subsections": [],
+          "id": "sec3dot3-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "3.4. Risk Factors for Death in Hospitalized Patients with COVID-19, including Vaccination Schedule",
+          "content": "Table 4 presents a multivariate generalized linear mixed model with binary logistic regression analysis that identifies factors associated with death in patients hospitalized with COVID-19, including the impact of their vaccination schedule. This analysis included factors that were found to be different among groups according to Table 2. The statistical model also incorporated the period of the pandemic during which the patient was hospitalized as a random effect (see Materials and Methods section). Regarding pre-existing conditions or conditions at hospital admission, smoking (RR 4.5, 95% CI 2.0–10.1, p < 0.001), and advanced disease phase (pulmonary/hyperinflammatory) significantly increased the risk of death (RR 4.01, 95% CI 2.4–6.5, p < 0.001). During hospitalization, elevated indices of severe disease, including NEWS-2 score ≥ 12 (RR 3.56, 95% CI 1.6–7.7, p = 0.001), PSI score > 120 (RR 8.14, 95% CI 5.0–13.1, p < 0.001), the need for mechanical ventilation (RR 3.74, 95% CI 1.8–7.3, p < 0.001), and neutrophils ≥ 8 × 10e3/uL (RR 3.76, 95% CI 2.3–6.0, p < 0.001), were identified as risk factors (see Table 4). Additionally, having lymphocytes ≥680/uL (RR 0.53, 95% CI 0.3–0.8, p = 0.007) or ALT > 45 UL (RR 0.45, 95% CI 0.2–0.8, p = 0.005) were identified as protective factors. BNT162b2-vaccinated individuals had a 2.4-times reduced risk of death (RR 0.41, 95% CI 0.2–0.8, p = 0.008), whereas ChAdOx1-S-vaccinated individuals showed no significant difference in the risk of death compared to the unvaccinated (RR 1.04, 95% CI 0.5–2.3, p = 0.915) (see Table 4). The receipt of a booster dose was also not associated with the risk of death (p = 0.247) (see Table 4). Combining the patients vaccinated with BNT162b2 and whereas ChAdOx1-S into a single group, it is observed that patients in this group reduce their risk of death by almost half, with a RR value of 0.54 (95% CI 0.30–0.97), being a congruent value as it is located between the RR values of BNT162b2 (0.41) and whereas ChAdOx1-S (1.04). It is important to highlight those only patients with a complete vaccination schedule (at least two doses) were considered, and all booster vaccinations were administered as ChAdOx1-S, irrespective of the initial vaccination scheme.",
+          "subsections": [],
+          "id": "sec3dot4-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "3.5. Clinical Differences between Those Vaccinated with BNT162b2 and ChAdOx1-S",
+          "content": "In Table 5, a multivariate analysis is shown to determine the probability of being vaccinated with BNT162b2 according to the presence of various characteristics, compared to patients vaccinated with ChAdOx1-S [21,22]. It is observed that being > 60 years old, being admitted in an advanced phase of the disease (pulmonary/hyperinflammatory) and having a PSI score > 120 were factors associated with being vaccinated with BNT162b2, in comparison to patients vaccinated with ChAdOx1-S. Conversely, having ferritin levels >810 ng/mL, receiving an additional vaccine dose, or experiencing death were variables less likely to be present in those vaccinated with BNT162b2 (see Table 5). This makes it evident that patients vaccinated with BNT162b2 had 3.7-times lower odds of death than patients vaccinated with ChAdOx1-S, despite being older and having a more advanced and severe disease at admission. Among the hematological or inflammatory parameters that could explain these differences between different vaccination schemes, the protection against elevated ferritin levels in patients with BNT162b2 stands out.\nIn Table 6, a multivariate analysis is shown to determine the probability of being vaccinated with Pfizer according to the presence of various characteristics, compared to non-vaccinated patients. It shows that being over 60 years old, male, having a higher comorbidity index, and having higher levels of neutrophils and lymphocytes were factors associated with being vaccinated with BNT162b2 compared to non-vaccinated patients. On the contrary, not smoking, experiencing less acute kidney injury during hospitalization, or dying were variables less likely to be present in BNT162b2-vaccinated individuals (see Table 6). This makes it clear that BNT162b2-vaccinated patients died 2.6-times less than non-vaccinated patients, despite being older and having more comorbidities. Having less lymphopenia and the presence of acute kidney injury appear to be the most relevant factors that could explain the lower mortality in BNT162b2-vaccinated patients compared to non-vaccinated individuals.",
+          "subsections": [],
+          "id": "sec3dot5-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "3.6. Evolution of Some Clinical Parameters during the First 6 Days",
+          "content": "The evolution of some risk factors for mortality (see Table 4) during the first 6 days of hospitalization was analyzed. In Figure 4A, the NEWS-2 score is higher in non-vaccinated patients at admission compared to vaccinated patients (p = 0.026; and p = 0.018; compared to ChAdOx1-S and BNT162b2, respectively). However, on day 4, patients vaccinated with ChAdOx1-S begin to increase this score, and those vaccinated with BNT162b2 remain with the lowest levels throughout all the days analyzed. On day 6, the NEWS-2 score was higher in non-vaccinated patients, followed by those vaccinated with ChAdOx1-S and BNT162b2 (8.4 ± 4.1, 7.3 ± 3.6, 5.8 ± 3.9, respectively). This is consistent with the proportion of patients who ultimately died in each patient group. The PSI (Figure 4B) was initially higher in patients vaccinated with BNT162b2, but as the days progressed, non-vaccinated patients and those vaccinated with ChAdOx1-S began to increase their PSI until, by day 6, there were no longer differences between the groups (118.7 ± 46.1, 122.6 ± 39.3, 124.1 ± 41.9, respectively). The absolute values of lymphocytes (Figure 4C) were, on average, always lower in non-vaccinated patients compared to vaccinated ones, with no differences observed between the two vaccine types. In terms of the PLR levels, non-vaccinated patients clearly had the highest values (Figure 4D). Finally, the serum level of ferritin (Figure 4E) in patients vaccinated with BNT162b2 was on average clearly lower than the value of non-vaccinated or ChAdOx1-S-vaccinated patients. Repeated measurement data for these variables were analyzed using multivariate linear mixed-effects models, confirming a significant difference in the BNT162b2 group compared to the other two groups in PSI index and ferritin levels, while the parameters of NEWS-2 score, lymphocytes, and PLR behaved similarly in both vaccinated groups, with significant differences compared to the values of non-vaccinated patients (see Table 7).",
+          "subsections": [],
+          "id": "sec3dot6-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        },
+        {
+          "section_type": "section",
+          "title": "3.7. Predictors of Death Based on Vaccination Status",
+          "content": "Table 8 and Table S1 present various clinical useful factors for predicting mortality in different patient groups based on their vaccination status. The area under the ROC curve (AUC) was calculated to determine the optimal cut-off point for each variable in predicting death within each patient group. The Pneumonia Severity Index (PSI) emerged as a relevant predictor of death toll across all groups, with significantly lower AUC values in BNT162b2-vaccinated patients compared to those vaccinated with ChAdOx1-S (p = 0.043) or unvaccinated individuals (p < 0.001). It is noteworthy that the cut-off points for predicting death were higher in BNT162b2 or ChAdOx1-S-vaccinated individuals compared to those the unvaccinated (124.5, 123.5, and 118.0, respectively), demonstrating good sensitivity (close to 0.80 in all groups) but low specificity. This indicates that vaccinated patients need to reach a higher severity to predict their mortality. Regarding oxygen levels, the AUCs were approximately 0.35 in all groups, showing no differences among them (p > 0.05 for all intergroup comparisons). However, BNT162b2 or ChAdOx1-S-vaccinated patients had higher cut-off points than the unvaccinated individuals (82.5%, 84.5%, and 74.0%, respectively) to predict patient survival or mortality with high sensitivity and specificity in all groups, although, it was higher in the unvaccinated (see Table 7). This aligns to arterial pH analysis, where AUC values were significant in predicting death in all groups (AUC 0.25, 0.29, and 0.37; in the unvaccinated, ChAdOx1-S, or BNT162b2, respectively). However, the cut-off point was more acidic in the unvaccinated (pH 7.2305) compared to ChAdOx1-S or BNT162b2-vaccinated individuals (pH 7.3100, and 7.3005, respectively) (see Table S1). Arterial pH was significantly lower on average in unvaccinated or ChAdOx1-S-vaccinated patients compared to BNT162b2-vaccinated patients (7.339 ± 0.16, 7.333 ± 0.15, and 7.360 ± 0.14, respectively, p < 0.05 for both comparisons, see Table 8). This suggests that lung damage might be more relevant in predicting death toll in unvaccinated patients than in vaccinated ones.\nRegarding immune system cells, as shown in Table 7, vaccinated patients had significantly higher cell counts than the unvaccinated individuals. Simultaneously, it was observed that a deeper degree of lymphopenia was necessary to predict death in unvaccinated patients (cutoff: 535/µL) compared to ChAdOx1-S or BNT162b2-vaccinated groups (cutoff: 831/µL and 893/µL, respectively). On the other hand, for neutrophils to be a predicting factor for death, vaccinated patients needed to have neutrophilia (neutrophil count > 7700/microliter), compared to a normal value in unvaccinated individuals (cutoff in ChAdOx1-S, BNT162b2, and unvaccinated: 9711, 9430, and 7311, respectively) (see Table 8). It has been previously reported that when neutrophilia is present in a hospitalized COVID-19 patient, an increased inflammatory status and cytokine storm occurs, and potential bacterial infections should be considered [27,28]. An average neutrophil count of over 9100 cells/µL was found in patients with confirmed bacterial infection hospitalized for COVID-19. If we consider this value as a possible indicator of bacterial infection, it is found that days prior to hospital discharge, this factor was present in 49.2%, 64.6%, and 77.8% of deceased patients in unvaccinated, ChAdOx1-S-vaccinated, and BNT162b2-vaccinated individuals, respectively (p < 0.001, Fisher’s exact test of 2 × 3 contingency table). This was significantly lower in deceased unvaccinated individuals compared to ChAdOx1-S-vaccinated (p = 0.036) and BNT162b2-vaccinated individuals (p < 0.001), although, the two vaccinated groups were not statistically different (p = 0.105). With this, clinical differences between vaccinated and unvaccinated individuals are evident, indicating that neutrophilia seems to be a relevant factor in predicting death in vaccinated patients, suggesting that the presence of bacterial co-infection could be a more critical factor for mortality in vaccinated individuals.\nHowever, it is interesting to note differences between the two vaccinated groups, considering that individuals vaccinated with BNT162b2 have over 3.7-times less likelihood of dying compared to those vaccinated with ChAdOx1-S (see Table 5). In liver function tests, the enzyme LDH emerged as the most relevant parameter for predicting death toll in all groups. A significant difference in the AUC was observed between the ChAdOx1-S group and the BNT162b2 group (AUC 0.873 vs. 0.758, p = 0.002) and between the ChAdOx1-S group and the unvaccinated group (ChAdOx1-S vs. unvaccinated, AUC 0.873 vs. AUC 0.744, p < 0.001) (Table 8). However, it is important to mention that unvaccinated individuals have a higher cut-off point than those vaccinated with ChAdOx1-S or BNT162b2 (367, 333, and 325 IU/L, respectively) (Table 8). LDH only demonstrates good sensitivity (0.78) with little specificity for predicting death in those vaccinated with ChAdOx1-S, while in those vaccinated with BNT162b2 or unvaccinated, its sensitivity is much lower (0.61 and 0.68, respectively) (Table 8). On the other hand, the enzymes ALP, ALT, and AST were not significant predicting factors in the ChAdOx1-S-vaccinated group, but they were in those vaccinated with BNT162b2 and the unvaccinated group. However, this does not imply that these enzymes are not relevant for ChAdOx1-S-vaccinated patients, as this group had, on average, higher serum levels of ALP, ALT, and AST (see Table 9). This could indicate that the values of these enzymes were elevated in both those who died and those who survived, making it an irrelevant parameter for distinguishing between these outcomes in ChAdOx1-S-vaccinated patients.\nRegarding renal function, eGFR upon hospital admission showed no differences between patients vaccinated with ChAdOx1-S or BNT162b2, but these groups had higher values compared to the unvaccinated individuals (see Table 2). The eGFR value was useful for predicting death in all groups, with significantly different AUCs between the unvaccinated and ChAdOx1-S groups (0.318 vs. 0.425, p = 0.001) and between the unvaccinated and BNT162b2 groups (0.316 vs. 0.431, p < 0.001), but no difference in AUCs between the ChAdOx1-S and BNT162b2 groups (p = 0.865) (Table 8). However, the cutoff values were observed to be very different, at 75.2, 36.3, and 60.0 mL/min/1.73m2 in the unvaccinated, ChAdOx1-S-vaccinated, and BNT162b2-vaccinated groups, respectively (see Table 8). This may suggest that severe loss of renal function as a predictor of death only occurred in the ChAdOx1-S-vaccinated group (eGFR < 36), while the loss of renal function for predicting death was mild to moderate in the BNT162b2 and unvaccinated groups, indicating that other factors were likely more relevant in these latter two groups.\nIn markers of inflammation, there was a difference in AUCs between ChAdOx1-S and BNT162b2 for PCR (p = 0.002), ferritin (p = 0.032), and VCP (<0.001), with these three factors being significant predictors of death in BNT162b2-vaccinated patients but not in those vaccinated with ChAdOx1-S (see Table 8 and Table S1). These three factors were also relevant for predicting death in unvaccinated patients. On the other hand, D-dimer was a useful and similar parameter for predicting death significantly in all groups (see Table 8). With all the above, it can be observed that there are some different factors between patients vaccinated with BNT162b2 or ChAdOx1-S. For those vaccinated with BNT162b2, a combination of markers of liver damage (AST, ALT, ALP, and LDH) and certain inflammation markers (ferritin, PCR, and VCP) were useful for predicting patient death, but not in those vaccinated with ChAdOx1-S. This does not mean that all these markers are low in ChAdOx1-S-vaccinated patients; on the contrary, ALP, ferritin, and D-dimer are significantly elevated in this group compared to those vaccinated with BNT162b2, with the rest of the liver enzymes and CRP following the same trend (see Table 9). On the other hand, the average values of ferritin, CRP, D-dimer and LDH do not differ between patients vaccinated with ChAdOx1-S and those unvaccinated. Additionally, the average values of ALT and ALP were significantly higher in patients with ChAdOx1-S than in those unvaccinated (see Table 9).",
+          "subsections": [],
+          "id": "sec3dot7-vaccines-12-00072",
+          "figures": [],
+          "tables": []
+        }
+      ],
+      "id": "sec3-vaccines-12-00072",
+      "figures": [],
+      "tables": []
+    },
+    {
+      "section_type": "section",
+      "title": "4. Discussion",
+      "content": "In the context of a population with one of the highest mortality rates worldwide for COVID-19 hospitalized patients, there were differences in the proportion of deaths based on the vaccination scheme. Those who died in higher proportion were the unvaccinated (52.6%), followed by those vaccinated with ChAdOx1-S (41.1%) and those vaccinated with BNT162b2 (31.7%) (vaccination schemes with at least two doses and at least 14 days elapsed since their second dose). The lower mortality of those vaccinated with BNT162b2 occurred even though these patients were older and had higher severity (higher PSI) at the time of hospital admission. Those vaccinated with ChAdOx1-S or BNT162b2 had nearly half the risk of dying from the disease compared to the unvaccinated (adjusted RR 0.54, 95% CI 0.30–0.97, p = 0.041). However, when stratifying by vaccine type, those vaccinated with BNT162b2 had 2.4-times less risk of death compared to the unvaccinated (adjusted RR 0.41, CI95% 0.2–0.8, p = 0.008), while those vaccinated with ChAdOx1-S did not differ from the unvaccinated in terms of their risk of death (adjusted RR 1.04, CI95% 0.5–2.3, p = 0.915). This suggests differences in the clinical outcomes of patients based on the administered vaccine.\nThe reduction in the risk of death by vaccination in hospitalized COVID-19 patients aligns with previous reports from Croatia [8] and Argentina-Spain [7]. However, other studies have not shown differences in mortality between vaccinated and unvaccinated patients in populations from the United States [9], Israel [10], or France [11]. Even a study conducted in Poland suggests that hospitalized patients may have a higher mortality after receiving one or two vaccine doses [12]. Huespe IA et al. (2023) mention that these contradictory results may be due to confounding variables, especially differences in the proportion and severity of comorbidities, generally higher in vaccinated groups at the beginning of the pandemic [7]. Differences among subgroups of populations can also lead to variations in the immune response to vaccines, which is progressively lower with older age and a higher prevalence of comorbidities [29].\nAmong studies that have found that vaccination reduces mortality in hospitalized patients, one points out that those vaccinated with ChAdOx1-S (and other vaccines with adenoviral vectors) have lower mortality than those vaccinated with BNT162b2 [8], while another observed that those vaccinated with BNT162b2 had a greater reduction in mortality (OR 0.37; 95% CI: 0.23–0.59), followed by those vaccinated with ChAdOx1-S (OR 0.42; 95% CI: 0.20–0.86) [7]. In the first study, Busic et al. (2022) discuss that those vaccinated with BNT162b2 could have higher mortality than those vaccinated with ChAdOx1-S because mRNA vaccines (such as Pfizer—BioNTech) were the first vaccines to be administered, having preference for the older population and among selected patients with unfavorable prognostic characteristics [7,8]. In the present report from Mexico, something similar happened in the vaccination strategy, with older patients and those with a higher index of comorbidities initially vaccinated and using BNT162b2. Therefore, patients vaccinated with BNT162b2 had more adverse characteristics and higher severity at the time of hospital admission, especially during periods when the Delta variant was one of the predominant strains in the population (see Figure 2). However, even with a worse prognosis, those vaccinated with BNT162b2 had lower mortality in absolute numbers. In the analysis adjusting for variables such as age, sex, morbidity, severity, as well as, the pandemic period to consider variations in different waves (as a random effect), it was found that those vaccinated with BNT162b2 reduce the risk of death by 2.4-times compared to the unvaccinated, while those vaccinated with ChAdOx1-S did not differ from the unvaccinated ones in adjusted risk of death (see Table 4). However, as mentioned above, both those vaccinated with ChAdOx1-S and BNT162b2 reduce the overall percentage of death compared to those not vaccinated (41.1%, 31.7%, and 52.6%, respectively).\nIn hospitalized patients, it was observed that receiving either the ChAdOx1-S or BNT162b2 vaccine contributes to higher lymphocyte counts and lower Platelet-to-Lymphocyte Ratios (PLR) compared to the unvaccinated group (Figure 4, Table 2, Table 7 and Table 9). Vaccination prevented severe hypoxemia from being the most sensitive and specific factor for predicting death, as observed in the unvaccinated group. This aligns to the improved survival rates found in both vaccinated groups. It is noteworthy that in the vaccinated individuals, neutrophilia serves as a predictive factor for death, suggesting that a concomitant bacterial infection might be a relevant factor leading to mortality in the vaccinated group. However, individuals vaccinated with BNT162b2 have a lower risk of death than those vaccinated with ChAdOx1-S (Table 5). This may be attributed to the additional observation that, on average, individuals vaccinated with BNT162b2 exhibit less impairment in markers of hepatic damage, lower levels of certain inflammatory markers (such as serum ferritin), and lower levels of D-dimer compared to those vaccinated with ChAdOx1-S or the unvaccinated group.\nThe vaccines appear to induce a more robust immune response against severe/critical COVID-19 infection, leading to increased survival. The results suggest that more severe damage to other organs or systems, in addition to the lungs, would be necessary to predict death in vaccinated patients (Table 8, Table 9 and Table S1). However, the ChAdOx1-S vaccine has a less beneficial effect than BNT162b2 in hospitalized patients. One possible explanation for this could be a lower stimulation of the immune system against COVID-19, resulting in lower survival rates in severe patients. It has been previously demonstrated that the efficacy for preventing disease or severe disease is higher for BNT162b2 compared to ChAdOx1-S (95–87.5% vs. 70%, respectively) [3], which aligns with a lower neutralization of SARS-CoV-2 by serum from individuals vaccinated with ChAdOx1-S compared to serum from BNT162b2-vaccinated individuals [3]. Another potential cause could be that using an adenoviral vector as a vehicle to stimulate immunity may limit some vaccine benefits. Exposure to adenovirus in preclinical models has led to long-term effects, including adverse metabolic, morphological (hepatic), and functional changes, with significantly high levels of serum inflammation markers [30,31]. It has been postulated that these chronic adenoviral effects, including prolonged inflammatory responses [32,33], could occur with their application in gene therapy [30] or after their use in COVID-19 vaccines [34]. However, these are unverified hypotheses that need to be investigated in future research, as the emergency authorization of COVID-19 vaccines (adenoviral or mRNA) may not have fully addressed certain safety aspects [32,35].\nA strength of the present study was the adjustment for comorbidities, severity, and other relevant factors that can affect the death prognosis of patients, as well as the analysis with repeated measurements of various clinical factors during hospitalization. Additionally, the temporality of the pandemic (month of hospital admission) was considered in the statistical model used. Another relevant aspect is that the effect of vaccination was analyzed from different points of view (mortality rate, survival curves, association analysis, ROC curves, evaluation of hematological and biochemical parameters), so conclusions can be reached based multiple aspects and not with the result of a single analysis. Undoubtedly, evaluating the effect of vaccination in a population of hospitalized patients with high mortality helps assess the potential impact of vaccines under very adverse prognostic conditions, which is challenging to evaluate in other populations or periods of the pandemic.\nConsidering the results obtained in this study, it is imperative to highlight that these findings reinforce the efficacy of COVID-19 vaccines in reducing hospital fatalities, in addition to the previously reported reduction in severity and hospitalizations [3,4]. However, addressing these findings with caution is fundamental to avoid misinterpretations that could be misused for anti-vaccine purposes. It is crucial to emphasize that this study not only highlights a significant decrease in the risk of mortality for vaccinated individuals, especially in populations with increased health risks, but also underscores notable differences among the various types of vaccines used. The findings highlight the crucial and beneficial role of vaccination, adding to what was previously described to reduce symptoms and the risks of hospital admission and death [36,37]. These collective results underscore the current importance of vaccination efforts, considering variations in populations and the types of vaccines used.\nThe present study also had limitations. The number of patients did not allow for evaluations and comparisons between patients with a single vaccine dose. Similarly, the mortality in patients vaccinated with ChAdOx1-S was intermediate between the unvaccinated and those vaccinated with BNT162b2, so in various analyses, statistically significant differences between ChAdOx1-S and the other two groups were not observed. Future analyses with a larger number of individuals are desirable to better observe the differences between these groups. Additional facets of the investigation pertinent to the studied population, such as the types of vaccines administered and who was given priority for vaccination at the beginning of the pandemic in Mexico, did not allow for the evaluation of other vaccine brands and types as well as their effects on various population strata with fewer comorbidities. Likewise, only 8.9% of the hospitalized patients included had a booster vaccine, making a detailed analysis of this subgroup unfeasible. It is important to note that exploring this aspect was limited in the current study. Future research efforts should consider a more in-depth examination of this subgroup, especially in the context of different COVID variants.",
+      "subsections": [],
+      "id": "sec4-vaccines-12-00072",
+      "figures": [],
+      "tables": []
+    },
+    {
+      "section_type": "section",
+      "title": "5. Conclusions",
+      "content": "In summary, in the context of a population of hospitalized patients with COVID-19 with a very adverse prognosis and very high mortality, patients vaccinated with BNT162b2 had a lower risk of death compared to those vaccinated with ChAdOx1-S and the unvaccinated. Patients vaccinated with ChAdOx1-S had an intermediate mortality rate between BNT162b2-vaccinated patients (who had the lowest mortality) and the unvaccinated group (with the highest mortality). The protective effect observed in vaccinated patients can be explained by higher lymphocyte counts and lower levels of some inflammation markers such as PLR. However, patients vaccinated with BNT162b2 additionally have lower values of other inflammation markers, such as ferritin and D-dimer. Unlike unvaccinated patients, it can be inferred that, in general, vaccinated patients require more extensive damage to other organs, in addition to lung damage, or other complications (such as concomitant bacterial infection) to predict death toll. More studies on the effects of COVID-19 vaccination are necessary.",
+      "subsections": [],
+      "id": "sec5-vaccines-12-00072",
+      "figures": [],
+      "tables": []
+    }
+  ],
+  "references": [
+    {
+      "id": "B1-vaccines-12-00072",
+      "title": "The Effectiveness of COVID-19 Vaccines in Reducing the Incidence, Hospitalization, and Mortality from COVID-19: A Systematic Review and Meta-Analysis",
+      "authors": [
+        {
+          "surname": "Rahmani",
+          "given_names": "K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K. Rahmani",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Shavaleh",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Shavaleh",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Forouhi",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Forouhi",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Disfani",
+          "given_names": "H.F.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "H.F. Disfani",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kamandi",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Kamandi",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Oskooi",
+          "given_names": "R.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R.K. Oskooi",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Foogerdi",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Foogerdi",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Soltani",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Soltani",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Rahchamani",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Rahchamani",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Mohaddespour",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Mohaddespour",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Front. Public Health",
+      "year": "2022",
+      "volume": "10",
+      "issue": null,
+      "pages": "873596",
+      "pmid": "36091533",
+      "doi": null,
+      "ref_type": "journal"
+    },
+    {
+      "id": "B2-vaccines-12-00072",
+      "title": "Clinical Characteristics in the Acute Phase of COVID-19 That Predict Long COVID: Tachycardia, Myalgias, Severity, and Use of Antibiotics as Main Risk Factors, While Education and Blood Group B Are Protective",
+      "authors": [
+        {
+          "surname": "Guzman-Esquivel",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Guzman-Esquivel",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Mendoza-Hernandez",
+          "given_names": "M.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.A. Mendoza-Hernandez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Guzman-Solorzano",
+          "given_names": "H.P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "H.P. Guzman-Solorzano",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Sarmiento-Hernandez",
+          "given_names": "K.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K.A. Sarmiento-Hernandez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Rodriguez-Sanchez",
+          "given_names": "I.P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I.P. Rodriguez-Sanchez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Martinez-Fierro",
+          "given_names": "M.L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.L. Martinez-Fierro",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Paz-Michel",
+          "given_names": "B.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B.A. Paz-Michel",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Murillo-Zamora",
+          "given_names": "E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E. Murillo-Zamora",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Rojas-Larios",
+          "given_names": "F.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "F. Rojas-Larios",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Lugo-Trampe",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Lugo-Trampe",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Healthcare",
+      "year": "2023",
+      "volume": "11",
+      "issue": null,
+      "pages": null,
+      "pmid": "36673565",
+      "doi": "10.3390/healthcare11020197",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B3-vaccines-12-00072",
+      "title": "Overview of the Main Anti-SARS-CoV-2 Vaccines: Mechanism of Action, Efficacy and Safety",
+      "authors": [
+        {
+          "surname": "Mascellino",
+          "given_names": "M.T.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.T. Mascellino",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Di Timoteo",
+          "given_names": "F.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "F. Di Timoteo",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "De Angelis",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. De Angelis",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Oliva",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Oliva",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Infect. Drug Resist.",
+      "year": "2021",
+      "volume": "14",
+      "issue": null,
+      "pages": "3459-3476",
+      "pmid": "34511939",
+      "doi": "10.2147/IDR.S315727",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B4-vaccines-12-00072",
+      "title": "COVID-19-Associated Hospitalizations among Vaccinated and Unvaccinated Adults 18 Years or Older in 13 US States, January 2021 to April 2022",
+      "authors": [
+        {
+          "surname": "Havers",
+          "given_names": "F.P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "F.P. Havers",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Pham",
+          "given_names": "H.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "H. Pham",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Taylor",
+          "given_names": "C.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C.A. Taylor",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Whitaker",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Whitaker",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Patel",
+          "given_names": "K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K. Patel",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Anglin",
+          "given_names": "O.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "O. Anglin",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kambhampati",
+          "given_names": "A.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.K. Kambhampati",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Milucky",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Milucky",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Zell",
+          "given_names": "E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E. Zell",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Moline",
+          "given_names": "H.L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "H.L. Moline",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "JAMA Intern. Med.",
+      "year": "2022",
+      "volume": "182",
+      "issue": null,
+      "pages": "1071",
+      "pmid": "36074486",
+      "doi": "10.1001/jamainternmed.2022.4299",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B5-vaccines-12-00072",
+      "title": "The Determinants of COVID-19 Morbidity and Mortality across Countries",
+      "authors": [
+        {
+          "surname": "Chang",
+          "given_names": "D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D. Chang",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Chang",
+          "given_names": "X.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "X. Chang",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "He",
+          "given_names": "Y.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "Y. He",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Tan",
+          "given_names": "K.J.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K.J.K. Tan",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Sci. Rep.",
+      "year": "2022",
+      "volume": "12",
+      "issue": null,
+      "pages": "5888",
+      "pmid": "35393471",
+      "doi": "10.1038/s41598-022-09783-9",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B6-vaccines-12-00072",
+      "title": "Comparative Epidemiology of Five Waves of COVID-19 in Mexico, March 2020–August 2022",
+      "authors": [
+        {
+          "surname": "Ascencio-Montiel",
+          "given_names": "I.d.J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I.d.J. Ascencio-Montiel",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Ovalle-Luna",
+          "given_names": "O.D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "O.D. Ovalle-Luna",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Rascón-Pacheco",
+          "given_names": "R.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R.A. Rascón-Pacheco",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Borja-Aburto",
+          "given_names": "V.H.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "V.H. Borja-Aburto",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Chowell",
+          "given_names": "G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G. Chowell",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "BMC Infect. Dis.",
+      "year": "2022",
+      "volume": "22",
+      "issue": null,
+      "pages": null,
+      "pmid": "36316634",
+      "doi": "10.1186/s12879-022-07800-w",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B7-vaccines-12-00072",
+      "title": "COVID-19 Vaccines Reduce Mortality in Hospitalized Patients with Oxygen Requirements: Differences between Vaccine Subtypes. A Multicontinental Cohort Study",
+      "authors": [
+        {
+          "surname": "Huespe",
+          "given_names": "I.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I.A. Huespe",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Ferraris",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Ferraris",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Lalueza",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Lalueza",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Valdez",
+          "given_names": "P.R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "P.R. Valdez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Peroni",
+          "given_names": "M.L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.L. Peroni",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Cayetti",
+          "given_names": "L.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L.A. Cayetti",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Mirofsky",
+          "given_names": "M.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.A. Mirofsky",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Boietti",
+          "given_names": "B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B. Boietti",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Gómez-Huelgas",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Gómez-Huelgas",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Casas-Rojo",
+          "given_names": "J.M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J.M. Casas-Rojo",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "J. Med. Virol.",
+      "year": "2023",
+      "volume": "95",
+      "issue": null,
+      "pages": "e28786",
+      "pmid": "37212340",
+      "doi": "10.1002/jmv.28786",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B8-vaccines-12-00072",
+      "title": "Vaccination Provides Protection from Respiratory Deterioration and Death among Hospitalized COVID-19 Patients: Differences between Vector and MRNA Vaccines",
+      "authors": [
+        {
+          "surname": "Busic",
+          "given_names": "N.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N. Busic",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Lucijanic",
+          "given_names": "T.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T. Lucijanic",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Barsic",
+          "given_names": "B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B. Barsic",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Luksic",
+          "given_names": "I.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I. Luksic",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Busic",
+          "given_names": "I.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I. Busic",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kurdija",
+          "given_names": "G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G. Kurdija",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Barbic",
+          "given_names": "L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L. Barbic",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kunstek",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. Kunstek",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Jelic",
+          "given_names": "T.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T. Jelic",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Lucijanic",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Lucijanic",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "J. Med. Virol.",
+      "year": "2022",
+      "volume": "94",
+      "issue": null,
+      "pages": "2849-2854",
+      "pmid": "35187697",
+      "doi": "10.1002/jmv.27666",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B9-vaccines-12-00072",
+      "title": "The Third Wave: Comparing Seasonal Trends in COVID-19 Patient Data at a Large Hospital System in New York City",
+      "authors": [
+        {
+          "surname": "Tandon",
+          "given_names": "P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "P. Tandon",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Leibner",
+          "given_names": "E.S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E.S. Leibner",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Hackett",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Hackett",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Maguire",
+          "given_names": "K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K. Maguire",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Mashriqi",
+          "given_names": "N.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N. Mashriqi",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kohli-Seth",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Kohli-Seth",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Crit. Care Explor.",
+      "year": "2022",
+      "volume": "4",
+      "issue": null,
+      "pages": "e0653",
+      "pmid": "35261982",
+      "doi": "10.1097/CCE.0000000000000653",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B10-vaccines-12-00072",
+      "title": "BNT162b2 Vaccine Breakthrough: Clinical Characteristics of 152 Fully Vaccinated Hospitalized COVID-19 Patients in Israel",
+      "authors": [
+        {
+          "surname": "Brosh-Nissimov",
+          "given_names": "T.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T. Brosh-Nissimov",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Orenbuch-Harroch",
+          "given_names": "E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E. Orenbuch-Harroch",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Chowers",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Chowers",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Elbaz",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Elbaz",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Nesher",
+          "given_names": "L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L. Nesher",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Stein",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Stein",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Maor",
+          "given_names": "Y.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "Y. Maor",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Cohen",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Cohen",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Hussein",
+          "given_names": "K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K. Hussein",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Weinberger",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Weinberger",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Clin. Microbiol. Infect.",
+      "year": "2021",
+      "volume": "27",
+      "issue": null,
+      "pages": "1652-1657",
+      "pmid": "34245907",
+      "doi": "10.1016/j.cmi.2021.06.036",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B11-vaccines-12-00072",
+      "title": "Prevalence and Main Clinical Characteristics of Fully Vaccinated Patients Admitted to Hospital for Delta Variant COVID-19",
+      "authors": [
+        {
+          "surname": "Vassallo",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Vassallo",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Clement",
+          "given_names": "N.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N. Clement",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Lotte",
+          "given_names": "L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L. Lotte",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Manni",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. Manni",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Sindt",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Sindt",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Bertrand",
+          "given_names": "P.M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "P.M. Bertrand",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Durant",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Durant",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Front. Med.",
+      "year": "2022",
+      "volume": "9",
+      "issue": null,
+      "pages": "809154",
+      "pmid": "35308544",
+      "doi": "10.3389/fmed.2022.809154",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B12-vaccines-12-00072",
+      "title": "Clinical Characteristics of Hospitalized COVID-19 Patients Who Received at Least One Dose of COVID-19 Vaccine",
+      "authors": [
+        {
+          "surname": "Rzymski",
+          "given_names": "P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "P. Rzymski",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Pazgan-Simon",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Pazgan-Simon",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Simon",
+          "given_names": "K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K. Simon",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Łapiński",
+          "given_names": "T.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T. Łapiński",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Zarębska-Michaluk",
+          "given_names": "D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D. Zarębska-Michaluk",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Szczepańska",
+          "given_names": "B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B. Szczepańska",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Chojnicki",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Chojnicki",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Mozer-Lisewska",
+          "given_names": "I.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I. Mozer-Lisewska",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Flisiak",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Flisiak",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Vaccines",
+      "year": "2021",
+      "volume": "9",
+      "issue": null,
+      "pages": null,
+      "pmid": "34358197",
+      "doi": "10.3390/vaccines9070781",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B13-vaccines-12-00072",
+      "title": "Global Prevalence and Determinants of Mortality among Patients with COVID-19: A Systematic Review and Meta-Analysis",
+      "authors": [
+        {
+          "surname": "Abate",
+          "given_names": "S.M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S.M. Abate",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Checkol",
+          "given_names": "Y.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "Y.A. Checkol",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Mantefardo",
+          "given_names": "B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B. Mantefardo",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Ann. Med. Surg.",
+      "year": "2021",
+      "volume": "64",
+      "issue": null,
+      "pages": "102204",
+      "pmid": "33692899",
+      "doi": "10.1016/j.amsu.2021.102204",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B14-vaccines-12-00072",
+      "title": "COVID-19 Hospital Activity and in-Hospital Mortality during the First and Second Waves of the Pandemic in England: An Observational Study",
+      "authors": [
+        {
+          "surname": "Gray",
+          "given_names": "W.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "W.K. Gray",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Navaratnam",
+          "given_names": "A.V.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.V. Navaratnam",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Day",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Day",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Wendon",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Wendon",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Briggs",
+          "given_names": "T.W.R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T.W.R. Briggs",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Thorax",
+      "year": "2022",
+      "volume": "77",
+      "issue": null,
+      "pages": "1113-1120",
+      "pmid": "34819384",
+      "doi": "10.1136/thoraxjnl-2021-218025",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B16-vaccines-12-00072",
+      "title": "SARS-CoV-2 and COVID-19: From the Bench to the Bedside",
+      "authors": [
+        {
+          "surname": "Romagnoli",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. Romagnoli",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Peris",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Peris",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "De Gaudio",
+          "given_names": "A.R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.R. De Gaudio",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Geppetti",
+          "given_names": "P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "P. Geppetti",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Physiol. Rev.",
+      "year": "2020",
+      "volume": "100",
+      "issue": null,
+      "pages": "1455-1466",
+      "pmid": "32496872",
+      "doi": "10.1152/physrev.00020.2020",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B17-vaccines-12-00072",
+      "title": "Comparison of 2021 CKD-EPI Equations for Estimating Racial Differences in Preemptive Waitlisting for Kidney Transplantation",
+      "authors": [
+        {
+          "surname": "Ku",
+          "given_names": "E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E. Ku",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Amaral",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. Amaral",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "McCulloch",
+          "given_names": "C.E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C.E. McCulloch",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Adey",
+          "given_names": "D.B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D.B. Adey",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Li",
+          "given_names": "L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L. Li",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Johansen",
+          "given_names": "K.L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K.L. Johansen",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Clin. J. Am. Soc. Nephrol.",
+      "year": "2022",
+      "volume": "17",
+      "issue": null,
+      "pages": "1515-1521",
+      "pmid": "36122938",
+      "doi": "10.2215/CJN.04850422",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B18-vaccines-12-00072",
+      "title": "Timing of Corticosteroids Impacts Mortality in Hospitalized COVID-19 Patients",
+      "authors": [
+        {
+          "surname": "Bahl",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Bahl",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Johnson",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. Johnson",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Chen",
+          "given_names": "N.-W.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N.-W. Chen",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Intern. Emerg. Med.",
+      "year": "2021",
+      "volume": "16",
+      "issue": null,
+      "pages": "1593-1603",
+      "pmid": "33547620",
+      "doi": "10.1007/s11739-021-02655-6",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B19-vaccines-12-00072",
+      "title": "Interactions between the Principal Risk Factors for Reduction of the EGFR in Unvaccinated COVID-19 Survivors: Normal Pre-COVID-19 EGFR, Not Having Diabetes and Being Hospitalized",
+      "authors": [
+        {
+          "surname": "Guzman-Esquivel",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Guzman-Esquivel",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Diaz-Martinez",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Diaz-Martinez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Ortega-Ortiz",
+          "given_names": "G.J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G.J. Ortega-Ortiz",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Murillo-Zamora",
+          "given_names": "E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E. Murillo-Zamora",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Melnikov",
+          "given_names": "V.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "V. Melnikov",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Tejeda-Luna",
+          "given_names": "R.H.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R.H. Tejeda-Luna",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Cosio-Medina",
+          "given_names": "G.V.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G.V. Cosio-Medina",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Llerenas-Aguirre",
+          "given_names": "I.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I.K. Llerenas-Aguirre",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Guzman-Solorzano",
+          "given_names": "A.J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.J. Guzman-Solorzano",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Hernandez-Fuentes",
+          "given_names": "A.G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.G. Hernandez-Fuentes",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Exp. Ther. Med.",
+      "year": "2023",
+      "volume": "26",
+      "issue": null,
+      "pages": "580",
+      "pmid": "38023357",
+      "doi": "10.3892/etm.2023.12279",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B20-vaccines-12-00072",
+      "title": "HIV, Psychological Resilience, and Substance Misuse during the COVID-19 Pandemic: A Multi-Cohort Study",
+      "authors": [
+        {
+          "surname": "Baum",
+          "given_names": "M.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.K. Baum",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Tamargo",
+          "given_names": "J.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J.A. Tamargo",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Diaz-Martinez",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Diaz-Martinez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Delgado-Enciso",
+          "given_names": "I.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I. Delgado-Enciso",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Meade",
+          "given_names": "C.S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C.S. Meade",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kirk",
+          "given_names": "G.D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G.D. Kirk",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Mehta",
+          "given_names": "S.H.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S.H. Mehta",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Moore",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Moore",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kipke",
+          "given_names": "M.D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.D. Kipke",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Shoptaw",
+          "given_names": "S.J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S.J. Shoptaw",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Drug Alcohol Depend.",
+      "year": "2022",
+      "volume": "231",
+      "issue": null,
+      "pages": "109230",
+      "pmid": "34998257",
+      "doi": "10.1016/j.drugalcdep.2021.109230",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B21-vaccines-12-00072",
+      "title": "Multivariate Generalized Linear Mixed Models with Random Intercepts to Analyze Cardiovascular Risk Markers in Type-1 Diabetic Patients",
+      "authors": [
+        {
+          "surname": "Jaffa",
+          "given_names": "M.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.A. Jaffa",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Gebregziabher",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Gebregziabher",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Luttrell",
+          "given_names": "D.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D.K. Luttrell",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Luttrell",
+          "given_names": "L.M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L.M. Luttrell",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Jaffa",
+          "given_names": "A.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.A. Jaffa",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "J. Appl. Stat.",
+      "year": "2016",
+      "volume": "43",
+      "issue": null,
+      "pages": "1447-1464",
+      "pmid": "27829695",
+      "doi": "10.1080/02664763.2015.1103708",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B22-vaccines-12-00072",
+      "title": "Estimating Risk Ratios and Risk Differences Using Regression",
+      "authors": [
+        {
+          "surname": "Naimi",
+          "given_names": "A.I.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.I. Naimi",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Whitcomb",
+          "given_names": "B.W.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B.W. Whitcomb",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Am. J. Epidemiol.",
+      "year": "2020",
+      "volume": "189",
+      "issue": null,
+      "pages": "508-510",
+      "pmid": "32219364",
+      "doi": "10.1093/aje/kwaa044",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B23-vaccines-12-00072",
+      "title": "Política Nacional de Vacunación Contra El Virus SARS-CoV-2, Para La Prevención de La COVID-19 En Mexico",
+      "authors": [],
+      "journal": null,
+      "year": null,
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "gov"
+    },
+    {
+      "id": "B24-vaccines-12-00072",
+      "title": "Two-Year Follow-up of the COVID-19 Pandemic in Mexico",
+      "authors": [
+        {
+          "surname": "Loza",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Loza",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Wong-Chew",
+          "given_names": "R.M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R.M. Wong-Chew",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Jiménez-Corona",
+          "given_names": "M.-E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.-E. Jiménez-Corona",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Zárate",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. Zárate",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "López",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. López",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Ciria",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Ciria",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Palomares",
+          "given_names": "D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D. Palomares",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "García-López",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. García-López",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Iša",
+          "given_names": "P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "P. Iša",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Taboada",
+          "given_names": "B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B. Taboada",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Front. Public Health",
+      "year": "2023",
+      "volume": "10",
+      "issue": null,
+      "pages": "1050673",
+      "pmid": "36711379",
+      "doi": "10.3389/fpubh.2022.1050673",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B25-vaccines-12-00072",
+      "title": "Omicron-BA.1 Dispersion Rates in Mexico Varied According to the Regional Epidemic Patterns and the Diversity of Local Delta Subvariants",
+      "authors": [
+        {
+          "surname": "Zárate",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. Zárate",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Taboada",
+          "given_names": "B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B. Taboada",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Rosales-Rivera",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Rosales-Rivera",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "García-López",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. García-López",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Muñoz-Medina",
+          "given_names": "J.E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J.E. Muñoz-Medina",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Sanchez-Flores",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Sanchez-Flores",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Herrera-Estrella",
+          "given_names": "A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A. Herrera-Estrella",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Gómez-Gil",
+          "given_names": "B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B. Gómez-Gil",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Selem Mojica",
+          "given_names": "N.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N. Selem Mojica",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Salas-Lais",
+          "given_names": "A.G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.G. Salas-Lais",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Viruses",
+      "year": "2023",
+      "volume": "15",
+      "issue": null,
+      "pages": null,
+      "pmid": "36680283",
+      "doi": "10.3390/v15010243",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B26-vaccines-12-00072",
+      "title": "Variants of SARS-CoV-2 and COVID-19 in Mexico",
+      "authors": [
+        {
+          "surname": "Ulises Pérez-Arenas",
+          "given_names": "L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L. Ulises Pérez-Arenas",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Paola Plascencia-Roldán",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Paola Plascencia-Roldán",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Irazú Morales-Reyes",
+          "given_names": "G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G. Irazú Morales-Reyes",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Flores-Vargas",
+          "given_names": "G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G. Flores-Vargas",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "de Jesús Gallardo-Luna",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. de Jesús Gallardo-Luna",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Navarro-Olivos",
+          "given_names": "E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E. Navarro-Olivos",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Javier Magos-Vázquez",
+          "given_names": "F.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "F. Javier Magos-Vázquez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Padilla-Raygoza",
+          "given_names": "N.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N. Padilla-Raygoza",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "New COVID-19 Variants [Working Title]",
+      "year": "2023",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "book"
+    },
+    {
+      "id": "B27-vaccines-12-00072",
+      "title": "Causes and Consequences of COVID-19-Associated Bacterial Infections",
+      "authors": [
+        {
+          "surname": "Farrell",
+          "given_names": "J.M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J.M. Farrell",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Zhao",
+          "given_names": "C.Y.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C.Y. Zhao",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Tarquinio",
+          "given_names": "K.M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K.M. Tarquinio",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Brown",
+          "given_names": "S.P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S.P. Brown",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Front. Microbiol.",
+      "year": "2021",
+      "volume": "12",
+      "issue": null,
+      "pages": null,
+      "pmid": "34354682",
+      "doi": "10.3389/fmicb.2021.682571",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B28-vaccines-12-00072",
+      "title": "Characteristics and Risk Factors of Secondary Bacterial Infections in COVID-19 Patients",
+      "authors": [
+        {
+          "surname": "Wu",
+          "given_names": "G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G. Wu",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Lu",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Lu",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Liu",
+          "given_names": "D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D. Liu",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "He",
+          "given_names": "Y.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "Y. He",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Antimicrob. Steward. Healthc. Epidemiol.",
+      "year": "2023",
+      "volume": "3",
+      "issue": null,
+      "pages": "e156",
+      "pmid": "37771749",
+      "doi": "10.1017/ash.2023.425",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B29-vaccines-12-00072",
+      "title": "Impact of Age and Comorbidities on SARS-CoV-2 Vaccine-Induced T Cell Immunity",
+      "authors": [
+        {
+          "surname": "Dietz",
+          "given_names": "L.L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L.L. Dietz",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Juhl",
+          "given_names": "A.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.K. Juhl",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Søgaard",
+          "given_names": "O.S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "O.S. Søgaard",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Reekie",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Reekie",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Nielsen",
+          "given_names": "H.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "H. Nielsen",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Johansen",
+          "given_names": "I.S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I.S. Johansen",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Benfield",
+          "given_names": "T.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T. Benfield",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Wiese",
+          "given_names": "L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L. Wiese",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Stærke",
+          "given_names": "N.B.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N.B. Stærke",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Jensen",
+          "given_names": "T.Ø.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T.Ø. Jensen",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Commun. Med.",
+      "year": "2023",
+      "volume": "3",
+      "issue": null,
+      "pages": "58",
+      "pmid": "37095240",
+      "doi": "10.1038/s43856-023-00277-x",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B30-vaccines-12-00072",
+      "title": "Adenovirus 5 Produces Obesity and Adverse Metabolic, Morphological, and Functional Changes in the Long Term in Animals Fed a Balanced Diet or a High-Fat Diet: A Study on Hamsters",
+      "authors": [
+        {
+          "surname": "Montes-Galindo",
+          "given_names": "D.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D.A. Montes-Galindo",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Espiritu-Mojarro",
+          "given_names": "A.C.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.C. Espiritu-Mojarro",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Melnikov",
+          "given_names": "V.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "V. Melnikov",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Moy-López",
+          "given_names": "N.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N.A. Moy-López",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Soriano-Hernandez",
+          "given_names": "A.D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A.D. Soriano-Hernandez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Galvan-Salazar",
+          "given_names": "H.R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "H.R. Galvan-Salazar",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Guzman-Muñiz",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Guzman-Muñiz",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Guzman-Esquivel",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Guzman-Esquivel",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Martinez-Fierro",
+          "given_names": "M.L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M.L. Martinez-Fierro",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Rodriguez-Sanchez",
+          "given_names": "I.P.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I.P. Rodriguez-Sanchez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Arch. Virol.",
+      "year": "2019",
+      "volume": "164",
+      "issue": null,
+      "pages": "775-786",
+      "pmid": "30666458",
+      "doi": "10.1007/s00705-018-04132-6",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B31-vaccines-12-00072",
+      "title": "Role of Adenoviruses in Obesity",
+      "authors": [
+        {
+          "surname": "Voss",
+          "given_names": "J.D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J.D. Voss",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Atkinson",
+          "given_names": "R.L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R.L. Atkinson",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Dhurandhar",
+          "given_names": "N.V.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N.V. Dhurandhar",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Rev. Med. Virol.",
+      "year": "2015",
+      "volume": "25",
+      "issue": null,
+      "pages": "379-387",
+      "pmid": "26352001",
+      "doi": "10.1002/rmv.1852",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B32-vaccines-12-00072",
+      "title": "MRNA: Vaccine or Gene Therapy? The Safety Regulatory Issues",
+      "authors": [
+        {
+          "surname": "Banoun",
+          "given_names": "H.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "H. Banoun",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Int. J. Mol. Sci.",
+      "year": "2023",
+      "volume": "24",
+      "issue": null,
+      "pages": null,
+      "pmid": "37445690",
+      "doi": "10.3390/ijms241310514",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B33-vaccines-12-00072",
+      "title": "Recombinant Adenoviral Vector Disrupts Surfactant Homeostasis in Mouse Lung",
+      "authors": [
+        {
+          "surname": "Zsengellér",
+          "given_names": "Z.K.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "Z.K. Zsengellér",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Wert",
+          "given_names": "S.E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S.E. Wert",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Bachurski",
+          "given_names": "C.J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C.J. Bachurski",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kirwin",
+          "given_names": "K.L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "K.L. Kirwin",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Trapnell",
+          "given_names": "B.C.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "B.C. Trapnell",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Whitsett",
+          "given_names": "J.A.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J.A. Whitsett",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Hum. Gene Ther.",
+      "year": "1997",
+      "volume": "8",
+      "issue": null,
+      "pages": "1331-1344",
+      "pmid": "9295128",
+      "doi": "10.1089/hum.1997.8.11-1331",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B34-vaccines-12-00072",
+      "title": "Use of Adenovirus Type-5 Vector Vaccines in COVID-19: Potential Implications for Metabolic Health?",
+      "authors": [
+        {
+          "surname": "Tsilingiris",
+          "given_names": "D.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D. Tsilingiris",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Vallianou",
+          "given_names": "N.G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N.G. Vallianou",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Karampela",
+          "given_names": "I.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "I. Karampela",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Muscogiuri",
+          "given_names": "G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G. Muscogiuri",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Dalamaga",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. Dalamaga",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Minerva Endocrinol.",
+      "year": "2022",
+      "volume": "47",
+      "issue": null,
+      "pages": "264-269",
+      "pmid": "35621112",
+      "doi": "10.23736/S2724-6507.22.03797-6",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B35-vaccines-12-00072",
+      "title": "Immune Responses to Recombinant Adenoviruses As Gene Therapy Vectors and COVID-19 Vaccines: A Two-Edged Sword",
+      "authors": [
+        {
+          "surname": "Flotte",
+          "given_names": "T.R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T.R. Flotte",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Gao",
+          "given_names": "G.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G. Gao",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Hum. Gene Ther.",
+      "year": "2021",
+      "volume": "32",
+      "issue": null,
+      "pages": "645-646",
+      "pmid": "34283643",
+      "doi": "10.1089/hum.2021.29169.trf",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B36-vaccines-12-00072",
+      "title": "The Effectiveness of Pfizer-BioNTech and Oxford-AstraZeneca Vaccines to Prevent Severe COVID-19 in Costa Rica: Nationwide, Ecological Study of Hospitalization Prevalence",
+      "authors": [
+        {
+          "surname": "Rosero-Bixby",
+          "given_names": "L.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "L. Rosero-Bixby",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "JMIR Public Health Surveill.",
+      "year": "2022",
+      "volume": "8",
+      "issue": null,
+      "pages": "e35054",
+      "pmid": "35483079",
+      "doi": "10.2196/35054",
+      "ref_type": "journal"
+    },
+    {
+      "id": "B37-vaccines-12-00072",
+      "title": "Effectiveness of the Pfizer-BioNTech and Oxford-AstraZeneca Vaccines on COVID-19 Related Symptoms, Hospital Admissions, and Mortality in Older Adults in England: Test Negative Case-Control Study",
+      "authors": [
+        {
+          "surname": "Lopez Bernal",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Lopez Bernal",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Andrews",
+          "given_names": "N.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N. Andrews",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Gower",
+          "given_names": "C.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C. Gower",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Robertson",
+          "given_names": "C.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C. Robertson",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Stowe",
+          "given_names": "J.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J. Stowe",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Tessier",
+          "given_names": "E.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E. Tessier",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Simmons",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Simmons",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Cottrell",
+          "given_names": "S.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S. Cottrell",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Roberts",
+          "given_names": "R.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R. Roberts",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "O’Doherty",
+          "given_names": "M.",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M. O’Doherty",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "BMJ",
+      "year": "2021",
+      "volume": "373",
+      "issue": null,
+      "pages": "n1088",
+      "pmid": "33985964",
+      "doi": "10.1136/bmj.n1088",
+      "ref_type": "journal"
+    }
+  ],
+  "article_type": "research-article",
+  "keywords": [
+    "COVID-19",
+    "hospitalized patients",
+    "vaccination scheme",
+    "mortality",
+    "diagnostic markers",
+    "cohort study"
+  ],
+  "funding": [
+    {
+      "source": "National Council of Humanities, Sciences and Technologies (CONAHCYT)",
+      "award_id": "319282",
+      "statement": "The present study was supported by the National Council of Humanities, Sciences and Technologies (CONAHCYT) (grant no. 319282; Call for Frontier Science, Modality: Paradigms and Controversies of Science)."
+    }
+  ],
+  "conflict_of_interest": null,
+  "acknowledgments": "Acknowledgments\n      The authors would like to thank Janet Diaz-Martinez from Florida International University (Miami, USA) and the contributions of Julio V. Barrios Nuñez from University of Colima (Colima, Mexico) for their assistance with English language editing.",
+  "data_availability": null,
+  "supplementary_materials": [
+    {
+      "id": "vaccines-12-00072-s001",
+      "content_type": "local-data",
+      "title": "Click here for additional data file.",
+      "description": null,
+      "file_url": "vaccines-12-00072-s001.zip",
+      "file_type": null,
+      "position": "float"
+    }
+  ],
+  "abstract_text": "COVID-19 vaccines primarily prevent severe illnesses or hospitalization, but there is limited data on their impact during hospitalization for seriously ill patients. In a Mexican cohort with high COVID-19 mortality, a study assessed vaccination’s effects. From 2021 to 2022, 462 patients with 4455 hospital days were analyzed. The generalized multivariate linear mixed model (GENLINMIXED) with binary logistic regression link, survival analysis and ROC curves were used to identify risk factors for death. The results showed that the vaccinated individuals were almost half as likely to die (adRR = 0.54, 95% CI = 0.30–0.97, p = 0.041). When stratifying by vaccine, the Pfizer group (BNT162b2) had a 2.4-times lower risk of death (adRR = 0.41, 95% CI = 0.2–0.8, p = 0.008), while the AstraZeneca group (ChAdOx1-S) group did not significantly differ from the non-vaccinated (adRR = 1.04, 95% CI = 0.5–2.3, p = 0.915). The Pfizer group exhibited a higher survival, the unvaccinated showed increasing mortality, and the AstraZeneca group remained intermediate (p = 0.003, multigroup log-rank test). Additionally, BNT162b2-vaccinated individuals had lower values for markers, such as ferritin and D-dimer. Biochemical and hematological indicators suggested a protective effect of both types of vaccines, possibly linked to higher lymphocyte counts and lower platelet-to-lymphocyte ratio (PLR). It is imperative to highlight that these results reinforce the efficacy of COVID-19 vaccines. However, further studies are warranted for a comprehensive understanding of these findings.",
+  "copyright": "© 2024 by the authors.",
+  "license": "https://creativecommons.org/licenses/by/4.0/Licensee MDPI, Basel, Switzerland. This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution (CC BY) license (https://creativecommons.org/licenses/by/4.0/).",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "history_dates": [
+    {
+      "date_type": "received",
+      "year": 2023,
+      "month": 11,
+      "day": 30
+    },
+    {
+      "date_type": "rev-recd",
+      "year": 2023,
+      "month": 12,
+      "day": 27
+    },
+    {
+      "date_type": "accepted",
+      "year": 2023,
+      "month": 12,
+      "day": 29
+    }
+  ],
+  "categories": [
+    "Article"
+  ],
+  "fpage": null,
+  "lpage": null,
+  "elocation_id": "72"
+}
