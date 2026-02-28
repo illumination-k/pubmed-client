@@ -1,5 +1,5 @@
 use super::xml_utils;
-use crate::pmc::models::{FundingInfo, JournalInfo, SupplementaryMaterial};
+use crate::pmc::models::{FundingInfo, HistoryDate, JournalInfo, SupplementaryMaterial};
 
 /// Extract comprehensive journal information
 pub fn extract_journal_info(content: &str) -> JournalInfo {
@@ -394,6 +394,128 @@ pub fn extract_license(content: &str) -> Option<String> {
         .map(|license_content| xml_utils::strip_xml_tags(&license_content))
 }
 
+/// Extract abstract text from article metadata
+///
+/// Handles both simple abstracts (`<abstract><p>...</p></abstract>`)
+/// and structured abstracts with sections (`<abstract><sec><title>Background</title><p>...</p></sec>...</abstract>`).
+pub fn extract_abstract(content: &str) -> Option<String> {
+    let abstract_content = xml_utils::extract_element_content(content, "abstract")?;
+
+    // Collect all paragraph text, stripping XML tags
+    let paragraphs = xml_utils::extract_all_text_between(&abstract_content, "<p", "</p>");
+    if paragraphs.is_empty() {
+        // Fallback: strip all tags from abstract content
+        let text = xml_utils::strip_xml_tags(&abstract_content);
+        if text.is_empty() {
+            return None;
+        }
+        return Some(text);
+    }
+
+    let text = paragraphs
+        .iter()
+        .map(|p| {
+            // Each paragraph may start with attributes like `id="Par1">`
+            // Find the closing `>` of the opening tag remnant and take content after it
+            let content = if let Some(gt_pos) = p.find('>') {
+                &p[gt_pos + 1..]
+            } else {
+                p
+            };
+            xml_utils::strip_xml_tags(content)
+        })
+        .filter(|s| !s.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ");
+
+    if text.is_empty() { None } else { Some(text) }
+}
+
+/// Extract publication history dates from `<history>` element
+///
+/// Parses `<date date-type="received">`, `<date date-type="accepted">`, etc.
+pub fn extract_history_dates(content: &str) -> Vec<HistoryDate> {
+    let mut dates = Vec::new();
+
+    let history_content = match xml_utils::extract_element_content(content, "history") {
+        Some(c) => c,
+        None => return dates,
+    };
+
+    let date_tags = xml_utils::find_all_tags(&history_content, "date");
+    for date_tag in &date_tags {
+        let date_type = match xml_utils::extract_attribute_value(date_tag, "date-type") {
+            Some(dt) => dt,
+            None => continue,
+        };
+
+        let year = xml_utils::extract_text_between(date_tag, "<year>", "</year>")
+            .and_then(|y| y.parse::<u16>().ok());
+        let month = xml_utils::extract_text_between(date_tag, "<month>", "</month>")
+            .and_then(|m| m.parse::<u8>().ok());
+        let day = xml_utils::extract_text_between(date_tag, "<day>", "</day>")
+            .and_then(|d| d.parse::<u8>().ok());
+
+        dates.push(HistoryDate {
+            date_type,
+            year,
+            month,
+            day,
+        });
+    }
+
+    dates
+}
+
+/// Extract article categories from `<article-categories>/<subj-group>/<subject>`
+pub fn extract_categories(content: &str) -> Vec<String> {
+    let mut categories = Vec::new();
+
+    let categories_content = match xml_utils::extract_element_content(content, "article-categories")
+    {
+        Some(c) => c,
+        None => return categories,
+    };
+
+    let subjects =
+        xml_utils::extract_all_text_between(&categories_content, "<subject>", "</subject>");
+    for subject in subjects {
+        let cleaned = xml_utils::strip_xml_tags(&subject);
+        if !cleaned.is_empty() {
+            categories.push(cleaned);
+        }
+    }
+
+    categories
+}
+
+/// Extract license URL from `<license xlink:href="...">` attribute
+pub fn extract_license_url(content: &str) -> Option<String> {
+    if let Some(license_start) = content.find("<license") {
+        if let Some(tag_end) = content[license_start..].find('>') {
+            let license_tag = &content[license_start..license_start + tag_end + 1];
+            return xml_utils::extract_attribute_value(license_tag, "xlink:href")
+                .or_else(|| xml_utils::extract_attribute_value(license_tag, "href"));
+        }
+    }
+    None
+}
+
+/// Extract first page number from `<fpage>` element
+pub fn extract_fpage(content: &str) -> Option<String> {
+    xml_utils::extract_text_between(content, "<fpage>", "</fpage>")
+}
+
+/// Extract last page number from `<lpage>` element
+pub fn extract_lpage(content: &str) -> Option<String> {
+    xml_utils::extract_text_between(content, "<lpage>", "</lpage>")
+}
+
+/// Extract electronic location identifier from `<elocation-id>` element
+pub fn extract_elocation_id(content: &str) -> Option<String> {
+    xml_utils::extract_text_between(content, "<elocation-id>", "</elocation-id>")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -502,5 +624,176 @@ mod tests {
             ack,
             Some("We thank the contributors for their valuable input.".to_string())
         );
+    }
+
+    #[test]
+    fn test_extract_abstract_simple() {
+        let content = r#"<abstract><p>This is a simple abstract.</p></abstract>"#;
+        let result = extract_abstract(content);
+        assert_eq!(result, Some("This is a simple abstract.".to_string()));
+    }
+
+    #[test]
+    fn test_extract_abstract_structured() {
+        let content = r#"
+        <abstract id="Abs1">
+            <sec>
+                <title>Background</title>
+                <p>Background text.</p>
+            </sec>
+            <sec>
+                <title>Methods</title>
+                <p>Methods text.</p>
+            </sec>
+        </abstract>
+        "#;
+        let result = extract_abstract(content);
+        assert!(result.is_some());
+        let text = result.unwrap();
+        assert!(text.contains("Background text."));
+        assert!(text.contains("Methods text."));
+    }
+
+    #[test]
+    fn test_extract_abstract_with_attributes() {
+        let content = r#"<abstract><p id="Par1">Text with id attribute.</p></abstract>"#;
+        let result = extract_abstract(content);
+        assert_eq!(result, Some("Text with id attribute.".to_string()));
+    }
+
+    #[test]
+    fn test_extract_abstract_missing() {
+        let content = r#"<title>No abstract here</title>"#;
+        let result = extract_abstract(content);
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_extract_history_dates() {
+        let content = r#"
+        <history>
+            <date date-type="received">
+                <day>21</day>
+                <month>2</month>
+                <year>2019</year>
+            </date>
+            <date date-type="accepted">
+                <day>23</day>
+                <month>4</month>
+                <year>2019</year>
+            </date>
+        </history>
+        "#;
+        let dates = extract_history_dates(content);
+        assert_eq!(dates.len(), 2);
+
+        assert_eq!(dates[0].date_type, "received");
+        assert_eq!(dates[0].year, Some(2019));
+        assert_eq!(dates[0].month, Some(2));
+        assert_eq!(dates[0].day, Some(21));
+
+        assert_eq!(dates[1].date_type, "accepted");
+        assert_eq!(dates[1].year, Some(2019));
+        assert_eq!(dates[1].month, Some(4));
+        assert_eq!(dates[1].day, Some(23));
+    }
+
+    #[test]
+    fn test_extract_history_dates_compact() {
+        let content = r#"
+        <history>
+<date date-type="received"><day>09</day><month>5</month><year>2023</year></date>
+<date date-type="accepted"><day>29</day><month>6</month><year>2023</year></date>
+</history>
+        "#;
+        let dates = extract_history_dates(content);
+        assert_eq!(dates.len(), 2);
+        assert_eq!(dates[0].date_type, "received");
+        assert_eq!(dates[0].year, Some(2023));
+        assert_eq!(dates[0].month, Some(5));
+        assert_eq!(dates[0].day, Some(9));
+    }
+
+    #[test]
+    fn test_extract_history_dates_missing() {
+        let content = r#"<article-meta><title>No history</title></article-meta>"#;
+        let dates = extract_history_dates(content);
+        assert!(dates.is_empty());
+    }
+
+    #[test]
+    fn test_extract_categories() {
+        let content = r#"
+        <article-categories>
+            <subj-group subj-group-type="heading">
+                <subject>Original Article</subject>
+            </subj-group>
+        </article-categories>
+        "#;
+        let categories = extract_categories(content);
+        assert_eq!(categories, vec!["Original Article"]);
+    }
+
+    #[test]
+    fn test_extract_categories_multiple() {
+        let content = r#"
+        <article-categories>
+            <subj-group subj-group-type="heading">
+                <subject>Research Article</subject>
+            </subj-group>
+            <subj-group subj-group-type="discipline">
+                <subject>Biology</subject>
+                <subject>Medicine</subject>
+            </subj-group>
+        </article-categories>
+        "#;
+        let categories = extract_categories(content);
+        assert_eq!(categories.len(), 3);
+        assert!(categories.contains(&"Research Article".to_string()));
+        assert!(categories.contains(&"Biology".to_string()));
+        assert!(categories.contains(&"Medicine".to_string()));
+    }
+
+    #[test]
+    fn test_extract_categories_missing() {
+        let content = r#"<title>No categories</title>"#;
+        let categories = extract_categories(content);
+        assert!(categories.is_empty());
+    }
+
+    #[test]
+    fn test_extract_license_url() {
+        let content = r#"<license license-type="open-access" xlink:href="http://creativecommons.org/licenses/by-nc-nd/3.0/"><license-p>Text</license-p></license>"#;
+        let url = extract_license_url(content);
+        assert_eq!(
+            url,
+            Some("http://creativecommons.org/licenses/by-nc-nd/3.0/".to_string())
+        );
+    }
+
+    #[test]
+    fn test_extract_license_url_missing() {
+        let content = r#"<license><license-p>No URL</license-p></license>"#;
+        let url = extract_license_url(content);
+        assert!(url.is_none());
+    }
+
+    #[test]
+    fn test_extract_fpage_lpage() {
+        let content = r#"<fpage>1865</fpage><lpage>1868</lpage>"#;
+        assert_eq!(extract_fpage(content), Some("1865".to_string()));
+        assert_eq!(extract_lpage(content), Some("1868".to_string()));
+    }
+
+    #[test]
+    fn test_extract_elocation_id() {
+        let content = r#"<elocation-id>e12345</elocation-id>"#;
+        assert_eq!(extract_elocation_id(content), Some("e12345".to_string()));
+    }
+
+    #[test]
+    fn test_extract_elocation_id_missing() {
+        let content = r#"<fpage>100</fpage>"#;
+        assert!(extract_elocation_id(content).is_none());
     }
 }

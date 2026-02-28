@@ -37,6 +37,17 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
     let keywords = metadata::extract_keywords(front);
     let funding = metadata::extract_funding(front);
 
+    // Additional metadata from <front>
+    let abstract_text = metadata::extract_abstract(front);
+    let copyright = metadata::extract_copyright(front);
+    let license = metadata::extract_license(front);
+    let license_url = metadata::extract_license_url(front);
+    let history_dates = metadata::extract_history_dates(front);
+    let categories = metadata::extract_categories(front);
+    let fpage = metadata::extract_fpage(front);
+    let lpage = metadata::extract_lpage(front);
+    let elocation_id = metadata::extract_elocation_id(front);
+
     // Article type is an attribute on the <article> tag itself (before <front>)
     let article_type = metadata::extract_article_type(xml_content);
 
@@ -74,6 +85,15 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
         acknowledgments,
         data_availability,
         supplementary_materials,
+        abstract_text,
+        copyright,
+        license,
+        license_url,
+        history_dates,
+        categories,
+        fpage,
+        lpage,
+        elocation_id,
     })
 }
 
