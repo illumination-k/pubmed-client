@@ -9,7 +9,7 @@ pub mod parser;
 
 // Re-export public types
 pub use models::{
-    Affiliation, ArticleSection, Author, Figure, FundingInfo, JournalInfo, OaSubsetInfo,
-    PmcFullText, Reference, Table,
+    Affiliation, ArticleSection, Author, Figure, FundingInfo, HistoryDate, JournalInfo,
+    OaSubsetInfo, PmcFullText, Reference, Table,
 };
 pub use parser::parse_pmc_xml;

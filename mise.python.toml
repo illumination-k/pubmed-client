@@ -14,7 +14,11 @@ PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
 [tasks."lint:py"]
 description = "Lint Python code with ruff and mypy"
 dir = "pubmed-client-py"
-run = ["uv run --frozen ruff check", "uv run --frozen mypy ."]
+run = [
+  "uv run --frozen ruff check",
+  "uv run --frozen mypy .",
+  "uv run --frozen ty check",
+]
 
 [tasks."test:py"]
 description = "Run Python tests with pytest"

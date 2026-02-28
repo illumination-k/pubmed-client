@@ -526,6 +526,15 @@ fn test_markdown_config_builder() {
         acknowledgments: None,
         data_availability: None,
         supplementary_materials: vec![],
+        abstract_text: None,
+        copyright: None,
+        license: None,
+        license_url: None,
+        history_dates: vec![],
+        categories: vec![],
+        fpage: None,
+        lpage: None,
+        elocation_id: None,
     };
 
     let markdown = converter.convert(&test_article);
@@ -575,6 +584,15 @@ fn test_markdown_edge_cases() {
         acknowledgments: None,
         data_availability: None,
         supplementary_materials: vec![],
+        abstract_text: None,
+        copyright: None,
+        license: None,
+        license_url: None,
+        history_dates: vec![],
+        categories: vec![],
+        fpage: None,
+        lpage: None,
+        elocation_id: None,
     };
 
     let converter = PmcMarkdownConverter::new();
@@ -607,6 +625,15 @@ fn test_markdown_edge_cases() {
         acknowledgments: None,
         data_availability: None,
         supplementary_materials: vec![],
+        abstract_text: None,
+        copyright: None,
+        license: None,
+        license_url: None,
+        history_dates: vec![],
+        categories: vec![],
+        fpage: None,
+        lpage: None,
+        elocation_id: None,
     };
 
     let markdown = converter.convert(&special_article);

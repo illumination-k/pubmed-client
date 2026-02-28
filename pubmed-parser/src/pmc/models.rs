@@ -3,6 +3,21 @@ use serde::{Deserialize, Serialize};
 // Re-export common types
 pub use crate::common::{Affiliation, Author};
 
+/// Represents a date from article publication history (e.g., received, accepted)
+///
+/// Maps to JATS `<date date-type="...">` inside `<history>`.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct HistoryDate {
+    /// Date type (e.g., "received", "accepted", "rev-recd")
+    pub date_type: String,
+    /// Year
+    pub year: Option<u16>,
+    /// Month (1-12)
+    pub month: Option<u8>,
+    /// Day (1-31)
+    pub day: Option<u8>,
+}
+
 /// Represents journal information
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JournalInfo {
@@ -182,6 +197,24 @@ pub struct PmcFullText {
     pub data_availability: Option<String>,
     /// Supplementary materials
     pub supplementary_materials: Vec<SupplementaryMaterial>,
+    /// Abstract text
+    pub abstract_text: Option<String>,
+    /// Copyright statement (from `<copyright-statement>`)
+    pub copyright: Option<String>,
+    /// License text (from `<license>`)
+    pub license: Option<String>,
+    /// License URL (from `<license xlink:href="...">`)
+    pub license_url: Option<String>,
+    /// Publication history dates (received, accepted, etc.)
+    pub history_dates: Vec<HistoryDate>,
+    /// Article categories/subjects (from `<article-categories>/<subj-group>/<subject>`)
+    pub categories: Vec<String>,
+    /// First page (from `<fpage>`)
+    pub fpage: Option<String>,
+    /// Last page (from `<lpage>`)
+    pub lpage: Option<String>,
+    /// Electronic location identifier (from `<elocation-id>`)
+    pub elocation_id: Option<String>,
 }
 
 /// Represents a section of an article
@@ -258,6 +291,15 @@ impl PmcFullText {
             acknowledgments: None,
             data_availability: None,
             supplementary_materials: Vec::new(),
+            abstract_text: None,
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: Vec::new(),
+            categories: Vec::new(),
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
         }
     }
 

@@ -1,0 +1,1431 @@
+---
+source: pubmed-parser/tests/integration/parsing/pmc_snapshots.rs
+assertion_line: 37
+expression: article
+---
+{
+  "pmcid": "PMC7906746",
+  "pmid": "33515491",
+  "title": "Resurgence of COVID-19 in Manaus, Brazil, despite high seroprevalence",
+  "authors": [
+    {
+      "surname": "Sabino",
+      "given_names": "Ester C",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Ester C Sabino",
+      "affiliations": [
+        {
+          "id": "aff1",
+          "institution": "aff1",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Buss",
+      "given_names": "Lewis F",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Lewis F Buss",
+      "affiliations": [
+        {
+          "id": "aff1",
+          "institution": "aff1",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Carvalho",
+      "given_names": "Maria P S",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Maria P S Carvalho",
+      "affiliations": [
+        {
+          "id": "aff2",
+          "institution": "aff2",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Prete",
+      "given_names": "Carlos A",
+      "initials": null,
+      "suffix": "Jr",
+      "full_name": "Carlos A Prete",
+      "affiliations": [
+        {
+          "id": "aff3",
+          "institution": "aff3",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Crispim",
+      "given_names": "Myuki A E",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Myuki A E Crispim",
+      "affiliations": [
+        {
+          "id": "aff2",
+          "institution": "aff2",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Fraiji",
+      "given_names": "Nelson A",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Nelson A Fraiji",
+      "affiliations": [
+        {
+          "id": "aff2",
+          "institution": "aff2",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Pereira",
+      "given_names": "Rafael H M",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Rafael H M Pereira",
+      "affiliations": [
+        {
+          "id": "aff4",
+          "institution": "aff4",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Parag",
+      "given_names": "Kris V",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Kris V Parag",
+      "affiliations": [
+        {
+          "id": "aff5",
+          "institution": "aff5",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "da Silva Peixoto",
+      "given_names": "Pedro",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Pedro da Silva Peixoto",
+      "affiliations": [
+        {
+          "id": "aff6",
+          "institution": "aff6",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Kraemer",
+      "given_names": "Moritz U G",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Moritz U G Kraemer",
+      "affiliations": [
+        {
+          "id": "aff7",
+          "institution": "aff7",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Oikawa",
+      "given_names": "Marcio K",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Marcio K Oikawa",
+      "affiliations": [
+        {
+          "id": "aff8",
+          "institution": "aff8",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Salomon",
+      "given_names": "Tassila",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Tassila Salomon",
+      "affiliations": [
+        {
+          "id": "aff9",
+          "institution": "aff9",
+          "department": null,
+          "address": null,
+          "country": null
+        },
+        {
+          "id": "aff10",
+          "institution": "aff10",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Cucunuba",
+      "given_names": "Zulma M",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Zulma M Cucunuba",
+      "affiliations": [
+        {
+          "id": "aff5",
+          "institution": "aff5",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Castro",
+      "given_names": "Márcia C",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Márcia C Castro",
+      "affiliations": [
+        {
+          "id": "aff11",
+          "institution": "aff11",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "de Souza Santos",
+      "given_names": "Andreza Aruska",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Andreza Aruska de Souza Santos",
+      "affiliations": [
+        {
+          "id": "aff12",
+          "institution": "aff12",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Nascimento",
+      "given_names": "Vítor H",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Vítor H Nascimento",
+      "affiliations": [
+        {
+          "id": "aff3",
+          "institution": "aff3",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Pereira",
+      "given_names": "Henrique S",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Henrique S Pereira",
+      "affiliations": [
+        {
+          "id": "aff13",
+          "institution": "aff13",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Ferguson",
+      "given_names": "Neil M",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Neil M Ferguson",
+      "affiliations": [
+        {
+          "id": "aff5",
+          "institution": "aff5",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Pybus",
+      "given_names": "Oliver G",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Oliver G Pybus",
+      "affiliations": [
+        {
+          "id": "aff7",
+          "institution": "aff7",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Kucharski",
+      "given_names": "Adam",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Adam Kucharski",
+      "affiliations": [
+        {
+          "id": "aff14",
+          "institution": "aff14",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Busch",
+      "given_names": "Michael P",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Michael P Busch",
+      "affiliations": [
+        {
+          "id": "aff15",
+          "institution": "aff15",
+          "department": null,
+          "address": null,
+          "country": null
+        },
+        {
+          "id": "aff16",
+          "institution": "aff16",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Dye",
+      "given_names": "Christopher",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Christopher Dye",
+      "affiliations": [
+        {
+          "id": "aff7",
+          "institution": "aff7",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    },
+    {
+      "surname": "Faria",
+      "given_names": "Nuno R",
+      "initials": null,
+      "suffix": null,
+      "full_name": "Nuno R Faria",
+      "affiliations": [
+        {
+          "id": "aff1",
+          "institution": "aff1",
+          "department": null,
+          "address": null,
+          "country": null
+        },
+        {
+          "id": "aff5",
+          "institution": "aff5",
+          "department": null,
+          "address": null,
+          "country": null
+        },
+        {
+          "id": "aff7",
+          "institution": "aff7",
+          "department": null,
+          "address": null,
+          "country": null
+        }
+      ],
+      "orcid": null,
+      "email": null,
+      "is_corresponding": false,
+      "roles": []
+    }
+  ],
+  "journal": {
+    "title": "Lancet (London, England)",
+    "abbreviation": "Lancet",
+    "issn_print": "0140-6736",
+    "issn_electronic": "1474-547X",
+    "publisher": null,
+    "volume": "397",
+    "issue": "10273"
+  },
+  "pub_date": "2021-01-27",
+  "doi": "10.1016/S0140-6736(21)00183-5",
+  "sections": [
+    {
+      "section_type": "body",
+      "title": null,
+      "content": "After initially containing severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2), many European and Asian countries had a resurgence of COVID-19 consistent with a large proportion of the population remaining susceptible to the virus after the first epidemic wave.1 By contrast, in Manaus, Brazil, a study of blood donors indicated that 76% (95% CI 67–98) of the population had been infected with SARS-CoV-2 by October, 2020.2 High attack rates of SARS-CoV-2 were also estimated in population-based samples from other locations in the Amazon Basin—eg, Iquitos, Peru 70% (67–73).3 The estimated SARS-CoV-2 attack rate in Manaus would be above the theoretical herd immunity threshold (67%), given a basic case reproduction number (R0) of 3.4\nIn this context, the abrupt increase in the number of COVID-19 hospital admissions in Manaus during January, 2021 (3431 in Jan 1–19, 2021, vs 552 in Dec 1–19, 2020) is unexpected and of concern (figure\n).5, 6, 7, 8, 9, 10 After a large epidemic that peaked in late April, 2020, COVID-19 hospitalisations in Manaus remained stable and fairly low for 7 months from May to November, despite the relaxation of COVID-19 control measures during that period (figure).\nThere are at least four non-mutually exclusive possible explanations for the resurgence of COVID-19 in Manaus. First, the SARS-CoV-2 attack rate could have been overestimated during the first wave, and the population remained below the herd immunity threshold until the beginning of December, 2020. In this scenario, the resurgence could be explained by greater mixing of infected and susceptible individuals during December. The 76% estimate of past infection2 might have been biased upwards due to adjustments to the observed 52·5% (95% CI 47·6–57·5) seroprevalence in June, 2020, to account for antibody waning. However, even this lower bound should confer important population immunity to avoid a larger outbreak. Furthermore, comparisons of blood donors with census data showed no major difference in a range of demographic variables,2 and the mandatory exclusion of donors with symptoms of COVID-19 is expected to underestimate the true population exposure to the virus. Reanalysis and model comparison11 by independent groups will help inform the best-fitting models for antibody waning and the representativeness of blood donors.\nSecond, immunity against infection might have already begun to wane by December, 2020, because of a general decrease in immune protection against SARS-CoV-2 after a first exposure. Waning of anti-nucleocapsid IgG antibody titres observed in blood donors2 might reflect a loss of immune protection, although immunity to SARS-CoV-2 depends on a combination of B-cell and T-cell responses.12 A study of UK health-care workers13 showed that reinfection with SARS-CoV-2 is uncommon up to 6 months after the primary infection. However, most of the SARS-CoV-2 infections in Manaus occurred 7–8 months before the resurgence in January, 2021; this is longer than the period covered by the UK study,13 but nonetheless suggests that waning immunity alone is unlikely to fully explain the recent resurgence. Moreover, population mobility in Manaus decreased from mid-November, 2020, with a sharp reduction in late December, 2020,14 suggesting that behavioural change does not account for the resurgence of hospitalisations.\nThird, SARS-CoV-2 lineages might evade immunity generated in response to previous infection.15 Three recently detected SARS-CoV-2 lineages (B.1.1.7, B.1.351, and P.1), are unusually divergent and each possesses a unique constellation of mutations of potential biological importance.16, 17, 18 Of these, two are circulating in Brazil (B.1.1.7 and P.1) and one (P.1) was detected in Manaus on Jan 12, 2021.16 One case of SARS-CoV-2 reinfection has been associated with the P.1 lineage in Manaus19 that accrued ten unique spike protein mutations, including E484K and N501K.16 Moreover, the newly classified P.2 lineage (sublineage of B.1.128 that independently accrued the spike E484K mutation) has now been detected in several locations in Brazil, including Manaus.20 P.2 variants with the E484K mutation have been detected in two people who have been reinfected with SARS-CoV-2 in Brazil,21, 22 and there is in-vitro evidence that the presence of the E484K mutation reduces neutralisation by polyclonal antibodies in convalescent sera.15\nFourth, SARS-CoV-2 lineages circulating in the second wave might have higher inherent transmissibility than pre-existing lineages circulating in Manaus. The P.1 lineage was first discovered in Manaus.16 In a preliminary study, this lineage reached a high frequency (42%, 13 of 31) among genome samples obtained from COVID-19 cases in December, 2020, but was absent in 26 samples collected in Manaus between March and November, 2020.16 Thus far, little is known about the transmissibility of the P.1 lineage, but it shares several independently acquired mutations with the B.1.1.7 (N501Y) and the B.1.325 (K417N/T, E484K, N501Y) lineages circulating in the UK and South Africa, which seem to have increased transmissibility.18 Contact tracing and outbreak investigation data are needed to better understand relative transmissibility of this lineage.\nThe new SARS-CoV-2 lineages may drive a resurgence of cases in the places where they circulate if they have increased transmissibility compared with pre-existing circulating lineages and if they are associated with antigenic escape. For this reason, the genetic, immunological, clinical, and epidemiological characteristics of these SARS-CoV-2 variants need to be quickly investigated. Conversely, if resurgence in Manaus is due to waning of protective immunity, then similar resurgence scenarios should be expected in other locations. Sustained serological and genomic surveillance in Manaus and elsewhere is a priority, with simultaneous monitoring for SARS-CoV-2 reinfections and implementation of non-pharmaceutical interventions. Determining the efficacy of existing COVID-19 vaccines against variants in the P.1 lineage and other lineages with potential immune escape variants is also crucial. Genotyping viruses from COVID-19 patients who were not protected by vaccination in clinical trials would help us to understand if there are lineage-specific frequencies underlying reinfection. The protocols and findings of such studies should be coordinated and rapidly shared wherever such variants emerge and spread.\nSince rapid data sharing is the basis for the development and implementation of actionable disease control measures during public health emergencies, we are openly sharing in real-time monthly curated serosurvey data from blood donors through the Brazil–UK Centre for Arbovirus Discovery, Diagnosis, Genomics and Epidemiology (CADDE) Centre GitHub website and will continue to share genetic sequence data and results from Manaus through openly accessible data platforms such as GISAID and Virological.",
+      "subsections": [],
+      "id": null,
+      "figures": [
+        {
+          "id": "fig1",
+          "label": "Figure",
+          "caption": "COVID-19 hospitalisations, excess deaths, and Rt in Manaus, Brazil, 2020–21(A) Dark lines are the 7-day rolling averages and lighter lines are the daily time series of COVID-19 hospitalisations and excess deaths. Hospitalisation data are from the Fundação de Vigilância em Saúde do Amazonas.5 Total all-cause deaths for 2020–21 were reported initially by the Prefeitura de Manaus6 and subsequently in the daily COVID-19 bulletin of the Fundação de Vigilância em Saúde do Amazonas.7 All-cause deaths from 2019 were from Arpen/AM (Associação dos Registradores Civis das Pessoas Naturais do Amazonas).8 The compiled excess death data are from Bruce Nelson from the Instituto Nacional de Pesquisas da Amazônia.9 (B) Rt was calculated using the time series of COVID-19 hospitalisations after removal of the past 14 days to account for delays in notification. Rt was calculated using the EpiFilter method.10 Lines are median Rt estimates; shaded areas are the 95% CIs. Rt=Effective reproduction number. SARS-CoV-2=severe acute respiratory syndrome coronavirus 2.",
+          "alt_text": null,
+          "fig_type": null,
+          "file_path": null,
+          "file_name": "gr1_lrg.jpg"
+        }
+      ],
+      "tables": []
+    }
+  ],
+  "references": [
+    {
+      "id": "bib1",
+      "title": "Have deaths from COVID-19 in Europe plateaued due to herd immunity?",
+      "authors": [
+        {
+          "surname": "Lucy",
+          "given_names": "CO",
+          "initials": null,
+          "suffix": null,
+          "full_name": "CO Lucy",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Verity",
+          "given_names": "R",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R Verity",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Watson",
+          "given_names": "OJ",
+          "initials": null,
+          "suffix": null,
+          "full_name": "OJ Watson",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Lancet",
+      "year": "2020",
+      "volume": "395",
+      "issue": null,
+      "pages": "e110-e111",
+      "pmid": "32534627",
+      "doi": "10.1016/S0140-6736(20)31357-X",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib2",
+      "title": "Three-quarters attack rate of SARS-CoV-2 in the Brazilian Amazon during a largely unmitigated epidemic",
+      "authors": [
+        {
+          "surname": "Buss",
+          "given_names": "LF",
+          "initials": null,
+          "suffix": null,
+          "full_name": "LF Buss",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Prete",
+          "given_names": "CA",
+          "initials": null,
+          "suffix": null,
+          "full_name": "CA Prete",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Abrahim",
+          "given_names": "CMM",
+          "initials": null,
+          "suffix": null,
+          "full_name": "CMM Abrahim",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Science",
+      "year": "2020",
+      "volume": "371",
+      "issue": null,
+      "pages": "288-292",
+      "pmid": "33293339",
+      "doi": "10.1126/science.abe9728",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib3",
+      "title": "Seroprevalence of anti-SARS-CoV-2 antibodies in Iquitos, Loreto, Peru",
+      "authors": [
+        {
+          "surname": "Álvarez-Antonio",
+          "given_names": "C",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C Álvarez-Antonio",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Meza-Sánchez",
+          "given_names": "G",
+          "initials": null,
+          "suffix": null,
+          "full_name": "G Meza-Sánchez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Calampa",
+          "given_names": "C",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C Calampa",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "MedRxiv",
+      "year": "2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": "34022148",
+      "doi": "10.1101/2021.01.17.21249913",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib4",
+      "title": "COVID-19 herd immunity: where are we?",
+      "authors": [
+        {
+          "surname": "Fontanet",
+          "given_names": "A",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A Fontanet",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Cauchemez",
+          "given_names": "S",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S Cauchemez",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Nat Rev Immunol",
+      "year": "2020",
+      "volume": "20",
+      "issue": null,
+      "pages": "583-584",
+      "pmid": "32908300",
+      "doi": "10.1038/s41577-020-00451-5",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib5",
+      "title": "COVID-19 no Amazonas. Dados epidemiológicos e financeiros das ações de combate à COVID-19. Publicações",
+      "authors": [],
+      "journal": null,
+      "year": null,
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib6",
+      "title": "Publicações. COVID-19",
+      "authors": [],
+      "journal": null,
+      "year": null,
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib7",
+      "title": "Index of media publicacao",
+      "authors": [],
+      "journal": null,
+      "year": null,
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib8",
+      "title": null,
+      "authors": [],
+      "journal": null,
+      "year": "2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "book"
+    },
+    {
+      "id": "bib9",
+      "title": "Excess deaths Manaus",
+      "authors": [
+        {
+          "surname": "Nelson",
+          "given_names": "BW",
+          "initials": null,
+          "suffix": null,
+          "full_name": "BW Nelson",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": null,
+      "year": "2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib10",
+      "title": "Deciphering early-warning signals of the elimination and resurgence potential of SARS-CoV-2 from limited data at multiple scales",
+      "authors": [
+        {
+          "surname": "Parag",
+          "given_names": "KV",
+          "initials": null,
+          "suffix": null,
+          "full_name": "KV Parag",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Cowling",
+          "given_names": "BJ",
+          "initials": null,
+          "suffix": null,
+          "full_name": "BJ Cowling",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Donnelly",
+          "given_names": "CA",
+          "initials": null,
+          "suffix": null,
+          "full_name": "CA Donnelly",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "MedRxiv",
+      "year": "2020",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": "34905965",
+      "doi": "10.1101/2020.11.23.20236968",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib11",
+      "title": "Coronavirus prevalence in Brazilian Amazon and Sao Paulo city [data set]",
+      "authors": [
+        {
+          "surname": "Tassila",
+          "given_names": "S",
+          "initials": null,
+          "suffix": null,
+          "full_name": "S Tassila",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Pybus",
+          "given_names": "O",
+          "initials": null,
+          "suffix": null,
+          "full_name": "O Pybus",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "França",
+          "given_names": "R",
+          "initials": null,
+          "suffix": null,
+          "full_name": "R França",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Dryad",
+      "year": "2020",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": "10.5061/dryad.c59zw3r5n",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib12",
+      "title": "Immunological memory to SARS-CoV-2 assessed for up to 8 months after infection",
+      "authors": [
+        {
+          "surname": "Dan",
+          "given_names": "JM",
+          "initials": null,
+          "suffix": null,
+          "full_name": "JM Dan",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Mateu",
+          "given_names": "J",
+          "initials": null,
+          "suffix": null,
+          "full_name": "J Mateu",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Kato",
+          "given_names": "Y",
+          "initials": null,
+          "suffix": null,
+          "full_name": "Y Kato",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Science",
+      "year": "2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": "33408181",
+      "doi": "10.1126/science.abf4063",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib13",
+      "title": "Antibody status and incidence of SARS-CoV-2 infection in health care workers",
+      "authors": [
+        {
+          "surname": "Lumley",
+          "given_names": "SF",
+          "initials": null,
+          "suffix": null,
+          "full_name": "SF Lumley",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "O'Donnell",
+          "given_names": "D",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D O'Donnell",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Stoesser",
+          "given_names": "NE",
+          "initials": null,
+          "suffix": null,
+          "full_name": "NE Stoesser",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "N Engl J Med",
+      "year": "2020",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": "33369366",
+      "doi": "10.1056/NEJMoa2034545",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib14",
+      "title": "Inloco. Índice de Isolamento Social das cidades do Amazonas. Dados cedidos pela empresa Inloco",
+      "authors": [],
+      "journal": null,
+      "year": null,
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib15",
+      "title": "Comprehensive mapping of mutations to the SARS-CoV-2 receptor-binding domain that affect recognition by polyclonal human serum antibodies",
+      "authors": [
+        {
+          "surname": "Greaney",
+          "given_names": "AJ",
+          "initials": null,
+          "suffix": null,
+          "full_name": "AJ Greaney",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Loes",
+          "given_names": "AN",
+          "initials": null,
+          "suffix": null,
+          "full_name": "AN Loes",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Crawford",
+          "given_names": "KHD",
+          "initials": null,
+          "suffix": null,
+          "full_name": "KHD Crawford",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "BioRxiv",
+      "year": "2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": "33592168",
+      "doi": "10.1101/2020.12.31.425021",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib16",
+      "title": "Genomic characterisation of an emergent SARS-CoV-2 lineage in Manaus: preliminary findings. Virological",
+      "authors": [
+        {
+          "surname": "Faria",
+          "given_names": "NR",
+          "initials": null,
+          "suffix": null,
+          "full_name": "NR Faria",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Claro",
+          "given_names": "IM",
+          "initials": null,
+          "suffix": null,
+          "full_name": "IM Claro",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Candido",
+          "given_names": "D",
+          "initials": null,
+          "suffix": null,
+          "full_name": "D Candido",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": null,
+      "year": "January, 2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib17",
+      "title": "Preliminary genomic characterisation of an emergent SARS-CoV-2 lineage in the UK defined by a novel set of spike mutations. Virological",
+      "authors": [
+        {
+          "surname": "Rambaut",
+          "given_names": "A",
+          "initials": null,
+          "suffix": null,
+          "full_name": "A Rambaut",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Loman",
+          "given_names": "N",
+          "initials": null,
+          "suffix": null,
+          "full_name": "N Loman",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Pybus",
+          "given_names": "OG",
+          "initials": null,
+          "suffix": null,
+          "full_name": "OG Pybus",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": null,
+      "year": "December, 2020",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib18",
+      "title": "Emergence and rapid spread of a new severe acute respiratory syndrome-related coronavirus 2 (SARS-CoV-2) lineage with multiple spike mutations in South Africa",
+      "authors": [
+        {
+          "surname": "Tegally",
+          "given_names": "H",
+          "initials": null,
+          "suffix": null,
+          "full_name": "H Tegally",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Wilkinson",
+          "given_names": "E",
+          "initials": null,
+          "suffix": null,
+          "full_name": "E Wilkinson",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Giovanetti",
+          "given_names": "M",
+          "initials": null,
+          "suffix": null,
+          "full_name": "M Giovanetti",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "MedRxiv",
+      "year": "2020",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": "10.1101/2020.12.21.20248640",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib19",
+      "title": "SARS-CoV-2 reinfection by the new variant of concern (VOC) P.1 in Amazonas, Brazil. Virological",
+      "authors": [
+        {
+          "surname": "Naveca",
+          "given_names": "F",
+          "initials": null,
+          "suffix": null,
+          "full_name": "F Naveca",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "da Costa",
+          "given_names": "C",
+          "initials": null,
+          "suffix": null,
+          "full_name": "C da Costa",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Nascimento",
+          "given_names": "V",
+          "initials": null,
+          "suffix": null,
+          "full_name": "V Nascimento",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": null,
+      "year": "Jan 18, 2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib20",
+      "title": "Phylogenetic relationship of SARS-CoV-2 sequences from Amazonas with emerging Brazilian variants harboring mutations E484K and N501Y in the Spike protein. Virological",
+      "authors": [
+        {
+          "surname": "Naveca",
+          "given_names": "F",
+          "initials": null,
+          "suffix": null,
+          "full_name": "F Naveca",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Nascimento",
+          "given_names": "V",
+          "initials": null,
+          "suffix": null,
+          "full_name": "V Nascimento",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Souza",
+          "given_names": "V",
+          "initials": null,
+          "suffix": null,
+          "full_name": "V Souza",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": null,
+      "year": "Jan 11, 2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    },
+    {
+      "id": "bib21",
+      "title": "Genomic evidence of a SARS-Cov-2 reinfection case with E484K spike mutation in Brazil",
+      "authors": [
+        {
+          "surname": "Nonaka",
+          "given_names": "VCK",
+          "initials": null,
+          "suffix": null,
+          "full_name": "VCK Nonaka",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Franco",
+          "given_names": "MM",
+          "initials": null,
+          "suffix": null,
+          "full_name": "MM Franco",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Gräf",
+          "given_names": "T",
+          "initials": null,
+          "suffix": null,
+          "full_name": "T Gräf",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": "Preprints",
+      "year": "2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": "33605869",
+      "doi": "10.20944/preprints202101.0132.v1",
+      "ref_type": "journal"
+    },
+    {
+      "id": "bib22",
+      "title": "Spike E484K mutation in the first SARS-CoV-2 reinfection case confirmed in Brazil, 2020. Virological",
+      "authors": [
+        {
+          "surname": "Resende",
+          "given_names": "PC",
+          "initials": null,
+          "suffix": null,
+          "full_name": "PC Resende",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Bezerra",
+          "given_names": "JF",
+          "initials": null,
+          "suffix": null,
+          "full_name": "JF Bezerra",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        },
+        {
+          "surname": "Vasconcelos",
+          "given_names": "RHT",
+          "initials": null,
+          "suffix": null,
+          "full_name": "RHT Vasconcelos",
+          "affiliations": [],
+          "orcid": null,
+          "email": null,
+          "is_corresponding": false,
+          "roles": []
+        }
+      ],
+      "journal": null,
+      "year": "Jan 10, 2021",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "pmid": null,
+      "doi": null,
+      "ref_type": "other"
+    }
+  ],
+  "article_type": "discussion",
+  "keywords": [],
+  "funding": [],
+  "conflict_of_interest": null,
+  "acknowledgments": "NRF reports funding from Wellcome Trust, the Royal Society, and the UK Medical Research Council. CAP reports grants from Coordenação de Aperfeiçoamento de Pessoal de Nível Superior Brasil and FAPESP. NMF reports grants from the UK Medical Research Council, the UK National Institute of Health Research, Community Jameel, NIH NIGMS, Janssen Pharmaceuticals, the Bill & Melinda Gates Foundation, and Gavi, the Vaccine Alliance. The other authors declare no competing interests.",
+  "data_availability": null,
+  "supplementary_materials": [],
+  "abstract_text": null,
+  "copyright": "© 2021 Elsevier Ltd. All rights reserved.",
+  "license": "Since January 2020 Elsevier has created a COVID-19 resource centre with free information in English and Mandarin on the novel coronavirus COVID-19. The COVID-19 resource centre is hosted on Elsevier Connect, the company's public news and information website. Elsevier hereby grants permission to make all its COVID-19-related research that is available on the COVID-19 resource centre - including this research content - immediately available in PubMed Central and other publicly funded repositories, such as the WHO COVID database with rights for unrestricted research re-use and analyses in any form or by any means with acknowledgement of the original source. These permissions are granted for free by Elsevier for as long as the COVID-19 resource centre remains active.",
+  "license_url": null,
+  "history_dates": [],
+  "categories": [
+    "Comment"
+  ],
+  "fpage": "452",
+  "lpage": "455",
+  "elocation_id": null
+}

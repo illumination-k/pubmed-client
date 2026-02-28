@@ -766,6 +766,15 @@ impl From<JsFullText> for PmcFullText {
             acknowledgments: js.acknowledgments,
             data_availability: js.data_availability,
             supplementary_materials: Vec::new(),
+            abstract_text: None,
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: Vec::new(),
+            categories: Vec::new(),
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
         }
     }
 }

@@ -50,11 +50,18 @@ struct ContribId {
 /// XML structure for name element
 #[derive(Debug, Deserialize)]
 struct Name {
+    #[serde(rename = "@name-style", default)]
+    #[allow(dead_code)]
+    name_style: Option<String>,
+
     #[serde(rename = "surname", default)]
     surname: Option<String>,
 
     #[serde(rename = "given-names", default)]
     given_names: Option<String>,
+
+    #[serde(rename = "suffix", default)]
+    suffix: Option<String>,
 }
 
 /// XML structure for xref element
@@ -153,6 +160,7 @@ fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
     let name = contrib.name?;
 
     let mut author = Author::new(name.surname.clone(), name.given_names.clone());
+    author.suffix = name.suffix;
 
     // Extract ORCID from contrib-id tags
     for contrib_id in &contrib.contrib_ids {
@@ -171,8 +179,12 @@ fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
     // Set email
     author.email = contrib.email.map(|e| e.trim().to_string());
 
-    // Set corresponding author flag
-    author.is_corresponding = contrib.corresp.map(|c| c == "yes").unwrap_or(false);
+    // Set corresponding author flag (check both corresp="yes" attribute and <xref ref-type="corresp">)
+    author.is_corresponding = contrib.corresp.map(|c| c == "yes").unwrap_or(false)
+        || contrib
+            .xrefs
+            .iter()
+            .any(|x| x.ref_type.as_deref() == Some("corresp"));
 
     // Set roles
     author.roles = contrib
