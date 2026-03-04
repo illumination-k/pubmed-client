@@ -1,13 +1,15 @@
 use crate::error::Result;
 use crate::pmc::domain::PmcArticle;
-use crate::pmc::models::PmcFullText;
 
 pub mod author;
 pub mod metadata;
+pub mod models;
 pub(crate) mod reader_utils;
 pub mod reference;
 pub mod section;
 pub mod xml_utils;
+
+use models::PmcFullText;
 
 /// Extract a section slice from XML content without allocating.
 ///

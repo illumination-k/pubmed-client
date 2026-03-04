@@ -1,5 +1,5 @@
+use super::models::{FundingInfo, HistoryDate, JournalInfo, SupplementaryMaterial};
 use super::xml_utils;
-use crate::pmc::models::{FundingInfo, HistoryDate, JournalInfo, SupplementaryMaterial};
 
 /// Extract comprehensive journal information
 pub fn extract_journal_info(content: &str) -> JournalInfo {

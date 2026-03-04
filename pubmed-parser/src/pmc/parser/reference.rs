@@ -1,6 +1,6 @@
+use super::models::{Author, Reference};
 use crate::common::xml_utils::strip_inline_html_tags;
 use crate::error::Result;
-use crate::pmc::models::{Author, Reference};
 use quick_xml::de::from_str;
 use serde::Deserialize;
 use tracing;

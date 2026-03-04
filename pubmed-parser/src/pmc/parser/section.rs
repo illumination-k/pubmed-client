@@ -1,6 +1,6 @@
+use super::models::{ArticleSection, Figure, Table};
 use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
 use super::xml_utils;
-use crate::pmc::models::{ArticleSection, Figure, Table};
 use quick_xml::events::Event;
 use quick_xml::name::QName;
 

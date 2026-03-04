@@ -13,7 +13,7 @@
 
 use crate::common::{Author, PmcId, PubMedId};
 use crate::error::ParseError;
-use crate::pmc::models;
+use crate::pmc::parser::models;
 use serde::{Deserialize, Serialize};
 
 // ============================================================================
