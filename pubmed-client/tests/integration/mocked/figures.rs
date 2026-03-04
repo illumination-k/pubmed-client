@@ -56,7 +56,7 @@ macro_rules! test_pmcid_figure_extraction {
                 // Collect all figures from all sections
                 let mut all_figures = Vec::new();
 
-                fn collect_figures_from_section(section: &pubmed_client::ArticleSection, figures: &mut Vec<pubmed_client::Figure>) {
+                fn collect_figures_from_section(section: &pubmed_client::Section, figures: &mut Vec<pubmed_client::Figure>) {
                     figures.extend(section.figures.clone());
                     for subsection in &section.subsections {
                         collect_figures_from_section(subsection, figures);
@@ -73,12 +73,12 @@ macro_rules! test_pmcid_figure_extraction {
                 // Log detailed section information for debugging
                 info!(pmcid = %pmcid, total_sections = pmc_full_text.sections.len(), "Section summary");
                 for (section_idx, section) in pmc_full_text.sections.iter().enumerate() {
-                    fn log_section_figures(section: &pubmed_client::ArticleSection, pmcid: &str, section_path: String, level: usize) {
+                    fn log_section_figures(section: &pubmed_client::Section, pmcid: &str, section_path: String, level: usize) {
                         let indent = "  ".repeat(level);
                         info!(
                             pmcid = %pmcid,
                             section_path = %section_path,
-                            section_type = %section.section_type,
+                            section_type = ?section.section_type,
                             section_title = ?section.title,
                             figures_count = section.figures.len(),
                             tables_count = section.tables.len(),
@@ -96,7 +96,7 @@ macro_rules! test_pmcid_figure_extraction {
                                 figure_label = ?figure.label,
                                 caption_length = figure.caption.len(),
                                 fig_type = ?figure.fig_type,
-                                file_name = ?figure.file_name,
+                                graphic_href = ?figure.graphic_href,
                                 "{}  Figure in section", indent
                             );
                         }
@@ -127,8 +127,7 @@ macro_rules! test_pmcid_figure_extraction {
                                 supp_id = %supp.id,
                                 supp_title = ?supp.title,
                                 content_type = ?supp.content_type,
-                                file_url = ?supp.file_url,
-                                file_type = ?supp.file_type,
+                                href = ?supp.href,
                                 "Supplementary material"
                             );
                         }
@@ -144,7 +143,7 @@ macro_rules! test_pmcid_figure_extraction {
                         info!(
                             pmcid = %pmcid,
                             section_index = i,
-                            section_type = %section.section_type,
+                            section_type = ?section.section_type,
                             content_sample = %content_sample,
                             "Section content sample"
                         );
@@ -167,7 +166,7 @@ macro_rules! test_pmcid_figure_extraction {
                         figure_label = ?figure.label,
                         caption_length = figure.caption.len(),
                         fig_type = ?figure.fig_type,
-                        file_name = ?figure.file_name,
+                        graphic_href = ?figure.graphic_href,
                         "Successfully extracted figure"
                     );
                 }
@@ -276,8 +275,7 @@ async fn test_figure_matching_functions() {
         caption: "Test figure caption".to_string(),
         alt_text: None,
         fig_type: None,
-        file_path: None,
-        file_name: None,
+        graphic_href: None,
     };
 
     // Test figure ID matching
@@ -309,8 +307,7 @@ async fn test_figure_matching_by_label() {
         caption: "Test figure caption".to_string(),
         alt_text: None,
         fig_type: None,
-        file_path: None,
-        file_name: None,
+        graphic_href: None,
     };
 
     let matching_file =
@@ -334,15 +331,14 @@ async fn test_figure_matching_by_filename() {
         "jpg", "jpeg", "png", "gif", "tiff", "tif", "svg", "eps", "pdf",
     ];
 
-    // Create a figure with a specific filename
+    // Create a figure with a specific graphic_href
     let figure = pubmed_client::Figure {
         id: "fig_unknown".to_string(),
         label: None,
         caption: "Test figure caption".to_string(),
         alt_text: None,
         fig_type: None,
-        file_path: None,
-        file_name: Some("specific_file".to_string()),
+        graphic_href: Some("specific_file".to_string()),
     };
 
     let matching_file =
@@ -373,8 +369,7 @@ async fn test_figure_no_match() {
         caption: "Test figure caption".to_string(),
         alt_text: None,
         fig_type: None,
-        file_path: None,
-        file_name: None,
+        graphic_href: None,
     };
 
     let matching_file =

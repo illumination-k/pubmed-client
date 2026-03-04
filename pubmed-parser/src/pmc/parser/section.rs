@@ -1,11 +1,12 @@
-use super::models::{ArticleSection, Figure, Table};
+use crate::pmc::domain::{Figure, Section, Table};
+
 use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
 use super::xml_utils;
 use quick_xml::events::Event;
 use quick_xml::name::QName;
 
 /// Extract all sections from PMC XML content
-pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
+pub fn extract_sections_enhanced(content: &str) -> Vec<Section> {
     let mut sections = Vec::new();
 
     // Extract abstract first
@@ -32,10 +33,17 @@ pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
             if let Some(first_section) = sections.first_mut() {
                 first_section.figures.extend(float_figures);
             } else {
-                let mut figures_section =
-                    ArticleSection::new("figures".to_string(), "Figures section".to_string());
-                figures_section.figures = float_figures;
-                sections.push(figures_section);
+                sections.push(Section {
+                    id: None,
+                    section_type: Some("figures".to_string()),
+                    label: None,
+                    title: Some("Figures".to_string()),
+                    content: String::new(),
+                    subsections: Vec::new(),
+                    figures: float_figures,
+                    tables: Vec::new(),
+                    formulas: Vec::new(),
+                });
             }
         }
     }
@@ -44,7 +52,7 @@ pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
 }
 
 /// Extract abstract section using Reader for text, Reader scan for figures/tables
-fn extract_abstract_section(content: &str) -> Option<ArticleSection> {
+fn extract_abstract_section(content: &str) -> Option<Section> {
     let abstract_start = content.find("<abstract")?;
     let abstract_end_offset = content[abstract_start..].find("</abstract>")?;
     let abstract_xml =
@@ -95,14 +103,17 @@ fn extract_abstract_section(content: &str) -> Option<ArticleSection> {
 
     let clean_content = text_parts.join("\n");
     if !clean_content.is_empty() {
-        let mut section = ArticleSection::with_title(
-            "abstract".to_string(),
-            "Abstract".to_string(),
-            clean_content,
-        );
-        section.figures = figures;
-        section.tables = tables;
-        Some(section)
+        Some(Section {
+            id: None,
+            section_type: Some("abstract".to_string()),
+            label: None,
+            title: Some("Abstract".to_string()),
+            content: clean_content,
+            subsections: Vec::new(),
+            figures,
+            tables,
+            formulas: Vec::new(),
+        })
     } else {
         None
     }
@@ -125,7 +136,7 @@ enum SectionAction {
 }
 
 /// Extract body sections using Reader with depth-aware `<sec>` parsing
-fn extract_body_sections(content: &str) -> Vec<ArticleSection> {
+fn extract_body_sections(content: &str) -> Vec<Section> {
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
     let mut sections = Vec::new();
@@ -217,10 +228,17 @@ fn extract_body_sections(content: &str) -> Vec<ArticleSection> {
     // If no sections found, create a body section from paragraphs
     if sections.is_empty() && !body_paragraphs.is_empty() {
         let text = body_paragraphs.join("\n");
-        let mut section = ArticleSection::new("body".to_string(), text);
-        section.figures = body_figures;
-        section.tables = body_tables;
-        sections.push(section);
+        sections.push(Section {
+            id: None,
+            section_type: Some("body".to_string()),
+            label: None,
+            title: None,
+            content: text,
+            subsections: Vec::new(),
+            figures: body_figures,
+            tables: body_tables,
+            formulas: Vec::new(),
+        });
     }
 
     sections
@@ -236,7 +254,7 @@ fn parse_section_from_body(
     reader: &mut quick_xml::Reader<&[u8]>,
     id: Option<String>,
     buf: &mut Vec<u8>,
-) -> Option<ArticleSection> {
+) -> Option<Section> {
     let mut title: Option<String> = None;
     let mut content_parts: Vec<String> = Vec::new();
     let mut subsections = Vec::new();
@@ -339,21 +357,17 @@ fn parse_section_from_body(
         || !figures.is_empty()
         || !tables.is_empty()
     {
-        let mut section = match title {
-            Some(t) => ArticleSection::with_title(
-                "section".to_string(),
-                t,
-                section_content.trim().to_string(),
-            ),
-            None => ArticleSection::new("section".to_string(), section_content.trim().to_string()),
-        };
-
-        section.id = id;
-        section.figures = figures;
-        section.tables = tables;
-        section.subsections = subsections;
-
-        Some(section)
+        Some(Section {
+            id,
+            section_type: Some("section".to_string()),
+            label: None,
+            title,
+            content: section_content.trim().to_string(),
+            subsections,
+            figures,
+            tables,
+            formulas: Vec::new(),
+        })
     } else {
         None
     }
@@ -557,16 +571,14 @@ fn parse_figure_inner(
         }
     }
 
-    let fig_id = attrs.id.unwrap_or_else(|| "fig_unknown".to_string());
-    let fig_caption = caption.unwrap_or_else(|| "No caption available".to_string());
-
-    let mut figure = Figure::new(fig_id, fig_caption);
-    figure.label = label;
-    figure.alt_text = alt_text;
-    figure.fig_type = attrs.fig_type;
-    figure.file_name = file_name;
-
-    Some(figure)
+    Some(Figure {
+        id: attrs.id.unwrap_or_else(|| "fig_unknown".to_string()),
+        label,
+        caption: caption.unwrap_or_else(|| "No caption available".to_string()),
+        alt_text,
+        fig_type: attrs.fig_type,
+        graphic_href: file_name,
+    })
 }
 
 enum FigAction {
@@ -630,14 +642,14 @@ fn parse_table_inner(
         }
     }
 
-    let table_id = attrs.id.unwrap_or_else(|| "table_unknown".to_string());
-    let table_caption = caption.unwrap_or_else(|| "No caption available".to_string());
-
-    let mut table = Table::new(table_id, table_caption);
-    table.label = label;
-    table.footnotes = footnotes;
-
-    Some(table)
+    Some(Table {
+        id: attrs.id.unwrap_or_else(|| "table_unknown".to_string()),
+        label,
+        caption: caption.unwrap_or_else(|| "No caption available".to_string()),
+        head: Vec::new(),
+        body: Vec::new(),
+        footnotes,
+    })
 }
 
 enum TableAction {
@@ -701,7 +713,7 @@ mod tests {
         assert!(section.is_some());
 
         let section = section.unwrap();
-        assert_eq!(section.section_type, "abstract");
+        assert_eq!(section.section_type, Some("abstract".to_string()));
         assert_eq!(section.title, Some("Abstract".to_string()));
         assert!(section.content.contains("This is an abstract paragraph."));
     }
@@ -814,7 +826,7 @@ mod tests {
 
         let sections = extract_sections_enhanced(content);
         assert_eq!(sections.len(), 1);
-        assert_eq!(sections[0].section_type, "body");
+        assert_eq!(sections[0].section_type, Some("body".to_string()));
         assert!(sections[0].content.contains("Just a paragraph."));
         assert!(sections[0].content.contains("Another paragraph."));
     }
@@ -1054,7 +1066,7 @@ value1   value2   value3
 
         let sections = extract_sections_enhanced(content);
         assert_eq!(sections.len(), 1);
-        assert_eq!(sections[0].section_type, "body");
+        assert_eq!(sections[0].section_type, Some("body".to_string()));
         assert!(sections[0].content.contains("Introduction paragraph."));
         assert!(sections[0].content.contains("Bullet point one"));
         assert!(sections[0].content.contains("Bullet point two"));

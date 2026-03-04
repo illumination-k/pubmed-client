@@ -4,7 +4,7 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use pubmed_client::{
     Client, ClientConfig,
-    pmc::{PmcFullText, markdown::PmcMarkdownConverter},
+    pmc::{PmcArticle, markdown::PmcMarkdownConverter},
     pubmed::{
         ArticleSummary, ArticleType, Language, PubMedArticle, SearchQuery as RustSearchQuery,
         SortOrder,
@@ -207,7 +207,7 @@ pub struct Reference {
 #[napi(object)]
 pub struct Section {
     /// Section type (e.g., "introduction", "methods")
-    pub section_type: String,
+    pub section_type: Option<String>,
     /// Section title
     pub title: Option<String>,
     /// Section content
@@ -318,11 +318,11 @@ pub struct FullTextArticle {
     pub keywords: Vec<String>,
 }
 
-impl From<PmcFullText> for FullTextArticle {
-    fn from(article: PmcFullText) -> Self {
+impl From<PmcArticle> for FullTextArticle {
+    fn from(article: PmcArticle) -> Self {
         FullTextArticle {
-            pmcid: article.pmcid,
-            pmid: article.pmid,
+            pmcid: article.pmcid.to_string(),
+            pmid: article.pmid.map(|p| p.to_string()),
             title: article.title,
             authors: article
                 .authors
@@ -341,7 +341,23 @@ impl From<PmcFullText> for FullTextArticle {
                 })
                 .collect(),
             journal: article.journal.title,
-            pub_date: article.pub_date,
+            pub_date: article
+                .pub_dates
+                .first()
+                .map(|d| {
+                    let mut s = String::new();
+                    if let Some(y) = d.year {
+                        s.push_str(&y.to_string());
+                    }
+                    if let Some(m) = d.month {
+                        s.push_str(&format!("-{:02}", m));
+                    }
+                    if let Some(day) = d.day {
+                        s.push_str(&format!("-{:02}", day));
+                    }
+                    s
+                })
+                .unwrap_or_default(),
             doi: article.doi,
             sections: article
                 .sections
@@ -364,7 +380,7 @@ impl From<PmcFullText> for FullTextArticle {
                         .map(|a| a.full_name.as_str())
                         .collect::<Vec<_>>()
                         .join(", "),
-                    journal: r.journal,
+                    journal: r.source,
                     year: r.year,
                     pmid: r.pmid,
                     doi: r.doi,

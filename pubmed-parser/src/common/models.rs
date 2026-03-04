@@ -208,6 +208,44 @@ pub fn format_author_name(
     }
 }
 
+/// Structured publication date.
+///
+/// Used by both PubMed and PMC articles. A single article can have multiple
+/// publication dates distinguished by `pub_type` (e.g., electronic vs. print).
+///
+/// PubMed: Maps to `<PubDate>` inside `<JournalIssue>`.
+/// PMC/JATS: Maps to `<pub-date pub-type="...">`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct PublicationDate {
+    /// Publication type. Common values: `"epub"`, `"ppub"`, `"collection"`, `"medline"`.
+    pub pub_type: Option<String>,
+    /// Year. From `<Year>`.
+    pub year: Option<u16>,
+    /// Month (1-12). From `<Month>`.
+    pub month: Option<u8>,
+    /// Day (1-31). From `<Day>`.
+    pub day: Option<u8>,
+}
+
+/// Publication history date.
+///
+/// Used by both PubMed and PMC articles for dates like received, accepted, revised.
+///
+/// PubMed: Maps to `<History>/<PubMedPubDate>`.
+/// PMC/JATS: Maps to `<history>/<date date-type="...">`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct HistoryDate {
+    /// Date type. Common values: `"received"`, `"accepted"`, `"rev-recd"`,
+    /// `"pubmed"`, `"medline"`, `"entrez"`.
+    pub date_type: String,
+    /// Year. From `<Year>`.
+    pub year: Option<u16>,
+    /// Month (1-12). From `<Month>`.
+    pub month: Option<u8>,
+    /// Day (1-31). From `<Day>`.
+    pub day: Option<u8>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

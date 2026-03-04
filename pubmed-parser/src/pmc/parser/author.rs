@@ -1,5 +1,5 @@
-use super::models::{Affiliation, Author};
 use crate::common::xml_utils::strip_inline_html_tags;
+use crate::common::{Affiliation, Author};
 use crate::error::{ParseError, Result};
 use quick_xml::de::from_str;
 use serde::Deserialize;

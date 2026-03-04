@@ -1,42 +1,56 @@
 ---
 source: pubmed-parser/tests/integration/parsing/pmc_snapshots.rs
-assertion_line: 28
 expression: article
 ---
 {
-  "pmcid": "PMC10000000",
-  "pmid": "37471719",
+  "pmcid": {
+    "value": 10000000
+  },
+  "pmid": {
+    "value": 37471719
+  },
+  "doi": null,
+  "article_type": "other",
+  "categories": [
+    "Editorial"
+  ],
   "title": "Editorial",
+  "subtitle": null,
   "authors": [],
   "journal": {
     "title": "Chicago Medical Examiner",
     "abbreviation": null,
     "issn_print": null,
     "issn_electronic": null,
-    "publisher": null,
-    "volume": "8",
-    "issue": "1"
+    "publisher": null
   },
-  "pub_date": "1867-01",
-  "doi": null,
+  "pub_dates": [
+    {
+      "pub_type": "ppub",
+      "year": 1867,
+      "month": 1,
+      "day": null
+    }
+  ],
+  "volume": "8",
+  "issue": "1",
+  "fpage": "54",
+  "lpage": "64",
+  "elocation_id": null,
+  "abstract_text": null,
+  "abstract_sections": [],
+  "keywords": [],
   "sections": [],
   "references": [],
-  "article_type": "other",
-  "keywords": [],
   "funding": [],
-  "conflict_of_interest": null,
   "acknowledgments": null,
+  "conflict_of_interest": null,
   "data_availability": null,
   "supplementary_materials": [],
-  "abstract_text": null,
+  "appendices": [],
+  "glossary": [],
   "copyright": null,
   "license": "https://creativecommons.org/publicdomain/mark/1.0/\n          This work is free of known copyright restrictions. For more information, please see PMC Back Issue Digitization.",
   "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-  "history_dates": [],
-  "categories": [
-    "Editorial"
-  ],
-  "fpage": "54",
-  "lpage": "64",
-  "elocation_id": null
+  "history_dates": []
 }

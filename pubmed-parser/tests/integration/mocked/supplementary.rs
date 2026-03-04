@@ -34,14 +34,14 @@ fn test_supplementary_material_extraction_from_real_xml() {
                 println!("  Material {}: {}", i + 1, material.id);
                 println!("    Content type: {:?}", material.content_type);
                 println!("    Title: {:?}", material.title);
-                println!("    File URL: {:?}", material.file_url);
+                println!("    File URL: {:?}", material.href);
                 println!("    Is tar file: {}", material.is_tar_file());
                 println!("    Is archive: {}", material.is_archive());
                 println!("    File extension: {:?}", material.get_file_extension());
 
                 // Basic validation
                 assert!(
-                    material.file_url.is_some(),
+                    material.href.is_some(),
                     "Supplementary material should have a file URL"
                 );
                 assert!(
@@ -125,13 +125,12 @@ fn test_supplementary_material_parsing_with_mock_data() {
     let tar_material = &article.supplementary_materials[0];
     assert_eq!(tar_material.id, "supp-data-1");
     assert_eq!(tar_material.content_type, Some("local-data".to_string()));
-    assert_eq!(tar_material.position, Some("float".to_string()));
     assert_eq!(
         tar_material.title,
         Some("Supplementary Data Archive".to_string())
     );
     assert_eq!(
-        tar_material.file_url,
+        tar_material.href,
         Some("supplementary-data.tar.gz".to_string())
     );
     assert!(tar_material.is_tar_file());
@@ -141,7 +140,7 @@ fn test_supplementary_material_parsing_with_mock_data() {
     let zip_material = &article.supplementary_materials[1];
     assert_eq!(zip_material.id, "supp-figures");
     assert_eq!(
-        zip_material.file_url,
+        zip_material.href,
         Some("supplementary-figures.zip".to_string())
     );
     assert!(!zip_material.is_tar_file());
@@ -150,10 +149,7 @@ fn test_supplementary_material_parsing_with_mock_data() {
     // Check the third material (tar.bz2)
     let bz2_material = &article.supplementary_materials[2];
     assert_eq!(bz2_material.id, "supp-code");
-    assert_eq!(
-        bz2_material.file_url,
-        Some("analysis-code.tar.bz2".to_string())
-    );
+    assert_eq!(bz2_material.href, Some("analysis-code.tar.bz2".to_string()));
     assert!(bz2_material.is_tar_file());
     assert!(bz2_material.is_archive());
 

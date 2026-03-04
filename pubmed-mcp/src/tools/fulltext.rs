@@ -1,6 +1,6 @@
 //! Full-text retrieval tool for PMC articles
 
-use pubmed_client::{ArticleSection, Figure, Table};
+use pubmed_client::{Figure, Section, Table};
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
 use std::borrow::Cow;
@@ -20,7 +20,7 @@ pub struct FullTextRequest {
 }
 
 /// Collect all figures from sections recursively
-fn collect_figures(sections: &[ArticleSection]) -> Vec<&Figure> {
+fn collect_figures(sections: &[Section]) -> Vec<&Figure> {
     let mut figures = Vec::new();
     for section in sections {
         figures.extend(section.figures.iter());
@@ -30,7 +30,7 @@ fn collect_figures(sections: &[ArticleSection]) -> Vec<&Figure> {
 }
 
 /// Collect all tables from sections recursively
-fn collect_tables(sections: &[ArticleSection]) -> Vec<&Table> {
+fn collect_tables(sections: &[Section]) -> Vec<&Table> {
     let mut tables = Vec::new();
     for section in sections {
         tables.extend(section.tables.iter());
@@ -95,7 +95,11 @@ pub async fn get_pmc_fulltext(
     };
 
     for section in sections {
-        let title = section.title.as_deref().unwrap_or(&section.section_type);
+        let title = section
+            .title
+            .as_deref()
+            .or(section.section_type.as_deref())
+            .unwrap_or("Untitled");
         result.push_str(&format!("\n## {}\n", title));
         result.push_str(&format!("{}\n", section.content));
     }

@@ -1,6 +1,7 @@
-use super::models::{Author, Reference};
+use crate::common::Author;
 use crate::common::xml_utils::strip_inline_html_tags;
 use crate::error::Result;
+use crate::pmc::domain::Reference;
 use quick_xml::de::from_str;
 use serde::Deserialize;
 use tracing;
@@ -325,10 +326,9 @@ fn try_extract_from_back_section(content: &str) -> Result<Option<Vec<Reference>>
     }
 }
 
-/// Convert a Ref struct to a Reference model
+/// Convert a Ref struct to a domain Reference
 fn parse_ref_to_reference(ref_elem: Ref) -> Option<Reference> {
     let id = ref_elem.id.unwrap_or_else(|| String::from("unknown"));
-    let mut reference = Reference::new(id);
 
     // Try element-citation first, then mixed-citation
     let citation = ref_elem
@@ -336,60 +336,71 @@ fn parse_ref_to_reference(ref_elem: Ref) -> Option<Reference> {
         .map(Citation::Element)
         .or_else(|| ref_elem.mixed_citation.map(Citation::Mixed));
 
-    if let Some(citation) = citation {
-        match citation {
-            Citation::Element(elem) => {
-                reference.ref_type = elem.publication_type;
-                reference.title = elem.article_title;
-                reference.journal = elem.source;
-                reference.year = elem.year;
-                reference.volume = elem.volume;
-                reference.issue = elem.issue;
-                reference.pages = format_pages(elem.fpage, elem.lpage);
+    let citation = citation?;
 
-                // Extract pub-ids
-                for pub_id in elem.pub_ids {
-                    if let (Some(id_type), Some(value)) = (pub_id.pub_id_type, pub_id.value) {
-                        match id_type.as_str() {
-                            "doi" => reference.doi = Some(value),
-                            "pmid" => reference.pmid = Some(value),
-                            _ => {}
-                        }
-                    }
-                }
+    let (
+        publication_type,
+        title,
+        source,
+        year,
+        volume,
+        issue,
+        fpage,
+        lpage,
+        pub_ids,
+        person_groups,
+    ) = match citation {
+        Citation::Element(elem) => (
+            elem.publication_type,
+            elem.article_title,
+            elem.source,
+            elem.year,
+            elem.volume,
+            elem.issue,
+            elem.fpage,
+            elem.lpage,
+            elem.pub_ids,
+            elem.person_groups,
+        ),
+        Citation::Mixed(mixed) => (
+            mixed.publication_type,
+            mixed.article_title,
+            mixed.source,
+            mixed.year,
+            mixed.volume,
+            mixed.issue,
+            mixed.fpage,
+            mixed.lpage,
+            mixed.pub_ids,
+            mixed.person_groups,
+        ),
+    };
 
-                // Extract authors
-                reference.authors = extract_authors_from_person_groups(elem.person_groups);
-            }
-            Citation::Mixed(mixed) => {
-                reference.ref_type = mixed.publication_type;
-                reference.title = mixed.article_title;
-                reference.journal = mixed.source;
-                reference.year = mixed.year;
-                reference.volume = mixed.volume;
-                reference.issue = mixed.issue;
-                reference.pages = format_pages(mixed.fpage, mixed.lpage);
-
-                // Extract pub-ids
-                for pub_id in mixed.pub_ids {
-                    if let (Some(id_type), Some(value)) = (pub_id.pub_id_type, pub_id.value) {
-                        match id_type.as_str() {
-                            "doi" => reference.doi = Some(value),
-                            "pmid" => reference.pmid = Some(value),
-                            _ => {}
-                        }
-                    }
-                }
-
-                // Extract authors
-                reference.authors = extract_authors_from_person_groups(mixed.person_groups);
+    let mut doi = None;
+    let mut pmid = None;
+    for pub_id in pub_ids {
+        if let (Some(id_type), Some(value)) = (pub_id.pub_id_type, pub_id.value) {
+            match id_type.as_str() {
+                "doi" => doi = Some(value),
+                "pmid" => pmid = Some(value),
+                _ => {}
             }
         }
-
-        Some(reference)
-    } else {
-        None
     }
+
+    Some(Reference {
+        id,
+        publication_type,
+        title,
+        authors: extract_authors_from_person_groups(person_groups),
+        source,
+        year,
+        volume,
+        issue,
+        pages: format_pages(fpage, lpage),
+        pmid,
+        doi,
+    })
 }
 
 /// Helper enum to handle both citation types uniformly
@@ -460,7 +471,7 @@ mod tests {
         let ref1 = &references[0];
         assert_eq!(ref1.id, "ref1");
         assert_eq!(ref1.title, Some("Test Article".to_string()));
-        assert_eq!(ref1.journal, Some("Test Journal".to_string()));
+        assert_eq!(ref1.source, Some("Test Journal".to_string()));
         assert_eq!(ref1.year, Some("2023".to_string()));
         assert_eq!(ref1.volume, Some("10".to_string()));
         assert_eq!(ref1.issue, Some("2".to_string()));
@@ -503,7 +514,7 @@ mod tests {
         let ref3 = &references[0];
         assert_eq!(ref3.id, "bib3");
         assert_eq!(ref3.title, Some("Test Article".to_string()));
-        assert_eq!(ref3.journal, Some("MedRxiv".to_string()));
+        assert_eq!(ref3.source, Some("MedRxiv".to_string()));
         assert_eq!(ref3.authors.len(), 1);
         assert_eq!(ref3.authors[0].surname, Some("Alvarez".to_string()));
     }

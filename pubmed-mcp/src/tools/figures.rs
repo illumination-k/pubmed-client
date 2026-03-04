@@ -1,6 +1,6 @@
 //! Figure extraction tool for PMC articles
 
-use pubmed_client::{ArticleSection, Figure, Table};
+use pubmed_client::{Figure, Section, Table};
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
 use std::borrow::Cow;
@@ -14,7 +14,7 @@ pub struct FiguresRequest {
 }
 
 /// Collect all figures from sections recursively
-fn collect_figures(sections: &[ArticleSection]) -> Vec<&Figure> {
+fn collect_figures(sections: &[Section]) -> Vec<&Figure> {
     let mut figures = Vec::new();
     for section in sections {
         figures.extend(section.figures.iter());
@@ -24,7 +24,7 @@ fn collect_figures(sections: &[ArticleSection]) -> Vec<&Figure> {
 }
 
 /// Collect all tables from sections recursively
-fn collect_tables(sections: &[ArticleSection]) -> Vec<&Table> {
+fn collect_tables(sections: &[Section]) -> Vec<&Table> {
     let mut tables = Vec::new();
     for section in sections {
         tables.extend(section.tables.iter());
@@ -72,8 +72,8 @@ pub async fn get_pmc_figures(
                 result.push_str(&format!("Label: {}\n", label));
             }
             result.push_str(&format!("Caption: {}\n", fig.caption));
-            if let Some(ref file_name) = fig.file_name {
-                result.push_str(&format!("File: {}\n", file_name));
+            if let Some(ref graphic_href) = fig.graphic_href {
+                result.push_str(&format!("File: {}\n", graphic_href));
             }
             result.push('\n');
         }

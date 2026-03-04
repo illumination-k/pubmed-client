@@ -11,7 +11,7 @@
 use pubmed_parser::pmc::parse_pmc_xml;
 use std::path::Path;
 
-fn parse_test_article(pmcid: &str) -> pubmed_parser::pmc::PmcFullText {
+fn parse_test_article(pmcid: &str) -> pubmed_parser::pmc::PmcArticle {
     let workspace_root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
     let xml_path = workspace_root.join(format!("test_data/pmc_xml/{pmcid}.xml"));
     let xml_content = std::fs::read_to_string(&xml_path)

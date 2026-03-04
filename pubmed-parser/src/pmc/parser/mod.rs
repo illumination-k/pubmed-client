@@ -1,3 +1,4 @@
+use crate::common::{PmcId, PubMedId};
 use crate::error::Result;
 use crate::pmc::domain::PmcArticle;
 
@@ -9,8 +10,6 @@ pub mod reference;
 pub mod section;
 pub mod xml_utils;
 
-use models::PmcFullText;
-
 /// Extract a section slice from XML content without allocating.
 ///
 /// Returns a `&str` slice covering `start_tag..end_tag` (inclusive),
@@ -21,11 +20,14 @@ fn extract_section_slice<'a>(content: &'a str, start_tag: &str, end_tag: &str) -
     Some(&content[start..start + end_offset + end_tag.len()])
 }
 
-/// Parse PMC XML content into structured data
+/// Parse PMC XML content into a [`PmcArticle`] domain model.
 ///
 /// This function acts as a coordinator that delegates parsing tasks
 /// to specialized parser modules for better maintainability and separation of concerns.
-pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
+/// It directly produces domain types without going through legacy intermediate models.
+pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
+    let pmcid_typed = PmcId::parse(pmcid)?;
+
     // Pre-extract major XML sections once to avoid scanning the full document repeatedly.
     // PMC JATS XML structure: <article> <front>...</front> <body>...</body> <back>...</back> </article>
     let front = extract_section_slice(xml_content, "<front>", "</front>").unwrap_or(xml_content);
@@ -34,9 +36,12 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
     // Metadata from <front> (title, journal, dates, IDs, keywords, funding are all in <front>)
     let title = metadata::extract_title(front);
     let journal = metadata::extract_journal_info(front);
-    let pub_date = metadata::extract_pub_date(front);
+    let pub_dates = metadata::extract_pub_dates(front);
+    let volume = metadata::extract_volume(front);
+    let issue = metadata::extract_issue(front);
     let doi = metadata::extract_doi(front);
-    let pmid = metadata::extract_pmid(front);
+    let pmid_str = metadata::extract_pmid(front);
+    let pmid = pmid_str.as_deref().map(PubMedId::parse).transpose()?;
     let keywords = metadata::extract_keywords(front);
     let funding = metadata::extract_funding(front);
 
@@ -71,44 +76,39 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
     // References from <back> (extract_references_detailed finds <ref-list>/<back> internally)
     let references = reference::extract_references_detailed(xml_content).unwrap_or_default();
 
-    Ok(PmcFullText {
-        pmcid: pmcid.to_string(),
+    Ok(PmcArticle {
+        pmcid: pmcid_typed,
         pmid,
+        doi,
+        article_type,
+        categories,
         title,
+        subtitle: None,
         authors,
         journal,
-        pub_date,
-        doi,
+        pub_dates,
+        volume,
+        issue,
+        fpage,
+        lpage,
+        elocation_id,
+        abstract_text,
+        abstract_sections: Vec::new(),
+        keywords,
         sections,
         references,
-        article_type,
-        keywords,
         funding,
-        conflict_of_interest,
         acknowledgments,
+        conflict_of_interest,
         data_availability,
         supplementary_materials,
-        abstract_text,
+        appendices: Vec::new(),
+        glossary: Vec::new(),
         copyright,
         license,
         license_url,
         history_dates,
-        categories,
-        fpage,
-        lpage,
-        elocation_id,
     })
-}
-
-/// Parse PMC XML content into the domain model.
-///
-/// This is a convenience wrapper that calls [`parse_pmc_xml`] and converts
-/// the result into [`PmcArticle`]. Fields not yet extracted by the current
-/// parser (structured abstracts, table content, formulas, appendices, glossary,
-/// subtitle, section labels) will be empty/`None`.
-pub fn parse_pmc_xml_domain(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
-    let legacy = parse_pmc_xml(xml_content, pmcid)?;
-    PmcArticle::try_from(legacy).map_err(Into::into)
 }
 
 #[cfg(test)]
@@ -164,9 +164,12 @@ mod tests {
         assert!(result.is_ok());
 
         let article = result.unwrap();
-        assert_eq!(article.pmcid, "PMC123456");
+        assert_eq!(article.pmcid.as_str(), "PMC123456");
         assert_eq!(article.title, "Test Article Title");
-        assert_eq!(article.pub_date, "2023-12-25");
+        assert!(!article.pub_dates.is_empty());
+        assert_eq!(article.pub_dates[0].year, Some(2023));
+        assert_eq!(article.pub_dates[0].month, Some(12));
+        assert_eq!(article.pub_dates[0].day, Some(25));
         assert!(!article.authors.is_empty());
         assert!(!article.sections.is_empty());
         assert!(!article.references.is_empty());
@@ -187,11 +190,11 @@ mod tests {
         </article>
         "#;
 
-        let result = parse_pmc_xml(xml_content, "PMC000000");
+        let result = parse_pmc_xml(xml_content, "PMC100000");
         assert!(result.is_ok());
 
         let article = result.unwrap();
-        assert_eq!(article.pmcid, "PMC000000");
+        assert_eq!(article.pmcid.as_str(), "PMC100000");
         assert_eq!(article.title, "Minimal Test");
     }
 

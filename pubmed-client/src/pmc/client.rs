@@ -4,12 +4,13 @@ use crate::cache::{PmcCache, create_cache};
 use crate::common::{PmcId, PubMedId};
 use crate::config::ClientConfig;
 use crate::error::{ParseError, PubMedError, Result};
-use crate::pmc::models::{ExtractedFigure, PmcFullText};
+use crate::pmc::extracted::ExtractedFigure;
 use crate::pmc::oa_api;
 use crate::pmc::oa_api::OaSubsetInfo;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
+use pubmed_parser::pmc::PmcArticle;
 use reqwest::{Client, Response};
 use tracing::{debug, info};
 
@@ -162,7 +163,7 @@ impl PmcClient {
     ///
     /// # Returns
     ///
-    /// Returns a `Result<PmcFullText>` containing the structured full text
+    /// Returns a `Result<PmcArticle>` containing the structured full text
     ///
     /// # Errors
     ///
@@ -184,7 +185,7 @@ impl PmcClient {
     ///     Ok(())
     /// }
     /// ```
-    pub async fn fetch_full_text(&self, pmcid: &str) -> Result<PmcFullText> {
+    pub async fn fetch_full_text(&self, pmcid: &str) -> Result<PmcArticle> {
         let normalized_pmcid = self.normalize_pmcid(pmcid);
         let cache_key = format!("pmc:{}", normalized_pmcid);
 

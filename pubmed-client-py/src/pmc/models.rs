@@ -8,7 +8,7 @@ use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::sync::Arc;
 
 use pubmed_client::pmc::{self, OaSubsetInfo, markdown::PmcMarkdownConverter};
-use pubmed_client::{ExtractedFigure, PmcFullText};
+use pubmed_client::{ExtractedFigure, PmcArticle};
 
 // ================================================================================================
 // PMC Data Models
@@ -125,9 +125,7 @@ pub struct PyFigure {
     #[pyo3(get)]
     pub fig_type: Option<String>,
     #[pyo3(get)]
-    pub file_path: Option<String>,
-    #[pyo3(get)]
-    pub file_name: Option<String>,
+    pub graphic_href: Option<String>,
 }
 
 impl From<&pmc::Figure> for PyFigure {
@@ -138,8 +136,7 @@ impl From<&pmc::Figure> for PyFigure {
             caption: figure.caption.clone(),
             alt_text: figure.alt_text.clone(),
             fig_type: figure.fig_type.clone(),
-            file_path: figure.file_path.clone(),
-            file_name: figure.file_name.clone(),
+            graphic_href: figure.graphic_href.clone(),
         }
     }
 }
@@ -237,7 +234,7 @@ pub struct PyReference {
     #[pyo3(get)]
     pub title: Option<String>,
     #[pyo3(get)]
-    pub journal: Option<String>,
+    pub source: Option<String>,
     #[pyo3(get)]
     pub year: Option<String>,
     #[pyo3(get)]
@@ -251,7 +248,7 @@ impl From<&pmc::Reference> for PyReference {
         PyReference {
             id: reference.id.clone(),
             title: reference.title.clone(),
-            journal: reference.journal.clone(),
+            source: reference.source.clone(),
             year: reference.year.clone(),
             pmid: reference.pmid.clone(),
             doi: reference.doi.clone(),
@@ -280,12 +277,12 @@ pub struct PyArticleSection {
     pub section_type: Option<String>,
 }
 
-impl From<&pmc::ArticleSection> for PyArticleSection {
-    fn from(section: &pmc::ArticleSection) -> Self {
+impl From<&pmc::Section> for PyArticleSection {
+    fn from(section: &pmc::Section) -> Self {
         PyArticleSection {
             title: section.title.clone(),
             content: section.content.clone(),
-            section_type: Some(section.section_type.clone()),
+            section_type: section.section_type.clone(),
         }
     }
 }
@@ -311,14 +308,14 @@ pub struct PyPmcFullText {
     pub title: String,
     #[pyo3(get)]
     pub doi: Option<String>,
-    inner: Arc<PmcFullText>,
+    inner: Arc<PmcArticle>,
 }
 
-impl From<PmcFullText> for PyPmcFullText {
-    fn from(full_text: PmcFullText) -> Self {
+impl From<PmcArticle> for PyPmcFullText {
+    fn from(full_text: PmcArticle) -> Self {
         PyPmcFullText {
-            pmcid: full_text.pmcid.clone(),
-            pmid: full_text.pmid.clone(),
+            pmcid: full_text.pmcid.as_str(),
+            pmid: full_text.pmid.as_ref().map(|p| p.as_str()),
             title: full_text.title.clone(),
             doi: full_text.doi.clone(),
             inner: Arc::new(full_text),
@@ -353,7 +350,7 @@ impl PyPmcFullText {
     fn figures(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         // Collect figures from all sections recursively
-        fn collect_figures(section: &pmc::ArticleSection, figures: &mut Vec<pmc::Figure>) {
+        fn collect_figures(section: &pmc::Section, figures: &mut Vec<pmc::Figure>) {
             figures.extend(section.figures.clone());
             for subsection in &section.subsections {
                 collect_figures(subsection, figures);
@@ -376,7 +373,7 @@ impl PyPmcFullText {
     fn tables(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
         // Collect tables from all sections recursively
-        fn collect_tables(section: &pmc::ArticleSection, tables: &mut Vec<pmc::Table>) {
+        fn collect_tables(section: &pmc::Section, tables: &mut Vec<pmc::Table>) {
             tables.extend(section.tables.clone());
             for subsection in &section.subsections {
                 collect_tables(subsection, tables);

@@ -11,9 +11,7 @@
 //! - Reuses shared types: `Author` and `Affiliation` from `common::models`
 //! - Text mining ready: structured abstracts, table content, formulas, definitions
 
-use crate::common::{Author, PmcId, PubMedId};
-use crate::error::ParseError;
-use crate::pmc::parser::models;
+use crate::common::{Author, HistoryDate, PmcId, PubMedId, PublicationDate};
 use serde::{Deserialize, Serialize};
 
 // ============================================================================
@@ -142,23 +140,6 @@ pub struct JournalMeta {
     pub issn_electronic: Option<String>,
     /// Publisher name. From `<publisher>/<publisher-name>`.
     pub publisher: Option<String>,
-}
-
-/// Structured publication date.
-///
-/// Maps to JATS `<pub-date>`. A single article can have multiple publication dates
-/// distinguished by `pub_type` (e.g., electronic vs. print vs. collection).
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct PublicationDate {
-    /// Publication type. From `<pub-date pub-type="...">` or `<pub-date date-type="...">`.
-    /// Common values: `"epub"`, `"ppub"`, `"collection"`.
-    pub pub_type: Option<String>,
-    /// Year. From `<year>`.
-    pub year: Option<u16>,
-    /// Month (1-12). From `<month>`.
-    pub month: Option<u8>,
-    /// Day (1-31). From `<day>`.
-    pub day: Option<u8>,
 }
 
 /// Structured abstract section.
@@ -329,6 +310,66 @@ pub struct Reference {
     pub doi: Option<String>,
 }
 
+impl Reference {
+    /// Format a human-readable citation string.
+    pub fn format_citation(&self) -> String {
+        let mut parts = Vec::new();
+
+        if !self.authors.is_empty() {
+            let author_names: Vec<String> = self
+                .authors
+                .iter()
+                .map(|a| a.full_name.clone())
+                .filter(|n| !n.trim().is_empty())
+                .collect();
+            if !author_names.is_empty() {
+                parts.push(author_names.join(", "));
+            }
+        }
+
+        if let Some(title) = &self.title
+            && !title.trim().is_empty()
+        {
+            parts.push(title.clone());
+        }
+
+        if let Some(source) = &self.source
+            && !source.trim().is_empty()
+        {
+            let mut source_part = source.clone();
+            if let Some(year) = &self.year
+                && !year.trim().is_empty()
+                && year != "n.d."
+            {
+                source_part.push_str(&format!(" ({year})"));
+            }
+            if let Some(volume) = &self.volume
+                && !volume.trim().is_empty()
+            {
+                source_part.push_str(&format!(" {volume}"));
+                if let Some(issue) = &self.issue
+                    && !issue.trim().is_empty()
+                {
+                    source_part.push_str(&format!("({issue})"));
+                }
+            }
+            if let Some(pages) = &self.pages
+                && !pages.trim().is_empty()
+            {
+                source_part.push_str(&format!(": {pages}"));
+            }
+            parts.push(source_part);
+        }
+
+        let result = parts.join(". ");
+        if result.trim().is_empty() {
+            format!("Reference {}", self.id)
+        } else {
+            result
+        }
+    }
+}
+
 /// Funding information.
 ///
 /// Maps to JATS `<funding-group>/<award-group>`.
@@ -340,22 +381,6 @@ pub struct FundingInfo {
     pub award_id: Option<String>,
     /// Funding statement. From `<funding-statement>`.
     pub statement: Option<String>,
-}
-
-/// Publication history date.
-///
-/// Maps to JATS `<history>/<date>`.
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct HistoryDate {
-    /// Date type. From `<date date-type="...">`.
-    /// Common values: `"received"`, `"accepted"`, `"rev-recd"`.
-    pub date_type: String,
-    /// Year. From `<year>`.
-    pub year: Option<u16>,
-    /// Month (1-12). From `<month>`.
-    pub month: Option<u8>,
-    /// Day (1-31). From `<day>`.
-    pub day: Option<u8>,
 }
 
 /// Supplementary material.
@@ -375,6 +400,77 @@ pub struct SupplementaryMaterial {
     pub description: Option<String>,
     /// Resource href. From `<supplementary-material xlink:href="...">`.
     pub href: Option<String>,
+}
+
+impl SupplementaryMaterial {
+    /// Check if this material is a tar archive based on the href extension.
+    pub fn is_tar_file(&self) -> bool {
+        if let Some(url) = &self.href {
+            url.ends_with(".tar")
+                || url.ends_with(".tar.gz")
+                || url.ends_with(".tar.bz2")
+                || url.ends_with(".tgz")
+        } else {
+            false
+        }
+    }
+
+    /// Get file extension from the href.
+    pub fn get_file_extension(&self) -> Option<String> {
+        if let Some(url) = &self.href
+            && let Some(filename) = url.split('/').next_back()
+            && let Some(dot_index) = filename.rfind('.')
+        {
+            return Some(filename[dot_index + 1..].to_lowercase());
+        }
+        None
+    }
+
+    /// Check if this is an archive file (zip, tar, etc.).
+    pub fn is_archive(&self) -> bool {
+        if let Some(ext) = self.get_file_extension() {
+            matches!(
+                ext.as_str(),
+                "zip" | "tar" | "gz" | "bz2" | "tgz" | "rar" | "7z"
+            )
+        } else {
+            false
+        }
+    }
+}
+
+impl PmcArticle {
+    /// Get tar files from supplementary materials.
+    pub fn get_tar_files(&self) -> Vec<&SupplementaryMaterial> {
+        self.supplementary_materials
+            .iter()
+            .filter(|m| m.is_tar_file())
+            .collect()
+    }
+
+    /// Get all archive files from supplementary materials.
+    pub fn get_archive_files(&self) -> Vec<&SupplementaryMaterial> {
+        self.supplementary_materials
+            .iter()
+            .filter(|m| m.is_archive())
+            .collect()
+    }
+
+    /// Check if the article has supplementary materials.
+    pub fn has_supplementary_materials(&self) -> bool {
+        !self.supplementary_materials.is_empty()
+    }
+
+    /// Get supplementary materials by content type.
+    pub fn get_supplementary_materials_by_type(
+        &self,
+        content_type: &str,
+    ) -> Vec<&SupplementaryMaterial> {
+        self.supplementary_materials
+            .iter()
+            .filter(|m| m.content_type.as_ref().is_some_and(|ct| ct == content_type))
+            .collect()
+    }
 }
 
 // ============================================================================
@@ -399,206 +495,4 @@ pub struct Definition {
     pub term: String,
     /// Definition text. From `<def>/<p>`.
     pub definition: String,
-}
-
-// ============================================================================
-// Conversions from legacy models (models::*) → domain types
-// ============================================================================
-
-impl TryFrom<models::PmcFullText> for PmcArticle {
-    type Error = ParseError;
-
-    fn try_from(old: models::PmcFullText) -> Result<Self, Self::Error> {
-        let pmcid = PmcId::parse(&old.pmcid)?;
-        let pmid = old.pmid.as_deref().map(PubMedId::parse).transpose()?;
-
-        // Parse pub_date string ("2023-12-25", "2023-12", "2023", "Unknown Date")
-        // into a single PublicationDate. Lossy — original XML may have had multiple
-        // <pub-date> elements with pub-type attributes, but the old parser flattens them.
-        let pub_dates = parse_pub_date_string(&old.pub_date);
-
-        // volume/issue move from JournalInfo to article level
-        let volume = old.journal.volume.clone();
-        let issue = old.journal.issue.clone();
-
-        Ok(PmcArticle {
-            pmcid,
-            pmid,
-            doi: old.doi,
-            article_type: old.article_type,
-            categories: old.categories,
-            title: old.title,
-            subtitle: None, // Not extracted by current parser
-            authors: old.authors,
-            journal: JournalMeta::from(old.journal),
-            pub_dates,
-            volume,
-            issue,
-            fpage: old.fpage,
-            lpage: old.lpage,
-            elocation_id: old.elocation_id,
-            abstract_text: old.abstract_text,
-            abstract_sections: Vec::new(), // Not extracted by current parser
-            keywords: old.keywords,
-            sections: old.sections.into_iter().map(Section::from).collect(),
-            references: old.references.into_iter().map(Reference::from).collect(),
-            funding: old.funding.into_iter().map(FundingInfo::from).collect(),
-            acknowledgments: old.acknowledgments,
-            conflict_of_interest: old.conflict_of_interest,
-            data_availability: old.data_availability,
-            supplementary_materials: old
-                .supplementary_materials
-                .into_iter()
-                .map(SupplementaryMaterial::from)
-                .collect(),
-            appendices: Vec::new(), // Not extracted by current parser
-            glossary: Vec::new(),   // Not extracted by current parser
-            copyright: old.copyright,
-            license: old.license,
-            license_url: old.license_url,
-            history_dates: old
-                .history_dates
-                .into_iter()
-                .map(HistoryDate::from)
-                .collect(),
-        })
-    }
-}
-
-impl From<models::JournalInfo> for JournalMeta {
-    fn from(old: models::JournalInfo) -> Self {
-        Self {
-            title: old.title,
-            abbreviation: old.abbreviation,
-            issn_print: old.issn_print,
-            issn_electronic: old.issn_electronic,
-            publisher: old.publisher,
-            // volume/issue intentionally omitted — moved to PmcArticle
-        }
-    }
-}
-
-impl From<models::ArticleSection> for Section {
-    fn from(old: models::ArticleSection) -> Self {
-        let section_type = if old.section_type.is_empty() {
-            None
-        } else {
-            Some(old.section_type)
-        };
-
-        Self {
-            id: old.id,
-            section_type,
-            label: None, // Not extracted by current parser
-            title: old.title,
-            content: old.content,
-            subsections: old.subsections.into_iter().map(Section::from).collect(),
-            figures: old.figures.into_iter().map(Figure::from).collect(),
-            tables: old.tables.into_iter().map(Table::from).collect(),
-            formulas: Vec::new(), // Not extracted by current parser
-        }
-    }
-}
-
-impl From<models::Figure> for Figure {
-    fn from(old: models::Figure) -> Self {
-        Self {
-            id: old.id,
-            label: old.label,
-            caption: old.caption,
-            alt_text: old.alt_text,
-            fig_type: old.fig_type,
-            graphic_href: old.file_name, // file_name was actually <graphic xlink:href>
-                                         // file_path dropped — extraction concern
-        }
-    }
-}
-
-impl From<models::Table> for Table {
-    fn from(old: models::Table) -> Self {
-        Self {
-            id: old.id,
-            label: old.label,
-            caption: old.caption,
-            head: Vec::new(), // Not extracted by current parser
-            body: Vec::new(), // Not extracted by current parser
-            footnotes: old.footnotes,
-        }
-    }
-}
-
-impl From<models::Reference> for Reference {
-    fn from(old: models::Reference) -> Self {
-        Self {
-            id: old.id,
-            publication_type: old.ref_type, // renamed
-            title: old.title,
-            authors: old.authors,
-            source: old.journal, // renamed: journal → source
-            year: old.year,
-            volume: old.volume,
-            issue: old.issue,
-            pages: old.pages,
-            pmid: old.pmid,
-            doi: old.doi,
-        }
-    }
-}
-
-impl From<models::FundingInfo> for FundingInfo {
-    fn from(old: models::FundingInfo) -> Self {
-        Self {
-            source: old.source,
-            award_id: old.award_id,
-            statement: old.statement,
-        }
-    }
-}
-
-impl From<models::HistoryDate> for HistoryDate {
-    fn from(old: models::HistoryDate) -> Self {
-        Self {
-            date_type: old.date_type,
-            year: old.year,
-            month: old.month,
-            day: old.day,
-        }
-    }
-}
-
-impl From<models::SupplementaryMaterial> for SupplementaryMaterial {
-    fn from(old: models::SupplementaryMaterial) -> Self {
-        Self {
-            id: old.id,
-            content_type: old.content_type,
-            title: old.title,
-            description: old.description,
-            href: old.file_url, // renamed: file_url → href
-                                // file_type dropped — inferred value
-                                // position dropped — layout attribute
-        }
-    }
-}
-
-/// Parse the legacy pub_date string into a `Vec<PublicationDate>`.
-///
-/// The old parser formats dates as "YYYY-MM-DD", "YYYY-MM", "YYYY",
-/// or "Unknown Date". This conversion is lossy — the original XML may
-/// have had multiple `<pub-date>` elements with `pub-type` attributes.
-fn parse_pub_date_string(s: &str) -> Vec<PublicationDate> {
-    if s == "Unknown Date" || s.is_empty() {
-        return Vec::new();
-    }
-
-    let parts: Vec<&str> = s.split('-').collect();
-    let year = parts.first().and_then(|y| y.parse::<u16>().ok());
-    let month = parts.get(1).and_then(|m| m.parse::<u8>().ok());
-    let day = parts.get(2).and_then(|d| d.parse::<u8>().ok());
-
-    vec![PublicationDate {
-        pub_type: None, // Lost in the old parser's string formatting
-        year,
-        month,
-        day,
-    }]
 }

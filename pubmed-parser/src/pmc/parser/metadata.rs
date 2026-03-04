@@ -1,21 +1,25 @@
-use super::models::{FundingInfo, HistoryDate, JournalInfo, SupplementaryMaterial};
+use crate::common::{HistoryDate, PublicationDate};
+use crate::pmc::domain::{FundingInfo, JournalMeta, SupplementaryMaterial};
+
 use super::xml_utils;
 
-/// Extract comprehensive journal information
-pub fn extract_journal_info(content: &str) -> JournalInfo {
-    let mut journal = JournalInfo::new(
-        xml_utils::extract_text_between(content, "<journal-title>", "</journal-title>")
-            .unwrap_or_else(|| "Unknown Journal".to_string()),
-    );
+/// Extract journal metadata.
+///
+/// Returns a [`JournalMeta`] without volume/issue — those belong to the article level
+/// per the JATS DTD and are extracted separately via [`extract_volume`] / [`extract_issue`].
+pub fn extract_journal_info(content: &str) -> JournalMeta {
+    let title = xml_utils::extract_text_between(content, "<journal-title>", "</journal-title>")
+        .unwrap_or_else(|| "Unknown Journal".to_string());
 
-    // Extract journal abbreviation
-    journal.abbreviation = xml_utils::extract_text_between(
+    let abbreviation = xml_utils::extract_text_between(
         content,
         "<journal-id journal-id-type=\"iso-abbrev\">",
         "</journal-id>",
     );
 
     // Extract ISSNs
+    let mut issn_print = None;
+    let mut issn_electronic = None;
     let mut pos = 0;
     while let Some(issn_start) = content[pos..].find("<issn") {
         let issn_start = pos + issn_start;
@@ -27,9 +31,9 @@ pub fn extract_journal_info(content: &str) -> JournalInfo {
                 let issn_value = &issn_section[content_start + 1..];
 
                 if issn_section.contains("pub-type=\"epub\"") {
-                    journal.issn_electronic = Some(issn_value.to_string());
+                    issn_electronic = Some(issn_value.to_string());
                 } else if issn_section.contains("pub-type=\"ppub\"") {
-                    journal.issn_print = Some(issn_value.to_string());
+                    issn_print = Some(issn_value.to_string());
                 }
             }
             pos = issn_end;
@@ -38,15 +42,65 @@ pub fn extract_journal_info(content: &str) -> JournalInfo {
         }
     }
 
-    // Extract publisher
-    journal.publisher =
+    let publisher =
         xml_utils::extract_text_between(content, "<publisher-name>", "</publisher-name>");
 
-    // Extract volume and issue
-    journal.volume = xml_utils::extract_text_between(content, "<volume>", "</volume>");
-    journal.issue = xml_utils::extract_text_between(content, "<issue>", "</issue>");
+    JournalMeta {
+        title,
+        abbreviation,
+        issn_print,
+        issn_electronic,
+        publisher,
+    }
+}
 
-    journal
+/// Extract volume number from `<volume>` element.
+pub fn extract_volume(content: &str) -> Option<String> {
+    xml_utils::extract_text_between(content, "<volume>", "</volume>")
+}
+
+/// Extract issue number from `<issue>` element.
+pub fn extract_issue(content: &str) -> Option<String> {
+    xml_utils::extract_text_between(content, "<issue>", "</issue>")
+}
+
+/// Extract structured publication dates from `<pub-date>` elements.
+///
+/// Returns a `Vec<PublicationDate>` with `pub_type` attribute preserved.
+pub fn extract_pub_dates(content: &str) -> Vec<PublicationDate> {
+    let mut dates = Vec::new();
+
+    let mut pos = 0;
+    while let Some(pd_start) = content[pos..].find("<pub-date") {
+        let pd_start = pos + pd_start;
+        if let Some(pd_end) = content[pd_start..].find("</pub-date>") {
+            let pd_end = pd_start + pd_end + "</pub-date>".len();
+            let pd_section = &content[pd_start..pd_end];
+
+            let pub_type = xml_utils::extract_attribute_value(pd_section, "pub-type")
+                .or_else(|| xml_utils::extract_attribute_value(pd_section, "date-type"));
+
+            let year = xml_utils::extract_text_between(pd_section, "<year>", "</year>")
+                .and_then(|y| y.parse::<u16>().ok());
+            let month = xml_utils::extract_text_between(pd_section, "<month>", "</month>")
+                .and_then(|m| m.parse::<u8>().ok());
+            let day = xml_utils::extract_text_between(pd_section, "<day>", "</day>")
+                .and_then(|d| d.parse::<u8>().ok());
+
+            dates.push(PublicationDate {
+                pub_type,
+                year,
+                month,
+                day,
+            });
+
+            pos = pd_end;
+        } else {
+            break;
+        }
+    }
+
+    dates
 }
 
 /// Extract publication date in YYYY-MM-DD format
@@ -185,12 +239,14 @@ pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
                 )
                 .unwrap_or_else(|| "Unknown Source".to_string());
 
-                let mut funding_info = FundingInfo::new(source);
-                funding_info.award_id =
+                let award_id =
                     xml_utils::extract_text_between(award_section, "<award-id>", "</award-id>");
-                funding_info.statement = statement.clone();
 
-                funding.push(funding_info);
+                funding.push(FundingInfo {
+                    source,
+                    award_id,
+                    statement: statement.clone(),
+                });
                 pos = award_end;
             } else {
                 break;
@@ -318,8 +374,6 @@ pub fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMateri
                 .unwrap_or_else(|| "No caption available".to_string());
 
             let content_type = xml_utils::extract_attribute_value(supp_content, "content-type");
-            let mime_type = xml_utils::extract_attribute_value(supp_content, "mimetype");
-            let position = xml_utils::extract_attribute_value(supp_content, "position");
             let href = xml_utils::extract_attribute_value(supp_content, "href")
                 .or_else(|| xml_utils::extract_attribute_value(supp_content, "xlink:href"))
                 .or_else(|| {
@@ -337,15 +391,13 @@ pub fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMateri
                     }
                 });
 
-            let mut material = SupplementaryMaterial::new(id);
-            material.title = Some(caption);
-            material.description = label;
-            material.content_type = content_type;
-            material.file_type = mime_type;
-            material.position = position;
-            material.file_url = href;
-
-            materials.push(material);
+            materials.push(SupplementaryMaterial {
+                id,
+                content_type,
+                title: Some(caption),
+                description: label,
+                href,
+            });
             pos = supp_end;
         } else {
             break;

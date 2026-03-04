@@ -7,12 +7,12 @@ pub mod domain;
 pub mod oa_api;
 pub mod parser;
 
-// Re-export parser models (backward compatibility)
-pub use parser::models;
-pub use parser::models::{
-    Affiliation, ArticleSection, Author, ExtractedFigure, Figure, FundingInfo, HistoryDate,
-    JournalInfo, PmcFullText, Reference, SupplementaryMaterial, Table,
+// Re-export domain types as the primary API
+pub use domain::{
+    AbstractSection, Definition, Figure, Formula, FundingInfo, JournalMeta, PmcArticle, Reference,
+    Section, SupplementaryMaterial, Table, TableCell, TableRow,
 };
+
 // Re-export OA types
 pub use oa_api::OaSubsetInfo;
-pub use parser::{parse_pmc_xml, parse_pmc_xml_domain};
+pub use parser::parse_pmc_xml;
