@@ -3,6 +3,7 @@
 //! This module provides parsers for PMC full-text XML responses
 //! and the data types that represent PMC articles.
 
+pub mod domain;
 pub mod models;
 pub mod oa_api;
 pub mod parser;
@@ -12,4 +13,4 @@ pub use models::{
     Affiliation, ArticleSection, Author, Figure, FundingInfo, HistoryDate, JournalInfo,
     OaSubsetInfo, PmcFullText, Reference, Table,
 };
-pub use parser::parse_pmc_xml;
+pub use parser::{parse_pmc_xml, parse_pmc_xml_domain};

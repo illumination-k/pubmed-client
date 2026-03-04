@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::pmc::domain::PmcArticle;
 use crate::pmc::models::PmcFullText;
 
 pub mod author;
@@ -95,6 +96,17 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcFullText> {
         lpage,
         elocation_id,
     })
+}
+
+/// Parse PMC XML content into the domain model.
+///
+/// This is a convenience wrapper that calls [`parse_pmc_xml`] and converts
+/// the result into [`PmcArticle`]. Fields not yet extracted by the current
+/// parser (structured abstracts, table content, formulas, appendices, glossary,
+/// subtitle, section labels) will be empty/`None`.
+pub fn parse_pmc_xml_domain(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
+    let legacy = parse_pmc_xml(xml_content, pmcid)?;
+    PmcArticle::try_from(legacy).map_err(Into::into)
 }
 
 #[cfg(test)]
