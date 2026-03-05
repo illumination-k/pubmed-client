@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 use serde::Serialize;
 
-use pubmed_parser::common::Author;
+use pubmed_parser::common::{Author, PublicationDate};
 use pubmed_parser::pmc::{Figure, FundingInfo, PmcArticle, Reference, Section, Table};
 
 /// HTML entity mappings for common entities found in PMC articles
@@ -167,7 +167,7 @@ impl Default for MarkdownConfig {
 }
 
 /// Format the first publication date as a "YYYY-MM-DD" / "YYYY-MM" / "YYYY" string.
-fn format_first_pub_date(dates: &[pubmed_parser::common::PublicationDate]) -> Option<String> {
+fn format_first_pub_date(dates: &[PublicationDate]) -> Option<String> {
     let d = dates.first()?;
     let year = d.year?;
     match (d.month, d.day) {
@@ -901,7 +901,7 @@ impl Default for PmcMarkdownConverter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pubmed_parser::common::{Author, PmcId, PublicationDate};
+    use pubmed_parser::common::{Author, PmcId, PubMedId, PublicationDate};
     use pubmed_parser::pmc::{JournalMeta, PmcArticle};
 
     /// Create a minimal test article with common defaults.
@@ -1016,7 +1016,7 @@ mod tests {
         let converter = PmcMarkdownConverter::new();
 
         let mut article = test_article("Test Article", "PMC1234567");
-        article.pmid = Some(pubmed_parser::common::PubMedId::parse("12345").unwrap());
+        article.pmid = Some(PubMedId::parse("12345").unwrap());
         article.authors = vec![Author::from_full_name("John Doe".to_string())];
         article.pub_dates = vec![PublicationDate {
             pub_type: None,
@@ -1041,7 +1041,7 @@ mod tests {
         let converter = PmcMarkdownConverter::new().with_yaml_frontmatter(true);
 
         let mut article = test_article("Test Article", "PMC1234567");
-        article.pmid = Some(pubmed_parser::common::PubMedId::parse("12345").unwrap());
+        article.pmid = Some(PubMedId::parse("12345").unwrap());
         article.authors = vec![
             Author::from_full_name("John Doe".to_string()),
             Author::from_full_name("Jane Smith".to_string()),
