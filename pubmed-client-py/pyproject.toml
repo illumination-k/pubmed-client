@@ -37,7 +37,13 @@ features = []
 include = ["pubmed_client.pyi"]
 
 [dependency-groups]
-dev = ["pytest>=8.0", "pytest-cov>=6.0", "mypy>=1.0", "ruff>=0.7"]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=6.0",
+  "mypy>=1.0",
+  "ruff>=0.7",
+  "ty>=0.0.19",
+]
 docs = [
   "sphinx>=8.0",
   "furo>=2024.0",

@@ -10,7 +10,7 @@ repos:
       - id: check-merge-conflict
       - id: check-added-large-files
         args: ["--maxkb=100", "--enforce-all"]
-        exclude: "^pubmed-client/tests/integration/test_data/.*\\.(xml|json)$|Cargo.lock$|pnpm-lock.yaml$|uv.lock$"
+        exclude: "^pubmed-client/tests/integration/test_data/.*\\.(xml|json)$|Cargo.lock$|pnpm-lock.yaml$|uv.lock$|.*\\.snap$"
       - id: mixed-line-ending
 
   - repo: local

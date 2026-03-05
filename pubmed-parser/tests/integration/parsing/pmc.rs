@@ -54,8 +54,11 @@ fn test_comprehensive_pmc_parsing(#[from(xml_test_cases)] test_cases: Vec<PmcXml
 
                 // Basic validation
                 assert!(!article.title.is_empty(), "Article should have a title");
-                assert!(!article.pmcid.is_empty(), "Article should have a PMC ID");
-                assert_eq!(article.pmcid, test_case.pmcid, "PMC ID should match");
+                assert_eq!(
+                    article.pmcid.as_str(),
+                    test_case.pmcid,
+                    "PMC ID should match"
+                );
 
                 // Log some statistics
                 info!(

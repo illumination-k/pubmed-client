@@ -343,6 +343,76 @@ pub fn extract_all_attributes(tag: &str) -> HashMap<String, String> {
     attributes
 }
 
+/// Decode XML character entities in a string
+///
+/// Decodes both named entities (`&amp;`, `&lt;`, `&gt;`, `&quot;`, `&apos;`)
+/// and numeric entities (`&#169;`, `&#x00A9;`).
+pub fn decode_xml_entities(content: &str) -> Cow<'_, str> {
+    if !content.contains('&') {
+        return Cow::Borrowed(content);
+    }
+
+    let mut result = String::with_capacity(content.len());
+    let mut chars = content.chars().peekable();
+
+    while let Some(c) = chars.next() {
+        if c == '&' {
+            // Collect entity
+            let mut entity = String::new();
+            let mut found_semicolon = false;
+            for ec in chars.by_ref() {
+                if ec == ';' {
+                    found_semicolon = true;
+                    break;
+                }
+                entity.push(ec);
+                if entity.len() > 10 {
+                    break;
+                }
+            }
+
+            if found_semicolon {
+                match entity.as_str() {
+                    "amp" => result.push('&'),
+                    "lt" => result.push('<'),
+                    "gt" => result.push('>'),
+                    "quot" => result.push('"'),
+                    "apos" => result.push('\''),
+                    s if s.starts_with('#') => {
+                        let code = if s.starts_with("#x") || s.starts_with("#X") {
+                            u32::from_str_radix(&s[2..], 16).ok()
+                        } else {
+                            s[1..].parse::<u32>().ok()
+                        };
+                        if let Some(ch) = code.and_then(char::from_u32) {
+                            result.push(ch);
+                        } else {
+                            // Unknown numeric entity - preserve as-is
+                            result.push('&');
+                            result.push_str(&entity);
+                            result.push(';');
+                        }
+                    }
+                    _ => {
+                        // Unknown named entity - preserve as-is
+                        result.push('&');
+                        result.push_str(&entity);
+                        result.push(';');
+                    }
+                }
+            } else {
+                // Malformed entity (no semicolon found) - preserve as-is
+                result.push('&');
+                result.push_str(&entity);
+            }
+        } else {
+            result.push(c);
+        }
+    }
+
+    Cow::Owned(result)
+}
+
 /// Check if a tag is self-closing
 ///
 /// # Arguments
@@ -486,5 +556,34 @@ mod tests {
         let result = extract_section_text(content, "section");
         // Note: strip_xml_tags removes tags but doesn't add spaces between elements
         assert_eq!(result, Some("TestContent".to_string()));
+    }
+
+    #[test]
+    fn test_decode_xml_entities() {
+        // Named entities
+        assert_eq!(decode_xml_entities("&amp;"), "&");
+        assert_eq!(decode_xml_entities("&lt;"), "<");
+        assert_eq!(decode_xml_entities("&gt;"), ">");
+        assert_eq!(decode_xml_entities("&quot;"), "\"");
+        assert_eq!(decode_xml_entities("&apos;"), "'");
+
+        // Numeric entities (decimal)
+        assert_eq!(decode_xml_entities("&#169;"), "©");
+        assert_eq!(decode_xml_entities("&#231;"), "ç");
+        assert_eq!(decode_xml_entities("&#193;"), "Á");
+
+        // Numeric entities (hexadecimal)
+        assert_eq!(decode_xml_entities("&#xA9;"), "©");
+        assert_eq!(decode_xml_entities("&#x00A9;"), "©");
+
+        // No entities — borrowed (no allocation)
+        let result = decode_xml_entities("no entities here");
+        assert!(matches!(result, Cow::Borrowed(_)));
+
+        // Mixed content
+        assert_eq!(
+            decode_xml_entities("&#169; 2021 Fran&#231;ois &amp; Co"),
+            "© 2021 François & Co"
+        );
     }
 }

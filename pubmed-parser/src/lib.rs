@@ -19,5 +19,5 @@ pub mod pmc;
 pub mod pubmed;
 
 // Re-export main types for convenience
-pub use common::{Affiliation, Author, PmcId, PubMedId};
+pub use common::{Affiliation, Author, HistoryDate, PmcId, PubMedId, PublicationDate};
 pub use error::{ParseError, Result};

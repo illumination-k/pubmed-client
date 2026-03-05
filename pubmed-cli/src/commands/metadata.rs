@@ -288,19 +288,31 @@ async fn fetch_article_metadata(
     let abstract_content = full_text
         .sections
         .iter()
-        .find(|s| s.section_type == "abstract")
+        .find(|s| s.section_type.as_deref() == Some("abstract"))
         .map(|s| s.content.clone());
 
     // Create metadata structure
     let metadata = ArticleMetadata {
-        pmcid: full_text.pmcid.clone(),
-        pmid: full_text.pmid.clone(),
+        pmcid: full_text.pmcid.to_string(),
+        pmid: full_text.pmid.as_ref().map(|p| p.to_string()),
         doi: full_text.doi.clone(),
         title: full_text.title.clone(),
         r#abstract: abstract_content,
         authors: full_text.authors.clone(),
         journal: Some(full_text.journal.clone()),
-        publication_date: Some(full_text.pub_date.clone()),
+        publication_date: full_text.pub_dates.first().map(|d| {
+            let mut s = String::new();
+            if let Some(y) = d.year {
+                s.push_str(&y.to_string());
+            }
+            if let Some(m) = d.month {
+                s.push_str(&format!("-{:02}", m));
+            }
+            if let Some(day) = d.day {
+                s.push_str(&format!("-{:02}", day));
+            }
+            s
+        }),
         keywords: full_text.keywords.clone(),
         funding: full_text.funding.clone(),
         references: full_text.references.clone(),
@@ -317,7 +329,7 @@ struct ArticleMetadata {
     title: String,
     r#abstract: Option<String>,
     authors: Vec<pubmed_client::pmc::Author>,
-    journal: Option<pubmed_client::pmc::JournalInfo>,
+    journal: Option<pubmed_client::pmc::JournalMeta>,
     publication_date: Option<String>,
     keywords: Vec<String>,
     funding: Vec<pubmed_client::pmc::FundingInfo>,

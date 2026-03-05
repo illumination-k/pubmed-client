@@ -7,9 +7,8 @@ use std::collections::HashMap;
 
 use serde::Serialize;
 
-use pubmed_parser::pmc::models::{
-    ArticleSection, Author, Figure, FundingInfo, PmcFullText, Reference, Table,
-};
+use pubmed_parser::common::{Author, PublicationDate};
+use pubmed_parser::pmc::{Figure, FundingInfo, PmcArticle, Reference, Section, Table};
 
 /// HTML entity mappings for common entities found in PMC articles
 static HTML_ENTITIES: &[(&str, &str)] = &[
@@ -167,6 +166,17 @@ impl Default for MarkdownConfig {
     }
 }
 
+/// Format the first publication date as a "YYYY-MM-DD" / "YYYY-MM" / "YYYY" string.
+fn format_first_pub_date(dates: &[PublicationDate]) -> Option<String> {
+    let d = dates.first()?;
+    let year = d.year?;
+    match (d.month, d.day) {
+        (Some(m), Some(day)) => Some(format!("{year}-{m:02}-{day:02}")),
+        (Some(m), None) => Some(format!("{year}-{m:02}")),
+        _ => Some(year.to_string()),
+    }
+}
+
 /// PMC to Markdown converter
 pub struct PmcMarkdownConverter {
     config: MarkdownConfig,
@@ -242,7 +252,7 @@ impl PmcMarkdownConverter {
     /// Convert a PMC article to Markdown with optional figure paths
     pub fn convert_with_figures(
         &self,
-        article: &PmcFullText,
+        article: &PmcArticle,
         figure_paths: Option<&HashMap<String, String>>,
     ) -> String {
         let mut markdown = String::new();
@@ -278,7 +288,7 @@ impl PmcMarkdownConverter {
     }
 
     /// Convert a PMC article to Markdown
-    pub fn convert(&self, article: &PmcFullText) -> String {
+    pub fn convert(&self, article: &PmcArticle) -> String {
         let mut markdown = String::new();
 
         // Add metadata section
@@ -312,7 +322,7 @@ impl PmcMarkdownConverter {
     }
 
     /// Generate YAML frontmatter from article metadata
-    fn generate_yaml_frontmatter(&self, article: &PmcFullText) -> String {
+    fn generate_yaml_frontmatter(&self, article: &PmcArticle) -> String {
         // Build metadata structure
         let metadata = ArticleMetadata {
             title: self.clean_content(&article.title),
@@ -327,13 +337,9 @@ impl PmcMarkdownConverter {
                 .abbreviation
                 .as_ref()
                 .map(|a| self.clean_content(a)),
-            pub_date: if !article.pub_date.is_empty() && article.pub_date != "Unknown Date" {
-                Some(self.clean_content(&article.pub_date))
-            } else {
-                None
-            },
-            pmcid: self.clean_content(&article.pmcid),
-            pmid: article.pmid.as_ref().map(|p| self.clean_content(p)),
+            pub_date: format_first_pub_date(&article.pub_dates),
+            pmcid: article.pmcid.as_str(),
+            pmid: article.pmid.as_ref().map(|p| p.as_str()),
             doi: article.doi.as_ref().map(|d| self.clean_content(d)),
             article_type: article.article_type.as_ref().map(|t| self.clean_content(t)),
             keywords: article
@@ -341,16 +347,8 @@ impl PmcMarkdownConverter {
                 .iter()
                 .map(|k| self.clean_content(k))
                 .collect(),
-            volume: article
-                .journal
-                .volume
-                .as_ref()
-                .map(|v| self.clean_content(v)),
-            issue: article
-                .journal
-                .issue
-                .as_ref()
-                .map(|i| self.clean_content(i)),
+            volume: article.volume.as_ref().map(|v| self.clean_content(v)),
+            issue: article.issue.as_ref().map(|i| self.clean_content(i)),
             publisher: article
                 .journal
                 .publisher
@@ -370,7 +368,7 @@ impl PmcMarkdownConverter {
     }
 
     /// Convert metadata section
-    fn convert_metadata(&self, article: &PmcFullText) -> String {
+    fn convert_metadata(&self, article: &PmcArticle) -> String {
         // Use YAML frontmatter if configured
         if self.config.use_yaml_frontmatter {
             return self.generate_yaml_frontmatter(article);
@@ -398,8 +396,7 @@ impl PmcMarkdownConverter {
         metadata.push('\n');
 
         // Publication date
-        if !article.pub_date.is_empty() && article.pub_date != "Unknown Date" {
-            let pub_date = &article.pub_date;
+        if let Some(pub_date) = format_first_pub_date(&article.pub_dates) {
             metadata.push_str(&format!("**Published:** {pub_date}\n"));
         }
 
@@ -413,15 +410,16 @@ impl PmcMarkdownConverter {
             }
         }
         if let Some(pmid) = &article.pmid {
+            let pmid_str = pmid.as_str();
             if self.config.include_identifier_links {
                 identifiers.push(format!(
-                    "[PMID: {pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid})"
+                    "[PMID: {pmid_str}](https://pubmed.ncbi.nlm.nih.gov/{pmid_str})"
                 ));
             } else {
-                identifiers.push(format!("PMID: {pmid}"));
+                identifiers.push(format!("PMID: {pmid_str}"));
             }
         }
-        let pmcid = &article.pmcid;
+        let pmcid = article.pmcid.as_str();
         identifiers.push(format!("PMC: {pmcid}"));
 
         if !identifiers.is_empty() {
@@ -447,10 +445,10 @@ impl PmcMarkdownConverter {
 
         // Journal details
         let mut journal_details = Vec::new();
-        if let Some(volume) = &article.journal.volume {
+        if let Some(volume) = &article.volume {
             journal_details.push(format!("Volume {volume}"));
         }
-        if let Some(issue) = &article.journal.issue {
+        if let Some(issue) = &article.issue {
             journal_details.push(format!("Issue {issue}"));
         }
         if let Some(publisher) = &article.journal.publisher {
@@ -467,7 +465,7 @@ impl PmcMarkdownConverter {
     }
 
     /// Convert table of contents
-    fn convert_toc(&self, article: &PmcFullText) -> String {
+    fn convert_toc(&self, article: &PmcArticle) -> String {
         let mut toc = String::new();
         toc.push_str(&self.format_heading("Table of Contents", 2));
         toc.push('\n');
@@ -498,7 +496,7 @@ impl PmcMarkdownConverter {
     /// Convert article sections with figure paths
     fn convert_sections_with_figures(
         &self,
-        sections: &[ArticleSection],
+        sections: &[Section],
         level: u8,
         figure_paths: Option<&HashMap<String, String>>,
     ) -> String {
@@ -549,7 +547,7 @@ impl PmcMarkdownConverter {
     }
 
     /// Convert article sections
-    fn convert_sections(&self, sections: &[ArticleSection], level: u8) -> String {
+    fn convert_sections(&self, sections: &[Section], level: u8) -> String {
         let mut content = String::new();
 
         for section in sections {
@@ -620,7 +618,7 @@ impl PmcMarkdownConverter {
     }
 
     /// Convert additional sections (funding, conflicts, acknowledgments)
-    fn convert_additional_sections(&self, article: &PmcFullText) -> String {
+    fn convert_additional_sections(&self, article: &PmcArticle) -> String {
         let mut content = String::new();
 
         // Funding
@@ -903,7 +901,51 @@ impl Default for PmcMarkdownConverter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pubmed_parser::pmc::models::{Author, JournalInfo, PmcFullText};
+    use pubmed_parser::common::{Author, PmcId, PubMedId, PublicationDate};
+    use pubmed_parser::pmc::{JournalMeta, PmcArticle};
+
+    /// Create a minimal test article with common defaults.
+    fn test_article(title: &str, pmcid: &str) -> PmcArticle {
+        PmcArticle {
+            pmcid: PmcId::parse(pmcid).unwrap(),
+            pmid: None,
+            doi: None,
+            article_type: None,
+            categories: vec![],
+            title: title.to_string(),
+            subtitle: None,
+            authors: vec![],
+            journal: JournalMeta {
+                title: "Test Journal".to_string(),
+                abbreviation: None,
+                issn_print: None,
+                issn_electronic: None,
+                publisher: None,
+            },
+            pub_dates: vec![],
+            volume: None,
+            issue: None,
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
+            abstract_text: None,
+            abstract_sections: vec![],
+            keywords: vec![],
+            sections: vec![],
+            references: vec![],
+            funding: vec![],
+            acknowledgments: None,
+            conflict_of_interest: None,
+            data_availability: None,
+            supplementary_materials: vec![],
+            appendices: vec![],
+            glossary: vec![],
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: vec![],
+        }
+    }
 
     #[test]
     fn test_markdown_converter_creation() {
@@ -973,24 +1015,18 @@ mod tests {
     fn test_basic_conversion() {
         let converter = PmcMarkdownConverter::new();
 
-        let article = PmcFullText {
-            pmcid: "PMC1234567".to_string(),
-            pmid: Some("12345".to_string()),
-            title: "Test Article".to_string(),
-            authors: vec![Author::from_full_name("John Doe".to_string())],
-            journal: JournalInfo::new("Test Journal".to_string()),
-            pub_date: "2023".to_string(),
-            doi: Some("10.1000/test".to_string()),
-            sections: vec![],
-            references: vec![],
-            article_type: Some("research-article".to_string()),
-            keywords: vec!["test".to_string(), "example".to_string()],
-            funding: vec![],
-            conflict_of_interest: None,
-            acknowledgments: None,
-            data_availability: None,
-            supplementary_materials: vec![],
-        };
+        let mut article = test_article("Test Article", "PMC1234567");
+        article.pmid = Some(PubMedId::parse("12345").unwrap());
+        article.authors = vec![Author::from_full_name("John Doe".to_string())];
+        article.pub_dates = vec![PublicationDate {
+            pub_type: None,
+            year: Some(2023),
+            month: None,
+            day: None,
+        }];
+        article.doi = Some("10.1000/test".to_string());
+        article.article_type = Some("research-article".to_string());
+        article.keywords = vec!["test".to_string(), "example".to_string()];
 
         let markdown = converter.convert(&article);
         assert!(markdown.contains("# Test Article"));
@@ -1004,33 +1040,26 @@ mod tests {
     fn test_yaml_frontmatter_basic() {
         let converter = PmcMarkdownConverter::new().with_yaml_frontmatter(true);
 
-        let article = PmcFullText {
-            pmcid: "PMC1234567".to_string(),
-            pmid: Some("12345".to_string()),
-            title: "Test Article".to_string(),
-            authors: vec![
-                Author::from_full_name("John Doe".to_string()),
-                Author::from_full_name("Jane Smith".to_string()),
-            ],
-            journal: JournalInfo::new("Test Journal".to_string()),
-            pub_date: "2023-05-15".to_string(),
-            doi: Some("10.1000/test".to_string()),
-            sections: vec![],
-            references: vec![],
-            article_type: Some("research-article".to_string()),
-            keywords: vec!["test".to_string(), "example".to_string()],
-            funding: vec![],
-            conflict_of_interest: None,
-            acknowledgments: None,
-            data_availability: None,
-            supplementary_materials: vec![],
-        };
+        let mut article = test_article("Test Article", "PMC1234567");
+        article.pmid = Some(PubMedId::parse("12345").unwrap());
+        article.authors = vec![
+            Author::from_full_name("John Doe".to_string()),
+            Author::from_full_name("Jane Smith".to_string()),
+        ];
+        article.pub_dates = vec![PublicationDate {
+            pub_type: None,
+            year: Some(2023),
+            month: Some(5),
+            day: Some(15),
+        }];
+        article.doi = Some("10.1000/test".to_string());
+        article.article_type = Some("research-article".to_string());
+        article.keywords = vec!["test".to_string(), "example".to_string()];
 
         let markdown = converter.convert(&article);
 
         // Check frontmatter delimiters
         assert!(markdown.starts_with("---\n"));
-        // Count occurrences of "---" - should have both opening and closing
         let delimiter_count = markdown.matches("---").count();
         assert_eq!(
             delimiter_count, 2,
@@ -1040,12 +1069,15 @@ mod tests {
         // Check basic fields (serde_yaml format)
         assert!(markdown.contains("title: Test Article"));
         assert!(markdown.contains("authors:"));
-        assert!(markdown.contains("- John Doe")); // serde_yaml uses "- " for arrays
+        assert!(markdown.contains("- John Doe"));
         assert!(markdown.contains("- Jane Smith"));
         assert!(markdown.contains("journal: Test Journal"));
-        assert!(markdown.contains("pub_date: 2023-05-15"));
+        assert!(
+            markdown.contains("pub_date: '2023-05-15'")
+                || markdown.contains("pub_date: 2023-05-15")
+        );
         assert!(markdown.contains("pmcid: PMC1234567"));
-        assert!(markdown.contains("pmid: '12345'")); // serde_yaml quotes numeric strings
+        assert!(markdown.contains("pmid: '12345'"));
         assert!(markdown.contains("doi: 10.1000/test"));
         assert!(markdown.contains("article_type: research-article"));
         assert!(markdown.contains("keywords:"));
@@ -1057,33 +1089,25 @@ mod tests {
     fn test_yaml_frontmatter_with_special_characters() {
         let converter = PmcMarkdownConverter::new().with_yaml_frontmatter(true);
 
-        let article = PmcFullText {
-            pmcid: "PMC7890123".to_string(),
-            pmid: None,
-            title: "COVID-19: A Comprehensive Study".to_string(),
-            authors: vec![Author::from_full_name("O'Brien, Michael".to_string())],
-            journal: JournalInfo::new("Nature: Medicine & Science".to_string()),
-            pub_date: "2023".to_string(),
-            doi: Some("10.1038/s41591-023-01234-5".to_string()),
-            sections: vec![],
-            references: vec![],
-            article_type: Some("research-article".to_string()),
-            keywords: vec![
-                "#COVID-19".to_string(),
-                "SARS-CoV-2".to_string(),
-                "vaccine".to_string(),
-            ],
-            funding: vec![],
-            conflict_of_interest: None,
-            acknowledgments: None,
-            data_availability: None,
-            supplementary_materials: vec![],
-        };
+        let mut article = test_article("COVID-19: A Comprehensive Study", "PMC7890123");
+        article.journal.title = "Nature: Medicine & Science".to_string();
+        article.authors = vec![Author::from_full_name("O'Brien, Michael".to_string())];
+        article.pub_dates = vec![PublicationDate {
+            pub_type: None,
+            year: Some(2023),
+            month: None,
+            day: None,
+        }];
+        article.doi = Some("10.1038/s41591-023-01234-5".to_string());
+        article.article_type = Some("research-article".to_string());
+        article.keywords = vec![
+            "#COVID-19".to_string(),
+            "SARS-CoV-2".to_string(),
+            "vaccine".to_string(),
+        ];
 
         let markdown = converter.convert(&article);
 
-        // Check that special characters are properly escaped by serde_yaml
-        // serde_yaml uses single quotes for strings with special chars
         assert!(
             markdown.contains("title: 'COVID-19: A Comprehensive Study'")
                 || markdown.contains("title: \"COVID-19: A Comprehensive Study\"")
@@ -1092,7 +1116,6 @@ mod tests {
             markdown.contains("journal: 'Nature: Medicine & Science'")
                 || markdown.contains("journal: \"Nature: Medicine & Science\"")
         );
-        // Keywords with special characters will be quoted
         assert!(markdown.contains("'#COVID-19'") || markdown.contains("\"#COVID-19\""));
         assert!(markdown.contains("SARS-CoV-2"));
     }
@@ -1103,24 +1126,7 @@ mod tests {
         let converter = PmcMarkdownConverter::new();
         assert!(!converter.config.use_yaml_frontmatter);
 
-        let article = PmcFullText {
-            pmcid: "PMC1234567".to_string(),
-            pmid: None,
-            title: "Test Article".to_string(),
-            authors: vec![],
-            journal: JournalInfo::new("Test Journal".to_string()),
-            pub_date: "2023".to_string(),
-            doi: None,
-            sections: vec![],
-            references: vec![],
-            article_type: None,
-            keywords: vec![],
-            funding: vec![],
-            conflict_of_interest: None,
-            acknowledgments: None,
-            data_availability: None,
-            supplementary_materials: vec![],
-        };
+        let article = test_article("Test Article", "PMC1234567");
 
         let markdown = converter.convert(&article);
 

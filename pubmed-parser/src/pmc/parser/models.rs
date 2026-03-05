@@ -3,6 +3,21 @@ use serde::{Deserialize, Serialize};
 // Re-export common types
 pub use crate::common::{Affiliation, Author};
 
+/// Represents a date from article publication history (e.g., received, accepted)
+///
+/// Maps to JATS `<date date-type="...">` inside `<history>`.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct HistoryDate {
+    /// Date type (e.g., "received", "accepted", "rev-recd")
+    pub date_type: String,
+    /// Year
+    pub year: Option<u16>,
+    /// Month (1-12)
+    pub month: Option<u8>,
+    /// Day (1-31)
+    pub day: Option<u8>,
+}
+
 /// Represents journal information
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JournalInfo {
@@ -182,6 +197,24 @@ pub struct PmcFullText {
     pub data_availability: Option<String>,
     /// Supplementary materials
     pub supplementary_materials: Vec<SupplementaryMaterial>,
+    /// Abstract text
+    pub abstract_text: Option<String>,
+    /// Copyright statement (from `<copyright-statement>`)
+    pub copyright: Option<String>,
+    /// License text (from `<license>`)
+    pub license: Option<String>,
+    /// License URL (from `<license xlink:href="...">`)
+    pub license_url: Option<String>,
+    /// Publication history dates (received, accepted, etc.)
+    pub history_dates: Vec<HistoryDate>,
+    /// Article categories/subjects (from `<article-categories>/<subj-group>/<subject>`)
+    pub categories: Vec<String>,
+    /// First page (from `<fpage>`)
+    pub fpage: Option<String>,
+    /// Last page (from `<lpage>`)
+    pub lpage: Option<String>,
+    /// Electronic location identifier (from `<elocation-id>`)
+    pub elocation_id: Option<String>,
 }
 
 /// Represents a section of an article
@@ -258,6 +291,15 @@ impl PmcFullText {
             acknowledgments: None,
             data_availability: None,
             supplementary_materials: Vec::new(),
+            abstract_text: None,
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: Vec::new(),
+            categories: Vec::new(),
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
         }
     }
 
@@ -529,69 +571,6 @@ impl Table {
             label: None,
             caption,
             footnotes: Vec::new(),
-        }
-    }
-}
-
-/// Information about OA (Open Access) subset availability for a PMC article
-///
-/// The OA subset contains articles with programmatic access to full-text XML.
-/// Not all PMC articles are in the OA subset - some publishers restrict programmatic access
-/// even though the article may be viewable on the PMC website.
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct OaSubsetInfo {
-    /// PMC ID (e.g., "PMC7906746")
-    pub pmcid: String,
-    /// Whether the article is in the OA subset
-    pub is_oa_subset: bool,
-    /// Citation string (if available)
-    pub citation: Option<String>,
-    /// License type (if available)
-    pub license: Option<String>,
-    /// Whether the article is retracted
-    pub retracted: bool,
-    /// Download link for tar.gz package (if available)
-    pub download_link: Option<String>,
-    /// Format of the download (e.g., "tgz", "pdf")
-    pub download_format: Option<String>,
-    /// Last updated timestamp for the download
-    pub updated: Option<String>,
-    /// Error code if not in OA subset
-    pub error_code: Option<String>,
-    /// Error message if not in OA subset
-    pub error_message: Option<String>,
-}
-
-impl OaSubsetInfo {
-    /// Create a new OaSubsetInfo for an article in the OA subset
-    pub fn available(pmcid: String) -> Self {
-        Self {
-            pmcid,
-            is_oa_subset: true,
-            citation: None,
-            license: None,
-            retracted: false,
-            download_link: None,
-            download_format: None,
-            updated: None,
-            error_code: None,
-            error_message: None,
-        }
-    }
-
-    /// Create a new OaSubsetInfo for an article NOT in the OA subset
-    pub fn not_available(pmcid: String, error_code: String, error_message: String) -> Self {
-        Self {
-            pmcid,
-            is_oa_subset: false,
-            citation: None,
-            license: None,
-            retracted: false,
-            download_link: None,
-            download_format: None,
-            updated: None,
-            error_code: Some(error_code),
-            error_message: Some(error_message),
         }
     }
 }

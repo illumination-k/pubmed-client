@@ -279,9 +279,9 @@ pub use common::{Affiliation, Author, PmcId, PubMedId};
 pub use config::ClientConfig;
 pub use error::{ParseError, PubMedError, Result};
 pub use pmc::{
-    ArticleSection, Figure, FundingInfo, HeadingStyle, JournalInfo, MarkdownConfig, OaSubsetInfo,
-    PmcClient, PmcFullText, PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Table,
-    models::ExtractedFigure, parse_pmc_xml,
+    ExtractedFigure, Figure, FundingInfo, HeadingStyle, JournalMeta, MarkdownConfig, OaSubsetInfo,
+    PmcArticle, PmcClient, PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Section,
+    Table, parse_pmc_xml,
 };
 pub use pubmed::{
     AbstractSection, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,
@@ -383,7 +383,7 @@ impl Client {
     ///
     /// # Returns
     ///
-    /// Returns a vector of tuples containing (`PubMedArticle`, `Option<PmcFullText>`)
+    /// Returns a vector of tuples containing (`PubMedArticle`, `Option<PmcArticle>`)
     ///
     /// # Example
     ///
@@ -411,7 +411,7 @@ impl Client {
         &self,
         query: &str,
         limit: usize,
-    ) -> Result<Vec<(PubMedArticle, Option<PmcFullText>)>> {
+    ) -> Result<Vec<(PubMedArticle, Option<PmcArticle>)>> {
         let articles = self.pubmed.search_and_fetch(query, limit, None).await?;
         let mut results = Vec::new();
 

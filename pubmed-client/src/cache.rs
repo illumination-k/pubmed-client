@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tracing::{debug, info};
 
-use crate::pmc::models::PmcFullText;
+use pubmed_parser::pmc::PmcArticle;
 
 // ---------------------------------------------------------------------------
 // CacheBackend trait
@@ -424,7 +424,7 @@ impl<V: Send + Sync + 'static> TypedCache<V> {
 }
 
 /// Type alias for the PMC full-text response cache.
-pub type PmcCache = TypedCache<PmcFullText>;
+pub type PmcCache = TypedCache<PmcArticle>;
 
 // ---------------------------------------------------------------------------
 // Factory

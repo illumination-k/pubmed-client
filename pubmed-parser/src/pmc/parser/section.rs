@@ -1,11 +1,12 @@
+use crate::pmc::domain::{Figure, Section, Table};
+
 use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
 use super::xml_utils;
-use crate::pmc::models::{ArticleSection, Figure, Table};
 use quick_xml::events::Event;
 use quick_xml::name::QName;
 
 /// Extract all sections from PMC XML content
-pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
+pub fn extract_sections_enhanced(content: &str) -> Vec<Section> {
     let mut sections = Vec::new();
 
     // Extract abstract first
@@ -32,10 +33,17 @@ pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
             if let Some(first_section) = sections.first_mut() {
                 first_section.figures.extend(float_figures);
             } else {
-                let mut figures_section =
-                    ArticleSection::new("figures".to_string(), "Figures section".to_string());
-                figures_section.figures = float_figures;
-                sections.push(figures_section);
+                sections.push(Section {
+                    id: None,
+                    section_type: Some("figures".to_string()),
+                    label: None,
+                    title: Some("Figures".to_string()),
+                    content: String::new(),
+                    subsections: Vec::new(),
+                    figures: float_figures,
+                    tables: Vec::new(),
+                    formulas: Vec::new(),
+                });
             }
         }
     }
@@ -44,7 +52,7 @@ pub fn extract_sections_enhanced(content: &str) -> Vec<ArticleSection> {
 }
 
 /// Extract abstract section using Reader for text, Reader scan for figures/tables
-fn extract_abstract_section(content: &str) -> Option<ArticleSection> {
+fn extract_abstract_section(content: &str) -> Option<Section> {
     let abstract_start = content.find("<abstract")?;
     let abstract_end_offset = content[abstract_start..].find("</abstract>")?;
     let abstract_xml =
@@ -95,14 +103,17 @@ fn extract_abstract_section(content: &str) -> Option<ArticleSection> {
 
     let clean_content = text_parts.join("\n");
     if !clean_content.is_empty() {
-        let mut section = ArticleSection::with_title(
-            "abstract".to_string(),
-            "Abstract".to_string(),
-            clean_content,
-        );
-        section.figures = figures;
-        section.tables = tables;
-        Some(section)
+        Some(Section {
+            id: None,
+            section_type: Some("abstract".to_string()),
+            label: None,
+            title: Some("Abstract".to_string()),
+            content: clean_content,
+            subsections: Vec::new(),
+            figures,
+            tables,
+            formulas: Vec::new(),
+        })
     } else {
         None
     }
@@ -118,12 +129,14 @@ enum SectionAction {
     ReadBodyParagraph,
     ReadFigure(FigAttrs),
     ReadTable(TableAttrs),
+    /// Extract text content from a block-level element (list, def-list, formula, etc.)
+    ReadTextElement(Vec<u8>),
     SkipTitle,
     SkipTag(Vec<u8>),
 }
 
 /// Extract body sections using Reader with depth-aware `<sec>` parsing
-fn extract_body_sections(content: &str) -> Vec<ArticleSection> {
+fn extract_body_sections(content: &str) -> Vec<Section> {
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
     let mut sections = Vec::new();
@@ -144,6 +157,27 @@ fn extract_body_sections(content: &str) -> Vec<ArticleSection> {
                 b"table-wrap" if !has_sec_tags => SectionAction::ReadTable(TableAttrs {
                     id: get_attr(e, b"id"),
                 }),
+                // Block-level elements per JATS %para-level; — extract text in no-sec bodies
+                b"list"
+                | b"def-list"
+                | b"disp-formula"
+                | b"disp-formula-group"
+                | b"disp-quote"
+                | b"boxed-text"
+                | b"code"
+                | b"preformat"
+                | b"media"
+                | b"supplementary-material"
+                | b"speech"
+                | b"statement"
+                | b"verse-group"
+                | b"array"
+                | b"graphic"
+                | b"fn-group"
+                    if !has_sec_tags =>
+                {
+                    SectionAction::ReadTextElement(e.name().as_ref().to_vec())
+                }
                 _ => SectionAction::Continue,
             },
             Ok(Event::Eof) => SectionAction::Break,
@@ -178,6 +212,14 @@ fn extract_body_sections(content: &str) -> Vec<ArticleSection> {
                     body_tables.push(table);
                 }
             }
+            SectionAction::ReadTextElement(tag) => {
+                if let Ok(text) = read_text_content(&mut reader, &tag, &mut buf) {
+                    let trimmed = text.trim().to_string();
+                    if !trimmed.is_empty() {
+                        body_paragraphs.push(trimmed);
+                    }
+                }
+            }
             SectionAction::Break => break,
             _ => {}
         }
@@ -186,10 +228,17 @@ fn extract_body_sections(content: &str) -> Vec<ArticleSection> {
     // If no sections found, create a body section from paragraphs
     if sections.is_empty() && !body_paragraphs.is_empty() {
         let text = body_paragraphs.join("\n");
-        let mut section = ArticleSection::new("body".to_string(), text);
-        section.figures = body_figures;
-        section.tables = body_tables;
-        sections.push(section);
+        sections.push(Section {
+            id: None,
+            section_type: Some("body".to_string()),
+            label: None,
+            title: None,
+            content: text,
+            subsections: Vec::new(),
+            figures: body_figures,
+            tables: body_tables,
+            formulas: Vec::new(),
+        });
     }
 
     sections
@@ -205,7 +254,7 @@ fn parse_section_from_body(
     reader: &mut quick_xml::Reader<&[u8]>,
     id: Option<String>,
     buf: &mut Vec<u8>,
-) -> Option<ArticleSection> {
+) -> Option<Section> {
     let mut title: Option<String> = None;
     let mut content_parts: Vec<String> = Vec::new();
     let mut subsections = Vec::new();
@@ -225,6 +274,23 @@ fn parse_section_from_body(
                 b"table-wrap" => SectionAction::ReadTable(TableAttrs {
                     id: get_attr(e, b"id"),
                 }),
+                // Block-level elements per JATS %para-level; — extract text instead of skipping
+                b"list"
+                | b"def-list"
+                | b"disp-formula"
+                | b"disp-formula-group"
+                | b"disp-quote"
+                | b"boxed-text"
+                | b"code"
+                | b"preformat"
+                | b"media"
+                | b"supplementary-material"
+                | b"speech"
+                | b"statement"
+                | b"verse-group"
+                | b"array"
+                | b"graphic"
+                | b"fn-group" => SectionAction::ReadTextElement(e.name().as_ref().to_vec()),
                 other => SectionAction::SkipTag(other.to_vec()),
             },
             Ok(Event::End(ref e)) if e.name().as_ref() == b"sec" => SectionAction::Break,
@@ -268,6 +334,14 @@ fn parse_section_from_body(
                     tables.push(table);
                 }
             }
+            SectionAction::ReadTextElement(tag) => {
+                if let Ok(text) = read_text_content(reader, &tag, buf) {
+                    let trimmed = text.trim().to_string();
+                    if !trimmed.is_empty() {
+                        content_parts.push(trimmed);
+                    }
+                }
+            }
             SectionAction::SkipTag(name) => {
                 let _ = skip_element(reader, QName(&name), buf);
             }
@@ -283,21 +357,17 @@ fn parse_section_from_body(
         || !figures.is_empty()
         || !tables.is_empty()
     {
-        let mut section = match title {
-            Some(t) => ArticleSection::with_title(
-                "section".to_string(),
-                t,
-                section_content.trim().to_string(),
-            ),
-            None => ArticleSection::new("section".to_string(), section_content.trim().to_string()),
-        };
-
-        section.id = id;
-        section.figures = figures;
-        section.tables = tables;
-        section.subsections = subsections;
-
-        Some(section)
+        Some(Section {
+            id,
+            section_type: Some("section".to_string()),
+            label: None,
+            title,
+            content: section_content.trim().to_string(),
+            subsections,
+            figures,
+            tables,
+            formulas: Vec::new(),
+        })
     } else {
         None
     }
@@ -501,16 +571,14 @@ fn parse_figure_inner(
         }
     }
 
-    let fig_id = attrs.id.unwrap_or_else(|| "fig_unknown".to_string());
-    let fig_caption = caption.unwrap_or_else(|| "No caption available".to_string());
-
-    let mut figure = Figure::new(fig_id, fig_caption);
-    figure.label = label;
-    figure.alt_text = alt_text;
-    figure.fig_type = attrs.fig_type;
-    figure.file_name = file_name;
-
-    Some(figure)
+    Some(Figure {
+        id: attrs.id.unwrap_or_else(|| "fig_unknown".to_string()),
+        label,
+        caption: caption.unwrap_or_else(|| "No caption available".to_string()),
+        alt_text,
+        fig_type: attrs.fig_type,
+        graphic_href: file_name,
+    })
 }
 
 enum FigAction {
@@ -574,14 +642,14 @@ fn parse_table_inner(
         }
     }
 
-    let table_id = attrs.id.unwrap_or_else(|| "table_unknown".to_string());
-    let table_caption = caption.unwrap_or_else(|| "No caption available".to_string());
-
-    let mut table = Table::new(table_id, table_caption);
-    table.label = label;
-    table.footnotes = footnotes;
-
-    Some(table)
+    Some(Table {
+        id: attrs.id.unwrap_or_else(|| "table_unknown".to_string()),
+        label,
+        caption: caption.unwrap_or_else(|| "No caption available".to_string()),
+        head: Vec::new(),
+        body: Vec::new(),
+        footnotes,
+    })
 }
 
 enum TableAction {
@@ -645,7 +713,7 @@ mod tests {
         assert!(section.is_some());
 
         let section = section.unwrap();
-        assert_eq!(section.section_type, "abstract");
+        assert_eq!(section.section_type, Some("abstract".to_string()));
         assert_eq!(section.title, Some("Abstract".to_string()));
         assert!(section.content.contains("This is an abstract paragraph."));
     }
@@ -758,7 +826,7 @@ mod tests {
 
         let sections = extract_sections_enhanced(content);
         assert_eq!(sections.len(), 1);
-        assert_eq!(sections[0].section_type, "body");
+        assert_eq!(sections[0].section_type, Some("body".to_string()));
         assert!(sections[0].content.contains("Just a paragraph."));
         assert!(sections[0].content.contains("Another paragraph."));
     }
@@ -779,5 +847,278 @@ mod tests {
             "Expected figures to be extracted from inline position"
         );
         assert_eq!(sections[0].figures[0].id, "fig1");
+    }
+
+    // --- Tests for JATS %para-level; elements that were previously skipped ---
+
+    #[test]
+    fn test_list_text_extraction_in_section() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Methods</title>
+            <p>Before list.</p>
+            <list list-type="bullet">
+                <list-item><p>First item</p></list-item>
+                <list-item><p>Second item</p></list-item>
+            </list>
+            <p>After list.</p>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(section.content.contains("Before list."));
+        assert!(section.content.contains("First item"));
+        assert!(section.content.contains("Second item"));
+        assert!(section.content.contains("After list."));
+    }
+
+    #[test]
+    fn test_def_list_text_extraction_in_section() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Abbreviations</title>
+            <def-list>
+                <def-item>
+                    <term>DNA</term>
+                    <def><p>Deoxyribonucleic acid</p></def>
+                </def-item>
+                <def-item>
+                    <term>RNA</term>
+                    <def><p>Ribonucleic acid</p></def>
+                </def-item>
+            </def-list>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(section.content.contains("DNA"));
+        assert!(section.content.contains("Deoxyribonucleic acid"));
+        assert!(section.content.contains("RNA"));
+        assert!(section.content.contains("Ribonucleic acid"));
+    }
+
+    #[test]
+    fn test_disp_formula_text_extraction() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Model</title>
+            <p>The equation is:</p>
+            <disp-formula id="eq1">
+                <label>(1)</label>
+                <tex-math>E = mc^2</tex-math>
+            </disp-formula>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(section.content.contains("The equation is:"));
+        assert!(
+            section.content.contains("E = mc^2"),
+            "Formula text should be extracted, got: {}",
+            section.content
+        );
+    }
+
+    #[test]
+    fn test_boxed_text_extraction() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Results</title>
+            <boxed-text>
+                <title>Key Finding</title>
+                <p>Important result goes here.</p>
+            </boxed-text>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(
+            section.content.contains("Important result goes here."),
+            "Boxed text content should be extracted, got: {}",
+            section.content
+        );
+    }
+
+    #[test]
+    fn test_code_extraction() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Implementation</title>
+            <code language="python">print("hello world")</code>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(
+            section.content.contains("print(\"hello world\")"),
+            "Code content should be extracted, got: {}",
+            section.content
+        );
+    }
+
+    #[test]
+    fn test_disp_quote_extraction() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Discussion</title>
+            <disp-quote>
+                <p>To be or not to be, that is the question.</p>
+            </disp-quote>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(section.content.contains("To be or not to be"));
+    }
+
+    #[test]
+    fn test_preformat_extraction() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Data</title>
+            <preformat>
+Column1  Column2  Column3
+value1   value2   value3
+            </preformat>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(section.content.contains("Column1"));
+        assert!(section.content.contains("value1"));
+    }
+
+    #[test]
+    fn test_mixed_elements_in_section() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Mixed Content</title>
+            <p>Paragraph text.</p>
+            <list list-type="order">
+                <list-item><p>Ordered item one</p></list-item>
+                <list-item><p>Ordered item two</p></list-item>
+            </list>
+            <fig id="fig1">
+                <label>Figure 1</label>
+                <caption>A test figure</caption>
+            </fig>
+            <disp-formula id="eq1">
+                <label>(2)</label>
+                <tex-math>a^2 + b^2 = c^2</tex-math>
+            </disp-formula>
+            <p>Final paragraph.</p>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(section.content.contains("Paragraph text."));
+        assert!(section.content.contains("Ordered item one"));
+        assert!(section.content.contains("a^2 + b^2 = c^2"));
+        assert!(section.content.contains("Final paragraph."));
+        assert_eq!(section.figures.len(), 1);
+        assert_eq!(section.figures[0].id, "fig1");
+    }
+
+    #[test]
+    fn test_body_without_sec_with_list() {
+        let content = r#"
+        <body>
+            <p>Introduction paragraph.</p>
+            <list list-type="bullet">
+                <list-item><p>Bullet point one</p></list-item>
+                <list-item><p>Bullet point two</p></list-item>
+            </list>
+            <p>Conclusion paragraph.</p>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        assert_eq!(sections[0].section_type, Some("body".to_string()));
+        assert!(sections[0].content.contains("Introduction paragraph."));
+        assert!(sections[0].content.contains("Bullet point one"));
+        assert!(sections[0].content.contains("Bullet point two"));
+        assert!(sections[0].content.contains("Conclusion paragraph."));
+    }
+
+    #[test]
+    fn test_media_in_section() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Supplementary</title>
+            <media mimetype="video" xlink:href="movie1.mp4">
+                <caption><p>Supplementary Movie 1</p></caption>
+            </media>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(
+            section.content.contains("Supplementary Movie 1"),
+            "Media caption should be extracted, got: {}",
+            section.content
+        );
+    }
+
+    #[test]
+    fn test_fn_group_in_section() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Notes</title>
+            <p>Main text.</p>
+            <fn-group>
+                <fn id="fn1"><p>Author contribution note.</p></fn>
+                <fn id="fn2"><p>Funding disclosure.</p></fn>
+            </fn-group>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(section.content.contains("Main text."));
+        assert!(
+            section.content.contains("Author contribution note."),
+            "fn-group content should be extracted, got: {}",
+            section.content
+        );
     }
 }

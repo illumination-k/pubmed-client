@@ -506,25 +506,47 @@ fn test_markdown_config_builder() {
 
     // Test the converter functionality instead of accessing private fields
     // We'll create a simple test article to verify the configuration is working
-    use pubmed_client::pmc::models::{JournalInfo, PmcFullText};
+    use pubmed_client::common::PmcId;
+    use pubmed_client::pmc::{JournalMeta, PmcArticle};
 
-    let test_article = PmcFullText {
-        pmcid: "PMC123456".to_string(),
+    let test_article = PmcArticle {
+        pmcid: PmcId::from_u32(123456),
         pmid: None,
-        title: "Test Article".to_string(),
-        authors: vec![],
-        journal: JournalInfo::new("Test Journal".to_string()),
-        pub_date: "2023".to_string(),
         doi: None,
+        article_type: None,
+        categories: vec![],
+        title: "Test Article".to_string(),
+        subtitle: None,
+        authors: vec![],
+        journal: JournalMeta {
+            title: "Test Journal".to_string(),
+            abbreviation: None,
+            issn_print: None,
+            issn_electronic: None,
+            publisher: None,
+        },
+        pub_dates: vec![],
+        volume: None,
+        issue: None,
+        fpage: None,
+        lpage: None,
+        elocation_id: None,
+        abstract_text: None,
+        abstract_sections: vec![],
+        keywords: vec![],
         sections: vec![],
         references: vec![],
-        article_type: None,
-        keywords: vec![],
         funding: vec![],
-        conflict_of_interest: None,
         acknowledgments: None,
+        conflict_of_interest: None,
         data_availability: None,
         supplementary_materials: vec![],
+        appendices: vec![],
+        glossary: vec![],
+        copyright: None,
+        license: None,
+        license_url: None,
+        history_dates: vec![],
     };
 
     let markdown = converter.convert(&test_article);
@@ -554,26 +576,48 @@ fn test_markdown_config_builder() {
 
 #[test]
 fn test_markdown_edge_cases() {
-    use pubmed_client::pmc::models::{Author, JournalInfo, PmcFullText};
+    use pubmed_client::common::{Author, PmcId, PubMedId};
+    use pubmed_client::pmc::{JournalMeta, PmcArticle};
 
     // Test with minimal article data
-    let minimal_article = PmcFullText {
-        pmcid: "PMC000000".to_string(),
+    let minimal_article = PmcArticle {
+        pmcid: PmcId::from_u32(100000),
         pmid: None,
-        title: "Minimal Test Article".to_string(),
-        authors: vec![],
-        journal: JournalInfo::new("Test Journal".to_string()),
-        pub_date: "Unknown Date".to_string(),
         doi: None,
+        article_type: None,
+        categories: vec![],
+        title: "Minimal Test Article".to_string(),
+        subtitle: None,
+        authors: vec![],
+        journal: JournalMeta {
+            title: "Test Journal".to_string(),
+            abbreviation: None,
+            issn_print: None,
+            issn_electronic: None,
+            publisher: None,
+        },
+        pub_dates: vec![],
+        volume: None,
+        issue: None,
+        fpage: None,
+        lpage: None,
+        elocation_id: None,
+        abstract_text: None,
+        abstract_sections: vec![],
+        keywords: vec![],
         sections: vec![],
         references: vec![],
-        article_type: None,
-        keywords: vec![],
         funding: vec![],
-        conflict_of_interest: None,
         acknowledgments: None,
+        conflict_of_interest: None,
         data_availability: None,
         supplementary_materials: vec![],
+        appendices: vec![],
+        glossary: vec![],
+        copyright: None,
+        license: None,
+        license_url: None,
+        history_dates: vec![],
     };
 
     let converter = PmcMarkdownConverter::new();
@@ -584,28 +628,49 @@ fn test_markdown_edge_cases() {
     assert!(markdown.contains("**Journal:** Test Journal"));
 
     // Test with article containing special characters
-    let special_article = PmcFullText {
-        pmcid: "PMC111111".to_string(),
-        pmid: Some("12345".to_string()),
+    let special_article = PmcArticle {
+        pmcid: PmcId::from_u32(111111),
+        pmid: Some(PubMedId::from_u32(12345)),
+        doi: Some("10.1000/test<>special".to_string()),
+        article_type: Some("research-article".to_string()),
+        categories: vec![],
         title: "Article with <em>HTML</em> & Special Characters".to_string(),
+        subtitle: None,
         authors: vec![Author::from_full_name(
             "Dr. John O'Reilly & Associates".to_string(),
         )],
-        journal: JournalInfo::new("Special Characters Journal".to_string()),
-        pub_date: "2023".to_string(),
-        doi: Some("10.1000/test<>special".to_string()),
-        sections: vec![],
-        references: vec![],
-        article_type: Some("research-article".to_string()),
+        journal: JournalMeta {
+            title: "Special Characters Journal".to_string(),
+            abbreviation: None,
+            issn_print: None,
+            issn_electronic: None,
+            publisher: None,
+        },
+        pub_dates: vec![],
+        volume: None,
+        issue: None,
+        fpage: None,
+        lpage: None,
+        elocation_id: None,
+        abstract_text: None,
+        abstract_sections: vec![],
         keywords: vec![
             "test & validation".to_string(),
             "<script>alert('xss')</script>".to_string(),
         ],
+        sections: vec![],
+        references: vec![],
         funding: vec![],
-        conflict_of_interest: None,
         acknowledgments: None,
+        conflict_of_interest: None,
         data_availability: None,
         supplementary_materials: vec![],
+        appendices: vec![],
+        glossary: vec![],
+        copyright: None,
+        license: None,
+        license_url: None,
+        history_dates: vec![],
     };
 
     let markdown = converter.convert(&special_article);

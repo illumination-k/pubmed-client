@@ -1,6 +1,7 @@
+use crate::common::Author;
 use crate::common::xml_utils::strip_inline_html_tags;
 use crate::error::Result;
-use crate::pmc::models::{Author, Reference};
+use crate::pmc::domain::Reference;
 use quick_xml::de::from_str;
 use serde::Deserialize;
 use tracing;
@@ -9,6 +10,14 @@ use tracing;
 #[derive(Debug, Deserialize)]
 #[serde(rename = "ref-list")]
 struct RefList {
+    #[serde(rename = "@id", default)]
+    #[allow(dead_code)]
+    id: Option<String>,
+
+    #[serde(rename = "title", default)]
+    #[allow(dead_code)]
+    title: Option<String>,
+
     #[serde(rename = "ref", default)]
     refs: Vec<Ref>,
 }
@@ -18,6 +27,10 @@ struct RefList {
 struct Ref {
     #[serde(rename = "@id")]
     id: Option<String>,
+
+    #[serde(rename = "label", default)]
+    #[allow(dead_code)]
+    label: Option<String>,
 
     #[serde(rename = "element-citation", default)]
     element_citation: Option<ElementCitation>,
@@ -32,6 +45,10 @@ struct Ref {
 struct ElementCitation {
     #[serde(rename = "@publication-type")]
     publication_type: Option<String>,
+
+    #[serde(rename = "@id", default)]
+    #[allow(dead_code)]
+    citation_id: Option<String>,
 
     #[serde(rename = "article-title", default)]
     article_title: Option<String>,
@@ -67,6 +84,10 @@ struct ElementCitation {
 struct MixedCitation {
     #[serde(rename = "@publication-type")]
     publication_type: Option<String>,
+
+    #[serde(rename = "@id", default)]
+    #[allow(dead_code)]
+    citation_id: Option<String>,
 
     #[serde(rename = "article-title", default)]
     article_title: Option<String>,
@@ -115,16 +136,46 @@ struct PersonGroup {
 
     #[serde(rename = "name", default)]
     names: Vec<Name>,
+
+    #[serde(rename = "etal", default)]
+    #[allow(dead_code)]
+    etal: Option<String>,
+
+    #[serde(rename = "collab", default)]
+    #[allow(dead_code)]
+    collab: Option<String>,
 }
 
 /// XML structure for name element
 #[derive(Debug, Deserialize)]
 struct Name {
+    #[serde(rename = "@name-style", default)]
+    #[allow(dead_code)]
+    name_style: Option<String>,
+
     #[serde(rename = "surname", default)]
     surname: Option<String>,
 
     #[serde(rename = "given-names", default)]
     given_names: Option<String>,
+
+    #[serde(rename = "suffix", default)]
+    #[allow(dead_code)]
+    suffix: Option<String>,
+}
+
+/// Strip `<comment>...</comment>` elements from XML content.
+///
+/// These elements cause "duplicate field" errors in quick-xml serde deserialization
+/// when multiple `<comment>` elements appear in the same citation.
+fn strip_comment_tags(content: &str) -> String {
+    use regex::Regex;
+    use std::sync::OnceLock;
+
+    static COMMENT_RE: OnceLock<Regex> = OnceLock::new();
+    let re =
+        COMMENT_RE.get_or_init(|| Regex::new(r"<comment[^>]*>.*?</comment>").expect("valid regex"));
+    re.replace_all(content, "").into_owned()
 }
 
 /// Extract detailed references from ref-list or alternative reference structures
@@ -174,8 +225,9 @@ fn try_extract_from_ref_list(content: &str) -> Result<Option<Vec<Reference>>> {
         return Ok(None);
     };
 
-    // Parse the ref-list (strip inline HTML tags first)
+    // Parse the ref-list (strip inline HTML tags and comment tags first)
     let cleaned_content = strip_inline_html_tags(ref_list_content);
+    let cleaned_content = strip_comment_tags(&cleaned_content);
     match from_str::<RefList>(&cleaned_content) {
         Ok(ref_list) => {
             let references = ref_list
@@ -185,7 +237,10 @@ fn try_extract_from_ref_list(content: &str) -> Result<Option<Vec<Reference>>> {
                 .collect();
             Ok(Some(references))
         }
-        Err(_) => Ok(None),
+        Err(e) => {
+            tracing::debug!("Failed to parse ref-list as whole: {}", e);
+            Ok(None)
+        }
     }
 }
 
@@ -208,6 +263,7 @@ fn try_extract_from_references_tag(content: &str) -> Result<Option<Vec<Reference
         .replace("</references>", "</ref-list>");
 
     let cleaned_adapted = strip_inline_html_tags(&adapted_content);
+    let cleaned_adapted = strip_comment_tags(&cleaned_adapted);
     match from_str::<RefList>(&cleaned_adapted) {
         Ok(ref_list) => {
             let references = ref_list
@@ -247,6 +303,7 @@ fn try_extract_from_back_section(content: &str) -> Result<Option<Vec<Reference>>
             // Wrap the ref in a temporary ref-list structure to reuse existing parsing
             let wrapped_content = format!("<ref-list>{}</ref-list>", ref_content);
             let cleaned_wrapped = strip_inline_html_tags(&wrapped_content);
+            let cleaned_wrapped = strip_comment_tags(&cleaned_wrapped);
 
             if let Ok(ref_list) = from_str::<RefList>(&cleaned_wrapped) {
                 for ref_item in ref_list.refs {
@@ -269,10 +326,9 @@ fn try_extract_from_back_section(content: &str) -> Result<Option<Vec<Reference>>
     }
 }
 
-/// Convert a Ref struct to a Reference model
+/// Convert a Ref struct to a domain Reference
 fn parse_ref_to_reference(ref_elem: Ref) -> Option<Reference> {
     let id = ref_elem.id.unwrap_or_else(|| String::from("unknown"));
-    let mut reference = Reference::new(id);
 
     // Try element-citation first, then mixed-citation
     let citation = ref_elem
@@ -280,60 +336,71 @@ fn parse_ref_to_reference(ref_elem: Ref) -> Option<Reference> {
         .map(Citation::Element)
         .or_else(|| ref_elem.mixed_citation.map(Citation::Mixed));
 
-    if let Some(citation) = citation {
-        match citation {
-            Citation::Element(elem) => {
-                reference.ref_type = elem.publication_type;
-                reference.title = elem.article_title;
-                reference.journal = elem.source;
-                reference.year = elem.year;
-                reference.volume = elem.volume;
-                reference.issue = elem.issue;
-                reference.pages = format_pages(elem.fpage, elem.lpage);
+    let citation = citation?;
 
-                // Extract pub-ids
-                for pub_id in elem.pub_ids {
-                    if let (Some(id_type), Some(value)) = (pub_id.pub_id_type, pub_id.value) {
-                        match id_type.as_str() {
-                            "doi" => reference.doi = Some(value),
-                            "pmid" => reference.pmid = Some(value),
-                            _ => {}
-                        }
-                    }
-                }
+    let (
+        publication_type,
+        title,
+        source,
+        year,
+        volume,
+        issue,
+        fpage,
+        lpage,
+        pub_ids,
+        person_groups,
+    ) = match citation {
+        Citation::Element(elem) => (
+            elem.publication_type,
+            elem.article_title,
+            elem.source,
+            elem.year,
+            elem.volume,
+            elem.issue,
+            elem.fpage,
+            elem.lpage,
+            elem.pub_ids,
+            elem.person_groups,
+        ),
+        Citation::Mixed(mixed) => (
+            mixed.publication_type,
+            mixed.article_title,
+            mixed.source,
+            mixed.year,
+            mixed.volume,
+            mixed.issue,
+            mixed.fpage,
+            mixed.lpage,
+            mixed.pub_ids,
+            mixed.person_groups,
+        ),
+    };
 
-                // Extract authors
-                reference.authors = extract_authors_from_person_groups(elem.person_groups);
-            }
-            Citation::Mixed(mixed) => {
-                reference.ref_type = mixed.publication_type;
-                reference.title = mixed.article_title;
-                reference.journal = mixed.source;
-                reference.year = mixed.year;
-                reference.volume = mixed.volume;
-                reference.issue = mixed.issue;
-                reference.pages = format_pages(mixed.fpage, mixed.lpage);
-
-                // Extract pub-ids
-                for pub_id in mixed.pub_ids {
-                    if let (Some(id_type), Some(value)) = (pub_id.pub_id_type, pub_id.value) {
-                        match id_type.as_str() {
-                            "doi" => reference.doi = Some(value),
-                            "pmid" => reference.pmid = Some(value),
-                            _ => {}
-                        }
-                    }
-                }
-
-                // Extract authors
-                reference.authors = extract_authors_from_person_groups(mixed.person_groups);
+    let mut doi = None;
+    let mut pmid = None;
+    for pub_id in pub_ids {
+        if let (Some(id_type), Some(value)) = (pub_id.pub_id_type, pub_id.value) {
+            match id_type.as_str() {
+                "doi" => doi = Some(value),
+                "pmid" => pmid = Some(value),
+                _ => {}
             }
         }
-
-        Some(reference)
-    } else {
-        None
     }
+
+    Some(Reference {
+        id,
+        publication_type,
+        title,
+        authors: extract_authors_from_person_groups(person_groups),
+        source,
+        year,
+        volume,
+        issue,
+        pages: format_pages(fpage, lpage),
+        pmid,
+        doi,
+    })
 }
 
 /// Helper enum to handle both citation types uniformly
@@ -360,7 +427,7 @@ fn extract_authors_from_person_groups(person_groups: Vec<PersonGroup>) -> Vec<Au
         if group.person_group_type.as_deref() == Some("author") || group.person_group_type.is_none()
         {
             for name in group.names {
-                let author = Author::new(name.given_names.clone(), name.surname.clone());
+                let author = Author::new(name.surname.clone(), name.given_names.clone());
                 authors.push(author);
             }
         }
@@ -404,7 +471,7 @@ mod tests {
         let ref1 = &references[0];
         assert_eq!(ref1.id, "ref1");
         assert_eq!(ref1.title, Some("Test Article".to_string()));
-        assert_eq!(ref1.journal, Some("Test Journal".to_string()));
+        assert_eq!(ref1.source, Some("Test Journal".to_string()));
         assert_eq!(ref1.year, Some("2023".to_string()));
         assert_eq!(ref1.volume, Some("10".to_string()));
         assert_eq!(ref1.issue, Some("2".to_string()));
@@ -428,5 +495,27 @@ mod tests {
         let result = extract_references_detailed(content);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().len(), 0);
+    }
+
+    #[test]
+    fn test_extract_references_with_comments_and_etal() {
+        // Test that the serde structs handle all elements that appear in real PMC XML
+        let content = r#"<ref-list id="bibl10"><title>References</title>
+<ref id="bib3"><label>3</label><element-citation publication-type="journal" id="sbref30"><person-group person-group-type="author"><name name-style="western"><surname>Alvarez</surname><given-names>C</given-names></name><etal/></person-group><article-title>Test Article</article-title><source>MedRxiv</source><year>2021</year><comment>published online 20.</comment><pub-id pub-id-type="doi">10.1234/test</pub-id><comment>(preprint)</comment><pub-id pub-id-type="pmcid">PMC123</pub-id><pub-id pub-id-type="pmid">123</pub-id></element-citation></ref>
+</ref-list>"#;
+
+        let references = extract_references_detailed(content).unwrap();
+        assert_eq!(
+            references.len(),
+            1,
+            "Should parse ref with comments and etal"
+        );
+
+        let ref3 = &references[0];
+        assert_eq!(ref3.id, "bib3");
+        assert_eq!(ref3.title, Some("Test Article".to_string()));
+        assert_eq!(ref3.source, Some("MedRxiv".to_string()));
+        assert_eq!(ref3.authors.len(), 1);
+        assert_eq!(ref3.authors[0].surname, Some("Alvarez".to_string()));
     }
 }

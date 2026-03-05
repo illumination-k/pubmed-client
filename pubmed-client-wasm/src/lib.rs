@@ -3,7 +3,7 @@
 //! This module provides JavaScript-compatible bindings for use in Node.js and browsers.
 
 use pubmed_client::{
-    Client, config::ClientConfig, pmc::PmcFullText, pubmed::ArticleSummary, pubmed::PubMedArticle,
+    Client, config::ClientConfig, pmc::PmcArticle, pubmed::ArticleSummary, pubmed::PubMedArticle,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -486,7 +486,7 @@ impl WasmPubMedClient {
         let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)
             .map_err(|e| JsValue::from_str(&format!("Invalid full text data: {e}")))?;
 
-        let full_text: PmcFullText = js_full_text.into();
+        let full_text: PmcArticle = js_full_text.into();
         let converter = pubmed_client::pmc::PmcMarkdownConverter::new();
         Ok(converter.convert(&full_text))
     }
@@ -660,7 +660,7 @@ pub struct JsJournal {
 #[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
 #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct JsSection {
-    pub section_type: String,
+    pub section_type: Option<String>,
     pub title: Option<String>,
     pub content: String,
     pub subsections: Vec<JsSection>,
@@ -675,7 +675,7 @@ pub struct JsFigure {
     pub id: String,
     pub label: Option<String>,
     pub caption: String,
-    pub file_name: Option<String>,
+    pub graphic_href: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -701,29 +701,41 @@ pub struct JsReference {
     pub doi: Option<String>,
 }
 
-impl From<PmcFullText> for JsFullText {
-    fn from(full_text: PmcFullText) -> Self {
+impl From<PmcArticle> for JsFullText {
+    fn from(article: PmcArticle) -> Self {
         Self {
-            pmcid: full_text.pmcid,
-            pmid: full_text.pmid,
-            title: full_text.title,
-            authors: full_text.authors.into_iter().map(JsAuthor::from).collect(),
-            journal: JsJournal::from(full_text.journal),
-            pub_date: full_text.pub_date,
-            doi: full_text.doi,
-            sections: full_text
-                .sections
-                .into_iter()
-                .map(JsSection::from)
-                .collect(),
-            references: full_text
+            pmcid: article.pmcid.to_string(),
+            pmid: article.pmid.map(|p| p.to_string()),
+            title: article.title,
+            authors: article.authors.into_iter().map(JsAuthor::from).collect(),
+            journal: JsJournal::from(article.journal),
+            pub_date: article
+                .pub_dates
+                .first()
+                .map(|d| {
+                    let mut s = String::new();
+                    if let Some(y) = d.year {
+                        s.push_str(&y.to_string());
+                    }
+                    if let Some(m) = d.month {
+                        s.push_str(&format!("-{:02}", m));
+                    }
+                    if let Some(day) = d.day {
+                        s.push_str(&format!("-{:02}", day));
+                    }
+                    s
+                })
+                .unwrap_or_default(),
+            doi: article.doi,
+            sections: article.sections.into_iter().map(JsSection::from).collect(),
+            references: article
                 .references
                 .into_iter()
                 .map(JsReference::from)
                 .collect(),
-            article_type: full_text.article_type,
-            keywords: full_text.keywords,
-            funding: full_text
+            article_type: article.article_type,
+            keywords: article.keywords,
+            funding: article
                 .funding
                 .into_iter()
                 .map(|f| JsFunding {
@@ -732,22 +744,29 @@ impl From<PmcFullText> for JsFullText {
                     statement: f.statement,
                 })
                 .collect(),
-            conflict_of_interest: full_text.conflict_of_interest,
-            acknowledgments: full_text.acknowledgments,
-            data_availability: full_text.data_availability,
+            conflict_of_interest: article.conflict_of_interest,
+            acknowledgments: article.acknowledgments,
+            data_availability: article.data_availability,
         }
     }
 }
 
-impl From<JsFullText> for PmcFullText {
+impl From<JsFullText> for PmcArticle {
     fn from(js: JsFullText) -> Self {
+        use pubmed_client::pmc::JournalMeta;
         Self {
-            pmcid: js.pmcid,
-            pmid: js.pmid,
+            pmcid: pubmed_client::PmcId::parse(&js.pmcid)
+                .unwrap_or_else(|_| pubmed_client::PmcId::from_u32(1)),
+            pmid: js
+                .pmid
+                .and_then(|p| pubmed_client::PubMedId::parse(&p).ok()),
             title: js.title,
+            subtitle: None,
             authors: js.authors.into_iter().map(|a| a.into()).collect(),
-            journal: js.journal.into(),
-            pub_date: js.pub_date,
+            journal: JournalMeta::from(js.journal),
+            pub_dates: Vec::new(),
+            volume: None,
+            issue: None,
             doi: js.doi,
             sections: js.sections.into_iter().map(|s| s.into()).collect(),
             references: js.references.into_iter().map(|r| r.into()).collect(),
@@ -766,6 +785,18 @@ impl From<JsFullText> for PmcFullText {
             acknowledgments: js.acknowledgments,
             data_availability: js.data_availability,
             supplementary_materials: Vec::new(),
+            abstract_text: None,
+            abstract_sections: Vec::new(),
+            appendices: Vec::new(),
+            glossary: Vec::new(),
+            copyright: None,
+            license: None,
+            license_url: None,
+            history_dates: Vec::new(),
+            categories: Vec::new(),
+            fpage: None,
+            lpage: None,
+            elocation_id: None,
         }
     }
 }
@@ -819,8 +850,8 @@ impl From<JsAuthor> for pubmed_client::pmc::Author {
     }
 }
 
-impl From<pubmed_client::pmc::JournalInfo> for JsJournal {
-    fn from(journal: pubmed_client::pmc::JournalInfo) -> Self {
+impl From<pubmed_client::pmc::JournalMeta> for JsJournal {
+    fn from(journal: pubmed_client::pmc::JournalMeta) -> Self {
         Self {
             title: journal.title,
             abbreviation: journal.abbreviation,
@@ -831,7 +862,7 @@ impl From<pubmed_client::pmc::JournalInfo> for JsJournal {
     }
 }
 
-impl From<JsJournal> for pubmed_client::pmc::JournalInfo {
+impl From<JsJournal> for pubmed_client::pmc::JournalMeta {
     fn from(js: JsJournal) -> Self {
         Self {
             title: js.title,
@@ -839,14 +870,12 @@ impl From<JsJournal> for pubmed_client::pmc::JournalInfo {
             issn_print: js.issn_print,
             issn_electronic: js.issn_electronic,
             publisher: js.publisher,
-            volume: None,
-            issue: None,
         }
     }
 }
 
-impl From<pubmed_client::pmc::ArticleSection> for JsSection {
-    fn from(section: pubmed_client::pmc::ArticleSection) -> Self {
+impl From<pubmed_client::pmc::Section> for JsSection {
+    fn from(section: pubmed_client::pmc::Section) -> Self {
         Self {
             section_type: section.section_type,
             title: section.title,
@@ -863,7 +892,7 @@ impl From<pubmed_client::pmc::ArticleSection> for JsSection {
                     id: f.id,
                     label: f.label,
                     caption: f.caption,
-                    file_name: f.file_name,
+                    graphic_href: f.graphic_href,
                 })
                 .collect(),
             tables: section
@@ -880,14 +909,15 @@ impl From<pubmed_client::pmc::ArticleSection> for JsSection {
     }
 }
 
-impl From<JsSection> for pubmed_client::pmc::ArticleSection {
+impl From<JsSection> for pubmed_client::pmc::Section {
     fn from(js: JsSection) -> Self {
         Self {
+            id: None,
             section_type: js.section_type,
+            label: None,
             title: js.title,
             content: js.content,
             subsections: js.subsections.into_iter().map(|s| s.into()).collect(),
-            id: None,
             figures: js
                 .figures
                 .into_iter()
@@ -897,8 +927,7 @@ impl From<JsSection> for pubmed_client::pmc::ArticleSection {
                     caption: f.caption,
                     alt_text: None,
                     fig_type: None,
-                    file_path: None,
-                    file_name: f.file_name,
+                    graphic_href: f.graphic_href,
                 })
                 .collect(),
             tables: js
@@ -908,9 +937,12 @@ impl From<JsSection> for pubmed_client::pmc::ArticleSection {
                     id: t.id,
                     label: t.label,
                     caption: t.caption,
+                    head: Vec::new(),
+                    body: Vec::new(),
                     footnotes: t.footnotes,
                 })
                 .collect(),
+            formulas: Vec::new(),
         }
     }
 }
@@ -928,7 +960,7 @@ impl From<pubmed_client::pmc::Reference> for JsReference {
             id: reference.id,
             title: reference.title,
             authors: author_names,
-            journal: reference.journal,
+            journal: reference.source,
             year: reference.year,
             pmid: reference.pmid,
             doi: reference.doi,
@@ -958,16 +990,16 @@ impl From<JsReference> for pubmed_client::pmc::Reference {
 
         Self {
             id: js.id,
+            publication_type: None,
             title: js.title,
             authors,
-            journal: js.journal,
+            source: js.journal,
             year: js.year,
             volume: None,
             issue: None,
             pages: None,
             pmid: js.pmid,
             doi: js.doi,
-            ref_type: None,
         }
     }
 }

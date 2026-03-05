@@ -3,10 +3,11 @@ use std::{path::Path, str, time::Duration};
 use crate::common::PmcId;
 use crate::config::ClientConfig;
 use crate::error::{ParseError, PubMedError, Result};
-use crate::pmc::models::{ArticleSection, ExtractedFigure, Figure, PmcFullText};
+use crate::pmc::extracted::ExtractedFigure;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::retry::with_retry;
+use pubmed_parser::pmc::{Figure, PmcArticle, Section};
 use reqwest::{Client, Response};
 use tracing::debug;
 
@@ -428,7 +429,7 @@ impl PmcTarClient {
     #[cfg(not(target_arch = "wasm32"))]
     async fn match_figures_with_files<P: AsRef<Path>>(
         &self,
-        full_text: &PmcFullText,
+        full_text: &PmcArticle,
         extracted_files: &[String],
         output_dir: P,
     ) -> Result<Vec<ExtractedFigure>> {
@@ -482,7 +483,7 @@ impl PmcTarClient {
 
     /// Recursively collect all figures from sections and subsections
     #[cfg(not(target_arch = "wasm32"))]
-    fn collect_figures_recursive(section: &ArticleSection, figures: &mut Vec<Figure>) {
+    fn collect_figures_recursive(section: &Section, figures: &mut Vec<Figure>) {
         figures.extend(section.figures.clone());
         for subsection in &section.subsections {
             Self::collect_figures_recursive(subsection, figures);
@@ -496,8 +497,8 @@ impl PmcTarClient {
         extracted_files: &[String],
         image_extensions: &[&str],
     ) -> Option<String> {
-        // First try to match by figure file_name if available
-        if let Some(file_name) = &figure.file_name {
+        // First try to match by figure graphic_href if available
+        if let Some(file_name) = &figure.graphic_href {
             for file_path in extracted_files {
                 if let Some(filename) = Path::new(file_path).file_name()
                     && filename.to_string_lossy().contains(file_name)

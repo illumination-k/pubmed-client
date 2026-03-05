@@ -64,7 +64,7 @@ mod integration_tests {
                     for section in &fulltext.sections {
                         total_figures += section.figures.len();
                         total_tables += section.tables.len();
-                        if section.section_type == "abstract" {
+                        if section.section_type.as_deref() == Some("abstract") {
                             has_abstract = true;
                         }
                     }
@@ -104,7 +104,7 @@ mod integration_tests {
                         debug!(
                             section_index = i,
                             section_title = ?section.title,
-                            section_type = %section.section_type,
+                            section_type = ?section.section_type,
                             content_length = section.content.len(),
                             "Section details"
                         );
@@ -275,7 +275,11 @@ mod integration_tests {
                     let mut discussion_found = false;
 
                     for section in &fulltext.sections {
-                        let section_type_lower = section.section_type.to_lowercase();
+                        let section_type_lower = section
+                            .section_type
+                            .as_ref()
+                            .map(|t| t.to_lowercase())
+                            .unwrap_or_default();
                         let title_lower = section
                             .title
                             .as_ref()
