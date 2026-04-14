@@ -912,4 +912,72 @@ mod tests {
             "Expected ArticleNotFound error for PMID 12345"
         );
     }
+
+    #[test]
+    fn test_multiple_keyword_lists_and_language_parsing() {
+        let xml = r#"<?xml version="1.0"?>
+<PubmedArticleSet>
+<PubmedArticle>
+  <MedlineCitation>
+    <PMID>99900001</PMID>
+    <Article>
+      <ArticleTitle>Keyword and language test article</ArticleTitle>
+      <Journal>
+        <Title>Test Journal</Title>
+      </Journal>
+      <Language>eng</Language>
+      <Language>fre</Language>
+    </Article>
+    <KeywordList Owner="NOTNLM">
+      <Keyword>Alpha</Keyword>
+      <Keyword>Shared</Keyword>
+    </KeywordList>
+    <KeywordList Owner="NLM">
+      <Keyword>shared</Keyword>
+      <Keyword>Beta</Keyword>
+    </KeywordList>
+  </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = parse_article_from_xml(xml, "99900001").unwrap();
+        assert_eq!(article.language, Some("eng".to_string()));
+
+        let keywords = article.keywords.unwrap();
+        assert_eq!(keywords, vec!["Alpha", "Shared", "Beta"]);
+    }
+
+    #[test]
+    fn test_supplemental_mesh_parsing() {
+        let xml = r#"<?xml version="1.0"?>
+<PubmedArticleSet>
+<PubmedArticle>
+  <MedlineCitation>
+    <PMID>99900002</PMID>
+    <Article>
+      <ArticleTitle>Supplemental concept test article</ArticleTitle>
+      <Journal>
+        <Title>Test Journal</Title>
+      </Journal>
+    </Article>
+    <SupplMeshList>
+      <SupplMeshName Type="Disease" UI="C0007124">COVID-19</SupplMeshName>
+      <SupplMeshName Type="Protocol" UI="C0007000">Treatment Protocol</SupplMeshName>
+    </SupplMeshList>
+  </MedlineCitation>
+</PubmedArticle>
+</PubmedArticleSet>"#;
+
+        let article = parse_article_from_xml(xml, "99900002").unwrap();
+        let mesh_headings = article.mesh_headings.unwrap();
+        assert_eq!(mesh_headings.len(), 1);
+        assert_eq!(mesh_headings[0].mesh_terms.len(), 0);
+        assert_eq!(mesh_headings[0].supplemental_concepts.len(), 2);
+        assert_eq!(mesh_headings[0].supplemental_concepts[0].name, "COVID-19");
+        assert_eq!(mesh_headings[0].supplemental_concepts[0].ui, "C0007124");
+        assert_eq!(
+            mesh_headings[0].supplemental_concepts[0].concept_type,
+            Some("Disease".to_string())
+        );
+    }
 }
