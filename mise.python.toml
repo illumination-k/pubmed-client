@@ -3,7 +3,9 @@
 # Used by: python.yml, docs.yml (Python docs)
 
 [tools]
-uv = "0.8"
+# Pin via pipx backend; the aqua backend cannot resolve partial versions
+# (it queries the GitHub release tag literally and "v0.8" 404s).
+"pipx:uv" = "0.8"
 
 [env]
 PYO3_PYTHON = "{{config_root}}/pubmed-client-py/.venv/bin/python"

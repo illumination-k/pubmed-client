@@ -8,7 +8,7 @@
 # For full local setup: mise run setup:all
 
 [hooks]
-postinstall = ["bash ./etc/postinstall.sh"]
+postinstall = ["bash {{config_root}}/etc/postinstall.sh"]
 
 [env]
 # Suppress verbose Rust tool output (affects all Rust-based CLIs like cargo, dprint, etc.)

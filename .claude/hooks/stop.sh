@@ -2,11 +2,15 @@
 
 set -eu
 
-cd "$(dirname "$0")"
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$HOOK_DIR/../.." && pwd)}"
 
 CLAUDE_CODE_FEEDBACK_EXIT_CODE=2
 
-source ./common.sh
+# shellcheck source=common.sh
+source "$HOOK_DIR/common.sh"
+
+cd "$PROJECT_ROOT"
 
 if ! check_command mise; then
 	echo "mise command not found. Please install mise to use this hook."

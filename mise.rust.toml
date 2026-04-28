@@ -3,8 +3,19 @@
 # Used by: rust.yml, integration-tests.yml
 
 [tools]
-"cargo:cargo-nextest" = "latest"
-"cargo:cargo-llvm-cov" = "latest"
+# cargo-binstall fetches prebuilt binaries; mise's cargo backend will use it
+# transparently when available on PATH. The explicit `depends` keys below
+# ensure it is installed before the tools that need it, so we avoid building
+# cargo-nextest / cargo-llvm-cov from source on every fresh setup.
+"aqua:cargo-bins/cargo-binstall" = "latest"
+
+[tools."cargo:cargo-nextest"]
+version = "latest"
+depends = ["aqua:cargo-bins/cargo-binstall"]
+
+[tools."cargo:cargo-llvm-cov"]
+version = "latest"
+depends = ["aqua:cargo-bins/cargo-binstall"]
 
 [tasks."fmt:rs"]
 description = "Format Rust code with cargo fmt"
