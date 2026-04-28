@@ -45,5 +45,3 @@ if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
 else
 	echo "CLAUDE_ENV_FILE is not set. Skipping shell environment setup."
 fi
-
-source ~/.bashrc

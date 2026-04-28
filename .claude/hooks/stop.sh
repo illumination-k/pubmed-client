@@ -13,10 +13,7 @@ if ! check_command mise; then
 	exit 1
 fi
 
-mise run fmt && mise run lint
-status=$?
-
-if [ $status -ne 0 ]; then
+if ! mise run fmt || ! mise run lint; then
 	echo "Formatting or linting failed. Please fix the issues above."
 	exit $CLAUDE_CODE_FEEDBACK_EXIT_CODE
 fi
@@ -25,6 +22,6 @@ if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
 	echo "SLACK_WEBHOOK_URL is not set. Skipping Slack notification."
 else
 	echo "Sending Slack notification..."
-	message="PROJECT: Revaital Nexus\nBranch: $(git rev-parse --abbrev-ref HEAD)\nStatus: Completed Successfully"
+	message="PROJECT: pubmed-client\nBranch: $(git rev-parse --abbrev-ref HEAD)\nStatus: Completed Successfully"
 	curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$message\"}" "$SLACK_WEBHOOK_URL"
 fi

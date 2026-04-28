@@ -3,12 +3,12 @@
   "env": {
     "MISE_ENV": "root,rust,python,node"
   },
-  "allow": [
-    "Skill",
-    "WebSearch",
-    "WebFetch"
-  ],
   "permissions": {
+    "allow": [
+      "Skill",
+      "WebSearch",
+      "WebFetch"
+    ],
     "deny": [
       "Bash(git reset:*)",
       "Bash(git rebase:*)",
