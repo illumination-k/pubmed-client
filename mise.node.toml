@@ -3,7 +3,7 @@
 # Used by: napi.yml, wasm.yml, docs.yml (TypeDoc)
 
 [tools]
-node = "20"
+node = "22"
 pnpm = "10"
 
 # ── NAPI tasks ────────────────────────────────────────────────────────────────
