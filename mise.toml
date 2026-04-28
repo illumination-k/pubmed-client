@@ -14,6 +14,12 @@ postinstall = ["bash ./etc/postinstall.sh"]
 # Suppress verbose Rust tool output (affects all Rust-based CLIs like cargo, dprint, etc.)
 RUST_LOG = "warn"
 
+[tools]
+# agent-lens uses a rolling pre-release tag "latest". The github backend's
+# /releases/latest API endpoint excludes pre-releases, so we use the ubi
+# backend which downloads the release asset directly.
+"ubi:illumination-k/agent-lens" = "latest"
+
 [tasks.fmt]
 description = "Format all code (runs fmt:* tasks from active environments)"
 depends = ["fmt:*"]
