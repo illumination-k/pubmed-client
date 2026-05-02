@@ -50,7 +50,7 @@ if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
 	echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >"$CLAUDE_ENV_FILE"
 	case "$DETECTED_SHELL" in
 	bash | zsh)
-		MISE_AUTO_INSTALL=false mise env -s "$DETECTED_SHELL" >>"$CLAUDE_ENV_FILE"
+		mise env -s "$DETECTED_SHELL" >>"$CLAUDE_ENV_FILE"
 		;;
 	*)
 		echo "Unsupported shell: $DETECTED_SHELL"
