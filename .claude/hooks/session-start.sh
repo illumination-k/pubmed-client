@@ -31,11 +31,8 @@ if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
 	# initialize
 	echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >"$CLAUDE_ENV_FILE"
 	case "$DETECTED_SHELL" in
-	bash)
-		mise activate bash >>"$CLAUDE_ENV_FILE"
-		;;
-	zsh)
-		mise activate zsh >>"$CLAUDE_ENV_FILE"
+	bash | zsh)
+		mise env -s "$DETECTED_SHELL" >>"$CLAUDE_ENV_FILE"
 		;;
 	*)
 		echo "Unsupported shell: $DETECTED_SHELL"
@@ -45,5 +42,3 @@ if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
 else
 	echo "CLAUDE_ENV_FILE is not set. Skipping shell environment setup."
 fi
-
-source ~/.bashrc
