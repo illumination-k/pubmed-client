@@ -17,6 +17,7 @@ if ! check_command mise; then
 	exit 1
 fi
 
+export MISE_AUTO_INSTALL=false
 eval "$(mise env -s bash)"
 
 if ! mise run fmt || ! mise run lint; then
