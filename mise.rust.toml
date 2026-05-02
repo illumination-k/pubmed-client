@@ -2,9 +2,19 @@
 # Rust-specific test tooling and workspace tasks
 # Used by: rust.yml, integration-tests.yml
 
+# cargo-binstall is fetched via aqua (prebuilt) and acts as the installer for
+# the cargo: tools below — mise picks it up automatically when present, so
+# nextest/llvm-cov download prebuilt binaries instead of compiling from source.
 [tools]
-"cargo:cargo-nextest" = "latest"
-"cargo:cargo-llvm-cov" = "latest"
+"aqua:cargo-bins/cargo-binstall" = "latest"
+
+[tools."cargo:cargo-nextest"]
+version = "latest"
+depends = ["aqua:cargo-bins/cargo-binstall"]
+
+[tools."cargo:cargo-llvm-cov"]
+version = "latest"
+depends = ["aqua:cargo-bins/cargo-binstall"]
 
 [tasks."fmt:rs"]
 description = "Format Rust code with cargo fmt"
