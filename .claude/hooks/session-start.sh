@@ -27,6 +27,21 @@ mise settings experimental=true
 # the env should still come up so subsequent hooks can run.
 mise install || echo "mise install reported failures; continuing with available tools"
 
+# Repair the pinned rust toolchain if its dir exists but cargo/rustc are
+# missing (rustup sees the dir and skips reinstall, so any cargo invocation
+# proxied through it fails; this also breaks maturin builds via uv).
+if check_command rustup && [ -f rust-toolchain.toml ]; then
+	if ! cargo --version >/dev/null 2>&1; then
+		channel=$(awk -F'"' '/^channel/ {print $2}' rust-toolchain.toml)
+		if [ -n "$channel" ]; then
+			echo "Repairing rust toolchain $channel (cargo missing)..."
+			rustup toolchain uninstall "$channel" || true
+			rustup toolchain install "$channel" --profile default \
+				--component rustfmt --component clippy --no-self-update
+		fi
+	fi
+fi
+
 
 DETECTED_SHELL=${CLAUDE_CODE_SHELL:-$(basename "$SHELL")}
 
