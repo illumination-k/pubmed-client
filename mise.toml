@@ -10,6 +10,9 @@
 [hooks]
 postinstall = ["bash ./etc/postinstall.sh"]
 
+[tools]
+"github:illumination-k/agent-lens" = { version = "rolling", prerelease = true }
+
 [env]
 # Suppress verbose Rust tool output (affects all Rust-based CLIs like cargo, dprint, etc.)
 RUST_LOG = "warn"
