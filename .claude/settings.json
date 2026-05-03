@@ -1,7 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
-    "MISE_ENV": "root,rust,python,node"
+    "MISE_ENV": "root,rust,python,node",
+    "MISE_AUTO_INSTALL": "false"
   },
   "allow": [
     "Skill",
