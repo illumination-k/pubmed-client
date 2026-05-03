@@ -2,7 +2,7 @@
 
 use crate::common::PubMedId;
 use crate::error::{PubMedError, Result};
-use crate::pubmed::models::{EPostResult, HistorySession, PubMedArticle, SearchResult};
+use crate::pubmed::domain::{EPostResult, HistorySession, PubMedArticle, SearchResult};
 use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::{EPostResponse, ESearchResult};

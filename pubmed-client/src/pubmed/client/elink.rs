@@ -1,7 +1,7 @@
 //! ELink API operations for cross-referencing between NCBI databases
 
 use crate::error::Result;
-use crate::pubmed::models::{Citations, PmcLinks, RelatedArticles};
+use crate::pubmed::domain::{Citations, PmcLinks, RelatedArticles};
 use crate::pubmed::responses::ELinkResponse;
 use tracing::{debug, info, instrument};
 

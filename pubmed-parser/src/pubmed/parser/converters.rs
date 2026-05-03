@@ -6,7 +6,7 @@
 use super::extractors::{extract_country_from_text, extract_email_from_text, format_author_name};
 use super::xml_types::*;
 use crate::error::{ParseError, Result};
-use crate::pubmed::models::{
+use crate::pubmed::domain::{
     Affiliation, Author, ChemicalConcept, MeshHeading, MeshQualifier, MeshTerm, PubMedArticle,
 };
 use tracing::debug;

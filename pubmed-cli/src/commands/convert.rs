@@ -72,7 +72,7 @@ impl Convert {
         &self,
         client: &pubmed_client::PubMedClient,
         parsed_pmids: &[u32],
-    ) -> Result<pubmed_client::pubmed::models::PmcLinks> {
+    ) -> Result<pubmed_client::pubmed::domain::PmcLinks> {
         let mut all_source_pmids = Vec::new();
         let mut all_pmc_ids = Vec::new();
 
@@ -94,7 +94,7 @@ impl Convert {
                 .await;
         }
 
-        Ok(pubmed_client::pubmed::models::PmcLinks {
+        Ok(pubmed_client::pubmed::domain::PmcLinks {
             source_pmids: all_source_pmids,
             pmc_ids: all_pmc_ids,
         })
@@ -105,7 +105,7 @@ impl Convert {
         client: &pubmed_client::PubMedClient,
         batch: &[u32],
         batch_number: usize,
-    ) -> Result<pubmed_client::pubmed::models::PmcLinks> {
+    ) -> Result<pubmed_client::pubmed::domain::PmcLinks> {
         tracing::info!(
             batch_index = batch_number,
             batch_size = batch.len(),
@@ -141,7 +141,7 @@ impl Convert {
         }
     }
 
-    fn output_json(&self, pmc_links: &pubmed_client::pubmed::models::PmcLinks) -> Result<()> {
+    fn output_json(&self, pmc_links: &pubmed_client::pubmed::domain::PmcLinks) -> Result<()> {
         // Create a more user-friendly JSON output
         let mut result = serde_json::Map::new();
         let mut conversions = Vec::new();
@@ -190,7 +190,7 @@ impl Convert {
         Ok(())
     }
 
-    fn output_csv(&self, pmc_links: &pubmed_client::pubmed::models::PmcLinks) {
+    fn output_csv(&self, pmc_links: &pubmed_client::pubmed::domain::PmcLinks) {
         println!("PMID,PMCID_Available,PMCIDs_Found");
         for pmid in &pmc_links.source_pmids {
             let has_pmc = if pmc_links.pmc_ids.is_empty() {
@@ -207,7 +207,7 @@ impl Convert {
         }
     }
 
-    fn output_txt(&self, pmc_links: &pubmed_client::pubmed::models::PmcLinks) {
+    fn output_txt(&self, pmc_links: &pubmed_client::pubmed::domain::PmcLinks) {
         // Text format: only output PMCIDs, one per line
         for pmcid in &pmc_links.pmc_ids {
             println!("{}", pmcid);

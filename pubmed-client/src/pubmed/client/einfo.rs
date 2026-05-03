@@ -1,7 +1,7 @@
 //! EInfo API operations for retrieving NCBI database information
 
 use crate::error::{PubMedError, Result};
-use crate::pubmed::models::{DatabaseInfo, FieldInfo, LinkInfo};
+use crate::pubmed::domain::{DatabaseInfo, FieldInfo, LinkInfo};
 use crate::pubmed::responses::EInfoResponse;
 use tracing::{debug, info, instrument};
 

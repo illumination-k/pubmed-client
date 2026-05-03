@@ -7,7 +7,7 @@
 //! to match the XML element and attribute names.
 
 use super::deserializers::{deserialize_abstract_text_with_label, deserialize_bool_yn};
-use crate::pubmed::models::AbstractSection as ModelAbstractSection;
+use crate::pubmed::domain::AbstractSection as ModelAbstractSection;
 use serde::{Deserialize, Deserializer};
 use std::fmt;
 use std::result;
