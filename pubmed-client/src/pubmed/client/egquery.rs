@@ -1,7 +1,7 @@
 //! EGQuery API operations for querying across all NCBI databases
 
 use crate::error::{PubMedError, Result};
-use crate::pubmed::models::{DatabaseCount, GlobalQueryResults};
+use crate::pubmed::domain::{DatabaseCount, GlobalQueryResults};
 use tracing::{debug, info, instrument};
 
 use super::PubMedClient;

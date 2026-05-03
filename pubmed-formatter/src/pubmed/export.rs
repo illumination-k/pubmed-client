@@ -8,7 +8,7 @@
 //! - **CSL-JSON** - Citation Style Language JSON format
 //! - **NBIB** - MEDLINE/PubMed native format
 
-use pubmed_parser::pubmed::models::PubMedArticle;
+use pubmed_parser::pubmed::domain::PubMedArticle;
 use serde_json::{Value, json};
 
 /// Generate a BibTeX citation key from article metadata

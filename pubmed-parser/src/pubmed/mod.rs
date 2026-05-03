@@ -3,11 +3,11 @@
 //! This module provides parsers for PubMed XML responses and the data types
 //! that represent PubMed article metadata.
 
-pub mod models;
+pub mod domain;
 pub mod parser;
 
 // Re-export public types
-pub use models::{
+pub use domain::{
     AbstractSection, Affiliation, ArticleSummary, Author, ChemicalConcept, CitationMatch,
     CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo,
     EPostResult, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, MeshHeading,

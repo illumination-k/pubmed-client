@@ -4,7 +4,6 @@ use crate::pmc::domain::PmcArticle;
 
 pub mod author;
 pub mod metadata;
-pub mod models;
 pub(crate) mod reader_utils;
 pub mod reference;
 pub mod section;

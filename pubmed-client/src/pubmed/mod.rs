@@ -18,7 +18,7 @@ pub mod query;
 pub mod responses;
 
 // Re-export parser types from pubmed-parser
-pub use pubmed_parser::pubmed::models;
+pub use pubmed_parser::pubmed::domain;
 pub use pubmed_parser::pubmed::parser;
 
 // Re-export formatter types from pubmed-formatter
@@ -26,13 +26,13 @@ pub use pubmed_formatter::pubmed::export;
 
 // Re-export public types
 pub use client::PubMedClient;
-pub use export::ExportFormat;
-pub use models::{
+pub use domain::{
     AbstractSection, Affiliation, ArticleSummary, Author, ChemicalConcept, CitationMatch,
     CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo,
     EPostResult, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, MeshHeading,
     MeshQualifier, MeshTerm, PmcLinks, PubMedArticle, RelatedArticles, SearchResult,
     SpellCheckResult, SpelledQuerySegment, SupplementalConcept,
 };
+pub use export::ExportFormat;
 pub use parser::{parse_article_from_xml, parse_articles_from_xml};
 pub use query::{ArticleType, Language, PubDate, SearchQuery, SortOrder};

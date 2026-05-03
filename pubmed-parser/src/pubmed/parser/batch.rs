@@ -6,7 +6,7 @@
 use super::preprocessing::strip_inline_html_tags;
 use super::xml_types::PubmedArticleSet;
 use crate::error::{ParseError, Result};
-use crate::pubmed::models::PubMedArticle;
+use crate::pubmed::domain::PubMedArticle;
 use quick_xml::de::from_str;
 use tracing::{instrument, warn};
 

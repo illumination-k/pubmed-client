@@ -2,7 +2,7 @@
 
 use crate::common::PubMedId;
 use crate::error::{ParseError, PubMedError, Result};
-use crate::pubmed::models::ArticleSummary;
+use crate::pubmed::domain::ArticleSummary;
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::{ESummaryDocSum, ESummaryResponse};
 use tracing::{debug, info, instrument, warn};

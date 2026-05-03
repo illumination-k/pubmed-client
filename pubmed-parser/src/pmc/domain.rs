@@ -8,7 +8,7 @@
 //! - DTD-faithful: reflects JATS Archiving 1.4 element structure
 //! - No extraction concerns: fields like `file_path` or inferred `file_type` are excluded
 //! - Type-safe IDs: uses `PmcId` / `PubMedId` instead of raw strings
-//! - Reuses shared types: `Author` and `Affiliation` from `common::models`
+//! - Reuses shared types: `Author` and `Affiliation` from `common::domain`
 //! - Text mining ready: structured abstracts, table content, formulas, definitions
 
 use crate::common::{Author, HistoryDate, PmcId, PubMedId, PublicationDate};

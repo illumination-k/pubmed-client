@@ -31,7 +31,7 @@ pub(crate) use preprocessing::strip_inline_html_tags;
 pub use batch::parse_articles_from_xml;
 
 use crate::error::{ParseError, Result};
-use crate::pubmed::models::PubMedArticle;
+use crate::pubmed::domain::PubMedArticle;
 use quick_xml::de::from_str;
 use tracing::instrument;
 use xml_types::PubmedArticleSet;

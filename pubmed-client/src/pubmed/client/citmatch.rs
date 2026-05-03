@@ -1,7 +1,7 @@
 //! ECitMatch API operations for matching citations to PMIDs
 
 use crate::error::Result;
-use crate::pubmed::models::{CitationMatch, CitationMatchStatus, CitationMatches, CitationQuery};
+use crate::pubmed::domain::{CitationMatch, CitationMatchStatus, CitationMatches, CitationQuery};
 use tracing::{debug, info, instrument};
 
 use super::PubMedClient;

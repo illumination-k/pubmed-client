@@ -1,7 +1,7 @@
 //! ESpell API operations for spell-checking search terms
 
 use crate::error::{PubMedError, Result};
-use crate::pubmed::models::{SpellCheckResult, SpelledQuerySegment};
+use crate::pubmed::domain::{SpellCheckResult, SpelledQuerySegment};
 use tracing::{debug, info, instrument};
 
 use super::PubMedClient;

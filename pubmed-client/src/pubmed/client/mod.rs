@@ -11,7 +11,7 @@ use std::time::Duration;
 use crate::common::PubMedId;
 use crate::config::ClientConfig;
 use crate::error::{ParseError, PubMedError, Result};
-use crate::pubmed::models::PubMedArticle;
+use crate::pubmed::domain::PubMedArticle;
 use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::ESearchResult;
