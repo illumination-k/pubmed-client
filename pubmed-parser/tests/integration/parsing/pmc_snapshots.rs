@@ -1,6 +1,6 @@
 //! Snapshot tests for PMC parser using real XML data.
 //!
-//! These tests pin the full `PmcFullText` output for representative articles.
+//! These tests pin the full `PmcArticle` output for representative articles.
 //! Any parser change that alters output will produce a visible diff via `insta`.
 //!
 //! To update snapshots after intentional parser changes:
@@ -40,7 +40,7 @@ fn test_snapshot_pmc7906746_lancet_comment() {
 /// PMC10821037: Vaccines research article (264KB).
 /// 15 authors with ORCIDs and CRediT roles, 6 keywords, funding with award ID,
 /// 3 history dates, elocation-id, abstract, supplementary materials,
-/// corresponding author, license URL. Exercises nearly all PmcFullText fields.
+/// corresponding author, license URL. Exercises nearly all PmcArticle fields.
 #[test]
 fn test_snapshot_pmc10821037_vaccines_research() {
     let article = parse_test_article("PMC10821037");
