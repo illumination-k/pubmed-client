@@ -7,7 +7,9 @@
 //! to match the XML element and attribute names.
 
 use super::deserializers::{deserialize_abstract_text_with_label, deserialize_bool_yn};
-use crate::pubmed::models::AbstractSection as ModelAbstractSection;
+use crate::pubmed::models::{
+    AbstractSection as ModelAbstractSection, SupplementalConcept as ModelSupplementalConcept,
+};
 use serde::{Deserialize, Deserializer};
 use std::fmt;
 use std::result;
@@ -64,7 +66,9 @@ pub(super) struct MedlineCitation {
     #[serde(rename = "ChemicalList")]
     pub chemical_list: Option<ChemicalList>,
     #[serde(rename = "KeywordList")]
-    pub keyword_list: Option<KeywordList>,
+    pub keyword_lists: Option<Vec<KeywordList>>,
+    #[serde(rename = "SupplMeshList")]
+    pub suppl_mesh_list: Option<SupplMeshList>,
 }
 
 /// PubMed ID element
@@ -94,8 +98,8 @@ pub(super) struct Article {
     pub abstract_section: Option<AbstractSection>,
     #[serde(rename = "AuthorList")]
     pub author_list: Option<AuthorList>,
-    #[serde(rename = "Language")]
-    pub language: Option<String>,
+    #[serde(rename = "Language", default)]
+    pub languages: Vec<String>,
     #[serde(rename = "PublicationTypeList")]
     pub publication_type_list: Option<PublicationTypeList>,
     #[serde(rename = "ELocationID")]
@@ -393,6 +397,46 @@ pub(super) struct NameOfSubstance {
 pub(super) struct KeywordList {
     #[serde(rename = "Keyword")]
     pub keywords: Option<Vec<KeywordElement>>,
+}
+
+/// List of supplemental MeSH concepts
+#[derive(Debug, Deserialize)]
+pub(super) struct SupplMeshList {
+    #[serde(rename = "SupplMeshName")]
+    pub concepts: Option<Vec<SupplMeshName>>,
+}
+
+/// Supplemental MeSH concept
+#[derive(Debug, Deserialize)]
+pub(super) struct SupplMeshName {
+    #[serde(rename = "$text")]
+    pub text: String,
+    #[serde(rename = "@UI")]
+    pub ui: Option<String>,
+    #[serde(rename = "@Type")]
+    pub concept_type: Option<String>,
+}
+
+impl SupplMeshList {
+    /// Convert supplemental MeSH list to public API model
+    pub(super) fn into_concepts(self) -> Vec<ModelSupplementalConcept> {
+        self.concepts
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(|concept| {
+                let name = concept.text.trim();
+                if name.is_empty() {
+                    None
+                } else {
+                    Some(ModelSupplementalConcept {
+                        name: name.to_string(),
+                        ui: concept.ui.unwrap_or_default(),
+                        concept_type: concept.concept_type,
+                    })
+                }
+            })
+            .collect()
+    }
 }
 
 /// Keyword element

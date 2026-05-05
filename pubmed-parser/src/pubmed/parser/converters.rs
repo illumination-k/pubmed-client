@@ -80,7 +80,11 @@ impl PubmedArticleXml {
             .and_then(|p| p.medline_pgn.clone());
 
         // Extract language
-        let language = article.language.clone();
+        let language = article
+            .languages
+            .iter()
+            .find(|lang| !lang.trim().is_empty())
+            .cloned();
 
         // Extract ISO journal abbreviation
         let journal_abbreviation = article
@@ -100,8 +104,12 @@ impl PubmedArticleXml {
             .elocation_ids
             .and_then(|ids| {
                 ids.into_iter()
-                    .find(|id| id.eid_type.as_deref() == Some("doi"))
-                    .map(|id| id.value)
+                    .find(|id| {
+                        id.eid_type
+                            .as_deref()
+                            .is_some_and(|t| t.eq_ignore_ascii_case("doi"))
+                    })
+                    .map(|id| id.value.trim().to_string())
             })
             .or_else(|| Self::extract_article_id(&self.pubmed_data, "doi"));
 
@@ -118,12 +126,34 @@ impl PubmedArticleXml {
             .map_or(Vec::new(), |list| list.into_types());
 
         // Extract MeSH headings
-        let mesh_headings = medline
+        let mut mesh_headings = medline
             .mesh_heading_list
             .and_then(|list| list.into_headings());
+        let supplemental_concepts = medline
+            .suppl_mesh_list
+            .map(|list| list.into_concepts())
+            .unwrap_or_default();
+
+        if !supplemental_concepts.is_empty() {
+            match mesh_headings.as_mut() {
+                Some(headings) => {
+                    for heading in headings {
+                        heading.supplemental_concepts = supplemental_concepts.clone();
+                    }
+                }
+                None => {
+                    mesh_headings = Some(vec![MeshHeading {
+                        mesh_terms: Vec::new(),
+                        supplemental_concepts,
+                    }]);
+                }
+            }
+        }
 
         // Extract keywords
-        let keywords = medline.keyword_list.and_then(|list| list.into_keywords());
+        let keywords = medline
+            .keyword_lists
+            .and_then(|lists| KeywordList::into_keywords_from_lists(&lists));
 
         // Extract chemical list
         let chemical_list = medline.chemical_list.and_then(|list| list.into_chemicals());
@@ -346,12 +376,41 @@ impl KeywordList {
     /// Convert XML keyword list to string vector
     pub(super) fn into_keywords(self) -> Option<Vec<String>> {
         self.keywords.and_then(|keywords| {
-            let result: Vec<String> = keywords.into_iter().map(|k| k.to_string()).collect();
+            let result: Vec<String> = keywords
+                .into_iter()
+                .map(|k| k.to_string())
+                .map(|k| k.trim().to_string())
+                .filter(|k| !k.is_empty())
+                .collect();
             if result.is_empty() {
                 None
             } else {
                 Some(result)
             }
         })
+    }
+
+    /// Convert multiple keyword lists into a flattened, deduplicated vector.
+    pub(super) fn into_keywords_from_lists(lists: &[KeywordList]) -> Option<Vec<String>> {
+        let mut seen = std::collections::HashSet::new();
+        let mut flattened = Vec::new();
+
+        for list in lists {
+            if let Some(keywords) = &list.keywords {
+                for keyword in keywords {
+                    let value = keyword.to_string();
+                    let normalized = value.trim();
+                    if !normalized.is_empty() && seen.insert(normalized.to_ascii_lowercase()) {
+                        flattened.push(normalized.to_string());
+                    }
+                }
+            }
+        }
+
+        if flattened.is_empty() {
+            None
+        } else {
+            Some(flattened)
+        }
     }
 }
