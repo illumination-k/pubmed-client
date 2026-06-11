@@ -10,6 +10,51 @@ use pubmed_parser::pmc::parse_pmc_xml;
 mod common;
 use common::{PmcXmlTestCase, pmc_xml_test_cases};
 
+/// Build a minimal `PmcArticle` with the new front/body/back structure for converter tests.
+fn build_test_article(pmcid: u32, title: &str) -> pubmed_parser::pmc::PmcArticle {
+    use pubmed_parser::common::PmcId;
+    use pubmed_parser::pmc::{ArticleMeta, Front, JournalMeta, PmcArticle, TitleGroup};
+
+    PmcArticle {
+        article_type: None,
+        front: Front {
+            journal_meta: JournalMeta {
+                title: "Test Journal".to_string(),
+                abbreviation: None,
+                issn_print: None,
+                issn_electronic: None,
+                publisher: None,
+            },
+            article_meta: ArticleMeta {
+                pmcid: PmcId::from_u32(pmcid),
+                pmid: None,
+                doi: None,
+                categories: vec![],
+                title_group: TitleGroup {
+                    article_title: title.to_string(),
+                    subtitle: None,
+                },
+                authors: vec![],
+                pub_dates: vec![],
+                volume: None,
+                issue: None,
+                fpage: None,
+                lpage: None,
+                elocation_id: None,
+                history: vec![],
+                permissions: None,
+                abstracts: vec![],
+                keywords: vec![],
+                funding: vec![],
+            },
+        },
+        body: None,
+        back: None,
+        supplementary_materials: vec![],
+        data_availability: None,
+    }
+}
+
 /// 全XMLファイルを返すフィクスチャ
 #[fixture]
 fn markdown_test_cases() -> Vec<PmcXmlTestCase> {
@@ -49,7 +94,7 @@ fn test_markdown_conversion_basic(#[from(markdown_test_cases)] test_cases: Vec<P
 
         // Check that title appears in markdown (use cleaned version for comparison)
         // Clean the title using regex to remove XML tags
-        let clean_title = xml_tag_regex.replace_all(&article.title, "").to_string();
+        let clean_title = xml_tag_regex.replace_all(article.title(), "").to_string();
         let title_words: Vec<&str> = clean_title.split_whitespace().take(4).collect();
         let title_portion = title_words.join(" ");
         assert!(
@@ -69,7 +114,7 @@ fn test_markdown_conversion_basic(#[from(markdown_test_cases)] test_cases: Vec<P
         );
 
         // If article has authors, they should be in the markdown
-        if !article.authors.is_empty() {
+        if !article.authors().is_empty() {
             assert!(
                 markdown.contains("**Authors:**"),
                 "Should contain authors section for {}",
@@ -84,7 +129,7 @@ fn test_markdown_conversion_basic(#[from(markdown_test_cases)] test_cases: Vec<P
             test_case.filename()
         );
         assert!(
-            markdown.contains(&article.journal.title),
+            markdown.contains(&article.journal().title),
             "Should contain journal title for {}",
             test_case.filename()
         );
@@ -148,7 +193,7 @@ fn test_markdown_conversion_with_different_configs(
             let markdown = converter.convert(&article);
             if markdown.is_empty() {
                 warn!(filename = test_case.filename(), config_name = config_name,
-                      section_count = article.sections.len(), title = %article.title,
+                      section_count = article.sections().len(), title = %article.title(),
                       "Empty markdown generated");
             }
             assert!(
@@ -167,17 +212,18 @@ fn test_markdown_conversion_with_different_configs(
                         config_name
                     );
                     assert!(
-                        !markdown.contains("**Journal:**") || article.sections.is_empty(),
+                        !markdown.contains("**Journal:**") || article.sections().is_empty(),
                         "Should not contain journal metadata or have minimal content for {}",
                         config_name
                     );
                 }
                 "setext_headers" => {
                     // For level 1 headers, should contain underlines
-                    if markdown.contains(&article.title) {
+                    if markdown.contains(article.title()) {
                         let lines: Vec<&str> = markdown.lines().collect();
-                        let title_line_idx =
-                            lines.iter().position(|&line| line.contains(&article.title));
+                        let title_line_idx = lines
+                            .iter()
+                            .position(|&line| line.contains(article.title()));
                         if let Some(idx) = title_line_idx
                             && idx + 1 < lines.len()
                         {
@@ -246,43 +292,43 @@ fn test_markdown_metadata_extraction(#[from(markdown_test_cases)] test_cases: Ve
         total_tested += 1;
 
         // Check DOI links
-        if article.doi.is_some() && markdown.contains("](https://doi.org/") {
+        if article.doi().is_some() && markdown.contains("](https://doi.org/") {
             articles_with_doi_links += 1;
             debug!("DOI link found");
         }
 
         // Check PMID links
-        if article.pmid.is_some() && markdown.contains("](https://pubmed.ncbi.nlm.nih.gov/") {
+        if article.pmid().is_some() && markdown.contains("](https://pubmed.ncbi.nlm.nih.gov/") {
             articles_with_pmid_links += 1;
             debug!("PMID link found");
         }
 
         // Check keywords
-        if !article.keywords.is_empty() {
+        if !article.keywords().is_empty() {
             articles_with_keywords += 1;
             assert!(
                 markdown.contains("**Keywords:**"),
                 "Should contain keywords section"
             );
-            for keyword in &article.keywords {
+            for keyword in article.keywords() {
                 assert!(
                     markdown.contains(keyword),
                     "Should contain keyword: {}",
                     keyword
                 );
             }
-            debug!(keyword_count = article.keywords.len(), "Keywords found");
+            debug!(keyword_count = article.keywords().len(), "Keywords found");
         }
 
         // Check funding
-        if !article.funding.is_empty() {
+        if !article.funding().is_empty() {
             articles_with_funding += 1;
             assert!(
                 markdown.contains("# Funding") || markdown.contains("## Funding"),
                 "Should contain funding section"
             );
             debug!(
-                funding_count = article.funding.len(),
+                funding_count = article.funding().len(),
                 "Funding sources found"
             );
         }
@@ -365,8 +411,8 @@ fn test_markdown_content_structure(#[from(markdown_test_cases)] test_cases: Vec<
         );
 
         // Check for figures and tables in markdown if they exist in the original
-        let has_figures = article.sections.iter().any(|s| !s.figures.is_empty());
-        let has_tables = article.sections.iter().any(|s| !s.tables.is_empty());
+        let has_figures = article.sections().iter().any(|s| !s.figures.is_empty());
+        let has_tables = article.sections().iter().any(|s| !s.tables.is_empty());
 
         if has_figures {
             if markdown.contains("**Figure") {
@@ -385,7 +431,7 @@ fn test_markdown_content_structure(#[from(markdown_test_cases)] test_cases: Vec<
         }
 
         // Check references section
-        if !article.references.is_empty() {
+        if !article.references().is_empty() {
             assert!(
                 markdown.contains("# References") || markdown.contains("## References"),
                 "Should contain references section for {}",
@@ -505,50 +551,8 @@ fn test_markdown_config_builder() {
 
     let converter = PmcMarkdownConverter::with_config(config.clone());
 
-    // Test the converter functionality instead of accessing private fields
-    // We'll create a simple test article to verify the configuration is working
-    use pubmed_parser::common::PmcId;
-    use pubmed_parser::pmc::{JournalMeta, PmcArticle};
-
-    let test_article = PmcArticle {
-        pmcid: PmcId::from_u32(123456),
-        pmid: None,
-        doi: None,
-        article_type: None,
-        categories: vec![],
-        title: "Test Article".to_string(),
-        subtitle: None,
-        authors: vec![],
-        journal: JournalMeta {
-            title: "Test Journal".to_string(),
-            abbreviation: None,
-            issn_print: None,
-            issn_electronic: None,
-            publisher: None,
-        },
-        pub_dates: vec![],
-        volume: None,
-        issue: None,
-        fpage: None,
-        lpage: None,
-        elocation_id: None,
-        abstract_text: None,
-        abstract_sections: vec![],
-        keywords: vec![],
-        sections: vec![],
-        references: vec![],
-        funding: vec![],
-        acknowledgments: None,
-        conflict_of_interest: None,
-        data_availability: None,
-        supplementary_materials: vec![],
-        appendices: vec![],
-        glossary: vec![],
-        copyright: None,
-        license: None,
-        license_url: None,
-        history_dates: vec![],
-    };
+    // Create a simple test article to verify the configuration is working
+    let test_article = build_test_article(123456, "Test Article");
 
     let markdown = converter.convert(&test_article);
 
@@ -577,49 +581,10 @@ fn test_markdown_config_builder() {
 
 #[test]
 fn test_markdown_edge_cases() {
-    use pubmed_parser::common::{Author, PmcId, PubMedId};
-    use pubmed_parser::pmc::{JournalMeta, PmcArticle};
+    use pubmed_parser::common::{Author, PubMedId};
 
     // Test with minimal article data
-    let minimal_article = PmcArticle {
-        pmcid: PmcId::from_u32(100000),
-        pmid: None,
-        doi: None,
-        article_type: None,
-        categories: vec![],
-        title: "Minimal Test Article".to_string(),
-        subtitle: None,
-        authors: vec![],
-        journal: JournalMeta {
-            title: "Test Journal".to_string(),
-            abbreviation: None,
-            issn_print: None,
-            issn_electronic: None,
-            publisher: None,
-        },
-        pub_dates: vec![],
-        volume: None,
-        issue: None,
-        fpage: None,
-        lpage: None,
-        elocation_id: None,
-        abstract_text: None,
-        abstract_sections: vec![],
-        keywords: vec![],
-        sections: vec![],
-        references: vec![],
-        funding: vec![],
-        acknowledgments: None,
-        conflict_of_interest: None,
-        data_availability: None,
-        supplementary_materials: vec![],
-        appendices: vec![],
-        glossary: vec![],
-        copyright: None,
-        license: None,
-        license_url: None,
-        history_dates: vec![],
-    };
+    let minimal_article = build_test_article(100000, "Minimal Test Article");
 
     let converter = PmcMarkdownConverter::new();
     let markdown = converter.convert(&minimal_article);
@@ -629,50 +594,19 @@ fn test_markdown_edge_cases() {
     assert!(markdown.contains("**Journal:** Test Journal"));
 
     // Test with article containing special characters
-    let special_article = PmcArticle {
-        pmcid: PmcId::from_u32(111111),
-        pmid: Some(PubMedId::from_u32(12345)),
-        doi: Some("10.1000/test<>special".to_string()),
-        article_type: Some("research-article".to_string()),
-        categories: vec![],
-        title: "Article with <em>HTML</em> & Special Characters".to_string(),
-        subtitle: None,
-        authors: vec![Author::from_full_name(
-            "Dr. John O'Reilly & Associates".to_string(),
-        )],
-        journal: JournalMeta {
-            title: "Special Characters Journal".to_string(),
-            abbreviation: None,
-            issn_print: None,
-            issn_electronic: None,
-            publisher: None,
-        },
-        pub_dates: vec![],
-        volume: None,
-        issue: None,
-        fpage: None,
-        lpage: None,
-        elocation_id: None,
-        abstract_text: None,
-        abstract_sections: vec![],
-        keywords: vec![
-            "test & validation".to_string(),
-            "<script>alert('xss')</script>".to_string(),
-        ],
-        sections: vec![],
-        references: vec![],
-        funding: vec![],
-        acknowledgments: None,
-        conflict_of_interest: None,
-        data_availability: None,
-        supplementary_materials: vec![],
-        appendices: vec![],
-        glossary: vec![],
-        copyright: None,
-        license: None,
-        license_url: None,
-        history_dates: vec![],
-    };
+    let mut special_article =
+        build_test_article(111111, "Article with <em>HTML</em> & Special Characters");
+    special_article.front.article_meta.pmid = Some(PubMedId::from_u32(12345));
+    special_article.front.article_meta.doi = Some("10.1000/test<>special".to_string());
+    special_article.article_type = Some("research-article".to_string());
+    special_article.front.article_meta.authors = vec![Author::from_full_name(
+        "Dr. John O'Reilly & Associates".to_string(),
+    )];
+    special_article.front.journal_meta.title = "Special Characters Journal".to_string();
+    special_article.front.article_meta.keywords = vec![
+        "test & validation".to_string(),
+        "<script>alert('xss')</script>".to_string(),
+    ];
 
     let markdown = converter.convert(&special_article);
     debug!(markdown = %markdown, "Generated markdown for special characters test");

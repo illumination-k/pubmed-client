@@ -705,13 +705,31 @@ pub struct JsReference {
 
 impl From<PmcArticle> for JsFullText {
     fn from(article: PmcArticle) -> Self {
+        let PmcArticle {
+            article_type,
+            front,
+            body,
+            back,
+            data_availability,
+            ..
+        } = article;
+        let journal_meta = front.journal_meta;
+        let meta = front.article_meta;
+        let sections = body.map(|b| b.sections).unwrap_or_default();
+        let back = back.unwrap_or(pubmed_client::pmc::Back {
+            acknowledgments: None,
+            conflict_of_interest: None,
+            references: Vec::new(),
+            appendices: Vec::new(),
+            glossary: Vec::new(),
+        });
         Self {
-            pmcid: article.pmcid.to_string(),
-            pmid: article.pmid.map(|p| p.to_string()),
-            title: article.title,
-            authors: article.authors.into_iter().map(JsAuthor::from).collect(),
-            journal: JsJournal::from(article.journal),
-            pub_date: article
+            pmcid: meta.pmcid.to_string(),
+            pmid: meta.pmid.map(|p| p.to_string()),
+            title: meta.title_group.article_title,
+            authors: meta.authors.into_iter().map(JsAuthor::from).collect(),
+            journal: JsJournal::from(journal_meta),
+            pub_date: meta
                 .pub_dates
                 .first()
                 .map(|d| {
@@ -728,16 +746,12 @@ impl From<PmcArticle> for JsFullText {
                     s
                 })
                 .unwrap_or_default(),
-            doi: article.doi,
-            sections: article.sections.into_iter().map(JsSection::from).collect(),
-            references: article
-                .references
-                .into_iter()
-                .map(JsReference::from)
-                .collect(),
-            article_type: article.article_type,
-            keywords: article.keywords,
-            funding: article
+            doi: meta.doi,
+            sections: sections.into_iter().map(JsSection::from).collect(),
+            references: back.references.into_iter().map(JsReference::from).collect(),
+            article_type,
+            keywords: meta.keywords,
+            funding: meta
                 .funding
                 .into_iter()
                 .map(|f| JsFunding {
@@ -746,59 +760,66 @@ impl From<PmcArticle> for JsFullText {
                     statement: f.statement,
                 })
                 .collect(),
-            conflict_of_interest: article.conflict_of_interest,
-            acknowledgments: article.acknowledgments,
-            data_availability: article.data_availability,
+            conflict_of_interest: back.conflict_of_interest,
+            acknowledgments: back.acknowledgments,
+            data_availability,
         }
     }
 }
 
 impl From<JsFullText> for PmcArticle {
     fn from(js: JsFullText) -> Self {
-        use pubmed_client::pmc::JournalMeta;
+        use pubmed_client::pmc::{ArticleMeta, Back, Body, Front, JournalMeta, TitleGroup};
         Self {
-            pmcid: pubmed_client::PmcId::parse(&js.pmcid)
-                .unwrap_or_else(|_| pubmed_client::PmcId::from_u32(1)),
-            pmid: js
-                .pmid
-                .and_then(|p| pubmed_client::PubMedId::parse(&p).ok()),
-            title: js.title,
-            subtitle: None,
-            authors: js.authors.into_iter().map(|a| a.into()).collect(),
-            journal: JournalMeta::from(js.journal),
-            pub_dates: Vec::new(),
-            volume: None,
-            issue: None,
-            doi: js.doi,
-            sections: js.sections.into_iter().map(|s| s.into()).collect(),
-            references: js.references.into_iter().map(|r| r.into()).collect(),
             article_type: js.article_type,
-            keywords: js.keywords,
-            funding: js
-                .funding
-                .into_iter()
-                .map(|f| pubmed_client::pmc::FundingInfo {
-                    source: f.source,
-                    award_id: f.award_id,
-                    statement: f.statement,
-                })
-                .collect(),
-            conflict_of_interest: js.conflict_of_interest,
-            acknowledgments: js.acknowledgments,
-            data_availability: js.data_availability,
+            front: Front {
+                journal_meta: JournalMeta::from(js.journal),
+                article_meta: ArticleMeta {
+                    pmcid: pubmed_client::PmcId::parse(&js.pmcid)
+                        .unwrap_or_else(|_| pubmed_client::PmcId::from_u32(1)),
+                    pmid: js
+                        .pmid
+                        .and_then(|p| pubmed_client::PubMedId::parse(&p).ok()),
+                    doi: js.doi,
+                    categories: Vec::new(),
+                    title_group: TitleGroup {
+                        article_title: js.title,
+                        subtitle: None,
+                    },
+                    authors: js.authors.into_iter().map(|a| a.into()).collect(),
+                    pub_dates: Vec::new(),
+                    volume: None,
+                    issue: None,
+                    fpage: None,
+                    lpage: None,
+                    elocation_id: None,
+                    history: Vec::new(),
+                    permissions: None,
+                    abstracts: Vec::new(),
+                    keywords: js.keywords,
+                    funding: js
+                        .funding
+                        .into_iter()
+                        .map(|f| pubmed_client::pmc::FundingInfo {
+                            source: f.source,
+                            award_id: f.award_id,
+                            statement: f.statement,
+                        })
+                        .collect(),
+                },
+            },
+            body: Some(Body {
+                sections: js.sections.into_iter().map(|s| s.into()).collect(),
+            }),
+            back: Some(Back {
+                acknowledgments: js.acknowledgments,
+                conflict_of_interest: js.conflict_of_interest,
+                references: js.references.into_iter().map(|r| r.into()).collect(),
+                appendices: Vec::new(),
+                glossary: Vec::new(),
+            }),
             supplementary_materials: Vec::new(),
-            abstract_text: None,
-            abstract_sections: Vec::new(),
-            appendices: Vec::new(),
-            glossary: Vec::new(),
-            copyright: None,
-            license: None,
-            license_url: None,
-            history_dates: Vec::new(),
-            categories: Vec::new(),
-            fpage: None,
-            lpage: None,
-            elocation_id: None,
+            data_availability: js.data_availability,
         }
     }
 }

@@ -66,9 +66,9 @@
 //!         // Fetch structured full text
 //!         let full_text = client.fetch_full_text(&pmcid).await?;
 //!
-//!         println!("Title: {}", full_text.title);
-//!         println!("Sections: {}", full_text.sections.len());
-//!         println!("References: {}", full_text.references.len());
+//!         println!("Title: {}", full_text.title());
+//!         println!("Sections: {}", full_text.sections().len());
+//!         println!("References: {}", full_text.references().len());
 //!     }
 //!
 //!     Ok(())
@@ -279,9 +279,10 @@ pub use common::{Affiliation, Author, PmcId, PubMedId};
 pub use config::ClientConfig;
 pub use error::{ParseError, PubMedError, Result};
 pub use pmc::{
-    ExtractedFigure, Figure, FundingInfo, HeadingStyle, JournalMeta, MarkdownConfig, OaSubsetInfo,
-    PmcArticle, PmcClient, PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Section,
-    Table, parse_pmc_xml,
+    Abstract, ArticleMeta, Back, Body, ExtractedFigure, Figure, Front, FundingInfo, HeadingStyle,
+    JournalMeta, License, MarkdownConfig, OaSubsetInfo, Permissions, PmcArticle, PmcClient,
+    PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Section, SupplementaryMaterial,
+    Table, TitleGroup, parse_pmc_xml,
 };
 pub use pubmed::{
     AbstractSection, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,
@@ -398,7 +399,7 @@ impl Client {
     ///     for (article, full_text) in results {
     ///         println!("Article: {}", article.title);
     ///         if let Some(ft) = full_text {
-    ///             println!("  Full text available with {} sections", ft.sections.len());
+    ///             println!("  Full text available with {} sections", ft.sections().len());
     ///         } else {
     ///             println!("  Full text not available");
     ///         }

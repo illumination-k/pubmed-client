@@ -414,6 +414,14 @@ pub fn extract_title(content: &str) -> String {
         .unwrap_or_else(|| "Unknown Title".to_string())
 }
 
+/// Extract article subtitle from `<title-group>/<subtitle>`
+pub fn extract_subtitle(content: &str) -> Option<String> {
+    let title_group = xml_utils::extract_element_content(content, "title-group")?;
+    xml_utils::extract_text_between(&title_group, "<subtitle>", "</subtitle>")
+        .map(|s| xml_utils::strip_xml_tags(&s))
+        .filter(|s| !s.is_empty())
+}
+
 /// Extract article language
 pub fn extract_language(content: &str) -> Option<String> {
     // Look for language in article tag

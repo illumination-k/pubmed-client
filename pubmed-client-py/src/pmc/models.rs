@@ -314,10 +314,10 @@ pub struct PyPmcFullText {
 impl From<PmcArticle> for PyPmcFullText {
     fn from(full_text: PmcArticle) -> Self {
         PyPmcFullText {
-            pmcid: full_text.pmcid.as_str(),
-            pmid: full_text.pmid.as_ref().map(|p| p.as_str()),
-            title: full_text.title.clone(),
-            doi: full_text.doi.clone(),
+            pmcid: full_text.pmcid().to_string(),
+            pmid: full_text.pmid().map(|p| p.to_string()),
+            title: full_text.title().to_string(),
+            doi: full_text.doi().map(str::to_string),
             inner: Arc::new(full_text),
         }
     }
@@ -329,7 +329,7 @@ impl PyPmcFullText {
     /// Get list of authors
     fn authors(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
-        for author in &self.inner.authors {
+        for author in self.inner.authors() {
             let py_author = PyPmcAuthor::from(author);
             list.append(py_author)?;
         }
@@ -339,7 +339,7 @@ impl PyPmcFullText {
     /// Get list of sections
     fn sections(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
-        for section in &self.inner.sections {
+        for section in self.inner.sections() {
             let py_section = PyArticleSection::from(section);
             list.append(py_section)?;
         }
@@ -358,7 +358,7 @@ impl PyPmcFullText {
         }
 
         let mut all_figures = Vec::new();
-        for section in &self.inner.sections {
+        for section in self.inner.sections() {
             collect_figures(section, &mut all_figures);
         }
 
@@ -381,7 +381,7 @@ impl PyPmcFullText {
         }
 
         let mut all_tables = Vec::new();
-        for section in &self.inner.sections {
+        for section in self.inner.sections() {
             collect_tables(section, &mut all_tables);
         }
 
@@ -395,7 +395,7 @@ impl PyPmcFullText {
     /// Get list of references
     fn references(&self, py: Python) -> PyResult<Py<PyAny>> {
         let list = PyList::empty(py);
-        for reference in &self.inner.references {
+        for reference in self.inner.references() {
             let py_reference = PyReference::from(reference);
             list.append(py_reference)?;
         }

@@ -286,21 +286,21 @@ async fn fetch_article_metadata(
 
     // Extract abstract from sections if available
     let abstract_content = full_text
-        .sections
+        .sections()
         .iter()
         .find(|s| s.section_type.as_deref() == Some("abstract"))
         .map(|s| s.content.clone());
 
     // Create metadata structure
     let metadata = ArticleMetadata {
-        pmcid: full_text.pmcid.to_string(),
-        pmid: full_text.pmid.as_ref().map(|p| p.to_string()),
-        doi: full_text.doi.clone(),
-        title: full_text.title.clone(),
+        pmcid: full_text.pmcid().to_string(),
+        pmid: full_text.pmid().as_ref().map(|p| p.to_string()),
+        doi: full_text.doi().map(str::to_string),
+        title: full_text.title().to_string(),
         r#abstract: abstract_content,
-        authors: full_text.authors.clone(),
-        journal: Some(full_text.journal.clone()),
-        publication_date: full_text.pub_dates.first().map(|d| {
+        authors: full_text.authors().to_vec(),
+        journal: Some(full_text.journal().clone()),
+        publication_date: full_text.pub_dates().first().map(|d| {
             let mut s = String::new();
             if let Some(y) = d.year {
                 s.push_str(&y.to_string());
@@ -313,9 +313,9 @@ async fn fetch_article_metadata(
             }
             s
         }),
-        keywords: full_text.keywords.clone(),
-        funding: full_text.funding.clone(),
-        references: full_text.references.clone(),
+        keywords: full_text.keywords().to_vec(),
+        funding: full_text.funding().to_vec(),
+        references: full_text.references().to_vec(),
     };
 
     Ok(metadata)

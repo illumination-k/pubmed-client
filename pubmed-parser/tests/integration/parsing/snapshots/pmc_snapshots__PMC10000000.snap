@@ -1,56 +1,62 @@
 ---
 source: pubmed-parser/tests/integration/parsing/pmc_snapshots.rs
+assertion_line: 28
 expression: article
 ---
 {
-  "pmcid": {
-    "value": 10000000
-  },
-  "pmid": {
-    "value": 37471719
-  },
-  "doi": null,
   "article_type": "other",
-  "categories": [
-    "Editorial"
-  ],
-  "title": "Editorial",
-  "subtitle": null,
-  "authors": [],
-  "journal": {
-    "title": "Chicago Medical Examiner",
-    "abbreviation": null,
-    "issn_print": null,
-    "issn_electronic": null,
-    "publisher": null
-  },
-  "pub_dates": [
-    {
-      "pub_type": "ppub",
-      "year": 1867,
-      "month": 1,
-      "day": null
+  "front": {
+    "journal_meta": {
+      "title": "Chicago Medical Examiner",
+      "abbreviation": null,
+      "issn_print": null,
+      "issn_electronic": null,
+      "publisher": null
+    },
+    "article_meta": {
+      "pmcid": {
+        "value": 10000000
+      },
+      "pmid": {
+        "value": 37471719
+      },
+      "doi": null,
+      "categories": [
+        "Editorial"
+      ],
+      "title_group": {
+        "article_title": "Editorial",
+        "subtitle": null
+      },
+      "authors": [],
+      "pub_dates": [
+        {
+          "pub_type": "ppub",
+          "year": 1867,
+          "month": 1,
+          "day": null
+        }
+      ],
+      "volume": "8",
+      "issue": "1",
+      "fpage": "54",
+      "lpage": "64",
+      "elocation_id": null,
+      "history": [],
+      "permissions": {
+        "copyright_statement": null,
+        "license": {
+          "href": "https://creativecommons.org/publicdomain/mark/1.0/",
+          "text": "https://creativecommons.org/publicdomain/mark/1.0/\n          This work is free of known copyright restrictions. For more information, please see PMC Back Issue Digitization."
+        }
+      },
+      "abstracts": [],
+      "keywords": [],
+      "funding": []
     }
-  ],
-  "volume": "8",
-  "issue": "1",
-  "fpage": "54",
-  "lpage": "64",
-  "elocation_id": null,
-  "abstract_text": null,
-  "abstract_sections": [],
-  "keywords": [],
-  "sections": [],
-  "references": [],
-  "funding": [],
-  "acknowledgments": null,
-  "conflict_of_interest": null,
-  "data_availability": null,
+  },
+  "body": null,
+  "back": null,
   "supplementary_materials": [],
-  "appendices": [],
-  "glossary": [],
-  "copyright": null,
-  "license": "https://creativecommons.org/publicdomain/mark/1.0/\n          This work is free of known copyright restrictions. For more information, please see PMC Back Issue Digitization.",
-  "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-  "history_dates": []
+  "data_availability": null
 }

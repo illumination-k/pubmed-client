@@ -1,10 +1,11 @@
 use crate::common::{PmcId, PubMedId};
 use crate::error::Result;
-use crate::pmc::domain::PmcArticle;
+use crate::pmc::domain::{
+    Abstract, ArticleMeta, Back, Body, Front, License, Permissions, PmcArticle, TitleGroup,
+};
 
 pub mod author;
 pub mod metadata;
-pub mod models;
 pub(crate) mod reader_utils;
 pub mod reference;
 pub mod section;
@@ -35,6 +36,7 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
 
     // Metadata from <front> (title, journal, dates, IDs, keywords, funding are all in <front>)
     let title = metadata::extract_title(front);
+    let subtitle = metadata::extract_subtitle(front);
     let journal = metadata::extract_journal_info(front);
     let pub_dates = metadata::extract_pub_dates(front);
     let volume = metadata::extract_volume(front);
@@ -76,38 +78,88 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
     // References from <back> (extract_references_detailed finds <ref-list>/<back> internally)
     let references = reference::extract_references_detailed(xml_content).unwrap_or_default();
 
+    // Assemble <permissions>: copyright + license
+    let license = if license.is_some() || license_url.is_some() {
+        Some(License {
+            href: license_url,
+            text: license,
+        })
+    } else {
+        None
+    };
+    let permissions = if copyright.is_some() || license.is_some() {
+        Some(Permissions {
+            copyright_statement: copyright,
+            license,
+        })
+    } else {
+        None
+    };
+
+    // Assemble <abstract>* (structured abstract sections not yet extracted)
+    let abstracts = abstract_text
+        .map(|text| {
+            vec![Abstract {
+                abstract_type: None,
+                text,
+                sections: Vec::new(),
+            }]
+        })
+        .unwrap_or_default();
+
+    let front = Front {
+        journal_meta: journal,
+        article_meta: ArticleMeta {
+            pmcid: pmcid_typed,
+            pmid,
+            doi,
+            categories,
+            title_group: TitleGroup {
+                article_title: title,
+                subtitle,
+            },
+            authors,
+            pub_dates,
+            volume,
+            issue,
+            fpage,
+            lpage,
+            elocation_id,
+            history: history_dates,
+            permissions,
+            abstracts,
+            keywords,
+            funding,
+        },
+    };
+
+    let body = if xml_content.contains("<body") || !sections.is_empty() {
+        Some(Body { sections })
+    } else {
+        None
+    };
+
+    let has_back_content =
+        acknowledgments.is_some() || conflict_of_interest.is_some() || !references.is_empty();
+    let back = if !back.is_empty() || has_back_content {
+        Some(Back {
+            acknowledgments,
+            conflict_of_interest,
+            references,
+            appendices: Vec::new(),
+            glossary: Vec::new(),
+        })
+    } else {
+        None
+    };
+
     Ok(PmcArticle {
-        pmcid: pmcid_typed,
-        pmid,
-        doi,
         article_type,
-        categories,
-        title,
-        subtitle: None,
-        authors,
-        journal,
-        pub_dates,
-        volume,
-        issue,
-        fpage,
-        lpage,
-        elocation_id,
-        abstract_text,
-        abstract_sections: Vec::new(),
-        keywords,
-        sections,
-        references,
-        funding,
-        acknowledgments,
-        conflict_of_interest,
-        data_availability,
+        front,
+        body,
+        back,
         supplementary_materials,
-        appendices: Vec::new(),
-        glossary: Vec::new(),
-        copyright,
-        license,
-        license_url,
-        history_dates,
+        data_availability,
     })
 }
 
@@ -164,15 +216,15 @@ mod tests {
         assert!(result.is_ok());
 
         let article = result.unwrap();
-        assert_eq!(article.pmcid.as_str(), "PMC123456");
-        assert_eq!(article.title, "Test Article Title");
-        assert!(!article.pub_dates.is_empty());
-        assert_eq!(article.pub_dates[0].year, Some(2023));
-        assert_eq!(article.pub_dates[0].month, Some(12));
-        assert_eq!(article.pub_dates[0].day, Some(25));
-        assert!(!article.authors.is_empty());
-        assert!(!article.sections.is_empty());
-        assert!(!article.references.is_empty());
+        assert_eq!(article.pmcid().as_str(), "PMC123456");
+        assert_eq!(article.title(), "Test Article Title");
+        assert!(!article.pub_dates().is_empty());
+        assert_eq!(article.pub_dates()[0].year, Some(2023));
+        assert_eq!(article.pub_dates()[0].month, Some(12));
+        assert_eq!(article.pub_dates()[0].day, Some(25));
+        assert!(!article.authors().is_empty());
+        assert!(!article.sections().is_empty());
+        assert!(!article.references().is_empty());
     }
 
     #[test]
@@ -194,8 +246,8 @@ mod tests {
         assert!(result.is_ok());
 
         let article = result.unwrap();
-        assert_eq!(article.pmcid.as_str(), "PMC100000");
-        assert_eq!(article.title, "Minimal Test");
+        assert_eq!(article.pmcid().as_str(), "PMC100000");
+        assert_eq!(article.title(), "Minimal Test");
     }
 
     // Note: Most detailed tests have been moved to the individual parser modules:

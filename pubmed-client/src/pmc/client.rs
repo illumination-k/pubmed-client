@@ -180,8 +180,8 @@ impl PmcClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PmcClient::new();
     ///     let full_text = client.fetch_full_text("PMC7906746").await?;
-    ///     println!("Title: {}", full_text.title);
-    ///     println!("Sections: {}", full_text.sections.len());
+    ///     println!("Title: {}", full_text.title());
+    ///     println!("Sections: {}", full_text.sections().len());
     ///     Ok(())
     /// }
     /// ```
@@ -286,7 +286,7 @@ impl PmcClient {
     ///     if let Some(pmcid) = client.check_pmc_availability("33515491").await? {
     ///         println!("PMC available: {}", pmcid);
     ///         let full_text = client.fetch_full_text(&pmcid).await?;
-    ///         println!("Title: {}", full_text.title);
+    ///         println!("Title: {}", full_text.title());
     ///     } else {
     ///         println!("PMC not available");
     ///     }

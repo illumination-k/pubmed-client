@@ -320,11 +320,18 @@ pub struct FullTextArticle {
 
 impl From<PmcArticle> for FullTextArticle {
     fn from(article: PmcArticle) -> Self {
+        let PmcArticle {
+            front, body, back, ..
+        } = article;
+        let journal_meta = front.journal_meta;
+        let meta = front.article_meta;
+        let sections = body.map(|b| b.sections).unwrap_or_default();
+        let references = back.map(|b| b.references).unwrap_or_default();
         FullTextArticle {
-            pmcid: article.pmcid.to_string(),
-            pmid: article.pmid.map(|p| p.to_string()),
-            title: article.title,
-            authors: article
+            pmcid: meta.pmcid.to_string(),
+            pmid: meta.pmid.map(|p| p.to_string()),
+            title: meta.title_group.article_title,
+            authors: meta
                 .authors
                 .into_iter()
                 .map(|a| {
@@ -340,8 +347,8 @@ impl From<PmcArticle> for FullTextArticle {
                     }
                 })
                 .collect(),
-            journal: article.journal.title,
-            pub_date: article
+            journal: journal_meta.title,
+            pub_date: meta
                 .pub_dates
                 .first()
                 .map(|d| {
@@ -358,9 +365,8 @@ impl From<PmcArticle> for FullTextArticle {
                     s
                 })
                 .unwrap_or_default(),
-            doi: article.doi,
-            sections: article
-                .sections
+            doi: meta.doi,
+            sections: sections
                 .into_iter()
                 .map(|s| Section {
                     section_type: s.section_type,
@@ -368,8 +374,7 @@ impl From<PmcArticle> for FullTextArticle {
                     content: s.content,
                 })
                 .collect(),
-            references: article
-                .references
+            references: references
                 .into_iter()
                 .map(|r| Reference {
                     id: r.id,
@@ -386,7 +391,7 @@ impl From<PmcArticle> for FullTextArticle {
                     doi: r.doi,
                 })
                 .collect(),
-            keywords: article.keywords,
+            keywords: meta.keywords,
         }
     }
 }
