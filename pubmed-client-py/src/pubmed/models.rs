@@ -194,15 +194,11 @@ impl PyPubMedArticle {
         Ok(list.into())
     }
 
-    /// Get keywords
+    /// Get keywords (empty list when none are present)
     fn keywords(&self, py: Python) -> PyResult<Py<PyAny>> {
-        match &self.inner.keywords {
-            Some(keywords) => {
-                let list = PyList::new(py, keywords)?;
-                Ok(list.into())
-            }
-            None => Ok(py.None()),
-        }
+        let keywords = self.inner.keywords.as_deref().unwrap_or(&[]);
+        let list = PyList::new(py, keywords)?;
+        Ok(list.into())
     }
 
     fn __repr__(&self) -> String {

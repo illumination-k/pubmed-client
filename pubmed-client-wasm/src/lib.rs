@@ -513,6 +513,7 @@ pub struct JsArticle {
     pub doi: Option<String>,
     pub pmc_id: Option<String>,
     pub article_types: Vec<String>,
+    pub keywords: Vec<String>,
     pub volume: Option<String>,
     pub issue: Option<String>,
     pub pages: Option<String>,
@@ -540,6 +541,7 @@ impl From<PubMedArticle> for JsArticle {
             doi: article.doi,
             pmc_id: article.pmc_id,
             article_types: article.article_types,
+            keywords: article.keywords.unwrap_or_default(),
             volume: article.volume,
             issue: article.issue,
             pages: article.pages,
@@ -1193,32 +1195,50 @@ impl WasmSearchQuery {
         self
     }
 
-    /// Filter to articles published after a given year
-    pub fn published_after(mut self, year: u32) -> Self {
+    /// Filter to articles published after a given year (must be 1800–3000)
+    pub fn published_after(mut self, year: u32) -> Result<Self, JsValue> {
+        pubmed_client::validate_year(year).map_err(|e| JsValue::from_str(&e))?;
         self.inner = self.inner.published_after(year);
-        self
+        Ok(self)
     }
 
-    /// Filter to articles published in a date range
-    pub fn date_range(mut self, start_year: u32, end_year: Option<u32>) -> Self {
+    /// Filter to articles published in a date range (years must be 1800–3000)
+    pub fn date_range(mut self, start_year: u32, end_year: Option<u32>) -> Result<Self, JsValue> {
+        pubmed_client::validate_year(start_year).map_err(|e| JsValue::from_str(&e))?;
+        if let Some(end) = end_year {
+            pubmed_client::validate_year(end).map_err(|e| JsValue::from_str(&e))?;
+            if start_year > end {
+                return Err(JsValue::from_str(&format!(
+                    "Start year ({}) must be <= end year ({})",
+                    start_year, end
+                )));
+            }
+        }
         self.inner = self.inner.date_range(start_year, end_year);
-        self
+        Ok(self)
     }
 
-    /// Filter by article type (e.g., "review", "clinical_trial", "meta_analysis")
-    pub fn article_type_str(mut self, article_type: &str) -> Self {
-        let at = match article_type {
-            "review" => pubmed_client::ArticleType::Review,
-            "clinical_trial" => pubmed_client::ArticleType::ClinicalTrial,
-            "meta_analysis" => pubmed_client::ArticleType::MetaAnalysis,
-            "randomized_controlled_trial" => pubmed_client::ArticleType::RandomizedControlledTrial,
-            "systematic_review" => pubmed_client::ArticleType::SystematicReview,
-            "case_report" => pubmed_client::ArticleType::CaseReport,
-            "observational_study" => pubmed_client::ArticleType::ObservationalStudy,
-            _ => return self,
+    /// Filter by article type string (case-insensitive).
+    ///
+    /// Accepted values: `"Clinical Trial"`, `"Review"`, `"Systematic Review"`,
+    /// `"Meta-Analysis"` / `"Meta Analysis"`, `"Case Reports"` / `"Case Report"`,
+    /// `"Randomized Controlled Trial"` / `"RCT"`, `"Observational Study"`.
+    /// Also accepts the legacy snake_case aliases used in previous versions.
+    pub fn article_type_str(mut self, article_type: &str) -> Result<Self, JsValue> {
+        // Support legacy snake_case aliases for backwards compatibility
+        let normalized = match article_type {
+            "clinical_trial" => "Clinical Trial",
+            "meta_analysis" => "Meta-Analysis",
+            "randomized_controlled_trial" => "Randomized Controlled Trial",
+            "systematic_review" => "Systematic Review",
+            "case_report" => "Case Reports",
+            "observational_study" => "Observational Study",
+            other => other,
         };
+        let at = pubmed_client::ArticleType::from_str_insensitive(normalized)
+            .map_err(|e| JsValue::from_str(&e))?;
         self.inner = self.inner.article_type(at);
-        self
+        Ok(self)
     }
 
     /// Filter to human-only studies
@@ -1227,32 +1247,24 @@ impl WasmSearchQuery {
         self
     }
 
-    /// Filter by language (e.g., "english", "french")
+    /// Filter by language string (case-insensitive, accepts full names and ISO 639-2 codes).
+    ///
+    /// Unknown values fall back to `Language::Other(s)` rather than being silently ignored.
     pub fn language_str(mut self, language: &str) -> Self {
-        let lang = match language.to_lowercase().as_str() {
-            "english" | "eng" => pubmed_client::Language::English,
-            "french" | "fre" => pubmed_client::Language::French,
-            "german" | "ger" => pubmed_client::Language::German,
-            "spanish" | "spa" => pubmed_client::Language::Spanish,
-            "japanese" | "jpn" => pubmed_client::Language::Japanese,
-            "chinese" | "chi" => pubmed_client::Language::Chinese,
-            _ => return self,
-        };
+        let lang = pubmed_client::Language::from_str_insensitive(language);
         self.inner = self.inner.language(lang);
         self
     }
 
-    /// Set the sort order for results
-    pub fn sort_str(mut self, sort: &str) -> Self {
-        let order = match sort {
-            "relevance" => pubmed_client::SortOrder::Relevance,
-            "publication_date" | "date" => pubmed_client::SortOrder::PublicationDate,
-            "first_author" | "author" => pubmed_client::SortOrder::FirstAuthor,
-            "journal_name" | "journal" => pubmed_client::SortOrder::JournalName,
-            _ => return self,
-        };
+    /// Set the sort order for results (case-insensitive).
+    ///
+    /// Accepted values: `"relevance"`, `"pub_date"` / `"publication_date"` / `"date"`,
+    /// `"author"` / `"first_author"`, `"journal"` / `"journal_name"`.
+    pub fn sort_str(mut self, sort: &str) -> Result<Self, JsValue> {
+        let order = pubmed_client::SortOrder::from_str_insensitive(sort)
+            .map_err(|e| JsValue::from_str(&e))?;
         self.inner = self.inner.sort(order);
-        self
+        Ok(self)
     }
 
     /// Build the query string

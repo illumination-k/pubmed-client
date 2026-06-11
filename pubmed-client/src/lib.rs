@@ -288,7 +288,7 @@ pub use pubmed::{
     CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult,
     ExportFormat, FieldInfo, GlobalQueryResults, HistorySession, Language, LinkInfo, PmcLinks,
     PubMedArticle, PubMedClient, RelatedArticles, SearchQuery, SearchResult, SortOrder,
-    SpellCheckResult, SpelledQuerySegment, export, parse_article_from_xml,
+    SpellCheckResult, SpelledQuerySegment, export, parse_article_from_xml, validate_year,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{Duration, Instant, sleep};

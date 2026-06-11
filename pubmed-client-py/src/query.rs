@@ -2,79 +2,26 @@
 //!
 //! This module provides Python wrappers for the SearchQuery builder.
 
-use pubmed_client::pubmed::ArticleType;
-use pubmed_client::pubmed::SearchQuery;
-use pubmed_client::pubmed::SortOrder;
+use pubmed_client::pubmed::{ArticleType, SearchQuery, SortOrder};
+use pubmed_client::validate_year as core_validate_year;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 
 // ================================================================================================
-// Helper Functions
+// Helper Functions (thin wrappers that convert core errors to PyValueError)
 // ================================================================================================
 
-/// Validate year is within reasonable range for biomedical publications
-///
-/// # Arguments
-/// * `year` - Year to validate (should be 1800-3000)
-///
-/// # Errors
-/// Returns `PyValueError` if year is outside the valid range
 fn validate_year(year: u32) -> PyResult<()> {
-    if !(1800..=3000).contains(&year) {
-        return Err(PyValueError::new_err(format!(
-            "Year must be between 1800 and 3000, got: {}",
-            year
-        )));
-    }
-    Ok(())
+    core_validate_year(year).map_err(PyValueError::new_err)
 }
 
-/// Convert string to SortOrder enum with case-insensitive matching
-///
-/// # Arguments
-/// * `s` - Sort order string (e.g., "pub_date", "relevance", "author")
-///
-/// # Errors
-/// Returns `PyValueError` if the sort order is not recognized
 fn str_to_sort_order(s: &str) -> PyResult<SortOrder> {
-    let normalized = s.trim().to_lowercase();
-
-    match normalized.as_str() {
-        "relevance" => Ok(SortOrder::Relevance),
-        "pub_date" | "publication_date" | "date" => Ok(SortOrder::PublicationDate),
-        "author" | "first_author" => Ok(SortOrder::FirstAuthor),
-        "journal" | "journal_name" => Ok(SortOrder::JournalName),
-        _ => Err(PyValueError::new_err(format!(
-            "Invalid sort order: '{}'. Supported values: relevance, pub_date, author, journal",
-            s
-        ))),
-    }
+    SortOrder::from_str_insensitive(s).map_err(PyValueError::new_err)
 }
 
-/// Convert string to ArticleType enum with case-insensitive matching
-///
-/// # Arguments
-/// * `s` - Article type string (e.g., "Clinical Trial", "review", "RCT")
-///
-/// # Errors
-/// Returns `PyValueError` if the article type is not recognized
 fn str_to_article_type(s: &str) -> PyResult<ArticleType> {
-    let normalized = s.trim().to_lowercase();
-
-    match normalized.as_str() {
-        "clinical trial" => Ok(ArticleType::ClinicalTrial),
-        "review" => Ok(ArticleType::Review),
-        "systematic review" => Ok(ArticleType::SystematicReview),
-        "meta-analysis" | "meta analysis" => Ok(ArticleType::MetaAnalysis),
-        "case reports" | "case report" => Ok(ArticleType::CaseReport),
-        "randomized controlled trial" | "rct" => Ok(ArticleType::RandomizedControlledTrial),
-        "observational study" => Ok(ArticleType::ObservationalStudy),
-        _ => Err(PyValueError::new_err(format!(
-            "Invalid article type: '{}'. Supported types: Clinical Trial, Review, Systematic Review, Meta-Analysis, Case Reports, Randomized Controlled Trial, Observational Study",
-            s
-        ))),
-    }
+    ArticleType::from_str_insensitive(s).map_err(PyValueError::new_err)
 }
 
 // ================================================================================================
