@@ -60,6 +60,7 @@ chrono = "0.4"
 clap = { version = "3.2", features = ["derive"] }
 paste = "1.0"
 proptest = "1"
+pubmed-test-utils = { workspace = true }
 rstest = "0.18"
 tempfile = "3.0"
 tokio-test = "0.4"
@@ -68,14 +69,6 @@ tracing-test = "0.2"
 wiremock = "0.6"
 
 # --- Parsing tests (fixture-based, no network) ---
-
-[[test]]
-name = "parsing_pubmed"
-path = "tests/integration/parsing/pubmed.rs"
-
-[[test]]
-name = "parsing_pmc"
-path = "tests/integration/parsing/pmc.rs"
 
 [[test]]
 name = "parsing_einfo"
@@ -104,16 +97,12 @@ path = "tests/integration/parsing/espell.rs"
 # --- Mocked tests (wiremock/offline, no network) ---
 
 [[test]]
-name = "mocked_markdown"
-path = "tests/integration/mocked/markdown.rs"
+name = "mocked_reexports"
+path = "tests/integration/mocked/reexports.rs"
 
 [[test]]
 name = "mocked_figures"
 path = "tests/integration/mocked/figures.rs"
-
-[[test]]
-name = "mocked_supplementary"
-path = "tests/integration/mocked/supplementary.rs"
 
 [[test]]
 name = "mocked_tar"

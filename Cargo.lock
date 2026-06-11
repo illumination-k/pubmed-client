@@ -3439,6 +3439,7 @@ dependencies = [
  "proptest",
  "pubmed-formatter",
  "pubmed-parser",
+ "pubmed-test-utils",
  "quick-xml",
  "rand 0.8.5",
  "redis",
@@ -3513,6 +3514,7 @@ name = "pubmed-formatter"
 version = "0.1.0"
 dependencies = [
  "pubmed-parser",
+ "pubmed-test-utils",
  "regex",
  "rstest",
  "serde",
@@ -3547,6 +3549,7 @@ version = "0.1.0"
 dependencies = [
  "criterion",
  "insta",
+ "pubmed-test-utils",
  "quick-xml",
  "regex",
  "rstest",
@@ -3558,6 +3561,10 @@ dependencies = [
  "tracing-test",
  "urlencoding",
 ]
+
+[[package]]
+name = "pubmed-test-utils"
+version = "0.1.0"
 
 [[package]]
 name = "pyo3"
