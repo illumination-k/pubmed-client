@@ -195,7 +195,7 @@ mod integration_tests {
                 Ok(fulltext) => {
                     warn!(
                         pmcid = pmcid,
-                        article_title = %fulltext.title,
+                        article_title = %fulltext.title(),
                         "Unexpected success with invalid PMCID"
                     );
                     // This might happen if the "invalid" PMCID actually exists

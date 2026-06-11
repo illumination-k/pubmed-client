@@ -61,7 +61,7 @@ mod integration_tests {
                     let mut total_tables = 0;
                     let mut has_abstract = false;
 
-                    for section in &fulltext.sections {
+                    for section in fulltext.sections() {
                         total_figures += section.figures.len();
                         total_tables += section.tables.len();
                         if section.section_type.as_deref() == Some("abstract") {
@@ -71,9 +71,9 @@ mod integration_tests {
 
                     info!(
                         pmcid = pmcid,
-                        title_length = fulltext.title.len(),
-                        authors_count = fulltext.authors.len(),
-                        sections_count = fulltext.sections.len(),
+                        title_length = fulltext.title().len(),
+                        authors_count = fulltext.authors().len(),
+                        sections_count = fulltext.sections().len(),
                         figures_count = total_figures,
                         tables_count = total_tables,
                         has_abstract = has_abstract,
@@ -82,13 +82,16 @@ mod integration_tests {
                     );
 
                     // Verify required fields
-                    assert!(!fulltext.title.is_empty(), "PMC article should have title");
                     assert!(
-                        !fulltext.authors.is_empty(),
+                        !fulltext.title().is_empty(),
+                        "PMC article should have title"
+                    );
+                    assert!(
+                        !fulltext.authors().is_empty(),
                         "PMC article should have authors"
                     );
                     assert!(
-                        !fulltext.sections.is_empty(),
+                        !fulltext.sections().is_empty(),
                         "PMC article should have sections"
                     );
 
@@ -96,7 +99,7 @@ mod integration_tests {
                     assert!(pmcid.starts_with("PMC"), "PMCID should start with PMC");
 
                     // Verify section structure
-                    for (i, section) in fulltext.sections.iter().take(3).enumerate() {
+                    for (i, section) in fulltext.sections().iter().take(3).enumerate() {
                         if let Some(ref title) = section.title {
                             assert!(!title.is_empty(), "Section title should not be empty");
                         }
@@ -111,11 +114,11 @@ mod integration_tests {
                     }
 
                     // Log title preview for verification
-                    let title_preview = if fulltext.title.len() > 100 {
-                        let preview = &fulltext.title[..100];
+                    let title_preview = if fulltext.title().len() > 100 {
+                        let preview = &fulltext.title()[..100];
                         format!("{preview}...")
                     } else {
-                        fulltext.title.clone()
+                        fulltext.title().to_string()
                     };
                     debug!(pmcid = pmcid, title_preview = %title_preview, "PMC article title");
                 }
@@ -172,14 +175,14 @@ mod integration_tests {
 
                     // Should contain title
                     assert!(
-                        markdown.contains(&fulltext.title)
-                            || markdown.contains(&fulltext.title.replace(" ", "")),
+                        markdown.contains(fulltext.title())
+                            || markdown.contains(&fulltext.title().replace(" ", "")),
                         "Markdown should contain article title"
                     );
 
                     // Should contain author information
-                    if !fulltext.authors.is_empty() {
-                        let first_author = &fulltext.authors[0];
+                    if !fulltext.authors().is_empty() {
+                        let first_author = &fulltext.authors()[0];
                         let author_name = format!(
                             "{} {}",
                             first_author.given_names.as_deref().unwrap_or(""),
@@ -194,8 +197,8 @@ mod integration_tests {
                     }
 
                     // Should contain section content
-                    if !fulltext.sections.is_empty() {
-                        let first_section = &fulltext.sections[0];
+                    if !fulltext.sections().is_empty() {
+                        let first_section = &fulltext.sections()[0];
                         let title_check = if let Some(ref title) = first_section.title {
                             markdown.contains(title)
                         } else {
@@ -255,8 +258,8 @@ mod integration_tests {
                     );
 
                     // Test author structure
-                    if !fulltext.authors.is_empty() {
-                        let author = &fulltext.authors[0];
+                    if !fulltext.authors().is_empty() {
+                        let author = &fulltext.authors()[0];
                         assert!(!author.full_name.is_empty(), "Author should have name");
 
                         debug!(
@@ -274,7 +277,7 @@ mod integration_tests {
                     let mut results_found = false;
                     let mut discussion_found = false;
 
-                    for section in &fulltext.sections {
+                    for section in fulltext.sections() {
                         let section_type_lower = section
                             .section_type
                             .as_ref()
@@ -325,7 +328,7 @@ mod integration_tests {
 
                     info!(
                         pmcid = pmcid,
-                        sections_count = fulltext.sections.len(),
+                        sections_count = fulltext.sections().len(),
                         introduction_found = introduction_found,
                         methods_found = methods_found,
                         results_found = results_found,
@@ -337,7 +340,7 @@ mod integration_tests {
                     let mut total_figures = 0;
                     let mut total_tables = 0;
 
-                    for section in &fulltext.sections {
+                    for section in fulltext.sections() {
                         total_figures += section.figures.len();
                         total_tables += section.tables.len();
 
@@ -599,8 +602,8 @@ mod integration_tests {
                         pmc_articles_fetched += 1;
                         info!(
                             pmcid = pmcid,
-                            title_length = fulltext.title.len(),
-                            sections_count = fulltext.sections.len(),
+                            title_length = fulltext.title().len(),
+                            sections_count = fulltext.sections().len(),
                             "PMC full text retrieved successfully"
                         );
 
