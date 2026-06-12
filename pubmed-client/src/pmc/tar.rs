@@ -438,7 +438,7 @@ impl PmcTarClient {
 
         // Collect all figures from all sections
         let mut all_figures = Vec::new();
-        for section in &full_text.sections {
+        for section in full_text.sections() {
             Self::collect_figures_recursive(section, &mut all_figures);
         }
 

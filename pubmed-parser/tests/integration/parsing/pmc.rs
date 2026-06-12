@@ -53,9 +53,9 @@ fn test_comprehensive_pmc_parsing(#[from(xml_test_cases)] test_cases: Vec<PmcXml
                 successful_parses += 1;
 
                 // Basic validation
-                assert!(!article.title.is_empty(), "Article should have a title");
+                assert!(!article.title().is_empty(), "Article should have a title");
                 assert_eq!(
-                    article.pmcid.as_str(),
+                    article.pmcid().as_str(),
                     test_case.pmcid,
                     "PMC ID should match"
                 );
@@ -63,11 +63,11 @@ fn test_comprehensive_pmc_parsing(#[from(xml_test_cases)] test_cases: Vec<PmcXml
                 // Log some statistics
                 info!(
                     filename = test_case.filename(),
-                    title = article.title.chars().take(60).collect::<String>(),
-                    authors_count = article.authors.len(),
-                    sections_count = article.sections.len(),
-                    references_count = article.references.len(),
-                    doi = ?article.doi,
+                    title = article.title().chars().take(60).collect::<String>(),
+                    authors_count = article.authors().len(),
+                    sections_count = article.sections().len(),
+                    references_count = article.references().len(),
+                    doi = ?article.doi(),
                     "Comprehensive parsing passed"
                 );
             }
@@ -130,28 +130,28 @@ fn test_pmc_parsing_statistics(#[from(xml_test_cases)] test_cases: Vec<PmcXmlTes
 
         if let Ok(article) = result {
             successful_parses += 1;
-            total_authors += article.authors.len();
-            total_sections += article.sections.len();
-            total_references += article.references.len();
+            total_authors += article.authors().len();
+            total_sections += article.sections().len();
+            total_references += article.references().len();
 
-            if article.doi.is_some() {
+            if article.doi().is_some() {
                 articles_with_doi += 1;
             }
-            if article.pmid.is_some() {
+            if article.pmid().is_some() {
                 articles_with_pmid += 1;
             }
-            if !article.keywords.is_empty() {
+            if !article.keywords().is_empty() {
                 articles_with_keywords += 1;
             }
-            if !article.funding.is_empty() {
+            if !article.funding().is_empty() {
                 articles_with_funding += 1;
             }
 
             debug!(
                 filename = test_case.filename(),
-                authors = article.authors.len(),
-                sections = article.sections.len(),
-                references = article.references.len(),
+                authors = article.authors().len(),
+                sections = article.sections().len(),
+                references = article.references().len(),
                 "Article statistics"
             );
         }
@@ -195,7 +195,7 @@ fn test_pmc_parsing_author_details(#[from(xml_test_cases)] test_cases: Vec<PmcXm
         let result = parse_pmc_xml(&xml_content, &test_case.pmcid);
 
         if let Ok(article) = result {
-            for author in &article.authors {
+            for author in article.authors() {
                 total_authors_analyzed += 1;
 
                 if author.is_corresponding {
@@ -210,20 +210,24 @@ fn test_pmc_parsing_author_details(#[from(xml_test_cases)] test_cases: Vec<PmcXm
             }
 
             let corresponding_count = article
-                .authors
+                .authors()
                 .iter()
                 .filter(|a| a.is_corresponding)
                 .count();
             let affiliation_count = article
-                .authors
+                .authors()
                 .iter()
                 .filter(|a| !a.affiliations.is_empty())
                 .count();
-            let orcid_count = article.authors.iter().filter(|a| a.orcid.is_some()).count();
+            let orcid_count = article
+                .authors()
+                .iter()
+                .filter(|a| a.orcid.is_some())
+                .count();
 
             debug!(
                 filename = test_case.filename(),
-                total_authors = article.authors.len(),
+                total_authors = article.authors().len(),
                 corresponding_count = corresponding_count,
                 affiliation_count = affiliation_count,
                 orcid_count = orcid_count,
@@ -279,7 +283,7 @@ fn test_pmc_parsing_content_structure(#[from(xml_test_cases)] test_cases: Vec<Pm
             let mut figure_count = 0;
             let mut table_count = 0;
 
-            for section in &article.sections {
+            for section in article.sections() {
                 if !section.figures.is_empty() {
                     has_figures = true;
                     figure_count += section.figures.len();
@@ -307,7 +311,7 @@ fn test_pmc_parsing_content_structure(#[from(xml_test_cases)] test_cases: Vec<Pm
 
             debug!(
                 filename = test_case.filename(),
-                sections_count = article.sections.len(),
+                sections_count = article.sections().len(),
                 figures_count = figure_count,
                 tables_count = table_count,
                 has_subsections = has_subsections,

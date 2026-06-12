@@ -1,5 +1,17 @@
 //! Filter types and enums for PubMed query filtering
 
+/// Validate that a year is within the range valid for biomedical publications (1800–3000).
+///
+/// Returns `Ok(())` if valid, or `Err(String)` with a descriptive message if not.
+/// Bindings convert the error message to their native error type.
+pub fn validate_year(year: u32) -> Result<(), String> {
+    if !(1800..=3000).contains(&year) {
+        Err(format!("Year must be between 1800 and 3000, got: {}", year))
+    } else {
+        Ok(())
+    }
+}
+
 /// Sort order for PubMed search results
 ///
 /// Controls how ESearch results are ordered. The default sort (when not specified)
@@ -19,6 +31,25 @@ pub enum SortOrder {
 }
 
 impl SortOrder {
+    /// Parse a sort order from a case-insensitive string.
+    ///
+    /// Accepted values: `"relevance"`, `"pub_date"` / `"publication_date"` / `"date"`,
+    /// `"author"` / `"first_author"`, `"journal"` / `"journal_name"`.
+    ///
+    /// Returns `Err(String)` for unrecognised input; bindings convert to their native error type.
+    pub fn from_str_insensitive(s: &str) -> Result<Self, String> {
+        match s.trim().to_lowercase().as_str() {
+            "relevance" => Ok(SortOrder::Relevance),
+            "pub_date" | "publication_date" | "date" => Ok(SortOrder::PublicationDate),
+            "author" | "first_author" => Ok(SortOrder::FirstAuthor),
+            "journal" | "journal_name" => Ok(SortOrder::JournalName),
+            _ => Err(format!(
+                "Invalid sort order: '{}'. Supported values: relevance, pub_date, author, journal",
+                s
+            )),
+        }
+    }
+
     /// Get the API parameter value for this sort order
     pub(crate) fn as_api_param(&self) -> &str {
         match self {
@@ -50,6 +81,29 @@ pub enum ArticleType {
 }
 
 impl ArticleType {
+    /// Parse an article type from a case-insensitive string.
+    ///
+    /// Accepted values (case-insensitive): `"Clinical Trial"`, `"Review"`, `"Systematic Review"`,
+    /// `"Meta-Analysis"` / `"Meta Analysis"`, `"Case Reports"` / `"Case Report"`,
+    /// `"Randomized Controlled Trial"` / `"RCT"`, `"Observational Study"`.
+    ///
+    /// Returns `Err(String)` for unrecognised input; bindings convert to their native error type.
+    pub fn from_str_insensitive(s: &str) -> Result<Self, String> {
+        match s.trim().to_lowercase().as_str() {
+            "clinical trial" => Ok(ArticleType::ClinicalTrial),
+            "review" => Ok(ArticleType::Review),
+            "systematic review" => Ok(ArticleType::SystematicReview),
+            "meta-analysis" | "meta analysis" => Ok(ArticleType::MetaAnalysis),
+            "case reports" | "case report" => Ok(ArticleType::CaseReport),
+            "randomized controlled trial" | "rct" => Ok(ArticleType::RandomizedControlledTrial),
+            "observational study" => Ok(ArticleType::ObservationalStudy),
+            _ => Err(format!(
+                "Invalid article type: '{}'. Supported types: Clinical Trial, Review, Systematic Review, Meta-Analysis, Case Reports, Randomized Controlled Trial, Observational Study",
+                s
+            )),
+        }
+    }
+
     pub(crate) fn to_query_string(&self) -> &'static str {
         match self {
             ArticleType::ClinicalTrial => "Clinical Trial[pt]",
@@ -92,6 +146,39 @@ pub enum Language {
 }
 
 impl Language {
+    /// Parse a language from a case-insensitive string.
+    ///
+    /// Accepts full English names (`"english"`, `"japanese"`, …) and ISO 639-2 three-letter codes
+    /// (`"eng"`, `"jpn"`, …). Unrecognised values fall back to `Language::Other(s)` rather than
+    /// returning an error, so callers never need to handle the unknown-language case.
+    pub fn from_str_insensitive(s: &str) -> Self {
+        match s.trim().to_lowercase().as_str() {
+            "english" | "eng" => Language::English,
+            "japanese" | "jpn" => Language::Japanese,
+            "german" | "ger" | "deu" => Language::German,
+            "french" | "fre" | "fra" => Language::French,
+            "spanish" | "spa" => Language::Spanish,
+            "italian" | "ita" => Language::Italian,
+            "chinese" | "chi" | "zho" => Language::Chinese,
+            "russian" | "rus" => Language::Russian,
+            "portuguese" | "por" => Language::Portuguese,
+            "arabic" | "ara" => Language::Arabic,
+            "dutch" | "dut" | "nld" => Language::Dutch,
+            "korean" | "kor" => Language::Korean,
+            "polish" | "pol" => Language::Polish,
+            "swedish" | "swe" => Language::Swedish,
+            "danish" | "dan" => Language::Danish,
+            "norwegian" | "nor" => Language::Norwegian,
+            "finnish" | "fin" => Language::Finnish,
+            "turkish" | "tur" => Language::Turkish,
+            "hebrew" | "heb" => Language::Hebrew,
+            "czech" | "cze" | "ces" => Language::Czech,
+            "hungarian" | "hun" => Language::Hungarian,
+            "greek" | "gre" | "ell" => Language::Greek,
+            _ => Language::Other(s.trim().to_string()),
+        }
+    }
+
     pub(crate) fn to_query_string(&self) -> String {
         match self {
             Language::English => "English[la]".to_string(),

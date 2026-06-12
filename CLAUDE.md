@@ -133,10 +133,12 @@ pubmed/                # PubMed XML parsing
     xml_types.rs       # XML element type definitions
 
 pmc/                   # PMC XML parsing
-  models.rs            # PmcFullText, ArticleSection, Figure, Table, Reference, etc.
+  domain.rs            # JATS-DTD-faithful domain models: PmcArticle (front/body/back),
+                       # Front, ArticleMeta, Body, Back, Section, Figure, Table, Reference, etc.
+                       # Single PMC model layer; flat read access via accessor methods
   oa_api.rs            # PMC Open Access API types
   parser/              # XML parsing for PMC full-text
-    mod.rs             # parse_pmc_xml, main entry
+    mod.rs             # parse_pmc_xml, main entry (returns PmcArticle)
     author.rs          # Author extraction
     metadata.rs        # Metadata extraction
     reference.rs       # Reference extraction

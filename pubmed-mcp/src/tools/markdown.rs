@@ -52,7 +52,7 @@ pub async fn get_pmc_markdown(
         .with_include_figure_captions(params.include_figure_captions.unwrap_or(true));
     info!(
         pmc_id = %pmc_id,
-        title = %article.title,
+        title = %article.title(),
         "Converting PMC article to markdown"
     );
 

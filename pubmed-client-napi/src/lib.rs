@@ -320,11 +320,18 @@ pub struct FullTextArticle {
 
 impl From<PmcArticle> for FullTextArticle {
     fn from(article: PmcArticle) -> Self {
+        let PmcArticle {
+            front, body, back, ..
+        } = article;
+        let journal_meta = front.journal_meta;
+        let meta = front.article_meta;
+        let sections = body.map(|b| b.sections).unwrap_or_default();
+        let references = back.map(|b| b.references).unwrap_or_default();
         FullTextArticle {
-            pmcid: article.pmcid.to_string(),
-            pmid: article.pmid.map(|p| p.to_string()),
-            title: article.title,
-            authors: article
+            pmcid: meta.pmcid.to_string(),
+            pmid: meta.pmid.map(|p| p.to_string()),
+            title: meta.title_group.article_title,
+            authors: meta
                 .authors
                 .into_iter()
                 .map(|a| {
@@ -340,8 +347,8 @@ impl From<PmcArticle> for FullTextArticle {
                     }
                 })
                 .collect(),
-            journal: article.journal.title,
-            pub_date: article
+            journal: journal_meta.title,
+            pub_date: meta
                 .pub_dates
                 .first()
                 .map(|d| {
@@ -358,9 +365,8 @@ impl From<PmcArticle> for FullTextArticle {
                     s
                 })
                 .unwrap_or_default(),
-            doi: article.doi,
-            sections: article
-                .sections
+            doi: meta.doi,
+            sections: sections
                 .into_iter()
                 .map(|s| Section {
                     section_type: s.section_type,
@@ -368,8 +374,7 @@ impl From<PmcArticle> for FullTextArticle {
                     content: s.content,
                 })
                 .collect(),
-            references: article
-                .references
+            references: references
                 .into_iter()
                 .map(|r| Reference {
                     id: r.id,
@@ -386,7 +391,7 @@ impl From<PmcArticle> for FullTextArticle {
                     doi: r.doi,
                 })
                 .collect(),
-            keywords: article.keywords,
+            keywords: meta.keywords,
         }
     }
 }
@@ -786,84 +791,23 @@ impl PubMedClient {
 }
 
 // ================================================================================================
-// Helper Functions
+// Helper Functions (thin wrappers that convert core errors to napi::Error)
 // ================================================================================================
 
-/// Validate year is within reasonable range for biomedical publications
 fn validate_year(year: u32) -> Result<()> {
-    if !(1800..=3000).contains(&year) {
-        return Err(Error::from_reason(format!(
-            "Year must be between 1800 and 3000, got: {}",
-            year
-        )));
-    }
-    Ok(())
+    pubmed_client::validate_year(year).map_err(Error::from_reason)
 }
 
-/// Convert string to ArticleType enum with case-insensitive matching
 fn str_to_article_type(s: &str) -> Result<ArticleType> {
-    let normalized = s.trim().to_lowercase();
-
-    match normalized.as_str() {
-        "clinical trial" => Ok(ArticleType::ClinicalTrial),
-        "review" => Ok(ArticleType::Review),
-        "systematic review" => Ok(ArticleType::SystematicReview),
-        "meta-analysis" | "meta analysis" => Ok(ArticleType::MetaAnalysis),
-        "case reports" | "case report" => Ok(ArticleType::CaseReport),
-        "randomized controlled trial" | "rct" => Ok(ArticleType::RandomizedControlledTrial),
-        "observational study" => Ok(ArticleType::ObservationalStudy),
-        _ => Err(Error::from_reason(format!(
-            "Invalid article type: '{}'. Supported types: Clinical Trial, Review, Systematic Review, Meta-Analysis, Case Reports, Randomized Controlled Trial, Observational Study",
-            s
-        ))),
-    }
+    ArticleType::from_str_insensitive(s).map_err(Error::from_reason)
 }
 
-/// Convert string to SortOrder enum with case-insensitive matching
 fn str_to_sort_order(s: &str) -> Result<SortOrder> {
-    let normalized = s.trim().to_lowercase();
-
-    match normalized.as_str() {
-        "relevance" => Ok(SortOrder::Relevance),
-        "pub_date" | "publication_date" | "date" => Ok(SortOrder::PublicationDate),
-        "author" | "first_author" => Ok(SortOrder::FirstAuthor),
-        "journal" | "journal_name" => Ok(SortOrder::JournalName),
-        _ => Err(Error::from_reason(format!(
-            "Invalid sort order: '{}'. Supported values: relevance, pub_date, author, journal",
-            s
-        ))),
-    }
+    SortOrder::from_str_insensitive(s).map_err(Error::from_reason)
 }
 
-/// Convert string to Language enum with case-insensitive matching
 fn str_to_language(s: &str) -> Language {
-    let normalized = s.trim().to_lowercase();
-
-    match normalized.as_str() {
-        "english" => Language::English,
-        "japanese" => Language::Japanese,
-        "german" => Language::German,
-        "french" => Language::French,
-        "spanish" => Language::Spanish,
-        "italian" => Language::Italian,
-        "chinese" => Language::Chinese,
-        "russian" => Language::Russian,
-        "portuguese" => Language::Portuguese,
-        "arabic" => Language::Arabic,
-        "dutch" => Language::Dutch,
-        "korean" => Language::Korean,
-        "polish" => Language::Polish,
-        "swedish" => Language::Swedish,
-        "danish" => Language::Danish,
-        "norwegian" => Language::Norwegian,
-        "finnish" => Language::Finnish,
-        "turkish" => Language::Turkish,
-        "hebrew" => Language::Hebrew,
-        "czech" => Language::Czech,
-        "hungarian" => Language::Hungarian,
-        "greek" => Language::Greek,
-        _ => Language::Other(s.trim().to_string()),
-    }
+    Language::from_str_insensitive(s)
 }
 
 // ================================================================================================

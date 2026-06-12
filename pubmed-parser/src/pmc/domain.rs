@@ -1,15 +1,40 @@
 //! PMC domain models based on JATS Archiving 1.4 DTD
 //!
-//! These types represent the domain of PMC full-text articles with clean
-//! separation from parsing and extraction concerns. Each type maps to
-//! specific JATS XML elements as documented in the field comments.
+//! **This module is the single model layer for PMC full-text articles.**
+//! All parsing produces these types directly; there is no separate
+//! intermediate parser model.
+//!
+//! The type hierarchy mirrors the JATS `<article>` content model:
+//!
+//! ```text
+//! <article>            → PmcArticle
+//!   <front>            → Front
+//!     <journal-meta>   → JournalMeta
+//!     <article-meta>   → ArticleMeta (ids, TitleGroup, contributors,
+//!                         pub info, history, Permissions, Abstract,
+//!                         keywords, funding)
+//!   <body>             → Body (Vec<Section>, recursive)
+//!   <back>             → Back (ack, COI, Vec<Reference>, appendices, glossary)
+//! ```
 //!
 //! Design principles:
-//! - DTD-faithful: reflects JATS Archiving 1.4 element structure
+//! - DTD-faithful: every field maps to a JATS element/attribute, structured
+//!   following the DTD hierarchy and declaration order
 //! - No extraction concerns: fields like `file_path` or inferred `file_type` are excluded
 //! - Type-safe IDs: uses `PmcId` / `PubMedId` instead of raw strings
-//! - Reuses shared types: `Author` and `Affiliation` from `common::models`
+//! - Reuses shared types: `Author` and `HistoryDate` from `common::models`
 //! - Text mining ready: structured abstracts, table content, formulas, definitions
+//!
+//! Documented deviations from strict DTD structure:
+//! - `supplementary_materials` and `data_availability` live on [`PmcArticle`]
+//!   because in real PMC XML they appear in `<body>` sections, `<back>`, or
+//!   `<floats-group>`; the parser collects them document-wide without
+//!   tracking their position
+//! - `<contrib-group>` is flattened to `Vec<Author>` (only author contribs
+//!   are modeled)
+//!
+//! Flattened read access is provided through accessor methods on
+//! [`PmcArticle`] (e.g. [`PmcArticle::title`], [`PmcArticle::sections`]).
 
 use crate::common::{Author, HistoryDate, PmcId, PubMedId, PublicationDate};
 use serde::{Deserialize, Serialize};
@@ -20,12 +45,74 @@ use serde::{Deserialize, Serialize};
 
 /// PMC full-text article.
 ///
-/// Maps to JATS `<article>`. Organized following the DTD's front/body/back structure,
-/// with identifiers and metadata from `<article-meta>`, content from `<body>`,
-/// and references/acknowledgments from `<back>`.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+/// Maps to JATS `<article>`: `front, body?, back?`.
+///
+/// DTD: <https://jats.nlm.nih.gov/archiving/tag-library/1.4/element/article.html>
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PmcArticle {
-    // --- Identifiers (<article-meta>/<article-id>) ---
+    /// Article type. From `<article article-type="...">` attribute.
+    pub article_type: Option<String>,
+    /// Front matter. From `<front>`.
+    pub front: Front,
+    /// Article body. From `<body>`. `None` when the article has no body
+    /// (e.g., metadata-only records).
+    pub body: Option<Body>,
+    /// Back matter. From `<back>`. `None` when the article has no back matter.
+    pub back: Option<Back>,
+
+    // --- Document-wide collections (deviation from strict DTD placement) ---
+    /// Supplementary materials. From `<supplementary-material>`, collected
+    /// from the entire document (`<body>` sections, `<back>`, or `<floats-group>`).
+    pub supplementary_materials: Vec<SupplementaryMaterial>,
+    /// Data availability statement. From `<sec sec-type="data-availability">`
+    /// or `<notes notes-type="data-availability">`, wherever it appears.
+    pub data_availability: Option<String>,
+}
+
+// ============================================================================
+// Front matter (<front>)
+// ============================================================================
+
+/// Front matter.
+///
+/// Maps to JATS `<front>`: `journal-meta?, article-meta?`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Front {
+    /// Journal metadata. From `<journal-meta>`.
+    pub journal_meta: JournalMeta,
+    /// Article metadata. From `<article-meta>`.
+    pub article_meta: ArticleMeta,
+}
+
+/// Journal metadata.
+///
+/// Maps to JATS `<journal-meta>`. Note that `volume` and `issue` are intentionally
+/// excluded here — in the DTD they belong to `<article-meta>`, not `<journal-meta>`,
+/// and are placed on [`ArticleMeta`] accordingly.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct JournalMeta {
+    /// Journal title. From `<journal-title-group>/<journal-title>`.
+    pub title: String,
+    /// Abbreviated journal title. From `<journal-id journal-id-type="iso-abbrev">`
+    /// or `<abbrev-journal-title>`.
+    pub abbreviation: Option<String>,
+    /// Print ISSN. From `<issn pub-type="ppub">`.
+    pub issn_print: Option<String>,
+    /// Electronic ISSN. From `<issn pub-type="epub">`.
+    pub issn_electronic: Option<String>,
+    /// Publisher name. From `<publisher>/<publisher-name>`.
+    pub publisher: Option<String>,
+}
+
+/// Article metadata.
+///
+/// Maps to JATS `<article-meta>`. Fields follow the DTD declaration order:
+/// `article-id*, article-categories?, title-group, contrib-group*, pub-date*,
+/// volume?, issue?, fpage?, lpage?, elocation-id?, history?, permissions?,
+/// abstract*, kwd-group*, funding-group*`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct ArticleMeta {
+    // --- Identifiers (<article-id>) ---
     /// PMC ID (e.g., PMC7906746). From `<article-id pub-id-type="pmc">`.
     pub pmcid: PmcId,
     /// PubMed ID. From `<article-id pub-id-type="pmid">`.
@@ -33,26 +120,15 @@ pub struct PmcArticle {
     /// DOI. From `<article-id pub-id-type="doi">`.
     pub doi: Option<String>,
 
-    // --- Article metadata ---
-    /// Article type. From `<article article-type="...">` attribute.
-    pub article_type: Option<String>,
     /// Subject categories. From `<article-categories>/<subj-group>/<subject>`.
     pub categories: Vec<String>,
 
-    // --- Title (<title-group>) ---
-    /// Article title. From `<article-title>`.
-    pub title: String,
-    /// Article subtitle. From `<subtitle>`.
-    pub subtitle: Option<String>,
+    /// Title group. From `<title-group>`.
+    pub title_group: TitleGroup,
 
-    // --- Contributors (<contrib-group>) ---
     /// Authors. From `<contrib-group>/<contrib contrib-type="author">`.
     pub authors: Vec<Author>,
 
-    // --- Journal metadata (<journal-meta>) ---
-    pub journal: JournalMeta,
-
-    // --- Publication info (<article-meta>) ---
     /// Publication dates (epub, ppub, collection, etc.). From `<pub-date>`.
     pub pub_dates: Vec<PublicationDate>,
     /// Volume number. From `<volume>`.
@@ -66,80 +142,70 @@ pub struct PmcArticle {
     /// Electronic location ID. From `<elocation-id>`.
     pub elocation_id: Option<String>,
 
-    // --- Abstract (<abstract>) ---
-    /// Plain abstract text (flattened). From `<abstract>` without `<sec>` children,
-    /// or concatenation of all section texts.
-    pub abstract_text: Option<String>,
-    /// Structured abstract sections. From `<abstract>/<sec>`.
-    /// Present when the abstract has labeled sections (e.g., Background, Methods, Results).
-    pub abstract_sections: Vec<AbstractSection>,
+    /// Publication history dates. From `<history>/<date>`.
+    pub history: Vec<HistoryDate>,
 
-    // --- Keywords ---
+    /// Copyright and licensing. From `<permissions>`.
+    pub permissions: Option<Permissions>,
+
+    /// Abstracts. From `<abstract>` (repeatable in the DTD, e.g. a main
+    /// abstract plus a graphical or teaser abstract).
+    pub abstracts: Vec<Abstract>,
+
     /// Keywords. From `<kwd-group>/<kwd>`.
     pub keywords: Vec<String>,
 
-    // --- Content (<body>) ---
-    /// Article sections. From `<body>/<sec>`.
-    pub sections: Vec<Section>,
-
-    // --- References (<back>/<ref-list>) ---
-    /// Reference list. From `<ref-list>/<ref>`.
-    pub references: Vec<Reference>,
-
-    // --- Funding (<funding-group>) ---
     /// Funding information. From `<funding-group>/<award-group>`.
     pub funding: Vec<FundingInfo>,
-
-    // --- Back matter (<back>) ---
-    /// Acknowledgments. From `<back>/<ack>`.
-    pub acknowledgments: Option<String>,
-    /// Conflict of interest statement. From `<fn fn-type="COI-statement">`
-    /// or `<sec sec-type="COI-statement">`.
-    pub conflict_of_interest: Option<String>,
-    /// Data availability statement. From `<sec sec-type="data-availability">`
-    /// or `<notes notes-type="data-availability">`.
-    pub data_availability: Option<String>,
-    /// Supplementary materials. From `<supplementary-material>`.
-    pub supplementary_materials: Vec<SupplementaryMaterial>,
-    /// Appendices. From `<back>/<app-group>/<app>`.
-    pub appendices: Vec<Section>,
-    /// Glossary definitions. From `<back>/<glossary>/<def-list>`.
-    pub glossary: Vec<Definition>,
-
-    // --- Legal (<permissions>) ---
-    /// Copyright statement. From `<copyright-statement>`.
-    pub copyright: Option<String>,
-    /// License text. From `<license>` body content.
-    pub license: Option<String>,
-    /// License URL. From `<license xlink:href="...">`.
-    pub license_url: Option<String>,
-
-    // --- History (<history>) ---
-    /// Publication history dates. From `<history>/<date>`.
-    pub history_dates: Vec<HistoryDate>,
 }
 
-// ============================================================================
-// Front matter types
-// ============================================================================
-
-/// Journal metadata.
+/// Title group.
 ///
-/// Maps to JATS `<journal-meta>`. Note that `volume` and `issue` are intentionally
-/// excluded here — in the DTD they belong to `<article-meta>`, not `<journal-meta>`,
-/// and are placed on [`PmcArticle`] accordingly.
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct JournalMeta {
-    /// Journal title. From `<journal-title>`.
-    pub title: String,
-    /// Abbreviated journal title. From `<abbrev-journal-title>`.
-    pub abbreviation: Option<String>,
-    /// Print ISSN. From `<issn pub-type="ppub">`.
-    pub issn_print: Option<String>,
-    /// Electronic ISSN. From `<issn pub-type="epub">`.
-    pub issn_electronic: Option<String>,
-    /// Publisher name. From `<publisher>/<publisher-name>`.
-    pub publisher: Option<String>,
+/// Maps to JATS `<title-group>`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct TitleGroup {
+    /// Article title. From `<article-title>`.
+    pub article_title: String,
+    /// Article subtitle. From `<subtitle>`.
+    pub subtitle: Option<String>,
+}
+
+/// Copyright and licensing information.
+///
+/// Maps to JATS `<permissions>`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Permissions {
+    /// Copyright statement. From `<copyright-statement>`
+    /// (falls back to `<copyright-year>`).
+    pub copyright_statement: Option<String>,
+    /// License. From `<license>`.
+    pub license: Option<License>,
+}
+
+/// License information.
+///
+/// Maps to JATS `<license>`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct License {
+    /// License URL. From `<license xlink:href="...">` or `<ali:license_ref>`.
+    pub href: Option<String>,
+    /// License text. From `<license-p>` content.
+    pub text: Option<String>,
+}
+
+/// Abstract.
+///
+/// Maps to JATS `<abstract>`. The DTD allows multiple abstracts
+/// distinguished by `@abstract-type`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Abstract {
+    /// Abstract type (e.g., "graphical", "teaser"). From `<abstract abstract-type="...">`.
+    pub abstract_type: Option<String>,
+    /// Plain abstract text (flattened). Concatenation of all `<p>` texts.
+    pub text: String,
+    /// Structured abstract sections. From `<abstract>/<sec>`.
+    /// Present when the abstract has labeled sections (e.g., Background, Methods, Results).
+    pub sections: Vec<AbstractSection>,
 }
 
 /// Structured abstract section.
@@ -148,7 +214,7 @@ pub struct JournalMeta {
 /// with labeled sections (Background, Methods, Results, Conclusions).
 /// This structure preserves the section boundaries for text mining pipelines
 /// that need to process abstract sections independently.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AbstractSection {
     /// Section label (e.g., "Background", "Methods", "Results", "Conclusions").
     /// From `<title>` inside `<abstract>/<sec>`.
@@ -158,15 +224,24 @@ pub struct AbstractSection {
 }
 
 // ============================================================================
-// Body content types
+// Body content (<body>)
 // ============================================================================
+
+/// Article body.
+///
+/// Maps to JATS `<body>`: `(p | sec | ...)*`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Body {
+    /// Article sections. From `<body>/<sec>`.
+    pub sections: Vec<Section>,
+}
 
 /// Article section.
 ///
 /// Maps to JATS `<sec>`. Sections form a recursive tree via `subsections`.
 /// Figures, tables, and formulas that appear inline within the section are
 /// collected in their respective fields.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Section {
     /// Section ID. From `<sec id="...">`.
     pub id: Option<String>,
@@ -196,7 +271,7 @@ pub struct Section {
 /// reference to the graphic file (from `<graphic xlink:href="...">`).
 /// Actual file extraction paths and sizes belong to the client layer's
 /// `ExtractedFigure` type, not here.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Figure {
     /// Figure ID. From `<fig id="...">`.
     pub id: String,
@@ -216,7 +291,7 @@ pub struct Figure {
 ///
 /// Maps to JATS `<table-wrap>`. Table body is parsed into structured rows/cells
 /// for direct programmatic access without requiring downstream HTML parsing.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Table {
     /// Table ID. From `<table-wrap id="...">`.
     pub id: String,
@@ -235,7 +310,7 @@ pub struct Table {
 /// A single table row.
 ///
 /// Maps to XHTML `<tr>` inside JATS `<table>`.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct TableRow {
     /// Cells in this row. From `<th>` or `<td>` elements.
     pub cells: Vec<TableCell>,
@@ -244,7 +319,7 @@ pub struct TableRow {
 /// A single table cell.
 ///
 /// Maps to XHTML `<th>` or `<td>` inside JATS `<table>`.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct TableCell {
     /// Cell text content (XML tags stripped).
     pub content: String,
@@ -261,7 +336,7 @@ pub struct TableCell {
 /// Maps to JATS `<disp-formula>`. Formulas can be represented as MathML,
 /// TeX/LaTeX, plain text, or as graphic images. The `notation` field indicates
 /// which representation is stored in `content`.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Formula {
     /// Formula ID. From `<disp-formula id="...">`.
     pub id: Option<String>,
@@ -277,13 +352,32 @@ pub struct Formula {
 }
 
 // ============================================================================
-// Back matter types
+// Back matter (<back>)
 // ============================================================================
+
+/// Back matter.
+///
+/// Maps to JATS `<back>`: `(ack | app-group | bio | fn-group | glossary |
+/// ref-list | notes | sec)*`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Back {
+    /// Acknowledgments. From `<ack>`.
+    pub acknowledgments: Option<String>,
+    /// Conflict of interest statement. From `<fn-group>/<fn fn-type="COI-statement">`
+    /// or `<sec>` whose title mentions conflicts/competing interests.
+    pub conflict_of_interest: Option<String>,
+    /// Reference list. From `<ref-list>/<ref>`.
+    pub references: Vec<Reference>,
+    /// Appendices. From `<app-group>/<app>`.
+    pub appendices: Vec<Section>,
+    /// Glossary definitions. From `<glossary>/<def-list>`.
+    pub glossary: Vec<Definition>,
+}
 
 /// Reference citation.
 ///
 /// Maps to JATS `<ref>` containing `<element-citation>` or `<mixed-citation>`.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Reference {
     /// Reference ID. From `<ref id="...">`.
     pub id: String,
@@ -373,7 +467,7 @@ impl Reference {
 /// Funding information.
 ///
 /// Maps to JATS `<funding-group>/<award-group>`.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct FundingInfo {
     /// Funding source/agency. From `<funding-source>`.
     pub source: String,
@@ -388,7 +482,7 @@ pub struct FundingInfo {
 /// Maps to JATS `<supplementary-material>`. Only contains domain-level
 /// data from the XML. Inferred values like file type (derived from URL extension)
 /// and layout attributes like `position` are excluded.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct SupplementaryMaterial {
     /// Material ID. From `<supplementary-material id="...">`.
     pub id: String,
@@ -439,7 +533,167 @@ impl SupplementaryMaterial {
     }
 }
 
+// ============================================================================
+// Text mining support types
+// ============================================================================
+
+/// Term definition.
+///
+/// Maps to JATS `<def-list>/<def-item>`. Used for abbreviation lists and
+/// glossaries commonly found in biomedical articles.
+///
+/// Example XML:
+/// ```xml
+/// <def-item>
+///   <term>HPV</term>
+///   <def><p>Human papillomavirus</p></def>
+/// </def-item>
+/// ```
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Definition {
+    /// Term being defined. From `<term>`.
+    pub term: String,
+    /// Definition text. From `<def>/<p>`.
+    pub definition: String,
+}
+
+// ============================================================================
+// Aggregate accessors
+// ============================================================================
+
 impl PmcArticle {
+    /// PMC ID of this article (aggregate identity).
+    pub fn pmcid(&self) -> &PmcId {
+        &self.front.article_meta.pmcid
+    }
+
+    /// PubMed ID, if present.
+    pub fn pmid(&self) -> Option<&PubMedId> {
+        self.front.article_meta.pmid.as_ref()
+    }
+
+    /// DOI, if present.
+    pub fn doi(&self) -> Option<&str> {
+        self.front.article_meta.doi.as_deref()
+    }
+
+    /// Article title.
+    pub fn title(&self) -> &str {
+        &self.front.article_meta.title_group.article_title
+    }
+
+    /// Article subtitle, if present.
+    pub fn subtitle(&self) -> Option<&str> {
+        self.front.article_meta.title_group.subtitle.as_deref()
+    }
+
+    /// Authors.
+    pub fn authors(&self) -> &[Author] {
+        &self.front.article_meta.authors
+    }
+
+    /// Journal metadata.
+    pub fn journal(&self) -> &JournalMeta {
+        &self.front.journal_meta
+    }
+
+    /// Publication dates.
+    pub fn pub_dates(&self) -> &[PublicationDate] {
+        &self.front.article_meta.pub_dates
+    }
+
+    /// Subject categories.
+    pub fn categories(&self) -> &[String] {
+        &self.front.article_meta.categories
+    }
+
+    /// Volume number, if present.
+    pub fn volume(&self) -> Option<&str> {
+        self.front.article_meta.volume.as_deref()
+    }
+
+    /// Issue number, if present.
+    pub fn issue(&self) -> Option<&str> {
+        self.front.article_meta.issue.as_deref()
+    }
+
+    /// Keywords.
+    pub fn keywords(&self) -> &[String] {
+        &self.front.article_meta.keywords
+    }
+
+    /// Funding information.
+    pub fn funding(&self) -> &[FundingInfo] {
+        &self.front.article_meta.funding
+    }
+
+    /// Publication history dates.
+    pub fn history(&self) -> &[HistoryDate] {
+        &self.front.article_meta.history
+    }
+
+    /// Text of the main abstract (first `<abstract>`), if present.
+    pub fn abstract_text(&self) -> Option<&str> {
+        self.front
+            .article_meta
+            .abstracts
+            .first()
+            .map(|a| a.text.as_str())
+    }
+
+    /// Copyright statement, if present.
+    pub fn copyright(&self) -> Option<&str> {
+        self.front
+            .article_meta
+            .permissions
+            .as_ref()
+            .and_then(|p| p.copyright_statement.as_deref())
+    }
+
+    /// License text, if present.
+    pub fn license_text(&self) -> Option<&str> {
+        self.front
+            .article_meta
+            .permissions
+            .as_ref()
+            .and_then(|p| p.license.as_ref())
+            .and_then(|l| l.text.as_deref())
+    }
+
+    /// License URL, if present.
+    pub fn license_url(&self) -> Option<&str> {
+        self.front
+            .article_meta
+            .permissions
+            .as_ref()
+            .and_then(|p| p.license.as_ref())
+            .and_then(|l| l.href.as_deref())
+    }
+
+    /// Body sections (empty slice when the article has no body).
+    pub fn sections(&self) -> &[Section] {
+        self.body.as_ref().map_or(&[], |b| b.sections.as_slice())
+    }
+
+    /// References (empty slice when the article has no back matter).
+    pub fn references(&self) -> &[Reference] {
+        self.back.as_ref().map_or(&[], |b| b.references.as_slice())
+    }
+
+    /// Acknowledgments, if present.
+    pub fn acknowledgments(&self) -> Option<&str> {
+        self.back
+            .as_ref()
+            .and_then(|b| b.acknowledgments.as_deref())
+    }
+
+    /// Conflict of interest statement, if present.
+    pub fn conflict_of_interest(&self) -> Option<&str> {
+        self.back
+            .as_ref()
+            .and_then(|b| b.conflict_of_interest.as_deref())
+    }
+
     /// Get tar files from supplementary materials.
     pub fn get_tar_files(&self) -> Vec<&SupplementaryMaterial> {
         self.supplementary_materials
@@ -471,28 +725,4 @@ impl PmcArticle {
             .filter(|m| m.content_type.as_ref().is_some_and(|ct| ct == content_type))
             .collect()
     }
-}
-
-// ============================================================================
-// Text mining support types
-// ============================================================================
-
-/// Term definition.
-///
-/// Maps to JATS `<def-list>/<def-item>`. Used for abbreviation lists and
-/// glossaries commonly found in biomedical articles.
-///
-/// Example XML:
-/// ```xml
-/// <def-item>
-///   <term>HPV</term>
-///   <def><p>Human papillomavirus</p></def>
-/// </def-item>
-/// ```
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Definition {
-    /// Term being defined. From `<term>`.
-    pub term: String,
-    /// Definition text. From `<def>/<p>`.
-    pub definition: String,
 }

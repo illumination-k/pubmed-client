@@ -63,7 +63,7 @@ macro_rules! test_pmcid_figure_extraction {
                     }
                 }
 
-                for section in &pmc_full_text.sections {
+                for section in pmc_full_text.sections() {
                     collect_figures_from_section(section, &mut all_figures);
                 }
 
@@ -71,8 +71,8 @@ macro_rules! test_pmcid_figure_extraction {
                 info!(pmcid = %pmcid, figures_count = figures_count, "Figure extraction completed");
 
                 // Log detailed section information for debugging
-                info!(pmcid = %pmcid, total_sections = pmc_full_text.sections.len(), "Section summary");
-                for (section_idx, section) in pmc_full_text.sections.iter().enumerate() {
+                info!(pmcid = %pmcid, total_sections = pmc_full_text.sections().len(), "Section summary");
+                for (section_idx, section) in pmc_full_text.sections().iter().enumerate() {
                     fn log_section_figures(section: &pubmed_client::Section, pmcid: &str, section_path: String, level: usize) {
                         let indent = "  ".repeat(level);
                         info!(
@@ -113,8 +113,8 @@ macro_rules! test_pmcid_figure_extraction {
                 // If no figures found, provide detailed debugging information
                 if figures_count == 0 {
                     info!(pmcid = %pmcid, "No figures found - debugging information:");
-                    info!(pmcid = %pmcid, title = %pmc_full_text.title, "Article title");
-                    info!(pmcid = %pmcid, pmid = ?pmc_full_text.pmid, "Associated PMID");
+                    info!(pmcid = %pmcid, title = %pmc_full_text.title(), "Article title");
+                    info!(pmcid = %pmcid, pmid = ?pmc_full_text.pmid(), "Associated PMID");
                     info!(pmcid = %pmcid, article_type = ?pmc_full_text.article_type, "Article type");
 
                     // Check if there are supplementary materials that might contain figures
@@ -134,7 +134,7 @@ macro_rules! test_pmcid_figure_extraction {
                     }
 
                     // Sample some content to see what's in the sections
-                    for (i, section) in pmc_full_text.sections.iter().take(3).enumerate() {
+                    for (i, section) in pmc_full_text.sections().iter().take(3).enumerate() {
                         let content_sample = if section.content.len() > 100 {
                             format!("{}...", &section.content[..100])
                         } else {

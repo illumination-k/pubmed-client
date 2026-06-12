@@ -57,10 +57,10 @@ pub async fn get_pmc_figures(
             data: None,
         })?;
 
-    let mut result = format!("Figures from: {} ({})\n\n", article.title, pmc_id);
+    let mut result = format!("Figures from: {} ({})\n\n", article.title(), pmc_id);
 
-    let all_figures = collect_figures(&article.sections);
-    let all_tables = collect_tables(&article.sections);
+    let all_figures = collect_figures(article.sections());
+    let all_tables = collect_tables(article.sections());
 
     if all_figures.is_empty() {
         result.push_str("No figures found in this article.\n");

@@ -263,7 +263,7 @@ impl PmcMarkdownConverter {
             markdown.push_str("\n\n");
         } else {
             // Always include at least the title even when metadata is disabled
-            markdown.push_str(&self.format_heading(&self.clean_content(&article.title), 1));
+            markdown.push_str(&self.format_heading(&self.clean_content(article.title()), 1));
             markdown.push_str("\n\n");
         }
 
@@ -274,11 +274,11 @@ impl PmcMarkdownConverter {
         }
 
         // Add main content sections
-        markdown.push_str(&self.convert_sections_with_figures(&article.sections, 1, figure_paths));
+        markdown.push_str(&self.convert_sections_with_figures(article.sections(), 1, figure_paths));
 
         // Add references section
-        if !article.references.is_empty() {
-            markdown.push_str(&self.convert_references(&article.references));
+        if !article.references().is_empty() {
+            markdown.push_str(&self.convert_references(article.references()));
         }
 
         // Add additional sections
@@ -297,7 +297,7 @@ impl PmcMarkdownConverter {
             markdown.push_str("\n\n");
         } else {
             // Always include at least the title even when metadata is disabled
-            markdown.push_str(&self.format_heading(&self.clean_content(&article.title), 1));
+            markdown.push_str(&self.format_heading(&self.clean_content(article.title()), 1));
             markdown.push_str("\n\n");
         }
 
@@ -308,11 +308,11 @@ impl PmcMarkdownConverter {
         }
 
         // Add main content sections
-        markdown.push_str(&self.convert_sections(&article.sections, 1));
+        markdown.push_str(&self.convert_sections(article.sections(), 1));
 
         // Add references section
-        if !article.references.is_empty() {
-            markdown.push_str(&self.convert_references(&article.references));
+        if !article.references().is_empty() {
+            markdown.push_str(&self.convert_references(article.references()));
         }
 
         // Add additional sections
@@ -325,32 +325,32 @@ impl PmcMarkdownConverter {
     fn generate_yaml_frontmatter(&self, article: &PmcArticle) -> String {
         // Build metadata structure
         let metadata = ArticleMetadata {
-            title: self.clean_content(&article.title),
+            title: self.clean_content(article.title()),
             authors: article
-                .authors
+                .authors()
                 .iter()
                 .map(|a| self.clean_content(&a.full_name))
                 .collect(),
-            journal: self.clean_content(&article.journal.title),
+            journal: self.clean_content(&article.journal().title),
             journal_abbrev: article
-                .journal
+                .journal()
                 .abbreviation
                 .as_ref()
                 .map(|a| self.clean_content(a)),
-            pub_date: format_first_pub_date(&article.pub_dates),
-            pmcid: article.pmcid.as_str(),
-            pmid: article.pmid.as_ref().map(|p| p.as_str()),
-            doi: article.doi.as_ref().map(|d| self.clean_content(d)),
+            pub_date: format_first_pub_date(article.pub_dates()),
+            pmcid: article.pmcid().as_str(),
+            pmid: article.pmid().map(|p| p.as_str()),
+            doi: article.doi().map(|d| self.clean_content(d)),
             article_type: article.article_type.as_ref().map(|t| self.clean_content(t)),
             keywords: article
-                .keywords
+                .keywords()
                 .iter()
                 .map(|k| self.clean_content(k))
                 .collect(),
-            volume: article.volume.as_ref().map(|v| self.clean_content(v)),
-            issue: article.issue.as_ref().map(|i| self.clean_content(i)),
+            volume: article.volume().map(|v| self.clean_content(v)),
+            issue: article.issue().map(|i| self.clean_content(i)),
             publisher: article
-                .journal
+                .journal()
                 .publisher
                 .as_ref()
                 .map(|p| self.clean_content(p)),
@@ -377,39 +377,39 @@ impl PmcMarkdownConverter {
         let mut metadata = String::new();
 
         // Title
-        metadata.push_str(&self.format_heading(&self.clean_content(&article.title), 1));
+        metadata.push_str(&self.format_heading(&self.clean_content(article.title()), 1));
         metadata.push('\n');
 
         // Authors
-        if !article.authors.is_empty() {
+        if !article.authors().is_empty() {
             metadata.push_str("\n**Authors:** ");
-            metadata.push_str(&self.format_authors(&article.authors));
+            metadata.push_str(&self.format_authors(article.authors()));
             metadata.push('\n');
         }
 
         // Journal information
-        let journal_title = &article.journal.title;
+        let journal_title = &article.journal().title;
         metadata.push_str(&format!("\n**Journal:** {journal_title}"));
-        if let Some(abbrev) = &article.journal.abbreviation {
+        if let Some(abbrev) = &article.journal().abbreviation {
             metadata.push_str(&format!(" ({abbrev})"));
         }
         metadata.push('\n');
 
         // Publication date
-        if let Some(pub_date) = format_first_pub_date(&article.pub_dates) {
+        if let Some(pub_date) = format_first_pub_date(article.pub_dates()) {
             metadata.push_str(&format!("**Published:** {pub_date}\n"));
         }
 
         // Identifiers
         let mut identifiers = Vec::new();
-        if let Some(doi) = &article.doi {
+        if let Some(doi) = article.doi() {
             if self.config.include_identifier_links {
                 identifiers.push(format!("[DOI: {doi}](https://doi.org/{doi})"));
             } else {
                 identifiers.push(format!("DOI: {doi}"));
             }
         }
-        if let Some(pmid) = &article.pmid {
+        if let Some(pmid) = article.pmid() {
             let pmid_str = pmid.as_str();
             if self.config.include_identifier_links {
                 identifiers.push(format!(
@@ -419,7 +419,7 @@ impl PmcMarkdownConverter {
                 identifiers.push(format!("PMID: {pmid_str}"));
             }
         }
-        let pmcid = article.pmcid.as_str();
+        let pmcid = article.pmcid().as_str();
         identifiers.push(format!("PMC: {pmcid}"));
 
         if !identifiers.is_empty() {
@@ -433,9 +433,9 @@ impl PmcMarkdownConverter {
         }
 
         // Keywords
-        if !article.keywords.is_empty() {
+        if !article.keywords().is_empty() {
             let clean_keywords: Vec<String> = article
-                .keywords
+                .keywords()
                 .iter()
                 .map(|k| self.clean_content(k))
                 .collect();
@@ -445,13 +445,13 @@ impl PmcMarkdownConverter {
 
         // Journal details
         let mut journal_details = Vec::new();
-        if let Some(volume) = &article.volume {
+        if let Some(volume) = article.volume() {
             journal_details.push(format!("Volume {volume}"));
         }
-        if let Some(issue) = &article.issue {
+        if let Some(issue) = article.issue() {
             journal_details.push(format!("Issue {issue}"));
         }
-        if let Some(publisher) = &article.journal.publisher {
+        if let Some(publisher) = &article.journal().publisher {
             journal_details.push(format!("Publisher: {publisher}"));
         }
         if !journal_details.is_empty() {
@@ -470,7 +470,7 @@ impl PmcMarkdownConverter {
         toc.push_str(&self.format_heading("Table of Contents", 2));
         toc.push('\n');
 
-        for (i, section) in article.sections.iter().enumerate() {
+        for (i, section) in article.sections().iter().enumerate() {
             let default_title = "Untitled".to_string();
             let title = section.title.as_ref().unwrap_or(&default_title);
             let anchor = self.create_anchor(title);
@@ -622,10 +622,10 @@ impl PmcMarkdownConverter {
         let mut content = String::new();
 
         // Funding
-        if !article.funding.is_empty() {
+        if !article.funding().is_empty() {
             content.push_str(&self.format_heading("Funding", 2));
             content.push_str("\n\n");
-            for funding in &article.funding {
+            for funding in article.funding() {
                 content.push_str(&self.format_funding(funding));
                 content.push('\n');
             }
@@ -633,7 +633,7 @@ impl PmcMarkdownConverter {
         }
 
         // Conflict of interest
-        if let Some(coi) = &article.conflict_of_interest {
+        if let Some(coi) = article.conflict_of_interest() {
             content.push_str(&self.format_heading("Conflict of Interest", 2));
             content.push_str("\n\n");
             content.push_str(&self.clean_content(coi));
@@ -641,7 +641,7 @@ impl PmcMarkdownConverter {
         }
 
         // Acknowledgments
-        if let Some(ack) = &article.acknowledgments {
+        if let Some(ack) = article.acknowledgments() {
             content.push_str(&self.format_heading("Acknowledgments", 2));
             content.push_str("\n\n");
             content.push_str(&self.clean_content(ack));
@@ -902,48 +902,47 @@ impl Default for PmcMarkdownConverter {
 mod tests {
     use super::*;
     use pubmed_parser::common::{Author, PmcId, PubMedId, PublicationDate};
-    use pubmed_parser::pmc::{JournalMeta, PmcArticle};
+    use pubmed_parser::pmc::{ArticleMeta, Front, JournalMeta, PmcArticle, TitleGroup};
 
     /// Create a minimal test article with common defaults.
     fn test_article(title: &str, pmcid: &str) -> PmcArticle {
         PmcArticle {
-            pmcid: PmcId::parse(pmcid).unwrap(),
-            pmid: None,
-            doi: None,
             article_type: None,
-            categories: vec![],
-            title: title.to_string(),
-            subtitle: None,
-            authors: vec![],
-            journal: JournalMeta {
-                title: "Test Journal".to_string(),
-                abbreviation: None,
-                issn_print: None,
-                issn_electronic: None,
-                publisher: None,
+            front: Front {
+                journal_meta: JournalMeta {
+                    title: "Test Journal".to_string(),
+                    abbreviation: None,
+                    issn_print: None,
+                    issn_electronic: None,
+                    publisher: None,
+                },
+                article_meta: ArticleMeta {
+                    pmcid: PmcId::parse(pmcid).unwrap(),
+                    pmid: None,
+                    doi: None,
+                    categories: vec![],
+                    title_group: TitleGroup {
+                        article_title: title.to_string(),
+                        subtitle: None,
+                    },
+                    authors: vec![],
+                    pub_dates: vec![],
+                    volume: None,
+                    issue: None,
+                    fpage: None,
+                    lpage: None,
+                    elocation_id: None,
+                    history: vec![],
+                    permissions: None,
+                    abstracts: vec![],
+                    keywords: vec![],
+                    funding: vec![],
+                },
             },
-            pub_dates: vec![],
-            volume: None,
-            issue: None,
-            fpage: None,
-            lpage: None,
-            elocation_id: None,
-            abstract_text: None,
-            abstract_sections: vec![],
-            keywords: vec![],
-            sections: vec![],
-            references: vec![],
-            funding: vec![],
-            acknowledgments: None,
-            conflict_of_interest: None,
-            data_availability: None,
+            body: None,
+            back: None,
             supplementary_materials: vec![],
-            appendices: vec![],
-            glossary: vec![],
-            copyright: None,
-            license: None,
-            license_url: None,
-            history_dates: vec![],
+            data_availability: None,
         }
     }
 
@@ -1016,17 +1015,17 @@ mod tests {
         let converter = PmcMarkdownConverter::new();
 
         let mut article = test_article("Test Article", "PMC1234567");
-        article.pmid = Some(PubMedId::parse("12345").unwrap());
-        article.authors = vec![Author::from_full_name("John Doe".to_string())];
-        article.pub_dates = vec![PublicationDate {
+        article.front.article_meta.pmid = Some(PubMedId::parse("12345").unwrap());
+        article.front.article_meta.authors = vec![Author::from_full_name("John Doe".to_string())];
+        article.front.article_meta.pub_dates = vec![PublicationDate {
             pub_type: None,
             year: Some(2023),
             month: None,
             day: None,
         }];
-        article.doi = Some("10.1000/test".to_string());
+        article.front.article_meta.doi = Some("10.1000/test".to_string());
         article.article_type = Some("research-article".to_string());
-        article.keywords = vec!["test".to_string(), "example".to_string()];
+        article.front.article_meta.keywords = vec!["test".to_string(), "example".to_string()];
 
         let markdown = converter.convert(&article);
         assert!(markdown.contains("# Test Article"));
@@ -1041,20 +1040,20 @@ mod tests {
         let converter = PmcMarkdownConverter::new().with_yaml_frontmatter(true);
 
         let mut article = test_article("Test Article", "PMC1234567");
-        article.pmid = Some(PubMedId::parse("12345").unwrap());
-        article.authors = vec![
+        article.front.article_meta.pmid = Some(PubMedId::parse("12345").unwrap());
+        article.front.article_meta.authors = vec![
             Author::from_full_name("John Doe".to_string()),
             Author::from_full_name("Jane Smith".to_string()),
         ];
-        article.pub_dates = vec![PublicationDate {
+        article.front.article_meta.pub_dates = vec![PublicationDate {
             pub_type: None,
             year: Some(2023),
             month: Some(5),
             day: Some(15),
         }];
-        article.doi = Some("10.1000/test".to_string());
+        article.front.article_meta.doi = Some("10.1000/test".to_string());
         article.article_type = Some("research-article".to_string());
-        article.keywords = vec!["test".to_string(), "example".to_string()];
+        article.front.article_meta.keywords = vec!["test".to_string(), "example".to_string()];
 
         let markdown = converter.convert(&article);
 
@@ -1090,17 +1089,18 @@ mod tests {
         let converter = PmcMarkdownConverter::new().with_yaml_frontmatter(true);
 
         let mut article = test_article("COVID-19: A Comprehensive Study", "PMC7890123");
-        article.journal.title = "Nature: Medicine & Science".to_string();
-        article.authors = vec![Author::from_full_name("O'Brien, Michael".to_string())];
-        article.pub_dates = vec![PublicationDate {
+        article.front.journal_meta.title = "Nature: Medicine & Science".to_string();
+        article.front.article_meta.authors =
+            vec![Author::from_full_name("O'Brien, Michael".to_string())];
+        article.front.article_meta.pub_dates = vec![PublicationDate {
             pub_type: None,
             year: Some(2023),
             month: None,
             day: None,
         }];
-        article.doi = Some("10.1038/s41591-023-01234-5".to_string());
+        article.front.article_meta.doi = Some("10.1038/s41591-023-01234-5".to_string());
         article.article_type = Some("research-article".to_string());
-        article.keywords = vec![
+        article.front.article_meta.keywords = vec![
             "#COVID-19".to_string(),
             "SARS-CoV-2".to_string(),
             "vaccine".to_string(),

@@ -68,16 +68,16 @@ pub async fn get_pmc_fulltext(
     let mut result = String::new();
 
     // Metadata
-    result.push_str(&format!("Title: {}\n", article.title));
-    result.push_str(&format!("PMC ID: {}\n", article.pmcid));
-    if let Some(ref doi) = article.doi {
+    result.push_str(&format!("Title: {}\n", article.title()));
+    result.push_str(&format!("PMC ID: {}\n", article.pmcid()));
+    if let Some(ref doi) = article.doi() {
         result.push_str(&format!("DOI: {}\n", doi));
     }
 
     // Authors
-    if !article.authors.is_empty() {
+    if !article.authors().is_empty() {
         let authors: Vec<String> = article
-            .authors
+            .authors()
             .iter()
             .map(|a| a.full_name.clone())
             .collect();
@@ -85,13 +85,13 @@ pub async fn get_pmc_fulltext(
     }
 
     // Journal
-    result.push_str(&format!("Journal: {}\n", article.journal.title));
+    result.push_str(&format!("Journal: {}\n", article.journal().title));
 
     // Sections
     let sections = if let Some(max) = params.max_sections {
-        &article.sections[..max.min(article.sections.len())]
+        &article.sections()[..max.min(article.sections().len())]
     } else {
-        &article.sections
+        article.sections()
     };
 
     for section in sections {
@@ -105,7 +105,7 @@ pub async fn get_pmc_fulltext(
     }
 
     // Figures (collected from all sections)
-    let all_figures = collect_figures(&article.sections);
+    let all_figures = collect_figures(article.sections());
     if !all_figures.is_empty() {
         result.push_str(&format!("\n## Figures ({})\n", all_figures.len()));
         for fig in &all_figures {
@@ -115,7 +115,7 @@ pub async fn get_pmc_fulltext(
     }
 
     // Tables (collected from all sections)
-    let all_tables = collect_tables(&article.sections);
+    let all_tables = collect_tables(article.sections());
     if !all_tables.is_empty() {
         result.push_str(&format!("\n## Tables ({})\n", all_tables.len()));
         for table in &all_tables {
@@ -125,9 +125,12 @@ pub async fn get_pmc_fulltext(
     }
 
     // References
-    if include_refs && !article.references.is_empty() {
-        result.push_str(&format!("\n## References ({})\n", article.references.len()));
-        for reference in &article.references {
+    if include_refs && !article.references().is_empty() {
+        result.push_str(&format!(
+            "\n## References ({})\n",
+            article.references().len()
+        ));
+        for reference in article.references() {
             result.push_str(&format!(
                 "{}. {}\n",
                 reference.id,
