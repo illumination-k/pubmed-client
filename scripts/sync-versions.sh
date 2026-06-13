@@ -22,6 +22,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 ROOT_CARGO="${ROOT}/Cargo.toml"
 NAPI_PKG="${ROOT}/pubmed-client-napi/package.json"
+NAPI_LOCK="${ROOT}/pubmed-client-napi/pnpm-lock.yaml"
 WASM_PKG="${ROOT}/pubmed-client-wasm/package.json"
 PY_PYPROJECT="${ROOT}/pubmed-client-py/pyproject.toml"
 
@@ -100,12 +101,34 @@ set_napi_optional_deps() {
 	mv "$tmp" "$NAPI_PKG"
 }
 
+# Bump the optionalDependencies specifier/version in the napi pnpm-lock.yaml so
+# `pnpm install --frozen-lockfile` (the CI default) stays in sync with package.json.
+# These platform packages have no `packages:` resolution entries (they are
+# self-published binaries), so a deterministic edit of the importer block is
+# equivalent to what pnpm would write — no pnpm/network needed.
+set_napi_lockfile_versions() {
+	local version="$1" tmp
+	[[ -f "$NAPI_LOCK" ]] || return 0
+	tmp="$(mktemp)"
+	awk -v v="$version" '
+		/^    optionalDependencies:$/ { in_opt = 1; print; next }
+		# Leaving the optionalDependencies block: any key at indent <= 4.
+		in_opt && /^ {0,4}[^ ]/ { in_opt = 0 }
+		in_opt && /^ {8}(specifier|version):/ {
+			sub(/:.*/, ": " v)
+		}
+		{ print }
+	' "$NAPI_LOCK" >"$tmp"
+	mv "$tmp" "$NAPI_LOCK"
+}
+
 propagate() {
 	local version="$1"
 	set_toml_table_version "$ROOT_CARGO" "workspace.package" "$version"
 	set_internal_crate_versions "$version"
 	set_json_version "$NAPI_PKG" "$version"
 	set_napi_optional_deps "$version"
+	set_napi_lockfile_versions "$version"
 	set_json_version "$WASM_PKG" "$version"
 	set_toml_table_version "$PY_PYPROJECT" "project" "$version"
 	echo "Synced all packages to ${version}"
@@ -122,6 +145,15 @@ collect_versions() {
 	done
 	printf 'napi.version\t%s\n' "$(jq -r '.version' "$NAPI_PKG")"
 	jq -r '.optionalDependencies | to_entries[] | "napi.opt." + .key + "\t" + .value' "$NAPI_PKG"
+	if [[ -f "$NAPI_LOCK" ]]; then
+		# Each optionalDependencies specifier/version line in the importer block.
+		awk '
+			/^    optionalDependencies:$/ { in_opt = 1; next }
+			in_opt && /^ {0,4}[^ ]/ { in_opt = 0 }
+			in_opt && /^ {6}[^ ]/ { pkg = $1; sub(/:$/, "", pkg) }
+			in_opt && /^ {8}version:/ { print "napi.lock." pkg "\t" $2 }
+		' "$NAPI_LOCK"
+	fi
 	printf 'wasm.version\t%s\n' "$(jq -r '.version' "$WASM_PKG")"
 	printf 'py.version\t%s\n' "$(awk '
 		/^\[project\]/ { in_section = 1; next }

@@ -33,26 +33,26 @@ importers:
         version: 2.1.9(@types/node@22.19.3)
     optionalDependencies:
       pubmed-client-darwin-arm64:
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.2.0
+        version: 0.2.0
       pubmed-client-darwin-x64:
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.2.0
+        version: 0.2.0
       pubmed-client-linux-arm64-gnu:
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.2.0
+        version: 0.2.0
       pubmed-client-linux-arm64-musl:
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.2.0
+        version: 0.2.0
       pubmed-client-linux-x64-gnu:
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.2.0
+        version: 0.2.0
       pubmed-client-linux-x64-musl:
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.2.0
+        version: 0.2.0
       pubmed-client-win32-x64-msvc:
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.2.0
+        version: 0.2.0
 
 packages:
   "@ampproject/remapping@2.3.0":
