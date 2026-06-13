@@ -1,0 +1,236 @@
+name: "Release (unified)"
+
+# Single entry point for releasing every package at one unified version.
+#
+# Trigger: push a `v<semver>` tag (e.g. v0.2.0) — created by `mise run release`.
+# That one tag publishes, in dependency order:
+#   crates.io : pubmed-parser → pubmed-formatter → pubmed-client → pubmed-cli, pubmed-mcp
+#   npm       : pubmed-client (NAPI), pubmed-client-wasm
+#   PyPI      : pubmed-client-py
+# and then creates the GitHub Release.
+#
+# workflow_dispatch runs the whole pipeline in dry-run mode (no real publishing,
+# Python goes to TestPyPI) so the release can be rehearsed end-to-end.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  guard:
+    name: Guard (version & tag consistency)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      is-prerelease: ${{ steps.meta.outputs.is-prerelease }}
+      dry-run: ${{ steps.meta.outputs.dry-run }}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: All package versions are in sync
+        run: scripts/sync-versions.sh --check
+
+      - name: Resolve release metadata
+        id: meta
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GIT_REF: ${{ github.ref }}
+        run: |
+          WS_VERSION=$(scripts/sync-versions.sh --check | sed -n 's/.*in sync at \(.*\)/\1/p')
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            {
+              echo "dry-run=true"
+              echo "version=$WS_VERSION"
+              echo "is-prerelease=false"
+            } >> "$GITHUB_OUTPUT"
+            echo "::notice::workflow_dispatch — full dry-run of release ${WS_VERSION}"
+          else
+            TAG=${GIT_REF#refs/tags/}
+            TAG_VERSION=${TAG#v}
+            if [[ "$TAG_VERSION" != "$WS_VERSION" ]]; then
+              echo "::error::Tag ${TAG} (=${TAG_VERSION}) does not match workspace version ${WS_VERSION}." \
+                   "Run 'mise run release ${TAG_VERSION}' to bump before tagging."
+              exit 1
+            fi
+            IS_PRERELEASE=false
+            if [[ "$TAG" == *alpha* || "$TAG" == *beta* || "$TAG" == *rc* ]]; then
+              IS_PRERELEASE=true
+            fi
+            {
+              echo "dry-run=false"
+              echo "version=$TAG_VERSION"
+              echo "is-prerelease=$IS_PRERELEASE"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+  test:
+    name: Test before release
+    needs: [guard]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          lfs: true
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
+
+      - name: Install nextest
+        uses: taiki-e/install-action@1eefb499cca04a53d96437664bda0e2e3211ebc8 # nextest
+
+      - name: Run tests
+        run: cargo nextest run --all-features
+
+  # ── crates.io (dependency order enforced via needs) ──────────────────────────
+  publish-parser:
+    name: crates.io · pubmed-parser
+    needs: [guard, test]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_publish-crate.yml
+    with:
+      package: pubmed-parser
+      package-path: pubmed-parser
+      check-version: ${{ github.event_name == 'push' }}
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+  publish-formatter:
+    name: crates.io · pubmed-formatter
+    needs: [guard, publish-parser]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_publish-crate.yml
+    with:
+      package: pubmed-formatter
+      package-path: pubmed-formatter
+      check-version: ${{ github.event_name == 'push' }}
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+  publish-client:
+    name: crates.io · pubmed-client
+    needs: [guard, publish-formatter]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_publish-crate.yml
+    with:
+      package: pubmed-client
+      package-path: pubmed-client
+      check-version: ${{ github.event_name == 'push' }}
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+  publish-cli:
+    name: crates.io · pubmed-cli
+    needs: [guard, publish-client]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_publish-crate.yml
+    with:
+      package: pubmed-cli
+      package-path: pubmed-cli
+      check-version: ${{ github.event_name == 'push' }}
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+  publish-mcp:
+    name: crates.io · pubmed-mcp
+    needs: [guard, publish-client]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_publish-crate.yml
+    with:
+      package: pubmed-mcp
+      package-path: pubmed-mcp
+      check-version: ${{ github.event_name == 'push' }}
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+    secrets:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+  # ── npm ──────────────────────────────────────────────────────────────────────
+  publish-napi:
+    name: npm · pubmed-client (NAPI)
+    needs: [guard, test]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_publish-napi.yml
+    with:
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+
+  publish-wasm:
+    name: npm · pubmed-client-wasm
+    needs: [guard, test]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_publish-wasm.yml
+    with:
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+
+  # ── PyPI ─────────────────────────────────────────────────────────────────────
+  publish-python:
+    name: PyPI · pubmed-client-py
+    needs: [guard, test]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_publish-python.yml
+    with:
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+
+  # ── GitHub Release (real releases only) ──────────────────────────────────────
+  create-release:
+    name: Create GitHub Release
+    needs:
+      - guard
+      - publish-parser
+      - publish-formatter
+      - publish-client
+      - publish-cli
+      - publish-mcp
+      - publish-napi
+      - publish-wasm
+      - publish-python
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+      - name: Get tag
+        id: tag
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - name: Create Release
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          release_name: Release ${{ steps.tag.outputs.tag }}
+          draft: false
+          prerelease: ${{ needs.guard.outputs.is-prerelease == 'true' }}

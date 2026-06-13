@@ -1,30 +1,17 @@
-name: "CI / Node.js (NAPI)"
+name: "Publish NAPI (npm)"
+
+# Reusable workflow: build native binaries for every target and publish the
+# `pubmed-client` npm package (+ platform optionalDependencies). Invoked by
+# release.yml. Set dry-run to validate packaging without publishing.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "pubmed-client-napi/**"
-      - "pubmed-client/src/**"
-      - "pubmed-client/Cargo.toml"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - ".github/workflows/ci-napi.yml"
-      - ".github/actions/setup-repo/**"
-  pull_request:
-    branches: [main]
-    paths:
-      - "pubmed-client-napi/**"
-      - "pubmed-client/src/**"
-      - "pubmed-client/Cargo.toml"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - ".github/workflows/ci-napi.yml"
-      - ".github/actions/setup-repo/**"
-  workflow_dispatch: # Allow manual trigger for testing
-
-# Publishing lives in release.yml (reusable _publish-napi.yml). This workflow is
-# CI-only: lint, cross-compile every target, and test.
+  workflow_call:
+    inputs:
+      dry-run:
+        description: "Build and pack without publishing to npm"
+        required: false
+        type: boolean
+        default: false
 
 env:
   CARGO_TERM_COLOR: always
@@ -34,36 +21,7 @@ env:
   SKIP_POSTINSTALL: "1"
   MISE_ENV: node
 
-permissions:
-  contents: read
-
 jobs:
-  lint:
-    permissions:
-      contents: read
-    timeout-minutes: 10
-    name: Lint
-    # Local: MISE_ENV=node mise run lint:napi
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: pubmed-client-napi
-
-    steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-        with:
-          lfs: true
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Setup repository environment
-        uses: ./.github/actions/setup-repo
-
-      - name: Install pnpm dependencies
-        run: pnpm install
-
-      - name: Biome lint and typecheck
-        run: pnpm run ci
   build:
     permissions:
       contents: read
@@ -142,13 +100,14 @@ jobs:
             pubmed-client-napi/index.d.ts
           if-no-files-found: error
 
-  test:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    needs: [build]
     permissions:
       contents: read
-    timeout-minutes: 10
-    name: Test
-    runs-on: ubuntu-latest
-    needs: [build, lint]
+      id-token: write # npm provenance (trusted publishing)
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: pubmed-client-napi
@@ -163,14 +122,63 @@ jobs:
       - name: Setup repository environment
         uses: ./.github/actions/setup-repo
 
+      - name: Setup Node.js for npm publishing
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
       - name: Install pnpm dependencies
         run: pnpm install
 
-      - name: Download artifact
+      # Note: download-artifact's path is relative to repo root, not working-directory
+      - name: Download all artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: bindings-x86_64-unknown-linux-gnu
-          path: .
+          pattern: bindings-*
+          path: pubmed-client-napi/artifacts
+          merge-multiple: true
 
-      - name: Run tests
-        run: pnpm test
+      - name: List artifacts
+        run: ls -la artifacts/*.node || echo "No .node files found"
+
+      - name: Create npm directories
+        run: pnpm run create-npm-dirs
+
+      - name: Move artifacts to platform directories
+        run: pnpm run artifacts
+
+      - name: Copy JS/TS binding files to package root
+        run: |
+          cp artifacts/index.js .
+          cp artifacts/index.d.ts .
+
+      - name: Prepare npm packages (dry-run)
+        if: ${{ inputs.dry-run }}
+        run: pnpm run prepublishOnly --dry-run --no-gh-release
+
+      - name: Publish dry-run main package
+        if: ${{ inputs.dry-run }}
+        run: npm publish --dry-run --access public
+
+      # Idempotency: if the main package@version is already on npm, the platform
+      # packages from that run exist too — skip so a re-run with the same tag is safe.
+      - name: Check if already on npm
+        id: npm-published
+        if: ${{ !inputs.dry-run }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "pubmed-client@${VERSION}" version > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::pubmed-client@${VERSION} already on npm — skipping publish"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare npm packages
+        if: ${{ !inputs.dry-run && steps.npm-published.outputs.exists != 'true' }}
+        run: pnpm run prepublishOnly --no-gh-release
+
+      - name: Publish main package
+        if: ${{ !inputs.dry-run && steps.npm-published.outputs.exists != 'true' }}
+        run: npm publish --provenance --access public

@@ -79,7 +79,6 @@ jobs:
 
       - name: Check Cargo.toml version
         id: cargo-version
-        if: inputs.check-version
         working-directory: ${{ steps.pkg-path.outputs.path }}
         run: |
           # Match only 'version = "..."', not 'version.workspace = true'
@@ -103,7 +102,27 @@ jobs:
           fi
           echo "✓ Version match confirmed: $CARGO_VERSION"
 
+      # Idempotency: skip if this version is already on crates.io, so a partially
+      # failed release can be safely re-run with the same tag.
+      - name: Check if already published
+        id: published
+        if: ${{ !inputs.dry-run }}
+        env:
+          PKG_NAME: ${{ inputs.package }}
+          PKG_VERSION: ${{ steps.cargo-version.outputs.version }}
+        run: |
+          STATUS=$(curl -so /dev/null -w '%{http_code}' \
+            -H "User-Agent: pubmed-client-release (github actions)" \
+            "https://crates.io/api/v1/crates/${PKG_NAME}/${PKG_VERSION}")
+          if [ "$STATUS" = "200" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::${PKG_NAME}@${PKG_VERSION} already on crates.io — skipping publish"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Validate package
+        if: ${{ inputs.dry-run || steps.published.outputs.exists != 'true' }}
         working-directory: ${{ steps.pkg-path.outputs.path }}
         env:
           PKG_NAME: ${{ inputs.package }}
@@ -123,7 +142,7 @@ jobs:
           cargo publish --dry-run --token "$CARGO_REGISTRY_TOKEN"
 
       - name: Publish to crates.io
-        if: ${{ !inputs.dry-run }}
+        if: ${{ !inputs.dry-run && steps.published.outputs.exists != 'true' }}
         working-directory: ${{ steps.pkg-path.outputs.path }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

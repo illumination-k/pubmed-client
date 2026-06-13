@@ -13,16 +13,20 @@ members = [
 resolver = "3"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 authors = ["illumination-k"]
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/illumination-k/pubmed-client"
 
+# Internal crate versions are kept in lock-step with [workspace.package] version
+# by scripts/sync-versions.sh. The explicit `version` is required so the crates
+# can be published to crates.io (path-only deps are rejected by `cargo publish`).
 [workspace.dependencies]
 anyhow = "1.0"
-pubmed-formatter = { path = "pubmed-formatter" }
-pubmed-parser = { path = "pubmed-parser" }
+pubmed-client = { path = "pubmed-client", version = "0.2.0" }
+pubmed-formatter = { path = "pubmed-formatter", version = "0.2.0" }
+pubmed-parser = { path = "pubmed-parser", version = "0.2.0" }
 pubmed-test-utils = { path = "pubmed-test-utils" }
 quick-xml = { version = "0.36", features = ["serialize"] }
 regex = "1.10"

@@ -1,17 +1,20 @@
-name: "Release / Python (PyPI)"
+name: "Publish Python (PyPI)"
+
+# Reusable workflow: build wheels for every platform and publish
+# `pubmed-client-py` to PyPI via trusted publishing. The package version comes
+# from the workspace Cargo.toml (kept in sync by scripts/sync-versions.sh).
+# Invoked by release.yml. Set dry-run to publish to TestPyPI instead of PyPI.
 
 on:
-  push:
-    tags:
-      - "py-v*" # Python package version tags (e.g., py-v0.1.0)
-  workflow_dispatch: # Allow manual trigger
-
-permissions:
-  contents: read
-  id-token: write
+  workflow_call:
+    inputs:
+      dry-run:
+        description: "Publish to TestPyPI instead of PyPI"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
-  # Linux builds
   linux:
     runs-on: ubuntu-latest
     permissions:
@@ -44,9 +47,7 @@ jobs:
           manylinux: auto
           container: off
         env:
-          # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python3
-          # Allow building with Python 3.14 using stable ABI
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
       - name: Upload wheels
@@ -55,7 +56,6 @@ jobs:
           name: wheels-linux-${{ matrix.target }}
           path: dist
 
-  # Windows builds
   windows:
     runs-on: windows-latest
     permissions:
@@ -81,9 +81,7 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter --manifest-path pubmed-client-py/Cargo.toml
         env:
-          # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python
-          # Allow building with Python 3.14 using stable ABI
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
       - name: Upload wheels
@@ -92,7 +90,6 @@ jobs:
           name: wheels-windows-${{ matrix.target }}
           path: dist
 
-  # macOS builds
   macos:
     runs-on: macos-latest
     permissions:
@@ -117,7 +114,6 @@ jobs:
         with:
           cache: false # Disable cache on publish workflows to prevent cache poisoning
         env:
-          # Override PYO3_PYTHON to use system Python for cross-compilation
           PYO3_PYTHON: python3
 
       - name: Build wheels
@@ -126,9 +122,7 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter --manifest-path pubmed-client-py/Cargo.toml
         env:
-          # Ensure maturin uses system Python for cross-compilation
           PYO3_PYTHON: python3
-          # Allow building with Python 3.14 using stable ABI
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
 
       - name: Upload wheels
@@ -137,7 +131,6 @@ jobs:
           name: wheels-macos-${{ matrix.target }}
           path: dist
 
-  # Source distribution
   sdist:
     runs-on: ubuntu-latest
     permissions:
@@ -161,7 +154,6 @@ jobs:
           name: wheels-sdist
           path: dist
 
-  # Run tests before publishing
   test:
     runs-on: ubuntu-latest
     permissions:
@@ -187,7 +179,6 @@ jobs:
 
       - name: Install wheel
         run: |
-          # Create a venv and install the wheel
           uv venv
           uv pip install dist/*.whl
         working-directory: .
@@ -202,20 +193,17 @@ jobs:
           cd pubmed-client-py
           uv run mypy tests/ --strict
 
-  # Publish to PyPI
   publish:
     name: Publish to PyPI
     runs-on: ubuntu-latest
     needs: [linux, windows, macos, sdist, test]
-    # Only publish on tags, not on manual workflow_dispatch
-    if: startsWith(github.ref, 'refs/tags/')
+    if: ${{ !inputs.dry-run }}
     environment:
       name: pypi
       url: https://pypi.org/p/pubmed-client
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing
     timeout-minutes: 10
-
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -230,20 +218,17 @@ jobs:
           skip-existing: true
           verbose: true
 
-  # Publish to TestPyPI (optional, for testing)
   publish-test:
     name: Publish to TestPyPI
     runs-on: ubuntu-latest
     needs: [linux, windows, macos, sdist, test]
-    # Only run on manual trigger
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ inputs.dry-run }}
     environment:
       name: testpypi
       url: https://test.pypi.org/p/pubmed-client
     permissions:
       id-token: write
     timeout-minutes: 10
-
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
