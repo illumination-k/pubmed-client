@@ -277,6 +277,15 @@ XML fixtures are in `test_data/` at the workspace root (pmc_xml/ and pubmed_xml/
 
 ## Guidelines
 
+### Releasing & Versioning
+
+All publishable packages share **one unified version**, sourced from `[workspace.package] version`
+in the root `Cargo.toml` and propagated by `scripts/sync-versions.sh` (napi `package.json` +
+optionalDependencies, wasm `package.json`, py `pyproject.toml`). CI enforces it via the
+**Version Consistency** job. Never hand-edit a single package's version — run `mise run release <ver>`.
+A single `v<semver>` tag publishes everything (crates.io + npm + PyPI) via `release.yml`.
+See [RELEASING.md](RELEASING.md) for the full process.
+
 ### Git Operations
 
 Always use `git mv` for renames (preserves history). Check `git status` before and after operations.

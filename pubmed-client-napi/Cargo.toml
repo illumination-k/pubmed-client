@@ -14,7 +14,9 @@ crate-type = ["cdylib"]
 napi = { version = "3", default-features = false, features = ["napi4", "tokio_rt", "async"] }
 napi-derive = "3"
 # Use rustls-tls for cross-compilation (avoids OpenSSL linking issues with zigbuild)
-pubmed-client = { version = "0.1.0", path = "../pubmed-client", default-features = false, features = ["rustls-tls"] }
+# napi is published to npm (not crates.io), so a path dep is sufficient.
+# default-features = false can't be set on an inherited workspace dep, so keep it direct.
+pubmed-client = { path = "../pubmed-client", default-features = false, features = ["rustls-tls"] }
 tokio = { version = "1", features = ["rt-multi-thread"] }
 
 [build-dependencies]

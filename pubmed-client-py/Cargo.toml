@@ -16,7 +16,7 @@ crate-type = ["cdylib", "rlib"]
 doctest = false
 
 [dependencies]
-pubmed-client = { version = "0.1.0", path = "../pubmed-client" }
+pubmed-client = { workspace = true }
 
 # PyO3 for Python bindings
 pyo3 = { version = "0.28.2", features = ["extension-module"] }

@@ -29,3 +29,18 @@ jobs:
 
       - name: Run lint
         run: mise run lint:root
+
+  version-sync:
+    name: Version Consistency
+    # Local: scripts/sync-versions.sh --check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check all package versions are in sync
+        run: scripts/sync-versions.sh --check

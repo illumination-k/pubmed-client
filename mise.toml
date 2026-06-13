@@ -24,3 +24,21 @@ depends = ["fmt:*"]
 [tasks.lint]
 description = "Lint all code (runs lint:* tasks from active environments)"
 depends = ["lint:*"]
+
+[tasks.sync-versions]
+description = "Propagate the workspace version to napi/wasm/py packages"
+run = "scripts/sync-versions.sh"
+
+[tasks.release]
+description = "Bump every package to one unified version. Usage: mise run release 0.3.0"
+run = [
+  "scripts/sync-versions.sh {{arg(name='version')}}",
+  # Refresh only the workspace members in Cargo.lock (leaves registry deps alone)
+  "cargo update --workspace",
+  "scripts/sync-versions.sh --check",
+  "echo ''",
+  "echo 'Versions bumped to {{arg(name=\"version\")}}. Next:'",
+  "echo '  git commit -am \"release: v{{arg(name=\"version\")}}\"'",
+  "echo '  git tag v{{arg(name=\"version\")}} && git push origin main --tags'",
+  "echo 'The v* tag triggers release.yml → crates.io + npm (napi/wasm) + PyPI.'",
+]
