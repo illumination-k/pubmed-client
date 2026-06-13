@@ -19,9 +19,10 @@ async fn test_mcp_server_initialize() -> Result<()> {
     // Get peer information to verify server initialized correctly
     let peer_info = client.peer_info().expect("Peer info should be available");
 
-    // Verify server info
+    // Verify server info. The version is sourced from CARGO_PKG_VERSION (the
+    // unified workspace version), so assert against the same to stay bump-proof.
     assert_eq!(peer_info.server_info.name, "pubmed-mcp");
-    assert_eq!(peer_info.server_info.version, "0.1.0");
+    assert_eq!(peer_info.server_info.version, env!("CARGO_PKG_VERSION"));
 
     Ok(())
 }
