@@ -1,49 +1,563 @@
 use crate::common::{HistoryDate, PublicationDate};
 use crate::pmc::domain::{FundingInfo, JournalMeta, SupplementaryMaterial};
 
-use super::xml_utils;
+use quick_xml::Reader;
+use quick_xml::events::Event;
+use quick_xml::name::QName;
+
+use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
+use super::xml_utils::decode_xml_entities;
+
+enum TextAction {
+    Read(Vec<u8>),
+    ReadSkip(Vec<u8>),
+    Continue,
+    Break,
+}
+
+fn read_first_text(content: &str, tag: &[u8]) -> Option<String> {
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+
+    loop {
+        let action = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == tag => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) => {
+                return read_text_content(&mut reader, &name, &mut buf)
+                    .ok()
+                    .map(|s| s.trim().to_string())
+                    .filter(|s| !s.is_empty());
+            }
+            TextAction::ReadSkip(name) => {
+                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+            }
+            TextAction::Break => return None,
+            TextAction::Continue => {}
+        }
+    }
+}
+
+fn read_texts_within_parent(content: &str, parent: &[u8], child: &[u8]) -> Vec<String> {
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+    let mut parent_depth = 0_u32;
+    let mut values = Vec::new();
+
+    loop {
+        let action = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == parent => {
+                parent_depth += 1;
+                TextAction::Continue
+            }
+            Ok(Event::Start(ref e)) if parent_depth > 0 && e.name().as_ref() == child => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::End(ref e)) if e.name().as_ref() == parent => {
+                parent_depth = parent_depth.saturating_sub(1);
+                TextAction::Continue
+            }
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) => {
+                if let Ok(text) = read_text_content(&mut reader, &name, &mut buf) {
+                    let text = text.trim().to_string();
+                    if !text.is_empty() {
+                        values.push(text);
+                    }
+                }
+            }
+            TextAction::ReadSkip(name) => {
+                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    values
+}
+
+fn read_first_text_matching_attr(
+    content: &str,
+    tag: &[u8],
+    attr: &[u8],
+    value: &str,
+) -> Option<String> {
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+
+    loop {
+        let action = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e))
+                if e.name().as_ref() == tag && get_attr(e, attr).as_deref() == Some(value) =>
+            {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) if e.name().as_ref() == tag => {
+                let name = e.name().as_ref().to_vec();
+                TextAction::ReadSkip(name)
+            }
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) => {
+                return read_text_content(&mut reader, &name, &mut buf)
+                    .ok()
+                    .map(|s| s.trim().to_string())
+                    .filter(|s| !s.is_empty());
+            }
+            TextAction::ReadSkip(name) => {
+                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+            }
+            TextAction::Break => return None,
+            TextAction::Continue => {}
+        }
+    }
+}
+
+fn read_first_attr(content: &str, tag: &[u8], attrs: &[&[u8]]) -> Option<String> {
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+
+    loop {
+        let result = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == tag => {
+                attrs.iter().find_map(|attr| get_attr(e, attr))
+            }
+            Ok(Event::Eof) => return None,
+            Err(_) => return None,
+            _ => None,
+        };
+        buf.clear();
+
+        if result.is_some() {
+            return result;
+        }
+    }
+}
+
+fn parse_u16(text: String) -> Option<u16> {
+    text.parse::<u16>().ok()
+}
+
+fn parse_u8(text: String) -> Option<u8> {
+    text.parse::<u8>().ok()
+}
+
+fn read_date_parts(
+    reader: &mut Reader<&[u8]>,
+    parent_tag: &[u8],
+    buf: &mut Vec<u8>,
+) -> (Option<u16>, Option<u8>, Option<u8>) {
+    let mut year = None;
+    let mut month = None;
+    let mut day = None;
+
+    loop {
+        let action = match reader.read_event_into(buf) {
+            Ok(Event::Start(ref e)) => match e.name().as_ref() {
+                b"year" | b"month" | b"day" => TextAction::Read(e.name().as_ref().to_vec()),
+                other => TextAction::ReadSkip(other.to_vec()),
+            },
+            Ok(Event::End(ref e)) if e.name().as_ref() == parent_tag => TextAction::Break,
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) if name == b"year" => {
+                year = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(parse_u16);
+            }
+            TextAction::Read(name) if name == b"month" => {
+                month = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(parse_u8);
+            }
+            TextAction::Read(name) if name == b"day" => {
+                day = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(parse_u8);
+            }
+            TextAction::Read(name) | TextAction::ReadSkip(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    (year, month, day)
+}
+
+fn clean_text(text: String) -> Option<String> {
+    let text = text.trim().to_string();
+    if text.is_empty() { None } else { Some(text) }
+}
+
+fn read_award_group(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> (String, Option<String>) {
+    let mut source = None;
+    let mut award_id = None;
+
+    loop {
+        let action = match reader.read_event_into(buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"funding-source" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"award-id" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) => TextAction::ReadSkip(e.name().as_ref().to_vec()),
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"award-group" => TextAction::Break,
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) if name.as_slice() == b"funding-source" => {
+                source = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(clean_text);
+            }
+            TextAction::Read(name) if name.as_slice() == b"award-id" => {
+                award_id = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(clean_text);
+            }
+            TextAction::Read(name) | TextAction::ReadSkip(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    (
+        source.unwrap_or_else(|| "Unknown Source".to_string()),
+        award_id,
+    )
+}
+
+fn read_funding_group(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Vec<FundingInfo> {
+    let mut statement = None;
+    let mut awards = Vec::new();
+
+    loop {
+        let action = match reader.read_event_into(buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"funding-statement" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"award-group" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) => TextAction::ReadSkip(e.name().as_ref().to_vec()),
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"funding-group" => TextAction::Break,
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) if name.as_slice() == b"funding-statement" => {
+                statement = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(clean_text);
+            }
+            TextAction::Read(name) if name.as_slice() == b"award-group" => {
+                let (source, award_id) = read_award_group(reader, buf);
+                awards.push((source, award_id));
+            }
+            TextAction::Read(name) | TextAction::ReadSkip(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    awards
+        .into_iter()
+        .map(|(source, award_id)| FundingInfo {
+            source,
+            award_id,
+            statement: statement.clone(),
+        })
+        .collect()
+}
+
+#[derive(Default)]
+struct SectionParts {
+    title: Option<String>,
+    paragraphs: Vec<String>,
+    text_parts: Vec<String>,
+}
+
+fn read_section_parts(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> SectionParts {
+    let mut parts = SectionParts::default();
+
+    loop {
+        let action = match reader.read_event_into(buf) {
+            Ok(Event::Start(ref e)) => match e.name().as_ref() {
+                b"title" | b"p" | b"sec" => TextAction::Read(e.name().as_ref().to_vec()),
+                other => TextAction::ReadSkip(other.to_vec()),
+            },
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"sec" => TextAction::Break,
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) if name.as_slice() == b"title" => {
+                if let Some(text) = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(clean_text)
+                {
+                    if parts.title.is_none() {
+                        parts.title = Some(text.clone());
+                    }
+                    parts.text_parts.push(text);
+                }
+            }
+            TextAction::Read(name) if name.as_slice() == b"p" => {
+                if let Some(text) = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(clean_text)
+                {
+                    parts.paragraphs.push(text.clone());
+                    parts.text_parts.push(text);
+                }
+            }
+            TextAction::Read(name) if name.as_slice() == b"sec" => {
+                let nested = read_section_parts(reader, buf);
+                parts.paragraphs.extend(nested.paragraphs);
+                parts.text_parts.extend(nested.text_parts);
+            }
+            TextAction::Read(name) | TextAction::ReadSkip(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    parts
+}
+
+fn read_caption(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Option<String> {
+    let mut title = None;
+    let mut text_parts = Vec::new();
+
+    loop {
+        let action = match reader.read_event_into(buf) {
+            Ok(Event::Start(ref e)) => TextAction::Read(e.name().as_ref().to_vec()),
+            Ok(Event::Text(ref e)) => {
+                if let Ok(text) = e.unescape()
+                    && let Some(text) = clean_text(text.into_owned())
+                {
+                    text_parts.push(text);
+                }
+                TextAction::Continue
+            }
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"caption" => TextAction::Break,
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) if name.as_slice() == b"title" => {
+                let text = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(clean_text);
+                if title.is_none() {
+                    title = text.clone();
+                }
+                if let Some(text) = text {
+                    text_parts.push(text);
+                }
+            }
+            TextAction::Read(name) => {
+                if let Some(text) = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(clean_text)
+                {
+                    text_parts.push(text);
+                }
+            }
+            TextAction::ReadSkip(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    title.or_else(|| clean_text(text_parts.join(" ")))
+}
+
+fn read_media(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>, caption: &mut Option<String>) {
+    loop {
+        let action = match reader.read_event_into(buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"caption" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) => TextAction::ReadSkip(e.name().as_ref().to_vec()),
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"media" => TextAction::Break,
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) if name.as_slice() == b"caption" => {
+                if caption.is_none() {
+                    *caption = read_caption(reader, buf);
+                } else {
+                    let _ = skip_element(reader, QName(&name), buf);
+                }
+            }
+            TextAction::Read(name) | TextAction::ReadSkip(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+}
+
+fn read_supplementary_material(
+    reader: &mut Reader<&[u8]>,
+    buf: &mut Vec<u8>,
+    id: Option<String>,
+    content_type: Option<String>,
+    href: Option<String>,
+    fallback_id: String,
+) -> SupplementaryMaterial {
+    let mut label = None;
+    let mut caption = None;
+    let mut href = href;
+
+    loop {
+        let action = match reader.read_event_into(buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"label" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"caption" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"media" => {
+                if href.is_none() {
+                    href = get_attr(e, b"xlink:href").or_else(|| get_attr(e, b"href"));
+                }
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) => TextAction::ReadSkip(e.name().as_ref().to_vec()),
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"supplementary-material" => {
+                TextAction::Break
+            }
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) if name.as_slice() == b"label" => {
+                label = read_text_content(reader, &name, buf)
+                    .ok()
+                    .and_then(clean_text);
+            }
+            TextAction::Read(name) if name.as_slice() == b"caption" => {
+                caption = read_caption(reader, buf);
+            }
+            TextAction::Read(name) if name.as_slice() == b"media" => {
+                read_media(reader, buf, &mut caption);
+            }
+            TextAction::Read(name) | TextAction::ReadSkip(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    SupplementaryMaterial {
+        id: id.unwrap_or(fallback_id),
+        content_type,
+        title: Some(caption.unwrap_or_else(|| "No caption available".to_string())),
+        description: label,
+        href,
+    }
+}
 
 /// Extract journal metadata.
 ///
 /// Returns a [`JournalMeta`] without volume/issue — those belong to the article level
 /// per the JATS DTD and are extracted separately via [`extract_volume`] / [`extract_issue`].
 pub fn extract_journal_info(content: &str) -> JournalMeta {
-    let title = xml_utils::extract_text_between(content, "<journal-title>", "</journal-title>")
-        .unwrap_or_else(|| "Unknown Journal".to_string());
+    let title =
+        read_first_text(content, b"journal-title").unwrap_or_else(|| "Unknown Journal".to_string());
+    let abbreviation =
+        read_first_text_matching_attr(content, b"journal-id", b"journal-id-type", "iso-abbrev");
 
-    let abbreviation = xml_utils::extract_text_between(
-        content,
-        "<journal-id journal-id-type=\"iso-abbrev\">",
-        "</journal-id>",
-    );
-
-    // Extract ISSNs
     let mut issn_print = None;
     let mut issn_electronic = None;
-    let mut pos = 0;
-    while let Some(issn_start) = content[pos..].find("<issn") {
-        let issn_start = pos + issn_start;
-        if let Some(issn_end) = content[issn_start..].find("</issn>") {
-            let issn_end = issn_start + issn_end;
-            let issn_section = &content[issn_start..issn_end];
 
-            if let Some(content_start) = issn_section.find(">") {
-                let issn_value = &issn_section[content_start + 1..];
-
-                if issn_section.contains("pub-type=\"epub\"") {
-                    issn_electronic = Some(issn_value.to_string());
-                } else if issn_section.contains("pub-type=\"ppub\"") {
-                    issn_print = Some(issn_value.to_string());
-                }
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+    loop {
+        let action = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"issn" => {
+                let pub_type = get_attr(e, b"pub-type");
+                Some((e.name().as_ref().to_vec(), pub_type))
             }
-            pos = issn_end;
-        } else {
-            break;
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => None,
+        };
+        buf.clear();
+
+        if let Some((name, pub_type)) = action
+            && let Ok(value) = read_text_content(&mut reader, &name, &mut buf)
+            && let Some(value) = clean_text(value)
+        {
+            match pub_type.as_deref() {
+                Some("epub") => issn_electronic = Some(value),
+                Some("ppub") => issn_print = Some(value),
+                _ => {}
+            }
         }
     }
 
-    let publisher =
-        xml_utils::extract_text_between(content, "<publisher-name>", "</publisher-name>");
+    let publisher = read_first_text(content, b"publisher-name");
 
     JournalMeta {
         title,
@@ -56,12 +570,12 @@ pub fn extract_journal_info(content: &str) -> JournalMeta {
 
 /// Extract volume number from `<volume>` element.
 pub fn extract_volume(content: &str) -> Option<String> {
-    xml_utils::extract_text_between(content, "<volume>", "</volume>")
+    read_first_text(content, b"volume")
 }
 
 /// Extract issue number from `<issue>` element.
 pub fn extract_issue(content: &str) -> Option<String> {
-    xml_utils::extract_text_between(content, "<issue>", "</issue>")
+    read_first_text(content, b"issue")
 }
 
 /// Extract structured publication dates from `<pub-date>` elements.
@@ -69,35 +583,30 @@ pub fn extract_issue(content: &str) -> Option<String> {
 /// Returns a `Vec<PublicationDate>` with `pub_type` attribute preserved.
 pub fn extract_pub_dates(content: &str) -> Vec<PublicationDate> {
     let mut dates = Vec::new();
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
 
-    let mut pos = 0;
-    while let Some(pd_start) = content[pos..].find("<pub-date") {
-        let pd_start = pos + pd_start;
-        if let Some(pd_end) = content[pd_start..].find("</pub-date>") {
-            let pd_end = pd_start + pd_end + "</pub-date>".len();
-            let pd_section = &content[pd_start..pd_end];
+    loop {
+        let pub_type = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"pub-date" => {
+                get_attr(e, b"pub-type").or_else(|| get_attr(e, b"date-type"))
+            }
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => {
+                buf.clear();
+                continue;
+            }
+        };
+        buf.clear();
 
-            let pub_type = xml_utils::extract_attribute_value(pd_section, "pub-type")
-                .or_else(|| xml_utils::extract_attribute_value(pd_section, "date-type"));
-
-            let year = xml_utils::extract_text_between(pd_section, "<year>", "</year>")
-                .and_then(|y| y.parse::<u16>().ok());
-            let month = xml_utils::extract_text_between(pd_section, "<month>", "</month>")
-                .and_then(|m| m.parse::<u8>().ok());
-            let day = xml_utils::extract_text_between(pd_section, "<day>", "</day>")
-                .and_then(|d| d.parse::<u8>().ok());
-
-            dates.push(PublicationDate {
-                pub_type,
-                year,
-                month,
-                day,
-            });
-
-            pos = pd_end;
-        } else {
-            break;
-        }
+        let (year, month, day) = read_date_parts(&mut reader, b"pub-date", &mut buf);
+        dates.push(PublicationDate {
+            pub_type,
+            year,
+            month,
+            day,
+        });
     }
 
     dates
@@ -105,152 +614,63 @@ pub fn extract_pub_dates(content: &str) -> Vec<PublicationDate> {
 
 /// Extract publication date in YYYY-MM-DD format
 pub fn extract_pub_date(content: &str) -> String {
-    if let Some(year) = xml_utils::extract_text_between_ref(content, "<year>", "</year>") {
-        if let Some(month) = xml_utils::extract_text_between_ref(content, "<month>", "</month>") {
-            if let Some(day) = xml_utils::extract_text_between_ref(content, "<day>", "</day>") {
-                return format!(
-                    "{}-{:02}-{:02}",
-                    year,
-                    month.parse::<u32>().unwrap_or(1),
-                    day.parse::<u32>().unwrap_or(1)
-                );
-            }
-            return format!("{}-{:02}", year, month.parse::<u32>().unwrap_or(1));
+    let year = read_first_text(content, b"year");
+    let month = read_first_text(content, b"month");
+    let day = read_first_text(content, b"day");
+
+    match (year, month, day) {
+        (Some(year), Some(month), Some(day)) => format!(
+            "{}-{:02}-{:02}",
+            year,
+            month.parse::<u32>().unwrap_or(1),
+            day.parse::<u32>().unwrap_or(1)
+        ),
+        (Some(year), Some(month), None) => {
+            format!("{}-{:02}", year, month.parse::<u32>().unwrap_or(1))
         }
-        return year.to_string();
+        (Some(year), None, _) => year,
+        _ => "Unknown Date".to_string(),
     }
-    "Unknown Date".to_string()
 }
 
 /// Extract DOI from article metadata
 pub fn extract_doi(content: &str) -> Option<String> {
-    let mut pos = 0;
-    while let Some(id_start) = content[pos..].find(r#"<article-id pub-id-type="doi""#) {
-        let id_start = pos + id_start;
-        if let Some(content_start) = content[id_start..].find(">") {
-            let content_start = id_start + content_start + 1;
-            if let Some(content_end) = content[content_start..].find("</article-id>") {
-                let content_end = content_start + content_end;
-                return Some(content[content_start..content_end].trim().to_string());
-            }
-        }
-        pos = id_start + 1;
-    }
-    None
+    read_first_text_matching_attr(content, b"article-id", b"pub-id-type", "doi")
 }
 
 /// Extract PMID from article metadata
 pub fn extract_pmid(content: &str) -> Option<String> {
-    let mut pos = 0;
-    while let Some(id_start) = content[pos..].find(r#"<article-id pub-id-type="pmid""#) {
-        let id_start = pos + id_start;
-        if let Some(content_start) = content[id_start..].find(">") {
-            let content_start = id_start + content_start + 1;
-            if let Some(content_end) = content[content_start..].find("</article-id>") {
-                let content_end = content_start + content_end;
-                return Some(content[content_start..content_end].trim().to_string());
-            }
-        }
-        pos = id_start + 1;
-    }
-    None
+    read_first_text_matching_attr(content, b"article-id", b"pub-id-type", "pmid")
 }
 
 /// Extract article type from article metadata
 pub fn extract_article_type(content: &str) -> Option<String> {
-    // Look for article-type attribute in article tag
-    if let Some(article_start) = content.find("<article")
-        && let Some(article_end) = content[article_start..].find(">")
-    {
-        let article_tag = &content[article_start..article_start + article_end];
-        if let Some(type_start) = article_tag.find("article-type=\"") {
-            let type_start = type_start + 14; // Length of "article-type=\""
-            if let Some(type_end) = article_tag[type_start..].find('"') {
-                return Some(article_tag[type_start..type_start + type_end].to_string());
-            }
-        }
-    }
-
-    // Fallback: look in article-categories
-    xml_utils::extract_text_between(content, "<subject>", "</subject>")
+    read_first_attr(content, b"article", &[b"article-type"])
+        .or_else(|| read_first_text(content, b"subject"))
 }
 
 /// Extract keywords from article metadata
 pub fn extract_keywords(content: &str) -> Vec<String> {
-    let mut keywords = Vec::new();
-
-    if let Some(kwd_start) = content.find("<kwd-group")
-        && let Some(kwd_end) = content[kwd_start..].find("</kwd-group>")
-    {
-        let kwd_section = &content[kwd_start..kwd_start + kwd_end];
-
-        let mut pos = 0;
-        while let Some(kwd_start) = kwd_section[pos..].find("<kwd>") {
-            let kwd_start = pos + kwd_start + 5; // Length of "<kwd>"
-            if let Some(kwd_end) = kwd_section[kwd_start..].find("</kwd>") {
-                let raw_keyword = kwd_section[kwd_start..kwd_start + kwd_end].trim();
-                // Only strip XML tags if the keyword actually contains tags
-                if raw_keyword.contains('<') {
-                    let keyword = xml_utils::strip_xml_tags(raw_keyword);
-                    if !keyword.is_empty() {
-                        keywords.push(keyword);
-                    }
-                } else if !raw_keyword.is_empty() {
-                    keywords.push(raw_keyword.to_string());
-                }
-                pos = kwd_start + kwd_end;
-            } else {
-                break;
-            }
-        }
-    }
-
-    keywords
+    read_texts_within_parent(content, b"kwd-group", b"kwd")
 }
 
 /// Extract funding information
 pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
     let mut funding = Vec::new();
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
 
-    if let Some(funding_start) = content.find("<funding-group>")
-        && let Some(funding_end) = content[funding_start..].find("</funding-group>")
-    {
-        let funding_section =
-            &content[funding_start..funding_start + funding_end + "</funding-group>".len()];
+    loop {
+        let is_group = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"funding-group" => true,
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => false,
+        };
+        buf.clear();
 
-        // Extract funding statement (applies to the funding group as a whole)
-        let statement = xml_utils::extract_text_between(
-            funding_section,
-            "<funding-statement>",
-            "</funding-statement>",
-        );
-
-        let mut pos = 0;
-        while let Some(award_start) = funding_section[pos..].find("<award-group") {
-            let award_start = pos + award_start;
-            if let Some(award_end) = funding_section[award_start..].find("</award-group>") {
-                let award_end = award_start + award_end;
-                let award_section = &funding_section[award_start..award_end];
-
-                let source = xml_utils::extract_text_between(
-                    award_section,
-                    "<funding-source>",
-                    "</funding-source>",
-                )
-                .unwrap_or_else(|| "Unknown Source".to_string());
-
-                let award_id =
-                    xml_utils::extract_text_between(award_section, "<award-id>", "</award-id>");
-
-                funding.push(FundingInfo {
-                    source,
-                    award_id,
-                    statement: statement.clone(),
-                });
-                pos = award_end;
-            } else {
-                break;
-            }
+        if is_group {
+            funding.extend(read_funding_group(&mut reader, &mut buf));
         }
     }
 
@@ -259,51 +679,32 @@ pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
 
 /// Extract conflict of interest statement
 pub fn extract_conflict_of_interest(content: &str) -> Option<String> {
-    // Look for conflict of interest in fn-group
-    if let Some(fn_start) = content.find("<fn-group")
-        && let Some(fn_end) = content[fn_start..].find("</fn-group>")
-    {
-        let fn_section = &content[fn_start..fn_start + fn_end];
-
-        // Look for conflict or competing interest
-        let mut pos = 0;
-        while let Some(fn_start) = fn_section[pos..].find("<fn") {
-            let fn_start = pos + fn_start;
-            if let Some(fn_end) = fn_section[fn_start..].find("</fn>") {
-                let fn_end = fn_start + fn_end;
-                let fn_content = &fn_section[fn_start..fn_end];
-
-                if (fn_content.contains("conflict") || fn_content.contains("competing"))
-                    && let Some(p_start) = fn_content.find("<p>")
-                    && let Some(p_end) = fn_content[p_start..].find("</p>")
-                {
-                    let coi = &fn_content[p_start + 3..p_start + p_end];
-                    return Some(xml_utils::strip_xml_tags(coi));
-                }
-                pos = fn_end;
-            } else {
-                break;
-            }
+    for text in read_texts_within_parent(content, b"fn-group", b"fn") {
+        let lower = text.to_lowercase();
+        if lower.contains("conflict") || lower.contains("competing") {
+            return Some(text);
         }
     }
 
-    // Look for conflict statement in dedicated section
-    if let Some(coi_start) = content.find("<sec")
-        && let Some(coi_end) = content[coi_start..].find("</sec>")
-    {
-        let coi_section = &content[coi_start..coi_start + coi_end];
-        if (coi_section.contains("conflict") || coi_section.contains("competing"))
-            && let Some(title_start) = coi_section.find("<title>")
-            && let Some(title_end) = coi_section[title_start..].find("</title>")
-        {
-            let title = &coi_section[title_start + 7..title_start + title_end];
-            if (title.to_lowercase().contains("conflict")
-                || title.to_lowercase().contains("competing"))
-                && let Some(p_start) = coi_section.find("<p>")
-                && let Some(p_end) = coi_section[p_start..].find("</p>")
-            {
-                let coi = &coi_section[p_start + 3..p_start + p_end];
-                return Some(xml_utils::strip_xml_tags(coi));
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+    loop {
+        let is_section = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"sec" => true,
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => false,
+        };
+        buf.clear();
+
+        if is_section {
+            let parts = read_section_parts(&mut reader, &mut buf);
+            if let Some(title) = parts.title {
+                let lower = title.to_lowercase();
+                if lower.contains("conflict") || lower.contains("competing") {
+                    return clean_text(parts.paragraphs.join(" "))
+                        .or_else(|| clean_text(parts.text_parts.join(" ")));
+                }
             }
         }
     }
@@ -315,30 +716,53 @@ pub fn extract_conflict_of_interest(content: &str) -> Option<String> {
 ///
 /// Strips XML tags and decodes XML entities (e.g., `&#231;` → `ç`).
 pub fn extract_acknowledgments(content: &str) -> Option<String> {
-    xml_utils::extract_text_between(content, "<ack>", "</ack>")
-        .map(|ack| xml_utils::strip_xml_tags(&ack))
-        .map(|s| xml_utils::decode_xml_entities(&s).into_owned())
+    read_first_text(content, b"ack").map(|s| decode_xml_entities(&s).into_owned())
 }
 
 /// Extract data availability statement
 pub fn extract_data_availability(content: &str) -> Option<String> {
-    // Look for data availability in dedicated section
-    if let Some(data_start) = content.find("<sec")
-        && let Some(data_end) = content[data_start..].find("</sec>")
-    {
-        let data_section = &content[data_start..data_start + data_end];
-        if data_section.contains("data") && data_section.contains("availab") {
-            return Some(xml_utils::strip_xml_tags(data_section));
-        }
-    }
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
 
-    // Look for data availability statement in supplementary material
-    if let Some(supp_start) = content.find("<supplementary-material")
-        && let Some(supp_end) = content[supp_start..].find("</supplementary-material>")
-    {
-        let supp_section = &content[supp_start..supp_start + supp_end];
-        if supp_section.contains("data") && supp_section.contains("availab") {
-            return Some(xml_utils::strip_xml_tags(supp_section));
+    loop {
+        let action = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"sec" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"supplementary-material" => {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) if name.as_slice() == b"sec" => {
+                let parts = read_section_parts(&mut reader, &mut buf);
+                if let Some(text) = clean_text(parts.text_parts.join(" ")) {
+                    let lower = text.to_lowercase();
+                    if lower.contains("data") && lower.contains("availab") {
+                        return Some(text);
+                    }
+                }
+            }
+            TextAction::Read(name) if name.as_slice() == b"supplementary-material" => {
+                if let Ok(text) = read_text_content(&mut reader, &name, &mut buf)
+                    && let Some(text) = clean_text(text)
+                {
+                    let lower = text.to_lowercase();
+                    if lower.contains("data") && lower.contains("availab") {
+                        return Some(text);
+                    }
+                }
+            }
+            TextAction::Read(name) | TextAction::ReadSkip(name) => {
+                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
         }
     }
 
@@ -348,59 +772,33 @@ pub fn extract_data_availability(content: &str) -> Option<String> {
 /// Extract supplementary materials
 pub fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMaterial> {
     let mut materials = Vec::new();
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
 
-    let mut pos = 0;
-    while let Some(supp_start) = content[pos..].find("<supplementary-material") {
-        let supp_start = pos + supp_start;
-        if let Some(supp_end) = content[supp_start..].find("</supplementary-material>") {
-            let supp_end = supp_start + supp_end;
-            let supp_content = &content[supp_start..supp_end];
+    loop {
+        let attrs = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"supplementary-material" => Some((
+                get_attr(e, b"id"),
+                get_attr(e, b"content-type"),
+                get_attr(e, b"xlink:href").or_else(|| get_attr(e, b"href")),
+            )),
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => None,
+        };
+        buf.clear();
 
-            let id = xml_utils::extract_attribute_value(supp_content, "id").unwrap_or_else(|| {
-                let supp_num = materials.len() + 1;
-                format!("supp_{supp_num}")
-            });
-
-            let label = xml_utils::extract_text_between(supp_content, "<label>", "</label>");
-            let caption = xml_utils::extract_text_between(supp_content, "<caption>", "</caption>")
-                .and_then(|caption_content| {
-                    // First try to extract just the title from caption
-                    xml_utils::extract_text_between(&caption_content, "<title>", "</title>")
-                        .or_else(|| {
-                            // If no title, extract all content and strip tags
-                            Some(xml_utils::strip_xml_tags(&caption_content))
-                        })
-                })
-                .unwrap_or_else(|| "No caption available".to_string());
-
-            let content_type = xml_utils::extract_attribute_value(supp_content, "content-type");
-            let href = xml_utils::extract_attribute_value(supp_content, "href")
-                .or_else(|| xml_utils::extract_attribute_value(supp_content, "xlink:href"))
-                .or_else(|| {
-                    // Look for href in nested media tags
-                    if let Some(media_start) = supp_content.find("<media") {
-                        if let Some(media_end) = supp_content[media_start..].find(">") {
-                            let media_tag = &supp_content[media_start..media_start + media_end + 1];
-                            xml_utils::extract_attribute_value(media_tag, "xlink:href")
-                                .or_else(|| xml_utils::extract_attribute_value(media_tag, "href"))
-                        } else {
-                            None
-                        }
-                    } else {
-                        None
-                    }
-                });
-
-            materials.push(SupplementaryMaterial {
+        if let Some((id, content_type, href)) = attrs {
+            let supp_num = materials.len() + 1;
+            let fallback_id = format!("supp_{supp_num}");
+            materials.push(read_supplementary_material(
+                &mut reader,
+                &mut buf,
                 id,
                 content_type,
-                title: Some(caption),
-                description: label,
                 href,
-            });
-            pos = supp_end;
-        } else {
-            break;
+                fallback_id,
+            ));
         }
     }
 
@@ -409,43 +807,43 @@ pub fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMateri
 
 /// Extract article title
 pub fn extract_title(content: &str) -> String {
-    xml_utils::extract_text_between_ref(content, "<article-title>", "</article-title>")
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| "Unknown Title".to_string())
+    read_first_text(content, b"article-title").unwrap_or_else(|| "Unknown Title".to_string())
 }
 
 /// Extract article subtitle from `<title-group>/<subtitle>`
 pub fn extract_subtitle(content: &str) -> Option<String> {
-    let title_group = xml_utils::extract_element_content(content, "title-group")?;
-    xml_utils::extract_text_between(&title_group, "<subtitle>", "</subtitle>")
-        .map(|s| xml_utils::strip_xml_tags(&s))
-        .filter(|s| !s.is_empty())
+    read_texts_within_parent(content, b"title-group", b"subtitle")
+        .into_iter()
+        .next()
 }
 
 /// Extract article language
 pub fn extract_language(content: &str) -> Option<String> {
-    // Look for language in article tag
-    if let Some(article_start) = content.find("<article")
-        && let Some(article_end) = content[article_start..].find(">")
-    {
-        let article_tag = &content[article_start..article_start + article_end];
-        if let Some(lang) = xml_utils::extract_attribute_value(article_tag, "xml:lang") {
-            return Some(lang);
-        }
-    }
-    None
+    read_first_attr(content, b"article", &[b"xml:lang"])
 }
 
 /// Extract article identifiers (DOI, PMID, PMC ID, etc.)
 pub fn extract_article_ids(content: &str) -> Vec<(String, String)> {
     let mut ids = Vec::new();
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
 
-    let id_tags = xml_utils::find_all_tags(content, "article-id");
-    for id_tag in id_tags {
-        if let Some(id_type) = xml_utils::extract_attribute_value(&id_tag, "pub-id-type")
-            && let Some(id_value) = xml_utils::extract_element_content(&id_tag, "article-id")
+    loop {
+        let id_type = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"article-id" => {
+                get_attr(e, b"pub-id-type")
+            }
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => None,
+        };
+        buf.clear();
+
+        if let Some(id_type) = id_type
+            && let Ok(id_value) = read_text_content(&mut reader, b"article-id", &mut buf)
+            && let Some(id_value) = clean_text(id_value)
         {
-            ids.push((id_type, id_value.trim().to_string()));
+            ids.push((id_type, id_value));
         }
     }
 
@@ -456,17 +854,14 @@ pub fn extract_article_ids(content: &str) -> Vec<(String, String)> {
 ///
 /// Decodes XML entities (e.g., `&#169;` → `©`).
 pub fn extract_copyright(content: &str) -> Option<String> {
-    xml_utils::extract_text_between(content, "<copyright-statement>", "</copyright-statement>")
-        .or_else(|| {
-            xml_utils::extract_text_between(content, "<copyright-year>", "</copyright-year>")
-        })
-        .map(|s| xml_utils::decode_xml_entities(&s).into_owned())
+    read_first_text(content, b"copyright-statement")
+        .or_else(|| read_first_text(content, b"copyright-year"))
+        .map(|s| decode_xml_entities(&s).into_owned())
 }
 
 /// Extract license information
 pub fn extract_license(content: &str) -> Option<String> {
-    xml_utils::extract_element_content(content, "license")
-        .map(|license_content| xml_utils::strip_xml_tags(&license_content))
+    read_first_text(content, b"license")
 }
 
 /// Extract abstract text from article metadata
@@ -474,36 +869,68 @@ pub fn extract_license(content: &str) -> Option<String> {
 /// Handles both simple abstracts (`<abstract><p>...</p></abstract>`)
 /// and structured abstracts with sections (`<abstract><sec><title>Background</title><p>...</p></sec>...</abstract>`).
 pub fn extract_abstract(content: &str) -> Option<String> {
-    let abstract_content = xml_utils::extract_element_content(content, "abstract")?;
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
 
-    // Collect all paragraph text, stripping XML tags
-    let paragraphs = xml_utils::extract_all_text_between(&abstract_content, "<p", "</p>");
-    if paragraphs.is_empty() {
-        // Fallback: strip all tags from abstract content
-        let text = xml_utils::strip_xml_tags(&abstract_content);
-        if text.is_empty() {
-            return None;
+    loop {
+        let found = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"abstract" => true,
+            Ok(Event::Eof) => return None,
+            Err(_) => return None,
+            _ => false,
+        };
+        buf.clear();
+
+        if !found {
+            continue;
         }
-        return Some(text);
-    }
 
-    let text = paragraphs
-        .iter()
-        .map(|p| {
-            // Each paragraph may start with attributes like `id="Par1">`
-            // Find the closing `>` of the opening tag remnant and take content after it
-            let content = if let Some(gt_pos) = p.find('>') {
-                &p[gt_pos + 1..]
-            } else {
-                p
+        let mut paragraphs = Vec::new();
+        let mut fallback_parts = Vec::new();
+        loop {
+            let action = match reader.read_event_into(&mut buf) {
+                Ok(Event::Start(ref e)) if e.name().as_ref() == b"p" => {
+                    TextAction::Read(e.name().as_ref().to_vec())
+                }
+                Ok(Event::Text(ref e)) => {
+                    if let Ok(text) = e.unescape()
+                        && let Some(text) = clean_text(text.into_owned())
+                    {
+                        fallback_parts.push(text);
+                    }
+                    TextAction::Continue
+                }
+                Ok(Event::End(ref e)) if e.name().as_ref() == b"abstract" => TextAction::Break,
+                Ok(Event::Eof) => TextAction::Break,
+                Err(_) => TextAction::Break,
+                _ => TextAction::Continue,
             };
-            xml_utils::strip_xml_tags(content)
-        })
-        .filter(|s| !s.is_empty())
-        .collect::<Vec<_>>()
-        .join(" ");
+            buf.clear();
 
-    if text.is_empty() { None } else { Some(text) }
+            match action {
+                TextAction::Read(name) => {
+                    if let Some(text) = read_text_content(&mut reader, &name, &mut buf)
+                        .ok()
+                        .and_then(clean_text)
+                    {
+                        paragraphs.push(text);
+                    }
+                }
+                TextAction::ReadSkip(name) => {
+                    let _ = skip_element(&mut reader, QName(&name), &mut buf);
+                }
+                TextAction::Break => {
+                    let text = if paragraphs.is_empty() {
+                        fallback_parts.join(" ")
+                    } else {
+                        paragraphs.join(" ")
+                    };
+                    return clean_text(text);
+                }
+                TextAction::Continue => {}
+            }
+        }
+    }
 }
 
 /// Extract publication history dates from `<history>` element
@@ -511,32 +938,38 @@ pub fn extract_abstract(content: &str) -> Option<String> {
 /// Parses `<date date-type="received">`, `<date date-type="accepted">`, etc.
 pub fn extract_history_dates(content: &str) -> Vec<HistoryDate> {
     let mut dates = Vec::new();
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+    let mut in_history = false;
 
-    let history_content = match xml_utils::extract_element_content(content, "history") {
-        Some(c) => c,
-        None => return dates,
-    };
-
-    let date_tags = xml_utils::find_all_tags(&history_content, "date");
-    for date_tag in &date_tags {
-        let date_type = match xml_utils::extract_attribute_value(date_tag, "date-type") {
-            Some(dt) => dt,
-            None => continue,
+    loop {
+        let date_type = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"history" => {
+                in_history = true;
+                None
+            }
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"history" => {
+                in_history = false;
+                None
+            }
+            Ok(Event::Start(ref e)) if in_history && e.name().as_ref() == b"date" => {
+                get_attr(e, b"date-type")
+            }
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => None,
         };
+        buf.clear();
 
-        let year = xml_utils::extract_text_between(date_tag, "<year>", "</year>")
-            .and_then(|y| y.parse::<u16>().ok());
-        let month = xml_utils::extract_text_between(date_tag, "<month>", "</month>")
-            .and_then(|m| m.parse::<u8>().ok());
-        let day = xml_utils::extract_text_between(date_tag, "<day>", "</day>")
-            .and_then(|d| d.parse::<u8>().ok());
-
-        dates.push(HistoryDate {
-            date_type,
-            year,
-            month,
-            day,
-        });
+        if let Some(date_type) = date_type {
+            let (year, month, day) = read_date_parts(&mut reader, b"date", &mut buf);
+            dates.push(HistoryDate {
+                date_type,
+                year,
+                month,
+                day,
+            });
+        }
     }
 
     dates
@@ -544,68 +977,33 @@ pub fn extract_history_dates(content: &str) -> Vec<HistoryDate> {
 
 /// Extract article categories from `<article-categories>/<subj-group>/<subject>`
 pub fn extract_categories(content: &str) -> Vec<String> {
-    let mut categories = Vec::new();
-
-    let categories_content = match xml_utils::extract_element_content(content, "article-categories")
-    {
-        Some(c) => c,
-        None => return categories,
-    };
-
-    let subjects =
-        xml_utils::extract_all_text_between(&categories_content, "<subject>", "</subject>");
-    for subject in subjects {
-        let cleaned = xml_utils::strip_xml_tags(&subject);
-        if !cleaned.is_empty() {
-            categories.push(cleaned);
-        }
-    }
-
-    categories
+    read_texts_within_parent(content, b"article-categories", b"subject")
 }
 
 /// Extract license URL from `<license xlink:href="...">` attribute
 /// or from `<ali:license_ref>` element content
 pub fn extract_license_url(content: &str) -> Option<String> {
-    // Try <license xlink:href="..."> first
-    if let Some(license_start) = content.find("<license")
-        && let Some(tag_end) = content[license_start..].find('>')
-    {
-        let license_tag = &content[license_start..license_start + tag_end + 1];
-        let url = xml_utils::extract_attribute_value(license_tag, "xlink:href")
-            .or_else(|| xml_utils::extract_attribute_value(license_tag, "href"));
-        if url.is_some() {
-            return url;
-        }
-    }
-
-    // Fallback: extract URL from <ali:license_ref> element content
-    xml_utils::extract_element_content(content, "ali:license_ref")
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
+    read_first_attr(content, b"license", &[b"xlink:href", b"href"])
+        .or_else(|| read_first_text(content, b"ali:license_ref"))
 }
 
 /// Extract first page number from `<fpage>` element
 ///
 /// Handles `<fpage>` with or without attributes (e.g., `<fpage seq="b">54</fpage>`).
 pub fn extract_fpage(content: &str) -> Option<String> {
-    xml_utils::extract_element_content(content, "fpage")
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
+    read_first_text(content, b"fpage")
 }
 
 /// Extract last page number from `<lpage>` element
 ///
 /// Handles `<lpage>` with or without attributes.
 pub fn extract_lpage(content: &str) -> Option<String> {
-    xml_utils::extract_element_content(content, "lpage")
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
+    read_first_text(content, b"lpage")
 }
 
 /// Extract electronic location identifier from `<elocation-id>` element
 pub fn extract_elocation_id(content: &str) -> Option<String> {
-    xml_utils::extract_text_between(content, "<elocation-id>", "</elocation-id>")
+    read_first_text(content, b"elocation-id")
 }
 
 #[cfg(test)]

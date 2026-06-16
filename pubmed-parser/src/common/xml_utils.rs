@@ -71,6 +71,8 @@ pub fn strip_inline_html_tags(xml: &str) -> Cow<'_, str> {
 /// # Returns
 ///
 /// Some(String) with the text between tags, or None if not found
+#[deprecated(note = "use Reader-based XML parsing helpers instead")]
+#[allow(deprecated)]
 pub fn extract_text_between(content: &str, start: &str, end: &str) -> Option<String> {
     extract_text_between_ref(content, start, end).map(|s| s.to_string())
 }
@@ -78,6 +80,7 @@ pub fn extract_text_between(content: &str, start: &str, end: &str) -> Option<Str
 /// Extract text between two XML tags as a borrowed string slice
 ///
 /// Same as [`extract_text_between`] but returns a `&str` slice to avoid allocation.
+#[deprecated(note = "use Reader-based XML parsing helpers instead")]
 pub fn extract_text_between_ref<'a>(content: &'a str, start: &str, end: &str) -> Option<&'a str> {
     let start_pos = content.find(start)? + start.len();
     let end_pos = content[start_pos..].find(end)? + start_pos;
@@ -94,6 +97,7 @@ pub fn extract_text_between_ref<'a>(content: &'a str, start: &str, end: &str) ->
 /// # Returns
 ///
 /// Some(String) with the attribute value, or None if not found
+#[deprecated(note = "use Reader-based XML parsing helpers instead")]
 pub fn extract_attribute_value(content: &str, attribute: &str) -> Option<String> {
     let pattern = format!("{attribute}=\"");
     if let Some(attr_start) = content.find(&pattern) {
@@ -156,6 +160,7 @@ pub fn strip_xml_tags(content: &str) -> String {
 /// # Returns
 ///
 /// A vector of strings containing all found tags
+#[deprecated(note = "use Reader-based XML parsing helpers instead")]
 pub fn find_all_tags(content: &str, tag: &str) -> Vec<String> {
     let mut results = Vec::new();
     let start_tag = format!("<{}", tag);
@@ -199,6 +204,7 @@ pub fn find_all_tags(content: &str, tag: &str) -> Vec<String> {
 /// # Returns
 ///
 /// A vector of strings containing all found text between tags
+#[deprecated(note = "use Reader-based XML parsing helpers instead")]
 pub fn extract_all_text_between(content: &str, start: &str, end: &str) -> Vec<String> {
     let mut results = Vec::new();
     let mut pos = 0;
@@ -232,6 +238,7 @@ pub fn extract_all_text_between(content: &str, start: &str, end: &str) -> Vec<St
 /// # Returns
 ///
 /// Some(String) with the element's inner content, or None if not found
+#[deprecated(note = "use Reader-based XML parsing helpers instead")]
 pub fn extract_element_content(content: &str, tag: &str) -> Option<String> {
     let start_tag = format!("<{}", tag);
     let end_tag = format!("</{}>", tag);
@@ -260,6 +267,7 @@ pub fn extract_element_content(content: &str, tag: &str) -> Option<String> {
 /// # Returns
 ///
 /// A HashMap containing all attribute name-value pairs
+#[deprecated(note = "use Reader-based XML parsing helpers instead")]
 pub fn extract_all_attributes(tag: &str) -> HashMap<String, String> {
     let mut attributes = HashMap::new();
 
@@ -438,12 +446,15 @@ pub fn is_self_closing_tag(tag: &str) -> bool {
 /// # Returns
 ///
 /// Some(String) with the section text (tags removed), or None if not found
+#[deprecated(note = "use Reader-based XML parsing helpers instead")]
+#[allow(deprecated)]
 pub fn extract_section_text(content: &str, section_tag: &str) -> Option<String> {
     extract_element_content(content, section_tag)
         .map(|section_content| strip_xml_tags(&section_content))
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
 
