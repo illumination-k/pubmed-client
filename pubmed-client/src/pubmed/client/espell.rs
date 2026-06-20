@@ -119,7 +119,7 @@ impl PubMedClient {
         query_term: &str,
         db: &str,
     ) -> Result<SpellCheckResult> {
-        use crate::common::xml_utils::extract_text_between;
+        use crate::pubmed::client::xml_text::extract_text_between;
 
         // Check for error
         let error = extract_text_between(xml, "<ERROR>", "</ERROR>");

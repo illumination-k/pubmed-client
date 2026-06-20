@@ -5,6 +5,7 @@ mod elink;
 mod espell;
 mod history;
 mod summary;
+mod xml_text;
 
 use std::time::Duration;
 

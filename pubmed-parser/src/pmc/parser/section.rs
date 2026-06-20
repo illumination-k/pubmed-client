@@ -1,7 +1,6 @@
 use crate::pmc::domain::{Figure, Section, Table};
 
 use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
-use super::xml_utils;
 use quick_xml::events::Event;
 use quick_xml::name::QName;
 
@@ -663,12 +662,45 @@ enum TableAction {
 
 /// Extract section title from section content
 pub fn extract_section_title(content: &str) -> Option<String> {
-    xml_utils::extract_text_between(content, "<title>", "</title>")
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+
+    loop {
+        let found = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"title" => true,
+            Ok(Event::Eof) => return None,
+            Err(_) => return None,
+            _ => false,
+        };
+        buf.clear();
+
+        if found {
+            return read_text_content(&mut reader, b"title", &mut buf)
+                .ok()
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty());
+        }
+    }
 }
 
 /// Extract section ID from section content
 pub fn extract_section_id(content: &str) -> Option<String> {
-    xml_utils::extract_attribute_value(content, "id")
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+
+    loop {
+        let id = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"sec" => get_attr(e, b"id"),
+            Ok(Event::Eof) => return None,
+            Err(_) => return None,
+            _ => None,
+        };
+        buf.clear();
+
+        if id.is_some() {
+            return id;
+        }
+    }
 }
 
 /// Extract all paragraph content from a section
