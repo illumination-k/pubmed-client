@@ -73,7 +73,7 @@ impl PubMedClient {
         xml: &str,
         query_term: &str,
     ) -> Result<GlobalQueryResults> {
-        use crate::common::xml_utils::{extract_all_text_between, extract_text_between};
+        use crate::pubmed::client::xml_text::{extract_all_text_between, extract_text_between};
 
         // Extract the term from response, fallback to the query term
         let term = extract_text_between(xml, "<Term>", "</Term>")
