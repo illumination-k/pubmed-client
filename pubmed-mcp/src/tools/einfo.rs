@@ -2,8 +2,9 @@
 
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
+
+use super::common::{internal_error, text_result};
 
 /// Request parameters for list_databases tool
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -26,11 +27,7 @@ pub async fn list_databases(
         .pubmed
         .get_database_list()
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Failed to list databases: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Failed to list databases: {}", e)))?;
 
     let filtered: Vec<&String> = if let Some(ref filter) = params.filter {
         let filter_lower = filter.to_lowercase();
@@ -47,7 +44,7 @@ pub async fn list_databases(
         result.push_str(&format!("- {}\n", db));
     }
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }
 
 /// Request parameters for get_database_info tool
@@ -78,11 +75,7 @@ pub async fn get_database_info(
         .pubmed
         .get_database_info(&params.database)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Failed to get database info: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Failed to get database info: {}", e)))?;
 
     let mut result = String::new();
 
@@ -129,5 +122,5 @@ pub async fn get_database_info(
         }
     }
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }

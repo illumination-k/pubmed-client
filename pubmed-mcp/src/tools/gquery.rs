@@ -2,8 +2,9 @@
 
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
+
+use super::common::{internal_error, text_result};
 
 /// Global query request parameters
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -33,11 +34,7 @@ pub async fn global_query(
         .pubmed
         .global_query(&params.term)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Global query failed: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Global query failed: {}", e)))?;
 
     let mut output = format!("Query: \"{}\"\n\n", results.term);
 
@@ -65,5 +62,5 @@ pub async fn global_query(
         output.push_str(&format!("| {} | {} |\n", db.menu_name, db.count));
     }
 
-    Ok(CallToolResult::success(vec![Content::text(output)]))
+    text_result(output)
 }

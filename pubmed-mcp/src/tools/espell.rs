@@ -2,8 +2,9 @@
 
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
+
+use super::common::{internal_error, text_result};
 
 /// Spell check request parameters
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -33,11 +34,7 @@ pub async fn spell_check(
         .pubmed
         .spell_check_db(&params.term, db)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Spell check failed: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Spell check failed: {}", e)))?;
 
     let mut output = format!("Database: {}\n", result.database);
     output.push_str(&format!("Original query: \"{}\"\n", result.query));
@@ -53,5 +50,5 @@ pub async fn spell_check(
         output.push_str("\nNo spelling corrections needed.\n");
     }
 
-    Ok(CallToolResult::success(vec![Content::text(output)]))
+    text_result(output)
 }
