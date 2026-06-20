@@ -3434,6 +3434,7 @@ dependencies = [
  "futures-util",
  "getrandom 0.2.16",
  "image",
+ "js-sys",
  "moka",
  "paste",
  "proptest",
@@ -3460,6 +3461,8 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "tracing-test",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wiremock",
 ]
 
