@@ -57,7 +57,11 @@ pub async fn get_pmc_figures(
             data: None,
         })?;
 
-    let mut result = format!("Figures from: {} ({})\n\n", article.title(), pmc_id);
+    let mut result = format!(
+        "Figures from: {} ({})\n\n",
+        article.title().unwrap_or("Untitled"),
+        pmc_id
+    );
 
     let all_figures = collect_figures(article.sections());
     let all_tables = collect_tables(article.sections());
@@ -71,7 +75,9 @@ pub async fn get_pmc_figures(
             if let Some(ref label) = fig.label {
                 result.push_str(&format!("Label: {}\n", label));
             }
-            result.push_str(&format!("Caption: {}\n", fig.caption));
+            if let Some(ref caption) = fig.caption {
+                result.push_str(&format!("Caption: {}\n", caption));
+            }
             if let Some(ref graphic_href) = fig.graphic_href {
                 result.push_str(&format!("File: {}\n", graphic_href));
             }
@@ -86,7 +92,9 @@ pub async fn get_pmc_figures(
             if let Some(ref label) = table.label {
                 result.push_str(&format!("Label: {}\n", label));
             }
-            result.push_str(&format!("Caption: {}\n", table.caption));
+            if let Some(ref caption) = table.caption {
+                result.push_str(&format!("Caption: {}\n", caption));
+            }
             result.push('\n');
         }
     }

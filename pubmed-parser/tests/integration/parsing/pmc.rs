@@ -53,7 +53,7 @@ fn test_comprehensive_pmc_parsing(#[from(xml_test_cases)] test_cases: Vec<PmcXml
                 successful_parses += 1;
 
                 // Basic validation
-                assert!(!article.title().is_empty(), "Article should have a title");
+                assert!(article.title().is_some(), "Article should have a title");
                 assert_eq!(
                     article.pmcid().as_str(),
                     test_case.pmcid,
@@ -63,7 +63,7 @@ fn test_comprehensive_pmc_parsing(#[from(xml_test_cases)] test_cases: Vec<PmcXml
                 // Log some statistics
                 info!(
                     filename = test_case.filename(),
-                    title = article.title().chars().take(60).collect::<String>(),
+                    title = article.title().unwrap_or("").chars().take(60).collect::<String>(),
                     authors_count = article.authors().len(),
                     sections_count = article.sections().len(),
                     references_count = article.references().len(),

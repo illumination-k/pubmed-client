@@ -263,7 +263,8 @@ impl PmcMarkdownConverter {
             markdown.push_str("\n\n");
         } else {
             // Always include at least the title even when metadata is disabled
-            markdown.push_str(&self.format_heading(&self.clean_content(article.title()), 1));
+            let title = article.title().unwrap_or("Untitled");
+            markdown.push_str(&self.format_heading(&self.clean_content(title), 1));
             markdown.push_str("\n\n");
         }
 
@@ -297,7 +298,8 @@ impl PmcMarkdownConverter {
             markdown.push_str("\n\n");
         } else {
             // Always include at least the title even when metadata is disabled
-            markdown.push_str(&self.format_heading(&self.clean_content(article.title()), 1));
+            let title = article.title().unwrap_or("Untitled");
+            markdown.push_str(&self.format_heading(&self.clean_content(title), 1));
             markdown.push_str("\n\n");
         }
 
@@ -325,13 +327,19 @@ impl PmcMarkdownConverter {
     fn generate_yaml_frontmatter(&self, article: &PmcArticle) -> String {
         // Build metadata structure
         let metadata = ArticleMetadata {
-            title: self.clean_content(article.title()),
+            title: self.clean_content(article.title().unwrap_or("Untitled")),
             authors: article
                 .authors()
                 .iter()
                 .map(|a| self.clean_content(&a.full_name))
                 .collect(),
-            journal: self.clean_content(&article.journal().title),
+            journal: self.clean_content(
+                article
+                    .journal()
+                    .title
+                    .as_deref()
+                    .unwrap_or("Unknown Journal"),
+            ),
             journal_abbrev: article
                 .journal()
                 .abbreviation
@@ -377,7 +385,8 @@ impl PmcMarkdownConverter {
         let mut metadata = String::new();
 
         // Title
-        metadata.push_str(&self.format_heading(&self.clean_content(article.title()), 1));
+        let title = article.title().unwrap_or("Untitled");
+        metadata.push_str(&self.format_heading(&self.clean_content(title), 1));
         metadata.push('\n');
 
         // Authors
@@ -388,7 +397,11 @@ impl PmcMarkdownConverter {
         }
 
         // Journal information
-        let journal_title = &article.journal().title;
+        let journal_title = article
+            .journal()
+            .title
+            .as_deref()
+            .unwrap_or("Unknown Journal");
         metadata.push_str(&format!("\n**Journal:** {journal_title}"));
         if let Some(abbrev) = &article.journal().abbreviation {
             metadata.push_str(&format!(" ({abbrev})"));
@@ -755,7 +768,7 @@ impl PmcMarkdownConverter {
 
     /// Format funding information
     fn format_funding(&self, funding: &FundingInfo) -> String {
-        let source = &funding.source;
+        let source = funding.source.as_deref().unwrap_or("Unknown");
         let mut text = format!("- **{source}**");
 
         if let Some(award_id) = &funding.award_id {
@@ -793,8 +806,10 @@ impl PmcMarkdownConverter {
             content.push_str(&format!("**Figure {figure_id}**"));
         }
 
-        let caption = self.clean_content(&figure.caption);
-        content.push_str(&format!(": {caption}"));
+        if let Some(caption) = &figure.caption {
+            let caption = self.clean_content(caption);
+            content.push_str(&format!(": {caption}"));
+        }
 
         if let Some(alt_text) = &figure.alt_text {
             let alt_content = self.clean_content(alt_text);
@@ -815,8 +830,10 @@ impl PmcMarkdownConverter {
             content.push_str(&format!("**Figure {figure_id}**"));
         }
 
-        let caption = self.clean_content(&figure.caption);
-        content.push_str(&format!(": {caption}"));
+        if let Some(caption) = &figure.caption {
+            let caption = self.clean_content(caption);
+            content.push_str(&format!(": {caption}"));
+        }
 
         if let Some(alt_text) = &figure.alt_text {
             let alt_content = self.clean_content(alt_text);
@@ -837,8 +854,10 @@ impl PmcMarkdownConverter {
             content.push_str(&format!("**Table {table_id}**"));
         }
 
-        let caption = self.clean_content(&table.caption);
-        content.push_str(&format!(": {caption}"));
+        if let Some(caption) = &table.caption {
+            let caption = self.clean_content(caption);
+            content.push_str(&format!(": {caption}"));
+        }
 
         if !table.footnotes.is_empty() {
             content.push_str("\n\n*Footnotes:*\n");
@@ -906,7 +925,7 @@ mod tests {
             article_type: None,
             front: Front {
                 journal_meta: JournalMeta {
-                    title: "Test Journal".to_string(),
+                    title: Some("Test Journal".to_string()),
                     abbreviation: None,
                     issn_print: None,
                     issn_electronic: None,
@@ -918,7 +937,7 @@ mod tests {
                     doi: None,
                     categories: vec![],
                     title_group: TitleGroup {
-                        article_title: title.to_string(),
+                        article_title: Some(title.to_string()),
                         subtitle: None,
                     },
                     authors: vec![],
@@ -1085,7 +1104,7 @@ mod tests {
         let converter = PmcMarkdownConverter::new().with_yaml_frontmatter(true);
 
         let mut article = test_article("COVID-19: A Comprehensive Study", "PMC7890123");
-        article.front.journal_meta.title = "Nature: Medicine & Science".to_string();
+        article.front.journal_meta.title = Some("Nature: Medicine & Science".to_string());
         article.front.article_meta.authors =
             vec![Author::from_full_name("O'Brien, Michael".to_string())];
         article.front.article_meta.pub_dates = vec![PublicationDate {

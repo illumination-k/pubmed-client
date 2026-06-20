@@ -70,11 +70,11 @@ async fn test_pmc_cache_hit() {
 
     // First fetch - should hit the API
     let article1 = client.fetch_full_text("PMC1234567").await.unwrap();
-    assert_eq!(article1.title(), "Test Article Title");
+    assert_eq!(article1.title(), Some("Test Article Title"));
 
     // Second fetch - should be served from cache
     let article2 = client.fetch_full_text("PMC1234567").await.unwrap();
-    assert_eq!(article2.title(), "Test Article Title");
+    assert_eq!(article2.title(), Some("Test Article Title"));
 
     // Verify both articles are identical
     assert_eq!(article1.pmcid(), article2.pmcid());

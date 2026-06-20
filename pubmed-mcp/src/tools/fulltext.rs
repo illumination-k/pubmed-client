@@ -68,7 +68,10 @@ pub async fn get_pmc_fulltext(
     let mut result = String::new();
 
     // Metadata
-    result.push_str(&format!("Title: {}\n", article.title()));
+    result.push_str(&format!(
+        "Title: {}\n",
+        article.title().unwrap_or("Untitled")
+    ));
     result.push_str(&format!("PMC ID: {}\n", article.pmcid()));
     if let Some(ref doi) = article.doi() {
         result.push_str(&format!("DOI: {}\n", doi));
@@ -85,7 +88,10 @@ pub async fn get_pmc_fulltext(
     }
 
     // Journal
-    result.push_str(&format!("Journal: {}\n", article.journal().title));
+    result.push_str(&format!(
+        "Journal: {}\n",
+        article.journal().title.as_deref().unwrap_or("Untitled")
+    ));
 
     // Sections
     let sections = if let Some(max) = params.max_sections {
@@ -110,7 +116,8 @@ pub async fn get_pmc_fulltext(
         result.push_str(&format!("\n## Figures ({})\n", all_figures.len()));
         for fig in &all_figures {
             let label = fig.label.as_deref().unwrap_or(&fig.id);
-            result.push_str(&format!("- {}: {}\n", label, fig.caption));
+            let caption = fig.caption.as_deref().unwrap_or("");
+            result.push_str(&format!("- {}: {}\n", label, caption));
         }
     }
 
@@ -120,7 +127,8 @@ pub async fn get_pmc_fulltext(
         result.push_str(&format!("\n## Tables ({})\n", all_tables.len()));
         for table in &all_tables {
             let label = table.label.as_deref().unwrap_or(&table.id);
-            result.push_str(&format!("- {}: {}\n", label, table.caption));
+            let caption = table.caption.as_deref().unwrap_or("");
+            result.push_str(&format!("- {}: {}\n", label, caption));
         }
     }
 

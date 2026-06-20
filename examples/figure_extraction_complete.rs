@@ -121,14 +121,16 @@ async fn process_article(
                 eprintln!("    ⚠️  Could not copy figure: {}", e);
             } else {
                 println!("    💾 Saved as: {}", new_filename);
-                println!(
-                    "    📝 Caption: {}",
-                    if extracted_figure.figure.caption.len() > 80 {
-                        format!("{}...", &extracted_figure.figure.caption[..80])
-                    } else {
-                        extracted_figure.figure.caption.clone()
-                    }
-                );
+                if let Some(caption) = &extracted_figure.figure.caption {
+                    println!(
+                        "    📝 Caption: {}",
+                        if caption.len() > 80 {
+                            format!("{}...", &caption[..80])
+                        } else {
+                            caption.clone()
+                        }
+                    );
+                }
 
                 if let Some(dimensions) = extracted_figure.dimensions {
                     println!("    📐 Dimensions: {}x{}", dimensions.0, dimensions.1);
@@ -181,14 +183,16 @@ async fn create_summary_report(
         if let Some(label) = &figure.label {
             report.push_str(&format!("   Label: {}\n", label));
         }
-        report.push_str(&format!(
-            "   Caption: {}\n",
-            if figure.caption.len() > 100 {
-                format!("{}...", &figure.caption[..100])
-            } else {
-                figure.caption.clone()
-            }
-        ));
+        if let Some(caption) = &figure.caption {
+            report.push_str(&format!(
+                "   Caption: {}\n",
+                if caption.len() > 100 {
+                    format!("{}...", &caption[..100])
+                } else {
+                    caption.clone()
+                }
+            ));
+        }
 
         if let Some(dimensions) = figure.dimensions {
             report.push_str(&format!(
@@ -215,7 +219,7 @@ struct FigureMetadata {
     pmcid: String,
     figure_id: String,
     label: Option<String>,
-    caption: String,
+    caption: Option<String>,
     alt_text: Option<String>,
     fig_type: Option<String>,
     original_file_path: String,

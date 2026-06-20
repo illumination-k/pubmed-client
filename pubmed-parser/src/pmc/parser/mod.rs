@@ -217,7 +217,7 @@ mod tests {
 
         let article = result.unwrap();
         assert_eq!(article.pmcid().as_str(), "PMC123456");
-        assert_eq!(article.title(), "Test Article Title");
+        assert_eq!(article.title(), Some("Test Article Title"));
         assert!(!article.pub_dates().is_empty());
         assert_eq!(article.pub_dates()[0].year, Some(2023));
         assert_eq!(article.pub_dates()[0].month, Some(12));
@@ -247,7 +247,7 @@ mod tests {
 
         let article = result.unwrap();
         assert_eq!(article.pmcid().as_str(), "PMC100000");
-        assert_eq!(article.title(), "Minimal Test");
+        assert_eq!(article.title(), Some("Minimal Test"));
     }
 
     // Note: Most detailed tests have been moved to the individual parser modules:

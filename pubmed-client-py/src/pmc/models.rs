@@ -119,7 +119,7 @@ pub struct PyFigure {
     #[pyo3(get)]
     pub label: Option<String>,
     #[pyo3(get)]
-    pub caption: String,
+    pub caption: Option<String>,
     #[pyo3(get)]
     pub alt_text: Option<String>,
     #[pyo3(get)]
@@ -203,7 +203,7 @@ pub struct PyTable {
     #[pyo3(get)]
     pub label: Option<String>,
     #[pyo3(get)]
-    pub caption: String,
+    pub caption: Option<String>,
 }
 
 impl From<&pmc::Table> for PyTable {
@@ -305,7 +305,7 @@ pub struct PyPmcFullText {
     #[pyo3(get)]
     pub pmid: Option<String>,
     #[pyo3(get)]
-    pub title: String,
+    pub title: Option<String>,
     #[pyo3(get)]
     pub doi: Option<String>,
     inner: Arc<PmcArticle>,
@@ -316,7 +316,7 @@ impl From<PmcArticle> for PyPmcFullText {
         PyPmcFullText {
             pmcid: full_text.pmcid().to_string(),
             pmid: full_text.pmid().map(|p| p.to_string()),
-            title: full_text.title().to_string(),
+            title: full_text.title().map(|s| s.to_string()),
             doi: full_text.doi().map(str::to_string),
             inner: Arc::new(full_text),
         }
@@ -418,7 +418,7 @@ impl PyPmcFullText {
 
     fn __repr__(&self) -> String {
         format!(
-            "PmcFullText(pmcid='{}', title='{}')",
+            "PmcFullText(pmcid='{}', title={:?})",
             self.pmcid, self.title
         )
     }

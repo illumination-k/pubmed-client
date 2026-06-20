@@ -301,11 +301,11 @@ pub struct FullTextArticle {
     /// PubMed ID if available
     pub pmid: Option<String>,
     /// Article title
-    pub title: String,
+    pub title: Option<String>,
     /// List of authors
     pub authors: Vec<Author>,
     /// Journal name
-    pub journal: String,
+    pub journal: Option<String>,
     /// Publication date
     pub pub_date: String,
     /// DOI if available

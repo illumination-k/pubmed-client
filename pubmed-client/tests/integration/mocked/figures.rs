@@ -94,7 +94,7 @@ macro_rules! test_pmcid_figure_extraction {
                                 figure_index = fig_idx,
                                 figure_id = %figure.id,
                                 figure_label = ?figure.label,
-                                caption_length = figure.caption.len(),
+                                caption_length = figure.caption.as_ref().map(|c| c.len()).unwrap_or(0),
                                 fig_type = ?figure.fig_type,
                                 graphic_href = ?figure.graphic_href,
                                 "{}  Figure in section", indent
@@ -113,7 +113,7 @@ macro_rules! test_pmcid_figure_extraction {
                 // If no figures found, provide detailed debugging information
                 if figures_count == 0 {
                     info!(pmcid = %pmcid, "No figures found - debugging information:");
-                    info!(pmcid = %pmcid, title = %pmc_full_text.title(), "Article title");
+                    info!(pmcid = %pmcid, title = ?pmc_full_text.title(), "Article title");
                     info!(pmcid = %pmcid, pmid = ?pmc_full_text.pmid(), "Associated PMID");
                     info!(pmcid = %pmcid, article_type = ?pmc_full_text.article_type, "Article type");
 
@@ -164,7 +164,7 @@ macro_rules! test_pmcid_figure_extraction {
                         figure_index = i,
                         figure_id = %figure.id,
                         figure_label = ?figure.label,
-                        caption_length = figure.caption.len(),
+                        caption_length = figure.caption.as_ref().map(|c| c.len()).unwrap_or(0),
                         fig_type = ?figure.fig_type,
                         graphic_href = ?figure.graphic_href,
                         "Successfully extracted figure"
@@ -272,7 +272,7 @@ async fn test_figure_matching_functions() {
     let figure = pubmed_client::Figure {
         id: figure_id,
         label: figure_label,
-        caption: "Test figure caption".to_string(),
+        caption: Some("Test figure caption".to_string()),
         alt_text: None,
         fig_type: None,
         graphic_href: None,
@@ -304,7 +304,7 @@ async fn test_figure_matching_by_label() {
     let figure = pubmed_client::Figure {
         id: "unknown".to_string(),
         label: Some("Figure 1".to_string()),
-        caption: "Test figure caption".to_string(),
+        caption: Some("Test figure caption".to_string()),
         alt_text: None,
         fig_type: None,
         graphic_href: None,
@@ -335,7 +335,7 @@ async fn test_figure_matching_by_filename() {
     let figure = pubmed_client::Figure {
         id: "fig_unknown".to_string(),
         label: None,
-        caption: "Test figure caption".to_string(),
+        caption: Some("Test figure caption".to_string()),
         alt_text: None,
         fig_type: None,
         graphic_href: Some("specific_file".to_string()),
@@ -366,7 +366,7 @@ async fn test_figure_no_match() {
     let figure = pubmed_client::Figure {
         id: "nonexistent".to_string(),
         label: Some("Nonexistent Figure".to_string()),
-        caption: "Test figure caption".to_string(),
+        caption: Some("Test figure caption".to_string()),
         alt_text: None,
         fig_type: None,
         graphic_href: None,

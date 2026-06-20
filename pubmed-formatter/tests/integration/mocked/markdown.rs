@@ -19,7 +19,7 @@ fn build_test_article(pmcid: u32, title: &str) -> pubmed_parser::pmc::PmcArticle
         article_type: None,
         front: Front {
             journal_meta: JournalMeta {
-                title: "Test Journal".to_string(),
+                title: Some("Test Journal".to_string()),
                 abbreviation: None,
                 issn_print: None,
                 issn_electronic: None,
@@ -31,7 +31,7 @@ fn build_test_article(pmcid: u32, title: &str) -> pubmed_parser::pmc::PmcArticle
                 doi: None,
                 categories: vec![],
                 title_group: TitleGroup {
-                    article_title: title.to_string(),
+                    article_title: Some(title.to_string()),
                     subtitle: None,
                 },
                 authors: vec![],
@@ -94,7 +94,9 @@ fn test_markdown_conversion_basic(#[from(markdown_test_cases)] test_cases: Vec<P
 
         // Check that title appears in markdown (use cleaned version for comparison)
         // Clean the title using regex to remove XML tags
-        let clean_title = xml_tag_regex.replace_all(article.title(), "").to_string();
+        let clean_title = xml_tag_regex
+            .replace_all(article.title().unwrap_or(""), "")
+            .to_string();
         let title_words: Vec<&str> = clean_title.split_whitespace().take(4).collect();
         let title_portion = title_words.join(" ");
         assert!(
@@ -128,11 +130,13 @@ fn test_markdown_conversion_basic(#[from(markdown_test_cases)] test_cases: Vec<P
             "Should contain journal information for {}",
             test_case.filename()
         );
-        assert!(
-            markdown.contains(&article.journal().title),
-            "Should contain journal title for {}",
-            test_case.filename()
-        );
+        if let Some(journal_title) = &article.journal().title {
+            assert!(
+                markdown.contains(journal_title),
+                "Should contain journal title for {}",
+                test_case.filename()
+            );
+        }
 
         info!(
             filename = test_case.filename(),
@@ -193,7 +197,7 @@ fn test_markdown_conversion_with_different_configs(
             let markdown = converter.convert(&article);
             if markdown.is_empty() {
                 warn!(filename = test_case.filename(), config_name = config_name,
-                      section_count = article.sections().len(), title = %article.title(),
+                      section_count = article.sections().len(), title = %article.title().unwrap_or(""),
                       "Empty markdown generated");
             }
             assert!(
@@ -219,11 +223,10 @@ fn test_markdown_conversion_with_different_configs(
                 }
                 "setext_headers" => {
                     // For level 1 headers, should contain underlines
-                    if markdown.contains(article.title()) {
+                    let title = article.title().unwrap_or("");
+                    if markdown.contains(title) {
                         let lines: Vec<&str> = markdown.lines().collect();
-                        let title_line_idx = lines
-                            .iter()
-                            .position(|&line| line.contains(article.title()));
+                        let title_line_idx = lines.iter().position(|&line| line.contains(title));
                         if let Some(idx) = title_line_idx
                             && idx + 1 < lines.len()
                         {
@@ -602,7 +605,7 @@ fn test_markdown_edge_cases() {
     special_article.front.article_meta.authors = vec![Author::from_full_name(
         "Dr. John O'Reilly & Associates".to_string(),
     )];
-    special_article.front.journal_meta.title = "Special Characters Journal".to_string();
+    special_article.front.journal_meta.title = Some("Special Characters Journal".to_string());
     special_article.front.article_meta.keywords = vec![
         "test & validation".to_string(),
         "<script>alert('xss')</script>".to_string(),
