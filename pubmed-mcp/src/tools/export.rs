@@ -3,8 +3,9 @@
 use pubmed_client::ExportFormat as _;
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
+
+use super::common::{internal_error, invalid_params, text_result};
 
 /// Export format for citations
 #[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
@@ -36,11 +37,7 @@ pub async fn export_citations(
     Parameters(params): Parameters<ExportRequest>,
 ) -> Result<CallToolResult, ErrorData> {
     if params.pmids.is_empty() {
-        return Err(ErrorData {
-            code: ErrorCode(-32602),
-            message: Cow::from("At least one PMID is required"),
-            data: None,
-        });
+        return Err(invalid_params("At least one PMID is required"));
     }
 
     let format = params.format.unwrap_or(ExportFormat::Bibtex);
@@ -57,23 +54,16 @@ pub async fn export_citations(
         "Exporting citations"
     );
 
-    // Fetch articles
     let pmid_refs: Vec<&str> = params.pmids.iter().map(|s| s.as_str()).collect();
     let articles = server
         .client
         .pubmed
         .fetch_articles(&pmid_refs)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Failed to fetch articles: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Failed to fetch articles: {}", e)))?;
 
     if articles.is_empty() {
-        return Ok(CallToolResult::success(vec![Content::text(
-            "No articles found for the given PMIDs.",
-        )]));
+        return text_result("No articles found for the given PMIDs.");
     }
 
     let result = match format {
@@ -90,5 +80,5 @@ pub async fn export_citations(
             .join("\n\n"),
     };
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }

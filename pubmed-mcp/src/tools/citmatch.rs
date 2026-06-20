@@ -2,9 +2,9 @@
 
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
 
+use super::common::{internal_error, text_result};
 use pubmed_client::CitationQuery;
 
 /// Single citation input for matching
@@ -46,9 +46,7 @@ pub async fn match_citations(
     Parameters(params): Parameters<CitMatchRequest>,
 ) -> Result<CallToolResult, ErrorData> {
     if params.citations.is_empty() {
-        return Ok(CallToolResult::success(vec![Content::text(
-            "No citations provided.",
-        )]));
+        return text_result("No citations provided.");
     }
 
     let citations: Vec<CitationQuery> = params
@@ -77,11 +75,7 @@ pub async fn match_citations(
         .pubmed
         .match_citations(&citations)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Citation match failed: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Citation match failed: {}", e)))?;
 
     let mut output = format!(
         "Matched {} of {} citations:\n\n",
@@ -109,5 +103,5 @@ pub async fn match_citations(
         }
     }
 
-    Ok(CallToolResult::success(vec![Content::text(output)]))
+    text_result(output)
 }

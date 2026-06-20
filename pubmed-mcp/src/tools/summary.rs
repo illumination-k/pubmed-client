@@ -2,8 +2,9 @@
 
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
+
+use super::common::{internal_error, invalid_params, text_result};
 
 /// Request parameters for fetch_summaries tool
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -24,11 +25,7 @@ pub async fn fetch_summaries(
     Parameters(params): Parameters<SummaryRequest>,
 ) -> Result<CallToolResult, ErrorData> {
     if params.pmids.is_empty() {
-        return Err(ErrorData {
-            code: ErrorCode(-32602),
-            message: Cow::from("At least one PMID is required"),
-            data: None,
-        });
+        return Err(invalid_params("At least one PMID is required"));
     }
 
     info!(
@@ -43,11 +40,7 @@ pub async fn fetch_summaries(
         .pubmed
         .fetch_summaries(&pmid_refs)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Fetch summaries failed: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Fetch summaries failed: {}", e)))?;
 
     let mut result = String::new();
     result.push_str(&format!("Retrieved {} summaries:\n\n", summaries.len()));
@@ -114,5 +107,5 @@ pub async fn fetch_summaries(
         result.push('\n');
     }
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }

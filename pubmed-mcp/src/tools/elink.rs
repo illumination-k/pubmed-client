@@ -2,8 +2,9 @@
 
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
+
+use super::common::{internal_error, invalid_params, text_result};
 
 /// Request parameters for get_related_articles tool
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -21,11 +22,7 @@ pub async fn get_related_articles(
     Parameters(params): Parameters<RelatedArticlesRequest>,
 ) -> Result<CallToolResult, ErrorData> {
     if params.pmids.is_empty() {
-        return Err(ErrorData {
-            code: ErrorCode(-32602),
-            message: Cow::from("At least one PMID is required"),
-            data: None,
-        });
+        return Err(invalid_params("At least one PMID is required"));
     }
 
     let max = params.max_results.unwrap_or(20);
@@ -41,11 +38,7 @@ pub async fn get_related_articles(
         .pubmed
         .get_related_articles(&params.pmids)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Failed to get related articles: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Failed to get related articles: {}", e)))?;
 
     let displayed: Vec<_> = related.related_pmids.iter().take(max).collect();
     let total = related.related_pmids.len();
@@ -65,7 +58,7 @@ pub async fn get_related_articles(
         result.push_str(&format!("\n... and {} more", total - max));
     }
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }
 
 /// Request parameters for get_citations tool
@@ -84,11 +77,7 @@ pub async fn get_citations(
     Parameters(params): Parameters<CitationsRequest>,
 ) -> Result<CallToolResult, ErrorData> {
     if params.pmids.is_empty() {
-        return Err(ErrorData {
-            code: ErrorCode(-32602),
-            message: Cow::from("At least one PMID is required"),
-            data: None,
-        });
+        return Err(invalid_params("At least one PMID is required"));
     }
 
     let max = params.max_results.unwrap_or(50);
@@ -104,11 +93,7 @@ pub async fn get_citations(
         .pubmed
         .get_citations(&params.pmids)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Failed to get citations: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Failed to get citations: {}", e)))?;
 
     let displayed: Vec<_> = citations.citing_pmids.iter().take(max).collect();
     let total = citations.citing_pmids.len();
@@ -130,7 +115,7 @@ pub async fn get_citations(
 
     result.push_str("\nNote: Citation counts reflect PubMed-indexed articles only. Google Scholar and other sources may report higher counts.");
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }
 
 /// Request parameters for get_pmc_links tool
@@ -148,11 +133,7 @@ pub async fn get_pmc_links(
     Parameters(params): Parameters<PmcLinksRequest>,
 ) -> Result<CallToolResult, ErrorData> {
     if params.pmids.is_empty() {
-        return Err(ErrorData {
-            code: ErrorCode(-32602),
-            message: Cow::from("At least one PMID is required"),
-            data: None,
-        });
+        return Err(invalid_params("At least one PMID is required"));
     }
 
     info!(
@@ -165,11 +146,7 @@ pub async fn get_pmc_links(
         .pubmed
         .get_pmc_links(&params.pmids)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Failed to get PMC links: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Failed to get PMC links: {}", e)))?;
 
     let mut result = format!(
         "Checked {} PMIDs, found {} with PMC full text:\n\n",
@@ -185,5 +162,5 @@ pub async fn get_pmc_links(
         result.push_str("No PMC full-text articles found for the given PMIDs.\n");
     }
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }

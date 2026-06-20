@@ -6,6 +6,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 pub mod citmatch;
+pub mod common;
 pub mod convert;
 pub mod einfo;
 pub mod elink;

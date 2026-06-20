@@ -2,9 +2,9 @@
 
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
 
+use super::common::{internal_error, text_result};
 use pubmed_client::{ArticleType, SearchQuery, SortOrder};
 
 /// Study type filter for PubMed searches
@@ -152,13 +152,11 @@ pub async fn search_pubmed(
     // Build search query with filters
     let mut search_query = SearchQuery::new().query(&params.query);
 
-    // Apply study type filter
     if let Some(ref study_type) = params.study_type {
         let article_type = study_type.to_article_type();
         search_query = search_query.article_type(article_type);
     }
 
-    // Apply text availability filter
     if let Some(ref text_availability) = params.text_availability {
         search_query = match text_availability {
             TextAvailability::FreeFullText => search_query.free_full_text_only(),
@@ -167,12 +165,10 @@ pub async fn search_pubmed(
         };
     }
 
-    // Apply date range filter
     if let Some(start_year) = params.start_year {
         search_query = search_query.date_range(start_year, params.end_year);
     }
 
-    // Apply sort order
     if let Some(ref sort_order) = params.sort {
         search_query = search_query.sort(sort_order.to_sort_order());
     }
@@ -195,11 +191,7 @@ pub async fn search_pubmed(
         .pubmed
         .search_and_fetch(&query_string, max, search_query.get_sort())
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Search failed: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Search failed: {}", e)))?;
 
     let mut result = String::new();
 
@@ -232,7 +224,6 @@ pub async fn search_pubmed(
     result.push_str(&format!("Found {} articles:\n\n", articles.len()));
 
     for (i, article) in articles.iter().enumerate() {
-        // Format article with PMC ID if available
         if let Some(ref pmc_id) = article.pmc_id {
             result.push_str(&format!(
                 "{}. {} (PMID: {} | PMC: {})\n",
@@ -250,7 +241,6 @@ pub async fn search_pubmed(
             ));
         }
 
-        // Add abstract preview if available and requested
         if include_abstract && let Some(ref abstract_text) = article.abstract_text {
             let preview = if abstract_text.len() > 200 {
                 format!("{}...", &abstract_text[..200])
@@ -262,5 +252,5 @@ pub async fn search_pubmed(
         result.push('\n');
     }
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }

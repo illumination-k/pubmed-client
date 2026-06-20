@@ -1,10 +1,12 @@
 //! Full-text retrieval tool for PMC articles
 
-use pubmed_client::{Figure, Section, Table};
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
+
+use super::common::{
+    collect_figures, collect_tables, internal_error, normalize_pmc_id, text_result,
+};
 
 /// Request parameters for get_pmc_fulltext tool
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -19,36 +21,12 @@ pub struct FullTextRequest {
     pub max_sections: Option<usize>,
 }
 
-/// Collect all figures from sections recursively
-fn collect_figures(sections: &[Section]) -> Vec<&Figure> {
-    let mut figures = Vec::new();
-    for section in sections {
-        figures.extend(section.figures.iter());
-        figures.extend(collect_figures(&section.subsections));
-    }
-    figures
-}
-
-/// Collect all tables from sections recursively
-fn collect_tables(sections: &[Section]) -> Vec<&Table> {
-    let mut tables = Vec::new();
-    for section in sections {
-        tables.extend(section.tables.iter());
-        tables.extend(collect_tables(&section.subsections));
-    }
-    tables
-}
-
 /// Get structured full-text content from a PMC article
 pub async fn get_pmc_fulltext(
     server: &super::PubMedServer,
     Parameters(params): Parameters<FullTextRequest>,
 ) -> Result<CallToolResult, ErrorData> {
-    let pmc_id = if params.pmc_id.starts_with("PMC") {
-        params.pmc_id.clone()
-    } else {
-        format!("PMC{}", params.pmc_id)
-    };
+    let pmc_id = normalize_pmc_id(&params.pmc_id);
 
     let include_refs = params.include_references.unwrap_or(false);
 
@@ -59,11 +37,7 @@ pub async fn get_pmc_fulltext(
         .pmc
         .fetch_full_text(&pmc_id)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Failed to fetch PMC article: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Failed to fetch PMC article: {}", e)))?;
 
     let mut result = String::new();
 
@@ -147,5 +121,5 @@ pub async fn get_pmc_fulltext(
         }
     }
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }

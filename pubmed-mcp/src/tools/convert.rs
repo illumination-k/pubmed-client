@@ -2,8 +2,9 @@
 
 use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
-use std::borrow::Cow;
 use tracing::info;
+
+use super::common::{internal_error, text_result};
 
 /// Request parameters for pmid_to_pmcid tool
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -24,11 +25,7 @@ pub async fn pmid_to_pmcid(
         .pmc
         .check_pmc_availability(&params.pmid)
         .await
-        .map_err(|e| ErrorData {
-            code: ErrorCode(-32603),
-            message: Cow::from(format!("Failed to check PMC availability: {}", e)),
-            data: None,
-        })?;
+        .map_err(|e| internal_error(format!("Failed to check PMC availability: {}", e)))?;
 
     let result = match pmc_id {
         Some(pmcid) => format!(
@@ -41,5 +38,5 @@ pub async fn pmid_to_pmcid(
         ),
     };
 
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    text_result(result)
 }
