@@ -268,6 +268,7 @@ pub mod error;
 pub mod pmc;
 pub mod pubmed;
 pub mod rate_limit;
+pub(crate) mod request;
 pub mod retry;
 pub mod time;
 

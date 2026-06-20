@@ -17,7 +17,7 @@ use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::ESearchResult;
 use crate::rate_limit::RateLimiter;
-use crate::retry::with_retry;
+use crate::request::RequestExecutor;
 use reqwest::{Client, Response};
 use tracing::{debug, info, instrument, warn};
 
@@ -161,14 +161,24 @@ impl PubMedClient {
         &self.config
     }
 
-    /// Get a reference to the rate limiter
-    pub(crate) fn rate_limiter(&self) -> &RateLimiter {
-        &self.rate_limiter
+    /// Build a request executor borrowing this client's HTTP client, rate limiter, and config.
+    pub(crate) fn executor(&self) -> RequestExecutor<'_> {
+        RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
     }
 
-    /// Get a reference to the HTTP client
-    pub(crate) fn http_client(&self) -> &Client {
-        &self.client
+    /// GET an E-utilities endpoint relative to the configured base URL.
+    ///
+    /// Builds the URL from `params` plus the API parameters (api_key / email /
+    /// tool), then performs a rate-limited, retrying request and returns a
+    /// success-checked response.
+    pub(crate) async fn get_eutils(
+        &self,
+        endpoint: &str,
+        params: &[(&str, &str)],
+    ) -> Result<Response> {
+        self.executor()
+            .get_endpoint(&self.base_url, endpoint, params)
+            .await
     }
 
     /// Fetch article metadata by PMID with full details including abstract
@@ -275,20 +285,20 @@ impl PubMedClient {
             return Ok(Vec::new());
         }
 
-        let mut url = format!(
-            "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retstart={}&retmode=json",
-            self.base_url,
-            urlencoding::encode(query),
-            limit,
-            0
-        );
-
+        let limit_str = limit.to_string();
+        let mut params = vec![
+            ("db", "pubmed"),
+            ("term", query),
+            ("retmax", limit_str.as_str()),
+            ("retstart", "0"),
+            ("retmode", "json"),
+        ];
         if let Some(sort_order) = sort {
-            url.push_str(&format!("&sort={}", sort_order.as_api_param()));
+            params.push(("sort", sort_order.as_api_param()));
         }
 
         debug!("Making initial ESearch API request");
-        let response = self.make_request(&url).await?;
+        let response = self.get_eutils("esearch.fcgi", &params).await?;
 
         let search_result: ESearchResult = response.json().await?;
 
@@ -375,13 +385,18 @@ impl PubMedClient {
                 .collect::<Vec<_>>()
                 .join(",");
 
-            let url = format!(
-                "{}/efetch.fcgi?db=pubmed&id={}&retmode=xml&rettype=abstract",
-                self.base_url, id_list
-            );
-
             debug!(batch_size = chunk.len(), "Making batch EFetch API request");
-            let response = self.make_request(&url).await?;
+            let response = self
+                .get_eutils(
+                    "efetch.fcgi",
+                    &[
+                        ("db", "pubmed"),
+                        ("id", id_list.as_str()),
+                        ("retmode", "xml"),
+                        ("rettype", "abstract"),
+                    ],
+                )
+                .await?;
             let xml_text = response.text().await?;
 
             if xml_text.trim().is_empty() {
@@ -438,72 +453,6 @@ impl PubMedClient {
 
         let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
         self.fetch_articles(&pmid_refs).await
-    }
-
-    /// Internal helper method for making HTTP requests with retry logic.
-    /// Automatically appends API parameters (api_key, email, tool) to the URL.
-    pub(crate) async fn make_request(&self, url: &str) -> Result<Response> {
-        // Build final URL with API parameters
-        let mut final_url = url.to_string();
-        let api_params = self.config.build_api_params();
-
-        if !api_params.is_empty() {
-            // Check if URL already has query parameters
-            let separator = if url.contains('?') { '&' } else { '?' };
-            final_url.push(separator);
-
-            // Append API parameters
-            let param_strings: Vec<String> = api_params
-                .into_iter()
-                .map(|(key, value)| format!("{}={}", key, urlencoding::encode(&value)))
-                .collect();
-            final_url.push_str(&param_strings.join("&"));
-        }
-
-        let response = with_retry(
-            || async {
-                self.rate_limiter.acquire().await?;
-                debug!("Making API request to: {}", final_url);
-                let response = self
-                    .client
-                    .get(&final_url)
-                    .send()
-                    .await
-                    .map_err(PubMedError::from)?;
-
-                // Check if response has server error status and convert to retryable error
-                if response.status().is_server_error() || response.status().as_u16() == 429 {
-                    return Err(PubMedError::ApiError {
-                        status: response.status().as_u16(),
-                        message: response
-                            .status()
-                            .canonical_reason()
-                            .unwrap_or("Unknown error")
-                            .to_string(),
-                    });
-                }
-
-                Ok(response)
-            },
-            &self.config.retry_config,
-            "NCBI API request",
-        )
-        .await?;
-
-        // Check for any non-success status (client errors, etc.)
-        if !response.status().is_success() {
-            warn!("API request failed with status: {}", response.status());
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
-
-        Ok(response)
     }
 }
 

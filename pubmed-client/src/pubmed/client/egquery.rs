@@ -45,14 +45,8 @@ impl PubMedClient {
             ));
         }
 
-        let url = format!(
-            "{}/egquery.fcgi?term={}",
-            self.base_url,
-            urlencoding::encode(term)
-        );
-
         debug!(term = %term, "Making EGQuery API request");
-        let response = self.make_request(&url).await?;
+        let response = self.get_eutils("egquery.fcgi", &[("term", term)]).await?;
         let xml_text = response.text().await?;
 
         // Parse XML response using string-based extraction (consistent with existing xml_utils)

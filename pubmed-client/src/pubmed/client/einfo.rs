@@ -34,11 +34,10 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self))]
     pub async fn get_database_list(&self) -> Result<Vec<String>> {
-        // Build URL - API parameters will be added by make_request
-        let url = format!("{}/einfo.fcgi?retmode=json", self.base_url);
-
         debug!("Making EInfo API request for database list");
-        let response = self.make_request(&url).await?;
+        let response = self
+            .get_eutils("einfo.fcgi", &[("retmode", "json")])
+            .await?;
 
         let einfo_response: EInfoResponse = response.json().await?;
 
@@ -92,15 +91,10 @@ impl PubMedClient {
             });
         }
 
-        // Build URL - API parameters will be added by make_request
-        let url = format!(
-            "{}/einfo.fcgi?db={}&retmode=json",
-            self.base_url,
-            urlencoding::encode(database)
-        );
-
         debug!("Making EInfo API request for database details");
-        let response = self.make_request(&url).await?;
+        let response = self
+            .get_eutils("einfo.fcgi", &[("db", database), ("retmode", "json")])
+            .await?;
 
         let einfo_response: EInfoResponse = response.json().await?;
 
