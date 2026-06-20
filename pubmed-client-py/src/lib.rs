@@ -92,6 +92,34 @@ fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Add query builder
     m.add_class::<PySearchQuery>()?;
 
+    // Add exception hierarchy
+    m.add(
+        "PubMedException",
+        m.py().get_type::<utils::PubMedException>(),
+    )?;
+    m.add("ParseException", m.py().get_type::<utils::ParseException>())?;
+    m.add(
+        "RequestException",
+        m.py().get_type::<utils::RequestException>(),
+    )?;
+    m.add(
+        "InvalidQueryException",
+        m.py().get_type::<utils::InvalidQueryException>(),
+    )?;
+    m.add(
+        "RateLimitException",
+        m.py().get_type::<utils::RateLimitException>(),
+    )?;
+    m.add("ApiException", m.py().get_type::<utils::ApiException>())?;
+    m.add(
+        "SearchLimitException",
+        m.py().get_type::<utils::SearchLimitException>(),
+    )?;
+    m.add(
+        "HistorySessionException",
+        m.py().get_type::<utils::HistorySessionException>(),
+    )?;
+
     Ok(())
 }
 

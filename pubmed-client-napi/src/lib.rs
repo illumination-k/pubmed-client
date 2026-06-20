@@ -491,7 +491,7 @@ impl PubMedClient {
             .pubmed
             .search_and_fetch(&query, limit, None)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(articles.into_iter().map(Article::from).collect())
     }
@@ -511,7 +511,7 @@ impl PubMedClient {
             .pubmed
             .fetch_articles(&pmid_refs)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(articles.into_iter().map(Article::from).collect())
     }
@@ -527,7 +527,7 @@ impl PubMedClient {
             .pubmed
             .fetch_article(&pmid)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(Article::from(article))
     }
@@ -547,7 +547,7 @@ impl PubMedClient {
             .pubmed
             .fetch_summaries(&pmid_refs)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(summaries.into_iter().map(Summary::from).collect())
     }
@@ -572,7 +572,7 @@ impl PubMedClient {
             .pubmed
             .search_and_fetch_summaries(&query, limit, None)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(summaries.into_iter().map(Summary::from).collect())
     }
@@ -588,7 +588,7 @@ impl PubMedClient {
             .pmc
             .fetch_full_text(&pmcid)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(FullTextArticle::from(article))
     }
@@ -609,7 +609,7 @@ impl PubMedClient {
             .pmc
             .fetch_full_text(&pmcid)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         let options = options.unwrap_or_default();
         let mut converter = PmcMarkdownConverter::new();
@@ -643,7 +643,7 @@ impl PubMedClient {
             .pmc
             .check_pmc_availability(&pmid)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))
+            .map_err(to_napi_err)
     }
 
     /// Check if a PMC article is in the OA (Open Access) subset
@@ -674,7 +674,7 @@ impl PubMedClient {
             .pmc
             .is_oa_subset(&pmcid)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(OaSubsetInfo::from(info))
     }
@@ -693,7 +693,7 @@ impl PubMedClient {
             .pubmed
             .spell_check(&term)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(SpellCheckResult::from(result))
     }
@@ -712,7 +712,7 @@ impl PubMedClient {
             .pubmed
             .spell_check_db(&term, &db)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(SpellCheckResult::from(result))
     }
@@ -730,7 +730,7 @@ impl PubMedClient {
             .pubmed
             .search_and_fetch(&query_string, limit, None)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(articles.into_iter().map(Article::from).collect())
     }
@@ -757,7 +757,7 @@ impl PubMedClient {
             .pubmed
             .epost(&pmid_refs)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(EPostResult::from(result))
     }
@@ -784,14 +784,37 @@ impl PubMedClient {
             .pubmed
             .fetch_all_by_pmids(&pmid_refs)
             .await
-            .map_err(|e| Error::from_reason(e.to_string()))?;
+            .map_err(to_napi_err)?;
 
         Ok(articles.into_iter().map(Article::from).collect())
     }
 }
 
 // ================================================================================================
-// Helper Functions (thin wrappers that convert core errors to napi::Error)
+// Error Conversion
+// ================================================================================================
+
+/// Convert `PubMedError` to `napi::Error` with an exhaustive match.
+///
+/// No wildcard arm — adding a new variant to `PubMedError` will cause a
+/// compile error here, forcing an explicit mapping decision.
+fn to_napi_err(err: pubmed_client::error::PubMedError) -> Error {
+    use pubmed_client::error::PubMedError;
+    let reason = match err {
+        PubMedError::ParseError(_) => err.to_string(),
+        PubMedError::RequestError(_) => err.to_string(),
+        PubMedError::InvalidQuery(_) => err.to_string(),
+        PubMedError::RateLimitExceeded => err.to_string(),
+        PubMedError::ApiError { .. } => err.to_string(),
+        PubMedError::SearchLimitExceeded { .. } => err.to_string(),
+        PubMedError::HistorySessionError(_) => err.to_string(),
+        PubMedError::WebEnvNotAvailable => err.to_string(),
+    };
+    Error::from_reason(reason)
+}
+
+// ================================================================================================
+// Helper Functions
 // ================================================================================================
 
 fn validate_year(year: u32) -> Result<()> {
