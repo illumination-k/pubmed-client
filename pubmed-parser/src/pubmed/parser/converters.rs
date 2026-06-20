@@ -3,8 +3,9 @@
 //! This module handles the transformation of internal XML deserialization types
 //! into the clean public API models exposed by the library.
 
-use super::extractors::{extract_country_from_text, extract_email_from_text, format_author_name};
+use super::extractors::{extract_country_from_text, extract_email_from_text};
 use super::xml_types::*;
+use crate::common::format_author_name;
 use crate::error::{ParseError, Result};
 use crate::pubmed::models::{
     Affiliation, Author, ChemicalConcept, MeshHeading, MeshQualifier, MeshTerm, PubMedArticle,

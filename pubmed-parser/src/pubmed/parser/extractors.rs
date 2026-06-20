@@ -119,56 +119,6 @@ pub(super) fn extract_country_from_text(text: &str) -> Option<String> {
     })
 }
 
-/// Format an author name from components
-///
-/// Constructs a full author name from available components, handling missing fields gracefully.
-///
-/// # Arguments
-///
-/// * `last_name` - Author's last name/surname
-/// * `fore_name` - Author's fore name (given name)
-/// * `initials` - Author's initials (used if fore_name is missing)
-///
-/// # Returns
-///
-/// A formatted full name string
-///
-/// # Formatting Rules
-///
-/// 1. If both fore_name and last_name exist: "ForeNamLast
-/// 2. If only last_name exists: "Initials LastName" (if initials available) or "LastName"
-/// 3. If only fore_name exists: "ForeName"
-/// 4. If neither exists: "Unknown Author"
-///
-/// # Example
-///
-/// ```ignore
-/// let name = format_author_name(
-///     &Some("Smith".to_string()),
-///     &Some("John".to_string()),
-///     &None
-/// );
-/// assert_eq!(name, "John Smith");
-/// ```
-pub(super) fn format_author_name(
-    last_name: &Option<String>,
-    fore_name: &Option<String>,
-    initials: &Option<String>,
-) -> String {
-    match (fore_name, last_name) {
-        (Some(fore), Some(last)) => format!("{fore} {last}"),
-        (None, Some(last)) => {
-            if let Some(init) = initials {
-                format!("{init} {last}")
-            } else {
-                last.clone()
-            }
-        }
-        (Some(fore), None) => fore.clone(),
-        (None, None) => "Unknown Author".to_string(),
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -201,23 +151,5 @@ mod tests {
         );
 
         assert_eq!(extract_country_from_text("Local Institution"), None);
-    }
-
-    #[test]
-    fn test_format_author_name() {
-        assert_eq!(
-            format_author_name(&Some("Smith".to_string()), &Some("John".to_string()), &None),
-            "John Smith"
-        );
-
-        assert_eq!(
-            format_author_name(&Some("Doe".to_string()), &None, &Some("J".to_string())),
-            "J Doe"
-        );
-
-        assert_eq!(
-            format_author_name(&Some("Johnson".to_string()), &None, &None),
-            "Johnson"
-        );
     }
 }

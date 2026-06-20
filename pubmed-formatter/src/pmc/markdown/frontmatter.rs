@@ -31,7 +31,7 @@ pub(super) struct ArticleMetadata {
     publisher: Option<String>,
 }
 
-fn format_first_pub_date(dates: &[PublicationDate]) -> Option<String> {
+pub(super) fn format_first_pub_date(dates: &[PublicationDate]) -> Option<String> {
     let d = dates.first()?;
     let year = d.year?;
     match (d.month, d.day) {
