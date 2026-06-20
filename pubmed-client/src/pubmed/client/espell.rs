@@ -90,15 +90,10 @@ impl PubMedClient {
             });
         }
 
-        let url = format!(
-            "{}/espell.fcgi?db={}&term={}",
-            self.base_url,
-            urlencoding::encode(db),
-            urlencoding::encode(term)
-        );
-
         debug!(term = %term, db = %db, "Making ESpell API request");
-        let response = self.make_request(&url).await?;
+        let response = self
+            .get_eutils("espell.fcgi", &[("db", db), ("term", term)])
+            .await?;
         let xml_text = response.text().await?;
 
         let result = Self::parse_espell_response(&xml_text, term, db)?;

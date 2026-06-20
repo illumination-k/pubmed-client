@@ -66,16 +66,20 @@ impl PubMedClient {
                 .collect::<Vec<_>>()
                 .join(",");
 
-            let url = format!(
-                "{}/esummary.fcgi?db=pubmed&id={}&retmode=json",
-                self.base_url, id_list
-            );
-
             debug!(
                 batch_size = chunk.len(),
                 "Making batch ESummary API request"
             );
-            let response = self.make_request(&url).await?;
+            let response = self
+                .get_eutils(
+                    "esummary.fcgi",
+                    &[
+                        ("db", "pubmed"),
+                        ("id", id_list.as_str()),
+                        ("retmode", "json"),
+                    ],
+                )
+                .await?;
             let json_text = response.text().await?;
 
             if json_text.trim().is_empty() {

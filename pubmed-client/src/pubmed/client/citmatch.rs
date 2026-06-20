@@ -59,16 +59,21 @@ impl PubMedClient {
             .collect::<Vec<_>>()
             .join("%0D");
 
-        let url = format!(
-            "{}/ecitmatch.cgi?db=pubmed&retmode=xml&bdata={}",
-            self.base_url, bdata
+        // `bdata` is pre-formatted with `+`, `|`, and `%0D` separators that must
+        // reach NCBI verbatim, so it is appended raw rather than percent-encoded.
+        let mut url = self.executor().build_url(
+            &self.base_url,
+            "ecitmatch.cgi",
+            &[("db", "pubmed"), ("retmode", "xml")],
         );
+        url.push_str("&bdata=");
+        url.push_str(&bdata);
 
         debug!(
             citations_count = citations.len(),
             "Making ECitMatch API request"
         );
-        let response = self.make_request(&url).await?;
+        let response = self.executor().get(&url).await?;
         let text = response.text().await?;
 
         // Parse pipe-delimited response

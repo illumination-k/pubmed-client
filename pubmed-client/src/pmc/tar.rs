@@ -6,9 +6,9 @@ use crate::error::{ParseError, PubMedError, Result};
 use crate::pmc::extracted::ExtractedFigure;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
-use crate::retry::with_retry;
+use crate::request::RequestExecutor;
 use pubmed_parser::pmc::{Figure, PmcArticle, Section};
-use reqwest::{Client, Response};
+use reqwest::Client;
 use tracing::debug;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -115,36 +115,17 @@ impl PmcTarClient {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
-        // Build OA API URL
-        let mut url = format!(
-            "https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={}&format=tgz",
-            normalized_pmcid
+        // Build OA API URL (with API parameters)
+        let url = self.executor().build_url(
+            "https://www.ncbi.nlm.nih.gov/pmc/utils/oa",
+            "oa.fcgi",
+            &[("id", normalized_pmcid.as_str()), ("format", "tgz")],
         );
-
-        // Add API parameters if available
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
 
         debug!("Downloading tar.gz from OA API: {}", url);
 
         // Download the OA API response
-        let response = self.make_request(&url).await?;
-
-        if !response.status().is_success() {
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
+        let response = self.executor().get(&url).await?;
 
         // Check if the response is XML (OA API response with download link)
         let content_type = response
@@ -192,18 +173,7 @@ impl PmcTarClient {
             };
 
         // Now download the actual tar.gz file
-        let tar_response = self.make_request(&download_url).await?;
-
-        if !tar_response.status().is_success() {
-            return Err(PubMedError::ApiError {
-                status: tar_response.status().as_u16(),
-                message: tar_response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
+        let tar_response = self.executor().get(&download_url).await?;
 
         // Create output directory if it doesn't exist
         let output_path = output_dir.as_ref();
@@ -334,32 +304,15 @@ impl PmcTarClient {
         let normalized_pmcid = pmc_id.as_str();
         let numeric_part = pmc_id.numeric_part();
 
-        // Build URL with API parameters
-        let mut url = format!(
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=PMC{numeric_part}&retmode=xml"
-        );
-
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
-
-        let response = self.make_request(&url).await?;
-
-        if !response.status().is_success() {
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
+        let id = format!("PMC{numeric_part}");
+        let response = self
+            .executor()
+            .get_endpoint(
+                self.config.effective_base_url(),
+                "efetch.fcgi",
+                &[("db", "pmc"), ("id", id.as_str()), ("retmode", "xml")],
+            )
+            .await?;
 
         let xml_content = response.text().await?;
 
@@ -642,37 +595,9 @@ impl PmcTarClient {
             })
     }
 
-    /// Internal helper method for making HTTP requests with retry logic
-    async fn make_request(&self, url: &str) -> Result<Response> {
-        with_retry(
-            || async {
-                self.rate_limiter.acquire().await?;
-                debug!("Making API request to: {url}");
-                let response = self
-                    .client
-                    .get(url)
-                    .send()
-                    .await
-                    .map_err(PubMedError::from)?;
-
-                // Check if response has server error status and convert to retryable error
-                if response.status().is_server_error() || response.status().as_u16() == 429 {
-                    return Err(PubMedError::ApiError {
-                        status: response.status().as_u16(),
-                        message: response
-                            .status()
-                            .canonical_reason()
-                            .unwrap_or("Unknown error")
-                            .to_string(),
-                    });
-                }
-
-                Ok(response)
-            },
-            &self.config.retry_config,
-            "NCBI API request",
-        )
-        .await
+    /// Build a request executor borrowing this client's HTTP client, rate limiter, and config.
+    fn executor(&self) -> RequestExecutor<'_> {
+        RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
     }
 }
 

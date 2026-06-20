@@ -238,17 +238,19 @@ impl PubMedClient {
         let id_list: Vec<String> = pmids.iter().map(|id| id.to_string()).collect();
         let ids = id_list.join(",");
 
-        // Build URL - API parameters will be added by make_request
-        let url = format!(
-            "{}/elink.fcgi?dbfrom=pubmed&db={}&id={}&linkname={}&retmode=json",
-            self.base_url,
-            urlencoding::encode(target_db),
-            urlencoding::encode(&ids),
-            urlencoding::encode(link_name)
-        );
-
         debug!("Making ELink API request");
-        let response = self.make_request(&url).await?;
+        let response = self
+            .get_eutils(
+                "elink.fcgi",
+                &[
+                    ("dbfrom", "pubmed"),
+                    ("db", target_db),
+                    ("id", ids.as_str()),
+                    ("linkname", link_name),
+                    ("retmode", "json"),
+                ],
+            )
+            .await?;
 
         let elink_response: ELinkResponse = response.json().await?;
         Ok(elink_response)

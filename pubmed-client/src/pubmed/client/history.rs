@@ -6,8 +6,7 @@ use crate::pubmed::models::{EPostResult, HistorySession, PubMedArticle, SearchRe
 use crate::pubmed::parser::parse_articles_from_xml;
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::{EPostResponse, ESearchResult};
-use crate::retry::with_retry;
-use tracing::{debug, info, instrument, warn};
+use tracing::{debug, info, instrument};
 
 use super::PubMedClient;
 
@@ -129,20 +128,21 @@ impl PubMedClient {
         }
 
         // Use usehistory=y to enable history server
-        let mut url = format!(
-            "{}/esearch.fcgi?db=pubmed&term={}&retmax={}&retstart={}&retmode=json&usehistory=y",
-            self.base_url,
-            urlencoding::encode(query),
-            limit,
-            0
-        );
-
+        let limit_str = limit.to_string();
+        let mut params = vec![
+            ("db", "pubmed"),
+            ("term", query),
+            ("retmax", limit_str.as_str()),
+            ("retstart", "0"),
+            ("retmode", "json"),
+            ("usehistory", "y"),
+        ];
         if let Some(sort_order) = sort {
-            url.push_str(&format!("&sort={}", sort_order.as_api_param()));
+            params.push(("sort", sort_order.as_api_param()));
         }
 
         debug!("Making ESearch API request with history");
-        let response = self.make_request(&url).await?;
+        let response = self.get_eutils("esearch.fcgi", &params).await?;
 
         let search_result: ESearchResult = response.json().await?;
 
@@ -296,51 +296,13 @@ impl PubMedClient {
         // Append API parameters (api_key, email, tool)
         params.extend(self.config().build_api_params());
 
+        // API parameters (api_key / email / tool) are already in the form body,
+        // so the URL only needs the bare endpoint.
         let url = format!("{}/epost.fcgi", self.base_url);
 
         debug!(pmids_count = pmids.len(), "Making EPost API request");
 
-        let response = with_retry(
-            || async {
-                self.rate_limiter().acquire().await?;
-                debug!("Making POST request to: {}", url);
-                let response = self
-                    .http_client()
-                    .post(&url)
-                    .form(&params)
-                    .send()
-                    .await
-                    .map_err(PubMedError::from)?;
-
-                if response.status().is_server_error() || response.status().as_u16() == 429 {
-                    return Err(PubMedError::ApiError {
-                        status: response.status().as_u16(),
-                        message: response
-                            .status()
-                            .canonical_reason()
-                            .unwrap_or("Unknown error")
-                            .to_string(),
-                    });
-                }
-
-                Ok(response)
-            },
-            &self.config().retry_config,
-            "NCBI EPost API request",
-        )
-        .await?;
-
-        if !response.status().is_success() {
-            warn!("EPost request failed with status: {}", response.status());
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
+        let response = self.executor().post_form(&url, &params).await?;
 
         let epost_response: EPostResponse = response.json().await?;
 
@@ -424,17 +386,24 @@ impl PubMedClient {
         max: usize,
     ) -> Result<Vec<PubMedArticle>> {
         // Use WebEnv and query_key to fetch from history server
-        let url = format!(
-            "{}/efetch.fcgi?db=pubmed&query_key={}&WebEnv={}&retstart={}&retmax={}&retmode=xml&rettype=abstract",
-            self.base_url,
-            urlencoding::encode(&session.query_key),
-            urlencoding::encode(&session.webenv),
-            start,
-            max
-        );
+        let start_str = start.to_string();
+        let max_str = max.to_string();
 
         debug!("Making EFetch API request from history");
-        let response = self.make_request(&url).await?;
+        let response = self
+            .get_eutils(
+                "efetch.fcgi",
+                &[
+                    ("db", "pubmed"),
+                    ("query_key", session.query_key.as_str()),
+                    ("WebEnv", session.webenv.as_str()),
+                    ("retstart", start_str.as_str()),
+                    ("retmax", max_str.as_str()),
+                    ("retmode", "xml"),
+                    ("rettype", "abstract"),
+                ],
+            )
+            .await?;
 
         let xml_text = response.text().await?;
 

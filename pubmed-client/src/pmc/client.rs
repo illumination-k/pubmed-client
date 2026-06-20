@@ -3,16 +3,16 @@ use std::time::Duration;
 use crate::cache::{PmcCache, create_cache};
 use crate::common::{PmcId, PubMedId};
 use crate::config::ClientConfig;
-use crate::error::{ParseError, PubMedError, Result};
+use crate::error::{ParseError, Result};
 use crate::pmc::extracted::ExtractedFigure;
 use crate::pmc::oa_api;
 use crate::pmc::oa_api::OaSubsetInfo;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
-use crate::retry::with_retry;
+use crate::request::RequestExecutor;
 use pubmed_parser::pmc::PmcArticle;
-use reqwest::{Client, Response};
-use tracing::{debug, info};
+use reqwest::Client;
+use tracing::info;
 
 #[cfg(not(target_arch = "wasm32"))]
 use {crate::pmc::tar::PmcTarClient, std::path::Path};
@@ -224,33 +224,15 @@ impl PmcClient {
         let normalized_pmcid = pmc_id.as_str();
         let numeric_part = pmc_id.numeric_part();
 
-        // Build URL with API parameters
-        let mut url = format!(
-            "{}/efetch.fcgi?db=pmc&id=PMC{numeric_part}&retmode=xml",
-            self.base_url
-        );
-
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
-
-        let response = self.make_request(&url).await?;
-
-        if !response.status().is_success() {
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
+        let id = format!("PMC{numeric_part}");
+        let response = self
+            .executor()
+            .get_endpoint(
+                &self.base_url,
+                "efetch.fcgi",
+                &[("db", "pmc"), ("id", id.as_str()), ("retmode", "xml")],
+            )
+            .await?;
 
         let xml_content = response.text().await?;
 
@@ -296,35 +278,21 @@ impl PmcClient {
     pub async fn check_pmc_availability(&self, pmid: &str) -> Result<Option<String>> {
         // Validate and parse PMID
         let pmid_obj = PubMedId::parse(pmid)?;
-        let pmid_value = pmid_obj.as_u32();
+        let pmid_value = pmid_obj.as_u32().to_string();
 
-        // Build URL with API parameters
-        let mut url = format!(
-            "{}/elink.fcgi?dbfrom=pubmed&db=pmc&id={pmid_value}&retmode=json",
-            self.base_url
-        );
-
-        // Add API parameters (API key, email, tool)
-        let api_params = self.config.build_api_params();
-        for (key, value) in api_params {
-            url.push('&');
-            url.push_str(&key);
-            url.push('=');
-            url.push_str(&urlencoding::encode(&value));
-        }
-
-        let response = self.make_request(&url).await?;
-
-        if !response.status().is_success() {
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
+        let response = self
+            .executor()
+            .get_endpoint(
+                &self.base_url,
+                "elink.fcgi",
+                &[
+                    ("dbfrom", "pubmed"),
+                    ("db", "pmc"),
+                    ("id", pmid_value.as_str()),
+                    ("retmode", "json"),
+                ],
+            )
+            .await?;
 
         let link_result: serde_json::Value = response.json().await?;
 
@@ -387,18 +355,7 @@ impl PmcClient {
     pub async fn is_oa_subset(&self, pmcid: &str) -> Result<OaSubsetInfo> {
         let url = oa_api::build_oa_api_url(pmcid)?;
 
-        let response = self.make_request(&url).await?;
-
-        if !response.status().is_success() {
-            return Err(PubMedError::ApiError {
-                status: response.status().as_u16(),
-                message: response
-                    .status()
-                    .canonical_reason()
-                    .unwrap_or("Unknown error")
-                    .to_string(),
-            });
-        }
+        let response = self.executor().get(&url).await?;
 
         let xml_content = response.text().await?;
 
@@ -563,37 +520,9 @@ impl PmcClient {
             })
     }
 
-    /// Internal helper method for making HTTP requests with retry logic
-    async fn make_request(&self, url: &str) -> Result<Response> {
-        with_retry(
-            || async {
-                self.rate_limiter.acquire().await?;
-                debug!("Making API request to: {url}");
-                let response = self
-                    .client
-                    .get(url)
-                    .send()
-                    .await
-                    .map_err(PubMedError::from)?;
-
-                // Check if response has server error status and convert to retryable error
-                if response.status().is_server_error() || response.status().as_u16() == 429 {
-                    return Err(PubMedError::ApiError {
-                        status: response.status().as_u16(),
-                        message: response
-                            .status()
-                            .canonical_reason()
-                            .unwrap_or("Unknown error")
-                            .to_string(),
-                    });
-                }
-
-                Ok(response)
-            },
-            &self.config.retry_config,
-            "NCBI API request",
-        )
-        .await
+    /// Build a request executor borrowing this client's HTTP client, rate limiter, and config.
+    fn executor(&self) -> RequestExecutor<'_> {
+        RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
     }
 }
 
