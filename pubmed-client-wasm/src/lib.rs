@@ -111,6 +111,36 @@ impl From<WasmClientConfig> for ClientConfig {
     }
 }
 
+// ================================================================================================
+// Error Conversion
+// ================================================================================================
+
+/// Convert `PubMedError` to a `JsValue` carrying a proper `js_sys::Error` with a
+/// `type` property that consumers can switch on (`"ParseError"`, `"RateLimitExceeded"`, etc.).
+///
+/// The match is exhaustive — adding a new `PubMedError` variant will fail to compile
+/// until an explicit mapping is added here.
+fn to_js_err(err: pubmed_client::error::PubMedError) -> JsValue {
+    use pubmed_client::error::PubMedError;
+    let (error_type, message) = match &err {
+        PubMedError::ParseError(_) => ("ParseError", err.to_string()),
+        PubMedError::RequestError(_) => ("RequestError", err.to_string()),
+        PubMedError::InvalidQuery(_) => ("InvalidQuery", err.to_string()),
+        PubMedError::RateLimitExceeded => ("RateLimitExceeded", err.to_string()),
+        PubMedError::ApiError { .. } => ("ApiError", err.to_string()),
+        PubMedError::SearchLimitExceeded { .. } => ("SearchLimitExceeded", err.to_string()),
+        PubMedError::HistorySessionError(_) => ("HistorySessionError", err.to_string()),
+        PubMedError::WebEnvNotAvailable => ("WebEnvNotAvailable", err.to_string()),
+    };
+    let js_error = js_sys::Error::new(&message);
+    let _ = js_sys::Reflect::set(
+        &js_error,
+        &JsValue::from_str("type"),
+        &JsValue::from_str(error_type),
+    );
+    js_error.into()
+}
+
 /// JavaScript-friendly wrapper for the PubMed client
 #[wasm_bindgen]
 pub struct WasmPubMedClient {
@@ -170,7 +200,7 @@ impl WasmPubMedClient {
                         articles.into_iter().map(JsArticle::from).collect();
                     Ok(serde_wasm_bindgen::to_value(&js_articles)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Search failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -189,7 +219,7 @@ impl WasmPubMedClient {
                         articles.into_iter().map(JsArticle::from).collect();
                     Ok(serde_wasm_bindgen::to_value(&js_articles)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Batch fetch failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -204,7 +234,7 @@ impl WasmPubMedClient {
                     let js_article = JsArticle::from(article);
                     Ok(serde_wasm_bindgen::to_value(&js_article)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Fetch failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -221,7 +251,7 @@ impl WasmPubMedClient {
                         summaries.into_iter().map(JsSummary::from).collect();
                     Ok(serde_wasm_bindgen::to_value(&js_summaries)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Fetch summaries failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -241,7 +271,7 @@ impl WasmPubMedClient {
                         summaries.into_iter().map(JsSummary::from).collect();
                     Ok(serde_wasm_bindgen::to_value(&js_summaries)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Search summaries failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -256,7 +286,7 @@ impl WasmPubMedClient {
                     let js_full_text = JsFullText::from(full_text);
                     Ok(serde_wasm_bindgen::to_value(&js_full_text)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Full text fetch failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -268,7 +298,7 @@ impl WasmPubMedClient {
         future_to_promise(async move {
             match client.pmc.check_pmc_availability(&pmid).await {
                 Ok(pmcid_opt) => Ok(serde_wasm_bindgen::to_value(&pmcid_opt)?),
-                Err(e) => Err(JsValue::from_str(&format!("PMC check failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -280,9 +310,7 @@ impl WasmPubMedClient {
         future_to_promise(async move {
             match client.get_related_articles(&pmids).await {
                 Ok(related) => Ok(serde_wasm_bindgen::to_value(&related)?),
-                Err(e) => Err(JsValue::from_str(&format!(
-                    "Related articles fetch failed: {e}"
-                ))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -316,7 +344,7 @@ impl WasmPubMedClient {
                         results.matches.iter().map(JsCitationMatch::from).collect();
                     Ok(serde_wasm_bindgen::to_value(&js_results)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Citation match failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -330,7 +358,7 @@ impl WasmPubMedClient {
                     let js_results = JsGlobalQueryResults::from(results);
                     Ok(serde_wasm_bindgen::to_value(&js_results)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Global query failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -350,7 +378,7 @@ impl WasmPubMedClient {
                     };
                     Ok(serde_wasm_bindgen::to_value(&js_result)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("EPost failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -369,9 +397,7 @@ impl WasmPubMedClient {
                         articles.into_iter().map(JsArticle::from).collect();
                     Ok(serde_wasm_bindgen::to_value(&js_articles)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!(
-                    "fetch_all_by_pmids failed: {e}"
-                ))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -386,7 +412,7 @@ impl WasmPubMedClient {
                     let js_result = JsSpellCheckResult::from(result);
                     Ok(serde_wasm_bindgen::to_value(&js_result)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Spell check failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -400,7 +426,7 @@ impl WasmPubMedClient {
                     let js_result = JsSpellCheckResult::from(result);
                     Ok(serde_wasm_bindgen::to_value(&js_result)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Spell check failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -411,7 +437,7 @@ impl WasmPubMedClient {
         future_to_promise(async move {
             match client.get_citations(&pmids).await {
                 Ok(citations) => Ok(serde_wasm_bindgen::to_value(&citations)?),
-                Err(e) => Err(JsValue::from_str(&format!("Get citations failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -423,7 +449,7 @@ impl WasmPubMedClient {
         future_to_promise(async move {
             match client.get_pmc_links(&pmids).await {
                 Ok(links) => Ok(serde_wasm_bindgen::to_value(&links)?),
-                Err(e) => Err(JsValue::from_str(&format!("Get PMC links failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -434,7 +460,7 @@ impl WasmPubMedClient {
         future_to_promise(async move {
             match client.get_database_list().await {
                 Ok(databases) => Ok(serde_wasm_bindgen::to_value(&databases)?),
-                Err(e) => Err(JsValue::from_str(&format!("Get database list failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
@@ -446,7 +472,7 @@ impl WasmPubMedClient {
         future_to_promise(async move {
             match client.get_database_info(&database).await {
                 Ok(info) => Ok(serde_wasm_bindgen::to_value(&info)?),
-                Err(e) => Err(JsValue::from_str(&format!("Get database info failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -461,7 +487,7 @@ impl WasmPubMedClient {
                     let bibtex = pubmed_client::export::articles_to_bibtex(&articles);
                     Ok(JsValue::from_str(&bibtex))
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Export failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -476,7 +502,7 @@ impl WasmPubMedClient {
                     let ris = pubmed_client::export::articles_to_ris(&articles);
                     Ok(JsValue::from_str(&ris))
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Export failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
     }
@@ -1309,7 +1335,7 @@ impl WasmSearchQuery {
                         articles.into_iter().map(JsArticle::from).collect();
                     Ok(serde_wasm_bindgen::to_value(&js_articles)?)
                 }
-                Err(e) => Err(JsValue::from_str(&format!("Search failed: {e}"))),
+                Err(e) => Err(to_js_err(e)),
             }
         })
         .unchecked_into()
