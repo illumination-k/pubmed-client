@@ -65,7 +65,7 @@ impl PubMedClient {
             &self.base_url,
             "ecitmatch.cgi",
             &[("db", "pubmed"), ("retmode", "xml")],
-        );
+        )?;
         url.push_str("&bdata=");
         url.push_str(&bdata);
 

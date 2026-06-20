@@ -97,7 +97,10 @@ impl RateLimiter {
     #[instrument(skip(self))]
     pub async fn acquire(&self) -> crate::Result<()> {
         let should_wait = {
-            let mut bucket = self.bucket.lock().unwrap();
+            let mut bucket = self
+                .bucket
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
             self.refill_bucket(&mut bucket);
 
             if bucket.tokens >= 1.0 {
@@ -122,7 +125,10 @@ impl RateLimiter {
             sleep(wait_duration).await;
 
             // After waiting, refill bucket and consume token
-            let mut bucket = self.bucket.lock().unwrap();
+            let mut bucket = self
+                .bucket
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
             self.refill_bucket(&mut bucket);
             bucket.tokens = bucket.tokens.min(bucket.capacity);
             if bucket.tokens >= 1.0 {
@@ -139,21 +145,30 @@ impl RateLimiter {
     /// Returns `true` if a token is available and can be acquired immediately.
     /// This method does not consume a token.
     pub fn check_available(&self) -> bool {
-        let mut bucket = self.bucket.lock().unwrap();
+        let mut bucket = self
+            .bucket
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
         self.refill_bucket(&mut bucket);
         bucket.tokens >= 1.0
     }
 
     /// Get current token count (for testing and monitoring)
     pub fn token_count(&self) -> f64 {
-        let mut bucket = self.bucket.lock().unwrap();
+        let mut bucket = self
+            .bucket
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
         self.refill_bucket(&mut bucket);
         bucket.tokens
     }
 
     /// Get the configured rate limit (requests per second)
     pub fn rate(&self) -> f64 {
-        let bucket = self.bucket.lock().unwrap();
+        let bucket = self
+            .bucket
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
         bucket.refill_rate
     }
 

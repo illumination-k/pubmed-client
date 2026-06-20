@@ -8,6 +8,10 @@
 //! cargo insta review
 //! ```
 
+// Test helpers below run outside `#[test]` fns, so the test-only unwrap/expect
+// exemption does not apply automatically.
+#![allow(clippy::unwrap_used, clippy::expect_used)]
+
 use pubmed_parser::pmc::parse_pmc_xml;
 use std::path::Path;
 

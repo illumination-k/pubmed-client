@@ -32,3 +32,6 @@ tracing-test = "0.2"
 [[test]]
 name = "mocked_markdown"
 path = "tests/integration/mocked/markdown.rs"
+
+[lints]
+workspace = true

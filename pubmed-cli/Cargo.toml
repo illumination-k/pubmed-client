@@ -55,3 +55,6 @@ aws-smithy-mocks-experimental = "0.2"
 aws-smithy-runtime-api = "1.7"
 tempfile = "3.8"
 tokio-test = "0.4"
+
+[lints]
+workspace = true

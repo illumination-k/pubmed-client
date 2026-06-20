@@ -122,9 +122,8 @@ where
     E: RetryableError + Display,
 {
     let mut attempt = 0;
-    let mut last_error = None;
 
-    while attempt <= config.max_retries {
+    loop {
         debug!(
             operation = operation_name,
             attempt = attempt,
@@ -162,35 +161,31 @@ where
                     return Err(error);
                 }
 
-                last_error = Some(error);
-
-                if attempt < config.max_retries {
-                    let delay = config.calculate_delay(attempt);
-                    debug!(
-                        operation = operation_name,
-                        attempt = attempt + 1,
-                        max_retries = config.max_retries,
-                        delay_ms = delay.as_millis(),
-                        error = %last_error.as_ref().unwrap(),
-                        "Retryable error encountered, will retry after delay"
-                    );
-                    sleep(delay).await;
-                } else {
+                if attempt >= config.max_retries {
                     warn!(
                         operation = operation_name,
                         attempts = attempt + 1,
-                        error = %last_error.as_ref().unwrap(),
+                        error = %error,
                         "Max retries exceeded, operation failed"
                     );
+                    return Err(error);
                 }
+
+                let delay = config.calculate_delay(attempt);
+                debug!(
+                    operation = operation_name,
+                    attempt = attempt + 1,
+                    max_retries = config.max_retries,
+                    delay_ms = delay.as_millis(),
+                    error = %error,
+                    "Retryable error encountered, will retry after delay"
+                );
+                sleep(delay).await;
             }
         }
 
         attempt += 1;
     }
-
-    // This should never be reached due to the loop logic, but just in case
-    Err(last_error.unwrap())
 }
 
 #[cfg(test)]

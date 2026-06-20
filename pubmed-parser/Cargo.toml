@@ -58,3 +58,6 @@ harness = false
 [[bench]]
 name = "pmc_parsing"
 harness = false
+
+[lints]
+workspace = true
