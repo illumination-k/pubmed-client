@@ -25,3 +25,6 @@ napi-build = "1"
 [profile.release]
 lto = true
 strip = "symbols"
+
+[lints]
+workspace = true

@@ -854,28 +854,24 @@ impl PmcMarkdownConverter {
 
     /// Clean content by removing XML tags and fixing formatting
     fn clean_content(&self, content: &str) -> String {
-        // Remove XML tags but preserve content
-        let mut cleaned = content.to_string();
+        use std::sync::OnceLock;
 
-        // Remove common XML tags while preserving content
-        cleaned = regex::Regex::new(r"<[^>]*>")
-            .unwrap()
-            .replace_all(&cleaned, "")
-            .to_string();
+        // Remove common XML tags while preserving content. The pattern is a
+        // compile-time constant; if it somehow failed to compile we fall back to
+        // the original content rather than panicking.
+        static TAG_RE: OnceLock<Option<regex::Regex>> = OnceLock::new();
+        let mut cleaned = match TAG_RE.get_or_init(|| regex::Regex::new(r"<[^>]*>").ok()) {
+            Some(re) => re.replace_all(content, "").into_owned(),
+            None => content.to_string(),
+        };
 
         // Fix HTML entities using the predefined table
         for (entity, replacement) in HTML_ENTITIES {
             cleaned = cleaned.replace(entity, replacement);
         }
 
-        // Normalize whitespace
-        cleaned = regex::Regex::new(r"\s+")
-            .unwrap()
-            .replace_all(&cleaned, " ")
-            .trim()
-            .to_string();
-
-        cleaned
+        // Normalize whitespace (collapse runs of whitespace to a single space and trim)
+        cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
     }
 
     /// Create URL-safe anchor from title

@@ -36,6 +36,13 @@ thiserror = "1.0"
 tracing = "0.1"
 urlencoding = "2.1"
 
+[workspace.lints.clippy]
+# Forbid `.unwrap()` / `.expect()` in non-test code. Tests, examples and
+# benches are exempted via `allow-unwrap-in-tests` / `allow-expect-in-tests`
+# in clippy.toml (and per-target allows where needed).
+unwrap_used = "deny"
+expect_used = "deny"
+
 [profile.bench]
 debug = true
 

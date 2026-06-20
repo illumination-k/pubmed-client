@@ -36,11 +36,14 @@ pub fn strip_inline_html_tags(xml: &str) -> Cow<'_, str> {
 
     // Regex pattern to match inline HTML tags (both opening and closing)
     // Matches: <i>, </i>, <b>, </b>, <sup>, </sup>, <sub>, </sub>, <u>, </u>, <em>, </em>, <strong>, </strong>
-    static INLINE_TAG_REGEX: OnceLock<Regex> = OnceLock::new();
-    let re = INLINE_TAG_REGEX.get_or_init(|| {
-        Regex::new(r"</?(?:i|b|u|sup|sub|em|strong|italic|bold)>")
-            .expect("Failed to compile inline tag regex")
-    });
+    static INLINE_TAG_REGEX: OnceLock<Option<Regex>> = OnceLock::new();
+    let re = INLINE_TAG_REGEX
+        .get_or_init(|| Regex::new(r"</?(?:i|b|u|sup|sub|em|strong|italic|bold)>").ok());
+
+    // If the (constant) pattern somehow failed to compile, leave the input untouched.
+    let Some(re) = re else {
+        return Cow::Borrowed(xml);
+    };
 
     let cleaned = re.replace_all(xml, "");
 

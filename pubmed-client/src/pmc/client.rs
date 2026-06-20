@@ -77,6 +77,10 @@ impl PmcClient {
         let rate_limiter = config.create_rate_limiter();
         let base_url = config.effective_base_url().to_string();
 
+        // reqwest's client builder only fails if the TLS backend cannot be
+        // initialized — an unrecoverable process-level environment error — so
+        // this infallible public constructor is allowed to `expect` here.
+        #[allow(clippy::expect_used)]
         let client = {
             #[cfg(not(target_arch = "wasm32"))]
             {

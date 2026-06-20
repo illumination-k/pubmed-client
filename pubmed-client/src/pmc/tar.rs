@@ -33,6 +33,10 @@ impl PmcTarClient {
     pub fn new(config: ClientConfig) -> Self {
         let rate_limiter = config.create_rate_limiter();
 
+        // reqwest's client builder only fails if the TLS backend cannot be
+        // initialized — an unrecoverable process-level environment error — so
+        // this infallible public constructor is allowed to `expect` here.
+        #[allow(clippy::expect_used)]
         let client = {
             #[cfg(not(target_arch = "wasm32"))]
             {
@@ -120,7 +124,7 @@ impl PmcTarClient {
             "https://www.ncbi.nlm.nih.gov/pmc/utils/oa",
             "oa.fcgi",
             &[("id", normalized_pmcid.as_str()), ("format", "tgz")],
-        );
+        )?;
 
         debug!("Downloading tar.gz from OA API: {}", url);
 

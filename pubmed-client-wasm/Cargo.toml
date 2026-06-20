@@ -38,3 +38,6 @@ serde_json = { workspace = true }
 [features]
 default = []
 tsify = ["dep:tsify"]
+
+[lints]
+workspace = true

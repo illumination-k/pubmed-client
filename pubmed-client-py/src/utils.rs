@@ -11,6 +11,11 @@ use tokio::runtime::Runtime;
 // ================================================================================================
 
 /// Get or create a Tokio runtime for blocking operations
+///
+/// `Runtime::new` only fails when the OS cannot create the underlying event
+/// loop / worker threads — an unrecoverable environment error — so this helper
+/// is allowed to `expect` here.
+#[allow(clippy::expect_used)]
 pub fn get_runtime() -> Runtime {
     Runtime::new().expect("Failed to create Tokio runtime")
 }

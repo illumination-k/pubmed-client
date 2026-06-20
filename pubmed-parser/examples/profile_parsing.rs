@@ -6,6 +6,9 @@
 //!
 //! The default mode is "all" which profiles both PMC and PubMed parsing.
 
+// Profiling/example harness — unwrap/expect are fine here.
+#![allow(clippy::unwrap_used, clippy::expect_used)]
+
 use std::fs;
 use std::hint::black_box;
 use std::path::{Path, PathBuf};

@@ -172,10 +172,12 @@ fn strip_comment_tags(content: &str) -> String {
     use regex::Regex;
     use std::sync::OnceLock;
 
-    static COMMENT_RE: OnceLock<Regex> = OnceLock::new();
-    let re =
-        COMMENT_RE.get_or_init(|| Regex::new(r"<comment[^>]*>.*?</comment>").expect("valid regex"));
-    re.replace_all(content, "").into_owned()
+    static COMMENT_RE: OnceLock<Option<Regex>> = OnceLock::new();
+    match COMMENT_RE.get_or_init(|| Regex::new(r"<comment[^>]*>.*?</comment>").ok()) {
+        Some(re) => re.replace_all(content, "").into_owned(),
+        // If the (constant) pattern somehow failed to compile, leave the input untouched.
+        None => content.to_string(),
+    }
 }
 
 /// Extract detailed references from ref-list or alternative reference structures

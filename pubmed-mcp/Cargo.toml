@@ -33,3 +33,6 @@ rmcp = { version = "0.16", features = ["client", "transport-child-process"] }
 [[bin]]
 name = "pubmed-mcp"
 path = "src/main.rs"
+
+[lints]
+workspace = true

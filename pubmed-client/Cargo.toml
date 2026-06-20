@@ -152,3 +152,6 @@ path = "tests/integration/api/webenv.rs"
 [[test]]
 name = "mocked_epost"
 path = "tests/integration/test_epost_mocked.rs"
+
+[lints]
+workspace = true

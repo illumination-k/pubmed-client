@@ -50,9 +50,13 @@ impl<'a> RequestExecutor<'a> {
         base_url: &str,
         endpoint: &str,
         params: &[(&str, &str)],
-    ) -> String {
+    ) -> Result<String> {
         let mut url = Url::parse(&format!("{}/{}", base_url.trim_end_matches('/'), endpoint))
-            .expect("base URL and endpoint should form a valid URL");
+            .map_err(|e| {
+                crate::PubMedError::InvalidQuery(format!(
+                    "failed to build request URL from base {base_url:?} and endpoint {endpoint:?}: {e}"
+                ))
+            })?;
 
         {
             let mut pairs = url.query_pairs_mut();
@@ -64,7 +68,7 @@ impl<'a> RequestExecutor<'a> {
             }
         }
 
-        url.to_string()
+        Ok(url.to_string())
     }
 
     /// GET an endpoint, building the URL from `params` plus the API parameters.
@@ -74,7 +78,7 @@ impl<'a> RequestExecutor<'a> {
         endpoint: &str,
         params: &[(&str, &str)],
     ) -> Result<Response> {
-        let url = self.build_url(base_url, endpoint, params);
+        let url = self.build_url(base_url, endpoint, params)?;
         self.get(&url).await
     }
 
@@ -162,11 +166,13 @@ mod tests {
         let (client, rate_limiter) = executor_config(&config);
         let executor = RequestExecutor::new(&client, &rate_limiter, &config);
 
-        let url = executor.build_url(
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
-            "esearch.fcgi",
-            &[("db", "pubmed"), ("term", "covid 19")],
-        );
+        let url = executor
+            .build_url(
+                "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+                "esearch.fcgi",
+                &[("db", "pubmed"), ("term", "covid 19")],
+            )
+            .unwrap();
 
         assert!(url.starts_with("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?"));
         assert!(url.contains("db=pubmed"));
@@ -183,7 +189,9 @@ mod tests {
         let (client, rate_limiter) = executor_config(&config);
         let executor = RequestExecutor::new(&client, &rate_limiter, &config);
 
-        let url = executor.build_url("http://example.com/", "einfo.fcgi", &[("retmode", "json")]);
+        let url = executor
+            .build_url("http://example.com/", "einfo.fcgi", &[("retmode", "json")])
+            .unwrap();
         assert!(url.starts_with("http://example.com/einfo.fcgi?"));
         // Tool is always present.
         assert!(url.contains("tool=pubmed-client"));
