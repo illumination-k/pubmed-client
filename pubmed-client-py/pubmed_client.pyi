@@ -189,7 +189,7 @@ class Figure:
 
     id: builtins.str
     label: typing.Optional[builtins.str]
-    caption: builtins.str
+    caption: typing.Optional[builtins.str]
     alt_text: typing.Optional[builtins.str]
     fig_type: typing.Optional[builtins.str]
     file_path: typing.Optional[builtins.str]
@@ -392,7 +392,7 @@ class PmcFullText:
 
     pmcid: builtins.str
     pmid: typing.Optional[builtins.str]
-    title: builtins.str
+    title: typing.Optional[builtins.str]
     doi: typing.Optional[builtins.str]
     def authors(self) -> typing.Any:
         r"""
@@ -1063,5 +1063,5 @@ class Table:
 
     id: builtins.str
     label: typing.Optional[builtins.str]
-    caption: builtins.str
+    caption: typing.Optional[builtins.str]
     def __repr__(self) -> builtins.str: ...

@@ -637,7 +637,7 @@ impl From<ArticleSummary> for JsSummary {
 pub struct JsFullText {
     pub pmcid: String,
     pub pmid: Option<String>,
-    pub title: String,
+    pub title: Option<String>,
     pub authors: Vec<JsAuthor>,
     pub journal: JsJournal,
     pub pub_date: String,
@@ -656,7 +656,7 @@ pub struct JsFullText {
 #[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
 #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct JsFunding {
-    pub source: String,
+    pub source: Option<String>,
     pub award_id: Option<String>,
     pub statement: Option<String>,
 }
@@ -677,7 +677,7 @@ pub struct JsAuthor {
 #[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
 #[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct JsJournal {
-    pub title: String,
+    pub title: Option<String>,
     pub abbreviation: Option<String>,
     pub publisher: Option<String>,
     pub issn_print: Option<String>,
@@ -702,7 +702,7 @@ pub struct JsSection {
 pub struct JsFigure {
     pub id: String,
     pub label: Option<String>,
-    pub caption: String,
+    pub caption: Option<String>,
     pub graphic_href: Option<String>,
 }
 
@@ -712,7 +712,7 @@ pub struct JsFigure {
 pub struct JsTable {
     pub id: String,
     pub label: Option<String>,
-    pub caption: String,
+    pub caption: Option<String>,
     pub footnotes: Vec<String>,
 }
 

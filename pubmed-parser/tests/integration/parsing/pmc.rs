@@ -1,6 +1,7 @@
 use rstest::*;
 use tracing::{debug, info, warn};
 
+use pubmed_parser::pmc::domain::Section;
 use pubmed_parser::pmc::parse_pmc_xml;
 
 #[path = "../common/mod.rs"]
@@ -53,7 +54,7 @@ fn test_comprehensive_pmc_parsing(#[from(xml_test_cases)] test_cases: Vec<PmcXml
                 successful_parses += 1;
 
                 // Basic validation
-                assert!(!article.title().is_empty(), "Article should have a title");
+                assert!(article.title().is_some(), "Article should have a title");
                 assert_eq!(
                     article.pmcid().as_str(),
                     test_case.pmcid,
@@ -63,7 +64,7 @@ fn test_comprehensive_pmc_parsing(#[from(xml_test_cases)] test_cases: Vec<PmcXml
                 // Log some statistics
                 info!(
                     filename = test_case.filename(),
-                    title = article.title().chars().take(60).collect::<String>(),
+                    title = article.title().unwrap_or("").chars().take(60).collect::<String>(),
                     authors_count = article.authors().len(),
                     sections_count = article.sections().len(),
                     references_count = article.references().len(),
@@ -351,4 +352,92 @@ fn test_pmc_parsing_content_structure(#[from(xml_test_cases)] test_cases: Vec<Pm
             );
         }
     }
+}
+
+const BANNED_PLACEHOLDERS: &[&str] = &[
+    "No caption available",
+    "Unknown Source",
+    "Unknown Journal",
+    "Unknown Title",
+    "Unknown Date",
+];
+
+fn assert_not_placeholder(value: &str, context: &str) {
+    for placeholder in BANNED_PLACEHOLDERS {
+        assert_ne!(
+            value, *placeholder,
+            "Found banned placeholder \"{placeholder}\" in {context}"
+        );
+    }
+}
+
+fn check_section_placeholders(section: &Section, path: &str) {
+    for (i, fig) in section.figures.iter().enumerate() {
+        if let Some(caption) = &fig.caption {
+            assert_not_placeholder(caption, &format!("{path} > figure[{i}].caption"));
+        }
+    }
+    for (i, table) in section.tables.iter().enumerate() {
+        if let Some(caption) = &table.caption {
+            assert_not_placeholder(caption, &format!("{path} > table[{i}].caption"));
+        }
+    }
+    for (i, sub) in section.subsections.iter().enumerate() {
+        check_section_placeholders(sub, &format!("{path} > subsection[{i}]"));
+    }
+}
+
+#[rstest]
+fn test_no_placeholder_strings_in_parsed_output(
+    #[from(xml_test_cases)] test_cases: Vec<PmcXmlTestCase>,
+) {
+    let mut checked = 0;
+
+    for test_case in &test_cases {
+        let xml_content = test_case.read_xml_content_or_panic();
+        let article = match parse_pmc_xml(&xml_content, &test_case.pmcid) {
+            Ok(a) => a,
+            Err(_) => continue,
+        };
+        checked += 1;
+        let pmcid = test_case.pmcid.as_str();
+
+        // Title
+        if let Some(title) = article.title() {
+            assert_not_placeholder(title, &format!("{pmcid} title"));
+        }
+
+        // Journal
+        if let Some(jt) = &article.journal().title {
+            assert_not_placeholder(jt, &format!("{pmcid} journal.title"));
+        }
+
+        // Funding
+        for (i, f) in article.funding().iter().enumerate() {
+            if let Some(src) = &f.source {
+                assert_not_placeholder(src, &format!("{pmcid} funding[{i}].source"));
+            }
+        }
+
+        // Supplementary materials
+        for (i, s) in article.supplementary_materials.iter().enumerate() {
+            if let Some(t) = &s.title {
+                assert_not_placeholder(t, &format!("{pmcid} supp[{i}].title"));
+            }
+        }
+
+        // Sections (recursive)
+        for (i, section) in article.sections().iter().enumerate() {
+            check_section_placeholders(section, &format!("{pmcid} section[{i}]"));
+        }
+
+        info!(pmcid = pmcid, "No placeholder strings found");
+    }
+
+    assert!(checked > 0, "Expected at least one article to be checked");
+    info!(
+        checked = checked,
+        total = test_cases.len(),
+        "Placeholder string check complete"
+    );
 }

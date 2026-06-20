@@ -4,6 +4,7 @@ use crate::pmc::domain::{FundingInfo, JournalMeta, SupplementaryMaterial};
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use quick_xml::name::QName;
+use tracing::warn;
 
 use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
 use super::xml_utils::decode_xml_entities;
@@ -216,7 +217,10 @@ fn clean_text(text: String) -> Option<String> {
     if text.is_empty() { None } else { Some(text) }
 }
 
-fn read_award_group(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> (String, Option<String>) {
+fn read_award_group(
+    reader: &mut Reader<&[u8]>,
+    buf: &mut Vec<u8>,
+) -> (Option<String>, Option<String>) {
     let mut source = None;
     let mut award_id = None;
 
@@ -255,10 +259,10 @@ fn read_award_group(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> (String, O
         }
     }
 
-    (
-        source.unwrap_or_else(|| "Unknown Source".to_string()),
-        award_id,
-    )
+    if source.is_none() {
+        warn!("funding award-group missing funding-source element");
+    }
+    (source, award_id)
 }
 
 fn read_funding_group(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Vec<FundingInfo> {
@@ -512,7 +516,7 @@ fn read_supplementary_material(
     SupplementaryMaterial {
         id: id.unwrap_or(fallback_id),
         content_type,
-        title: Some(caption.unwrap_or_else(|| "No caption available".to_string())),
+        title: caption,
         description: label,
         href,
     }
@@ -523,8 +527,7 @@ fn read_supplementary_material(
 /// Returns a [`JournalMeta`] without volume/issue — those belong to the article level
 /// per the JATS DTD and are extracted separately via [`extract_volume`] / [`extract_issue`].
 pub fn extract_journal_info(content: &str) -> JournalMeta {
-    let title =
-        read_first_text(content, b"journal-title").unwrap_or_else(|| "Unknown Journal".to_string());
+    let title = read_first_text(content, b"journal-title");
     let abbreviation =
         read_first_text_matching_attr(content, b"journal-id", b"journal-id-type", "iso-abbrev");
 
@@ -612,24 +615,35 @@ pub fn extract_pub_dates(content: &str) -> Vec<PublicationDate> {
     dates
 }
 
-/// Extract publication date in YYYY-MM-DD format
-pub fn extract_pub_date(content: &str) -> String {
-    let year = read_first_text(content, b"year");
+/// Extract publication date in YYYY-MM-DD format.
+///
+/// Returns `None` when no year element is present. Non-numeric month/day
+/// values are logged and omitted rather than silently defaulted to `1`.
+pub fn extract_pub_date(content: &str) -> Option<String> {
+    let year = read_first_text(content, b"year")?;
     let month = read_first_text(content, b"month");
     let day = read_first_text(content, b"day");
 
-    match (year, month, day) {
-        (Some(year), Some(month), Some(day)) => format!(
-            "{}-{:02}-{:02}",
-            year,
-            month.parse::<u32>().unwrap_or(1),
-            day.parse::<u32>().unwrap_or(1)
-        ),
-        (Some(year), Some(month), None) => {
-            format!("{}-{:02}", year, month.parse::<u32>().unwrap_or(1))
-        }
-        (Some(year), None, _) => year,
-        _ => "Unknown Date".to_string(),
+    match (month, day) {
+        (Some(m), Some(d)) => match (m.parse::<u32>(), d.parse::<u32>()) {
+            (Ok(mv), Ok(dv)) => Some(format!("{year}-{mv:02}-{dv:02}")),
+            (Ok(mv), Err(_)) => {
+                warn!(year = %year, month = %m, day = %d, "non-numeric day value, omitting day");
+                Some(format!("{year}-{mv:02}"))
+            }
+            (Err(_), _) => {
+                warn!(year = %year, month = %m, "non-numeric month value, omitting month/day");
+                Some(year)
+            }
+        },
+        (Some(m), None) => match m.parse::<u32>() {
+            Ok(mv) => Some(format!("{year}-{mv:02}")),
+            Err(_) => {
+                warn!(year = %year, month = %m, "non-numeric month value, omitting month");
+                Some(year)
+            }
+        },
+        _ => Some(year),
     }
 }
 
@@ -805,9 +819,9 @@ pub fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMateri
     materials
 }
 
-/// Extract article title
-pub fn extract_title(content: &str) -> String {
-    read_first_text(content, b"article-title").unwrap_or_else(|| "Unknown Title".to_string())
+/// Extract article title. Returns `None` when the element is absent.
+pub fn extract_title(content: &str) -> Option<String> {
+    read_first_text(content, b"article-title")
 }
 
 /// Extract article subtitle from `<title-group>/<subtitle>`
@@ -1014,7 +1028,13 @@ mod tests {
     fn test_extract_title() {
         let content = r#"<article-title>Test Article Title</article-title>"#;
         let title = extract_title(content);
-        assert_eq!(title, "Test Article Title");
+        assert_eq!(title.as_deref(), Some("Test Article Title"));
+    }
+
+    #[test]
+    fn test_extract_title_missing() {
+        let content = r#"<body>No title here</body>"#;
+        assert_eq!(extract_title(content), None);
     }
 
     #[test]
@@ -1065,16 +1085,34 @@ mod tests {
     #[test]
     fn test_extract_pub_date() {
         let content_full = r#"<year>2023</year><month>12</month><day>25</day>"#;
-        assert_eq!(extract_pub_date(content_full), "2023-12-25");
+        assert_eq!(
+            extract_pub_date(content_full).as_deref(),
+            Some("2023-12-25")
+        );
 
         let content_year_month = r#"<year>2023</year><month>12</month>"#;
-        assert_eq!(extract_pub_date(content_year_month), "2023-12");
+        assert_eq!(
+            extract_pub_date(content_year_month).as_deref(),
+            Some("2023-12")
+        );
 
         let content_year_only = r#"<year>2023</year>"#;
-        assert_eq!(extract_pub_date(content_year_only), "2023");
+        assert_eq!(extract_pub_date(content_year_only).as_deref(), Some("2023"));
 
         let content_no_date = r#"<title>No date here</title>"#;
-        assert_eq!(extract_pub_date(content_no_date), "Unknown Date");
+        assert_eq!(extract_pub_date(content_no_date), None);
+    }
+
+    #[test]
+    fn test_extract_pub_date_non_numeric_month() {
+        let content = r#"<year>2023</year><month>Jan</month><day>15</day>"#;
+        assert_eq!(extract_pub_date(content).as_deref(), Some("2023"));
+    }
+
+    #[test]
+    fn test_extract_pub_date_non_numeric_day() {
+        let content = r#"<year>2023</year><month>12</month><day>unknown</day>"#;
+        assert_eq!(extract_pub_date(content).as_deref(), Some("2023-12"));
     }
 
     #[test]

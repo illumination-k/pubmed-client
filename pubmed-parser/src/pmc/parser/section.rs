@@ -3,6 +3,7 @@ use crate::pmc::domain::{Figure, Section, Table};
 use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
 use quick_xml::events::Event;
 use quick_xml::name::QName;
+use tracing::warn;
 
 /// Extract all sections from PMC XML content
 pub fn extract_sections_enhanced(content: &str) -> Vec<Section> {
@@ -550,10 +551,17 @@ fn parse_figure_inner(
                 label = read_text_content(reader, b"label", buf).ok();
             }
             FigAction::ReadCaption => {
-                caption = Some(
-                    read_text_content(reader, b"caption", buf)
-                        .unwrap_or_else(|_| "No caption available".to_string()),
-                );
+                caption = match read_text_content(reader, b"caption", buf) {
+                    Ok(text) => Some(text),
+                    Err(e) => {
+                        warn!(
+                            figure_id = ?attrs.id,
+                            error = %e,
+                            "failed to parse figure caption"
+                        );
+                        None
+                    }
+                };
             }
             FigAction::ReadAltText => {
                 alt_text = read_text_content(reader, b"alt-text", buf).ok();
@@ -570,10 +578,17 @@ fn parse_figure_inner(
         }
     }
 
+    let id = match attrs.id {
+        Some(id) => id,
+        None => {
+            warn!("figure element missing id attribute");
+            format!("fig_unknown_{}", line!())
+        }
+    };
     Some(Figure {
-        id: attrs.id.unwrap_or_else(|| "fig_unknown".to_string()),
+        id,
         label,
-        caption: caption.unwrap_or_else(|| "No caption available".to_string()),
+        caption,
         alt_text,
         fig_type: attrs.fig_type,
         graphic_href: file_name,
@@ -620,10 +635,17 @@ fn parse_table_inner(
                 label = read_text_content(reader, b"label", buf).ok();
             }
             TableAction::ReadCaption => {
-                caption = Some(
-                    read_text_content(reader, b"caption", buf)
-                        .unwrap_or_else(|_| "No caption available".to_string()),
-                );
+                caption = match read_text_content(reader, b"caption", buf) {
+                    Ok(text) => Some(text),
+                    Err(e) => {
+                        warn!(
+                            table_id = ?attrs.id,
+                            error = %e,
+                            "failed to parse table caption"
+                        );
+                        None
+                    }
+                };
             }
             TableAction::ReadFootnote => {
                 if let Ok(text) = read_text_content(reader, b"table-wrap-foot", buf) {
@@ -641,10 +663,17 @@ fn parse_table_inner(
         }
     }
 
+    let id = match attrs.id {
+        Some(id) => id,
+        None => {
+            warn!("table-wrap element missing id attribute");
+            format!("table_unknown_{}", line!())
+        }
+    };
     Some(Table {
-        id: attrs.id.unwrap_or_else(|| "table_unknown".to_string()),
+        id,
         label,
-        caption: caption.unwrap_or_else(|| "No caption available".to_string()),
+        caption,
         head: Vec::new(),
         body: Vec::new(),
         footnotes,
@@ -791,7 +820,10 @@ mod tests {
         assert_eq!(figures.len(), 1);
         assert_eq!(figures[0].id, "fig1");
         assert_eq!(figures[0].label, Some("Figure 1".to_string()));
-        assert_eq!(figures[0].caption, "This is a test figure.");
+        assert_eq!(
+            figures[0].caption.as_deref(),
+            Some("This is a test figure.")
+        );
         assert_eq!(figures[0].alt_text, Some("Alternative text".to_string()));
         assert_eq!(figures[0].fig_type, Some("diagram".to_string()));
     }
@@ -815,7 +847,7 @@ mod tests {
         assert_eq!(tables.len(), 1);
         assert_eq!(tables[0].id, "table1");
         assert_eq!(tables[0].label, Some("Table 1".to_string()));
-        assert_eq!(tables[0].caption, "This is a test table.");
+        assert_eq!(tables[0].caption.as_deref(), Some("This is a test table."));
     }
 
     #[test]

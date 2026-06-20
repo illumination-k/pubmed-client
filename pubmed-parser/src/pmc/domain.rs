@@ -91,8 +91,9 @@ pub struct Front {
 /// and are placed on [`ArticleMeta`] accordingly.
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct JournalMeta {
-    /// Journal title. From `<journal-title-group>/<journal-title>`.
-    pub title: String,
+    /// Journal title. From `<journal-title-group>/<journal-title>`. `None`
+    /// when the element is absent in the XML.
+    pub title: Option<String>,
     /// Abbreviated journal title. From `<journal-id journal-id-type="iso-abbrev">`
     /// or `<abbrev-journal-title>`.
     pub abbreviation: Option<String>,
@@ -164,8 +165,9 @@ pub struct ArticleMeta {
 /// Maps to JATS `<title-group>`.
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct TitleGroup {
-    /// Article title. From `<article-title>`.
-    pub article_title: String,
+    /// Article title. From `<article-title>`. `None` when the element is
+    /// absent in the XML.
+    pub article_title: Option<String>,
     /// Article subtitle. From `<subtitle>`.
     pub subtitle: Option<String>,
 }
@@ -277,8 +279,9 @@ pub struct Figure {
     pub id: String,
     /// Figure label (e.g., "Figure 1"). From `<label>`.
     pub label: Option<String>,
-    /// Figure caption. From `<caption>/<p>`.
-    pub caption: String,
+    /// Figure caption. From `<caption>/<p>`. `None` when the XML element is
+    /// absent or could not be parsed.
+    pub caption: Option<String>,
     /// Alt text. From `<alt-text>`.
     pub alt_text: Option<String>,
     /// Figure type (e.g., "figure", "scheme", "chart"). From `<fig fig-type="...">`.
@@ -297,8 +300,9 @@ pub struct Table {
     pub id: String,
     /// Table label (e.g., "Table 1"). From `<label>`.
     pub label: Option<String>,
-    /// Table caption. From `<caption>/<p>`.
-    pub caption: String,
+    /// Table caption. From `<caption>/<p>`. `None` when the XML element is
+    /// absent or could not be parsed.
+    pub caption: Option<String>,
     /// Header rows. From `<thead>/<tr>`.
     pub head: Vec<TableRow>,
     /// Body rows. From `<tbody>/<tr>` (or direct `<tr>` if no `<tbody>`).
@@ -469,8 +473,9 @@ impl Reference {
 /// Maps to JATS `<funding-group>/<award-group>`.
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct FundingInfo {
-    /// Funding source/agency. From `<funding-source>`.
-    pub source: String,
+    /// Funding source/agency. From `<funding-source>`. `None` when the element
+    /// is absent in the XML.
+    pub source: Option<String>,
     /// Grant/award ID. From `<award-id>`.
     pub award_id: Option<String>,
     /// Funding statement. From `<funding-statement>`.
@@ -577,9 +582,9 @@ impl PmcArticle {
         self.front.article_meta.doi.as_deref()
     }
 
-    /// Article title.
-    pub fn title(&self) -> &str {
-        &self.front.article_meta.title_group.article_title
+    /// Article title, if present.
+    pub fn title(&self) -> Option<&str> {
+        self.front.article_meta.title_group.article_title.as_deref()
     }
 
     /// Article subtitle, if present.

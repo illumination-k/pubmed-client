@@ -346,22 +346,22 @@ mod integration_tests {
 
                         if !section.figures.is_empty() {
                             let figure = &section.figures[0];
-                            assert!(!figure.caption.is_empty(), "Figure should have caption");
+                            assert!(figure.caption.is_some(), "Figure should have caption");
 
                             debug!(
                                 figure_id = %figure.id,
-                                caption_length = figure.caption.len(),
+                                caption_length = figure.caption.as_ref().map(|c| c.len()).unwrap_or(0),
                                 "Figure details"
                             );
                         }
 
                         if !section.tables.is_empty() {
                             let table = &section.tables[0];
-                            assert!(!table.caption.is_empty(), "Table should have caption");
+                            assert!(table.caption.is_some(), "Table should have caption");
 
                             debug!(
                                 table_id = %table.id,
-                                caption_length = table.caption.len(),
+                                caption_length = table.caption.as_ref().map(|c| c.len()).unwrap_or(0),
                                 "Table details"
                             );
                         }

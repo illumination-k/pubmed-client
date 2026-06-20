@@ -296,7 +296,7 @@ async fn fetch_article_metadata(
         pmcid: full_text.pmcid().to_string(),
         pmid: full_text.pmid().as_ref().map(|p| p.to_string()),
         doi: full_text.doi().map(str::to_string),
-        title: full_text.title().to_string(),
+        title: full_text.title().unwrap_or("Untitled").to_string(),
         r#abstract: abstract_content,
         authors: full_text.authors().to_vec(),
         journal: Some(full_text.journal().clone()),

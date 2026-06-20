@@ -454,7 +454,7 @@ struct FigureMetadata {
     pmcid: String,
     figureid: String,
     label: Option<String>,
-    caption: String,
+    caption: Option<String>,
 }
 
 fn categorize_failure_from_figures_error(
