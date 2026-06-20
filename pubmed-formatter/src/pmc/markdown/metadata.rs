@@ -1,20 +1,10 @@
-use pubmed_parser::common::{Author, PublicationDate};
+use pubmed_parser::common::Author;
 use pubmed_parser::pmc::PmcArticle;
 
 use super::config::MarkdownConfig;
 use super::entities::clean_content;
-use super::frontmatter::generate_yaml_frontmatter;
+use super::frontmatter::{format_first_pub_date, generate_yaml_frontmatter};
 use super::heading::format_heading;
-
-fn format_first_pub_date(dates: &[PublicationDate]) -> Option<String> {
-    let d = dates.first()?;
-    let year = d.year?;
-    match (d.month, d.day) {
-        (Some(m), Some(day)) => Some(format!("{year}-{m:02}-{day:02}")),
-        (Some(m), None) => Some(format!("{year}-{m:02}")),
-        _ => Some(year.to_string()),
-    }
-}
 
 pub(super) fn convert_metadata(config: &MarkdownConfig, article: &PmcArticle) -> String {
     if config.metadata.use_yaml_frontmatter {
