@@ -2,7 +2,8 @@ use rstest::*;
 use tracing::{debug, info, warn};
 
 use pubmed_formatter::pmc::markdown::{
-    HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle,
+    FigureOptions, HeadingStyle, MarkdownConfig, MetadataOptions, PmcMarkdownConverter,
+    ReferenceStyle,
 };
 use pubmed_parser::pmc::parse_pmc_xml;
 
@@ -540,16 +541,20 @@ fn test_specific_markdown_conversion(#[case] filename: &str) {
 #[test]
 fn test_markdown_config_builder() {
     let config = MarkdownConfig {
-        include_metadata: false,
+        metadata: MetadataOptions {
+            include_metadata: false,
+            use_yaml_frontmatter: false,
+            include_orcid_links: false,
+            include_identifier_links: false,
+        },
+        figures: FigureOptions {
+            include_figure_captions: true,
+            include_local_figures: false,
+        },
         include_toc: true,
         heading_style: HeadingStyle::Setext,
         reference_style: ReferenceStyle::AuthorYear,
         max_heading_level: 4,
-        include_orcid_links: false,
-        include_identifier_links: false,
-        include_figure_captions: true,
-        include_local_figures: false,
-        use_yaml_frontmatter: false,
     };
 
     let converter = PmcMarkdownConverter::with_config(config.clone());

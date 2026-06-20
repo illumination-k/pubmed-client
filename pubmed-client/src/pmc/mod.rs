@@ -18,7 +18,10 @@ pub use pubmed_formatter::pmc::markdown;
 // Re-export public types
 pub use client::PmcClient;
 pub use extracted::ExtractedFigure;
-pub use markdown::{HeadingStyle, MarkdownConfig, PmcMarkdownConverter, ReferenceStyle};
+pub use markdown::{
+    FigureOptions, HeadingStyle, MarkdownConfig, MetadataOptions, PmcMarkdownConverter,
+    ReferenceStyle,
+};
 pub use oa_api::OaSubsetInfo;
 pub use parser::parse_pmc_xml;
 pub use pubmed_parser::common::{Affiliation, Author};

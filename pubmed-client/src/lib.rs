@@ -280,10 +280,10 @@ pub use common::{Affiliation, Author, PmcId, PubMedId};
 pub use config::ClientConfig;
 pub use error::{ParseError, PubMedError, Result};
 pub use pmc::{
-    Abstract, ArticleMeta, Back, Body, ExtractedFigure, Figure, Front, FundingInfo, HeadingStyle,
-    JournalMeta, License, MarkdownConfig, OaSubsetInfo, Permissions, PmcArticle, PmcClient,
-    PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Section, SupplementaryMaterial,
-    Table, TitleGroup, parse_pmc_xml,
+    Abstract, ArticleMeta, Back, Body, ExtractedFigure, Figure, FigureOptions, Front, FundingInfo,
+    HeadingStyle, JournalMeta, License, MarkdownConfig, MetadataOptions, OaSubsetInfo, Permissions,
+    PmcArticle, PmcClient, PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Section,
+    SupplementaryMaterial, Table, TitleGroup, parse_pmc_xml,
 };
 pub use pubmed::{
     AbstractSection, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,

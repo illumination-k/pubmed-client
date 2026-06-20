@@ -52,7 +52,10 @@ impl Markdown {
         let article = client.fetch_full_text(pmcid).await?;
 
         let mut config = MarkdownConfig {
-            use_yaml_frontmatter: self.frontmatter,
+            metadata: pubmed_client::pmc::MetadataOptions {
+                use_yaml_frontmatter: self.frontmatter,
+                ..Default::default()
+            },
             ..Default::default()
         };
 
@@ -85,7 +88,7 @@ impl Markdown {
                 }
             }
 
-            config.include_local_figures = true;
+            config.figures.include_local_figures = true;
             Some(figure_paths)
         } else {
             None
