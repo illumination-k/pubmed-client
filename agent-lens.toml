@@ -1,0 +1,84 @@
+# agent-lens.toml — multi-analyzer profiles for the pubmed-client-rs workspace.
+# Discovered by walking up from the cwd; run with `agent-lens run <profile>`.
+# Keys are kebab-case and mirror the CLI flags. Relative paths resolve against
+# this file's directory. Unknown keys are rejected at parse time.
+
+# ---------------------------------------------------------------------------
+# quality — full static-quality sweep over the whole workspace.
+# Surfaces near-duplicate functions, thin wrappers, complexity creep, and
+# weak cohesion across every crate. Tests are excluded so the report stays
+# focused on production code.
+# ---------------------------------------------------------------------------
+[profile.quality]
+path = "."
+format = "md"
+exclude-tests = true
+exclude = ["test_data/**", "tmp_*/**", "examples/**"]
+tools = ["similarity", "wrapper", "cohesion", "complexity"]
+
+[profile.quality.similarity]
+threshold = 0.85
+min-lines = 8 # ignore trivial getters / one-liners
+top = 25
+
+[profile.quality.cohesion]
+min-score = 2 # LCOM4 >= 2 (units that split into multiple components)
+top = 25
+
+[profile.quality.complexity]
+min-score = 12 # cognitive complexity floor
+top = 25
+
+# ---------------------------------------------------------------------------
+# review — pre-commit lens. Reports only the units touching unstaged changes
+# (`git diff -U0`); an empty report is the success case. Run before committing
+# to catch duplication / wrappers / complexity introduced by the current diff.
+# ---------------------------------------------------------------------------
+[profile.review]
+path = "."
+format = "md"
+exclude-tests = true
+exclude = ["test_data/**", "tmp_*/**"]
+tools = ["similarity", "wrapper", "cohesion", "complexity"]
+
+[profile.review.similarity]
+diff-only = true
+threshold = 0.85
+min-lines = 5
+
+[profile.review.cohesion]
+diff-only = true
+min-score = 2
+
+[profile.review.complexity]
+diff-only = true
+min-score = 10
+
+[profile.review.wrapper]
+diff-only = true
+
+# ---------------------------------------------------------------------------
+# hotspot — rank files by `commits × cognitive_max` to find where churn and
+# complexity meet (best refactor ROI). Must run inside a git working tree.
+# ---------------------------------------------------------------------------
+[profile.hotspot]
+path = "."
+format = "md"
+exclude-tests = true
+exclude = ["test_data/**", "tmp_*/**", "examples/**"]
+tools = ["hotspot"]
+
+[profile.hotspot.hotspot]
+since = "6.months.ago"
+top = 30
+
+# ---------------------------------------------------------------------------
+# coupling — module-level coupling for a single crate root (coupling needs one
+# entry, so point it at the crate that ties the workspace together). Swap the
+# path to inspect another crate, e.g. "pubmed-parser/src/lib.rs".
+# ---------------------------------------------------------------------------
+[profile.coupling]
+path = "pubmed-client/src/lib.rs"
+format = "md"
+exclude-tests = true
+tools = ["coupling", "context-span"]
