@@ -1,8 +1,9 @@
-use anyhow::Result;
-use clap::Args;
-use serde_json;
+use std::io::Write;
 
-use super::create_pubmed_client;
+use anyhow::{Result, bail};
+use clap::Args;
+
+use super::{ClientContext, OutputFormat};
 
 #[derive(Args, Debug)]
 pub struct Convert {
@@ -11,8 +12,8 @@ pub struct Convert {
     pub pmids: Vec<String>,
 
     /// Output format (json, csv, or txt)
-    #[arg(long, default_value = "json")]
-    pub format: String,
+    #[arg(long, value_enum, default_value_t = OutputFormat::Json)]
+    pub format: OutputFormat,
 
     /// Batch size for processing PMIDs (to avoid API rate limits)
     #[arg(long, default_value = "350")]
@@ -20,48 +21,42 @@ pub struct Convert {
 }
 
 impl Convert {
-    pub async fn execute_with_config(
-        &self,
-        api_key: Option<&str>,
-        email: Option<&str>,
-        tool: &str,
-    ) -> Result<()> {
-        // Parse PMIDs from strings to u32
-        let parsed_pmids: Result<Vec<u32>, _> =
-            self.pmids.iter().map(|pmid| pmid.parse::<u32>()).collect();
+    pub async fn execute(&self, ctx: &ClientContext<'_>) -> Result<()> {
+        let parsed_pmids: Vec<u32> = self
+            .pmids
+            .iter()
+            .map(|pmid| {
+                pmid.parse::<u32>().map_err(|e| {
+                    anyhow::anyhow!(
+                        "Invalid PMID format '{}'. PMIDs must be numeric: {}",
+                        pmid,
+                        e
+                    )
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
 
-        let parsed_pmids = match parsed_pmids {
-            Ok(pmids) => pmids,
-            Err(e) => {
-                tracing::error!("Invalid PMID format. PMIDs must be numeric. Error: {}", e);
-                std::process::exit(1);
-            }
-        };
+        let client = ctx.pubmed_client();
 
-        // Create client with configuration
-        let client = create_pubmed_client(api_key, email, tool)?;
-
-        // Process PMIDs in batches to avoid 419 errors
         let pmc_links = self
             .process_pmids_in_batches(&client, &parsed_pmids)
             .await?;
 
-        match self.format.as_str() {
-            "json" => {
+        match self.format {
+            OutputFormat::Json => {
                 self.output_json(&pmc_links)?;
             }
-            "csv" => {
-                self.output_csv(&pmc_links);
+            OutputFormat::Csv => {
+                self.output_csv(&pmc_links)?;
             }
-            "txt" => {
-                self.output_txt(&pmc_links);
+            OutputFormat::Text => {
+                self.output_txt(&pmc_links)?;
             }
             _ => {
-                tracing::error!(
-                    "Unsupported format '{}'. Use 'json', 'csv', or 'txt'.",
+                bail!(
+                    "Unsupported format '{}' for pmid-to-pmcid. Use 'json', 'csv', or 'txt'.",
                     self.format
                 );
-                std::process::exit(1);
             }
         }
 
@@ -89,7 +84,6 @@ impl Convert {
             all_source_pmids.extend(batch_result.source_pmids);
             all_pmc_ids.extend(batch_result.pmc_ids);
 
-            // Add delay between batches to be respectful to the API
             self.add_inter_batch_delay(batch_idx, parsed_pmids.len())
                 .await;
         }
@@ -142,11 +136,9 @@ impl Convert {
     }
 
     fn output_json(&self, pmc_links: &pubmed_client::pubmed::models::PmcLinks) -> Result<()> {
-        // Create a more user-friendly JSON output
         let mut result = serde_json::Map::new();
         let mut conversions = Vec::new();
 
-        // Add all source PMIDs with their conversion status
         for pmid in &pmc_links.source_pmids {
             let mut conversion = serde_json::Map::new();
             conversion.insert(
@@ -157,9 +149,6 @@ impl Convert {
             conversions.push(serde_json::Value::Object(conversion));
         }
 
-        // If we have PMCIDs, update the conversions
-        // Note: This is a simplified approach - the actual PMID->PMCID mapping
-        // requires parsing the ELink response more carefully
         if !pmc_links.pmc_ids.is_empty() {
             result.insert(
                 "note".to_string(),
@@ -186,12 +175,13 @@ impl Convert {
         );
 
         let json_output = serde_json::to_string_pretty(&result)?;
-        println!("{}", json_output);
+        writeln!(std::io::stdout(), "{}", json_output)?;
         Ok(())
     }
 
-    fn output_csv(&self, pmc_links: &pubmed_client::pubmed::models::PmcLinks) {
-        println!("PMID,PMCID_Available,PMCIDs_Found");
+    fn output_csv(&self, pmc_links: &pubmed_client::pubmed::models::PmcLinks) -> Result<()> {
+        let mut stdout = std::io::stdout();
+        writeln!(stdout, "PMID,PMCID_Available,PMCIDs_Found")?;
         for pmid in &pmc_links.source_pmids {
             let has_pmc = if pmc_links.pmc_ids.is_empty() {
                 "false"
@@ -203,14 +193,16 @@ impl Convert {
             } else {
                 pmc_links.pmc_ids.join(";")
             };
-            println!("{},{},{}", pmid, has_pmc, pmcids_str);
+            writeln!(stdout, "{},{},{}", pmid, has_pmc, pmcids_str)?;
         }
+        Ok(())
     }
 
-    fn output_txt(&self, pmc_links: &pubmed_client::pubmed::models::PmcLinks) {
-        // Text format: only output PMCIDs, one per line
+    fn output_txt(&self, pmc_links: &pubmed_client::pubmed::models::PmcLinks) -> Result<()> {
+        let mut stdout = std::io::stdout();
         for pmcid in &pmc_links.pmc_ids {
-            println!("{}", pmcid);
+            writeln!(stdout, "{}", pmcid)?;
         }
+        Ok(())
     }
 }

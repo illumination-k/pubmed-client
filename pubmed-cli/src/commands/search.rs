@@ -1,11 +1,11 @@
+use std::io::Write;
 use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::Args;
 use pubmed_client::pubmed::ArticleType;
-use serde_json;
 
-use super::create_pubmed_client;
+use super::ClientContext;
 
 #[derive(Args, Debug)]
 pub struct Search {
@@ -120,26 +120,18 @@ impl From<ArticleTypeArg> for ArticleType {
 }
 
 impl Search {
-    pub async fn execute_with_config(
-        &self,
-        api_key: Option<&str>,
-        email: Option<&str>,
-        tool: &str,
-    ) -> Result<()> {
-        let client = create_pubmed_client(api_key, email, tool)?;
+    pub async fn execute(&self, ctx: &ClientContext<'_>) -> Result<()> {
+        let client = ctx.pubmed_client();
 
-        // Build the search query
         let search_query = self.build_query()?;
 
         if self.ids_only {
-            // Just search for PMIDs
             let pmids = client
                 .search_articles(&search_query, self.limit, None)
                 .await?;
             let output = pmids.join("\n");
             self.output_results(&output).await?;
         } else if self.pmc_ids_only {
-            // Search for PMIDs and convert to PMCIDs
             let pmids = client
                 .search_articles(&search_query, self.limit, None)
                 .await?;
@@ -153,12 +145,10 @@ impl Search {
                 return Ok(());
             }
 
-            // Convert PMIDs to PMCIDs
             let pmc_links = client.get_pmc_links(&pmid_u32s).await?;
             let output = pmc_links.pmc_ids.join("\n");
             self.output_results(&output).await?;
         } else {
-            // Fetch full articles
             let articles = client
                 .search_and_fetch(&search_query, self.limit, None)
                 .await?;
@@ -172,12 +162,10 @@ impl Search {
     fn build_query(&self) -> Result<String> {
         let mut query = pubmed_client::pubmed::SearchQuery::new();
 
-        // Add main query if provided
         if let Some(ref q) = self.query {
             query = query.query(q);
         }
 
-        // Date filters
         if let Some(year) = self.year {
             query = query.published_in_year(year);
         } else {
@@ -215,7 +203,6 @@ impl Search {
             query = query.journal_abbreviation(journal_abbrev);
         }
 
-        // MeSH terms
         if let Some(ref mesh_term) = self.mesh_term {
             query = query.mesh_term(mesh_term);
         }
@@ -224,12 +211,10 @@ impl Search {
             query = query.mesh_major_topic(mesh_major);
         }
 
-        // Organism filter
         if let Some(ref organism) = self.organism {
             query = query.organism_mesh(organism);
         }
 
-        // Article type and content filters
         if let Some(ref article_type) = self.article_type {
             let article_type: ArticleType = article_type.clone().into();
             query = query.article_type(article_type);
@@ -243,12 +228,10 @@ impl Search {
             query = query.pmc_only();
         }
 
-        // Other identifiers
         if let Some(ref grant_number) = self.grant_number {
             query = query.grant_number(grant_number);
         }
 
-        // Set limit
         query = query.limit(self.limit);
 
         Ok(query.build())
@@ -261,7 +244,7 @@ impl Search {
                 tracing::info!(path = %path.display(), "Results saved to file");
             }
             None => {
-                println!("{}", content);
+                writeln!(std::io::stdout(), "{}", content)?;
             }
         }
         Ok(())
@@ -399,8 +382,6 @@ mod tests {
             grant_number: None,
         };
 
-        // We can't test the actual execution here since it requires network calls,
-        // but we can verify that the search struct is properly constructed
         assert!(search.ids_only);
         assert_eq!(search.query, Some("test".to_string()));
     }
@@ -460,8 +441,6 @@ mod tests {
             grant_number: None,
         };
 
-        // We can't test the actual execution here since it requires network calls,
-        // but we can verify that the search struct is properly constructed
         assert!(search.pmc_ids_only);
         assert!(!search.ids_only);
         assert_eq!(search.query, Some("COVID-19".to_string()));
@@ -492,7 +471,6 @@ mod tests {
             grant_number: None,
         };
 
-        // Verify that we can combine pmc_ids_only with pmc_only filter
         assert!(search.pmc_ids_only);
         assert!(search.pmc_only);
 

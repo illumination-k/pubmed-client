@@ -8,8 +8,7 @@ use thiserror::Error;
 use tokio::io::AsyncWriteExt;
 use tracing::{debug, error, info};
 
-use crate::Cli;
-use crate::commands::create_pmc_client_with_timeout;
+use crate::commands::ClientContext;
 
 #[derive(Error, Debug)]
 pub enum MetadataError {
@@ -94,21 +93,13 @@ pub struct MetadataOptions {
     pub append: bool,
 }
 
-pub async fn execute(options: MetadataOptions, cli: &Cli) -> Result<()> {
-    // Determine output file path
+pub async fn execute(options: MetadataOptions, ctx: &ClientContext<'_>) -> Result<()> {
     let output_path = options
         .output_file
         .unwrap_or_else(|| PathBuf::from("metadata.jsonl"));
 
-    // Initialize the PMC client with timeout (default to 60 seconds for metadata extraction)
     let timeout = options.timeout_seconds.unwrap_or(60);
-    let client = create_pmc_client_with_timeout(
-        cli.api_key.as_deref(),
-        cli.email.as_deref(),
-        &cli.tool,
-        Some(timeout),
-    )
-    .context("Failed to create PMC client")?;
+    let client = ctx.pmc_client_with_timeout(Some(timeout));
 
     let mut failed_pmcids: Vec<FailedPmcId> = Vec::new();
 

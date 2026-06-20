@@ -8,8 +8,7 @@ use tempfile::TempDir;
 use thiserror::Error;
 use tracing::{debug, error, info, warn};
 
-use crate::Cli;
-use crate::commands::create_pmc_client_with_timeout;
+use crate::commands::ClientContext;
 use crate::commands::storage::{StorageBackend, create_storage_backend};
 
 #[derive(Error, Debug)]
@@ -122,21 +121,13 @@ pub struct FiguresOptions {
     pub overwrite: bool,
 }
 
-pub async fn execute(options: FiguresOptions, cli: &Cli) -> Result<()> {
-    // Create the appropriate storage backend
+pub async fn execute(options: FiguresOptions, ctx: &ClientContext<'_>) -> Result<()> {
     let storage = create_storage_backend(options.output_dir, options.s3_path, options.s3_region)
         .await
         .context("Failed to create storage backend")?;
 
-    // Initialize the PMC client with timeout (default to 180 seconds for figure extraction)
     let timeout = options.timeout_seconds.unwrap_or(180);
-    let client = create_pmc_client_with_timeout(
-        cli.api_key.as_deref(),
-        cli.email.as_deref(),
-        &cli.tool,
-        Some(timeout),
-    )
-    .context("Failed to create PMC client")?;
+    let client = ctx.pmc_client_with_timeout(Some(timeout));
 
     let mut failed_pmcids: Vec<FailedPmcId> = Vec::new();
 

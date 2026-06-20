@@ -1,7 +1,9 @@
-use anyhow::Result;
+use std::io::Write;
+
+use anyhow::{Result, bail};
 use clap::Args;
 
-use super::create_pubmed_client;
+use super::{ClientContext, OutputFormat};
 
 #[derive(Args, Debug)]
 pub struct ESpell {
@@ -14,31 +16,24 @@ pub struct ESpell {
     pub db: String,
 
     /// Output format (text or json)
-    #[arg(long, default_value = "text")]
-    pub format: String,
+    #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
+    pub format: OutputFormat,
 }
 
 impl ESpell {
-    pub async fn execute_with_config(
-        &self,
-        api_key: Option<&str>,
-        email: Option<&str>,
-        tool: &str,
-    ) -> Result<()> {
-        let client = create_pubmed_client(api_key, email, tool)?;
+    pub async fn execute(&self, ctx: &ClientContext<'_>) -> Result<()> {
+        let client = ctx.pubmed_client();
 
         tracing::info!(term = %self.term, db = %self.db, "Checking spelling");
 
         let result = client.spell_check_db(&self.term, &self.db).await?;
 
-        match self.format.as_str() {
-            "json" => {
+        match self.format {
+            OutputFormat::Json => {
                 let json = serde_json::to_string_pretty(&result)?;
-                use std::io::Write;
                 writeln!(std::io::stdout(), "{}", json)?;
             }
-            "text" => {
-                use std::io::Write;
+            OutputFormat::Text => {
                 let mut stdout = std::io::stdout();
                 writeln!(stdout, "Database: {}", result.database)?;
                 writeln!(stdout, "Original:  \"{}\"", result.query)?;
@@ -54,11 +49,10 @@ impl ESpell {
                 }
             }
             _ => {
-                tracing::error!(
-                    "Unsupported format '{}'. Use 'text' or 'json'.",
+                bail!(
+                    "Unsupported format '{}' for spell-check. Use 'text' or 'json'.",
                     self.format
                 );
-                std::process::exit(1);
             }
         }
 
