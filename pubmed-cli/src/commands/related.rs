@@ -1,7 +1,9 @@
-use anyhow::Result;
+use std::io::Write;
+
+use anyhow::{Result, bail};
 use clap::Args;
 
-use super::create_pubmed_client;
+use super::{ClientContext, OutputFormat};
 
 #[derive(Args, Debug)]
 pub struct Related {
@@ -14,31 +16,24 @@ pub struct Related {
     pub max: usize,
 
     /// Output format (text or json)
-    #[arg(long, default_value = "text")]
-    pub format: String,
+    #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
+    pub format: OutputFormat,
 }
 
 impl Related {
-    pub async fn execute_with_config(
-        &self,
-        api_key: Option<&str>,
-        email: Option<&str>,
-        tool: &str,
-    ) -> Result<()> {
-        let client = create_pubmed_client(api_key, email, tool)?;
+    pub async fn execute(&self, ctx: &ClientContext<'_>) -> Result<()> {
+        let client = ctx.pubmed_client();
 
         tracing::info!(pmids = ?self.pmids, "Finding related articles");
 
         let related = client.get_related_articles(&self.pmids).await?;
 
-        match self.format.as_str() {
-            "json" => {
+        match self.format {
+            OutputFormat::Json => {
                 let json = serde_json::to_string_pretty(&related)?;
-                use std::io::Write;
                 writeln!(std::io::stdout(), "{}", json)?;
             }
-            "text" => {
-                use std::io::Write;
+            OutputFormat::Text => {
                 let mut stdout = std::io::stdout();
                 writeln!(
                     stdout,
@@ -61,11 +56,10 @@ impl Related {
                 }
             }
             _ => {
-                tracing::error!(
-                    "Unsupported format '{}'. Use 'text' or 'json'.",
+                bail!(
+                    "Unsupported format '{}' for related. Use 'text' or 'json'.",
                     self.format
                 );
-                std::process::exit(1);
             }
         }
 

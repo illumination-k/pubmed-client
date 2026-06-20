@@ -1,7 +1,9 @@
-use anyhow::Result;
+use std::io::Write;
+
+use anyhow::{Result, bail};
 use clap::Args;
 
-use super::create_pubmed_client;
+use super::{ClientContext, OutputFormat};
 use pubmed_client::CitationQuery;
 
 #[derive(Args, Debug)]
@@ -12,20 +14,14 @@ pub struct CitMatch {
     pub citations: Vec<String>,
 
     /// Output format (json, csv, or txt)
-    #[arg(long, default_value = "json")]
-    pub format: String,
+    #[arg(long, value_enum, default_value_t = OutputFormat::Json)]
+    pub format: OutputFormat,
 }
 
 impl CitMatch {
-    pub async fn execute_with_config(
-        &self,
-        api_key: Option<&str>,
-        email: Option<&str>,
-        tool: &str,
-    ) -> Result<()> {
-        let client = create_pubmed_client(api_key, email, tool)?;
+    pub async fn execute(&self, ctx: &ClientContext<'_>) -> Result<()> {
+        let client = ctx.pubmed_client();
 
-        // Parse citation strings
         let queries: Vec<CitationQuery> = self
             .citations
             .iter()
@@ -33,20 +29,19 @@ impl CitMatch {
             .map(|(i, s)| {
                 let parts: Vec<&str> = s.split('|').collect();
                 if parts.len() < 5 {
-                    tracing::error!(
+                    bail!(
                         "Invalid citation format: '{}'. Expected: journal|year|volume|first_page|author_name",
                         s
                     );
-                    std::process::exit(1);
                 }
                 let key = if parts.len() >= 6 {
                     parts[5].to_string()
                 } else {
                     format!("ref{}", i + 1)
                 };
-                CitationQuery::new(parts[0], parts[1], parts[2], parts[3], parts[4], &key)
+                Ok(CitationQuery::new(parts[0], parts[1], parts[2], parts[3], parts[4], &key))
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         tracing::info!(
             citation_count = queries.len(),
@@ -55,15 +50,12 @@ impl CitMatch {
 
         let results = client.match_citations(&queries).await?;
 
-        match self.format.as_str() {
-            "json" => {
+        match self.format {
+            OutputFormat::Json => {
                 let json = serde_json::to_string_pretty(&results)?;
-                // Using write! to stdout since println! is disallowed by clippy in this workspace
-                use std::io::Write;
                 writeln!(std::io::stdout(), "{}", json)?;
             }
-            "csv" => {
-                use std::io::Write;
+            OutputFormat::Csv => {
                 let mut stdout = std::io::stdout();
                 writeln!(
                     stdout,
@@ -89,8 +81,7 @@ impl CitMatch {
                     )?;
                 }
             }
-            "txt" => {
-                use std::io::Write;
+            OutputFormat::Text => {
                 let mut stdout = std::io::stdout();
                 for m in &results.matches {
                     let status = match m.status {
@@ -112,11 +103,10 @@ impl CitMatch {
                 )?;
             }
             _ => {
-                tracing::error!(
-                    "Unsupported format '{}'. Use 'json', 'csv', or 'txt'.",
+                bail!(
+                    "Unsupported format '{}' for citmatch. Use 'json', 'csv', or 'txt'.",
                     self.format
                 );
-                std::process::exit(1);
             }
         }
 

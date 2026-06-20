@@ -7,6 +7,8 @@ use tracing_subscriber::util::SubscriberInitExt;
 
 mod commands;
 
+use commands::ClientContext;
+
 #[derive(Parser)]
 #[command(
     name = "pubmed-cli",
@@ -32,6 +34,16 @@ struct Cli {
     /// Tool name for NCBI requests
     #[arg(long, env = "NCBI_TOOL", default_value = "pubmed-cli", global = true)]
     tool: String,
+}
+
+impl Cli {
+    fn client_context(&self) -> ClientContext<'_> {
+        ClientContext {
+            api_key: self.api_key.as_deref(),
+            email: self.email.as_deref(),
+            tool: &self.tool,
+        }
+    }
 }
 
 #[derive(Subcommand)]
@@ -106,7 +118,6 @@ enum Commands {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    // Initialize tracing with indicatif layer for progress bars
     let filter = if cli.verbose { "debug" } else { "info" };
 
     let indicatif_layer = IndicatifLayer::new();
@@ -122,14 +133,10 @@ async fn main() -> Result<()> {
         .with(tracing_subscriber::EnvFilter::new(filter))
         .init();
 
-    // Execute command
+    let ctx = cli.client_context();
+
     match &cli.command {
-        Commands::Search(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
+        Commands::Search(cmd) => cmd.execute(&ctx).await,
         Commands::Figures {
             pmcids,
             output_dir,
@@ -148,14 +155,9 @@ async fn main() -> Result<()> {
                 timeout_seconds: *timeout,
                 overwrite: *overwrite,
             };
-            commands::figures::execute(options, &cli).await
+            commands::figures::execute(options, &ctx).await
         }
-        Commands::Markdown(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
+        Commands::Markdown(cmd) => cmd.execute(&ctx).await,
         Commands::Metadata {
             pmcids,
             output,
@@ -170,55 +172,15 @@ async fn main() -> Result<()> {
                 timeout_seconds: *timeout,
                 append: *append,
             };
-            commands::metadata::execute(options, &cli).await
+            commands::metadata::execute(options, &ctx).await
         }
-        Commands::PmidToPmcid(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
-        Commands::CitMatch(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
-        Commands::GQuery(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
-        Commands::SpellCheck(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
-        Commands::Related(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
-        Commands::Citations(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
-        Commands::Info(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
-        Commands::Export(cmd) => {
-            let api_key = cli.api_key.as_deref();
-            let email = cli.email.as_deref();
-            let tool = &cli.tool;
-            cmd.execute_with_config(api_key, email, tool).await
-        }
+        Commands::PmidToPmcid(cmd) => cmd.execute(&ctx).await,
+        Commands::CitMatch(cmd) => cmd.execute(&ctx).await,
+        Commands::GQuery(cmd) => cmd.execute(&ctx).await,
+        Commands::SpellCheck(cmd) => cmd.execute(&ctx).await,
+        Commands::Related(cmd) => cmd.execute(&ctx).await,
+        Commands::Citations(cmd) => cmd.execute(&ctx).await,
+        Commands::Info(cmd) => cmd.execute(&ctx).await,
+        Commands::Export(cmd) => cmd.execute(&ctx).await,
     }
 }

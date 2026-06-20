@@ -1,7 +1,9 @@
-use anyhow::Result;
+use std::io::Write;
+
+use anyhow::{Result, bail};
 use clap::Args;
 
-use super::create_pubmed_client;
+use super::{ClientContext, OutputFormat};
 
 #[derive(Args, Debug)]
 pub struct GQuery {
@@ -10,8 +12,8 @@ pub struct GQuery {
     pub term: String,
 
     /// Output format (json, table, or csv)
-    #[arg(long, default_value = "table")]
-    pub format: String,
+    #[arg(long, value_enum, default_value_t = OutputFormat::Table)]
+    pub format: OutputFormat,
 
     /// Only show databases with matching records (count > 0)
     #[arg(long)]
@@ -19,13 +21,8 @@ pub struct GQuery {
 }
 
 impl GQuery {
-    pub async fn execute_with_config(
-        &self,
-        api_key: Option<&str>,
-        email: Option<&str>,
-        tool: &str,
-    ) -> Result<()> {
-        let client = create_pubmed_client(api_key, email, tool)?;
+    pub async fn execute(&self, ctx: &ClientContext<'_>) -> Result<()> {
+        let client = ctx.pubmed_client();
 
         tracing::info!(term = %self.term, "Querying all NCBI databases");
 
@@ -37,19 +34,16 @@ impl GQuery {
             results.results.iter().collect()
         };
 
-        match self.format.as_str() {
-            "json" => {
+        match self.format {
+            OutputFormat::Json => {
                 let json = serde_json::to_string_pretty(&results)?;
-                use std::io::Write;
                 writeln!(std::io::stdout(), "{}", json)?;
             }
-            "table" => {
-                use std::io::Write;
+            OutputFormat::Table => {
                 let mut stdout = std::io::stdout();
                 writeln!(stdout, "Query: \"{}\"", results.term)?;
                 writeln!(stdout)?;
 
-                // Find max widths for formatting
                 let max_name_len = display_results
                     .iter()
                     .map(|r| r.menu_name.len())
@@ -101,8 +95,7 @@ impl GQuery {
                     display_results.len()
                 )?;
             }
-            "csv" => {
-                use std::io::Write;
+            OutputFormat::Csv => {
                 let mut stdout = std::io::stdout();
                 writeln!(stdout, "db_name,menu_name,count,status")?;
                 for db in &display_results {
@@ -114,11 +107,10 @@ impl GQuery {
                 }
             }
             _ => {
-                tracing::error!(
-                    "Unsupported format '{}'. Use 'json', 'table', or 'csv'.",
+                bail!(
+                    "Unsupported format '{}' for gquery. Use 'json', 'table', or 'csv'.",
                     self.format
                 );
-                std::process::exit(1);
             }
         }
 

@@ -1,8 +1,10 @@
+use std::io::Write;
+
 use anyhow::Result;
 use clap::Args;
 use pubmed_client::ExportFormat;
 
-use super::create_pubmed_client;
+use super::{CitationFormat, ClientContext};
 
 #[derive(Args, Debug)]
 pub struct Export {
@@ -11,8 +13,8 @@ pub struct Export {
     pub pmids: Vec<String>,
 
     /// Export format (bibtex, ris, csl-json, nbib)
-    #[arg(short, long, default_value = "bibtex")]
-    pub format: String,
+    #[arg(short, long, value_enum, default_value_t = CitationFormat::Bibtex)]
+    pub format: CitationFormat,
 
     /// Output file (default: stdout)
     #[arg(short, long)]
@@ -20,13 +22,8 @@ pub struct Export {
 }
 
 impl Export {
-    pub async fn execute_with_config(
-        &self,
-        api_key: Option<&str>,
-        email: Option<&str>,
-        tool: &str,
-    ) -> Result<()> {
-        let client = create_pubmed_client(api_key, email, tool)?;
+    pub async fn execute(&self, ctx: &ClientContext<'_>) -> Result<()> {
+        let client = ctx.pubmed_client();
 
         tracing::info!(
             pmids_count = self.pmids.len(),
@@ -42,25 +39,18 @@ impl Export {
             return Ok(());
         }
 
-        let result = match self.format.as_str() {
-            "bibtex" | "bib" => pubmed_client::export::articles_to_bibtex(&articles),
-            "ris" => pubmed_client::export::articles_to_ris(&articles),
-            "csl-json" | "csl" => {
+        let result = match self.format {
+            CitationFormat::Bibtex => pubmed_client::export::articles_to_bibtex(&articles),
+            CitationFormat::Ris => pubmed_client::export::articles_to_ris(&articles),
+            CitationFormat::CslJson => {
                 let json = pubmed_client::export::articles_to_csl_json(&articles);
                 serde_json::to_string_pretty(&json)?
             }
-            "nbib" | "medline" => articles
+            CitationFormat::Nbib => articles
                 .iter()
                 .map(|a| a.to_nbib())
                 .collect::<Vec<_>>()
                 .join("\n\n"),
-            _ => {
-                tracing::error!(
-                    "Unsupported format '{}'. Use 'bibtex', 'ris', 'csl-json', or 'nbib'.",
-                    self.format
-                );
-                std::process::exit(1);
-            }
         };
 
         if let Some(ref output_path) = self.output {
@@ -73,7 +63,6 @@ impl Export {
                 output_path.display()
             );
         } else {
-            use std::io::Write;
             write!(std::io::stdout(), "{}", result)?;
         }
 
