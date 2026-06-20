@@ -261,7 +261,7 @@ impl PmcTarClient {
     ///     let figures = client.extract_figures_with_captions("PMC7906746", output_dir).await?;
     ///
     ///     for figure in figures {
-    ///         println!("Figure {}: {}", figure.figure.id, figure.figure.caption);
+    ///         println!("Figure {}: {:?}", figure.figure.id, figure.figure.caption);
     ///         println!("File: {}", figure.extracted_file_path);
     ///     }
     ///     Ok(())

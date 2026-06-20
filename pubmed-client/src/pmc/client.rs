@@ -184,7 +184,7 @@ impl PmcClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PmcClient::new();
     ///     let full_text = client.fetch_full_text("PMC7906746").await?;
-    ///     println!("Title: {}", full_text.title());
+    ///     println!("Title: {}", full_text.title().unwrap_or("Untitled"));
     ///     println!("Sections: {}", full_text.sections().len());
     ///     Ok(())
     /// }
@@ -272,7 +272,7 @@ impl PmcClient {
     ///     if let Some(pmcid) = client.check_pmc_availability("33515491").await? {
     ///         println!("PMC available: {}", pmcid);
     ///         let full_text = client.fetch_full_text(&pmcid).await?;
-    ///         println!("Title: {}", full_text.title());
+    ///         println!("Title: {}", full_text.title().unwrap_or("Untitled"));
     ///     } else {
     ///         println!("PMC not available");
     ///     }
@@ -445,7 +445,7 @@ impl PmcClient {
     ///     let figures = client.extract_figures_with_captions("PMC7906746", output_dir).await?;
     ///
     ///     for figure in figures {
-    ///         println!("Figure {}: {}", figure.figure.id, figure.figure.caption);
+    ///         println!("Figure {}: {:?}", figure.figure.id, figure.figure.caption);
     ///         println!("File: {}", figure.extracted_file_path);
     ///     }
     ///     Ok(())

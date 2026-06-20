@@ -66,7 +66,7 @@
 //!         // Fetch structured full text
 //!         let full_text = client.fetch_full_text(&pmcid).await?;
 //!
-//!         println!("Title: {}", full_text.title());
+//!         println!("Title: {}", full_text.title().unwrap_or("Untitled"));
 //!         println!("Sections: {}", full_text.sections().len());
 //!         println!("References: {}", full_text.references().len());
 //!     }
@@ -143,7 +143,7 @@
 //!     let figures = client.extract_figures_with_captions("PMC7906746", output_dir).await?;
 //!
 //!     for figure in figures {
-//!         println!("Figure {}: {}", figure.figure.id, figure.figure.caption);
+//!         println!("Figure {}: {:?}", figure.figure.id, figure.figure.caption);
 //!         println!("File: {}", figure.extracted_file_path);
 //!         if let Some(dimensions) = figure.dimensions {
 //!             println!("Dimensions: {}x{}", dimensions.0, dimensions.1);
