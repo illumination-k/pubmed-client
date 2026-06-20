@@ -6,6 +6,8 @@
 
 #[cfg(not(target_arch = "wasm32"))]
 use std::time::{Duration as StdDuration, Instant as StdInstant};
+#[cfg(not(target_arch = "wasm32"))]
+use tokio::time as tokio_time;
 
 /// Simple duration representation for cross-platform compatibility
 ///
@@ -98,7 +100,7 @@ pub async fn sleep(duration: Duration) {
     if duration.is_zero() {
         return;
     }
-    tokio::time::sleep(StdDuration::from_millis(duration.as_millis())).await;
+    tokio_time::sleep(StdDuration::from_millis(duration.as_millis())).await;
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -225,10 +227,10 @@ mod tests {
         assert!(elapsed.as_millis() < 1000);
     }
 
-    #[test]
-    fn test_instant_duration_since() {
+    #[tokio::test]
+    async fn test_instant_duration_since() {
         let earlier = Instant::now();
-        std::thread::sleep(std::time::Duration::from_millis(50));
+        sleep(Duration::from_millis(50)).await;
         let later = Instant::now();
         let diff = later.duration_since(earlier);
         assert!(diff.as_millis() >= 30);
