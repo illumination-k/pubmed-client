@@ -3,6 +3,7 @@ use std::{path::Path, str, time::Duration};
 use crate::common::PmcId;
 use crate::config::ClientConfig;
 use crate::error::{ParseError, PubMedError, Result};
+use crate::pmc::common;
 use crate::pmc::extracted::ExtractedFigure;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
@@ -17,6 +18,7 @@ use {
     futures_util::StreamExt,
     std::{fs, fs::File},
     tar::Archive,
+    tempfile::NamedTempFile,
     tokio::{fs as tokio_fs, io::AsyncWriteExt, task},
 };
 
@@ -33,9 +35,6 @@ impl PmcTarClient {
     pub fn new(config: ClientConfig) -> Self {
         let rate_limiter = config.create_rate_limiter();
 
-        // reqwest's client builder only fails if the TLS backend cannot be
-        // initialized — an unrecoverable process-level environment error — so
-        // this infallible public constructor is allowed to `expect` here.
         #[allow(clippy::expect_used)]
         let client = {
             #[cfg(not(target_arch = "wasm32"))]
@@ -56,6 +55,21 @@ impl PmcTarClient {
             }
         };
 
+        Self {
+            client,
+            rate_limiter,
+            config,
+        }
+    }
+
+    /// Create a TAR client sharing an existing HTTP client and rate limiter.
+    ///
+    /// Used by `PmcClient` to avoid duplicating the HTTP client and rate limiter.
+    pub(crate) fn with_shared(
+        client: Client,
+        rate_limiter: RateLimiter,
+        config: ClientConfig,
+    ) -> Self {
         Self {
             client,
             rate_limiter,
@@ -107,11 +121,9 @@ impl PmcTarClient {
         pmcid: &str,
         output_dir: P,
     ) -> Result<Vec<String>> {
-        // Validate and parse PMC ID
         let pmc_id = PmcId::parse(pmcid)?;
         let normalized_pmcid = pmc_id.as_str();
 
-        // Create output directory early (before any potential failures)
         let output_path = output_dir.as_ref();
         tokio_fs::create_dir_all(output_path)
             .await
@@ -119,19 +131,34 @@ impl PmcTarClient {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
-        // Build OA API URL (with API parameters)
+        let download_url = self.resolve_download_url(&normalized_pmcid, pmcid).await?;
+        let temp_file = self.stream_to_temp_file(&download_url, output_path).await?;
+
+        let extracted_files = self.extract_tar_gz(temp_file.path(), output_path).await?;
+
+        Ok(extracted_files)
+    }
+
+    /// Resolve the actual tar.gz download URL via the OA API.
+    ///
+    /// The OA API may return an XML document containing the real download link,
+    /// or it may serve the tar.gz directly.
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn resolve_download_url(
+        &self,
+        normalized_pmcid: &str,
+        original_pmcid: &str,
+    ) -> Result<String> {
         let url = self.executor().build_url(
             "https://www.ncbi.nlm.nih.gov/pmc/utils/oa",
             "oa.fcgi",
-            &[("id", normalized_pmcid.as_str()), ("format", "tgz")],
+            &[("id", normalized_pmcid), ("format", "tgz")],
         )?;
 
         debug!("Downloading tar.gz from OA API: {}", url);
 
-        // Download the OA API response
         let response = self.executor().get(&url).await?;
 
-        // Check if the response is XML (OA API response with download link)
         let content_type = response
             .headers()
             .get("content-type")
@@ -140,66 +167,65 @@ impl PmcTarClient {
 
         debug!("OA API response content-type: {}", content_type);
 
-        let download_url =
-            if content_type.contains("text/xml") || content_type.contains("application/xml") {
-                // Parse XML to extract the actual download URL
-                let xml_content = response.text().await?;
-                debug!("OA API returned XML, parsing for download URL");
-                let parsed_url = self.parse_oa_response(&xml_content, pmcid)?;
-                // Convert FTP URLs to HTTPS for HTTP client compatibility
-                if parsed_url.starts_with("ftp://ftp.ncbi.nlm.nih.gov/") {
-                    parsed_url.replace(
-                        "ftp://ftp.ncbi.nlm.nih.gov/",
-                        "https://ftp.ncbi.nlm.nih.gov/",
-                    )
-                } else {
-                    parsed_url
-                }
-            } else if content_type.contains("application/x-gzip")
-                || content_type.contains("application/gzip")
-            {
-                // Direct tar.gz download - use the original URL
-                url.clone()
+        if content_type.contains("text/xml") || content_type.contains("application/xml") {
+            let xml_content = response.text().await?;
+            debug!("OA API returned XML, parsing for download URL");
+            let parsed_url = self.parse_oa_response(&xml_content, original_pmcid)?;
+            if parsed_url.starts_with("ftp://ftp.ncbi.nlm.nih.gov/") {
+                Ok(parsed_url.replace(
+                    "ftp://ftp.ncbi.nlm.nih.gov/",
+                    "https://ftp.ncbi.nlm.nih.gov/",
+                ))
             } else {
-                // Check if it's an error response
-                let error_text = response.text().await?;
-                if error_text.contains("error") || error_text.contains("Error") {
-                    return Err(ParseError::PmcNotAvailable {
-                        id: pmcid.to_string(),
-                    }
-                    .into());
-                }
-                // If we get here, it's likely still an error but we consumed the response
+                Ok(parsed_url)
+            }
+        } else if content_type.contains("application/x-gzip")
+            || content_type.contains("application/gzip")
+        {
+            Ok(url)
+        } else {
+            let error_text = response.text().await?;
+            if error_text.contains("error") || error_text.contains("Error") {
                 return Err(ParseError::PmcNotAvailable {
-                    id: pmcid.to_string(),
+                    id: original_pmcid.to_string(),
                 }
                 .into());
-            };
+            }
+            Err(ParseError::PmcNotAvailable {
+                id: original_pmcid.to_string(),
+            }
+            .into())
+        }
+    }
 
-        // Now download the actual tar.gz file
-        let tar_response = self.executor().get(&download_url).await?;
+    /// Stream a tar.gz response into a temporary file with RAII cleanup.
+    ///
+    /// The returned `NamedTempFile` is automatically deleted when dropped,
+    /// ensuring no leftover files on any error path.
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn stream_to_temp_file(
+        &self,
+        download_url: &str,
+        output_dir: &Path,
+    ) -> Result<NamedTempFile> {
+        let tar_response = self.executor().get(download_url).await?;
 
-        // Create output directory if it doesn't exist
-        let output_path = output_dir.as_ref();
-        tokio_fs::create_dir_all(output_path)
-            .await
-            .map_err(|e| ParseError::IoError {
-                message: format!("Failed to create output directory: {}", e),
-            })?;
+        let temp_file = NamedTempFile::new_in(output_dir).map_err(|e| ParseError::IoError {
+            message: format!("Failed to create temporary file: {}", e),
+        })?;
 
-        // Stream the response to a temporary file
-        let temp_file_path = output_path.join(format!("{}.tar.gz", normalized_pmcid));
-        let mut temp_file =
-            tokio_fs::File::create(&temp_file_path)
+        let temp_path = temp_file.path().to_path_buf();
+        let mut async_file =
+            tokio_fs::File::create(&temp_path)
                 .await
                 .map_err(|e| ParseError::IoError {
-                    message: format!("Failed to create temporary file: {}", e),
+                    message: format!("Failed to open temporary file for writing: {}", e),
                 })?;
 
         let mut stream = tar_response.bytes_stream();
         while let Some(chunk) = stream.next().await {
             let chunk = chunk.map_err(PubMedError::from)?;
-            temp_file
+            async_file
                 .write_all(&chunk)
                 .await
                 .map_err(|e| ParseError::IoError {
@@ -207,25 +233,13 @@ impl PmcTarClient {
                 })?;
         }
 
-        temp_file.flush().await.map_err(|e| ParseError::IoError {
+        async_file.flush().await.map_err(|e| ParseError::IoError {
             message: format!("Failed to flush temporary file: {}", e),
         })?;
 
-        debug!("Downloaded tar.gz to: {}", temp_file_path.display());
+        debug!("Downloaded tar.gz to: {}", temp_path.display());
 
-        // Extract the tar.gz file
-        let extracted_files = self
-            .extract_tar_gz(&temp_file_path, &output_path.to_path_buf())
-            .await?;
-
-        // Clean up temporary file
-        tokio_fs::remove_file(&temp_file_path)
-            .await
-            .map_err(|e| ParseError::IoError {
-                message: format!("Failed to remove temporary file: {}", e),
-            })?;
-
-        Ok(extracted_files)
+        Ok(temp_file)
     }
 
     /// Download, extract tar.gz file, and match figures with their captions from XML
@@ -273,9 +287,8 @@ impl PmcTarClient {
         pmcid: &str,
         output_dir: P,
     ) -> Result<Vec<ExtractedFigure>> {
-        let normalized_pmcid = self.normalize_pmcid(pmcid);
+        let normalized_pmcid = common::normalize_pmcid(pmcid);
 
-        // Create output directory early (before any potential failures)
         let output_path = output_dir.as_ref();
         tokio_fs::create_dir_all(output_path)
             .await
@@ -283,52 +296,23 @@ impl PmcTarClient {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
-        // First, fetch the XML to get figure captions
-        let xml_content = self.fetch_xml(&normalized_pmcid).await?;
+        let xml_content = common::fetch_pmc_xml(
+            &self.executor(),
+            self.config.effective_base_url(),
+            &normalized_pmcid,
+        )
+        .await?;
         let full_text = parse_pmc_xml(&xml_content, &normalized_pmcid)?;
 
-        // Extract the tar.gz file
         let extracted_files = self
             .download_and_extract_tar(&normalized_pmcid, &output_dir)
             .await?;
 
-        // Find and match figures
         let figures = self
             .match_figures_with_files(&full_text, &extracted_files, &output_dir)
             .await?;
 
         Ok(figures)
-    }
-
-    /// Fetch raw XML content from PMC
-    #[cfg(not(target_arch = "wasm32"))]
-    async fn fetch_xml(&self, pmcid: &str) -> Result<String> {
-        // Validate and parse PMC ID
-        let pmc_id = PmcId::parse(pmcid)?;
-        let normalized_pmcid = pmc_id.as_str();
-        let numeric_part = pmc_id.numeric_part();
-
-        let id = format!("PMC{numeric_part}");
-        let response = self
-            .executor()
-            .get_endpoint(
-                self.config.effective_base_url(),
-                "efetch.fcgi",
-                &[("db", "pmc"), ("id", id.as_str()), ("retmode", "xml")],
-            )
-            .await?;
-
-        let xml_content = response.text().await?;
-
-        // Check if the response contains an error
-        if xml_content.contains("<ERROR>") {
-            return Err(ParseError::PmcNotAvailable {
-                id: normalized_pmcid,
-            }
-            .into());
-        }
-
-        Ok(xml_content)
     }
 
     /// Parse OA API XML response to extract download URL
@@ -350,7 +334,6 @@ impl PmcTarClient {
                     if e.name().as_ref() == b"link" =>
                 {
                     debug!("Found link element");
-                    // Look for href attribute
                     for attr in e.attributes().flatten() {
                         debug!(
                             "Attribute: {:?} = {:?}",
@@ -393,19 +376,16 @@ impl PmcTarClient {
         let output_path = output_dir.as_ref();
         let mut matched_figures = Vec::new();
 
-        // Collect all figures from all sections
         let mut all_figures = Vec::new();
         for section in full_text.sections() {
             Self::collect_figures_recursive(section, &mut all_figures);
         }
 
-        // Common image extensions to look for
         let image_extensions = [
             "jpg", "jpeg", "png", "gif", "tiff", "tif", "svg", "eps", "pdf",
         ];
 
         for figure in all_figures {
-            // Try to find a matching file for this figure
             let matching_file =
                 Self::find_matching_file(&figure, extracted_files, &image_extensions);
 
@@ -417,13 +397,11 @@ impl PmcTarClient {
                         output_path.join(&file_path).to_string_lossy().to_string()
                     };
 
-                // Get file size
                 let file_size = tokio_fs::metadata(&absolute_path)
                     .await
                     .map(|m| m.len())
                     .ok();
 
-                // Try to get image dimensions
                 let dimensions = Self::get_image_dimensions(&absolute_path).await;
 
                 matched_figures.push(ExtractedFigure {
@@ -454,7 +432,6 @@ impl PmcTarClient {
         extracted_files: &[String],
         image_extensions: &[&str],
     ) -> Option<String> {
-        // First try to match by figure graphic_href if available
         if let Some(file_name) = &figure.graphic_href {
             for file_path in extracted_files {
                 if let Some(filename) = Path::new(file_path).file_name()
@@ -465,13 +442,11 @@ impl PmcTarClient {
             }
         }
 
-        // Try to match by figure ID
         for file_path in extracted_files {
             if let Some(filename) = Path::new(file_path).file_name() {
                 let filename_str = filename.to_string_lossy().to_lowercase();
                 let figure_id_lower = figure.id.to_lowercase();
 
-                // Check if filename contains figure ID and has image extension
                 if filename_str.contains(&figure_id_lower)
                     && let Some(extension) = Path::new(file_path).extension()
                 {
@@ -483,7 +458,6 @@ impl PmcTarClient {
             }
         }
 
-        // Try to match by label if available
         if let Some(label) = &figure.label {
             let label_clean = label.to_lowercase().replace([' ', '.'], "");
             for file_path in extracted_files {
@@ -539,7 +513,6 @@ impl PmcTarClient {
         let tar_path = tar_path.as_ref();
         let output_dir = output_dir.as_ref();
 
-        // Read the tar.gz file
         let tar_file = File::open(tar_path).map_err(|e| ParseError::IoError {
             message: format!("Failed to open tar.gz file: {}", e),
         })?;
@@ -549,7 +522,6 @@ impl PmcTarClient {
 
         let mut extracted_files = Vec::new();
 
-        // Extract all entries
         for entry in archive.entries().map_err(|e| ParseError::IoError {
             message: format!("Failed to read tar entries: {}", e),
         })? {
@@ -563,14 +535,12 @@ impl PmcTarClient {
 
             let output_path = output_dir.join(&path);
 
-            // Create parent directories if they don't exist
             if let Some(parent) = output_path.parent() {
                 fs::create_dir_all(parent).map_err(|e| ParseError::IoError {
                     message: format!("Failed to create parent directories: {}", e),
                 })?;
             }
 
-            // Extract the entry
             entry
                 .unpack(&output_path)
                 .map_err(|e| ParseError::IoError {
@@ -584,22 +554,6 @@ impl PmcTarClient {
         Ok(extracted_files)
     }
 
-    /// Normalize PMCID format (ensure it starts with "PMC")
-    fn normalize_pmcid(&self, pmcid: &str) -> String {
-        // Use PmcId for validation and normalization
-        // If parsing fails, fall back to the old behavior for backwards compatibility
-        PmcId::parse(pmcid)
-            .map(|id| id.as_str())
-            .unwrap_or_else(|_| {
-                if pmcid.starts_with("PMC") {
-                    pmcid.to_string()
-                } else {
-                    format!("PMC{pmcid}")
-                }
-            })
-    }
-
-    /// Build a request executor borrowing this client's HTTP client, rate limiter, and config.
     fn executor(&self) -> RequestExecutor<'_> {
         RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
     }
@@ -611,17 +565,21 @@ mod tests {
 
     #[test]
     fn test_normalize_pmcid() {
-        let config = ClientConfig::new();
-        let client = PmcTarClient::new(config);
-
-        assert_eq!(client.normalize_pmcid("1234567"), "PMC1234567");
-        assert_eq!(client.normalize_pmcid("PMC1234567"), "PMC1234567");
+        assert_eq!(common::normalize_pmcid("1234567"), "PMC1234567");
+        assert_eq!(common::normalize_pmcid("PMC1234567"), "PMC1234567");
     }
 
     #[test]
     fn test_client_creation() {
         let config = ClientConfig::new();
         let _client = PmcTarClient::new(config);
-        // Test that client is created successfully
+    }
+
+    #[test]
+    fn test_with_shared_creation() {
+        let config = ClientConfig::new();
+        let rate_limiter = config.create_rate_limiter();
+        let client = Client::new();
+        let _tar_client = PmcTarClient::with_shared(client, rate_limiter, config);
     }
 }
