@@ -4,6 +4,7 @@
 //! full-text articles, check availability, and parse structured content.
 
 pub mod client;
+pub(crate) mod common;
 pub mod extracted;
 pub mod tar;
 

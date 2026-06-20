@@ -1,9 +1,9 @@
 use std::time::Duration;
 
 use crate::cache::{PmcCache, create_cache};
-use crate::common::{PmcId, PubMedId};
+use crate::common::PubMedId;
 use crate::config::ClientConfig;
-use crate::error::{ParseError, Result};
+use crate::error::Result;
 use crate::pmc::extracted::ExtractedFigure;
 use crate::pmc::oa_api;
 use crate::pmc::oa_api::OaSubsetInfo;
@@ -16,6 +16,8 @@ use tracing::info;
 
 #[cfg(not(target_arch = "wasm32"))]
 use {crate::pmc::tar::PmcTarClient, std::path::Path};
+
+use super::common;
 
 /// Client for interacting with PMC (PubMed Central) API
 #[derive(Clone)]
@@ -103,11 +105,15 @@ impl PmcClient {
         let cache = config.cache_config.as_ref().map(create_cache);
 
         Self {
+            #[cfg(not(target_arch = "wasm32"))]
+            tar_client: PmcTarClient::with_shared(
+                client.clone(),
+                rate_limiter.clone(),
+                config.clone(),
+            ),
             client,
             base_url,
             rate_limiter,
-            #[cfg(not(target_arch = "wasm32"))]
-            tar_client: PmcTarClient::new(config.clone()),
             cache,
             config,
         }
@@ -139,11 +145,15 @@ impl PmcClient {
         let base_url = config.effective_base_url().to_string();
 
         Self {
+            #[cfg(not(target_arch = "wasm32"))]
+            tar_client: PmcTarClient::with_shared(
+                client.clone(),
+                rate_limiter.clone(),
+                config.clone(),
+            ),
             client,
             base_url,
             rate_limiter,
-            #[cfg(not(target_arch = "wasm32"))]
-            tar_client: PmcTarClient::new(config.clone()),
             cache: None,
             config,
         }
@@ -223,32 +233,7 @@ impl PmcClient {
     ///
     /// Returns a `Result<String>` containing the raw XML content
     pub async fn fetch_xml(&self, pmcid: &str) -> Result<String> {
-        // Validate and parse PMC ID
-        let pmc_id = PmcId::parse(pmcid)?;
-        let normalized_pmcid = pmc_id.as_str();
-        let numeric_part = pmc_id.numeric_part();
-
-        let id = format!("PMC{numeric_part}");
-        let response = self
-            .executor()
-            .get_endpoint(
-                &self.base_url,
-                "efetch.fcgi",
-                &[("db", "pmc"), ("id", id.as_str()), ("retmode", "xml")],
-            )
-            .await?;
-
-        let xml_content = response.text().await?;
-
-        // Check if the response contains an error
-        if xml_content.contains("<ERROR>") {
-            return Err(ParseError::PmcNotAvailable {
-                id: normalized_pmcid,
-            }
-            .into());
-        }
-
-        Ok(xml_content)
+        common::fetch_pmc_xml(&self.executor(), &self.base_url, pmcid).await
     }
 
     /// Check if PMC full text is available for a given PMID
@@ -509,19 +494,8 @@ impl PmcClient {
         }
     }
 
-    /// Normalize PMCID format (ensure it starts with "PMC")
     fn normalize_pmcid(&self, pmcid: &str) -> String {
-        // Use PmcId for validation and normalization
-        // If parsing fails, fall back to the old behavior for backwards compatibility
-        PmcId::parse(pmcid)
-            .map(|id| id.as_str())
-            .unwrap_or_else(|_| {
-                if pmcid.starts_with("PMC") {
-                    pmcid.to_string()
-                } else {
-                    format!("PMC{pmcid}")
-                }
-            })
+        common::normalize_pmcid(pmcid)
     }
 
     /// Build a request executor borrowing this client's HTTP client, rate limiter, and config.
