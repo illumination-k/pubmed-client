@@ -79,9 +79,15 @@ enum Commands {
     Metadata {
         /// PMC ID(s) to process (e.g., PMC7906746 or 7906746)
         pmcids: Vec<String>,
-        /// Output JSONL file path (default: metadata.jsonl)
-        #[arg(short, long)]
+        /// Output JSONL file path (default: metadata.jsonl, local storage)
+        #[arg(short, long, conflicts_with = "s3_path")]
         output: Option<PathBuf>,
+        /// S3 object path for the JSONL output (e.g., s3://bucket/prefix/metadata.jsonl)
+        #[arg(long, conflicts_with = "output")]
+        s3_path: Option<String>,
+        /// AWS region for S3 (optional, uses default AWS config if not specified)
+        #[arg(long, requires = "s3_path")]
+        s3_region: Option<String>,
         /// Path to save failed PMC IDs (if not specified, failures are logged only)
         #[arg(short, long)]
         failed_output: Option<PathBuf>,
@@ -161,6 +167,8 @@ async fn main() -> Result<()> {
         Commands::Metadata {
             pmcids,
             output,
+            s3_path,
+            s3_region,
             failed_output,
             timeout,
             append,
@@ -168,6 +176,8 @@ async fn main() -> Result<()> {
             let options = commands::metadata::MetadataOptions {
                 pmcids: pmcids.clone(),
                 output_file: output.clone(),
+                s3_path: s3_path.clone(),
+                s3_region: s3_region.clone(),
                 failed_output: failed_output.clone(),
                 timeout_seconds: *timeout,
                 append: *append,
