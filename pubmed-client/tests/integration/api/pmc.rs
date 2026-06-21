@@ -71,7 +71,7 @@ mod integration_tests {
 
                     info!(
                         pmcid = pmcid,
-                        title_length = fulltext.title().len(),
+                        title_length = fulltext.title().unwrap_or_default().len(),
                         authors_count = fulltext.authors().len(),
                         sections_count = fulltext.sections().len(),
                         figures_count = total_figures,
@@ -83,7 +83,7 @@ mod integration_tests {
 
                     // Verify required fields
                     assert!(
-                        !fulltext.title().is_empty(),
+                        fulltext.title().is_some_and(|t| !t.is_empty()),
                         "PMC article should have title"
                     );
                     assert!(
@@ -114,11 +114,12 @@ mod integration_tests {
                     }
 
                     // Log title preview for verification
-                    let title_preview = if fulltext.title().len() > 100 {
-                        let preview = &fulltext.title()[..100];
+                    let title = fulltext.title().unwrap_or_default();
+                    let title_preview = if title.len() > 100 {
+                        let preview = &title[..100];
                         format!("{preview}...")
                     } else {
-                        fulltext.title().to_string()
+                        title.to_string()
                     };
                     debug!(pmcid = pmcid, title_preview = %title_preview, "PMC article title");
                 }
@@ -174,9 +175,9 @@ mod integration_tests {
                     assert!(markdown.contains("#"), "Markdown should contain headers");
 
                     // Should contain title
+                    let title = fulltext.title().unwrap_or_default();
                     assert!(
-                        markdown.contains(fulltext.title())
-                            || markdown.contains(&fulltext.title().replace(" ", "")),
+                        markdown.contains(title) || markdown.contains(&title.replace(" ", "")),
                         "Markdown should contain article title"
                     );
 
@@ -602,7 +603,7 @@ mod integration_tests {
                         pmc_articles_fetched += 1;
                         info!(
                             pmcid = pmcid,
-                            title_length = fulltext.title().len(),
+                            title_length = fulltext.title().unwrap_or_default().len(),
                             sections_count = fulltext.sections().len(),
                             "PMC full text retrieved successfully"
                         );
