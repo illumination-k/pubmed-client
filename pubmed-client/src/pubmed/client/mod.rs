@@ -363,6 +363,31 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(pmids_count = pmids.len()))]
     pub async fn fetch_articles(&self, pmids: &[&str]) -> Result<Vec<PubMedArticle>> {
+        self.batch_fetch_pmids(
+            pmids,
+            "efetch.fcgi",
+            &[("retmode", "xml"), ("rettype", "abstract")],
+            |xml| Ok(parse_articles_from_xml(xml)?),
+        )
+        .await
+    }
+
+    /// Fetch records for many PMIDs by chunking them into NCBI-sized batches.
+    ///
+    /// Validates every PMID upfront, then splits the request into batches of up to
+    /// 200 IDs (per NCBI guidance), issues one E-utilities call per batch against
+    /// `endpoint` (with `extra_params` appended to the shared `db`/`id` pair), and
+    /// parses each response body with `parse_fn`. Empty response bodies are skipped.
+    pub(crate) async fn batch_fetch_pmids<T, F>(
+        &self,
+        pmids: &[&str],
+        endpoint: &str,
+        extra_params: &[(&str, &str)],
+        parse_fn: F,
+    ) -> Result<Vec<T>>
+    where
+        F: Fn(&str) -> Result<Vec<T>>,
+    {
         if pmids.is_empty() {
             return Ok(Vec::new());
         }
@@ -380,7 +405,7 @@ impl PubMedClient {
         // NCBI recommends batches of up to 200 IDs per request
         const BATCH_SIZE: usize = 200;
 
-        let mut all_articles = Vec::with_capacity(pmids.len());
+        let mut all_items = Vec::with_capacity(pmids.len());
 
         for chunk in validated.chunks(BATCH_SIZE) {
             let id_list: String = chunk
@@ -389,34 +414,31 @@ impl PubMedClient {
                 .collect::<Vec<_>>()
                 .join(",");
 
-            debug!(batch_size = chunk.len(), "Making batch EFetch API request");
-            let response = self
-                .get_eutils(
-                    "efetch.fcgi",
-                    &[
-                        ("db", "pubmed"),
-                        ("id", id_list.as_str()),
-                        ("retmode", "xml"),
-                        ("rettype", "abstract"),
-                    ],
-                )
-                .await?;
-            let xml_text = response.text().await?;
+            let mut params: Vec<(&str, &str)> = vec![("db", "pubmed"), ("id", id_list.as_str())];
+            params.extend_from_slice(extra_params);
 
-            if xml_text.trim().is_empty() {
+            debug!(
+                batch_size = chunk.len(),
+                endpoint, "Making batch E-utilities API request"
+            );
+            let response = self.get_eutils(endpoint, &params).await?;
+            let body = response.text().await?;
+
+            if body.trim().is_empty() {
                 continue;
             }
 
-            let articles = parse_articles_from_xml(&xml_text)?;
+            let items = parse_fn(&body)?;
             info!(
                 requested = chunk.len(),
-                parsed = articles.len(),
+                parsed = items.len(),
+                endpoint,
                 "Batch fetch completed"
             );
-            all_articles.extend(articles);
+            all_items.extend(items);
         }
 
-        Ok(all_articles)
+        Ok(all_items)
     }
 
     /// Search and fetch multiple articles with metadata

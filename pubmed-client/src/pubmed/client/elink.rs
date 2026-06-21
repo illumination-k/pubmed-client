@@ -43,25 +43,8 @@ impl PubMedClient {
 
         let elink_response = self.elink_request(pmids, "pubmed", "pubmed_pubmed").await?;
 
-        let mut all_related_pmids = Vec::new();
-
-        for linkset in elink_response.linksets {
-            if let Some(linkset_dbs) = linkset.linkset_dbs {
-                for linkset_db in linkset_dbs {
-                    if linkset_db.link_name == "pubmed_pubmed" {
-                        for link_id in linkset_db.links {
-                            if let Ok(pmid) = link_id.parse::<u32>() {
-                                all_related_pmids.push(pmid);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Remove duplicates and original PMIDs
-        all_related_pmids.sort_unstable();
-        all_related_pmids.dedup();
+        let mut all_related_pmids = Self::collect_linked_pmids(elink_response, "pubmed_pubmed");
+        // Drop the original PMIDs from their own related set
         all_related_pmids.retain(|&pmid| !pmids.contains(&pmid));
 
         info!(
@@ -194,25 +177,7 @@ impl PubMedClient {
             .elink_request(pmids, "pubmed", "pubmed_pubmed_citedin")
             .await?;
 
-        let mut citing_pmids = Vec::new();
-
-        for linkset in elink_response.linksets {
-            if let Some(linkset_dbs) = linkset.linkset_dbs {
-                for linkset_db in linkset_dbs {
-                    if linkset_db.link_name == "pubmed_pubmed_citedin" {
-                        for link_id in linkset_db.links {
-                            if let Ok(pmid) = link_id.parse::<u32>() {
-                                citing_pmids.push(pmid);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Remove duplicates
-        citing_pmids.sort_unstable();
-        citing_pmids.dedup();
+        let citing_pmids = Self::collect_linked_pmids(elink_response, "pubmed_pubmed_citedin");
 
         info!(
             source_count = pmids.len(),
@@ -225,6 +190,34 @@ impl PubMedClient {
             citing_pmids,
             link_type: "pubmed_pubmed_citedin".to_string(),
         })
+    }
+
+    /// Collect deduplicated u32 PMIDs from an ELink response for a given link name.
+    ///
+    /// Walks `linksets → linkset_dbs → links`, keeping only entries whose
+    /// `link_name` matches, parsing each link ID to `u32`, then sorting and
+    /// deduplicating the result. Shared by `get_related_articles` and
+    /// `get_citations`, which differ only in the link name and result wrapper.
+    fn collect_linked_pmids(response: ELinkResponse, link_name: &str) -> Vec<u32> {
+        let mut pmids = Vec::new();
+
+        for linkset in response.linksets {
+            if let Some(linkset_dbs) = linkset.linkset_dbs {
+                for linkset_db in linkset_dbs {
+                    if linkset_db.link_name == link_name {
+                        for link_id in linkset_db.links {
+                            if let Ok(pmid) = link_id.parse::<u32>() {
+                                pmids.push(pmid);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        pmids.sort_unstable();
+        pmids.dedup();
+        pmids
     }
 
     /// Internal helper method for ELink API requests
