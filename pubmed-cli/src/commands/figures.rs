@@ -1,115 +1,16 @@
-use anyhow::{Context as _, Result};
+use anyhow::Result;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use serde::{Deserialize, Serialize};
-use std::fmt;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tempfile::TempDir;
-use thiserror::Error;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info, warn};
 
 use crate::commands::ClientContext;
+use crate::commands::batch::{
+    BatchItemError, BatchProcessor, FailureKind, classify_fetch_error, report_failures,
+};
 use crate::commands::storage::{StorageBackend, create_storage_backend};
-
-#[derive(Error, Debug)]
-pub enum FiguresError {
-    #[error("Failed to download TAR archive for PMC ID {pmcid}: {source}")]
-    TarDownloadFailed {
-        pmcid: String,
-        #[source]
-        source: anyhow::Error,
-    },
-
-    #[error("No figures found in article {pmcid}")]
-    NoFiguresFound { pmcid: String },
-
-    #[error("Failed to save metadata for {pmcid}: {source}")]
-    MetadataSaveFailed {
-        pmcid: String,
-        path: String,
-        #[source]
-        source: anyhow::Error,
-    },
-
-    #[error("Network timeout while processing {pmcid} (timeout: {timeout_seconds}s)")]
-    NetworkTimeout { pmcid: String, timeout_seconds: u64 },
-
-    #[error("Storage backend error for {pmcid}: {source}")]
-    StorageError {
-        pmcid: String,
-        operation: String,
-        #[source]
-        source: anyhow::Error,
-    },
-
-    #[error("Unexpected error processing {pmcid}: {source}")]
-    Other {
-        pmcid: String,
-        #[source]
-        source: anyhow::Error,
-    },
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum FailureReason {
-    TarDownloadFailed {
-        message: String,
-        is_timeout: bool,
-        is_network_error: bool,
-    },
-    NoFiguresFound,
-    MetadataSaveFailed(String),
-    NetworkTimeout {
-        timeout_seconds: u64,
-    },
-    StorageError {
-        operation: String,
-        message: String,
-    },
-    Other(String),
-}
-
-impl fmt::Display for FailureReason {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::TarDownloadFailed {
-                message,
-                is_timeout,
-                is_network_error,
-            } => {
-                write!(
-                    f,
-                    "TAR download failed: {}{}{}]",
-                    message,
-                    if *is_timeout { " (timeout)" } else { "" },
-                    if *is_network_error {
-                        " (network error)"
-                    } else {
-                        ""
-                    }
-                )
-            }
-            Self::NoFiguresFound => write!(f, "No figures found in article"),
-            Self::MetadataSaveFailed(msg) => write!(f, "Metadata save failed: {}", msg),
-            Self::NetworkTimeout { timeout_seconds } => {
-                write!(f, "Network timeout after {} seconds", timeout_seconds)
-            }
-            Self::StorageError { operation, message } => {
-                write!(f, "Storage error during {}: {}", operation, message)
-            }
-            Self::Other(msg) => write!(f, "Unexpected error: {}", msg),
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct FailedPmcId {
-    pub pmcid: String,
-    pub reason: FailureReason,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error_details: Option<String>,
-}
 
 pub struct FiguresOptions {
     pub pmcids: Vec<String>,
@@ -124,107 +25,43 @@ pub struct FiguresOptions {
 pub async fn execute(options: FiguresOptions, ctx: &ClientContext<'_>) -> Result<()> {
     let storage = create_storage_backend(options.output_dir, options.s3_path, options.s3_region)
         .await
-        .context("Failed to create storage backend")?;
+        .map_err(|e| anyhow::anyhow!("Failed to create storage backend: {}", e))?;
 
     let timeout = options.timeout_seconds.unwrap_or(180);
     let client = ctx.pmc_client_with_timeout(Some(timeout));
 
-    let mut failed_pmcids: Vec<FailedPmcId> = Vec::new();
+    let mut processor = BatchProcessor::new(options.pmcids.len())?;
 
-    // Create progress bars
-    let multi_progress = MultiProgress::new();
-    let total_pmcids = options.pmcids.len();
+    processor
+        .run(&options.pmcids, async |multi_progress, pmcid| {
+            process_article(
+                &client,
+                pmcid,
+                storage.as_ref(),
+                options.overwrite,
+                multi_progress,
+            )
+            .await
+        })
+        .await;
 
-    let main_pb = multi_progress.add(ProgressBar::new(total_pmcids as u64));
-    main_pb.set_style(
-        ProgressStyle::default_bar()
-            .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} articles ({msg})")
-            .context("Failed to set progress bar style")?
-            .progress_chars("#>-"),
-    );
-    main_pb.set_message("Processing PMC articles");
+    processor.finish();
 
-    // Process each PMCID
-    for pmcid in &options.pmcids {
-        main_pb.set_message(format!("Processing {}", pmcid));
-        debug!(pmcid = %pmcid, "Processing article");
-
-        match process_article_with_progress(
-            &client,
-            pmcid,
-            storage.as_ref(),
-            options.overwrite,
-            &multi_progress,
-        )
-        .await
-        {
-            Ok(_) => {
-                debug!(pmcid = %pmcid, "Successfully processed article");
-                main_pb.set_message(format!("Completed {}", pmcid));
-            }
-            Err(e) => {
-                error!(pmcid = %pmcid, error = %e, "Failed to process article");
-
-                // Determine the failure reason based on the error
-                let (reason, error_details) = categorize_failure_from_figures_error(&e, pmcid);
-
-                failed_pmcids.push(FailedPmcId {
-                    pmcid: pmcid.clone(),
-                    reason,
-                    error_details: Some(error_details),
-                });
-                main_pb.set_message(format!("Failed {}", pmcid));
-                continue;
-            }
-        }
-
-        main_pb.inc(1);
-    }
-
-    main_pb.finish_with_message(format!(
-        "Processed {} articles ({} failed)",
-        total_pmcids,
-        failed_pmcids.len()
-    ));
-
-    if !failed_pmcids.is_empty() {
-        // Save failed PMC IDs to file if output path is specified
-        if let Some(failed_path) = options.failed_output {
-            match save_failed_pmcids_json(&failed_pmcids, &failed_path, storage.as_ref()).await {
-                Ok(_) => {
-                    info!(
-                        path = %failed_path.display(),
-                        count = failed_pmcids.len(),
-                        "Saved failed PMC IDs to JSON file"
-                    );
-                }
-                Err(e) => {
-                    error!(
-                        path = %failed_path.display(),
-                        error = %e,
-                        "Failed to save failed PMC IDs to JSON file"
-                    );
-                }
-            }
-        } else {
-            error!(
-                failed_count = failed_pmcids.len(),
-                failed_pmcids = ?failed_pmcids,
-                "Failed to process some PMC IDs"
-            );
-        }
-    }
-
-    Ok(())
+    report_failures(
+        processor.failures(),
+        options.failed_output,
+        storage.as_ref(),
+    )
+    .await
 }
 
-async fn process_article_with_progress(
+async fn process_article(
     client: &pubmed_client::PmcClient,
     pmcid: &str,
     storage: &dyn StorageBackend,
     overwrite: bool,
     multi_progress: &MultiProgress,
-) -> Result<(), FiguresError> {
+) -> Result<(), BatchItemError> {
     // Check if metadata file already exists and skip early if overwrite is false
     let article_dir_str = pmcid;
     let json_filename = format!("{}_figures_metadata.json", pmcid);
@@ -242,10 +79,8 @@ async fn process_article_with_progress(
 
     // Create a temporary directory for extraction using tempfile crate
     // This ensures automatic cleanup on drop and avoids conflicts
-    let temp_dir_handle = TempDir::new().map_err(|e| FiguresError::Other {
-        pmcid: pmcid.to_string(),
-        source: anyhow::anyhow!(e),
-    })?;
+    let temp_dir_handle = TempDir::new()
+        .map_err(|e| BatchItemError::new(pmcid, FailureKind::Other, e.to_string()))?;
     let temp_dir = temp_dir_handle.path();
 
     // Create progress bar for downloading
@@ -253,10 +88,7 @@ async fn process_article_with_progress(
     download_pb.set_style(
         ProgressStyle::default_spinner()
             .template("{spinner:.green} {msg}")
-            .map_err(|e| FiguresError::Other {
-                pmcid: pmcid.to_string(),
-                source: anyhow::anyhow!(e),
-            })?,
+            .map_err(|e| BatchItemError::new(pmcid, FailureKind::Other, e.to_string()))?,
     );
     download_pb.enable_steady_tick(Duration::from_millis(100));
     download_pb.set_message(format!("Downloading and extracting figures from {}", pmcid));
@@ -273,43 +105,37 @@ async fn process_article_with_progress(
         Err(e) => {
             download_pb.finish_with_message(format!("Failed to download {}", pmcid));
             // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
-            error!(
-                pmcid = %pmcid,
-                error = %e,
-                "Failed to download TAR archive or extract figures"
-            );
-
-            // Check if it's a timeout error
             let error_str = e.to_string();
-            if error_str.contains("timeout") || error_str.contains("timed out") {
-                return Err(FiguresError::NetworkTimeout {
-                    pmcid: pmcid.to_string(),
-                    timeout_seconds: client.get_tar_client_config().timeout.as_secs(),
-                });
-            }
-
-            return Err(FiguresError::TarDownloadFailed {
-                pmcid: pmcid.to_string(),
-                source: anyhow::anyhow!(e),
-            });
+            let timeout_seconds = client.get_tar_client_config().timeout.as_secs();
+            return Err(BatchItemError::new(
+                pmcid,
+                classify_fetch_error(&error_str, timeout_seconds),
+                format!("TAR download/extraction failed: {:#}", anyhow::anyhow!(e)),
+            ));
         }
     };
 
     if figures.is_empty() {
         // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
-        return Err(FiguresError::NoFiguresFound {
-            pmcid: pmcid.to_string(),
-        });
+        return Err(BatchItemError::new(
+            pmcid,
+            FailureKind::Empty,
+            "No figures found in article",
+        ));
     }
 
     // Now that we have figures, ensure the storage directory exists
     storage
         .ensure_directory(article_dir_str)
         .await
-        .map_err(|e| FiguresError::StorageError {
-            pmcid: pmcid.to_string(),
-            operation: "ensure_directory".to_string(),
-            source: e,
+        .map_err(|e| {
+            BatchItemError::new(
+                pmcid,
+                FailureKind::StorageError {
+                    operation: "ensure_directory".to_string(),
+                },
+                format!("{:#}", e),
+            )
         })?;
     debug!(directory = %storage.get_full_path(article_dir_str), "Created storage directory");
 
@@ -323,10 +149,7 @@ async fn process_article_with_progress(
     figure_pb.set_style(
         ProgressStyle::default_bar()
             .template("  {spinner:.green} Saving figures [{bar:30.cyan/blue}] {pos}/{len} {msg}")
-            .map_err(|e| FiguresError::Other {
-                pmcid: pmcid.to_string(),
-                source: anyhow::anyhow!(e),
-            })?
+            .map_err(|e| BatchItemError::new(pmcid, FailureKind::Other, e.to_string()))?
             .progress_chars("#>-"),
     );
     figure_pb.set_message(pmcid.to_string());
@@ -409,33 +232,33 @@ async fn process_article_with_progress(
 
     // Save metadata as JSON to storage (always save metadata if we got this far)
     let json_content = serde_json::to_string_pretty(&figure_metadata).map_err(|e| {
-        FiguresError::MetadataSaveFailed {
-            pmcid: pmcid.to_string(),
-            path: json_storage_path.clone(),
-            source: anyhow::anyhow!(e),
-        }
+        BatchItemError::new(
+            pmcid,
+            FailureKind::StorageError {
+                operation: "serialize_metadata".to_string(),
+            },
+            e.to_string(),
+        )
     })?;
 
     storage
         .write_file(&json_storage_path, json_content.as_bytes())
         .await
-        .map_err(|e| FiguresError::MetadataSaveFailed {
-            pmcid: pmcid.to_string(),
-            path: json_storage_path.clone(),
-            source: e,
+        .map_err(|e| {
+            BatchItemError::new(
+                pmcid,
+                FailureKind::StorageError {
+                    operation: "write_metadata".to_string(),
+                },
+                format!("Failed to save metadata to {}: {:#}", json_storage_path, e),
+            )
         })?;
 
-    let metadata_action = if storage
-        .file_exists(&json_storage_path)
-        .await
-        .unwrap_or(false)
-        && overwrite
-    {
-        "Overwritten"
-    } else {
-        "Saved"
-    };
-    debug!(filename = %json_filename, location = %storage.get_full_path(&json_storage_path), "{} metadata", metadata_action);
+    debug!(
+        filename = %json_filename,
+        location = %storage.get_full_path(&json_storage_path),
+        "Saved metadata"
+    );
 
     Ok(())
 }
@@ -446,69 +269,4 @@ struct FigureMetadata {
     figureid: String,
     label: Option<String>,
     caption: Option<String>,
-}
-
-fn categorize_failure_from_figures_error(
-    error: &FiguresError,
-    _pmcid: &str,
-) -> (FailureReason, String) {
-    let error_str = error.to_string();
-    let error_chain = format!("{:#}", error); // Include full error chain for debugging
-
-    let reason = match error {
-        FiguresError::TarDownloadFailed { .. } => {
-            let is_timeout = error_str.contains("timeout") || error_str.contains("timed out");
-            let is_network = error_str.contains("network") || error_str.contains("connection");
-            FailureReason::TarDownloadFailed {
-                message: error_str.clone(),
-                is_timeout,
-                is_network_error: is_network,
-            }
-        }
-        FiguresError::NoFiguresFound { .. } => FailureReason::NoFiguresFound,
-        FiguresError::MetadataSaveFailed { path, .. } => FailureReason::MetadataSaveFailed(
-            format!("Failed to save metadata to {}: {}", path, error_str),
-        ),
-        FiguresError::NetworkTimeout {
-            timeout_seconds, ..
-        } => FailureReason::NetworkTimeout {
-            timeout_seconds: *timeout_seconds,
-        },
-        FiguresError::StorageError { operation, .. } => FailureReason::StorageError {
-            operation: operation.clone(),
-            message: error_str.clone(),
-        },
-        FiguresError::Other { .. } => FailureReason::Other(error_str.clone()),
-    };
-
-    (reason, error_chain)
-}
-
-async fn save_failed_pmcids_json(
-    failed_pmcids: &[FailedPmcId],
-    path: &Path,
-    storage: &dyn StorageBackend,
-) -> Result<()> {
-    // Convert to JSON with pretty formatting
-    let json_content = serde_json::to_string_pretty(failed_pmcids)?;
-
-    // Get just the filename from the path
-    let filename = path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .ok_or_else(|| anyhow::anyhow!("Invalid failed output path"))?;
-
-    // Ensure the filename has .json extension
-    let json_filename = if !filename.ends_with(".json") {
-        format!("{}.json", filename.trim_end_matches('.'))
-    } else {
-        filename.to_string()
-    };
-
-    // Write to storage
-    storage
-        .write_file(&json_filename, json_content.as_bytes())
-        .await?;
-
-    Ok(())
 }

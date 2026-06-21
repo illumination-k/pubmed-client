@@ -1,3 +1,4 @@
+pub mod batch;
 pub mod citations;
 pub mod citmatch;
 pub mod convert;
