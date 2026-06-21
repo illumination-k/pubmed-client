@@ -1,11 +1,10 @@
 //! ESummary API operations for fetching lightweight article metadata
 
-use crate::common::PubMedId;
 use crate::error::{ParseError, PubMedError, Result};
 use crate::pubmed::models::ArticleSummary;
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::{ESummaryDocSum, ESummaryResponse};
-use tracing::{debug, info, instrument, warn};
+use tracing::{instrument, warn};
 
 use super::PubMedClient;
 
@@ -41,61 +40,13 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(pmids_count = pmids.len()))]
     pub async fn fetch_summaries(&self, pmids: &[&str]) -> Result<Vec<ArticleSummary>> {
-        if pmids.is_empty() {
-            return Ok(Vec::new());
-        }
-
-        // Validate all PMIDs upfront
-        let validated: Vec<u32> = pmids
-            .iter()
-            .map(|pmid| {
-                PubMedId::parse(pmid)
-                    .map(|p| p.as_u32())
-                    .map_err(PubMedError::from)
-            })
-            .collect::<Result<Vec<_>>>()?;
-
-        const BATCH_SIZE: usize = 200;
-
-        let mut all_summaries = Vec::with_capacity(pmids.len());
-
-        for chunk in validated.chunks(BATCH_SIZE) {
-            let id_list: String = chunk
-                .iter()
-                .map(|id| id.to_string())
-                .collect::<Vec<_>>()
-                .join(",");
-
-            debug!(
-                batch_size = chunk.len(),
-                "Making batch ESummary API request"
-            );
-            let response = self
-                .get_eutils(
-                    "esummary.fcgi",
-                    &[
-                        ("db", "pubmed"),
-                        ("id", id_list.as_str()),
-                        ("retmode", "json"),
-                    ],
-                )
-                .await?;
-            let json_text = response.text().await?;
-
-            if json_text.trim().is_empty() {
-                continue;
-            }
-
-            let summaries = Self::parse_esummary_response(&json_text)?;
-            info!(
-                requested = chunk.len(),
-                parsed = summaries.len(),
-                "ESummary batch completed"
-            );
-            all_summaries.extend(summaries);
-        }
-
-        Ok(all_summaries)
+        self.batch_fetch_pmids(
+            pmids,
+            "esummary.fcgi",
+            &[("retmode", "json")],
+            Self::parse_esummary_response,
+        )
+        .await
     }
 
     /// Fetch a single article summary by PMID using the ESummary API
