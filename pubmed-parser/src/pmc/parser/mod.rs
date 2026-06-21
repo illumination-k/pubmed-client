@@ -4,12 +4,12 @@ use crate::pmc::domain::{
     Abstract, ArticleMeta, Back, Body, Front, License, Permissions, PmcArticle, TitleGroup,
 };
 
-pub mod author;
-pub mod metadata;
+pub(crate) mod author;
+pub(crate) mod metadata;
 pub(crate) mod reader_utils;
-pub mod reference;
-pub mod section;
-pub mod xml_utils;
+pub(crate) mod reference;
+pub(crate) mod section;
+pub(crate) mod xml_utils;
 
 /// Extract a section slice from XML content without allocating.
 ///

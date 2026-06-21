@@ -850,8 +850,8 @@ impl From<JsFullText> for PmcArticle {
     }
 }
 
-impl From<pubmed_client::pmc::Author> for JsAuthor {
-    fn from(author: pubmed_client::pmc::Author) -> Self {
+impl From<pubmed_client::Author> for JsAuthor {
+    fn from(author: pubmed_client::Author) -> Self {
         // Convert affiliations to simple strings
         let affiliation_names: Vec<String> = author
             .affiliations
@@ -870,12 +870,12 @@ impl From<pubmed_client::pmc::Author> for JsAuthor {
     }
 }
 
-impl From<JsAuthor> for pubmed_client::pmc::Author {
+impl From<JsAuthor> for pubmed_client::Author {
     fn from(js: JsAuthor) -> Self {
         let affiliations = js
             .affiliations
             .into_iter()
-            .map(|name| pubmed_client::pmc::Affiliation {
+            .map(|name| pubmed_client::Affiliation {
                 id: None,
                 institution: Some(name),
                 department: None,
@@ -1020,10 +1020,10 @@ impl From<pubmed_client::pmc::Reference> for JsReference {
 impl From<JsReference> for pubmed_client::pmc::Reference {
     fn from(js: JsReference) -> Self {
         // Convert simple strings back to Author structs
-        let authors: Vec<pubmed_client::pmc::Author> = js
+        let authors: Vec<pubmed_client::Author> = js
             .authors
             .into_iter()
-            .map(|name| pubmed_client::pmc::Author {
+            .map(|name| pubmed_client::Author {
                 given_names: None,
                 surname: None,
                 initials: None,

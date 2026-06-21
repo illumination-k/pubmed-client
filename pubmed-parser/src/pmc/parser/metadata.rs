@@ -526,7 +526,7 @@ fn read_supplementary_material(
 ///
 /// Returns a [`JournalMeta`] without volume/issue — those belong to the article level
 /// per the JATS DTD and are extracted separately via [`extract_volume`] / [`extract_issue`].
-pub fn extract_journal_info(content: &str) -> JournalMeta {
+pub(crate) fn extract_journal_info(content: &str) -> JournalMeta {
     let title = read_first_text(content, b"journal-title");
     let abbreviation =
         read_first_text_matching_attr(content, b"journal-id", b"journal-id-type", "iso-abbrev");
@@ -572,19 +572,19 @@ pub fn extract_journal_info(content: &str) -> JournalMeta {
 }
 
 /// Extract volume number from `<volume>` element.
-pub fn extract_volume(content: &str) -> Option<String> {
+pub(crate) fn extract_volume(content: &str) -> Option<String> {
     read_first_text(content, b"volume")
 }
 
 /// Extract issue number from `<issue>` element.
-pub fn extract_issue(content: &str) -> Option<String> {
+pub(crate) fn extract_issue(content: &str) -> Option<String> {
     read_first_text(content, b"issue")
 }
 
 /// Extract structured publication dates from `<pub-date>` elements.
 ///
 /// Returns a `Vec<PublicationDate>` with `pub_type` attribute preserved.
-pub fn extract_pub_dates(content: &str) -> Vec<PublicationDate> {
+pub(crate) fn extract_pub_dates(content: &str) -> Vec<PublicationDate> {
     let mut dates = Vec::new();
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
@@ -615,61 +615,29 @@ pub fn extract_pub_dates(content: &str) -> Vec<PublicationDate> {
     dates
 }
 
-/// Extract publication date in YYYY-MM-DD format.
-///
-/// Returns `None` when no year element is present. Non-numeric month/day
-/// values are logged and omitted rather than silently defaulted to `1`.
-pub fn extract_pub_date(content: &str) -> Option<String> {
-    let year = read_first_text(content, b"year")?;
-    let month = read_first_text(content, b"month");
-    let day = read_first_text(content, b"day");
-
-    match (month, day) {
-        (Some(m), Some(d)) => match (m.parse::<u32>(), d.parse::<u32>()) {
-            (Ok(mv), Ok(dv)) => Some(format!("{year}-{mv:02}-{dv:02}")),
-            (Ok(mv), Err(_)) => {
-                warn!(year = %year, month = %m, day = %d, "non-numeric day value, omitting day");
-                Some(format!("{year}-{mv:02}"))
-            }
-            (Err(_), _) => {
-                warn!(year = %year, month = %m, "non-numeric month value, omitting month/day");
-                Some(year)
-            }
-        },
-        (Some(m), None) => match m.parse::<u32>() {
-            Ok(mv) => Some(format!("{year}-{mv:02}")),
-            Err(_) => {
-                warn!(year = %year, month = %m, "non-numeric month value, omitting month");
-                Some(year)
-            }
-        },
-        _ => Some(year),
-    }
-}
-
 /// Extract DOI from article metadata
-pub fn extract_doi(content: &str) -> Option<String> {
+pub(crate) fn extract_doi(content: &str) -> Option<String> {
     read_first_text_matching_attr(content, b"article-id", b"pub-id-type", "doi")
 }
 
 /// Extract PMID from article metadata
-pub fn extract_pmid(content: &str) -> Option<String> {
+pub(crate) fn extract_pmid(content: &str) -> Option<String> {
     read_first_text_matching_attr(content, b"article-id", b"pub-id-type", "pmid")
 }
 
 /// Extract article type from article metadata
-pub fn extract_article_type(content: &str) -> Option<String> {
+pub(crate) fn extract_article_type(content: &str) -> Option<String> {
     read_first_attr(content, b"article", &[b"article-type"])
         .or_else(|| read_first_text(content, b"subject"))
 }
 
 /// Extract keywords from article metadata
-pub fn extract_keywords(content: &str) -> Vec<String> {
+pub(crate) fn extract_keywords(content: &str) -> Vec<String> {
     read_texts_within_parent(content, b"kwd-group", b"kwd")
 }
 
 /// Extract funding information
-pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
+pub(crate) fn extract_funding(content: &str) -> Vec<FundingInfo> {
     let mut funding = Vec::new();
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
@@ -692,7 +660,7 @@ pub fn extract_funding(content: &str) -> Vec<FundingInfo> {
 }
 
 /// Extract conflict of interest statement
-pub fn extract_conflict_of_interest(content: &str) -> Option<String> {
+pub(crate) fn extract_conflict_of_interest(content: &str) -> Option<String> {
     for text in read_texts_within_parent(content, b"fn-group", b"fn") {
         let lower = text.to_lowercase();
         if lower.contains("conflict") || lower.contains("competing") {
@@ -729,12 +697,12 @@ pub fn extract_conflict_of_interest(content: &str) -> Option<String> {
 /// Extract acknowledgments
 ///
 /// Strips XML tags and decodes XML entities (e.g., `&#231;` → `ç`).
-pub fn extract_acknowledgments(content: &str) -> Option<String> {
+pub(crate) fn extract_acknowledgments(content: &str) -> Option<String> {
     read_first_text(content, b"ack").map(|s| decode_xml_entities(&s).into_owned())
 }
 
 /// Extract data availability statement
-pub fn extract_data_availability(content: &str) -> Option<String> {
+pub(crate) fn extract_data_availability(content: &str) -> Option<String> {
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
 
@@ -784,7 +752,7 @@ pub fn extract_data_availability(content: &str) -> Option<String> {
 }
 
 /// Extract supplementary materials
-pub fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMaterial> {
+pub(crate) fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMaterial> {
     let mut materials = Vec::new();
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
@@ -820,61 +788,28 @@ pub fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMateri
 }
 
 /// Extract article title. Returns `None` when the element is absent.
-pub fn extract_title(content: &str) -> Option<String> {
+pub(crate) fn extract_title(content: &str) -> Option<String> {
     read_first_text(content, b"article-title")
 }
 
 /// Extract article subtitle from `<title-group>/<subtitle>`
-pub fn extract_subtitle(content: &str) -> Option<String> {
+pub(crate) fn extract_subtitle(content: &str) -> Option<String> {
     read_texts_within_parent(content, b"title-group", b"subtitle")
         .into_iter()
         .next()
 }
 
-/// Extract article language
-pub fn extract_language(content: &str) -> Option<String> {
-    read_first_attr(content, b"article", &[b"xml:lang"])
-}
-
-/// Extract article identifiers (DOI, PMID, PMC ID, etc.)
-pub fn extract_article_ids(content: &str) -> Vec<(String, String)> {
-    let mut ids = Vec::new();
-    let mut reader = make_reader(content);
-    let mut buf = Vec::new();
-
-    loop {
-        let id_type = match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"article-id" => {
-                get_attr(e, b"pub-id-type")
-            }
-            Ok(Event::Eof) => break,
-            Err(_) => break,
-            _ => None,
-        };
-        buf.clear();
-
-        if let Some(id_type) = id_type
-            && let Ok(id_value) = read_text_content(&mut reader, b"article-id", &mut buf)
-            && let Some(id_value) = clean_text(id_value)
-        {
-            ids.push((id_type, id_value));
-        }
-    }
-
-    ids
-}
-
 /// Extract copyright information
 ///
 /// Decodes XML entities (e.g., `&#169;` → `©`).
-pub fn extract_copyright(content: &str) -> Option<String> {
+pub(crate) fn extract_copyright(content: &str) -> Option<String> {
     read_first_text(content, b"copyright-statement")
         .or_else(|| read_first_text(content, b"copyright-year"))
         .map(|s| decode_xml_entities(&s).into_owned())
 }
 
 /// Extract license information
-pub fn extract_license(content: &str) -> Option<String> {
+pub(crate) fn extract_license(content: &str) -> Option<String> {
     read_first_text(content, b"license")
 }
 
@@ -882,7 +817,7 @@ pub fn extract_license(content: &str) -> Option<String> {
 ///
 /// Handles both simple abstracts (`<abstract><p>...</p></abstract>`)
 /// and structured abstracts with sections (`<abstract><sec><title>Background</title><p>...</p></sec>...</abstract>`).
-pub fn extract_abstract(content: &str) -> Option<String> {
+pub(crate) fn extract_abstract(content: &str) -> Option<String> {
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
 
@@ -950,7 +885,7 @@ pub fn extract_abstract(content: &str) -> Option<String> {
 /// Extract publication history dates from `<history>` element
 ///
 /// Parses `<date date-type="received">`, `<date date-type="accepted">`, etc.
-pub fn extract_history_dates(content: &str) -> Vec<HistoryDate> {
+pub(crate) fn extract_history_dates(content: &str) -> Vec<HistoryDate> {
     let mut dates = Vec::new();
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
@@ -990,13 +925,13 @@ pub fn extract_history_dates(content: &str) -> Vec<HistoryDate> {
 }
 
 /// Extract article categories from `<article-categories>/<subj-group>/<subject>`
-pub fn extract_categories(content: &str) -> Vec<String> {
+pub(crate) fn extract_categories(content: &str) -> Vec<String> {
     read_texts_within_parent(content, b"article-categories", b"subject")
 }
 
 /// Extract license URL from `<license xlink:href="...">` attribute
 /// or from `<ali:license_ref>` element content
-pub fn extract_license_url(content: &str) -> Option<String> {
+pub(crate) fn extract_license_url(content: &str) -> Option<String> {
     read_first_attr(content, b"license", &[b"xlink:href", b"href"])
         .or_else(|| read_first_text(content, b"ali:license_ref"))
 }
@@ -1004,19 +939,19 @@ pub fn extract_license_url(content: &str) -> Option<String> {
 /// Extract first page number from `<fpage>` element
 ///
 /// Handles `<fpage>` with or without attributes (e.g., `<fpage seq="b">54</fpage>`).
-pub fn extract_fpage(content: &str) -> Option<String> {
+pub(crate) fn extract_fpage(content: &str) -> Option<String> {
     read_first_text(content, b"fpage")
 }
 
 /// Extract last page number from `<lpage>` element
 ///
 /// Handles `<lpage>` with or without attributes.
-pub fn extract_lpage(content: &str) -> Option<String> {
+pub(crate) fn extract_lpage(content: &str) -> Option<String> {
     read_first_text(content, b"lpage")
 }
 
 /// Extract electronic location identifier from `<elocation-id>` element
-pub fn extract_elocation_id(content: &str) -> Option<String> {
+pub(crate) fn extract_elocation_id(content: &str) -> Option<String> {
     read_first_text(content, b"elocation-id")
 }
 
@@ -1083,65 +1018,10 @@ mod tests {
     }
 
     #[test]
-    fn test_extract_pub_date() {
-        let content_full = r#"<year>2023</year><month>12</month><day>25</day>"#;
-        assert_eq!(
-            extract_pub_date(content_full).as_deref(),
-            Some("2023-12-25")
-        );
-
-        let content_year_month = r#"<year>2023</year><month>12</month>"#;
-        assert_eq!(
-            extract_pub_date(content_year_month).as_deref(),
-            Some("2023-12")
-        );
-
-        let content_year_only = r#"<year>2023</year>"#;
-        assert_eq!(extract_pub_date(content_year_only).as_deref(), Some("2023"));
-
-        let content_no_date = r#"<title>No date here</title>"#;
-        assert_eq!(extract_pub_date(content_no_date), None);
-    }
-
-    #[test]
-    fn test_extract_pub_date_non_numeric_month() {
-        let content = r#"<year>2023</year><month>Jan</month><day>15</day>"#;
-        assert_eq!(extract_pub_date(content).as_deref(), Some("2023"));
-    }
-
-    #[test]
-    fn test_extract_pub_date_non_numeric_day() {
-        let content = r#"<year>2023</year><month>12</month><day>unknown</day>"#;
-        assert_eq!(extract_pub_date(content).as_deref(), Some("2023-12"));
-    }
-
-    #[test]
     fn test_extract_article_type() {
         let content = r#"<article article-type="research-article">Content</article>"#;
         let article_type = extract_article_type(content);
         assert_eq!(article_type, Some("research-article".to_string()));
-    }
-
-    #[test]
-    fn test_extract_language() {
-        let content = r#"<article xml:lang="en">Content</article>"#;
-        let language = extract_language(content);
-        assert_eq!(language, Some("en".to_string()));
-    }
-
-    #[test]
-    fn test_extract_article_ids() {
-        let content = r#"
-        <article-id pub-id-type="doi">10.1234/test</article-id>
-        <article-id pub-id-type="pmid">12345</article-id>
-        <article-id pub-id-type="pmc">PMC123456</article-id>
-        "#;
-
-        let ids = extract_article_ids(content);
-        assert_eq!(ids.len(), 3);
-        assert!(ids.contains(&("doi".to_string(), "10.1234/test".to_string())));
-        assert!(ids.contains(&("pmid".to_string(), "12345".to_string())));
-        assert!(ids.contains(&("pmc".to_string(), "PMC123456".to_string())));
     }
 
     #[test]

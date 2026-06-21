@@ -96,28 +96,8 @@ struct Aff {
     countries: Vec<String>,
 }
 
-/// XML structure for element-citation or mixed-citation
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-struct Citation {
-    #[serde(rename = "person-group", default)]
-    person_groups: Vec<PersonGroup>,
-    #[serde(rename = "name", default)]
-    names: Vec<Name>,
-}
-
-/// XML structure for person-group element
-#[derive(Debug, Deserialize)]
-#[serde(rename = "person-group")]
-struct PersonGroup {
-    #[serde(rename = "@person-group-type")]
-    _group_type: Option<String>,
-    #[serde(rename = "name", default)]
-    names: Vec<Name>,
-}
-
 /// Extract authors from PMC XML content
-pub fn extract_authors(content: &str) -> Result<Vec<Author>> {
+pub(crate) fn extract_authors(content: &str) -> Result<Vec<Author>> {
     // Find and extract the contrib-group section
     if let Some(contrib_start) = content.find("<contrib-group>") {
         if let Some(contrib_end) = content[contrib_start..].find("</contrib-group>") {
@@ -234,88 +214,6 @@ fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
     Some(author)
 }
 
-/// Extract authors from reference sections
-pub fn extract_reference_authors(ref_content: &str) -> Result<Vec<Author>> {
-    let mut authors = Vec::new();
-
-    // Try to parse as element-citation
-    if ref_content.contains("<element-citation") {
-        if let Some(start) = ref_content.find("<element-citation")
-            && let Some(end) = ref_content[start..].find("</element-citation>")
-        {
-            let citation_content = &ref_content[start..start + end + "</element-citation>".len()];
-            let cleaned_citation = strip_inline_html_tags(citation_content);
-            match from_str::<Citation>(&cleaned_citation) {
-                Ok(citation) => {
-                    // Extract names from person-groups first
-                    for person_group in citation.person_groups {
-                        for name in person_group.names {
-                            authors.push(Author::new(name.surname, name.given_names));
-                        }
-                    }
-                    // Also check for direct names (without person-group wrapper)
-                    for name in citation.names {
-                        authors.push(Author::new(name.surname, name.given_names));
-                    }
-                    if !authors.is_empty() {
-                        return Ok(authors);
-                    }
-                }
-                Err(e) => {
-                    return Err(ParseError::XmlError(format!(
-                        "Failed to parse element-citation XML: {}",
-                        e
-                    )));
-                }
-            }
-        } else {
-            return Err(ParseError::XmlError(
-                "Found element-citation start tag but no matching end tag".to_string(),
-            ));
-        }
-    }
-
-    // Try to parse as mixed-citation
-    if ref_content.contains("<mixed-citation") {
-        if let Some(start) = ref_content.find("<mixed-citation")
-            && let Some(end) = ref_content[start..].find("</mixed-citation>")
-        {
-            let citation_content = &ref_content[start..start + end + "</mixed-citation>".len()];
-            let cleaned_citation = strip_inline_html_tags(citation_content);
-            match from_str::<Citation>(&cleaned_citation) {
-                Ok(citation) => {
-                    // Extract names from person-groups first
-                    for person_group in citation.person_groups {
-                        for name in person_group.names {
-                            authors.push(Author::new(name.surname, name.given_names));
-                        }
-                    }
-                    // Also check for direct names (without person-group wrapper)
-                    for name in citation.names {
-                        authors.push(Author::new(name.surname, name.given_names));
-                    }
-                    if !authors.is_empty() {
-                        return Ok(authors);
-                    }
-                }
-                Err(e) => {
-                    return Err(ParseError::XmlError(format!(
-                        "Failed to parse mixed-citation XML: {}",
-                        e
-                    )));
-                }
-            }
-        } else {
-            return Err(ParseError::XmlError(
-                "Found mixed-citation start tag but no matching end tag".to_string(),
-            ));
-        }
-    }
-
-    // No citations found or no authors in citations - return empty vector as success
-    Ok(authors)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -342,29 +240,6 @@ mod tests {
         assert!(authors[0].is_corresponding);
         assert_eq!(authors[0].email, Some("john.doe@example.com".to_string()));
         assert_eq!(authors[0].roles, vec!["Principal Investigator"]);
-    }
-
-    #[test]
-    fn test_extract_reference_authors() {
-        let content = r#"
-        <element-citation>
-            <name>
-                <surname>Johnson</surname>
-                <given-names>Alice</given-names>
-            </name>
-            <name>
-                <surname>Williams</surname>
-                <given-names>Bob</given-names>
-            </name>
-        </element-citation>
-        "#;
-
-        let authors = extract_reference_authors(content).unwrap();
-        assert_eq!(authors.len(), 2);
-        assert_eq!(authors[0].surname, Some("Johnson".to_string()));
-        assert_eq!(authors[0].given_names, Some("Alice".to_string()));
-        assert_eq!(authors[1].surname, Some("Williams".to_string()));
-        assert_eq!(authors[1].given_names, Some("Bob".to_string()));
     }
 
     #[test]

@@ -166,7 +166,7 @@ struct ArticleMetadata {
     doi: Option<String>,
     title: String,
     r#abstract: Option<String>,
-    authors: Vec<pubmed_client::pmc::Author>,
+    authors: Vec<pubmed_client::Author>,
     journal: Option<pubmed_client::pmc::JournalMeta>,
     publication_date: Option<String>,
     keywords: Vec<String>,

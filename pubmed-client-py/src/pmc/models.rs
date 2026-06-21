@@ -31,8 +31,8 @@ pub struct PyPmcAffiliation {
     pub country: Option<String>,
 }
 
-impl From<&pmc::Affiliation> for PyPmcAffiliation {
-    fn from(affiliation: &pmc::Affiliation) -> Self {
+impl From<&pubmed_client::Affiliation> for PyPmcAffiliation {
+    fn from(affiliation: &pubmed_client::Affiliation) -> Self {
         PyPmcAffiliation {
             id: affiliation.id.clone(),
             institution: affiliation.institution.clone(),
@@ -68,11 +68,11 @@ pub struct PyPmcAuthor {
     pub email: Option<String>,
     #[pyo3(get)]
     pub is_corresponding: bool,
-    inner: Arc<pmc::Author>,
+    inner: Arc<pubmed_client::Author>,
 }
 
-impl From<&pmc::Author> for PyPmcAuthor {
-    fn from(author: &pmc::Author) -> Self {
+impl From<&pubmed_client::Author> for PyPmcAuthor {
+    fn from(author: &pubmed_client::Author) -> Self {
         PyPmcAuthor {
             given_names: author.given_names.clone(),
             surname: author.surname.clone(),
