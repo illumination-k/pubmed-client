@@ -272,8 +272,9 @@ pub(crate) mod request;
 pub mod retry;
 pub mod time;
 
-// Re-export common module from pubmed-parser
-pub use pubmed_parser::common;
+// Common types from pubmed-parser are surfaced only at the crate root (below);
+// the module itself is kept crate-internal to avoid duplicate public paths.
+pub(crate) use pubmed_parser::common;
 
 // Re-export main types for convenience
 pub use common::{Affiliation, Author, PmcId, PubMedId};

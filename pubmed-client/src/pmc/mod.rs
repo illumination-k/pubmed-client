@@ -24,7 +24,6 @@ pub use markdown::{
 };
 pub use oa_api::OaSubsetInfo;
 pub use parser::parse_pmc_xml;
-pub use pubmed_parser::common::{Affiliation, Author};
 pub use pubmed_parser::pmc::{
     Abstract, AbstractSection, ArticleMeta, Back, Body, Definition, Figure, Formula, Front,
     FundingInfo, JournalMeta, License, Permissions, PmcArticle, Reference, Section,

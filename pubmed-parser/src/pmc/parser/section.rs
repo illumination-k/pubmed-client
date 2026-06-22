@@ -6,7 +6,7 @@ use quick_xml::name::QName;
 use tracing::warn;
 
 /// Extract all sections from PMC XML content
-pub fn extract_sections_enhanced(content: &str) -> Vec<Section> {
+pub(crate) fn extract_sections_enhanced(content: &str) -> Vec<Section> {
     let mut sections = Vec::new();
 
     // Extract abstract first
@@ -689,75 +689,6 @@ enum TableAction {
     Skip(Vec<u8>),
 }
 
-/// Extract section title from section content
-pub fn extract_section_title(content: &str) -> Option<String> {
-    let mut reader = make_reader(content);
-    let mut buf = Vec::new();
-
-    loop {
-        let found = match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"title" => true,
-            Ok(Event::Eof) => return None,
-            Err(_) => return None,
-            _ => false,
-        };
-        buf.clear();
-
-        if found {
-            return read_text_content(&mut reader, b"title", &mut buf)
-                .ok()
-                .map(|s| s.trim().to_string())
-                .filter(|s| !s.is_empty());
-        }
-    }
-}
-
-/// Extract section ID from section content
-pub fn extract_section_id(content: &str) -> Option<String> {
-    let mut reader = make_reader(content);
-    let mut buf = Vec::new();
-
-    loop {
-        let id = match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"sec" => get_attr(e, b"id"),
-            Ok(Event::Eof) => return None,
-            Err(_) => return None,
-            _ => None,
-        };
-        buf.clear();
-
-        if id.is_some() {
-            return id;
-        }
-    }
-}
-
-/// Extract all paragraph content from a section
-pub fn extract_paragraph_content(content: &str) -> Vec<String> {
-    let mut paragraphs = Vec::new();
-    let mut reader = make_reader(content);
-    let mut buf = Vec::new();
-
-    loop {
-        let is_p = match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"p" => true,
-            Ok(Event::Eof) => break,
-            Err(_) => break,
-            _ => false,
-        };
-        buf.clear();
-
-        if is_p && let Ok(text) = read_text_content(&mut reader, b"p", &mut buf) {
-            let trimmed = text.trim().to_string();
-            if !trimmed.is_empty() {
-                paragraphs.push(trimmed);
-            }
-        }
-    }
-
-    paragraphs
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -777,33 +708,6 @@ mod tests {
         assert_eq!(section.section_type, Some("abstract".to_string()));
         assert_eq!(section.title, Some("Abstract".to_string()));
         assert!(section.content.contains("This is an abstract paragraph."));
-    }
-
-    #[test]
-    fn test_extract_section_title() {
-        let content = r#"<sec id="sec1"><title>Introduction</title><p>Content</p></sec>"#;
-        let title = extract_section_title(content);
-        assert_eq!(title, Some("Introduction".to_string()));
-    }
-
-    #[test]
-    fn test_extract_section_id() {
-        let content = r#"<sec id="sec1"><title>Introduction</title><p>Content</p></sec>"#;
-        let id = extract_section_id(content);
-        assert_eq!(id, Some("sec1".to_string()));
-    }
-
-    #[test]
-    fn test_extract_paragraph_content() {
-        let content = r#"
-        <p>First paragraph.</p>
-        <p>Second paragraph with <em>emphasis</em>.</p>
-        "#;
-
-        let paragraphs = extract_paragraph_content(content);
-        assert_eq!(paragraphs.len(), 2);
-        assert_eq!(paragraphs[0], "First paragraph.");
-        assert_eq!(paragraphs[1], "Second paragraph with emphasis.");
     }
 
     #[test]

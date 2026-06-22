@@ -181,7 +181,7 @@ fn strip_comment_tags(content: &str) -> String {
 }
 
 /// Extract detailed references from ref-list or alternative reference structures
-pub fn extract_references_detailed(content: &str) -> Result<Vec<Reference>> {
+pub(crate) fn extract_references_detailed(content: &str) -> Result<Vec<Reference>> {
     // Try multiple reference extraction strategies to handle different PMC XML formats
 
     // Strategy 1: Standard <ref-list> structure
