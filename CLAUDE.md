@@ -235,7 +235,7 @@ R bindings via [extendr](https://extendr.github.io/). R package name: `pubmedcli
 - Rust source: `src/rust/src/lib.rs` (extendr free functions; client handle passed as an `ExternalPtr`). R-level API: `R/pubmed-client.R`. Low-level `.Call` wrappers: `R/extendr-wrappers.R` (regenerate with `rextendr::document("pubmed-client-r")` and keep in sync with the `extendr_module!` block).
 - Build/install: `R CMD INSTALL pubmed-client-r` or `remotes::install_local("pubmed-client-r")` (requires `cargo`/`rustc`).
 - Tests: `testthat` (edition 3) in `tests/testthat/`. Offline tests cover client construction + input validation; live-API tests are gated behind `PUBMED_REAL_API_TESTS=1` (same convention as the Rust crate).
-- CI: `.github/workflows/ci-r.yml` — `rust-fmt` job (rustfmt over the non-workspace inner crate) + `R-CMD-check` matrix (ubuntu + macOS) via `r-lib/actions`.
+- CI: `.github/workflows/ci-r.yml` — `rust-fmt` job (rustfmt over the non-workspace inner crate) + `R-CMD-check` (ubuntu, R via apt + Posit binary CRAN mirror; runs `rcmdcheck`). Avoids `r-lib/actions` so every action stays pinned to a full commit SHA (enforced by `ghalint`).
 
 ### Website (`website/`)
 
