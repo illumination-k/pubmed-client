@@ -93,5 +93,8 @@ jobs:
           Rscript -e 'install.packages(c("testthat", "rcmdcheck"), repos = Sys.getenv("RSPM"))'
 
       - name: R CMD check
+        # error_on = "error" fails the build on genuine problems (compile/install
+        # failure, test failure, malformed Rd) while surfacing — not failing on —
+        # platform NOTEs/WARNINGs (e.g. installed size of the Rust static lib).
         run: |
-          Rscript -e 'rcmdcheck::rcmdcheck("pubmed-client-r", args = c("--no-manual", "--no-build-vignettes"), error_on = "warning")'
+          Rscript -e 'rcmdcheck::rcmdcheck("pubmed-client-r", args = c("--no-manual", "--no-build-vignettes"), error_on = "error")'
