@@ -18,6 +18,7 @@ pubmed-client-rs/                    # Cargo workspace root
 ├── pubmed-client-napi/              # Native Node.js bindings via napi-rs (npm: pubmed-client)
 ├── pubmed-client-wasm/              # WASM bindings for browsers/Node.js (npm: pubmed-client-wasm)
 ├── pubmed-client-py/                # Python bindings via PyO3 (PyPI: pubmed-client-py)
+├── pubmed-client-r/                 # R bindings via extendr (R package: pubmedclient) — NOT a workspace member
 ├── pubmed-cli/                      # Command-line interface
 ├── pubmed-mcp/                      # MCP server for AI assistant integration
 └── website/                         # Docusaurus v3 landing page (GitHub Pages)
@@ -225,6 +226,14 @@ WebAssembly bindings via wasm-pack. Published as `pubmed-client-wasm` on npm. Ke
 ### Python Bindings (`pubmed-client-py/`)
 
 Python bindings via PyO3/maturin. Published as `pubmed-client-py` on PyPI. Synchronous API with internal Tokio runtime. Key types: `Client`, `PubMedClient`, `PmcClient`, `SearchQuery`, `ClientConfig`.
+
+### R Bindings (`pubmed-client-r/`)
+
+R bindings via [extendr](https://extendr.github.io/). R package name: `pubmedclient`. Synchronous API with internal Tokio runtime (same pattern as Python). Currently an **MVP** covering core operations: `pubmed_client()`, `pubmed_search()`, `pubmed_fetch()`, `pubmed_search_and_fetch()`, `pmc_fulltext()`, `pmc_to_markdown()`.
+
+- **NOT a Cargo workspace member**: the inner crate (`src/rust/`) declares an empty `[workspace]` table so the root `cargo build`/CI never tries to build it — linking requires the R toolchain (`libR`), which isn't always present.
+- Rust source: `src/rust/src/lib.rs` (extendr free functions; client handle passed as an `ExternalPtr`). R-level API: `R/pubmed-client.R`. Low-level `.Call` wrappers: `R/extendr-wrappers.R` (regenerate with `rextendr::document("pubmed-client-r")` and keep in sync with the `extendr_module!` block).
+- Build/install: `R CMD INSTALL pubmed-client-r` or `remotes::install_local("pubmed-client-r")` (requires `cargo`/`rustc`).
 
 ### Website (`website/`)
 

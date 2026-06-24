@@ -1,0 +1,18 @@
+Package: pubmedclient
+Title: PubMed and PMC API Client
+Version: 0.2.0
+Authors@R:
+    person("illumination-k", role = c("aut", "cre"),
+           email = "illumination27@gmail.com")
+Description: R bindings for the Rust 'pubmed-client' library. Provides access to
+    the PubMed and PubMed Central (PMC) APIs for searching, fetching article
+    metadata, and retrieving full text or Markdown. Wraps the high-performance
+    asynchronous Rust client behind a synchronous R interface.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+SystemRequirements: Cargo (Rust's package manager), rustc
+Config/rextendr/version: 0.3.1
+URL: https://github.com/illumination-k/pubmed-client
+BugReports: https://github.com/illumination-k/pubmed-client/issues

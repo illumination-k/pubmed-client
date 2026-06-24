@@ -1,0 +1,27 @@
+# This crate is intentionally NOT part of the root Cargo workspace: building it
+# requires the R toolchain (libR) at link time, which is not always available.
+# The empty `[workspace]` table makes it a standalone workspace root so the
+# parent workspace never attempts to build it during `cargo build`/CI.
+[workspace]
+
+[package]
+name = "pubmedclient"
+version = "0.2.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "pubmedclient"
+# `staticlib` is linked into the R package shared object; `lib` keeps the crate
+# usable as a normal Rust library (e.g. for `cargo check`/tests where possible).
+crate-type = ["staticlib", "lib"]
+
+[dependencies]
+extendr-api = "0.7"
+pubmed-client = { path = "../../../pubmed-client" }
+tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
+
+[profile.release]
+# Smaller, faster-to-load shared objects for the R package.
+lto = true
+opt-level = 3
