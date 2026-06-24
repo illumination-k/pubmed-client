@@ -22,17 +22,27 @@ on:
         required: false
         type: boolean
         default: true
-    secrets:
-      CRATES_IO_TOKEN:
-        description: "Token for publishing to crates.io"
-        required: true
+      environment:
+        description: >-
+          GitHub Environment to run the publish in. Its OIDC `environment` claim
+          must match the crates.io Trusted Publisher config. Empty string = no
+          environment gate (used for dry-runs).
+        required: false
+        type: string
+        default: ""
 
 jobs:
   publish:
     name: Publish ${{ inputs.package }} to crates.io
     runs-on: ubuntu-latest
+    # An empty string disables the environment gate (dry-run path). Real
+    # publishes run in the `release` environment so the OIDC token carries the
+    # `environment` claim crates.io's Trusted Publisher requires.
+    environment: ${{ inputs.environment }}
     permissions:
       contents: read
+      # Trusted Publishing: mint a short-lived crates.io token via OIDC.
+      id-token: write
     timeout-minutes: 30
     steps:
       - name: Checkout code
@@ -146,23 +156,31 @@ jobs:
         if: ${{ inputs.dry-run }}
         working-directory: ${{ steps.pkg-path.outputs.path }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
           PKG_NAME: ${{ inputs.package }}
         run: |
           echo "Dry run - would publish: $PKG_NAME"
           # --no-verify: the verify build would resolve internal deps from
           # crates.io, which aren't published in a dry-run. See the Validate step.
-          cargo publish --dry-run --no-verify --token "$CARGO_REGISTRY_TOKEN"
+          # No auth needed: --dry-run never contacts the registry for upload.
+          cargo publish --dry-run --no-verify
+
+      # Trusted Publishing: exchange the job's OIDC token for a short-lived
+      # crates.io token. Requires a Trusted Publisher configured for this crate
+      # on crates.io (repo + workflow). No long-lived CRATES_IO_TOKEN secret.
+      - name: Authenticate to crates.io (Trusted Publishing)
+        id: auth
+        if: ${{ !inputs.dry-run && steps.published.outputs.exists != 'true' }}
+        uses: rust-lang/crates-io-auth-action@c6f97d42243bad5fab37ca0427f495c86d5b1a18 # v1.0.5
 
       - name: Publish to crates.io
         if: ${{ !inputs.dry-run && steps.published.outputs.exists != 'true' }}
         working-directory: ${{ steps.pkg-path.outputs.path }}
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
           PKG_NAME: ${{ inputs.package }}
         run: |
           echo "Publishing package: $PKG_NAME"
-          cargo publish --token "$CARGO_REGISTRY_TOKEN"
+          cargo publish
 
       - name: Wait for crate to appear in the registry index
         if: ${{ !inputs.dry-run && steps.published.outputs.exists != 'true' }}

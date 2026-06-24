@@ -62,12 +62,54 @@ pipeline without publishing: crates use `cargo publish --dry-run`, npm uses
 > meaningful for packaging/version checks; the real release still verifies, publishing in
 > dependency order and waiting for each crate to land in the registry index before the next.
 
+## Authentication (Trusted Publishing)
+
+crates.io publishing uses **Trusted Publishing** (OIDC) — there is **no** long-lived
+`CRATES_IO_TOKEN` secret. `_publish-crate.yml` mints a short-lived token at publish time
+via [`rust-lang/crates-io-auth-action`](https://github.com/rust-lang/crates-io-auth-action)
+(the job grants `id-token: write`). PyPI and npm publish jobs likewise use OIDC.
+
+All real publish jobs (crates.io, npm, PyPI) run in the **`release` GitHub Environment**, which
+is restricted to `v*` tags (deployment tag policy). The OIDC token therefore carries an
+`environment: release` claim, and every Trusted Publisher (crates.io per-crate, npm per-package,
+PyPI) is pinned to that environment — so only a `v*`-tag-triggered run of `release.yml` can
+publish. Dry-runs (`workflow_dispatch`) pass an empty environment and skip the gate (crates also
+skip the auth step); the TestPyPI dry-run job uses a separate `testpypi` environment (no tag
+policy) so dispatch runs from a branch are allowed.
+
+> **One-time setup per crate** (already done for all five as of 0.2.0): crates.io has **no
+> "pending publisher"** — a Trusted Publisher can only be configured on a crate that already
+> exists. Each of `pubmed-parser`, `pubmed-formatter`, `pubmed-client`, `pubmed-cli`,
+> `pubmed-mcp` has a Trusted Publisher (repo `illumination-k/pubmed-client`, workflow
+> `release.yml`, environment `release`). All five were bootstrap-published at 0.1.1 to make
+> this possible. A brand-new crate added later needs a manual first publish with a token, then
+> the same Trusted Publisher + environment config. Configure via the crate's
+> `https://crates.io/crates/<crate>/settings` page, or `POST /api/v1/trusted_publishing/github_configs`.
+
+### Trusted Publishing matches different OIDC claims per registry
+
+A registry validates the GitHub OIDC token against either the **entry** workflow
+(`workflow_ref`, always `release.yml`) or the **defining** workflow (`job_workflow_ref`, the
+reusable file). This dictates whether the publish step may live in a reusable workflow:
+
+| Registry  | Matches claim      | Reusable workflow?                    | Where the publish step lives                                            |
+| --------- | ------------------ | ------------------------------------- | ----------------------------------------------------------------------- |
+| crates.io | `workflow_ref`     | ✅ safe                               | `_publish-crate.yml` (reusable) — claim still resolves to `release.yml` |
+| npm       | calling/top-level  | ✅ if configured with `release.yml`   | `_publish-napi.yml` / `_publish-wasm.yml` (reusable)                    |
+| PyPI      | `job_workflow_ref` | ❌ unsupported (pypi/warehouse#11096) | **directly in `release.yml`**                                           |
+
+So configure every Trusted Publisher (crates.io, npm, PyPI) with workflow filename **`release.yml`**
+and environment **`release`**. PyPI cannot match a reusable workflow, so the
+`pypa/gh-action-pypi-publish` step is inlined into `release.yml`; `_publish-python.yml` only builds
+wheels. (The TestPyPI dry-run publisher uses environment `testpypi` instead.)
+
 ## Workflow layout
 
-- `release.yml` — the single entry point (tag `v*` or manual dry-run).
-- `_publish-crate.yml` — reusable crates.io publisher (one call per crate).
+- `release.yml` — the single entry point (tag `v*` or manual dry-run); also contains the PyPI
+  publish/TestPyPI jobs inline (see note above).
+- `_publish-crate.yml` — reusable crates.io publisher (one call per crate); Trusted Publishing.
 - `_publish-napi.yml` — reusable NAPI build matrix + npm publish.
 - `_publish-wasm.yml` — reusable wasm-pack build + npm publish.
-- `_publish-python.yml` — reusable wheel build matrix + PyPI/TestPyPI publish.
+- `_publish-python.yml` — reusable wheel **build** matrix + test (no publish — see note above).
 
 CI workflows (`ci-napi.yml`, `ci-wasm.yml`, etc.) are build/test only and no longer publish.

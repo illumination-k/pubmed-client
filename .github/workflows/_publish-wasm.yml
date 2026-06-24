@@ -13,6 +13,14 @@ on:
         required: false
         type: boolean
         default: false
+      environment:
+        description: >-
+          GitHub Environment for the publish job. Its OIDC `environment` claim
+          must match the npm Trusted Publisher config. Empty string = no
+          environment gate (used for dry-runs).
+        required: false
+        type: string
+        default: ""
 
 env:
   CARGO_TERM_COLOR: always
@@ -22,6 +30,10 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    # Empty string disables the gate (dry-run); real publishes run in `release`
+    # so the OIDC token carries the `environment` claim npm's Trusted Publisher
+    # requires.
+    environment: ${{ inputs.environment }}
     permissions:
       contents: read
       id-token: write # npm provenance (trusted publishing)

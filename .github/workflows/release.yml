@@ -105,70 +105,70 @@ jobs:
     needs: [guard, test]
     permissions:
       contents: read
+      id-token: write
     uses: ./.github/workflows/_publish-crate.yml
     with:
       package: pubmed-parser
       package-path: pubmed-parser
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-    secrets:
-      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
 
   publish-formatter:
     name: crates.io · pubmed-formatter
     needs: [guard, publish-parser]
     permissions:
       contents: read
+      id-token: write
     uses: ./.github/workflows/_publish-crate.yml
     with:
       package: pubmed-formatter
       package-path: pubmed-formatter
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-    secrets:
-      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
 
   publish-client:
     name: crates.io · pubmed-client
     needs: [guard, publish-formatter]
     permissions:
       contents: read
+      id-token: write
     uses: ./.github/workflows/_publish-crate.yml
     with:
       package: pubmed-client
       package-path: pubmed-client
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-    secrets:
-      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
 
   publish-cli:
     name: crates.io · pubmed-cli
     needs: [guard, publish-client]
     permissions:
       contents: read
+      id-token: write
     uses: ./.github/workflows/_publish-crate.yml
     with:
       package: pubmed-cli
       package-path: pubmed-cli
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-    secrets:
-      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
 
   publish-mcp:
     name: crates.io · pubmed-mcp
     needs: [guard, publish-client]
     permissions:
       contents: read
+      id-token: write
     uses: ./.github/workflows/_publish-crate.yml
     with:
       package: pubmed-mcp
       package-path: pubmed-mcp
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-    secrets:
-      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
 
   # ── npm ──────────────────────────────────────────────────────────────────────
   publish-napi:
@@ -180,6 +180,7 @@ jobs:
     uses: ./.github/workflows/_publish-napi.yml
     with:
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
 
   publish-wasm:
     name: npm · pubmed-client-wasm
@@ -190,17 +191,74 @@ jobs:
     uses: ./.github/workflows/_publish-wasm.yml
     with:
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
 
   # ── PyPI ─────────────────────────────────────────────────────────────────────
-  publish-python:
-    name: PyPI · pubmed-client-py
+  # Build wheels in the reusable workflow, but publish from a job defined HERE.
+  # PyPI Trusted Publishing matches the OIDC `job_workflow_ref`, which for a
+  # reusable workflow would be `_publish-python.yml` (unconfigurable on PyPI —
+  # pypi/warehouse#11096). Keeping the publish step in release.yml makes the
+  # claim resolve to `release.yml`, so the PyPI trusted publisher matches.
+  build-python:
+    name: PyPI · build wheels
     needs: [guard, test]
     permissions:
       contents: read
-      id-token: write
     uses: ./.github/workflows/_publish-python.yml
-    with:
-      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+
+  publish-python:
+    name: PyPI · pubmed-client-py
+    needs: [guard, build-python]
+    if: ${{ needs.guard.outputs.dry-run != 'true' }}
+    runs-on: ubuntu-latest
+    # Real publishes only run on a v* tag push, so the `release` environment's
+    # tag policy is always satisfied here. PyPI's trusted publisher is pinned to
+    # environment `release` to match.
+    environment:
+      name: release
+      url: https://pypi.org/p/pubmed-client-py
+    permissions:
+      id-token: write # IMPORTANT: mandatory for trusted publishing
+    timeout-minutes: 10
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
+        with:
+          skip-existing: true
+          verbose: true
+
+  publish-python-test:
+    name: PyPI · pubmed-client-py (TestPyPI dry-run)
+    needs: [guard, build-python]
+    if: ${{ needs.guard.outputs.dry-run == 'true' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/pubmed-client
+    permissions:
+      id-token: write
+    timeout-minutes: 10
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+          verbose: true
 
   # ── GitHub Release (real releases only) ──────────────────────────────────────
   create-release:
