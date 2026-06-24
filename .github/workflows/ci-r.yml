@@ -1,0 +1,100 @@
+name: "CI / R"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pubmed-client-r/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "pubmed-parser/**"
+      - "pubmed-formatter/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/ci-r.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "pubmed-client-r/**"
+      - "pubmed-client/src/**"
+      - "pubmed-client/Cargo.toml"
+      - "pubmed-parser/**"
+      - "pubmed-formatter/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/ci-r.yml"
+
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: read
+
+jobs:
+  # Format check for the inner extendr crate. It is NOT a workspace member, so
+  # `mise run lint:rs` (which runs over the workspace) never sees it — this step
+  # keeps it formatted. rustfmt does not compile the crate, so no R/libR needed.
+  rust-fmt:
+    name: R crate rustfmt
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
+        with:
+          components: rustfmt
+
+      - name: Check formatting
+        run: cargo fmt --check --manifest-path pubmed-client-r/src/rust/Cargo.toml
+
+  R-CMD-check:
+    name: R CMD check (${{ matrix.config.os }})
+    runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: ubuntu-latest }
+          - { os: macos-latest }
+    env:
+      # rcmdcheck needs the source kept around for useful error messages, and we
+      # do not want missing Suggests to error the check.
+      R_KEEP_PKG_SOURCE: yes
+      _R_CHECK_FORCE_SUGGESTS_: false
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      # The extendr static library is compiled at install time, so a Rust
+      # toolchain must be on PATH for R CMD INSTALL/check.
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
+        with:
+          workspaces: "pubmed-client-r/src/rust -> target"
+
+      # r-lib/actions is pinned to the @v2 major tag (the maintainers' documented
+      # recommendation); the sandboxed build environment cannot resolve its
+      # commit SHA, unlike the other actions above.
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+          working-directory: pubmed-client-r
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          working-directory: pubmed-client-r
+          upload-snapshots: true

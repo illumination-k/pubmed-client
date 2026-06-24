@@ -180,8 +180,7 @@ fn client_search_and_fetch(
     limit: i32,
 ) -> Result<Robj> {
     let client = client.inner.clone();
-    let result =
-        runtime().block_on(client.pubmed.search_and_fetch(query, limit as usize, None));
+    let result = runtime().block_on(client.pubmed.search_and_fetch(query, limit as usize, None));
     let articles = to_r_err(result)?;
     let items: Vec<Robj> = articles.iter().map(article_to_robj).collect();
     Ok(List::from_values(items).into())
@@ -203,8 +202,7 @@ fn pmc_fetch_fulltext(client: ExternalPtr<ClientHandle>, pmcid: &str) -> Result<
 #[extendr]
 fn pmc_markdown(client: ExternalPtr<ClientHandle>, pmcid: &str) -> Result<String> {
     let client = client.inner.clone();
-    let article: PmcArticle =
-        to_r_err(runtime().block_on(client.pmc.fetch_full_text(pmcid)))?;
+    let article: PmcArticle = to_r_err(runtime().block_on(client.pmc.fetch_full_text(pmcid)))?;
     let converter = PmcMarkdownConverter::new();
     Ok(converter.convert(&article))
 }
