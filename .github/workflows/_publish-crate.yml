@@ -126,10 +126,21 @@ jobs:
         working-directory: ${{ steps.pkg-path.outputs.path }}
         env:
           PKG_NAME: ${{ inputs.package }}
+          DRY_RUN: ${{ inputs.dry-run }}
         run: |
           echo "Validating package: $PKG_NAME"
           cargo package --list
-          cargo package --allow-dirty
+          # The verification build resolves internal workspace deps (e.g.
+          # pubmed-parser) from crates.io, not from their local path. In a dry-run
+          # nothing is actually published, so those versions don't exist on
+          # crates.io yet and the verify build can't resolve them. Skip verify in
+          # dry-run; real releases publish in dependency order (and wait for the
+          # registry index below), so the verify build resolves fine.
+          if [ "$DRY_RUN" = "true" ]; then
+            cargo package --allow-dirty --no-verify
+          else
+            cargo package --allow-dirty
+          fi
 
       - name: Publish to crates.io (dry-run)
         if: ${{ inputs.dry-run }}
@@ -139,7 +150,9 @@ jobs:
           PKG_NAME: ${{ inputs.package }}
         run: |
           echo "Dry run - would publish: $PKG_NAME"
-          cargo publish --dry-run --token "$CARGO_REGISTRY_TOKEN"
+          # --no-verify: the verify build would resolve internal deps from
+          # crates.io, which aren't published in a dry-run. See the Validate step.
+          cargo publish --dry-run --no-verify --token "$CARGO_REGISTRY_TOKEN"
 
       - name: Publish to crates.io
         if: ${{ !inputs.dry-run && steps.published.outputs.exists != 'true' }}
@@ -150,6 +163,39 @@ jobs:
         run: |
           echo "Publishing package: $PKG_NAME"
           cargo publish --token "$CARGO_REGISTRY_TOKEN"
+
+      - name: Wait for crate to appear in the registry index
+        if: ${{ !inputs.dry-run && steps.published.outputs.exists != 'true' }}
+        env:
+          PKG_NAME: ${{ inputs.package }}
+          PKG_VERSION: ${{ steps.cargo-version.outputs.version }}
+        run: |
+          # The next crate in the dependency chain (pubmed-parser → pubmed-formatter
+          # → pubmed-client → ...) runs in a separate job with a fresh checkout and
+          # resolves this crate from the sparse index. `cargo publish` only waits
+          # for the index within its own invocation, not across jobs, so poll the
+          # sparse index here until this version is visible before the job finishes.
+          # Sparse index path layout: lowercase name, sharded by length.
+          name=$(echo "$PKG_NAME" | tr '[:upper:]' '[:lower:]')
+          case "${#name}" in
+            1) path="1/$name" ;;
+            2) path="2/$name" ;;
+            3) path="3/${name:0:1}/$name" ;;
+            *) path="${name:0:2}/${name:2:2}/$name" ;;
+          esac
+          url="https://index.crates.io/$path"
+          echo "Polling $url for version $PKG_VERSION"
+          for i in $(seq 1 30); do
+            if curl -s -H "User-Agent: pubmed-client-release (github actions)" "$url" \
+                | grep -q "\"vers\":\"$PKG_VERSION\""; then
+              echo "::notice::$PKG_NAME@$PKG_VERSION is visible in the registry index"
+              exit 0
+            fi
+            echo "  not yet indexed (attempt $i/30) — sleeping 10s"
+            sleep 10
+          done
+          echo "::error::$PKG_NAME@$PKG_VERSION did not appear in the registry index within timeout"
+          exit 1
 
       - name: Publish summary
         if: ${{ !inputs.dry-run }}
