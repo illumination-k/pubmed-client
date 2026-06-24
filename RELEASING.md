@@ -55,6 +55,13 @@ Trigger `release.yml` manually via **workflow_dispatch** (Actions tab) to run th
 pipeline without publishing: crates use `cargo publish --dry-run`, npm uses
 `npm publish --dry-run`, and Python publishes to **TestPyPI**.
 
+> **Dry-run caveat**: the crate dry-runs use `--no-verify`. Because nothing is actually
+> published during a dry-run, the verification build of a dependent crate (e.g.
+> `pubmed-formatter`) could not resolve its internal deps (`pubmed-parser` at the new
+> version) from crates.io and would always fail. Skipping verify keeps the rehearsal
+> meaningful for packaging/version checks; the real release still verifies, publishing in
+> dependency order and waiting for each crate to land in the registry index before the next.
+
 ## Workflow layout
 
 - `release.yml` — the single entry point (tag `v*` or manual dry-run).
