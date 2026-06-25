@@ -65,6 +65,13 @@ The Rust source lives in `src/rust/`. This crate is intentionally **excluded
 from the workspace Cargo build** (an empty `[workspace]` table in its
 `Cargo.toml`) because linking requires the R toolchain (`libR`).
 
+It depends on the **published `pubmed-client` crate** (crates.io), not a
+workspace-relative path: `R CMD check` and source-tarball installs build the
+package in an isolated copy, where a relative path outside the package cannot
+resolve. To develop against unpublished `pubmed-client` changes, temporarily set
+`pubmed-client = { path = "../../../pubmed-client" }` in `src/rust/Cargo.toml`
+and install with `R CMD INSTALL pubmed-client-r` (in-place, no tarball).
+
 After editing `src/rust/src/lib.rs`, regenerate the R wrappers and docs:
 
 ```r

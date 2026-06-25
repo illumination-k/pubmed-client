@@ -18,7 +18,13 @@ crate-type = ["staticlib", "lib"]
 
 [dependencies]
 extendr-api = "0.7"
-pubmed-client = { path = "../../../pubmed-client" }
+# Depend on the published crate rather than a workspace-relative path: R CMD
+# check (and source-tarball installs) build the package in an isolated copy, so
+# a `path = "../../../pubmed-client"` dependency would point outside the package
+# and fail to resolve. Keep this version in lock-step with the workspace version.
+# For local development against unpublished pubmed-client changes, temporarily
+# switch this to `{ path = "../../../pubmed-client" }`.
+pubmed-client = "0.2.0"
 tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
 
 [profile.release]
