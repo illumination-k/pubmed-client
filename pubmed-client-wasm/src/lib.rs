@@ -516,6 +516,115 @@ impl WasmPubMedClient {
         let converter = pubmed_client::pmc::PmcMarkdownConverter::new();
         Ok(converter.convert(&full_text))
     }
+
+    /// Fetch a PMC article and convert it to markdown in a single call
+    ///
+    /// `options` is an optional object with boolean fields: `include_metadata`,
+    /// `include_toc`, `use_yaml_frontmatter`, `include_orcid_links`,
+    /// `include_figure_captions`. Unset fields fall back to converter defaults.
+    pub fn fetch_pmc_as_markdown(&self, pmcid: String, options: JsValue) -> js_sys::Promise {
+        let client = self.client.clone();
+        // Parse options synchronously so a malformed value rejects eagerly.
+        let parsed: Result<Option<JsMarkdownOptions>, _> =
+            if options.is_undefined() || options.is_null() {
+                Ok(None)
+            } else {
+                serde_wasm_bindgen::from_value(options).map(Some)
+            };
+        future_to_promise(async move {
+            let options = parsed
+                .map_err(|e| JsValue::from_str(&format!("Invalid markdown options: {e}")))?
+                .unwrap_or_default();
+            match client.pmc.fetch_full_text(&pmcid).await {
+                Ok(full_text) => {
+                    let mut converter = pubmed_client::pmc::PmcMarkdownConverter::new();
+                    if let Some(v) = options.include_metadata {
+                        converter = converter.with_include_metadata(v);
+                    }
+                    if let Some(v) = options.include_toc {
+                        converter = converter.with_include_toc(v);
+                    }
+                    if let Some(v) = options.use_yaml_frontmatter {
+                        converter = converter.with_yaml_frontmatter(v);
+                    }
+                    if let Some(v) = options.include_orcid_links {
+                        converter = converter.with_include_orcid_links(v);
+                    }
+                    if let Some(v) = options.include_figure_captions {
+                        converter = converter.with_include_figure_captions(v);
+                    }
+                    Ok(JsValue::from_str(&converter.convert(&full_text)))
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
+    /// Check whether a PMC article is in the Open Access (OA) subset
+    ///
+    /// Resolves to a `JsOaSubsetInfo` object describing programmatic full-text
+    /// availability, license, download link, and (when not available) error details.
+    pub fn is_oa_subset(&self, pmcid: String) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            match client.pmc.is_oa_subset(&pmcid).await {
+                Ok(info) => {
+                    let js_info = JsOaSubsetInfo::from(info);
+                    Ok(serde_wasm_bindgen::to_value(&js_info)?)
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+}
+
+/// JavaScript-friendly markdown conversion options
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct JsMarkdownOptions {
+    #[serde(default)]
+    pub include_metadata: Option<bool>,
+    #[serde(default)]
+    pub include_toc: Option<bool>,
+    #[serde(default)]
+    pub use_yaml_frontmatter: Option<bool>,
+    #[serde(default)]
+    pub include_orcid_links: Option<bool>,
+    #[serde(default)]
+    pub include_figure_captions: Option<bool>,
+}
+
+/// JavaScript-friendly OA (Open Access) subset availability information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsOaSubsetInfo {
+    pub pmcid: String,
+    pub is_oa_subset: bool,
+    pub citation: Option<String>,
+    pub license: Option<String>,
+    pub retracted: bool,
+    pub download_link: Option<String>,
+    pub download_format: Option<String>,
+    pub updated: Option<String>,
+    pub error_code: Option<String>,
+    pub error_message: Option<String>,
+}
+
+impl From<pubmed_client::OaSubsetInfo> for JsOaSubsetInfo {
+    fn from(info: pubmed_client::OaSubsetInfo) -> Self {
+        Self {
+            pmcid: info.pmcid,
+            is_oa_subset: info.is_oa_subset,
+            citation: info.citation,
+            license: info.license,
+            retracted: info.retracted,
+            download_link: info.download_link,
+            download_format: info.download_format,
+            updated: info.updated,
+            error_code: info.error_code,
+            error_message: info.error_message,
+        }
+    }
 }
 
 /// JavaScript-friendly EPost result
@@ -1158,6 +1267,20 @@ impl From<pubmed_client::SpellCheckResult> for JsSpellCheckResult {
 // WasmSearchQuery builder
 // ================================================================================================
 
+/// Map legacy snake_case article-type aliases to the canonical names accepted by
+/// `ArticleType::from_str_insensitive`. Unknown values pass through unchanged.
+fn normalize_article_type(article_type: &str) -> &str {
+    match article_type {
+        "clinical_trial" => "Clinical Trial",
+        "meta_analysis" => "Meta-Analysis",
+        "randomized_controlled_trial" => "Randomized Controlled Trial",
+        "systematic_review" => "Systematic Review",
+        "case_report" => "Case Reports",
+        "observational_study" => "Observational Study",
+        other => other,
+    }
+}
+
 /// Search query builder for constructing complex PubMed queries
 ///
 /// Provides a fluent API for building PubMed search queries with filters,
@@ -1273,16 +1396,7 @@ impl WasmSearchQuery {
     /// `"Randomized Controlled Trial"` / `"RCT"`, `"Observational Study"`.
     /// Also accepts the legacy snake_case aliases used in previous versions.
     pub fn article_type_str(mut self, article_type: &str) -> Result<Self, JsValue> {
-        // Support legacy snake_case aliases for backwards compatibility
-        let normalized = match article_type {
-            "clinical_trial" => "Clinical Trial",
-            "meta_analysis" => "Meta-Analysis",
-            "randomized_controlled_trial" => "Randomized Controlled Trial",
-            "systematic_review" => "Systematic Review",
-            "case_report" => "Case Reports",
-            "observational_study" => "Observational Study",
-            other => other,
-        };
+        let normalized = normalize_article_type(article_type);
         let at = pubmed_client::ArticleType::from_str_insensitive(normalized)
             .map_err(|e| JsValue::from_str(&e))?;
         self.inner = self.inner.article_type(at);
@@ -1313,6 +1427,202 @@ impl WasmSearchQuery {
             .map_err(|e| JsValue::from_str(&e))?;
         self.inner = self.inner.sort(order);
         Ok(self)
+    }
+
+    /// Add multiple search terms (joined with the default AND logic)
+    pub fn terms(mut self, terms: Vec<String>) -> Self {
+        self.inner = self.inner.terms(&terms);
+        self
+    }
+
+    /// Set the maximum number of results to retrieve
+    pub fn limit(mut self, limit: usize) -> Self {
+        self.inner = self.inner.limit(limit);
+        self
+    }
+
+    /// Get the currently configured result limit
+    pub fn get_limit(&self) -> usize {
+        self.inner.get_limit()
+    }
+
+    /// Search in article abstracts only
+    pub fn abstract_contains(mut self, text: &str) -> Self {
+        self.inner = self.inner.abstract_contains(text);
+        self
+    }
+
+    /// Filter to only articles that have an abstract
+    pub fn has_abstract(mut self) -> Self {
+        self.inner = self.inner.has_abstract();
+        self
+    }
+
+    /// Search by journal abbreviation (e.g. "N Engl J Med")
+    pub fn journal_abbreviation(mut self, abbreviation: &str) -> Self {
+        self.inner = self.inner.journal_abbreviation(abbreviation);
+        self
+    }
+
+    /// Search by grant number
+    pub fn grant_number(mut self, grant_number: &str) -> Self {
+        self.inner = self.inner.grant_number(grant_number);
+        self
+    }
+
+    /// Search by ISBN
+    pub fn isbn(mut self, isbn: &str) -> Self {
+        self.inner = self.inner.isbn(isbn);
+        self
+    }
+
+    /// Search by ISSN
+    pub fn issn(mut self, issn: &str) -> Self {
+        self.inner = self.inner.issn(issn);
+        self
+    }
+
+    /// Search by last author name
+    pub fn last_author(mut self, author: &str) -> Self {
+        self.inner = self.inner.last_author(author);
+        self
+    }
+
+    /// Search by author affiliation / institution
+    pub fn affiliation(mut self, institution: &str) -> Self {
+        self.inner = self.inner.affiliation(institution);
+        self
+    }
+
+    /// Search by author ORCID identifier
+    pub fn orcid(mut self, orcid_id: &str) -> Self {
+        self.inner = self.inner.orcid(orcid_id);
+        self
+    }
+
+    /// Search by multiple MeSH terms (OR logic)
+    pub fn mesh_terms(mut self, terms: Vec<String>) -> Self {
+        self.inner = self.inner.mesh_terms(&terms);
+        self
+    }
+
+    /// Search by MeSH subheading
+    pub fn mesh_subheading(mut self, subheading: &str) -> Self {
+        self.inner = self.inner.mesh_subheading(subheading);
+        self
+    }
+
+    /// Filter to animal-only studies
+    pub fn animal_studies_only(mut self) -> Self {
+        self.inner = self.inner.animal_studies_only();
+        self
+    }
+
+    /// Filter by age group (e.g. "Adult", "Child")
+    pub fn age_group(mut self, age_group: &str) -> Self {
+        self.inner = self.inner.age_group(age_group);
+        self
+    }
+
+    /// Filter by organism using its MeSH term
+    pub fn organism_mesh(mut self, organism: &str) -> Self {
+        self.inner = self.inner.organism_mesh(organism);
+        self
+    }
+
+    /// Add a raw custom filter clause appended verbatim to the query
+    pub fn custom_filter(mut self, filter: &str) -> Self {
+        self.inner = self.inner.custom_filter(filter);
+        self
+    }
+
+    /// Filter by multiple article types (OR logic, case-insensitive).
+    ///
+    /// Accepts the same values as `article_type_str`, including the legacy
+    /// snake_case aliases. An empty array is a no-op.
+    pub fn article_types_str(mut self, article_types: Vec<String>) -> Result<Self, JsValue> {
+        if article_types.is_empty() {
+            return Ok(self);
+        }
+        let mut parsed = Vec::with_capacity(article_types.len());
+        for at in &article_types {
+            let normalized = normalize_article_type(at);
+            parsed.push(
+                pubmed_client::ArticleType::from_str_insensitive(normalized)
+                    .map_err(|e| JsValue::from_str(&e))?,
+            );
+        }
+        self.inner = self.inner.article_types(&parsed);
+        Ok(self)
+    }
+
+    /// Filter to a single publication year (must be 1800–3000)
+    pub fn published_in_year(mut self, year: u32) -> Result<Self, JsValue> {
+        pubmed_client::validate_year(year).map_err(|e| JsValue::from_str(&e))?;
+        self.inner = self.inner.published_in_year(year);
+        Ok(self)
+    }
+
+    /// Filter to a publication-year range (years must be 1800–3000)
+    pub fn published_between(
+        mut self,
+        start_year: u32,
+        end_year: Option<u32>,
+    ) -> Result<Self, JsValue> {
+        pubmed_client::validate_year(start_year).map_err(|e| JsValue::from_str(&e))?;
+        if let Some(end) = end_year {
+            pubmed_client::validate_year(end).map_err(|e| JsValue::from_str(&e))?;
+            if start_year > end {
+                return Err(JsValue::from_str(&format!(
+                    "Start year ({}) must be <= end year ({})",
+                    start_year, end
+                )));
+            }
+        }
+        self.inner = self.inner.published_between(start_year, end_year);
+        Ok(self)
+    }
+
+    /// Filter to articles published before a given year (must be 1800–3000)
+    pub fn published_before(mut self, year: u32) -> Result<Self, JsValue> {
+        pubmed_client::validate_year(year).map_err(|e| JsValue::from_str(&e))?;
+        self.inner = self.inner.published_before(year);
+        Ok(self)
+    }
+
+    /// Combine this query with another using AND logic, returning a new query
+    pub fn and(&self, other: &WasmSearchQuery) -> WasmSearchQuery {
+        WasmSearchQuery {
+            inner: self.inner.clone().and(other.inner.clone()),
+        }
+    }
+
+    /// Combine this query with another using OR logic, returning a new query
+    pub fn or(&self, other: &WasmSearchQuery) -> WasmSearchQuery {
+        WasmSearchQuery {
+            inner: self.inner.clone().or(other.inner.clone()),
+        }
+    }
+
+    /// Negate this query using NOT logic, returning a new query
+    pub fn negate(&self) -> WasmSearchQuery {
+        WasmSearchQuery {
+            inner: self.inner.clone().negate(),
+        }
+    }
+
+    /// Exclude articles matching another query, returning a new query
+    pub fn exclude(&self, excluded: &WasmSearchQuery) -> WasmSearchQuery {
+        WasmSearchQuery {
+            inner: self.inner.clone().exclude(excluded.inner.clone()),
+        }
+    }
+
+    /// Wrap this query in parentheses for grouping, returning a new query
+    pub fn group(&self) -> WasmSearchQuery {
+        WasmSearchQuery {
+            inner: self.inner.clone().group(),
+        }
     }
 
     /// Build the query string

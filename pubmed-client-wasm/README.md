@@ -46,9 +46,15 @@ searchArticles().catch(console.error);
 
 ### PMC Full-Text Access
 
-- Check PMC availability for articles
+- Check PMC availability and Open Access (OA) subset status
 - Retrieve structured full-text content
-- Convert articles to Markdown format
+- Convert articles to Markdown format (with configurable options)
+
+### Query Builder
+
+- Fluent `WasmSearchQuery` builder with field filters (title, author, MeSH, journal, ORCID, …)
+- Date-range, article-type, language, and study-population filters
+- Boolean composition: AND / OR / NOT / exclude / grouping
 
 ### Advanced Features
 
@@ -165,6 +171,52 @@ console.log(markdown);
 
 **Returns:** string
 
+##### fetch_pmc_as_markdown(pmcid, options?)
+
+Fetch a PMC article and convert it to Markdown in a single call.
+
+```javascript
+const markdown = await client.fetch_pmc_as_markdown("PMC7239045", {
+    include_metadata: true,
+    include_toc: true,
+    use_yaml_frontmatter: true,
+    include_orcid_links: false,
+    include_figure_captions: true,
+});
+console.log(markdown);
+```
+
+**Parameters:**
+
+- `pmcid` (string): PMC ID
+- `options` (object, optional): Markdown conversion options. All fields are
+  optional booleans; unset fields fall back to converter defaults:
+  `include_metadata`, `include_toc`, `use_yaml_frontmatter`,
+  `include_orcid_links`, `include_figure_captions`.
+
+**Returns:** Promise<string>
+
+##### is_oa_subset(pmcid)
+
+Check whether a PMC article is in the Open Access (OA) subset (i.e. has
+programmatic full-text access).
+
+```javascript
+const info = await client.is_oa_subset("PMC7239045");
+if (info.is_oa_subset) {
+    console.log(`License: ${info.license}`);
+    console.log(`Download: ${info.download_link}`);
+} else {
+    console.log(`Not in OA subset: ${info.error_code}`);
+}
+```
+
+**Parameters:**
+
+- `pmcid` (string): PMC ID
+
+**Returns:** Promise<OaSubsetInfo>
+
 ##### get_related_articles(pmids)
 
 Find articles related to given PMIDs.
@@ -179,6 +231,66 @@ console.log(`Found ${related.related_pmids.length} related articles`);
 - `pmids` (number[]): Array of PubMed IDs
 
 **Returns:** Promise<RelatedArticles>
+
+### WasmSearchQuery
+
+A fluent builder for constructing complex PubMed queries with field filters,
+date ranges, article types, and boolean composition. Build a query string with
+`build()`, or run it directly with `search_and_fetch(client, limit)`.
+
+```javascript
+const { WasmSearchQuery, WasmPubMedClient } = require('pubmed-client-wasm');
+
+const client = new WasmPubMedClient();
+
+const query = new WasmSearchQuery()
+    .title_abstract("CRISPR")
+    .mesh_term("Neoplasms")
+    .author("Zhang Y")
+    .article_types_str(["Review", "Meta-Analysis"])
+    .published_between(2019, 2023)
+    .humans_only();
+
+console.log(query.build());
+// (CRISPR[tiab]) AND ... AND (2019:2023[pdat]) ...
+
+const articles = await query.search_and_fetch(client, 20);
+```
+
+#### Field filters
+
+- `query(text)`, `terms(string[])`, `custom_filter(text)`
+- `title(text)`, `abstract_contains(text)`, `title_abstract(text)`, `has_abstract()`
+- `author(name)`, `first_author(name)`, `last_author(name)`, `affiliation(institution)`, `orcid(id)`
+- `journal(name)`, `journal_abbreviation(abbrev)`, `grant_number(gr)`, `isbn(isbn)`, `issn(issn)`
+- `mesh_term(term)`, `mesh_terms(string[])`, `mesh_major_topic(term)`, `mesh_subheading(sh)`
+
+#### Filters & study population
+
+- `free_full_text_only()`, `full_text_only()`, `pmc_only()`
+- `humans_only()`, `animal_studies_only()`, `age_group(group)`, `organism_mesh(organism)`
+- `article_type_str(type)`, `article_types_str(string[])`, `language_str(lang)`, `sort_str(order)`
+
+#### Dates (years must be 1800–3000)
+
+- `published_after(year)`, `published_before(year)`, `published_in_year(year)`
+- `published_between(startYear, endYear?)`, `date_range(startYear, endYear?)`
+
+#### Boolean composition
+
+These return a **new** query and do not consume their operands:
+
+- `and(other)`, `or(other)`, `negate()`, `exclude(other)`, `group()`
+
+```javascript
+const a = new WasmSearchQuery().query("diabetes");
+const b = new WasmSearchQuery().query("hypertension");
+a.or(b).build(); // "(diabetes) OR (hypertension)"
+```
+
+#### Misc
+
+- `limit(n)` / `get_limit()`, `build()`, `search_and_fetch(client, limit)`
 
 ## Data Types
 
@@ -235,6 +347,23 @@ interface Section {
     section_type: string;
     title?: string;
     content: string;
+}
+```
+
+### OaSubsetInfo
+
+```typescript
+interface OaSubsetInfo {
+    pmcid: string;
+    is_oa_subset: boolean;
+    citation?: string;
+    license?: string;
+    retracted: boolean;
+    download_link?: string;
+    download_format?: string;
+    updated?: string;
+    error_code?: string;
+    error_message?: string;
 }
 ```
 
