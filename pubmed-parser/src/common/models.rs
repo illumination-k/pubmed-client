@@ -51,6 +51,12 @@ pub struct Author {
     pub is_corresponding: bool,
     /// Author's roles/contributions (e.g., ["Conceptualization", "Writing - original draft"])
     pub roles: Vec<String>,
+    /// Collaboration / group-author name, when this contributor is a collective
+    /// rather than an individual. From JATS `<collab>` (PMC) or
+    /// `<CollectiveName>` (PubMed). When set, `surname`/`given_names` are
+    /// typically `None` and `full_name` mirrors this value.
+    #[serde(default)]
+    pub collab_name: Option<String>,
 }
 
 impl Display for Author {
@@ -74,6 +80,7 @@ impl Author {
             email: None,
             is_corresponding: false,
             roles: Vec::new(),
+            collab_name: None,
         }
     }
 
@@ -93,7 +100,32 @@ impl Author {
             email: None,
             is_corresponding: false,
             roles: Vec::new(),
+            collab_name: None,
         }
+    }
+
+    /// Create a collaboration / group author (JATS `<collab>` /
+    /// PubMed `<CollectiveName>`), e.g. "COVID-19 Study Group".
+    pub fn collaboration(name: String) -> Self {
+        Author {
+            surname: None,
+            given_names: None,
+            initials: None,
+            suffix: None,
+            full_name: name.clone(),
+            affiliations: Vec::new(),
+            orcid: None,
+            email: None,
+            is_corresponding: false,
+            roles: Vec::new(),
+            collab_name: Some(name),
+        }
+    }
+
+    /// Whether this contributor is a collaboration / group author rather than
+    /// an individual person.
+    pub fn is_collaboration(&self) -> bool {
+        self.collab_name.is_some()
     }
 
     /// Check if the author is affiliated with a specific institution

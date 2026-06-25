@@ -997,6 +997,7 @@ mod tests {
                 "Conceptualization".to_string(),
                 "Writing - original draft".to_string(),
             ],
+            collab_name: None,
         }
     }
 

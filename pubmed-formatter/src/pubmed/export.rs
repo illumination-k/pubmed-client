@@ -358,6 +358,7 @@ mod tests {
                     email: None,
                     is_corresponding: false,
                     roles: vec![],
+                    collab_name: None,
                     affiliations: vec![Affiliation {
                         id: None,
                         institution: Some("Harvard University".to_string()),
@@ -376,6 +377,7 @@ mod tests {
                     email: None,
                     is_corresponding: false,
                     roles: vec![],
+                    collab_name: None,
                     affiliations: vec![],
                 },
             ],

@@ -1,6 +1,5 @@
 ---
 source: pubmed-parser/tests/integration/parsing/pmc_snapshots.rs
-assertion_line: 28
 expression: article
 ---
 {
@@ -52,6 +51,17 @@ expression: article
       },
       "abstracts": [],
       "keywords": [],
+      "keyword_groups": [],
+      "subject_groups": [
+        {
+          "group_type": "heading",
+          "subjects": [
+            "Editorial"
+          ]
+        }
+      ],
+      "related_articles": [],
+      "author_notes": [],
       "funding": []
     }
   },

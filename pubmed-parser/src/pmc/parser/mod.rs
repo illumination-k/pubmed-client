@@ -45,6 +45,10 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
     let pmid_str = metadata::extract_pmid(front);
     let pmid = pmid_str.as_deref().map(PubMedId::parse).transpose()?;
     let keywords = metadata::extract_keywords(front);
+    let keyword_groups = metadata::extract_keyword_groups(front);
+    let subject_groups = metadata::extract_subject_groups(front);
+    let related_articles = metadata::extract_related_articles(front);
+    let author_notes = metadata::extract_author_notes(front);
     let funding = metadata::extract_funding(front);
 
     // Additional metadata from <front>
@@ -129,6 +133,10 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
             permissions,
             abstracts,
             keywords,
+            keyword_groups,
+            subject_groups,
+            related_articles,
+            author_notes,
             funding,
         },
     };
