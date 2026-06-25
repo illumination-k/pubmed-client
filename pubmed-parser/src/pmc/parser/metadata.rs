@@ -1,5 +1,7 @@
 use crate::common::{HistoryDate, PublicationDate};
-use crate::pmc::domain::{FundingInfo, JournalMeta, SupplementaryMaterial};
+use crate::pmc::domain::{
+    FundingInfo, JournalMeta, KeywordGroup, RelatedArticle, SubjectGroup, SupplementaryMaterial,
+};
 
 use quick_xml::Reader;
 use quick_xml::events::Event;
@@ -636,6 +638,207 @@ pub(crate) fn extract_keywords(content: &str) -> Vec<String> {
     read_texts_within_parent(content, b"kwd-group", b"kwd")
 }
 
+/// Read child `<{child}>` texts until the current `<{group}>` element closes
+/// (depth-aware, so nested same-name groups roll up into the enclosing one).
+/// The reader must have just consumed the opening `<{group}>` start tag.
+fn read_group_child_texts(
+    reader: &mut Reader<&[u8]>,
+    buf: &mut Vec<u8>,
+    group: &[u8],
+    child: &[u8],
+) -> Vec<String> {
+    let mut depth = 1_u32;
+    let mut values = Vec::new();
+
+    loop {
+        let action = match reader.read_event_into(buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == group => {
+                depth += 1;
+                TextAction::Continue
+            }
+            Ok(Event::Start(ref e)) if e.name().as_ref() == child => {
+                TextAction::Read(child.to_vec())
+            }
+            Ok(Event::End(ref e)) if e.name().as_ref() == group => {
+                depth = depth.saturating_sub(1);
+                if depth == 0 {
+                    TextAction::Break
+                } else {
+                    TextAction::Continue
+                }
+            }
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) => {
+                if let Ok(text) = read_text_content(reader, &name, buf)
+                    && !text.is_empty()
+                {
+                    values.push(text);
+                }
+            }
+            TextAction::ReadSkip(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    values
+}
+
+/// Extract structured keyword groups, preserving `kwd-group-type` and
+/// `xml:lang`. From `<kwd-group>/<kwd>`.
+pub(crate) fn extract_keyword_groups(content: &str) -> Vec<KeywordGroup> {
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+    let mut groups = Vec::new();
+
+    loop {
+        let attrs = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"kwd-group" => {
+                Some((get_attr(e, b"kwd-group-type"), get_attr(e, b"xml:lang")))
+            }
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => None,
+        };
+        buf.clear();
+
+        if let Some((group_type, lang)) = attrs {
+            let keywords = read_group_child_texts(&mut reader, &mut buf, b"kwd-group", b"kwd");
+            if !keywords.is_empty() {
+                groups.push(KeywordGroup {
+                    group_type,
+                    lang,
+                    keywords,
+                });
+            }
+        }
+    }
+
+    groups
+}
+
+/// Extract structured subject groups, preserving `subj-group-type`. From
+/// `<article-categories>/<subj-group>/<subject>`.
+pub(crate) fn extract_subject_groups(content: &str) -> Vec<SubjectGroup> {
+    let Some(start) = content.find("<article-categories") else {
+        return Vec::new();
+    };
+    let Some(end) = content[start..].find("</article-categories>") else {
+        return Vec::new();
+    };
+    let cats = &content[start..start + end + "</article-categories>".len()];
+
+    let mut reader = make_reader(cats);
+    let mut buf = Vec::new();
+    let mut groups = Vec::new();
+
+    loop {
+        let group_type = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"subj-group" => {
+                Some(get_attr(e, b"subj-group-type"))
+            }
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => None,
+        };
+        buf.clear();
+
+        if let Some(group_type) = group_type {
+            let subjects = read_group_child_texts(&mut reader, &mut buf, b"subj-group", b"subject");
+            if !subjects.is_empty() {
+                groups.push(SubjectGroup {
+                    group_type,
+                    subjects,
+                });
+            }
+        }
+    }
+
+    groups
+}
+
+/// Extract related-article links (corrections, retractions, companions, …).
+/// From `<related-article>` attributes.
+pub(crate) fn extract_related_articles(content: &str) -> Vec<RelatedArticle> {
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+    let mut out = Vec::new();
+
+    loop {
+        match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"related-article" => {
+                out.push(RelatedArticle {
+                    related_article_type: get_attr(e, b"related-article-type"),
+                    ext_link_type: get_attr(e, b"ext-link-type"),
+                    href: get_attr(e, b"xlink:href").or_else(|| get_attr(e, b"href")),
+                    id: get_attr(e, b"id"),
+                });
+            }
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => {}
+        }
+        buf.clear();
+    }
+
+    out
+}
+
+/// Extract author notes (`<corresp>` / `<fn>` text) from `<author-notes>`.
+pub(crate) fn extract_author_notes(content: &str) -> Vec<String> {
+    let mut reader = make_reader(content);
+    let mut buf = Vec::new();
+    let mut notes = Vec::new();
+    let mut in_notes = 0_u32;
+
+    loop {
+        let action = match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"author-notes" => {
+                in_notes += 1;
+                TextAction::Continue
+            }
+            Ok(Event::Start(ref e))
+                if in_notes > 0 && matches!(e.name().as_ref(), b"corresp" | b"fn") =>
+            {
+                TextAction::Read(e.name().as_ref().to_vec())
+            }
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"author-notes" => {
+                in_notes = in_notes.saturating_sub(1);
+                TextAction::Continue
+            }
+            Ok(Event::Eof) => TextAction::Break,
+            Err(_) => TextAction::Break,
+            _ => TextAction::Continue,
+        };
+        buf.clear();
+
+        match action {
+            TextAction::Read(name) => {
+                if let Ok(text) = read_text_content(&mut reader, &name, &mut buf)
+                    && !text.is_empty()
+                {
+                    notes.push(text);
+                }
+            }
+            TextAction::ReadSkip(name) => {
+                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+            }
+            TextAction::Break => break,
+            TextAction::Continue => {}
+        }
+    }
+
+    notes
+}
+
 /// Extract funding information
 pub(crate) fn extract_funding(content: &str) -> Vec<FundingInfo> {
     let mut funding = Vec::new();
@@ -958,6 +1161,86 @@ pub(crate) fn extract_elocation_id(content: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_extract_keyword_groups_with_type_and_lang() {
+        let content = r#"
+        <article-meta>
+            <kwd-group kwd-group-type="author" xml:lang="en">
+                <kwd>genomics</kwd>
+                <kwd>RNA-seq</kwd>
+            </kwd-group>
+            <kwd-group>
+                <kwd>plain</kwd>
+            </kwd-group>
+        </article-meta>"#;
+        let groups = extract_keyword_groups(content);
+        assert_eq!(groups.len(), 2);
+        assert_eq!(groups[0].group_type.as_deref(), Some("author"));
+        assert_eq!(groups[0].lang.as_deref(), Some("en"));
+        assert_eq!(groups[0].keywords, vec!["genomics", "RNA-seq"]);
+        assert_eq!(groups[1].group_type, None);
+        assert_eq!(groups[1].keywords, vec!["plain"]);
+        // Flattened view still works and is consistent.
+        assert_eq!(
+            extract_keywords(content),
+            vec!["genomics", "RNA-seq", "plain"]
+        );
+    }
+
+    #[test]
+    fn test_extract_subject_groups_with_type() {
+        let content = r#"
+        <article-categories>
+            <subj-group subj-group-type="heading">
+                <subject>Research Article</subject>
+            </subj-group>
+            <subj-group subj-group-type="discipline">
+                <subject>Microbiology</subject>
+                <subject>Virology</subject>
+            </subj-group>
+        </article-categories>"#;
+        let groups = extract_subject_groups(content);
+        assert_eq!(groups.len(), 2);
+        assert_eq!(groups[0].group_type.as_deref(), Some("heading"));
+        assert_eq!(groups[0].subjects, vec!["Research Article"]);
+        assert_eq!(groups[1].group_type.as_deref(), Some("discipline"));
+        assert_eq!(groups[1].subjects, vec!["Microbiology", "Virology"]);
+    }
+
+    #[test]
+    fn test_extract_related_articles() {
+        let content = r#"
+        <article-meta>
+            <related-article related-article-type="corrected-article"
+                ext-link-type="doi" xlink:href="10.1/orig" id="d1"/>
+        </article-meta>"#;
+        let related = extract_related_articles(content);
+        assert_eq!(related.len(), 1);
+        assert_eq!(
+            related[0].related_article_type.as_deref(),
+            Some("corrected-article")
+        );
+        assert_eq!(related[0].ext_link_type.as_deref(), Some("doi"));
+        assert_eq!(related[0].href.as_deref(), Some("10.1/orig"));
+        assert_eq!(related[0].id.as_deref(), Some("d1"));
+        assert!(related[0].is_correction());
+    }
+
+    #[test]
+    fn test_extract_author_notes() {
+        let content = r#"
+        <article-meta>
+            <author-notes>
+                <corresp id="c1">Correspondence to: jane@example.org</corresp>
+                <fn fn-type="equal"><p>These authors contributed equally.</p></fn>
+            </author-notes>
+        </article-meta>"#;
+        let notes = extract_author_notes(content);
+        assert_eq!(notes.len(), 2);
+        assert!(notes[0].contains("jane@example.org"));
+        assert!(notes[1].contains("contributed equally"));
+    }
 
     #[test]
     fn test_extract_title() {

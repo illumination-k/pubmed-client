@@ -26,7 +26,8 @@ pub use oa_api::OaSubsetInfo;
 pub use parser::parse_pmc_xml;
 pub use pubmed_parser::pmc::{
     Abstract, AbstractSection, ArticleMeta, Back, Body, Definition, Figure, Formula, Front,
-    FundingInfo, JournalMeta, License, Permissions, PmcArticle, Reference, Section, SectionIter,
-    SectionKind, SupplementaryMaterial, Table, TableCell, TableRow, TitleGroup,
+    FundingInfo, JournalMeta, KeywordGroup, License, Permissions, PmcArticle, Reference,
+    RelatedArticle, Section, SectionIter, SectionKind, SubjectGroup, SupplementaryMaterial, Table,
+    TableCell, TableRow, TitleGroup,
 };
 pub use tar::PmcTarClient;

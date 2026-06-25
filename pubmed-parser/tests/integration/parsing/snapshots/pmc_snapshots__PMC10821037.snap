@@ -1,6 +1,5 @@
 ---
 source: pubmed-parser/tests/integration/parsing/pmc_snapshots.rs
-assertion_line: 47
 expression: article
 ---
 {
@@ -66,7 +65,8 @@ expression: article
             "Supervision",
             "Project administration",
             "Funding acquisition"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Guzman-Esquivel",
@@ -86,7 +86,8 @@ expression: article
           "orcid": "https://orcid.org/0000-0002-6727-0051",
           "email": null,
           "is_corresponding": false,
-          "roles": []
+          "roles": [],
+          "collab_name": null
         },
         {
           "surname": "Ramos-Rojas",
@@ -110,7 +111,8 @@ expression: article
             "Methodology",
             "Validation",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Santillan-Luna",
@@ -130,7 +132,8 @@ expression: article
           "orcid": null,
           "email": null,
           "is_corresponding": false,
-          "roles": []
+          "roles": [],
+          "collab_name": null
         },
         {
           "surname": "Sanchez-Ramirez",
@@ -154,7 +157,8 @@ expression: article
             "Methodology",
             "Validation",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Hernandez-Fuentes",
@@ -187,7 +191,8 @@ expression: article
             "Data curation",
             "Writing – original draft",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Diaz-Martinez",
@@ -211,7 +216,8 @@ expression: article
             "Methodology",
             "Validation",
             "Writing – original draft"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Melnikov",
@@ -235,7 +241,8 @@ expression: article
             "Methodology",
             "Validation",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Rojas-Larios",
@@ -259,7 +266,8 @@ expression: article
             "Methodology",
             "Validation",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Martinez-Fierro",
@@ -279,7 +287,8 @@ expression: article
           "orcid": "https://orcid.org/0000-0003-1478-9068",
           "email": null,
           "is_corresponding": false,
-          "roles": []
+          "roles": [],
+          "collab_name": null
         },
         {
           "surname": "Tiburcio-Jimenez",
@@ -302,7 +311,8 @@ expression: article
           "roles": [
             "Formal analysis",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Rodriguez-Sanchez",
@@ -322,7 +332,8 @@ expression: article
           "orcid": "https://orcid.org/0000-0002-5988-4168",
           "email": null,
           "is_corresponding": false,
-          "roles": []
+          "roles": [],
+          "collab_name": null
         },
         {
           "surname": "Delgado-Enciso",
@@ -345,7 +356,8 @@ expression: article
           "roles": [
             "Formal analysis",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Cabrera-Licona",
@@ -368,7 +380,8 @@ expression: article
           "roles": [
             "Methodology",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         },
         {
           "surname": "Delgado-Enciso",
@@ -413,7 +426,8 @@ expression: article
             "Data curation",
             "Writing – original draft",
             "Writing – review & editing"
-          ]
+          ],
+          "collab_name": null
         }
       ],
       "pub_dates": [
@@ -476,6 +490,32 @@ expression: article
         "mortality",
         "diagnostic markers",
         "cohort study"
+      ],
+      "keyword_groups": [
+        {
+          "group_type": null,
+          "lang": null,
+          "keywords": [
+            "COVID-19",
+            "hospitalized patients",
+            "vaccination scheme",
+            "mortality",
+            "diagnostic markers",
+            "cohort study"
+          ]
+        }
+      ],
+      "subject_groups": [
+        {
+          "group_type": "heading",
+          "subjects": [
+            "Article"
+          ]
+        }
+      ],
+      "related_articles": [],
+      "author_notes": [
+        "*Correspondence: ivan_delgado_enciso@ucol.mx or ivadelga@fiu.edu; Tel.: +52-312-3161099"
       ],
       "funding": [
         {
@@ -731,7 +771,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Shavaleh",
@@ -743,7 +784,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Forouhi",
@@ -755,7 +797,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Disfani",
@@ -767,7 +810,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Kamandi",
@@ -779,7 +823,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Oskooi",
@@ -791,7 +836,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Foogerdi",
@@ -803,7 +849,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Soltani",
@@ -815,7 +862,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Rahchamani",
@@ -827,7 +875,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Mohaddespour",
@@ -839,7 +888,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Front. Public Health",
@@ -847,6 +897,13 @@ expression: article
         "volume": "10",
         "issue": null,
         "pages": "873596",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "36091533",
         "doi": null
       },
@@ -865,7 +922,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Mendoza-Hernandez",
@@ -877,7 +935,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Guzman-Solorzano",
@@ -889,7 +948,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Sarmiento-Hernandez",
@@ -901,7 +961,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Rodriguez-Sanchez",
@@ -913,7 +974,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Martinez-Fierro",
@@ -925,7 +987,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Paz-Michel",
@@ -937,7 +1000,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Murillo-Zamora",
@@ -949,7 +1013,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Rojas-Larios",
@@ -961,7 +1026,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Lugo-Trampe",
@@ -973,7 +1039,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Healthcare",
@@ -981,6 +1048,13 @@ expression: article
         "volume": "11",
         "issue": null,
         "pages": null,
+        "elocation_id": "197",
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "36673565",
         "doi": "10.3390/healthcare11020197"
       },
@@ -999,7 +1073,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Di Timoteo",
@@ -1011,7 +1086,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "De Angelis",
@@ -1023,7 +1099,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Oliva",
@@ -1035,7 +1112,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Infect. Drug Resist.",
@@ -1043,6 +1121,13 @@ expression: article
         "volume": "14",
         "issue": null,
         "pages": "3459-3476",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "34511939",
         "doi": "10.2147/IDR.S315727"
       },
@@ -1061,7 +1146,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Pham",
@@ -1073,7 +1159,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Taylor",
@@ -1085,7 +1172,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Whitaker",
@@ -1097,7 +1185,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Patel",
@@ -1109,7 +1198,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Anglin",
@@ -1121,7 +1211,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Kambhampati",
@@ -1133,7 +1224,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Milucky",
@@ -1145,7 +1237,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Zell",
@@ -1157,7 +1250,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Moline",
@@ -1169,7 +1263,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "JAMA Intern. Med.",
@@ -1177,6 +1272,13 @@ expression: article
         "volume": "182",
         "issue": null,
         "pages": "1071",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "36074486",
         "doi": "10.1001/jamainternmed.2022.4299"
       },
@@ -1195,7 +1297,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Chang",
@@ -1207,7 +1310,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "He",
@@ -1219,7 +1323,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Tan",
@@ -1231,7 +1336,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Sci. Rep.",
@@ -1239,6 +1345,13 @@ expression: article
         "volume": "12",
         "issue": null,
         "pages": "5888",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "35393471",
         "doi": "10.1038/s41598-022-09783-9"
       },
@@ -1257,7 +1370,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Ovalle-Luna",
@@ -1269,7 +1383,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Rascón-Pacheco",
@@ -1281,7 +1396,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Borja-Aburto",
@@ -1293,7 +1409,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Chowell",
@@ -1305,7 +1422,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "BMC Infect. Dis.",
@@ -1313,6 +1431,13 @@ expression: article
         "volume": "22",
         "issue": null,
         "pages": null,
+        "elocation_id": "813",
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "36316634",
         "doi": "10.1186/s12879-022-07800-w"
       },
@@ -1331,7 +1456,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Ferraris",
@@ -1343,7 +1469,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Lalueza",
@@ -1355,7 +1482,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Valdez",
@@ -1367,7 +1495,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Peroni",
@@ -1379,7 +1508,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Cayetti",
@@ -1391,7 +1521,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Mirofsky",
@@ -1403,7 +1534,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Boietti",
@@ -1415,7 +1547,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Gómez-Huelgas",
@@ -1427,7 +1560,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Casas-Rojo",
@@ -1439,7 +1573,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "J. Med. Virol.",
@@ -1447,6 +1582,13 @@ expression: article
         "volume": "95",
         "issue": null,
         "pages": "e28786",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "37212340",
         "doi": "10.1002/jmv.28786"
       },
@@ -1465,7 +1607,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Lucijanic",
@@ -1477,7 +1620,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Barsic",
@@ -1489,7 +1633,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Luksic",
@@ -1501,7 +1646,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Busic",
@@ -1513,7 +1659,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Kurdija",
@@ -1525,7 +1672,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Barbic",
@@ -1537,7 +1685,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Kunstek",
@@ -1549,7 +1698,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Jelic",
@@ -1561,7 +1711,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Lucijanic",
@@ -1573,7 +1724,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "J. Med. Virol.",
@@ -1581,6 +1733,13 @@ expression: article
         "volume": "94",
         "issue": null,
         "pages": "2849-2854",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "35187697",
         "doi": "10.1002/jmv.27666"
       },
@@ -1599,7 +1758,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Leibner",
@@ -1611,7 +1771,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Hackett",
@@ -1623,7 +1784,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Maguire",
@@ -1635,7 +1797,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Mashriqi",
@@ -1647,7 +1810,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Kohli-Seth",
@@ -1659,7 +1823,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Crit. Care Explor.",
@@ -1667,6 +1832,13 @@ expression: article
         "volume": "4",
         "issue": null,
         "pages": "e0653",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "35261982",
         "doi": "10.1097/CCE.0000000000000653"
       },
@@ -1685,7 +1857,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Orenbuch-Harroch",
@@ -1697,7 +1870,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Chowers",
@@ -1709,7 +1883,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Elbaz",
@@ -1721,7 +1896,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Nesher",
@@ -1733,7 +1909,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Stein",
@@ -1745,7 +1922,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Maor",
@@ -1757,7 +1935,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Cohen",
@@ -1769,7 +1948,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Hussein",
@@ -1781,7 +1961,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Weinberger",
@@ -1793,7 +1974,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Clin. Microbiol. Infect.",
@@ -1801,6 +1983,13 @@ expression: article
         "volume": "27",
         "issue": null,
         "pages": "1652-1657",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "34245907",
         "doi": "10.1016/j.cmi.2021.06.036"
       },
@@ -1819,7 +2008,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Clement",
@@ -1831,7 +2021,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Lotte",
@@ -1843,7 +2034,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Manni",
@@ -1855,7 +2047,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Sindt",
@@ -1867,7 +2060,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Bertrand",
@@ -1879,7 +2073,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Durant",
@@ -1891,7 +2086,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Front. Med.",
@@ -1899,6 +2095,13 @@ expression: article
         "volume": "9",
         "issue": null,
         "pages": "809154",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "35308544",
         "doi": "10.3389/fmed.2022.809154"
       },
@@ -1917,7 +2120,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Pazgan-Simon",
@@ -1929,7 +2133,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Simon",
@@ -1941,7 +2146,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Łapiński",
@@ -1953,7 +2159,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Zarębska-Michaluk",
@@ -1965,7 +2172,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Szczepańska",
@@ -1977,7 +2185,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Chojnicki",
@@ -1989,7 +2198,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Mozer-Lisewska",
@@ -2001,7 +2211,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Flisiak",
@@ -2013,7 +2224,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Vaccines",
@@ -2021,6 +2233,13 @@ expression: article
         "volume": "9",
         "issue": null,
         "pages": null,
+        "elocation_id": "781",
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "34358197",
         "doi": "10.3390/vaccines9070781"
       },
@@ -2039,7 +2258,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Checkol",
@@ -2051,7 +2271,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Mantefardo",
@@ -2063,7 +2284,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Ann. Med. Surg.",
@@ -2071,6 +2293,13 @@ expression: article
         "volume": "64",
         "issue": null,
         "pages": "102204",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "33692899",
         "doi": "10.1016/j.amsu.2021.102204"
       },
@@ -2089,7 +2318,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Navaratnam",
@@ -2101,7 +2331,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Day",
@@ -2113,7 +2344,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Wendon",
@@ -2125,7 +2357,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Briggs",
@@ -2137,7 +2370,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Thorax",
@@ -2145,6 +2379,13 @@ expression: article
         "volume": "77",
         "issue": null,
         "pages": "1113-1120",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "34819384",
         "doi": "10.1136/thoraxjnl-2021-218025"
       },
@@ -2163,7 +2404,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Peris",
@@ -2175,7 +2417,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "De Gaudio",
@@ -2187,7 +2430,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Geppetti",
@@ -2199,7 +2443,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Physiol. Rev.",
@@ -2207,6 +2452,13 @@ expression: article
         "volume": "100",
         "issue": null,
         "pages": "1455-1466",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "32496872",
         "doi": "10.1152/physrev.00020.2020"
       },
@@ -2225,7 +2477,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Amaral",
@@ -2237,7 +2490,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "McCulloch",
@@ -2249,7 +2503,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Adey",
@@ -2261,7 +2516,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Li",
@@ -2273,7 +2529,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Johansen",
@@ -2285,7 +2542,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Clin. J. Am. Soc. Nephrol.",
@@ -2293,6 +2551,13 @@ expression: article
         "volume": "17",
         "issue": null,
         "pages": "1515-1521",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "36122938",
         "doi": "10.2215/CJN.04850422"
       },
@@ -2311,7 +2576,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Johnson",
@@ -2323,7 +2589,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Chen",
@@ -2335,7 +2602,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Intern. Emerg. Med.",
@@ -2343,6 +2611,13 @@ expression: article
         "volume": "16",
         "issue": null,
         "pages": "1593-1603",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "33547620",
         "doi": "10.1007/s11739-021-02655-6"
       },
@@ -2361,7 +2636,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Diaz-Martinez",
@@ -2373,7 +2649,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Ortega-Ortiz",
@@ -2385,7 +2662,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Murillo-Zamora",
@@ -2397,7 +2675,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Melnikov",
@@ -2409,7 +2688,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Tejeda-Luna",
@@ -2421,7 +2701,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Cosio-Medina",
@@ -2433,7 +2714,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Llerenas-Aguirre",
@@ -2445,7 +2727,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Guzman-Solorzano",
@@ -2457,7 +2740,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Hernandez-Fuentes",
@@ -2469,7 +2753,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Exp. Ther. Med.",
@@ -2477,6 +2762,13 @@ expression: article
         "volume": "26",
         "issue": null,
         "pages": "580",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "38023357",
         "doi": "10.3892/etm.2023.12279"
       },
@@ -2495,7 +2787,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Tamargo",
@@ -2507,7 +2800,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Diaz-Martinez",
@@ -2519,7 +2813,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Delgado-Enciso",
@@ -2531,7 +2826,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Meade",
@@ -2543,7 +2839,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Kirk",
@@ -2555,7 +2852,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Mehta",
@@ -2567,7 +2865,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Moore",
@@ -2579,7 +2878,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Kipke",
@@ -2591,7 +2891,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Shoptaw",
@@ -2603,7 +2904,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Drug Alcohol Depend.",
@@ -2611,6 +2913,13 @@ expression: article
         "volume": "231",
         "issue": null,
         "pages": "109230",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "34998257",
         "doi": "10.1016/j.drugalcdep.2021.109230"
       },
@@ -2629,7 +2938,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Gebregziabher",
@@ -2641,7 +2951,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Luttrell",
@@ -2653,7 +2964,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Luttrell",
@@ -2665,7 +2977,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Jaffa",
@@ -2677,7 +2990,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "J. Appl. Stat.",
@@ -2685,6 +2999,13 @@ expression: article
         "volume": "43",
         "issue": null,
         "pages": "1447-1464",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "27829695",
         "doi": "10.1080/02664763.2015.1103708"
       },
@@ -2703,7 +3024,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Whitcomb",
@@ -2715,7 +3037,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Am. J. Epidemiol.",
@@ -2723,6 +3046,13 @@ expression: article
         "volume": "189",
         "issue": null,
         "pages": "508-510",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "32219364",
         "doi": "10.1093/aje/kwaa044"
       },
@@ -2730,12 +3060,33 @@ expression: article
         "id": "B23-vaccines-12-00072",
         "publication_type": "gov",
         "title": "Política Nacional de Vacunación Contra El Virus SARS-CoV-2, Para La Prevención de La COVID-19 En Mexico",
-        "authors": [],
+        "authors": [
+          {
+            "surname": null,
+            "given_names": null,
+            "initials": null,
+            "suffix": null,
+            "full_name": "Gobierno de Mexico",
+            "affiliations": [],
+            "orcid": null,
+            "email": null,
+            "is_corresponding": false,
+            "roles": [],
+            "collab_name": "Gobierno de Mexico"
+          }
+        ],
         "source": null,
         "year": null,
         "volume": null,
         "issue": null,
         "pages": null,
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": null,
         "doi": null
       },
@@ -2754,7 +3105,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Wong-Chew",
@@ -2766,7 +3118,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Jiménez-Corona",
@@ -2778,7 +3131,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Zárate",
@@ -2790,7 +3144,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "López",
@@ -2802,7 +3157,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Ciria",
@@ -2814,7 +3170,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Palomares",
@@ -2826,7 +3183,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "García-López",
@@ -2838,7 +3196,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Iša",
@@ -2850,7 +3209,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Taboada",
@@ -2862,7 +3222,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Front. Public Health",
@@ -2870,6 +3231,13 @@ expression: article
         "volume": "10",
         "issue": null,
         "pages": "1050673",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "36711379",
         "doi": "10.3389/fpubh.2022.1050673"
       },
@@ -2888,7 +3256,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Taboada",
@@ -2900,7 +3269,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Rosales-Rivera",
@@ -2912,7 +3282,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "García-López",
@@ -2924,7 +3295,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Muñoz-Medina",
@@ -2936,7 +3308,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Sanchez-Flores",
@@ -2948,7 +3321,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Herrera-Estrella",
@@ -2960,7 +3334,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Gómez-Gil",
@@ -2972,7 +3347,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Selem Mojica",
@@ -2984,7 +3360,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Salas-Lais",
@@ -2996,7 +3373,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Viruses",
@@ -3004,6 +3382,13 @@ expression: article
         "volume": "15",
         "issue": null,
         "pages": null,
+        "elocation_id": "243",
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "36680283",
         "doi": "10.3390/v15010243"
       },
@@ -3022,7 +3407,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Paola Plascencia-Roldán",
@@ -3034,7 +3420,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Irazú Morales-Reyes",
@@ -3046,7 +3433,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Flores-Vargas",
@@ -3058,7 +3446,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "de Jesús Gallardo-Luna",
@@ -3070,7 +3459,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Navarro-Olivos",
@@ -3082,7 +3472,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Javier Magos-Vázquez",
@@ -3094,7 +3485,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Padilla-Raygoza",
@@ -3106,7 +3498,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "New COVID-19 Variants [Working Title]",
@@ -3114,6 +3507,13 @@ expression: article
         "volume": null,
         "issue": null,
         "pages": null,
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": "IntechOpen",
+        "publisher_loc": "Rijeka, Croatia",
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": null,
         "doi": null
       },
@@ -3132,7 +3532,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Zhao",
@@ -3144,7 +3545,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Tarquinio",
@@ -3156,7 +3558,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Brown",
@@ -3168,7 +3571,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Front. Microbiol.",
@@ -3176,6 +3580,13 @@ expression: article
         "volume": "12",
         "issue": null,
         "pages": null,
+        "elocation_id": "682571",
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "34354682",
         "doi": "10.3389/fmicb.2021.682571"
       },
@@ -3194,7 +3605,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Lu",
@@ -3206,7 +3618,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Liu",
@@ -3218,7 +3631,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "He",
@@ -3230,7 +3644,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Antimicrob. Steward. Healthc. Epidemiol.",
@@ -3238,6 +3653,13 @@ expression: article
         "volume": "3",
         "issue": null,
         "pages": "e156",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "37771749",
         "doi": "10.1017/ash.2023.425"
       },
@@ -3256,7 +3678,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Juhl",
@@ -3268,7 +3691,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Søgaard",
@@ -3280,7 +3704,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Reekie",
@@ -3292,7 +3717,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Nielsen",
@@ -3304,7 +3730,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Johansen",
@@ -3316,7 +3743,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Benfield",
@@ -3328,7 +3756,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Wiese",
@@ -3340,7 +3769,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Stærke",
@@ -3352,7 +3782,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Jensen",
@@ -3364,7 +3795,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Commun. Med.",
@@ -3372,6 +3804,13 @@ expression: article
         "volume": "3",
         "issue": null,
         "pages": "58",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "37095240",
         "doi": "10.1038/s43856-023-00277-x"
       },
@@ -3390,7 +3829,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Espiritu-Mojarro",
@@ -3402,7 +3842,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Melnikov",
@@ -3414,7 +3855,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Moy-López",
@@ -3426,7 +3868,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Soriano-Hernandez",
@@ -3438,7 +3881,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Galvan-Salazar",
@@ -3450,7 +3894,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Guzman-Muñiz",
@@ -3462,7 +3907,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Guzman-Esquivel",
@@ -3474,7 +3920,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Martinez-Fierro",
@@ -3486,7 +3933,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Rodriguez-Sanchez",
@@ -3498,7 +3946,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Arch. Virol.",
@@ -3506,6 +3955,13 @@ expression: article
         "volume": "164",
         "issue": null,
         "pages": "775-786",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "30666458",
         "doi": "10.1007/s00705-018-04132-6"
       },
@@ -3524,7 +3980,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Atkinson",
@@ -3536,7 +3993,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Dhurandhar",
@@ -3548,7 +4006,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Rev. Med. Virol.",
@@ -3556,6 +4015,13 @@ expression: article
         "volume": "25",
         "issue": null,
         "pages": "379-387",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "26352001",
         "doi": "10.1002/rmv.1852"
       },
@@ -3574,7 +4040,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Int. J. Mol. Sci.",
@@ -3582,6 +4049,13 @@ expression: article
         "volume": "24",
         "issue": null,
         "pages": null,
+        "elocation_id": "10514",
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "37445690",
         "doi": "10.3390/ijms241310514"
       },
@@ -3600,7 +4074,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Wert",
@@ -3612,7 +4087,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Bachurski",
@@ -3624,7 +4100,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Kirwin",
@@ -3636,7 +4113,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Trapnell",
@@ -3648,7 +4126,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Whitsett",
@@ -3660,7 +4139,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Hum. Gene Ther.",
@@ -3668,6 +4148,13 @@ expression: article
         "volume": "8",
         "issue": null,
         "pages": "1331-1344",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "9295128",
         "doi": "10.1089/hum.1997.8.11-1331"
       },
@@ -3686,7 +4173,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Vallianou",
@@ -3698,7 +4186,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Karampela",
@@ -3710,7 +4199,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Muscogiuri",
@@ -3722,7 +4212,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Dalamaga",
@@ -3734,7 +4225,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Minerva Endocrinol.",
@@ -3742,6 +4234,13 @@ expression: article
         "volume": "47",
         "issue": null,
         "pages": "264-269",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "35621112",
         "doi": "10.23736/S2724-6507.22.03797-6"
       },
@@ -3760,7 +4259,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Gao",
@@ -3772,7 +4272,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "Hum. Gene Ther.",
@@ -3780,6 +4281,13 @@ expression: article
         "volume": "32",
         "issue": null,
         "pages": "645-646",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "34283643",
         "doi": "10.1089/hum.2021.29169.trf"
       },
@@ -3798,7 +4306,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "JMIR Public Health Surveill.",
@@ -3806,6 +4315,13 @@ expression: article
         "volume": "8",
         "issue": null,
         "pages": "e35054",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "35483079",
         "doi": "10.2196/35054"
       },
@@ -3824,7 +4340,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Andrews",
@@ -3836,7 +4353,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Gower",
@@ -3848,7 +4366,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Robertson",
@@ -3860,7 +4379,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Stowe",
@@ -3872,7 +4392,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Tessier",
@@ -3884,7 +4405,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Simmons",
@@ -3896,7 +4418,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Cottrell",
@@ -3908,7 +4431,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "Roberts",
@@ -3920,7 +4444,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           },
           {
             "surname": "O’Doherty",
@@ -3932,7 +4457,8 @@ expression: article
             "orcid": null,
             "email": null,
             "is_corresponding": false,
-            "roles": []
+            "roles": [],
+            "collab_name": null
           }
         ],
         "source": "BMJ",
@@ -3940,6 +4466,13 @@ expression: article
         "volume": "373",
         "issue": null,
         "pages": "n1088",
+        "elocation_id": null,
+        "editors": [],
+        "publisher_name": null,
+        "publisher_loc": null,
+        "edition": null,
+        "isbn": null,
+        "conf_name": null,
         "pmid": "33985964",
         "doi": "10.1136/bmj.n1088"
       }

@@ -24,6 +24,9 @@ struct Contrib {
     #[serde(rename = "name", default)]
     name: Option<Name>,
 
+    #[serde(rename = "collab", default)]
+    collab: Option<String>,
+
     #[serde(rename = "email", default)]
     email: Option<String>,
 
@@ -137,7 +140,23 @@ pub(crate) fn extract_authors(content: &str) -> Result<Vec<Author>> {
 
 /// Convert a Contrib to an Author
 fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
-    let name = contrib.name?;
+    // A contributor is either an individual (`<name>`) or a collaboration/group
+    // (`<collab>`, e.g. a consortium). Prefer the personal name; fall back to
+    // collab so group authors are not silently dropped.
+    let Some(name) = contrib.name else {
+        let collab = contrib.collab?;
+        let collab = collab.trim();
+        if collab.is_empty() {
+            return None;
+        }
+        let mut author = Author::collaboration(collab.to_string());
+        author.is_corresponding = contrib.corresp.as_deref() == Some("yes")
+            || contrib
+                .xrefs
+                .iter()
+                .any(|x| x.ref_type.as_deref() == Some("corresp"));
+        return Some(author);
+    };
 
     let mut author = Author::new(name.surname.clone(), name.given_names.clone());
     author.suffix = name.suffix;
@@ -217,6 +236,30 @@ fn parse_contrib_to_author(contrib: Contrib) -> Option<Author> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_extract_collab_group_author() {
+        let content = r#"
+        <contrib-group>
+            <contrib contrib-type="author">
+                <name><surname>Doe</surname><given-names>John</given-names></name>
+            </contrib>
+            <contrib contrib-type="author">
+                <collab>The COVID-19 Study Group</collab>
+            </contrib>
+        </contrib-group>
+        "#;
+        let authors = extract_authors(content).unwrap();
+        assert_eq!(authors.len(), 2);
+        assert!(!authors[0].is_collaboration());
+        assert_eq!(authors[0].surname.as_deref(), Some("Doe"));
+        assert!(authors[1].is_collaboration());
+        assert_eq!(
+            authors[1].collab_name.as_deref(),
+            Some("The COVID-19 Study Group")
+        );
+        assert_eq!(authors[1].full_name, "The COVID-19 Study Group");
+    }
 
     #[test]
     fn test_extract_authors_detailed() {

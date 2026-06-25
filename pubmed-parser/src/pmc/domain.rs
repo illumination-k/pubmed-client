@@ -153,11 +153,92 @@ pub struct ArticleMeta {
     /// abstract plus a graphical or teaser abstract).
     pub abstracts: Vec<Abstract>,
 
-    /// Keywords. From `<kwd-group>/<kwd>`.
+    /// Keywords (flattened across all groups). From `<kwd-group>/<kwd>`.
     pub keywords: Vec<String>,
+
+    /// Keyword groups, preserving `kwd-group-type` and `xml:lang`. From
+    /// `<kwd-group>`. This is the structured counterpart of [`keywords`](Self::keywords),
+    /// distinguishing e.g. author-supplied keywords from MeSH-derived ones.
+    #[serde(default)]
+    pub keyword_groups: Vec<KeywordGroup>,
+
+    /// Subject groups, preserving `subj-group-type`. From
+    /// `<article-categories>/<subj-group>`. Structured counterpart of
+    /// [`categories`](Self::categories).
+    #[serde(default)]
+    pub subject_groups: Vec<SubjectGroup>,
+
+    /// Related articles (corrections, retractions, companion/peer-reviewed
+    /// articles). From `<related-article>`.
+    #[serde(default)]
+    pub related_articles: Vec<RelatedArticle>,
+
+    /// Author notes (correspondence details, equal-contribution and present-
+    /// address statements). From `<author-notes>` (`<corresp>` / `<fn>`).
+    #[serde(default)]
+    pub author_notes: Vec<String>,
 
     /// Funding information. From `<funding-group>/<award-group>`.
     pub funding: Vec<FundingInfo>,
+}
+
+/// A keyword group.
+///
+/// Maps to JATS `<kwd-group>`. Articles frequently carry several groups — e.g.
+/// author-supplied keywords plus publisher subject terms — distinguished by
+/// `@kwd-group-type` and `@xml:lang`.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct KeywordGroup {
+    /// Group type (e.g., "author", "npg-subject"). From `@kwd-group-type`.
+    pub group_type: Option<String>,
+    /// Language of the keywords. From `@xml:lang`.
+    pub lang: Option<String>,
+    /// Keywords in this group. From `<kwd>`.
+    pub keywords: Vec<String>,
+}
+
+/// A subject (article-category) group.
+///
+/// Maps to JATS `<article-categories>/<subj-group>`. `@subj-group-type` carries
+/// the role of the terms (e.g. "heading", "discipline").
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct SubjectGroup {
+    /// Group type (e.g., "heading", "discipline"). From `@subj-group-type`.
+    pub group_type: Option<String>,
+    /// Subjects in this group. From `<subject>`.
+    pub subjects: Vec<String>,
+}
+
+/// A link to a related article.
+///
+/// Maps to JATS `<related-article>`. The `related_article_type` drives common
+/// text-mining use cases such as detecting corrections and retractions
+/// (e.g. `"corrected-article"`, `"retracted-article"`, `"companion"`,
+/// `"peer-reviewed-article"`).
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct RelatedArticle {
+    /// Relationship type. From `@related-article-type`.
+    pub related_article_type: Option<String>,
+    /// External link type (e.g., "doi", "pmc"). From `@ext-link-type`.
+    pub ext_link_type: Option<String>,
+    /// Link target (DOI, PMC id, URL). From `@xlink:href`.
+    pub href: Option<String>,
+    /// Element id. From `@id`.
+    pub id: Option<String>,
+}
+
+impl RelatedArticle {
+    /// Whether this link points to an article corrected by the current one
+    /// (`related-article-type="corrected-article"`).
+    pub fn is_correction(&self) -> bool {
+        self.related_article_type.as_deref() == Some("corrected-article")
+    }
+
+    /// Whether this link points to an article retracted by the current one
+    /// (`related-article-type="retracted-article"`).
+    pub fn is_retraction(&self) -> bool {
+        self.related_article_type.as_deref() == Some("retracted-article")
+    }
 }
 
 /// Title group.
@@ -402,6 +483,29 @@ pub struct Reference {
     pub issue: Option<String>,
     /// Page range. From `<fpage>`-`<lpage>`.
     pub pages: Option<String>,
+    /// Electronic location ID. From `<elocation-id>` (used by e-journals in
+    /// place of page numbers).
+    #[serde(default)]
+    pub elocation_id: Option<String>,
+    /// Editors. From `<person-group person-group-type="editor">` (common for
+    /// book and book-chapter citations).
+    #[serde(default)]
+    pub editors: Vec<Author>,
+    /// Publisher name. From `<publisher-name>` (book / report citations).
+    #[serde(default)]
+    pub publisher_name: Option<String>,
+    /// Publisher location. From `<publisher-loc>`.
+    #[serde(default)]
+    pub publisher_loc: Option<String>,
+    /// Edition. From `<edition>`.
+    #[serde(default)]
+    pub edition: Option<String>,
+    /// ISBN. From `<isbn>` (book citations).
+    #[serde(default)]
+    pub isbn: Option<String>,
+    /// Conference name. From `<conf-name>` (conference-proceedings citations).
+    #[serde(default)]
+    pub conf_name: Option<String>,
     /// PubMed ID. From `<pub-id pub-id-type="pmid">`.
     pub pmid: Option<String>,
     /// DOI. From `<pub-id pub-id-type="doi">`.
@@ -1097,6 +1201,42 @@ impl PmcArticle {
     pub fn data_availability(&self) -> Option<&str> {
         self.data_availability.as_deref()
     }
+
+    /// Keyword groups (structured, with `kwd-group-type` / language).
+    pub fn keyword_groups(&self) -> &[KeywordGroup] {
+        &self.front.article_meta.keyword_groups
+    }
+
+    /// Subject groups (structured, with `subj-group-type`).
+    pub fn subject_groups(&self) -> &[SubjectGroup] {
+        &self.front.article_meta.subject_groups
+    }
+
+    /// Related articles (corrections, retractions, companions, …).
+    pub fn related_articles(&self) -> &[RelatedArticle] {
+        &self.front.article_meta.related_articles
+    }
+
+    /// Articles corrected by this one (`related-article-type="corrected-article"`).
+    pub fn corrections(&self) -> Vec<&RelatedArticle> {
+        self.related_articles()
+            .iter()
+            .filter(|r| r.is_correction())
+            .collect()
+    }
+
+    /// Articles retracted by this one (`related-article-type="retracted-article"`).
+    pub fn retractions(&self) -> Vec<&RelatedArticle> {
+        self.related_articles()
+            .iter()
+            .filter(|r| r.is_retraction())
+            .collect()
+    }
+
+    /// Author notes (correspondence / contribution / present-address statements).
+    pub fn author_notes(&self) -> &[String] {
+        &self.front.article_meta.author_notes
+    }
 }
 
 // ============================================================================
@@ -1274,6 +1414,10 @@ mod tests {
                         ],
                     }],
                     keywords: Vec::new(),
+                    keyword_groups: Vec::new(),
+                    subject_groups: Vec::new(),
+                    related_articles: Vec::new(),
+                    author_notes: Vec::new(),
                     funding: Vec::new(),
                 },
             },
@@ -1294,6 +1438,13 @@ mod tests {
                         volume: None,
                         issue: None,
                         pages: None,
+                        elocation_id: None,
+                        editors: Vec::new(),
+                        publisher_name: None,
+                        publisher_loc: None,
+                        edition: None,
+                        isbn: None,
+                        conf_name: None,
                         pmid: Some("111".into()),
                         doi: None,
                     },
@@ -1307,6 +1458,13 @@ mod tests {
                         volume: None,
                         issue: None,
                         pages: None,
+                        elocation_id: None,
+                        editors: Vec::new(),
+                        publisher_name: None,
+                        publisher_loc: None,
+                        edition: None,
+                        isbn: None,
+                        conf_name: None,
                         pmid: None,
                         doi: Some("10.1/x".into()),
                     },

@@ -282,9 +282,10 @@ pub use config::ClientConfig;
 pub use error::{ParseError, PubMedError, Result};
 pub use pmc::{
     Abstract, ArticleMeta, Back, Body, ExtractedFigure, Figure, FigureOptions, Front, FundingInfo,
-    HeadingStyle, JournalMeta, License, MarkdownConfig, MetadataOptions, OaSubsetInfo, Permissions,
-    PmcArticle, PmcClient, PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Section,
-    SectionKind, SupplementaryMaterial, Table, TitleGroup, parse_pmc_xml,
+    HeadingStyle, JournalMeta, KeywordGroup, License, MarkdownConfig, MetadataOptions,
+    OaSubsetInfo, Permissions, PmcArticle, PmcClient, PmcMarkdownConverter, PmcTarClient,
+    Reference, ReferenceStyle, RelatedArticle, Section, SectionKind, SubjectGroup,
+    SupplementaryMaterial, Table, TitleGroup, parse_pmc_xml,
 };
 pub use pubmed::{
     AbstractSection, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,

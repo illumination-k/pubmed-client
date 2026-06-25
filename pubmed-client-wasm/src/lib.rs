@@ -823,6 +823,10 @@ impl From<JsFullText> for PmcArticle {
                     permissions: None,
                     abstracts: Vec::new(),
                     keywords: js.keywords,
+                    keyword_groups: Vec::new(),
+                    subject_groups: Vec::new(),
+                    related_articles: Vec::new(),
+                    author_notes: Vec::new(),
                     funding: js
                         .funding
                         .into_iter()
@@ -894,6 +898,7 @@ impl From<JsAuthor> for pubmed_client::Author {
             orcid: None,
             email: js.email,
             roles: Vec::new(),
+            collab_name: None,
             is_corresponding: js.is_corresponding,
         }
     }
@@ -1023,18 +1028,7 @@ impl From<JsReference> for pubmed_client::pmc::Reference {
         let authors: Vec<pubmed_client::Author> = js
             .authors
             .into_iter()
-            .map(|name| pubmed_client::Author {
-                given_names: None,
-                surname: None,
-                initials: None,
-                suffix: None,
-                full_name: name,
-                affiliations: Vec::new(),
-                orcid: None,
-                email: None,
-                roles: Vec::new(),
-                is_corresponding: false,
-            })
+            .map(pubmed_client::Author::from_full_name)
             .collect();
 
         Self {
@@ -1042,11 +1036,18 @@ impl From<JsReference> for pubmed_client::pmc::Reference {
             publication_type: None,
             title: js.title,
             authors,
+            editors: Vec::new(),
             source: js.journal,
             year: js.year,
             volume: None,
             issue: None,
             pages: None,
+            elocation_id: None,
+            publisher_name: None,
+            publisher_loc: None,
+            edition: None,
+            isbn: None,
+            conf_name: None,
             pmid: js.pmid,
             doi: js.doi,
         }

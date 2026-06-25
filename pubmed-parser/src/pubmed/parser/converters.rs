@@ -180,20 +180,9 @@ impl AuthorList {
 impl AuthorXml {
     /// Convert XML author to public API author model
     pub(super) fn into_author(self) -> Option<Author> {
-        // Handle collective names
+        // Handle collective names (PubMed <CollectiveName> → group author)
         if let Some(collective_name) = self.collective_name {
-            return Some(Author {
-                surname: None,
-                given_names: None,
-                initials: None,
-                suffix: None,
-                full_name: collective_name,
-                affiliations: Vec::new(),
-                orcid: None,
-                email: None,
-                is_corresponding: false,
-                roles: Vec::new(),
-            });
+            return Some(Author::collaboration(collective_name));
         }
 
         let full_name = format_author_name(&self.last_name, &self.fore_name, &self.initials);
@@ -247,6 +236,7 @@ impl AuthorXml {
                 email,
                 is_corresponding: false,
                 roles: Vec::new(),
+                collab_name: None,
             })
         }
     }

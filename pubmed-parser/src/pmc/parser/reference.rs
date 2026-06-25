@@ -72,6 +72,24 @@ struct ElementCitation {
     #[serde(rename = "lpage", default)]
     lpage: Option<String>,
 
+    #[serde(rename = "elocation-id", default)]
+    elocation_id: Option<String>,
+
+    #[serde(rename = "publisher-name", default)]
+    publisher_name: Option<String>,
+
+    #[serde(rename = "publisher-loc", default)]
+    publisher_loc: Option<String>,
+
+    #[serde(rename = "edition", default)]
+    edition: Option<String>,
+
+    #[serde(rename = "isbn", default)]
+    isbn: Option<String>,
+
+    #[serde(rename = "conf-name", default)]
+    conf_name: Option<String>,
+
     #[serde(rename = "pub-id", default)]
     pub_ids: Vec<PubId>,
 
@@ -110,6 +128,24 @@ struct MixedCitation {
 
     #[serde(rename = "lpage", default)]
     lpage: Option<String>,
+
+    #[serde(rename = "elocation-id", default)]
+    elocation_id: Option<String>,
+
+    #[serde(rename = "publisher-name", default)]
+    publisher_name: Option<String>,
+
+    #[serde(rename = "publisher-loc", default)]
+    publisher_loc: Option<String>,
+
+    #[serde(rename = "edition", default)]
+    edition: Option<String>,
+
+    #[serde(rename = "isbn", default)]
+    isbn: Option<String>,
+
+    #[serde(rename = "conf-name", default)]
+    conf_name: Option<String>,
 
     #[serde(rename = "pub-id", default)]
     pub_ids: Vec<PubId>,
@@ -345,49 +381,11 @@ fn parse_ref_to_reference(ref_elem: Ref) -> Option<Reference> {
         .map(Citation::Element)
         .or_else(|| ref_elem.mixed_citation.map(Citation::Mixed));
 
-    let citation = citation?;
-
-    let (
-        publication_type,
-        title,
-        source,
-        year,
-        volume,
-        issue,
-        fpage,
-        lpage,
-        pub_ids,
-        person_groups,
-    ) = match citation {
-        Citation::Element(elem) => (
-            elem.publication_type,
-            elem.article_title,
-            elem.source,
-            elem.year,
-            elem.volume,
-            elem.issue,
-            elem.fpage,
-            elem.lpage,
-            elem.pub_ids,
-            elem.person_groups,
-        ),
-        Citation::Mixed(mixed) => (
-            mixed.publication_type,
-            mixed.article_title,
-            mixed.source,
-            mixed.year,
-            mixed.volume,
-            mixed.issue,
-            mixed.fpage,
-            mixed.lpage,
-            mixed.pub_ids,
-            mixed.person_groups,
-        ),
-    };
+    let citation: NormalizedCitation = citation?.into();
 
     let mut doi = None;
     let mut pmid = None;
-    for pub_id in pub_ids {
+    for pub_id in citation.pub_ids {
         if let (Some(id_type), Some(value)) = (pub_id.pub_id_type, pub_id.value) {
             match id_type.as_str() {
                 "doi" => doi = Some(value),
@@ -399,14 +397,21 @@ fn parse_ref_to_reference(ref_elem: Ref) -> Option<Reference> {
 
     Some(Reference {
         id,
-        publication_type,
-        title,
-        authors: extract_authors_from_person_groups(person_groups),
-        source,
-        year,
-        volume,
-        issue,
-        pages: format_pages(fpage, lpage),
+        publication_type: citation.publication_type,
+        title: citation.article_title,
+        authors: extract_persons(&citation.person_groups, &["author", ""]),
+        editors: extract_persons(&citation.person_groups, &["editor"]),
+        source: citation.source,
+        year: citation.year,
+        volume: citation.volume,
+        issue: citation.issue,
+        pages: format_pages(citation.fpage, citation.lpage),
+        elocation_id: citation.elocation_id,
+        publisher_name: citation.publisher_name,
+        publisher_loc: citation.publisher_loc,
+        edition: citation.edition,
+        isbn: citation.isbn,
+        conf_name: citation.conf_name,
         pmid,
         doi,
     })
@@ -418,6 +423,58 @@ enum Citation {
     Mixed(MixedCitation),
 }
 
+/// Fields shared by `<element-citation>` and `<mixed-citation>`, normalized so
+/// the two formats are handled uniformly.
+struct NormalizedCitation {
+    publication_type: Option<String>,
+    article_title: Option<String>,
+    source: Option<String>,
+    year: Option<String>,
+    volume: Option<String>,
+    issue: Option<String>,
+    fpage: Option<String>,
+    lpage: Option<String>,
+    elocation_id: Option<String>,
+    publisher_name: Option<String>,
+    publisher_loc: Option<String>,
+    edition: Option<String>,
+    isbn: Option<String>,
+    conf_name: Option<String>,
+    pub_ids: Vec<PubId>,
+    person_groups: Vec<PersonGroup>,
+}
+
+impl From<Citation> for NormalizedCitation {
+    fn from(citation: Citation) -> Self {
+        macro_rules! normalize {
+            ($c:expr) => {
+                NormalizedCitation {
+                    publication_type: $c.publication_type,
+                    article_title: $c.article_title,
+                    source: $c.source,
+                    year: $c.year,
+                    volume: $c.volume,
+                    issue: $c.issue,
+                    fpage: $c.fpage,
+                    lpage: $c.lpage,
+                    elocation_id: $c.elocation_id,
+                    publisher_name: $c.publisher_name,
+                    publisher_loc: $c.publisher_loc,
+                    edition: $c.edition,
+                    isbn: $c.isbn,
+                    conf_name: $c.conf_name,
+                    pub_ids: $c.pub_ids,
+                    person_groups: $c.person_groups,
+                }
+            };
+        }
+        match citation {
+            Citation::Element(elem) => normalize!(elem),
+            Citation::Mixed(mixed) => normalize!(mixed),
+        }
+    }
+}
+
 /// Format page range from first and last page
 fn format_pages(fpage: Option<String>, lpage: Option<String>) -> Option<String> {
     match (fpage, lpage) {
@@ -427,27 +484,71 @@ fn format_pages(fpage: Option<String>, lpage: Option<String>) -> Option<String> 
     }
 }
 
-/// Extract authors from person groups
-fn extract_authors_from_person_groups(person_groups: Vec<PersonGroup>) -> Vec<Author> {
-    let mut authors = Vec::new();
+/// Extract people from person groups whose `person-group-type` is one of
+/// `wanted` (use `""` to also match groups with no type attribute). `<collab>`
+/// group entries are captured as collaboration authors.
+fn extract_persons(person_groups: &[PersonGroup], wanted: &[&str]) -> Vec<Author> {
+    let mut people = Vec::new();
 
     for group in person_groups {
-        // Only process author groups (not editor, etc.)
-        if group.person_group_type.as_deref() == Some("author") || group.person_group_type.is_none()
-        {
-            for name in group.names {
-                let author = Author::new(name.surname.clone(), name.given_names.clone());
-                authors.push(author);
+        let group_type = group.person_group_type.as_deref().unwrap_or("");
+        if !wanted.contains(&group_type) {
+            continue;
+        }
+        for name in &group.names {
+            people.push(Author::new(name.surname.clone(), name.given_names.clone()));
+        }
+        if let Some(collab) = &group.collab {
+            let collab = collab.trim();
+            if !collab.is_empty() {
+                people.push(Author::collaboration(collab.to_string()));
             }
         }
     }
 
-    authors
+    people
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_book_citation_publisher_editors() {
+        let content = r#"
+        <ref-list>
+            <ref id="b1">
+                <element-citation publication-type="book">
+                    <person-group person-group-type="author">
+                        <name><surname>Smith</surname><given-names>A</given-names></name>
+                    </person-group>
+                    <person-group person-group-type="editor">
+                        <name><surname>Jones</surname><given-names>B</given-names></name>
+                    </person-group>
+                    <source>Molecular Biology</source>
+                    <edition>2nd ed</edition>
+                    <publisher-name>Academic Press</publisher-name>
+                    <publisher-loc>London</publisher-loc>
+                    <isbn>978-0-12-345678-9</isbn>
+                    <year>2020</year>
+                </element-citation>
+            </ref>
+        </ref-list>
+        "#;
+        let refs = extract_references_detailed(content).unwrap();
+        assert_eq!(refs.len(), 1);
+        let r = &refs[0];
+        assert_eq!(r.publication_type.as_deref(), Some("book"));
+        assert_eq!(r.source.as_deref(), Some("Molecular Biology"));
+        assert_eq!(r.edition.as_deref(), Some("2nd ed"));
+        assert_eq!(r.publisher_name.as_deref(), Some("Academic Press"));
+        assert_eq!(r.publisher_loc.as_deref(), Some("London"));
+        assert_eq!(r.isbn.as_deref(), Some("978-0-12-345678-9"));
+        assert_eq!(r.authors.len(), 1);
+        assert_eq!(r.authors[0].surname.as_deref(), Some("Smith"));
+        assert_eq!(r.editors.len(), 1);
+        assert_eq!(r.editors[0].surname.as_deref(), Some("Jones"));
+    }
 
     #[test]
     fn test_extract_references_detailed() {
