@@ -67,6 +67,9 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
       # Do not error the check when an optional Suggests package is unavailable.
       _R_CHECK_FORCE_SUGGESTS_: false
+      # apt-installed R's site-library is not writable by the runner user, so
+      # install packages into a writable user library that R CMD check also reads.
+      R_LIBS_USER: ${{ github.workspace }}/.rlibrary
       # Posit Public Package Manager serves precompiled binaries for ubuntu,
       # avoiding slow source installs of testthat/rcmdcheck and their deps.
       RSPM: https://packagemanager.posit.co/cran/__linux__/noble/latest
@@ -90,7 +93,19 @@ jobs:
 
       - name: Install R package dependencies
         run: |
-          Rscript -e 'install.packages(c("testthat", "rcmdcheck"), repos = Sys.getenv("RSPM"))'
+          mkdir -p "$R_LIBS_USER"
+          # shellcheck disable=SC2016  # $platform/$arch/$os are R expressions, not shell
+          Rscript -e '
+            options(
+              repos = c(RSPM = Sys.getenv("RSPM")),
+              # The user-agent lets Posit PPM serve binaries matching this R build.
+              HTTPUserAgent = sprintf(
+                "R/%s R (%s)", getRversion(),
+                paste(getRversion(), R.version$platform, R.version$arch, R.version$os)
+              )
+            )
+            install.packages(c("testthat", "rcmdcheck"))
+          '
 
       - name: R CMD check
         # error_on = "error" fails the build on genuine problems (compile/install
