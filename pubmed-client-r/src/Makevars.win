@@ -1,0 +1,24 @@
+TARGET = $(subst 64,x86_64,$(subst 32,i686,$(WIN)))-pc-windows-gnu
+
+TARGET_DIR = ./rust/target
+LIBDIR = $(TARGET_DIR)/$(TARGET)/release
+STATLIB = $(LIBDIR)/libpubmedclient.a
+PKG_LIBS = -L$(LIBDIR) -lpubmedclient -lws2_32 -ladvapi32 -luserenv -lbcrypt -lncrypt -lcrypt32 -lsecur32
+
+all: C_clean
+
+$(SHLIB): $(STATLIB)
+
+$(STATLIB):
+	mkdir -p $(TARGET_DIR)/libgcc_mock
+	# `cargo` does not respect `$(R_HOME)/bin/gcc` so we add a mock libgcc_eh.
+	touch $(TARGET_DIR)/libgcc_mock/libgcc_eh.a
+	export CARGO_LINKER=$(R_HOME)/bin/$(R_ARCH_BIN)/gcc && \
+	  export LIBRARY_PATH="$${LIBRARY_PATH};$(CURDIR)/$(TARGET_DIR)/libgcc_mock" && \
+	  cargo build --target=$(TARGET) --lib --release --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR)
+
+C_clean:
+	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS)
+
+clean:
+	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) rust/target

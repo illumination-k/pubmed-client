@@ -18,6 +18,7 @@ pubmed-client-rs/                    # Cargo workspace root
 ├── pubmed-client-napi/              # Native Node.js bindings via napi-rs (npm: pubmed-client)
 ├── pubmed-client-wasm/              # WASM bindings for browsers/Node.js (npm: pubmed-client-wasm)
 ├── pubmed-client-py/                # Python bindings via PyO3 (PyPI: pubmed-client-py)
+├── pubmed-client-r/                 # R bindings via extendr (R package: pubmedclient) — NOT a workspace member
 ├── pubmed-cli/                      # Command-line interface
 ├── pubmed-mcp/                      # MCP server for AI assistant integration
 └── website/                         # Docusaurus v3 landing page (GitHub Pages)
@@ -225,6 +226,17 @@ WebAssembly bindings via wasm-pack. Published as `pubmed-client-wasm` on npm. Ke
 ### Python Bindings (`pubmed-client-py/`)
 
 Python bindings via PyO3/maturin. Published as `pubmed-client-py` on PyPI. Synchronous API with internal Tokio runtime. Key types: `Client`, `PubMedClient`, `PmcClient`, `SearchQuery`, `ClientConfig`.
+
+### R Bindings (`pubmed-client-r/`)
+
+R bindings via [extendr](https://extendr.github.io/). R package name: `pubmedclient`. Synchronous API with internal Tokio runtime (same pattern as Python). Currently an **MVP** covering core operations: `pubmed_client()`, `pubmed_search()`, `pubmed_fetch()`, `pubmed_search_and_fetch()`, `pmc_fulltext()`, `pmc_to_markdown()`.
+
+- **NOT a Cargo workspace member**: the inner crate (`src/rust/`) declares an empty `[workspace]` table so the root `cargo build`/CI never tries to build it — linking requires the R toolchain (`libR`), which isn't always present.
+- Rust source: `src/rust/src/lib.rs` (extendr free functions; client handle passed as an `ExternalPtr`). R-level API: `R/pubmed-client.R`. Low-level `.Call` wrappers: `R/extendr-wrappers.R` (regenerate with `rextendr::document("pubmed-client-r")` and keep in sync with the `extendr_module!` block).
+- The inner crate depends on the **published `pubmed-client`** (crates.io), not a workspace path — `R CMD check`/source-tarball installs build in an isolated copy where a relative path outside the package can't resolve. Keep its version in lock-step with the workspace; for local dev against unpublished changes, temporarily switch to `{ path = "../../../pubmed-client" }`.
+- Build/install: `R CMD INSTALL pubmed-client-r` or `remotes::install_local("pubmed-client-r")` (requires `cargo`/`rustc`).
+- Tests: `testthat` (edition 3) in `tests/testthat/`. Offline tests cover client construction + input validation; live-API tests are gated behind `PUBMED_REAL_API_TESTS=1` (same convention as the Rust crate).
+- CI: `.github/workflows/ci-r.yml` — `rust-fmt` job (rustfmt over the non-workspace inner crate) + `R-CMD-check` (ubuntu, R via apt + Posit binary CRAN mirror; runs `rcmdcheck`). Avoids `r-lib/actions` so every action stays pinned to a full commit SHA (enforced by `ghalint`).
 
 ### Website (`website/`)
 

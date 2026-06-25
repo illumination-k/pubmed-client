@@ -1,0 +1,10 @@
+*.o
+*.so
+*.dll
+*.a
+src/rust/target/
+src/Makevars.ucrt
+.Rproj.user
+.Rhistory
+.RData
+.Rd2pdf*
