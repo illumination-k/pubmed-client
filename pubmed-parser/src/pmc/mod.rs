@@ -10,8 +10,8 @@ pub mod parser;
 // Re-export domain types as the primary API
 pub use domain::{
     Abstract, AbstractSection, ArticleMeta, Back, Body, Definition, Figure, Formula, Front,
-    FundingInfo, JournalMeta, License, Permissions, PmcArticle, Reference, Section,
-    SupplementaryMaterial, Table, TableCell, TableRow, TitleGroup,
+    FundingInfo, JournalMeta, License, Permissions, PmcArticle, Reference, Section, SectionIter,
+    SectionKind, SupplementaryMaterial, Table, TableCell, TableRow, TitleGroup,
 };
 
 // Re-export OA types

@@ -1,6 +1,6 @@
 use crate::pmc::domain::{Figure, Section, Table};
 
-use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
+use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element, trim_in_place};
 use quick_xml::events::Event;
 use quick_xml::name::QName;
 use tracing::warn;
@@ -83,9 +83,9 @@ fn extract_abstract_section(content: &str) -> Option<Section> {
             SectionAction::EnterAbstract => in_abstract = true,
             SectionAction::ReadParagraph => {
                 if let Ok(text) = read_text_content(&mut reader, b"p", &mut buf) {
-                    let trimmed = text.trim().to_string();
-                    if !trimmed.is_empty() {
-                        text_parts.push(trimmed);
+                    // `read_text_content` already returns trimmed text.
+                    if !text.is_empty() {
+                        text_parts.push(text);
                     }
                 }
             }
@@ -214,9 +214,9 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
             }
             SectionAction::ReadTextElement(tag) => {
                 if let Ok(text) = read_text_content(&mut reader, &tag, &mut buf) {
-                    let trimmed = text.trim().to_string();
-                    if !trimmed.is_empty() {
-                        body_paragraphs.push(trimmed);
+                    // `read_text_content` already returns trimmed text.
+                    if !text.is_empty() {
+                        body_paragraphs.push(text);
                     }
                 }
             }
@@ -303,7 +303,7 @@ fn parse_section_from_body(
         match action {
             SectionAction::SkipTitle => {
                 if let Ok(t) = read_text_content(reader, b"title", buf) {
-                    let t = t.trim().to_string();
+                    // Already trimmed by `read_text_content`.
                     if !t.is_empty() {
                         title = Some(t);
                     }
@@ -311,9 +311,9 @@ fn parse_section_from_body(
             }
             SectionAction::ReadParagraph => {
                 let (text, inline_figs, inline_tables) = read_paragraph_with_inline(reader, buf);
-                let trimmed = text.trim().to_string();
-                if !trimmed.is_empty() {
-                    content_parts.push(trimmed);
+                // `read_paragraph_with_inline` already returns trimmed text.
+                if !text.is_empty() {
+                    content_parts.push(text);
                 }
                 figures.extend(inline_figs);
                 tables.extend(inline_tables);
@@ -336,9 +336,9 @@ fn parse_section_from_body(
             }
             SectionAction::ReadTextElement(tag) => {
                 if let Ok(text) = read_text_content(reader, &tag, buf) {
-                    let trimmed = text.trim().to_string();
-                    if !trimmed.is_empty() {
-                        content_parts.push(trimmed);
+                    // Already trimmed by `read_text_content`.
+                    if !text.is_empty() {
+                        content_parts.push(text);
                     }
                 }
             }
@@ -350,9 +350,11 @@ fn parse_section_from_body(
         }
     }
 
+    // Each part is already trimmed and non-empty, so the joined content has no
+    // leading/trailing whitespace — no extra trim/allocation needed.
     let section_content = content_parts.join("\n");
 
-    if !section_content.trim().is_empty()
+    if !section_content.is_empty()
         || !subsections.is_empty()
         || !figures.is_empty()
         || !tables.is_empty()
@@ -362,7 +364,7 @@ fn parse_section_from_body(
             section_type: Some("section".to_string()),
             label: None,
             title,
-            content: section_content.trim().to_string(),
+            content: section_content,
             subsections,
             figures,
             tables,
@@ -446,7 +448,7 @@ fn read_paragraph_with_inline(
         }
     }
 
-    (text.trim().to_string(), figures, tables)
+    (trim_in_place(text), figures, tables)
 }
 
 // --- Figure and Table extraction using Reader scan ---
@@ -649,9 +651,9 @@ fn parse_table_inner(
             }
             TableAction::ReadFootnote => {
                 if let Ok(text) = read_text_content(reader, b"table-wrap-foot", buf) {
-                    let trimmed = text.trim().to_string();
-                    if !trimmed.is_empty() {
-                        footnotes.push(trimmed);
+                    // Already trimmed by `read_text_content`.
+                    if !text.is_empty() {
+                        footnotes.push(text);
                     }
                 }
             }

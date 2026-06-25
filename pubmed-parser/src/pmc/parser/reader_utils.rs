@@ -47,22 +47,12 @@ pub fn read_text_content(
                 // Skip child tags, keep reading for text
             }
             Ok(Event::Text(ref e)) => {
+                // Mixed content (e.g. "<p>text <b>bold</b> more</p>") arrives as
+                // multiple Text events; the source whitespace around inline tags
+                // is preserved in the events, so we simply concatenate.
                 let unescaped = e
                     .unescape()
                     .map_err(|err| ParseError::XmlError(err.to_string()))?;
-                if !text.is_empty() && !unescaped.is_empty() {
-                    // Add space between adjacent text fragments from mixed content
-                    // e.g., "<p>text <b>bold</b> more</p>" → "text bold more"
-                    // Only if the previous text doesn't end with space and current doesn't start with space
-                    let needs_space = !text.ends_with(' ')
-                        && !text.ends_with('\n')
-                        && !unescaped.starts_with(' ')
-                        && !unescaped.starts_with('\n');
-                    if needs_space {
-                        // Don't add space — the XML already had spacing around inline tags
-                        // text events already include surrounding whitespace from the source
-                    }
-                }
                 text.push_str(&unescaped);
             }
             Ok(Event::End(ref e)) => {
@@ -80,7 +70,30 @@ pub fn read_text_content(
         buf.clear();
     }
 
-    Ok(text.trim().to_string())
+    // Reuse the existing buffer instead of allocating a second String via
+    // `trim().to_string()`. This runs for every text-bearing element (titles,
+    // paragraphs, captions, …), so avoiding a per-call allocation matters on
+    // large documents.
+    Ok(trim_in_place(text))
+}
+
+/// Trim leading/trailing whitespace from an owned `String` in place, reusing its
+/// allocation rather than allocating a fresh `String` (as `trim().to_string()`
+/// would). On the hot PMC parsing path this saves one allocation per text node.
+pub(crate) fn trim_in_place(mut text: String) -> String {
+    let trimmed_len = text.trim().len();
+    if trimmed_len == text.len() {
+        return text;
+    }
+    if trimmed_len == 0 {
+        text.clear();
+        return text;
+    }
+    // The trimmed content is a contiguous slice `[start, start + trimmed_len)`.
+    let start = text.len() - text.trim_start().len();
+    text.truncate(start + trimmed_len);
+    text.drain(..start);
+    text
 }
 
 /// Extract an attribute value from a `BytesStart` event.

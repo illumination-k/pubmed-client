@@ -731,3 +731,621 @@ impl PmcArticle {
             .collect()
     }
 }
+
+// ============================================================================
+// Section classification
+// ============================================================================
+
+/// Semantic classification of a JATS `<sec sec-type="...">` value.
+///
+/// The DTD leaves `@sec-type` open-ended, but the NLM/PMC tagging guidelines use
+/// a recognized vocabulary for the standard parts of a research article (IMRaD
+/// and friends). This enum maps those well-known values to type-safe variants so
+/// text-mining pipelines can match on section role without string juggling,
+/// while preserving any unrecognized value via [`SectionKind::Other`].
+///
+/// Use [`Section::kind`] to obtain this from a section.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SectionKind {
+    /// `intro` / `introduction`.
+    Introduction,
+    /// `methods` / `materials` / `materials|methods` / `methods|materials`.
+    Methods,
+    /// `results`.
+    Results,
+    /// `results|discussion`.
+    ResultsDiscussion,
+    /// `discussion`.
+    Discussion,
+    /// `conclusions`.
+    Conclusions,
+    /// `abstract`.
+    Abstract,
+    /// `background`.
+    Background,
+    /// `cases` / `case` / `case-report`.
+    CaseStudy,
+    /// `supplementary-material`.
+    SupplementaryMaterial,
+    /// `data-availability`.
+    DataAvailability,
+    /// A `sec-type` that is present but not one of the recognized values.
+    Other(String),
+    /// No `sec-type` attribute was present on the section.
+    Unspecified,
+}
+
+impl SectionKind {
+    /// Classify a raw `sec-type` attribute value.
+    ///
+    /// Matching is case-insensitive and tolerant of the `|` separator that JATS
+    /// uses for combined sections (e.g. `materials|methods`).
+    pub fn from_sec_type(sec_type: Option<&str>) -> Self {
+        let Some(raw) = sec_type else {
+            return SectionKind::Unspecified;
+        };
+        let normalized = raw.trim().to_ascii_lowercase();
+        match normalized.as_str() {
+            "intro" | "introduction" => SectionKind::Introduction,
+            "methods" | "materials" | "methods|materials" | "materials|methods"
+            | "subjects|methods" => SectionKind::Methods,
+            "results" => SectionKind::Results,
+            "results|discussion" | "discussion|results" => SectionKind::ResultsDiscussion,
+            "discussion" => SectionKind::Discussion,
+            "conclusions" | "conclusion" => SectionKind::Conclusions,
+            "abstract" => SectionKind::Abstract,
+            "background" => SectionKind::Background,
+            "cases" | "case" | "case-report" | "case-study" => SectionKind::CaseStudy,
+            "supplementary-material" => SectionKind::SupplementaryMaterial,
+            "data-availability" | "availability" => SectionKind::DataAvailability,
+            _ => SectionKind::Other(normalized),
+        }
+    }
+
+    /// Whether this is one of the core IMRaD sections
+    /// (introduction, methods, results, discussion, conclusions).
+    pub fn is_imrad(&self) -> bool {
+        matches!(
+            self,
+            SectionKind::Introduction
+                | SectionKind::Methods
+                | SectionKind::Results
+                | SectionKind::ResultsDiscussion
+                | SectionKind::Discussion
+                | SectionKind::Conclusions
+        )
+    }
+}
+
+/// Depth-first, pre-order iterator over a section subtree.
+///
+/// Yields sections in document order: a section is yielded before its
+/// subsections. Created by [`Section::iter_subtree`] and
+/// [`PmcArticle::all_sections`].
+pub struct SectionIter<'a> {
+    stack: Vec<&'a Section>,
+}
+
+impl<'a> Iterator for SectionIter<'a> {
+    type Item = &'a Section;
+
+    fn next(&mut self) -> Option<&'a Section> {
+        let section = self.stack.pop()?;
+        // Push children in reverse so they are popped in document order.
+        self.stack.extend(section.subsections.iter().rev());
+        Some(section)
+    }
+}
+
+impl Section {
+    /// Semantic classification of this section's `sec-type`.
+    pub fn kind(&self) -> SectionKind {
+        SectionKind::from_sec_type(self.section_type.as_deref())
+    }
+
+    /// Iterate this section and all of its nested subsections, depth-first in
+    /// document order (pre-order: parent before children).
+    pub fn iter_subtree(&self) -> SectionIter<'_> {
+        SectionIter { stack: vec![self] }
+    }
+
+    /// All figures in this section and its subsections (recursive).
+    pub fn all_figures(&self) -> Vec<&Figure> {
+        self.iter_subtree().flat_map(|s| s.figures.iter()).collect()
+    }
+
+    /// All tables in this section and its subsections (recursive).
+    pub fn all_tables(&self) -> Vec<&Table> {
+        self.iter_subtree().flat_map(|s| s.tables.iter()).collect()
+    }
+
+    /// All display formulas in this section and its subsections (recursive).
+    pub fn all_formulas(&self) -> Vec<&Formula> {
+        self.iter_subtree()
+            .flat_map(|s| s.formulas.iter())
+            .collect()
+    }
+
+    /// Whitespace-delimited word count of this section's own `content`
+    /// (not including subsections). Useful for readability/length metrics.
+    pub fn word_count(&self) -> usize {
+        self.content.split_whitespace().count()
+    }
+
+    /// Whether this section carries no text and no child structure.
+    pub fn is_empty(&self) -> bool {
+        self.content.trim().is_empty()
+            && self.subsections.is_empty()
+            && self.figures.is_empty()
+            && self.tables.is_empty()
+            && self.formulas.is_empty()
+    }
+}
+
+impl Abstract {
+    /// Whether this abstract has labeled/structured sections.
+    pub fn is_structured(&self) -> bool {
+        !self.sections.is_empty()
+    }
+
+    /// Find a structured abstract section by label (case-insensitive match).
+    ///
+    /// Returns the first section whose label equals `label` ignoring case, e.g.
+    /// `abstract.section_by_label("methods")`.
+    pub fn section_by_label(&self, label: &str) -> Option<&AbstractSection> {
+        self.sections.iter().find(|s| {
+            s.label
+                .as_ref()
+                .is_some_and(|l| l.eq_ignore_ascii_case(label))
+        })
+    }
+}
+
+impl Table {
+    /// Total number of rows (header rows plus body rows).
+    pub fn row_count(&self) -> usize {
+        self.head.len() + self.body.len()
+    }
+
+    /// Iterate all rows, header rows first then body rows.
+    pub fn rows(&self) -> impl Iterator<Item = &TableRow> {
+        self.head.iter().chain(self.body.iter())
+    }
+
+    /// Number of columns, accounting for `colspan`. Computed as the maximum
+    /// spanned cell count across all rows (0 for an empty table).
+    pub fn column_count(&self) -> usize {
+        self.rows()
+            .map(|row| {
+                row.cells
+                    .iter()
+                    .map(|c| c.colspan.unwrap_or(1).max(1) as usize)
+                    .sum()
+            })
+            .max()
+            .unwrap_or(0)
+    }
+
+    /// Whether the table has no rows.
+    pub fn is_empty(&self) -> bool {
+        self.head.is_empty() && self.body.is_empty()
+    }
+}
+
+impl Reference {
+    /// Whether this reference carries a PubMed ID.
+    pub fn has_pmid(&self) -> bool {
+        self.pmid.is_some()
+    }
+
+    /// Whether this reference carries a DOI.
+    pub fn has_doi(&self) -> bool {
+        self.doi.is_some()
+    }
+}
+
+// ============================================================================
+// Article-wide text-mining accessors
+// ============================================================================
+
+impl PmcArticle {
+    /// Iterate every body section in the article, flattened depth-first in
+    /// document order (parent before children).
+    ///
+    /// This walks the entire `<body>` section tree so callers don't have to
+    /// recurse through [`Section::subsections`] manually.
+    pub fn all_sections(&self) -> SectionIter<'_> {
+        SectionIter {
+            stack: self.sections().iter().rev().collect(),
+        }
+    }
+
+    /// All body sections whose semantic [`SectionKind`] matches `kind`
+    /// (recursive). For example, `article.sections_of_kind(&SectionKind::Methods)`.
+    pub fn sections_of_kind(&self, kind: &SectionKind) -> Vec<&Section> {
+        self.all_sections().filter(|s| &s.kind() == kind).collect()
+    }
+
+    /// All body sections whose raw `sec-type` equals `sec_type`
+    /// (case-insensitive, recursive).
+    pub fn sections_by_type(&self, sec_type: &str) -> Vec<&Section> {
+        self.all_sections()
+            .filter(|s| {
+                s.section_type
+                    .as_ref()
+                    .is_some_and(|t| t.eq_ignore_ascii_case(sec_type))
+            })
+            .collect()
+    }
+
+    /// First body section whose title contains `keyword` (case-insensitive,
+    /// recursive). Handy for locating sections like "Statistical analysis".
+    pub fn find_section_by_title(&self, keyword: &str) -> Option<&Section> {
+        let needle = keyword.to_ascii_lowercase();
+        self.all_sections().find(|s| {
+            s.title
+                .as_ref()
+                .is_some_and(|t| t.to_ascii_lowercase().contains(&needle))
+        })
+    }
+
+    /// All figures across the whole article body (recursive over sections).
+    pub fn all_figures(&self) -> Vec<&Figure> {
+        self.all_sections().flat_map(|s| s.figures.iter()).collect()
+    }
+
+    /// All tables across the whole article body (recursive over sections).
+    pub fn all_tables(&self) -> Vec<&Table> {
+        self.all_sections().flat_map(|s| s.tables.iter()).collect()
+    }
+
+    /// All display formulas across the whole article body (recursive).
+    pub fn all_formulas(&self) -> Vec<&Formula> {
+        self.all_sections()
+            .flat_map(|s| s.formulas.iter())
+            .collect()
+    }
+
+    /// Number of figures in the article body.
+    pub fn figure_count(&self) -> usize {
+        self.all_sections().map(|s| s.figures.len()).sum()
+    }
+
+    /// Number of tables in the article body.
+    pub fn table_count(&self) -> usize {
+        self.all_sections().map(|s| s.tables.len()).sum()
+    }
+
+    /// Concatenated plain text of the whole article body, in reading order.
+    ///
+    /// Section titles and paragraph content are joined with blank lines. Useful
+    /// as a single input string for tokenizers, embeddings, or full-text search.
+    pub fn body_text(&self) -> String {
+        let mut out = String::new();
+        for section in self.all_sections() {
+            if let Some(title) = &section.title
+                && !title.trim().is_empty()
+            {
+                if !out.is_empty() {
+                    out.push_str("\n\n");
+                }
+                out.push_str(title);
+            }
+            if !section.content.trim().is_empty() {
+                if !out.is_empty() {
+                    out.push_str("\n\n");
+                }
+                out.push_str(&section.content);
+            }
+        }
+        out
+    }
+
+    /// All abstracts (a JATS article may have several, e.g. a main and a
+    /// graphical abstract).
+    pub fn abstracts(&self) -> &[Abstract] {
+        &self.front.article_meta.abstracts
+    }
+
+    /// Structured sections of the main (first) abstract, if it is structured.
+    pub fn abstract_sections(&self) -> &[AbstractSection] {
+        self.front
+            .article_meta
+            .abstracts
+            .first()
+            .map_or(&[], |a| a.sections.as_slice())
+    }
+
+    /// References that carry a PubMed ID (useful for building citation graphs).
+    pub fn references_with_pmid(&self) -> Vec<&Reference> {
+        self.references().iter().filter(|r| r.has_pmid()).collect()
+    }
+
+    /// References that carry a DOI.
+    pub fn references_with_doi(&self) -> Vec<&Reference> {
+        self.references().iter().filter(|r| r.has_doi()).collect()
+    }
+
+    /// References whose `publication_type` equals `pub_type` (case-insensitive).
+    pub fn references_by_type(&self, pub_type: &str) -> Vec<&Reference> {
+        self.references()
+            .iter()
+            .filter(|r| {
+                r.publication_type
+                    .as_ref()
+                    .is_some_and(|t| t.eq_ignore_ascii_case(pub_type))
+            })
+            .collect()
+    }
+
+    /// Appendices (empty slice when the article has no back matter).
+    pub fn appendices(&self) -> &[Section] {
+        self.back.as_ref().map_or(&[], |b| b.appendices.as_slice())
+    }
+
+    /// Glossary / abbreviation definitions (empty slice when absent).
+    pub fn glossary(&self) -> &[Definition] {
+        self.back.as_ref().map_or(&[], |b| b.glossary.as_slice())
+    }
+
+    /// Supplementary materials attached to the article.
+    pub fn supplementary_materials(&self) -> &[SupplementaryMaterial] {
+        &self.supplementary_materials
+    }
+
+    /// Data availability statement, if present.
+    pub fn data_availability(&self) -> Option<&str> {
+        self.data_availability.as_deref()
+    }
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sec(section_type: Option<&str>, title: Option<&str>, content: &str) -> Section {
+        Section {
+            id: None,
+            section_type: section_type.map(String::from),
+            label: None,
+            title: title.map(String::from),
+            content: content.to_string(),
+            subsections: Vec::new(),
+            figures: Vec::new(),
+            tables: Vec::new(),
+            formulas: Vec::new(),
+        }
+    }
+
+    fn fig(id: &str) -> Figure {
+        Figure {
+            id: id.to_string(),
+            label: None,
+            caption: None,
+            alt_text: None,
+            fig_type: None,
+            graphic_href: None,
+        }
+    }
+
+    #[test]
+    fn test_section_kind_classification() {
+        assert_eq!(
+            SectionKind::from_sec_type(Some("intro")),
+            SectionKind::Introduction
+        );
+        assert_eq!(
+            SectionKind::from_sec_type(Some("Methods")),
+            SectionKind::Methods
+        );
+        assert_eq!(
+            SectionKind::from_sec_type(Some("materials|methods")),
+            SectionKind::Methods
+        );
+        assert_eq!(
+            SectionKind::from_sec_type(Some("results|discussion")),
+            SectionKind::ResultsDiscussion
+        );
+        assert_eq!(SectionKind::from_sec_type(None), SectionKind::Unspecified);
+        assert_eq!(
+            SectionKind::from_sec_type(Some("custom-thing")),
+            SectionKind::Other("custom-thing".to_string())
+        );
+        assert!(SectionKind::Methods.is_imrad());
+        assert!(!SectionKind::SupplementaryMaterial.is_imrad());
+    }
+
+    #[test]
+    fn test_section_subtree_iteration_is_preorder() {
+        // root -> [a -> [a1], b]
+        let mut root = sec(Some("intro"), Some("Root"), "r");
+        let mut a = sec(None, Some("A"), "a");
+        a.subsections.push(sec(None, Some("A1"), "a1"));
+        let b = sec(None, Some("B"), "b");
+        root.subsections.push(a);
+        root.subsections.push(b);
+
+        let titles: Vec<&str> = root
+            .iter_subtree()
+            .filter_map(|s| s.title.as_deref())
+            .collect();
+        assert_eq!(titles, vec!["Root", "A", "A1", "B"]);
+    }
+
+    #[test]
+    fn test_section_recursive_figures() {
+        let mut root = sec(None, None, "");
+        root.figures.push(fig("f1"));
+        let mut child = sec(None, None, "");
+        child.figures.push(fig("f2"));
+        root.subsections.push(child);
+
+        let ids: Vec<&str> = root.all_figures().iter().map(|f| f.id.as_str()).collect();
+        assert_eq!(ids, vec!["f1", "f2"]);
+        assert_eq!(root.word_count(), 0);
+    }
+
+    #[test]
+    fn test_article_text_mining_accessors() {
+        let mut intro = sec(Some("intro"), Some("Introduction"), "Hello world.");
+        intro.figures.push(fig("f1"));
+        let mut methods = sec(
+            Some("methods"),
+            Some("Statistical analysis"),
+            "We used t-tests.",
+        );
+        let mut sub = sec(None, Some("Sub"), "Nested.");
+        sub.tables.push(Table {
+            id: "t1".to_string(),
+            label: None,
+            caption: None,
+            head: vec![TableRow {
+                cells: vec![TableCell {
+                    content: "h1".into(),
+                    is_header: true,
+                    colspan: Some(2),
+                    rowspan: None,
+                }],
+            }],
+            body: vec![TableRow {
+                cells: vec![
+                    TableCell {
+                        content: "a".into(),
+                        is_header: false,
+                        colspan: None,
+                        rowspan: None,
+                    },
+                    TableCell {
+                        content: "b".into(),
+                        is_header: false,
+                        colspan: None,
+                        rowspan: None,
+                    },
+                ],
+            }],
+            footnotes: Vec::new(),
+        });
+        methods.subsections.push(sub);
+
+        let article = PmcArticle {
+            article_type: None,
+            front: Front {
+                journal_meta: JournalMeta {
+                    title: None,
+                    abbreviation: None,
+                    issn_print: None,
+                    issn_electronic: None,
+                    publisher: None,
+                },
+                article_meta: ArticleMeta {
+                    pmcid: PmcId::from_u32(123),
+                    pmid: None,
+                    doi: None,
+                    categories: Vec::new(),
+                    title_group: TitleGroup {
+                        article_title: None,
+                        subtitle: None,
+                    },
+                    authors: Vec::new(),
+                    pub_dates: Vec::new(),
+                    volume: None,
+                    issue: None,
+                    fpage: None,
+                    lpage: None,
+                    elocation_id: None,
+                    history: Vec::new(),
+                    permissions: None,
+                    abstracts: vec![Abstract {
+                        abstract_type: None,
+                        text: "Full abstract.".to_string(),
+                        sections: vec![
+                            AbstractSection {
+                                label: Some("Background".into()),
+                                text: "bg".into(),
+                            },
+                            AbstractSection {
+                                label: Some("Methods".into()),
+                                text: "m".into(),
+                            },
+                        ],
+                    }],
+                    keywords: Vec::new(),
+                    funding: Vec::new(),
+                },
+            },
+            body: Some(Body {
+                sections: vec![intro, methods],
+            }),
+            back: Some(Back {
+                acknowledgments: None,
+                conflict_of_interest: None,
+                references: vec![
+                    Reference {
+                        id: "r1".into(),
+                        publication_type: Some("journal".into()),
+                        title: None,
+                        authors: Vec::new(),
+                        source: None,
+                        year: None,
+                        volume: None,
+                        issue: None,
+                        pages: None,
+                        pmid: Some("111".into()),
+                        doi: None,
+                    },
+                    Reference {
+                        id: "r2".into(),
+                        publication_type: Some("book".into()),
+                        title: None,
+                        authors: Vec::new(),
+                        source: None,
+                        year: None,
+                        volume: None,
+                        issue: None,
+                        pages: None,
+                        pmid: None,
+                        doi: Some("10.1/x".into()),
+                    },
+                ],
+                appendices: Vec::new(),
+                glossary: Vec::new(),
+            }),
+            supplementary_materials: Vec::new(),
+            data_availability: None,
+        };
+
+        // Recursive section walk reaches nested subsection.
+        assert_eq!(article.all_sections().count(), 3);
+        // Filter by semantic kind and raw type.
+        assert_eq!(article.sections_of_kind(&SectionKind::Methods).len(), 1);
+        assert_eq!(article.sections_by_type("intro").len(), 1);
+        // Title search is recursive + case-insensitive substring.
+        assert!(article.find_section_by_title("statistical").is_some());
+        // Recursive figure/table discovery.
+        assert_eq!(article.figure_count(), 1);
+        assert_eq!(article.table_count(), 1);
+        // Body text joins titles and content.
+        let body = article.body_text();
+        assert!(body.contains("Hello world."));
+        assert!(body.contains("We used t-tests."));
+        assert!(body.contains("Nested."));
+        // Abstract section lookup.
+        let abs = &article.abstracts()[0];
+        assert!(abs.is_structured());
+        assert_eq!(abs.section_by_label("methods").unwrap().text, "m");
+        assert_eq!(article.abstract_sections().len(), 2);
+        // Reference filters.
+        assert_eq!(article.references_with_pmid().len(), 1);
+        assert_eq!(article.references_with_doi().len(), 1);
+        assert_eq!(article.references_by_type("JOURNAL").len(), 1);
+        // Table geometry helpers.
+        let table = article.all_tables()[0];
+        assert_eq!(table.row_count(), 2);
+        assert_eq!(table.column_count(), 2);
+        assert!(!table.is_empty());
+    }
+}

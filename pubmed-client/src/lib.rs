@@ -284,7 +284,7 @@ pub use pmc::{
     Abstract, ArticleMeta, Back, Body, ExtractedFigure, Figure, FigureOptions, Front, FundingInfo,
     HeadingStyle, JournalMeta, License, MarkdownConfig, MetadataOptions, OaSubsetInfo, Permissions,
     PmcArticle, PmcClient, PmcMarkdownConverter, PmcTarClient, Reference, ReferenceStyle, Section,
-    SupplementaryMaterial, Table, TitleGroup, parse_pmc_xml,
+    SectionKind, SupplementaryMaterial, Table, TitleGroup, parse_pmc_xml,
 };
 pub use pubmed::{
     AbstractSection, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,

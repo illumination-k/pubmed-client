@@ -4,6 +4,7 @@ use crate::error::Result;
 use crate::pmc::domain::Reference;
 use quick_xml::de::from_str;
 use serde::Deserialize;
+use std::borrow::Cow;
 use tracing;
 
 /// XML structure for ref-list element
@@ -168,15 +169,21 @@ struct Name {
 ///
 /// These elements cause "duplicate field" errors in quick-xml serde deserialization
 /// when multiple `<comment>` elements appear in the same citation.
-fn strip_comment_tags(content: &str) -> String {
+fn strip_comment_tags(content: &str) -> Cow<'_, str> {
     use regex::Regex;
     use std::sync::OnceLock;
 
+    // Skip the regex entirely when there is no `<comment` substring — the common
+    // case — so we return the input borrowed without allocating a full copy.
+    if !content.contains("<comment") {
+        return Cow::Borrowed(content);
+    }
+
     static COMMENT_RE: OnceLock<Option<Regex>> = OnceLock::new();
     match COMMENT_RE.get_or_init(|| Regex::new(r"<comment[^>]*>.*?</comment>").ok()) {
-        Some(re) => re.replace_all(content, "").into_owned(),
+        Some(re) => re.replace_all(content, ""),
         // If the (constant) pattern somehow failed to compile, leave the input untouched.
-        None => content.to_string(),
+        None => Cow::Borrowed(content),
     }
 }
 
