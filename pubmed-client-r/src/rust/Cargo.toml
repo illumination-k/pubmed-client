@@ -23,8 +23,14 @@ extendr-api = "0.7"
 # a `path = "../../../pubmed-client"` dependency would point outside the package
 # and fail to resolve. Keep this version in lock-step with the workspace version.
 # For local development against unpublished pubmed-client changes, temporarily
-# switch this to `{ path = "../../../pubmed-client" }`.
-pubmed-client = "0.2.0"
+# switch this to `{ path = "../../../pubmed-client", default-features = false,
+# features = ["rustls-tls"] }`.
+#
+# rustls-tls (not the default native-tls) keeps TLS pure-Rust and statically
+# linked into the package's shared object. With native-tls the .so references
+# system OpenSSL symbols (e.g. PKCS5_PBKDF2_HMAC) that the R link line does not
+# resolve, so loading fails; rustls avoids needing -lssl/-lcrypto entirely.
+pubmed-client = { version = "0.2.0", default-features = false, features = ["rustls-tls"] }
 tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
 
 [profile.release]
