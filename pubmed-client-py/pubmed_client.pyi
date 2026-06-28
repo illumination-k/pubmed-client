@@ -463,6 +463,22 @@ class PubMedArticle:
         r"""
         Get keywords
         """
+    def to_bibtex(self) -> builtins.str:
+        r"""
+        Export the article as a BibTeX entry
+        """
+    def to_ris(self) -> builtins.str:
+        r"""
+        Export the article in RIS format
+        """
+    def to_nbib(self) -> builtins.str:
+        r"""
+        Export the article in MEDLINE/NBIB format
+        """
+    def to_csl_json(self) -> builtins.str:
+        r"""
+        Export the article as a CSL-JSON string
+        """
     def __repr__(self) -> builtins.str: ...
 
 class PubMedClient:
