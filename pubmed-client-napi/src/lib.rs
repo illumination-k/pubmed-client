@@ -433,6 +433,267 @@ impl From<pubmed_client::EPostResult> for EPostResult {
     }
 }
 
+/// Related articles result from the ELink API
+#[napi(object)]
+pub struct RelatedArticles {
+    /// Source PMIDs the relations were computed from
+    pub source_pmids: Vec<u32>,
+    /// PMIDs of related articles
+    pub related_pmids: Vec<u32>,
+    /// ELink link type (e.g., "pubmed_pubmed")
+    pub link_type: String,
+}
+
+impl From<pubmed_client::RelatedArticles> for RelatedArticles {
+    fn from(related: pubmed_client::RelatedArticles) -> Self {
+        RelatedArticles {
+            source_pmids: related.source_pmids,
+            related_pmids: related.related_pmids,
+            link_type: related.link_type,
+        }
+    }
+}
+
+/// PMC availability links from the ELink API
+#[napi(object)]
+pub struct PmcLinks {
+    /// Source PMIDs the links were computed from
+    pub source_pmids: Vec<u32>,
+    /// PMC IDs available for the source PMIDs
+    pub pmc_ids: Vec<String>,
+}
+
+impl From<pubmed_client::PmcLinks> for PmcLinks {
+    fn from(links: pubmed_client::PmcLinks) -> Self {
+        PmcLinks {
+            source_pmids: links.source_pmids,
+            pmc_ids: links.pmc_ids,
+        }
+    }
+}
+
+/// Citing articles result from the ELink API
+#[napi(object)]
+pub struct Citations {
+    /// Source PMIDs the citations were computed from
+    pub source_pmids: Vec<u32>,
+    /// PMIDs of articles citing the source PMIDs
+    pub citing_pmids: Vec<u32>,
+}
+
+impl From<pubmed_client::Citations> for Citations {
+    fn from(citations: pubmed_client::Citations) -> Self {
+        Citations {
+            source_pmids: citations.source_pmids,
+            citing_pmids: citations.citing_pmids,
+        }
+    }
+}
+
+/// Detailed information about an NCBI database from the EInfo API
+#[napi(object)]
+pub struct DatabaseInfo {
+    /// Internal database name (e.g., "pubmed")
+    pub name: String,
+    /// Human-readable database name
+    pub menu_name: String,
+    /// Database description
+    pub description: String,
+    /// Build identifier if available
+    pub build: Option<String>,
+    /// Number of records if available
+    pub count: Option<i64>,
+    /// Last update timestamp if available
+    pub last_update: Option<String>,
+}
+
+impl From<pubmed_client::DatabaseInfo> for DatabaseInfo {
+    fn from(info: pubmed_client::DatabaseInfo) -> Self {
+        DatabaseInfo {
+            name: info.name,
+            menu_name: info.menu_name,
+            description: info.description,
+            build: info.build,
+            count: info.count.map(|c| c as i64),
+            last_update: info.last_update,
+        }
+    }
+}
+
+/// Input for a single citation match query (ECitMatch API)
+#[napi(object)]
+pub struct CitationQuery {
+    /// Journal title
+    pub journal: String,
+    /// Publication year
+    pub year: String,
+    /// Volume
+    pub volume: String,
+    /// First page
+    pub first_page: String,
+    /// First author name
+    pub author_name: String,
+    /// User-defined key echoed back in the result
+    pub key: String,
+}
+
+impl From<&CitationQuery> for pubmed_client::CitationQuery {
+    fn from(query: &CitationQuery) -> Self {
+        pubmed_client::CitationQuery::new(
+            &query.journal,
+            &query.year,
+            &query.volume,
+            &query.first_page,
+            &query.author_name,
+            &query.key,
+        )
+    }
+}
+
+/// Result of a single citation match (ECitMatch API)
+#[napi(object)]
+pub struct CitationMatch {
+    /// Journal title from the query
+    pub journal: String,
+    /// Year from the query
+    pub year: String,
+    /// Volume from the query
+    pub volume: String,
+    /// First page from the query
+    pub first_page: String,
+    /// Author name from the query
+    pub author_name: String,
+    /// User-defined key from the query
+    pub key: String,
+    /// Matched PMID (null if not found)
+    pub pmid: Option<String>,
+    /// Match status ("found", "not_found", or "ambiguous")
+    pub status: String,
+}
+
+impl From<&pubmed_client::CitationMatch> for CitationMatch {
+    fn from(m: &pubmed_client::CitationMatch) -> Self {
+        let status = match m.status {
+            pubmed_client::CitationMatchStatus::Found => "found",
+            pubmed_client::CitationMatchStatus::NotFound => "not_found",
+            pubmed_client::CitationMatchStatus::Ambiguous => "ambiguous",
+        };
+        CitationMatch {
+            journal: m.journal.clone(),
+            year: m.year.clone(),
+            volume: m.volume.clone(),
+            first_page: m.first_page.clone(),
+            author_name: m.author_name.clone(),
+            key: m.key.clone(),
+            pmid: m.pmid.clone(),
+            status: status.to_string(),
+        }
+    }
+}
+
+/// Record count for a single NCBI database from the EGQuery API
+#[napi(object)]
+pub struct DatabaseCount {
+    /// Internal database name (e.g., "pubmed", "pmc")
+    pub db_name: String,
+    /// Human-readable database name
+    pub menu_name: String,
+    /// Number of matching records
+    pub count: i64,
+    /// Query status (e.g., "Ok")
+    pub status: String,
+}
+
+impl From<&pubmed_client::DatabaseCount> for DatabaseCount {
+    fn from(dc: &pubmed_client::DatabaseCount) -> Self {
+        DatabaseCount {
+            db_name: dc.db_name.clone(),
+            menu_name: dc.menu_name.clone(),
+            count: dc.count as i64,
+            status: dc.status.clone(),
+        }
+    }
+}
+
+/// Results from the EGQuery API for a global database search
+#[napi(object)]
+pub struct GlobalQueryResults {
+    /// The query term that was searched
+    pub term: String,
+    /// Per-database record counts
+    pub results: Vec<DatabaseCount>,
+}
+
+impl From<pubmed_client::GlobalQueryResults> for GlobalQueryResults {
+    fn from(results: pubmed_client::GlobalQueryResults) -> Self {
+        GlobalQueryResults {
+            term: results.term,
+            results: results.results.iter().map(DatabaseCount::from).collect(),
+        }
+    }
+}
+
+/// Figure metadata extracted from a PMC article
+#[napi(object)]
+pub struct Figure {
+    /// Figure ID
+    pub id: String,
+    /// Figure label (e.g., "Figure 1")
+    pub label: Option<String>,
+    /// Figure caption
+    pub caption: Option<String>,
+    /// Alternative text
+    pub alt_text: Option<String>,
+    /// Figure type
+    pub fig_type: Option<String>,
+    /// Reference to the graphic file
+    pub graphic_href: Option<String>,
+}
+
+impl From<&pubmed_client::Figure> for Figure {
+    fn from(figure: &pubmed_client::Figure) -> Self {
+        Figure {
+            id: figure.id.clone(),
+            label: figure.label.clone(),
+            caption: figure.caption.clone(),
+            alt_text: figure.alt_text.clone(),
+            fig_type: figure.fig_type.clone(),
+            graphic_href: figure.graphic_href.clone(),
+        }
+    }
+}
+
+/// A figure extracted from a downloaded tar.gz package, with file metadata
+#[napi(object)]
+pub struct ExtractedFigure {
+    /// Figure metadata
+    pub figure: Figure,
+    /// Path to the extracted image file
+    pub extracted_file_path: String,
+    /// File size in bytes if available
+    pub file_size: Option<i64>,
+    /// Image width in pixels if available
+    pub width: Option<u32>,
+    /// Image height in pixels if available
+    pub height: Option<u32>,
+}
+
+impl From<&pubmed_client::ExtractedFigure> for ExtractedFigure {
+    fn from(extracted: &pubmed_client::ExtractedFigure) -> Self {
+        let (width, height) = match extracted.dimensions {
+            Some((w, h)) => (Some(w), Some(h)),
+            None => (None, None),
+        };
+        ExtractedFigure {
+            figure: Figure::from(&extracted.figure),
+            extracted_file_path: extracted.extracted_file_path.clone(),
+            file_size: extracted.file_size.map(|s| s as i64),
+            width,
+            height,
+        }
+    }
+}
+
 /// PubMed/PMC API client
 #[napi]
 pub struct PubMedClient {
@@ -787,6 +1048,227 @@ impl PubMedClient {
             .map_err(to_napi_err)?;
 
         Ok(articles.into_iter().map(Article::from).collect())
+    }
+
+    /// Get related articles for the given PMIDs using the ELink API
+    ///
+    /// @param pmids - Array of PubMed IDs
+    /// @returns Related articles
+    #[napi]
+    pub async fn get_related_articles(&self, pmids: Vec<u32>) -> Result<RelatedArticles> {
+        let related = self
+            .client
+            .get_related_articles(&pmids)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(RelatedArticles::from(related))
+    }
+
+    /// Get PMC links for the given PMIDs (check full-text availability)
+    ///
+    /// @param pmids - Array of PubMed IDs
+    /// @returns PMC links
+    #[napi]
+    pub async fn get_pmc_links(&self, pmids: Vec<u32>) -> Result<PmcLinks> {
+        let links = self
+            .client
+            .get_pmc_links(&pmids)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(PmcLinks::from(links))
+    }
+
+    /// Get citing articles for the given PMIDs using the ELink API
+    ///
+    /// @param pmids - Array of PubMed IDs
+    /// @returns Citing articles
+    #[napi]
+    pub async fn get_citations(&self, pmids: Vec<u32>) -> Result<Citations> {
+        let citations = self
+            .client
+            .get_citations(&pmids)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(Citations::from(citations))
+    }
+
+    /// List all available NCBI databases using the EInfo API
+    ///
+    /// @returns Array of database names
+    #[napi]
+    pub async fn get_database_list(&self) -> Result<Vec<String>> {
+        self.client.get_database_list().await.map_err(to_napi_err)
+    }
+
+    /// Get detailed information about a specific NCBI database using the EInfo API
+    ///
+    /// @param database - Database name (e.g., "pubmed", "pmc")
+    /// @returns Database information
+    #[napi]
+    pub async fn get_database_info(&self, database: String) -> Result<DatabaseInfo> {
+        let info = self
+            .client
+            .get_database_info(&database)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(DatabaseInfo::from(info))
+    }
+
+    /// Match citations to PMIDs using the ECitMatch API
+    ///
+    /// @param citations - Array of citation queries
+    /// @returns Array of citation match results
+    #[napi]
+    pub async fn match_citations(
+        &self,
+        citations: Vec<CitationQuery>,
+    ) -> Result<Vec<CitationMatch>> {
+        let rust_citations: Vec<pubmed_client::CitationQuery> = citations
+            .iter()
+            .map(pubmed_client::CitationQuery::from)
+            .collect();
+        let results = self
+            .client
+            .match_citations(&rust_citations)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(results.matches.iter().map(CitationMatch::from).collect())
+    }
+
+    /// Query all NCBI databases for record counts using the EGQuery API
+    ///
+    /// @param term - Search term
+    /// @returns Per-database record counts
+    #[napi]
+    pub async fn global_query(&self, term: String) -> Result<GlobalQueryResults> {
+        let results = self.client.global_query(&term).await.map_err(to_napi_err)?;
+
+        Ok(GlobalQueryResults::from(results))
+    }
+
+    /// Export articles as BibTeX
+    ///
+    /// Fetches the given PMIDs and formats them as a BibTeX bibliography.
+    ///
+    /// @param pmids - Array of PubMed IDs as strings
+    /// @returns BibTeX string
+    #[napi]
+    pub async fn export_bibtex(&self, pmids: Vec<String>) -> Result<String> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let articles = self
+            .client
+            .pubmed
+            .fetch_articles(&pmid_refs)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(pubmed_client::export::articles_to_bibtex(&articles))
+    }
+
+    /// Export articles in RIS format
+    ///
+    /// @param pmids - Array of PubMed IDs as strings
+    /// @returns RIS string
+    #[napi]
+    pub async fn export_ris(&self, pmids: Vec<String>) -> Result<String> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let articles = self
+            .client
+            .pubmed
+            .fetch_articles(&pmid_refs)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(pubmed_client::export::articles_to_ris(&articles))
+    }
+
+    /// Export articles as CSL-JSON
+    ///
+    /// @param pmids - Array of PubMed IDs as strings
+    /// @returns CSL-JSON string (array of items)
+    #[napi]
+    pub async fn export_csl_json(&self, pmids: Vec<String>) -> Result<String> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let articles = self
+            .client
+            .pubmed
+            .fetch_articles(&pmid_refs)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(pubmed_client::export::articles_to_csl_json(&articles).to_string())
+    }
+
+    /// Export articles in MEDLINE/NBIB format
+    ///
+    /// @param pmids - Array of PubMed IDs as strings
+    /// @returns NBIB string
+    #[napi]
+    pub async fn export_nbib(&self, pmids: Vec<String>) -> Result<String> {
+        let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+        let articles = self
+            .client
+            .pubmed
+            .fetch_articles(&pmid_refs)
+            .await
+            .map_err(to_napi_err)?;
+
+        let nbib = articles
+            .iter()
+            .map(pubmed_client::ExportFormat::to_nbib)
+            .collect::<Vec<_>>()
+            .join("\n");
+        Ok(nbib)
+    }
+
+    /// Download and extract a PMC tar.gz package to a directory
+    ///
+    /// Downloads the Open Access package for the given PMC ID and extracts it,
+    /// returning the list of extracted file paths.
+    ///
+    /// @param pmcid - PMC ID (e.g., "PMC7906746")
+    /// @param outputDir - Directory to extract files into
+    /// @returns Array of extracted file paths
+    #[napi]
+    pub async fn download_and_extract_tar(
+        &self,
+        pmcid: String,
+        output_dir: String,
+    ) -> Result<Vec<String>> {
+        self.client
+            .pmc
+            .download_and_extract_tar(&pmcid, &output_dir)
+            .await
+            .map_err(to_napi_err)
+    }
+
+    /// Extract figures with their captions from a PMC article
+    ///
+    /// Downloads the Open Access package, extracts figure image files, and
+    /// associates them with caption metadata from the article XML.
+    ///
+    /// @param pmcid - PMC ID (e.g., "PMC7906746")
+    /// @param outputDir - Directory to extract figure files into
+    /// @returns Array of extracted figures with file metadata
+    #[napi]
+    pub async fn extract_figures_with_captions(
+        &self,
+        pmcid: String,
+        output_dir: String,
+    ) -> Result<Vec<ExtractedFigure>> {
+        let figures = self
+            .client
+            .pmc
+            .extract_figures_with_captions(&pmcid, &output_dir)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(figures.iter().map(ExtractedFigure::from).collect())
     }
 }
 

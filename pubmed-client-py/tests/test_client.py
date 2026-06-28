@@ -1,5 +1,7 @@
 """Tests for PubMed and PMC clients."""
 
+import pytest
+
 import pubmed_client
 
 
@@ -66,3 +68,25 @@ class TestCombinedClient:
         pmc = client.pmc
         assert pmc is not None
         assert repr(pmc) == "PmcClient()"
+
+
+class TestCitationExport:
+    """Tests for citation export on PubMedArticle."""
+
+    @pytest.mark.integration
+    def test_export_formats(self) -> None:
+        """Fetch a known article and export it in all four citation formats."""
+        client = pubmed_client.PubMedClient()
+        article = client.fetch_article("31978945")
+
+        bibtex = article.to_bibtex()
+        assert bibtex.startswith("@article{")
+
+        ris = article.to_ris()
+        assert "TY  -" in ris
+
+        nbib = article.to_nbib()
+        assert "PMID-" in nbib
+
+        csl_json = article.to_csl_json()
+        assert csl_json.strip().startswith("{")

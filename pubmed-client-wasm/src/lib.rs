@@ -507,6 +507,42 @@ impl WasmPubMedClient {
         })
     }
 
+    /// Export articles as CSL-JSON format
+    ///
+    /// Returns a Promise resolving to a JSON string (an array of CSL-JSON items).
+    pub fn export_csl_json(&self, pmids: Vec<String>) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.fetch_articles(&pmid_refs).await {
+                Ok(articles) => {
+                    let value = pubmed_client::export::articles_to_csl_json(&articles);
+                    Ok(JsValue::from_str(&value.to_string()))
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
+    /// Export articles in MEDLINE/NBIB format
+    pub fn export_nbib(&self, pmids: Vec<String>) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let pmid_refs: Vec<&str> = pmids.iter().map(|s| s.as_str()).collect();
+            match client.pubmed.fetch_articles(&pmid_refs).await {
+                Ok(articles) => {
+                    let nbib = articles
+                        .iter()
+                        .map(pubmed_client::ExportFormat::to_nbib)
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    Ok(JsValue::from_str(&nbib))
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
     /// Convert PMC full text to markdown
     pub fn convert_to_markdown(&self, full_text_js: JsValue) -> Result<String, JsValue> {
         let js_full_text: JsFullText = serde_wasm_bindgen::from_value(full_text_js)

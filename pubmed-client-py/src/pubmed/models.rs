@@ -201,6 +201,30 @@ impl PyPubMedArticle {
         Ok(list.into())
     }
 
+    /// Export the article as a BibTeX entry
+    fn to_bibtex(&self) -> String {
+        use pubmed_client::ExportFormat;
+        self.inner.to_bibtex()
+    }
+
+    /// Export the article in RIS format
+    fn to_ris(&self) -> String {
+        use pubmed_client::ExportFormat;
+        self.inner.to_ris()
+    }
+
+    /// Export the article in MEDLINE/NBIB format
+    fn to_nbib(&self) -> String {
+        use pubmed_client::ExportFormat;
+        self.inner.to_nbib()
+    }
+
+    /// Export the article as a CSL-JSON string
+    fn to_csl_json(&self) -> String {
+        use pubmed_client::ExportFormat;
+        self.inner.to_csl_json().to_string()
+    }
+
     fn __repr__(&self) -> String {
         format!(
             "PubMedArticle(pmid='{}', title='{}')",
