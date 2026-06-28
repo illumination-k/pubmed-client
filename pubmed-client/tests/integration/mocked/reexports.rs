@@ -49,3 +49,15 @@ fn reexport_markdown_converter_types_accessible() {
         ..Default::default()
     });
 }
+
+#[test]
+fn reexport_pubtator_types_accessible() {
+    // Verify PubTator3 types and the parser re-export are reachable via pubmed-client.
+    use pubmed_client::{EntityType, PubTatorClient, PubTatorResponse};
+
+    let _client = PubTatorClient::new();
+    let response: PubTatorResponse =
+        pubmed_client::parse_biocjson(r#"{"PubTator3": []}"#).expect("empty biocjson parses");
+    assert!(response.documents.is_empty());
+    assert_eq!(EntityType::from_type_str("gene"), EntityType::Gene);
+}

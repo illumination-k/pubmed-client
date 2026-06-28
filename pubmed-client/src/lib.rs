@@ -267,6 +267,7 @@ pub mod config;
 pub mod error;
 pub mod pmc;
 pub mod pubmed;
+pub mod pubtator;
 pub mod rate_limit;
 pub(crate) mod request;
 pub mod retry;
@@ -294,6 +295,12 @@ pub use pubmed::{
     PubMedArticle, PubMedClient, RelatedArticles, SearchQuery, SearchResult, SortOrder,
     SpellCheckResult, SpelledQuerySegment, export, parse_article_from_xml, validate_year,
 };
+pub use pubmed_parser::pubtator::{parse_biocjson, parse_entity_matches};
+pub use pubtator::{
+    BioCAnnotation, BioCDocument, BioCLocation, BioCNode, BioCPassage, BioCRelation,
+    DEFAULT_PUBTATOR_BASE_URL, EntityMatch, EntityType, PubTatorClient, PubTatorResponse,
+    RelationRole,
+};
 pub use rate_limit::RateLimiter;
 pub use time::{Duration, Instant, sleep};
 
@@ -304,6 +311,8 @@ pub struct Client {
     pub pubmed: PubMedClient,
     /// PMC client for full text
     pub pmc: PmcClient,
+    /// PubTator3 client for biomedical entity/relation annotations
+    pub pubtator: PubTatorClient,
 }
 
 impl Client {
@@ -347,7 +356,8 @@ impl Client {
     pub fn with_config(config: ClientConfig) -> Self {
         Self {
             pubmed: PubMedClient::with_config(config.clone()),
-            pmc: PmcClient::with_config(config),
+            pmc: PmcClient::with_config(config.clone()),
+            pubtator: PubTatorClient::with_config(config),
         }
     }
 
@@ -374,8 +384,39 @@ impl Client {
     pub fn with_http_client(http_client: reqwest::Client) -> Self {
         Self {
             pubmed: PubMedClient::with_client(http_client.clone()),
-            pmc: PmcClient::with_client(http_client),
+            pmc: PmcClient::with_client(http_client.clone()),
+            pubtator: PubTatorClient::with_client(http_client),
         }
+    }
+
+    /// Fetch PubTator3 biomedical annotations (abstract-level) for the given PMIDs.
+    ///
+    /// Convenience wrapper over [`PubTatorClient::export_annotations`].
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::Client;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = Client::new();
+    ///     let annotations = client.get_annotations(&["29355051"]).await?;
+    ///     for doc in &annotations.documents {
+    ///         println!("{} annotations in {}", doc.annotations().count(), doc.id);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn get_annotations(&self, pmids: &[&str]) -> Result<PubTatorResponse> {
+        self.pubtator.export_annotations(pmids).await
+    }
+
+    /// Resolve free text to normalized PubTator3 entities.
+    ///
+    /// Convenience wrapper over [`PubTatorClient::find_entity`].
+    pub async fn find_entity(&self, query: &str) -> Result<Vec<EntityMatch>> {
+        self.pubtator.find_entity(query).await
     }
 
     /// Search for articles and attempt to fetch full text for each

@@ -127,6 +127,10 @@ path = "tests/integration/mocked/search_options.rs"
 name = "mocked_rate_limiting"
 path = "tests/integration/mocked/rate_limiting.rs"
 
+[[test]]
+name = "mocked_pubtator"
+path = "tests/integration/mocked/pubtator.rs"
+
 # --- API tests (opt-in, require network + PUBMED_REAL_API_TESTS=1) ---
 
 [[test]]

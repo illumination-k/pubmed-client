@@ -114,7 +114,7 @@ The codebase is split into three core Rust crates with a clear layering:
 ### Parser (`pubmed-parser/src/`)
 
 ```
-lib.rs                 # Re-exports: common, error, pmc, pubmed modules
+lib.rs                 # Re-exports: common, error, pmc, pubmed, pubtator modules
 error.rs               # ParseError enum and Result type alias
 
 common/                # Shared types between PubMed and PMC
@@ -145,6 +145,12 @@ pmc/                   # PMC XML parsing
     reference.rs       # Reference extraction
     section.rs         # Section parsing
     xml_utils.rs       # XML utilities
+
+pubtator/              # PubTator3 BioC JSON (text-mining annotations, no network)
+  mod.rs               # parse_biocjson, parse_entity_matches entry points
+  models.rs            # BioC domain models: PubTatorResponse, BioCDocument, BioCPassage,
+                       # BioCAnnotation, BioCLocation, BioCRelation, RelationRole;
+                       # EntityType enum, EntityMatch; ergonomic accessors over infons maps
 ```
 
 ### Formatter (`pubmed-formatter/src/`)
@@ -197,13 +203,17 @@ pubmed/                # PubMed E-utilities API
 pmc/                   # PMC (PubMed Central) API
   client.rs            # PmcClient - full-text fetch, availability check, figure extraction
   tar.rs               # PmcTarClient for tar archive extraction
+
+pubtator/              # PubTator3 text-mining API (not E-utilities; separate base URL)
+  mod.rs               # PubTatorClient - BioC annotation export + entity autocomplete
 ```
 
 ### Key Types
 
-- `Client` — Unified client with `pubmed` and `pmc` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`
+- `Client` — Unified client with `pubmed`, `pmc`, and `pubtator` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`, `get_annotations`, `find_entity`
 - `PubMedClient` — Search, fetch metadata, ESummary, EPost/History, ELink, EInfo, ECitMatch, EGQuery, ESpell
 - `PmcClient` — Fetch full-text, check availability, extract figures, download tar archives
+- `PubTatorClient` — PubTator3 biomedical annotations: `export_annotations` (abstract), `export_full_text_annotations`, `export_pmc_annotations`, `find_entity` (autocomplete). BioC types (`PubTatorResponse`, `BioCDocument`, `EntityType`, …) defined in `pubmed-parser`
 - `SearchQuery` — Builder pattern for complex queries with filters, date ranges, boolean logic
 - `PubMedArticle` — Article metadata (title, authors, abstract, MeSH, keywords, etc.) — defined in `pubmed-parser`
 - `PmcFullText` — Structured full-text (sections, references, figures, tables) — defined in `pubmed-parser`
@@ -281,11 +291,11 @@ src/
 
 ### Integration Tests
 
-XML fixtures are in `test_data/` at the workspace root (pmc_xml/ and pubmed_xml/).
+XML fixtures are in `test_data/` at the workspace root (pmc_xml/, pubmed_xml/, and pubtator/ BioC JSON).
 
-- **`pubmed-parser`** tests: Parsing PubMed XML, PMC XML, supplementary materials
+- **`pubmed-parser`** tests: Parsing PubMed XML, PMC XML, supplementary materials, PubTator3 BioC JSON
 - **`pubmed-formatter`** tests: Markdown conversion, BibTeX/RIS/CSL-JSON/NBIB export, YAML frontmatter
-- **`pubmed-client`** tests: `comprehensive_pmc_tests`, `comprehensive_pubmed_tests`, `comprehensive_elink_tests`, `comprehensive_einfo_tests`, `test_figure_extraction`, `test_tar_extraction`, `test_pmc_cache`, `test_webenv`, `test_batch_fetch_mocked`
+- **`pubmed-client`** tests: `comprehensive_pmc_tests`, `comprehensive_pubmed_tests`, `comprehensive_elink_tests`, `comprehensive_einfo_tests`, `test_figure_extraction`, `test_tar_extraction`, `test_pmc_cache`, `test_webenv`, `test_batch_fetch_mocked`, `mocked_pubtator`
 
 ## Guidelines
 

@@ -17,7 +17,12 @@ pub mod common;
 pub mod error;
 pub mod pmc;
 pub mod pubmed;
+pub mod pubtator;
 
 // Re-export main types for convenience
 pub use common::{Affiliation, Author, HistoryDate, PmcId, PubMedId, PublicationDate};
 pub use error::{ParseError, Result};
+pub use pubtator::{
+    BioCAnnotation, BioCDocument, BioCLocation, BioCNode, BioCPassage, BioCRelation, EntityMatch,
+    EntityType, PubTatorResponse, RelationRole, parse_biocjson, parse_entity_matches,
+};
