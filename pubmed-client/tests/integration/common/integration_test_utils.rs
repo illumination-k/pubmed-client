@@ -3,6 +3,7 @@
 
 #![allow(dead_code)]
 
+use pubmed_client::europe_pmc::EuropePmcClient;
 use pubmed_client::{Client, ClientConfig, PmcClient, PubMedClient};
 
 /// Helper function to check if real API tests should be run
@@ -52,6 +53,18 @@ pub fn create_test_pmc_client() -> PmcClient {
     }
 
     PmcClient::with_config(config)
+}
+
+/// Create a Europe PMC-specific client for integration tests
+///
+/// Europe PMC does not use an NCBI API key; rate limiting is kept conservative.
+pub fn create_test_europe_pmc_client() -> EuropePmcClient {
+    let config = ClientConfig::new()
+        .with_email("test@example.com")
+        .with_tool("pubmed-client-europe-pmc-integration-tests")
+        .with_rate_limit(2.0);
+
+    EuropePmcClient::with_config(config)
 }
 
 /// Known PMIDs for integration testing (these are stable, well-formed articles)
