@@ -265,6 +265,7 @@
 pub mod cache;
 pub mod config;
 pub mod error;
+pub mod europe_pmc;
 pub mod pmc;
 pub mod pubmed;
 pub mod rate_limit;
@@ -280,6 +281,12 @@ pub(crate) use pubmed_parser::common;
 pub use common::{Affiliation, Author, PmcId, PubMedId};
 pub use config::ClientConfig;
 pub use error::{ParseError, PubMedError, Result};
+pub use europe_pmc::{
+    EuropePmcCitation, EuropePmcCitationList, EuropePmcClient, EuropePmcDatabaseLink,
+    EuropePmcDatabaseLinkList, EuropePmcDbCrossReferenceInfo, EuropePmcId, EuropePmcReference,
+    EuropePmcReferenceList, EuropePmcResult, EuropePmcSearchOptions, EuropePmcSearchResponse,
+    EuropePmcSource, ResultType,
+};
 pub use pmc::{
     Abstract, ArticleMeta, Back, Body, ExtractedFigure, Figure, FigureOptions, Front, FundingInfo,
     HeadingStyle, JournalMeta, KeywordGroup, License, MarkdownConfig, MetadataOptions,
@@ -304,6 +311,8 @@ pub struct Client {
     pub pubmed: PubMedClient,
     /// PMC client for full text
     pub pmc: PmcClient,
+    /// Europe PMC client for cross-source search, full text, and citation graphs
+    pub europe_pmc: EuropePmcClient,
 }
 
 impl Client {
@@ -347,7 +356,8 @@ impl Client {
     pub fn with_config(config: ClientConfig) -> Self {
         Self {
             pubmed: PubMedClient::with_config(config.clone()),
-            pmc: PmcClient::with_config(config),
+            pmc: PmcClient::with_config(config.clone()),
+            europe_pmc: EuropePmcClient::with_config(config),
         }
     }
 
@@ -374,7 +384,8 @@ impl Client {
     pub fn with_http_client(http_client: reqwest::Client) -> Self {
         Self {
             pubmed: PubMedClient::with_client(http_client.clone()),
-            pmc: PmcClient::with_client(http_client),
+            pmc: PmcClient::with_client(http_client.clone()),
+            europe_pmc: EuropePmcClient::with_client(http_client),
         }
     }
 

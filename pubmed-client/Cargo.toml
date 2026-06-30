@@ -127,6 +127,10 @@ path = "tests/integration/mocked/search_options.rs"
 name = "mocked_rate_limiting"
 path = "tests/integration/mocked/rate_limiting.rs"
 
+[[test]]
+name = "mocked_europe_pmc"
+path = "tests/integration/mocked/europe_pmc.rs"
+
 # --- API tests (opt-in, require network + PUBMED_REAL_API_TESTS=1) ---
 
 [[test]]
@@ -152,6 +156,10 @@ path = "tests/integration/api/batch_fetch.rs"
 [[test]]
 name = "api_webenv"
 path = "tests/integration/api/webenv.rs"
+
+[[test]]
+name = "api_europe_pmc"
+path = "tests/integration/api/europe_pmc.rs"
 
 [[test]]
 name = "mocked_epost"
