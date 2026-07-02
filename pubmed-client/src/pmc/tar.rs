@@ -416,57 +416,88 @@ impl PmcTarClient {
         }
     }
 
-    /// Find a matching file for a figure based on ID, label, or filename patterns
+    /// Find a matching file for a figure based on ID, label, or filename patterns.
+    ///
+    /// Three rules are tried in order, returning the first extracted file that matches:
+    /// 1. the explicit `graphic_href` (case-sensitive substring of the file name, any extension);
+    /// 2. the figure `id` (case-insensitive substring) with an image extension;
+    /// 3. the figure `label` with whitespace/dots stripped (case-insensitive) with an image extension.
     #[cfg(not(target_arch = "wasm32"))]
     pub fn find_matching_file(
         figure: &Figure,
         extracted_files: &[String],
         image_extensions: &[&str],
     ) -> Option<String> {
-        if let Some(file_name) = &figure.graphic_href {
-            for file_path in extracted_files {
-                if let Some(filename) = Path::new(file_path).file_name()
-                    && filename.to_string_lossy().contains(file_name)
-                {
-                    return Some(file_path.clone());
-                }
-            }
+        // Rule 1: match by explicit graphic href. Case-sensitive and does not
+        // require an image extension, mirroring the original behavior.
+        if let Some(file_name) = &figure.graphic_href
+            && let Some(matched) =
+                Self::find_first_file(extracted_files, false, image_extensions, |filename| {
+                    filename.contains(file_name.as_str())
+                })
+        {
+            return Some(matched);
         }
 
-        for file_path in extracted_files {
-            if let Some(filename) = Path::new(file_path).file_name() {
-                let filename_str = filename.to_string_lossy().to_lowercase();
-                let figure_id_lower = figure.id.to_lowercase();
-
-                if filename_str.contains(&figure_id_lower)
-                    && let Some(extension) = Path::new(file_path).extension()
-                {
-                    let ext_str = extension.to_string_lossy().to_lowercase();
-                    if image_extensions.contains(&ext_str.as_str()) {
-                        return Some(file_path.clone());
-                    }
-                }
-            }
+        // Rule 2: match by figure id (case-insensitive) with an image extension.
+        let figure_id_lower = figure.id.to_lowercase();
+        if let Some(matched) =
+            Self::find_first_file(extracted_files, true, image_extensions, |filename| {
+                filename.to_lowercase().contains(&figure_id_lower)
+            })
+        {
+            return Some(matched);
         }
 
+        // Rule 3: match by label (whitespace/dots stripped) with an image extension.
         if let Some(label) = &figure.label {
             let label_clean = label.to_lowercase().replace([' ', '.'], "");
-            for file_path in extracted_files {
-                if let Some(filename) = Path::new(file_path).file_name() {
-                    let filename_str = filename.to_string_lossy().to_lowercase();
-                    if filename_str.contains(&label_clean)
-                        && let Some(extension) = Path::new(file_path).extension()
-                    {
-                        let ext_str = extension.to_string_lossy().to_lowercase();
-                        if image_extensions.contains(&ext_str.as_str()) {
-                            return Some(file_path.clone());
-                        }
-                    }
-                }
+            if let Some(matched) =
+                Self::find_first_file(extracted_files, true, image_extensions, |filename| {
+                    filename.to_lowercase().contains(&label_clean)
+                })
+            {
+                return Some(matched);
             }
         }
 
         None
+    }
+
+    /// Return the first extracted file whose file name satisfies `predicate`.
+    ///
+    /// When `require_image_ext` is true, the file must additionally have an
+    /// extension (case-insensitive) present in `image_extensions`. The predicate
+    /// receives the raw (non-lower-cased) file name so callers control casing.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn find_first_file(
+        extracted_files: &[String],
+        require_image_ext: bool,
+        image_extensions: &[&str],
+        predicate: impl Fn(&str) -> bool,
+    ) -> Option<String> {
+        for file_path in extracted_files {
+            let path = Path::new(file_path);
+            let Some(filename) = path.file_name() else {
+                continue;
+            };
+            if !predicate(&filename.to_string_lossy()) {
+                continue;
+            }
+            if require_image_ext && !Self::has_image_extension(path, image_extensions) {
+                continue;
+            }
+            return Some(file_path.clone());
+        }
+        None
+    }
+
+    /// Whether `path` has an extension (case-insensitive) in `image_extensions`.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn has_image_extension(path: &Path, image_extensions: &[&str]) -> bool {
+        path.extension()
+            .map(|ext| image_extensions.contains(&ext.to_string_lossy().to_lowercase().as_str()))
+            .unwrap_or(false)
     }
 
     /// Get image dimensions using the image crate
@@ -566,5 +597,83 @@ mod tests {
     #[test]
     fn test_select_latest_version_keys_empty() {
         assert!(PmcTarClient::select_latest_version_keys(vec![]).is_empty());
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn figure(id: &str, label: Option<&str>, graphic_href: Option<&str>) -> Figure {
+        Figure {
+            id: id.to_string(),
+            label: label.map(|s| s.to_string()),
+            caption: None,
+            alt_text: None,
+            fig_type: None,
+            graphic_href: graphic_href.map(|s| s.to_string()),
+        }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    const IMAGE_EXTS: &[&str] = &["jpg", "jpeg", "png", "gif", "tif", "tiff"];
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_by_graphic_href() {
+        let files = vec![
+            "PMC1/PMC1.xml".to_string(),
+            "PMC1/gr1_lrg.jpg".to_string(),
+            "PMC1/fig2.png".to_string(),
+        ];
+        // graphic_href match is a case-sensitive substring and ignores extension.
+        let fig = figure("fig-1", None, Some("gr1_lrg.jpg"));
+        assert_eq!(
+            PmcTarClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            Some("PMC1/gr1_lrg.jpg".to_string())
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_by_figure_id() {
+        let files = vec!["PMC1/PMC1.xml".to_string(), "PMC1/GR1.PNG".to_string()];
+        // id match is case-insensitive and requires an image extension.
+        let fig = figure("gr1", None, None);
+        assert_eq!(
+            PmcTarClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            Some("PMC1/GR1.PNG".to_string())
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_by_label() {
+        let files = vec!["PMC1/PMC1.xml".to_string(), "PMC1/figure1.jpg".to_string()];
+        // label match strips spaces/dots and is case-insensitive: "Figure 1." -> "figure1".
+        let fig = figure("unrelated-id", Some("Figure 1."), None);
+        assert_eq!(
+            PmcTarClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            Some("PMC1/figure1.jpg".to_string())
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_id_requires_image_extension() {
+        // A non-image file whose name contains the id must not match rule 2.
+        let files = vec!["PMC1/gr1.xml".to_string()];
+        let fig = figure("gr1", None, None);
+        assert_eq!(
+            PmcTarClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            None
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_no_match() {
+        let files = vec!["PMC1/other.jpg".to_string()];
+        let fig = figure("gr9", Some("Figure 9"), Some("missing.png"));
+        assert_eq!(
+            PmcTarClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            None
+        );
     }
 }
