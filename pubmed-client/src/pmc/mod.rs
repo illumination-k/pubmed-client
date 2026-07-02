@@ -4,9 +4,9 @@
 //! full-text articles, check availability, and parse structured content.
 
 pub mod client;
+pub mod cloud;
 pub(crate) mod common;
 pub mod extracted;
-pub mod tar;
 
 // Re-export parser types from pubmed-parser
 pub use pubmed_parser::pmc::oa_api;
@@ -17,6 +17,7 @@ pub use pubmed_formatter::pmc::markdown;
 
 // Re-export public types
 pub use client::PmcClient;
+pub use cloud::PmcCloudClient;
 pub use extracted::ExtractedFigure;
 pub use markdown::{
     FigureOptions, HeadingStyle, MarkdownConfig, MetadataOptions, PmcMarkdownConverter,
@@ -30,4 +31,3 @@ pub use pubmed_parser::pmc::{
     RelatedArticle, Section, SectionIter, SectionKind, SubjectGroup, SupplementaryMaterial, Table,
     TableCell, TableRow, TitleGroup,
 };
-pub use tar::PmcTarClient;

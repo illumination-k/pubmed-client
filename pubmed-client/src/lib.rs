@@ -116,10 +116,10 @@
 //!     let client = PmcClient::new();
 //!     let output_dir = Path::new("./extracted_articles");
 //!
-//!     // Download and extract a PMC article as tar.gz from the OA API
-//!     let files = client.download_and_extract_tar("PMC7906746", output_dir).await?;
+//!     // Download a PMC article's files from the PMC OA Cloud (AWS S3) service
+//!     let files = client.download_files("PMC7906746", output_dir).await?;
 //!
-//!     println!("Extracted {} files:", files.len());
+//!     println!("Downloaded {} files:", files.len());
 //!     for file in files {
 //!         println!("  - {}", file);
 //!     }
@@ -283,7 +283,7 @@ pub use error::{ParseError, PubMedError, Result};
 pub use pmc::{
     Abstract, ArticleMeta, Back, Body, ExtractedFigure, Figure, FigureOptions, Front, FundingInfo,
     HeadingStyle, JournalMeta, KeywordGroup, License, MarkdownConfig, MetadataOptions,
-    OaSubsetInfo, Permissions, PmcArticle, PmcClient, PmcMarkdownConverter, PmcTarClient,
+    OaSubsetInfo, Permissions, PmcArticle, PmcClient, PmcCloudClient, PmcMarkdownConverter,
     Reference, ReferenceStyle, RelatedArticle, Section, SectionKind, SubjectGroup,
     SupplementaryMaterial, Table, TitleGroup, parse_pmc_xml,
 };

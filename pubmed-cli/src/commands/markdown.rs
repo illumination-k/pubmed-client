@@ -147,12 +147,12 @@ impl Markdown {
         let temp_dir = TempDir::new()
             .map_err(|e| BatchItemError::new(pmcid, FailureKind::Other, e.to_string()))?;
 
-        let tar_client = pubmed_client::pmc::PmcTarClient::new(ctx.build_config());
-        let extracted_figures = tar_client
+        let cloud_client = pubmed_client::pmc::PmcCloudClient::new(ctx.build_config());
+        let extracted_figures = cloud_client
             .extract_figures_with_captions(pmcid, temp_dir.path())
             .await
             .map_err(|e| {
-                let timeout_seconds = client.get_tar_client_config().timeout.as_secs();
+                let timeout_seconds = client.get_cloud_client_config().timeout.as_secs();
                 BatchItemError::new(
                     pmcid,
                     classify_fetch_error(&e.to_string(), timeout_seconds),

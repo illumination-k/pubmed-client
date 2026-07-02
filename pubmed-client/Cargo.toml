@@ -105,8 +105,8 @@ name = "mocked_figures"
 path = "tests/integration/mocked/figures.rs"
 
 [[test]]
-name = "mocked_tar"
-path = "tests/integration/mocked/tar.rs"
+name = "mocked_cloud"
+path = "tests/integration/mocked/cloud.rs"
 
 [[test]]
 name = "mocked_cache"

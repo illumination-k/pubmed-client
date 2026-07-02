@@ -151,7 +151,7 @@ impl PyFigure {
 
 /// Python wrapper for ExtractedFigure
 ///
-/// Represents a figure that has been extracted from a PMC tar.gz archive,
+/// Represents a figure that has been extracted from a PMC OA Cloud article,
 /// combining XML metadata with actual file information.
 #[gen_stub_pyclass]
 #[pyclass(name = "ExtractedFigure", from_py_object)]
