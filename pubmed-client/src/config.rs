@@ -45,6 +45,16 @@ pub struct ClientConfig {
     /// This should rarely need to be changed unless using a proxy or test environment.
     pub base_url: Option<String>,
 
+    /// Base URL for the PMC Open Access Cloud (AWS S3) service.
+    ///
+    /// Default: <https://pmc-oa-opendata.s3.amazonaws.com>
+    ///
+    /// NCBI is retiring the PMC FTP service (and the legacy `oa_package` tar.gz
+    /// bundles) in August 2026; article full-text XML and media are served from
+    /// this S3 bucket as individual per-article files instead. This should rarely
+    /// need to be changed unless using a proxy or test environment.
+    pub oa_cloud_base_url: Option<String>,
+
     /// Email address for identification (recommended by NCBI)
     ///
     /// NCBI recommends including an email address in requests for contact
@@ -87,6 +97,7 @@ impl ClientConfig {
             timeout: Duration::from_secs(30),
             user_agent: None,
             base_url: None,
+            oa_cloud_base_url: None,
             email: None,
             tool: None,
             retry_config: RetryConfig::default(),
@@ -209,6 +220,25 @@ impl ClientConfig {
     /// ```
     pub fn with_base_url<S: Into<String>>(mut self, base_url: S) -> Self {
         self.base_url = Some(base_url.into());
+        self
+    }
+
+    /// Set the base URL for the PMC Open Access Cloud (AWS S3) service.
+    ///
+    /// # Arguments
+    ///
+    /// * `base_url` - Base URL for the PMC OA Cloud service
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client::config::ClientConfig;
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_oa_cloud_base_url("https://proxy.example.com/pmc-oa");
+    /// ```
+    pub fn with_oa_cloud_base_url<S: Into<String>>(mut self, base_url: S) -> Self {
+        self.oa_cloud_base_url = Some(base_url.into());
         self
     }
 
@@ -441,6 +471,16 @@ impl ClientConfig {
         self.base_url
             .as_deref()
             .unwrap_or("https://eutils.ncbi.nlm.nih.gov/entrez/eutils")
+    }
+
+    /// Get the effective PMC OA Cloud (AWS S3) base URL.
+    ///
+    /// Returns the configured cloud base URL or the default
+    /// `https://pmc-oa-opendata.s3.amazonaws.com`.
+    pub fn effective_oa_cloud_base_url(&self) -> &str {
+        self.oa_cloud_base_url
+            .as_deref()
+            .unwrap_or("https://pmc-oa-opendata.s3.amazonaws.com")
     }
 
     /// Get the User-Agent string
