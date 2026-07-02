@@ -1,4 +1,4 @@
-use std::{path::Path, str, time::Duration};
+use std::{path::Path, time::Duration};
 
 use crate::common::PmcId;
 use crate::config::ClientConfig;
@@ -10,19 +10,18 @@ use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
 use pubmed_parser::pmc::{Figure, PmcArticle, Section};
 use reqwest::Client;
-use tracing::{debug, warn};
+use tracing::debug;
 
 #[cfg(not(target_arch = "wasm32"))]
-use {
-    flate2::read::GzDecoder,
-    futures_util::StreamExt,
-    std::{fs, fs::File},
-    tar::Archive,
-    tempfile::NamedTempFile,
-    tokio::{fs as tokio_fs, io::AsyncWriteExt, task},
-};
+use tokio::{fs as tokio_fs, task};
 
-/// TAR extraction client for PMC Open Access articles
+/// Download client for PMC Open Access articles via the PMC OA Cloud (AWS S3).
+///
+/// Fetches an article's full-text XML, media, and supplementary files as
+/// individual per-article objects from the `pmc-oa-opendata` S3 bucket. This
+/// replaces the retired PMC FTP service and its legacy `oa_package` tar.gz
+/// bundles (removed by NCBI in August 2026). The struct name is retained for
+/// backwards compatibility.
 #[derive(Clone)]
 pub struct PmcTarClient {
     client: Client,
@@ -77,23 +76,28 @@ impl PmcTarClient {
         }
     }
 
-    /// Download and extract tar.gz file for a PMC article using the OA API
+    /// Download a PMC article's files from the PMC OA Cloud (AWS S3) service.
+    ///
+    /// NCBI retired the PMC FTP service and the legacy `oa_package` tar.gz
+    /// bundles (August 2026). This downloads each of the article's files
+    /// (full-text XML, media, supplementary materials, PDF, etc.) individually
+    /// from the `pmc-oa-opendata` S3 bucket into `output_dir`.
     ///
     /// # Arguments
     ///
     /// * `pmcid` - PMC ID (with or without "PMC" prefix)
-    /// * `output_dir` - Directory to extract the tar.gz contents to
+    /// * `output_dir` - Directory to download the article's files into
     ///
     /// # Returns
     ///
-    /// Returns a `Result<Vec<String>>` containing the list of extracted file paths
+    /// Returns a `Result<Vec<String>>` containing the list of downloaded file paths
     ///
     /// # Errors
     ///
     /// * `ParseError::InvalidPmid` - If the PMCID format is invalid
     /// * `PubMedError::RequestError` - If the HTTP request fails
     /// * `ParseError::IoError` - If file operations fail
-    /// * `ParseError::PmcNotAvailable` - If the article is not available in OA
+    /// * `ParseError::PmcNotAvailable` - If the article is not available in the OA Cloud
     ///
     /// # Example
     ///
@@ -110,7 +114,7 @@ impl PmcTarClient {
     ///     let files = client.download_and_extract_tar("PMC7906746", output_dir).await?;
     ///
     ///     for file in files {
-    ///         println!("Extracted: {}", file);
+    ///         println!("Downloaded: {}", file);
     ///     }
     ///     Ok(())
     /// }
@@ -131,39 +135,18 @@ impl PmcTarClient {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
-        // Prefer the PMC OA Cloud (AWS S3) service. NCBI is retiring the PMC FTP
-        // service and the legacy `oa_package` tar.gz bundles in August 2026; the
-        // cloud service serves each article's XML, media, and supplementary files
-        // as individual per-article objects instead.
-        match self
+        let files = self
             .download_cloud_files(&normalized_pmcid, output_path)
-            .await
-        {
-            Ok(files) if !files.is_empty() => return Ok(files),
-            Ok(_) => {
-                debug!(
-                    pmcid = %normalized_pmcid,
-                    "PMC OA Cloud returned no files; falling back to legacy OA package"
-                );
+            .await?;
+
+        if files.is_empty() {
+            return Err(ParseError::PmcNotAvailable {
+                id: pmcid.to_string(),
             }
-            Err(e) => {
-                warn!(
-                    pmcid = %normalized_pmcid,
-                    error = %e,
-                    "PMC OA Cloud download failed; falling back to legacy OA package"
-                );
-            }
+            .into());
         }
 
-        // Fallback: legacy OA package tar.gz via the OA Web Service API.
-        // NOTE: this path relies on the deprecated FTP/oa_package bundles and
-        // will stop working once NCBI removes them (August 2026).
-        let download_url = self.resolve_download_url(&normalized_pmcid, pmcid).await?;
-        let temp_file = self.stream_to_temp_file(&download_url, output_path).await?;
-
-        let extracted_files = self.extract_tar_gz(temp_file.path(), output_path).await?;
-
-        Ok(extracted_files)
+        Ok(files)
     }
 
     /// Download an article's files from the PMC OA Cloud (AWS S3) service.
@@ -171,8 +154,7 @@ impl PmcTarClient {
     /// Lists the objects under the article's prefix in the `pmc-oa-opendata`
     /// bucket, selects the latest version folder, and downloads each file into
     /// `output_dir`. Returns the list of local file paths (empty if the article
-    /// is not present in the cloud bucket, signalling the caller to fall back to
-    /// the legacy OA package).
+    /// is not present in the cloud bucket).
     #[cfg(not(target_arch = "wasm32"))]
     async fn download_cloud_files(
         &self,
@@ -301,134 +283,12 @@ impl PmcTarClient {
             .collect()
     }
 
-    /// Convert a legacy OA package FTP link into a working HTTPS URL.
-    ///
-    /// The OA Web Service API still advertises `ftp://ftp.ncbi.nlm.nih.gov/...`
-    /// links. FTP itself is unsupported here, and as of April 2026 NCBI moved the
-    /// legacy `oa_package` bundles under a `deprecated/` prefix (to be removed in
-    /// August 2026), so the plain host swap now 404s. Rewrite the `pub/pmc/` path
-    /// to `pub/pmc/deprecated/` so the fallback keeps working during the
-    /// transition; any other FTP link just gets an `ftp` -> `https` host swap.
-    #[cfg(not(target_arch = "wasm32"))]
-    fn oa_package_url_to_https(url: &str) -> String {
-        const FTP_PMC_PREFIX: &str = "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/";
-        const FTP_HOST_PREFIX: &str = "ftp://ftp.ncbi.nlm.nih.gov/";
-
-        if let Some(rest) = url.strip_prefix(FTP_PMC_PREFIX) {
-            if rest.starts_with("deprecated/") {
-                format!("https://ftp.ncbi.nlm.nih.gov/pub/pmc/{rest}")
-            } else {
-                format!("https://ftp.ncbi.nlm.nih.gov/pub/pmc/deprecated/{rest}")
-            }
-        } else if let Some(rest) = url.strip_prefix(FTP_HOST_PREFIX) {
-            format!("https://ftp.ncbi.nlm.nih.gov/{rest}")
-        } else {
-            url.to_string()
-        }
-    }
-
-    /// Resolve the actual tar.gz download URL via the OA API.
-    ///
-    /// The OA API may return an XML document containing the real download link,
-    /// or it may serve the tar.gz directly.
-    #[cfg(not(target_arch = "wasm32"))]
-    async fn resolve_download_url(
-        &self,
-        normalized_pmcid: &str,
-        original_pmcid: &str,
-    ) -> Result<String> {
-        let url = self.executor().build_url(
-            "https://www.ncbi.nlm.nih.gov/pmc/utils/oa",
-            "oa.fcgi",
-            &[("id", normalized_pmcid), ("format", "tgz")],
-        )?;
-
-        debug!("Downloading tar.gz from OA API: {}", url);
-
-        let response = self.executor().get(&url).await?;
-
-        let content_type = response
-            .headers()
-            .get("content-type")
-            .and_then(|v| v.to_str().ok())
-            .unwrap_or("");
-
-        debug!("OA API response content-type: {}", content_type);
-
-        if content_type.contains("text/xml") || content_type.contains("application/xml") {
-            let xml_content = response.text().await?;
-            debug!("OA API returned XML, parsing for download URL");
-            let parsed_url = self.parse_oa_response(&xml_content, original_pmcid)?;
-            Ok(Self::oa_package_url_to_https(&parsed_url))
-        } else if content_type.contains("application/x-gzip")
-            || content_type.contains("application/gzip")
-        {
-            Ok(url)
-        } else {
-            let error_text = response.text().await?;
-            if error_text.contains("error") || error_text.contains("Error") {
-                return Err(ParseError::PmcNotAvailable {
-                    id: original_pmcid.to_string(),
-                }
-                .into());
-            }
-            Err(ParseError::PmcNotAvailable {
-                id: original_pmcid.to_string(),
-            }
-            .into())
-        }
-    }
-
-    /// Stream a tar.gz response into a temporary file with RAII cleanup.
-    ///
-    /// The returned `NamedTempFile` is automatically deleted when dropped,
-    /// ensuring no leftover files on any error path.
-    #[cfg(not(target_arch = "wasm32"))]
-    async fn stream_to_temp_file(
-        &self,
-        download_url: &str,
-        output_dir: &Path,
-    ) -> Result<NamedTempFile> {
-        let tar_response = self.executor().get(download_url).await?;
-
-        let temp_file = NamedTempFile::new_in(output_dir).map_err(|e| ParseError::IoError {
-            message: format!("Failed to create temporary file: {}", e),
-        })?;
-
-        let temp_path = temp_file.path().to_path_buf();
-        let mut async_file =
-            tokio_fs::File::create(&temp_path)
-                .await
-                .map_err(|e| ParseError::IoError {
-                    message: format!("Failed to open temporary file for writing: {}", e),
-                })?;
-
-        let mut stream = tar_response.bytes_stream();
-        while let Some(chunk) = stream.next().await {
-            let chunk = chunk.map_err(PubMedError::from)?;
-            async_file
-                .write_all(&chunk)
-                .await
-                .map_err(|e| ParseError::IoError {
-                    message: format!("Failed to write to temporary file: {}", e),
-                })?;
-        }
-
-        async_file.flush().await.map_err(|e| ParseError::IoError {
-            message: format!("Failed to flush temporary file: {}", e),
-        })?;
-
-        debug!("Downloaded tar.gz to: {}", temp_path.display());
-
-        Ok(temp_file)
-    }
-
-    /// Download, extract tar.gz file, and match figures with their captions from XML
+    /// Download the article's files and match figures with their captions from XML
     ///
     /// # Arguments
     ///
     /// * `pmcid` - PMC ID (with or without "PMC" prefix)
-    /// * `output_dir` - Directory to extract the tar.gz contents to
+    /// * `output_dir` - Directory to download the article's files into
     ///
     /// # Returns
     ///
@@ -494,56 +354,6 @@ impl PmcTarClient {
             .await?;
 
         Ok(figures)
-    }
-
-    /// Parse OA API XML response to extract download URL
-    #[cfg(not(target_arch = "wasm32"))]
-    fn parse_oa_response(&self, xml_content: &str, pmcid: &str) -> Result<String> {
-        use quick_xml::Reader;
-        use quick_xml::events::Event;
-
-        debug!("Parsing OA API XML response: {}", xml_content);
-
-        let mut reader = Reader::from_str(xml_content);
-        reader.config_mut().trim_text(true);
-
-        let mut buf = Vec::new();
-
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) | Ok(Event::Empty(ref e))
-                    if e.name().as_ref() == b"link" =>
-                {
-                    debug!("Found link element");
-                    for attr in e.attributes().flatten() {
-                        debug!(
-                            "Attribute: {:?} = {:?}",
-                            str::from_utf8(attr.key.as_ref()).unwrap_or("invalid"),
-                            str::from_utf8(&attr.value).unwrap_or("invalid")
-                        );
-                        if attr.key.as_ref() == b"href" {
-                            let href = str::from_utf8(&attr.value).map_err(|e| {
-                                ParseError::XmlError(format!("Invalid UTF-8 in href: {}", e))
-                            })?;
-                            debug!("Found href: {}", href);
-                            return Ok(href.to_string());
-                        }
-                    }
-                }
-                Ok(Event::Eof) => break,
-                Err(e) => {
-                    return Err(ParseError::XmlError(format!("XML parsing error: {}", e)).into());
-                }
-                _ => {}
-            }
-            buf.clear();
-        }
-
-        debug!("No href attribute found in XML response");
-        Err(ParseError::PmcNotAvailable {
-            id: pmcid.to_string(),
-        }
-        .into())
     }
 
     /// Match figures from XML with extracted files
@@ -675,66 +485,6 @@ impl PmcTarClient {
         .flatten()
     }
 
-    /// Extract tar.gz file to the specified directory
-    ///
-    /// # Arguments
-    ///
-    /// * `tar_path` - Path to the tar.gz file
-    /// * `output_dir` - Directory to extract contents to
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result<Vec<String>>` containing the list of extracted file paths
-    #[cfg(not(target_arch = "wasm32"))]
-    async fn extract_tar_gz<P: AsRef<Path>>(
-        &self,
-        tar_path: P,
-        output_dir: P,
-    ) -> Result<Vec<String>> {
-        let tar_path = tar_path.as_ref();
-        let output_dir = output_dir.as_ref();
-
-        let tar_file = File::open(tar_path).map_err(|e| ParseError::IoError {
-            message: format!("Failed to open tar.gz file: {}", e),
-        })?;
-
-        let tar_gz = GzDecoder::new(tar_file);
-        let mut archive = Archive::new(tar_gz);
-
-        let mut extracted_files = Vec::new();
-
-        for entry in archive.entries().map_err(|e| ParseError::IoError {
-            message: format!("Failed to read tar entries: {}", e),
-        })? {
-            let mut entry = entry.map_err(|e| ParseError::IoError {
-                message: format!("Failed to read tar entry: {}", e),
-            })?;
-
-            let path = entry.path().map_err(|e| ParseError::IoError {
-                message: format!("Failed to get entry path: {}", e),
-            })?;
-
-            let output_path = output_dir.join(&path);
-
-            if let Some(parent) = output_path.parent() {
-                fs::create_dir_all(parent).map_err(|e| ParseError::IoError {
-                    message: format!("Failed to create parent directories: {}", e),
-                })?;
-            }
-
-            entry
-                .unpack(&output_path)
-                .map_err(|e| ParseError::IoError {
-                    message: format!("Failed to extract entry: {}", e),
-                })?;
-
-            extracted_files.push(output_path.to_string_lossy().to_string());
-            debug!("Extracted: {}", output_path.display());
-        }
-
-        Ok(extracted_files)
-    }
-
     fn executor(&self) -> RequestExecutor<'_> {
         RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
     }
@@ -762,46 +512,6 @@ mod tests {
         let rate_limiter = config.create_rate_limiter();
         let client = Client::new();
         let _tar_client = PmcTarClient::with_shared(client, rate_limiter, config);
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[test]
-    fn test_oa_package_url_to_https_rewrites_to_deprecated() {
-        // Legacy OA package links must be rewritten to the deprecated HTTPS path,
-        // since NCBI moved the bundles there ahead of the August 2026 removal.
-        let ftp = "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/f1/69/PMC7906746.tar.gz";
-        assert_eq!(
-            PmcTarClient::oa_package_url_to_https(ftp),
-            "https://ftp.ncbi.nlm.nih.gov/pub/pmc/deprecated/oa_package/f1/69/PMC7906746.tar.gz"
-        );
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[test]
-    fn test_oa_package_url_to_https_idempotent_on_deprecated() {
-        let already =
-            "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/deprecated/oa_package/f1/69/PMC7906746.tar.gz";
-        assert_eq!(
-            PmcTarClient::oa_package_url_to_https(already),
-            "https://ftp.ncbi.nlm.nih.gov/pub/pmc/deprecated/oa_package/f1/69/PMC7906746.tar.gz"
-        );
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[test]
-    fn test_oa_package_url_to_https_other_ftp_host_swap() {
-        let other = "ftp://ftp.ncbi.nlm.nih.gov/other/path/file.tar.gz";
-        assert_eq!(
-            PmcTarClient::oa_package_url_to_https(other),
-            "https://ftp.ncbi.nlm.nih.gov/other/path/file.tar.gz"
-        );
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[test]
-    fn test_oa_package_url_to_https_passthrough_non_ftp() {
-        let https = "https://example.com/file.tar.gz";
-        assert_eq!(PmcTarClient::oa_package_url_to_https(https), https);
     }
 
     #[cfg(not(target_arch = "wasm32"))]
