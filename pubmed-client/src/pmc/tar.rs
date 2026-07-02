@@ -10,7 +10,7 @@ use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
 use pubmed_parser::pmc::{Figure, PmcArticle, Section};
 use reqwest::Client;
-use tracing::debug;
+use tracing::{debug, warn};
 
 #[cfg(not(target_arch = "wasm32"))]
 use {
@@ -131,12 +131,200 @@ impl PmcTarClient {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
+        // Prefer the PMC OA Cloud (AWS S3) service. NCBI is retiring the PMC FTP
+        // service and the legacy `oa_package` tar.gz bundles in August 2026; the
+        // cloud service serves each article's XML, media, and supplementary files
+        // as individual per-article objects instead.
+        match self
+            .download_cloud_files(&normalized_pmcid, output_path)
+            .await
+        {
+            Ok(files) if !files.is_empty() => return Ok(files),
+            Ok(_) => {
+                debug!(
+                    pmcid = %normalized_pmcid,
+                    "PMC OA Cloud returned no files; falling back to legacy OA package"
+                );
+            }
+            Err(e) => {
+                warn!(
+                    pmcid = %normalized_pmcid,
+                    error = %e,
+                    "PMC OA Cloud download failed; falling back to legacy OA package"
+                );
+            }
+        }
+
+        // Fallback: legacy OA package tar.gz via the OA Web Service API.
+        // NOTE: this path relies on the deprecated FTP/oa_package bundles and
+        // will stop working once NCBI removes them (August 2026).
         let download_url = self.resolve_download_url(&normalized_pmcid, pmcid).await?;
         let temp_file = self.stream_to_temp_file(&download_url, output_path).await?;
 
         let extracted_files = self.extract_tar_gz(temp_file.path(), output_path).await?;
 
         Ok(extracted_files)
+    }
+
+    /// Download an article's files from the PMC OA Cloud (AWS S3) service.
+    ///
+    /// Lists the objects under the article's prefix in the `pmc-oa-opendata`
+    /// bucket, selects the latest version folder, and downloads each file into
+    /// `output_dir`. Returns the list of local file paths (empty if the article
+    /// is not present in the cloud bucket, signalling the caller to fall back to
+    /// the legacy OA package).
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn download_cloud_files(
+        &self,
+        normalized_pmcid: &str,
+        output_dir: &Path,
+    ) -> Result<Vec<String>> {
+        let keys = self.list_cloud_object_keys(normalized_pmcid).await?;
+        if keys.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let base_url = self.config.effective_oa_cloud_base_url();
+        let mut downloaded = Vec::with_capacity(keys.len());
+
+        for key in keys {
+            // The object filename is the last path segment of the S3 key,
+            // e.g. `PMC7906746.1/gr1_lrg.jpg` -> `gr1_lrg.jpg`.
+            let Some(file_name) = key.rsplit('/').next().filter(|s| !s.is_empty()) else {
+                continue;
+            };
+
+            let url = format!("{}/{}", base_url.trim_end_matches('/'), key);
+            let response = self.executor().get(&url).await?;
+            let bytes = response.bytes().await.map_err(PubMedError::from)?;
+
+            let output_path = output_dir.join(file_name);
+            tokio_fs::write(&output_path, &bytes)
+                .await
+                .map_err(|e| ParseError::IoError {
+                    message: format!("Failed to write cloud file {}: {}", file_name, e),
+                })?;
+
+            debug!("Downloaded cloud file: {}", output_path.display());
+            downloaded.push(output_path.to_string_lossy().to_string());
+        }
+
+        Ok(downloaded)
+    }
+
+    /// List the S3 object keys for an article's latest version in the OA Cloud.
+    ///
+    /// Queries the bucket's ListObjectsV2 endpoint with the article prefix
+    /// (`<PMCID>.`, the trailing dot preventing matches against longer PMCIDs),
+    /// then keeps only the keys belonging to the highest version folder
+    /// (`<PMCID>.<n>/`).
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn list_cloud_object_keys(&self, normalized_pmcid: &str) -> Result<Vec<String>> {
+        let base_url = self.config.effective_oa_cloud_base_url();
+        // The trailing dot restricts the prefix to `<PMCID>.<version>/...`,
+        // so e.g. `PMC790674` does not also match `PMC7906740`.
+        let url = format!(
+            "{}/?list-type=2&prefix={}.",
+            base_url.trim_end_matches('/'),
+            normalized_pmcid
+        );
+
+        debug!("Listing PMC OA Cloud objects: {}", url);
+        let response = self.executor().get(&url).await?;
+        let body = response.text().await?;
+
+        let keys = Self::parse_cloud_listing(&body)?;
+        Ok(Self::select_latest_version_keys(keys))
+    }
+
+    /// Parse the `<Key>` entries from an S3 ListObjectsV2 XML response.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn parse_cloud_listing(xml_content: &str) -> Result<Vec<String>> {
+        use quick_xml::Reader;
+        use quick_xml::events::Event;
+
+        let mut reader = Reader::from_str(xml_content);
+        reader.config_mut().trim_text(true);
+
+        let mut buf = Vec::new();
+        let mut keys = Vec::new();
+        let mut in_key = false;
+
+        loop {
+            match reader.read_event_into(&mut buf) {
+                Ok(Event::Start(ref e)) if e.name().as_ref() == b"Key" => in_key = true,
+                Ok(Event::End(ref e)) if e.name().as_ref() == b"Key" => in_key = false,
+                Ok(Event::Text(ref e)) if in_key => {
+                    let text = e
+                        .unescape()
+                        .map_err(|err| {
+                            ParseError::XmlError(format!("Invalid UTF-8 in S3 Key: {}", err))
+                        })?
+                        .to_string();
+                    // Skip folder-marker keys (zero-byte objects ending in `/`).
+                    if !text.ends_with('/') {
+                        keys.push(text);
+                    }
+                }
+                Ok(Event::Eof) => break,
+                Err(e) => {
+                    return Err(
+                        ParseError::XmlError(format!("Failed to parse S3 listing: {}", e)).into(),
+                    );
+                }
+                _ => {}
+            }
+            buf.clear();
+        }
+
+        Ok(keys)
+    }
+
+    /// From a flat list of keys, keep only those under the highest version folder.
+    ///
+    /// Keys look like `PMC7906746.1/PMC7906746.1.xml`; the version is the integer
+    /// after the last `.` of the leading `<folder>/` segment. When multiple
+    /// versions are present, only the latest is retained.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn select_latest_version_keys(keys: Vec<String>) -> Vec<String> {
+        fn version_of(key: &str) -> Option<u32> {
+            let folder = key.split('/').next()?;
+            folder.rsplit('.').next()?.parse::<u32>().ok()
+        }
+
+        let Some(latest) = keys.iter().filter_map(|k| version_of(k)).max() else {
+            return keys;
+        };
+
+        keys.into_iter()
+            .filter(|k| version_of(k) == Some(latest))
+            .collect()
+    }
+
+    /// Convert a legacy OA package FTP link into a working HTTPS URL.
+    ///
+    /// The OA Web Service API still advertises `ftp://ftp.ncbi.nlm.nih.gov/...`
+    /// links. FTP itself is unsupported here, and as of April 2026 NCBI moved the
+    /// legacy `oa_package` bundles under a `deprecated/` prefix (to be removed in
+    /// August 2026), so the plain host swap now 404s. Rewrite the `pub/pmc/` path
+    /// to `pub/pmc/deprecated/` so the fallback keeps working during the
+    /// transition; any other FTP link just gets an `ftp` -> `https` host swap.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn oa_package_url_to_https(url: &str) -> String {
+        const FTP_PMC_PREFIX: &str = "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/";
+        const FTP_HOST_PREFIX: &str = "ftp://ftp.ncbi.nlm.nih.gov/";
+
+        if let Some(rest) = url.strip_prefix(FTP_PMC_PREFIX) {
+            if rest.starts_with("deprecated/") {
+                format!("https://ftp.ncbi.nlm.nih.gov/pub/pmc/{rest}")
+            } else {
+                format!("https://ftp.ncbi.nlm.nih.gov/pub/pmc/deprecated/{rest}")
+            }
+        } else if let Some(rest) = url.strip_prefix(FTP_HOST_PREFIX) {
+            format!("https://ftp.ncbi.nlm.nih.gov/{rest}")
+        } else {
+            url.to_string()
+        }
     }
 
     /// Resolve the actual tar.gz download URL via the OA API.
@@ -171,14 +359,7 @@ impl PmcTarClient {
             let xml_content = response.text().await?;
             debug!("OA API returned XML, parsing for download URL");
             let parsed_url = self.parse_oa_response(&xml_content, original_pmcid)?;
-            if parsed_url.starts_with("ftp://ftp.ncbi.nlm.nih.gov/") {
-                Ok(parsed_url.replace(
-                    "ftp://ftp.ncbi.nlm.nih.gov/",
-                    "https://ftp.ncbi.nlm.nih.gov/",
-                ))
-            } else {
-                Ok(parsed_url)
-            }
+            Ok(Self::oa_package_url_to_https(&parsed_url))
         } else if content_type.contains("application/x-gzip")
             || content_type.contains("application/gzip")
         {
@@ -581,5 +762,99 @@ mod tests {
         let rate_limiter = config.create_rate_limiter();
         let client = Client::new();
         let _tar_client = PmcTarClient::with_shared(client, rate_limiter, config);
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_oa_package_url_to_https_rewrites_to_deprecated() {
+        // Legacy OA package links must be rewritten to the deprecated HTTPS path,
+        // since NCBI moved the bundles there ahead of the August 2026 removal.
+        let ftp = "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_package/f1/69/PMC7906746.tar.gz";
+        assert_eq!(
+            PmcTarClient::oa_package_url_to_https(ftp),
+            "https://ftp.ncbi.nlm.nih.gov/pub/pmc/deprecated/oa_package/f1/69/PMC7906746.tar.gz"
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_oa_package_url_to_https_idempotent_on_deprecated() {
+        let already =
+            "ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/deprecated/oa_package/f1/69/PMC7906746.tar.gz";
+        assert_eq!(
+            PmcTarClient::oa_package_url_to_https(already),
+            "https://ftp.ncbi.nlm.nih.gov/pub/pmc/deprecated/oa_package/f1/69/PMC7906746.tar.gz"
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_oa_package_url_to_https_other_ftp_host_swap() {
+        let other = "ftp://ftp.ncbi.nlm.nih.gov/other/path/file.tar.gz";
+        assert_eq!(
+            PmcTarClient::oa_package_url_to_https(other),
+            "https://ftp.ncbi.nlm.nih.gov/other/path/file.tar.gz"
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_oa_package_url_to_https_passthrough_non_ftp() {
+        let https = "https://example.com/file.tar.gz";
+        assert_eq!(PmcTarClient::oa_package_url_to_https(https), https);
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_parse_cloud_listing_extracts_keys() {
+        let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>pmc-oa-opendata</Name><Prefix>PMC7906746.</Prefix><KeyCount>5</KeyCount>
+<Contents><Key>PMC7906746.1/PMC7906746.1.json</Key><Size>1</Size></Contents>
+<Contents><Key>PMC7906746.1/PMC7906746.1.xml</Key><Size>1</Size></Contents>
+<Contents><Key>PMC7906746.1/gr1_lrg.jpg</Key><Size>1</Size></Contents>
+</ListBucketResult>"#;
+
+        let keys = PmcTarClient::parse_cloud_listing(xml).unwrap();
+        assert_eq!(
+            keys,
+            vec![
+                "PMC7906746.1/PMC7906746.1.json".to_string(),
+                "PMC7906746.1/PMC7906746.1.xml".to_string(),
+                "PMC7906746.1/gr1_lrg.jpg".to_string(),
+            ]
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_parse_cloud_listing_skips_folder_markers() {
+        let xml = r#"<ListBucketResult><Contents><Key>PMC1.1/</Key></Contents><Contents><Key>PMC1.1/PMC1.1.xml</Key></Contents></ListBucketResult>"#;
+        let keys = PmcTarClient::parse_cloud_listing(xml).unwrap();
+        assert_eq!(keys, vec!["PMC1.1/PMC1.1.xml".to_string()]);
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_select_latest_version_keys_picks_highest() {
+        let keys = vec![
+            "PMC1.1/PMC1.1.xml".to_string(),
+            "PMC1.1/gr1.jpg".to_string(),
+            "PMC1.2/PMC1.2.xml".to_string(),
+            "PMC1.2/gr1.jpg".to_string(),
+        ];
+        let latest = PmcTarClient::select_latest_version_keys(keys);
+        assert_eq!(
+            latest,
+            vec![
+                "PMC1.2/PMC1.2.xml".to_string(),
+                "PMC1.2/gr1.jpg".to_string(),
+            ]
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_select_latest_version_keys_empty() {
+        assert!(PmcTarClient::select_latest_version_keys(vec![]).is_empty());
     }
 }
