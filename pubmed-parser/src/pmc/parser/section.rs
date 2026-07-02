@@ -135,6 +135,30 @@ enum SectionAction {
     SkipTag(Vec<u8>),
 }
 
+/// Whether `tag` is a JATS block-level (`%para-level;`) element whose text we
+/// extract inline rather than skipping. Shared by the body and `<sec>` parsers.
+fn is_block_level(tag: &[u8]) -> bool {
+    matches!(
+        tag,
+        b"list"
+            | b"def-list"
+            | b"disp-formula"
+            | b"disp-formula-group"
+            | b"disp-quote"
+            | b"boxed-text"
+            | b"code"
+            | b"preformat"
+            | b"media"
+            | b"supplementary-material"
+            | b"speech"
+            | b"statement"
+            | b"verse-group"
+            | b"array"
+            | b"graphic"
+            | b"fn-group"
+    )
+}
+
 /// Extract body sections using Reader with depth-aware `<sec>` parsing
 fn extract_body_sections(content: &str) -> Vec<Section> {
     let mut reader = make_reader(content);
@@ -158,25 +182,8 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
                     id: get_attr(e, b"id"),
                 }),
                 // Block-level elements per JATS %para-level; — extract text in no-sec bodies
-                b"list"
-                | b"def-list"
-                | b"disp-formula"
-                | b"disp-formula-group"
-                | b"disp-quote"
-                | b"boxed-text"
-                | b"code"
-                | b"preformat"
-                | b"media"
-                | b"supplementary-material"
-                | b"speech"
-                | b"statement"
-                | b"verse-group"
-                | b"array"
-                | b"graphic"
-                | b"fn-group"
-                    if !has_sec_tags =>
-                {
-                    SectionAction::ReadTextElement(e.name().as_ref().to_vec())
+                other if !has_sec_tags && is_block_level(other) => {
+                    SectionAction::ReadTextElement(other.to_vec())
                 }
                 _ => SectionAction::Continue,
             },
@@ -244,6 +251,125 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
     sections
 }
 
+/// Classify a start element encountered inside a `<sec>` into the action needed
+/// to consume it. Keeps the tag dispatch out of the main parse loop.
+fn classify_section_child(e: &quick_xml::events::BytesStart) -> SectionAction {
+    match e.name().as_ref() {
+        b"title" => SectionAction::SkipTitle,
+        b"p" => SectionAction::ReadParagraph,
+        b"sec" => SectionAction::ReadSection(get_attr(e, b"id")),
+        b"fig" => SectionAction::ReadFigure(FigAttrs {
+            id: get_attr(e, b"id"),
+            fig_type: get_attr(e, b"fig-type"),
+        }),
+        b"table-wrap" => SectionAction::ReadTable(TableAttrs {
+            id: get_attr(e, b"id"),
+        }),
+        // Block-level elements per JATS %para-level; — extract text instead of skipping
+        other if is_block_level(other) => SectionAction::ReadTextElement(other.to_vec()),
+        other => SectionAction::SkipTag(other.to_vec()),
+    }
+}
+
+/// Accumulators filled while parsing the children of a single `<sec>`.
+#[derive(Default)]
+struct SectionParts {
+    title: Option<String>,
+    content_parts: Vec<String>,
+    subsections: Vec<Section>,
+    figures: Vec<Figure>,
+    tables: Vec<Table>,
+}
+
+impl SectionParts {
+    /// Apply one classified action to the accumulators.
+    /// Returns `true` when the enclosing `<sec>` is finished (Break/EOF).
+    fn apply(
+        &mut self,
+        action: SectionAction,
+        reader: &mut quick_xml::Reader<&[u8]>,
+        buf: &mut Vec<u8>,
+    ) -> bool {
+        match action {
+            SectionAction::SkipTitle => {
+                // `read_text_content` already returns trimmed text.
+                if let Ok(t) = read_text_content(reader, b"title", buf)
+                    && !t.is_empty()
+                {
+                    self.title = Some(t);
+                }
+            }
+            SectionAction::ReadParagraph => {
+                let (text, inline_figs, inline_tables) = read_paragraph_with_inline(reader, buf);
+                if !text.is_empty() {
+                    self.content_parts.push(text);
+                }
+                self.figures.extend(inline_figs);
+                self.tables.extend(inline_tables);
+            }
+            SectionAction::ReadSection(sub_id) => {
+                // Recursive: properly handles nested sections
+                if let Some(sub) = parse_section_from_body(reader, sub_id, buf) {
+                    self.subsections.push(sub);
+                }
+            }
+            SectionAction::ReadFigure(attrs) => {
+                if let Some(fig) = parse_figure_inner(reader, attrs, buf) {
+                    self.figures.push(fig);
+                }
+            }
+            SectionAction::ReadTable(attrs) => {
+                if let Some(table) = parse_table_inner(reader, attrs, buf) {
+                    self.tables.push(table);
+                }
+            }
+            SectionAction::ReadTextElement(tag) => {
+                if let Ok(text) = read_text_content(reader, &tag, buf)
+                    && !text.is_empty()
+                {
+                    self.content_parts.push(text);
+                }
+            }
+            SectionAction::SkipTag(name) => {
+                let _ = skip_element(reader, QName(&name), buf);
+            }
+            SectionAction::Break => return true,
+            // Remaining variants never arise from `classify_section_child`.
+            SectionAction::Continue
+            | SectionAction::EnterAbstract
+            | SectionAction::ReadBodyParagraph => {}
+        }
+        false
+    }
+
+    /// Build a `Section`, or `None` when it carries no content at all.
+    fn into_section(self, id: Option<String>) -> Option<Section> {
+        // Each part is already trimmed and non-empty, so the joined content has
+        // no leading/trailing whitespace — no extra trim/allocation needed.
+        let section_content = self.content_parts.join("\n");
+
+        if section_content.is_empty()
+            && self.subsections.is_empty()
+            && self.figures.is_empty()
+            && self.tables.is_empty()
+        {
+            return None;
+        }
+
+        Some(Section {
+            id,
+            section_type: Some("section".to_string()),
+            label: None,
+            title: self.title,
+            content: section_content,
+            subsections: self.subsections,
+            figures: self.figures,
+            tables: self.tables,
+            formulas: Vec::new(),
+        })
+    }
+}
+
 /// Parse a single `<sec>` element using Reader for structure.
 /// The reader has just consumed `Event::Start` for `<sec>`.
 ///
@@ -255,44 +381,11 @@ fn parse_section_from_body(
     id: Option<String>,
     buf: &mut Vec<u8>,
 ) -> Option<Section> {
-    let mut title: Option<String> = None;
-    let mut content_parts: Vec<String> = Vec::new();
-    let mut subsections = Vec::new();
-    let mut figures = Vec::new();
-    let mut tables = Vec::new();
+    let mut parts = SectionParts::default();
 
     loop {
         let action = match reader.read_event_into(buf) {
-            Ok(Event::Start(ref e)) => match e.name().as_ref() {
-                b"title" => SectionAction::SkipTitle,
-                b"p" => SectionAction::ReadParagraph,
-                b"sec" => SectionAction::ReadSection(get_attr(e, b"id")),
-                b"fig" => SectionAction::ReadFigure(FigAttrs {
-                    id: get_attr(e, b"id"),
-                    fig_type: get_attr(e, b"fig-type"),
-                }),
-                b"table-wrap" => SectionAction::ReadTable(TableAttrs {
-                    id: get_attr(e, b"id"),
-                }),
-                // Block-level elements per JATS %para-level; — extract text instead of skipping
-                b"list"
-                | b"def-list"
-                | b"disp-formula"
-                | b"disp-formula-group"
-                | b"disp-quote"
-                | b"boxed-text"
-                | b"code"
-                | b"preformat"
-                | b"media"
-                | b"supplementary-material"
-                | b"speech"
-                | b"statement"
-                | b"verse-group"
-                | b"array"
-                | b"graphic"
-                | b"fn-group" => SectionAction::ReadTextElement(e.name().as_ref().to_vec()),
-                other => SectionAction::SkipTag(other.to_vec()),
-            },
+            Ok(Event::Start(ref e)) => classify_section_child(e),
             Ok(Event::End(ref e)) if e.name().as_ref() == b"sec" => SectionAction::Break,
             Ok(Event::Eof) => SectionAction::Break,
             Err(_) => SectionAction::Break,
@@ -300,79 +393,12 @@ fn parse_section_from_body(
         };
         buf.clear();
 
-        match action {
-            SectionAction::SkipTitle => {
-                if let Ok(t) = read_text_content(reader, b"title", buf) {
-                    // Already trimmed by `read_text_content`.
-                    if !t.is_empty() {
-                        title = Some(t);
-                    }
-                }
-            }
-            SectionAction::ReadParagraph => {
-                let (text, inline_figs, inline_tables) = read_paragraph_with_inline(reader, buf);
-                // `read_paragraph_with_inline` already returns trimmed text.
-                if !text.is_empty() {
-                    content_parts.push(text);
-                }
-                figures.extend(inline_figs);
-                tables.extend(inline_tables);
-            }
-            SectionAction::ReadSection(sub_id) => {
-                // Recursive: properly handles nested sections
-                if let Some(sub) = parse_section_from_body(reader, sub_id, buf) {
-                    subsections.push(sub);
-                }
-            }
-            SectionAction::ReadFigure(attrs) => {
-                if let Some(fig) = parse_figure_inner(reader, attrs, buf) {
-                    figures.push(fig);
-                }
-            }
-            SectionAction::ReadTable(attrs) => {
-                if let Some(table) = parse_table_inner(reader, attrs, buf) {
-                    tables.push(table);
-                }
-            }
-            SectionAction::ReadTextElement(tag) => {
-                if let Ok(text) = read_text_content(reader, &tag, buf) {
-                    // Already trimmed by `read_text_content`.
-                    if !text.is_empty() {
-                        content_parts.push(text);
-                    }
-                }
-            }
-            SectionAction::SkipTag(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
-            }
-            SectionAction::Break => break,
-            _ => {}
+        if parts.apply(action, reader, buf) {
+            break;
         }
     }
 
-    // Each part is already trimmed and non-empty, so the joined content has no
-    // leading/trailing whitespace — no extra trim/allocation needed.
-    let section_content = content_parts.join("\n");
-
-    if !section_content.is_empty()
-        || !subsections.is_empty()
-        || !figures.is_empty()
-        || !tables.is_empty()
-    {
-        Some(Section {
-            id,
-            section_type: Some("section".to_string()),
-            label: None,
-            title,
-            content: section_content,
-            subsections,
-            figures,
-            tables,
-            formulas: Vec::new(),
-        })
-    } else {
-        None
-    }
+    parts.into_section(id)
 }
 
 /// Read a `<p>` element, collecting text while extracting inline figures and tables.
@@ -453,19 +479,26 @@ fn read_paragraph_with_inline(
 
 // --- Figure and Table extraction using Reader scan ---
 
-/// Extract all `<fig>` elements from content using Reader.
-/// Scans the entire content string regardless of nesting depth.
-fn extract_figures_from_content(content: &str) -> Vec<Figure> {
-    let mut figures = Vec::new();
+/// Scan `content` for every top-level `<tag>` element and parse each one.
+///
+/// Walks the whole content string regardless of nesting depth. `extract_attrs`
+/// pulls the attributes off the start event (before the buffer is cleared) and
+/// `parse_inner` consumes the element body. Shared by the figure and table
+/// scanners, which differ only in the tag name, the attribute type, and the
+/// inner parser.
+fn scan_elements<A, T>(
+    content: &str,
+    tag: &[u8],
+    extract_attrs: impl Fn(&quick_xml::events::BytesStart) -> A,
+    parse_inner: impl Fn(&mut quick_xml::Reader<&[u8]>, A, &mut Vec<u8>) -> Option<T>,
+) -> Vec<T> {
+    let mut results = Vec::new();
     let mut reader = make_reader(content);
     let mut buf = Vec::new();
 
     loop {
         let attrs = match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"fig" => Some(FigAttrs {
-                id: get_attr(e, b"id"),
-                fig_type: get_attr(e, b"fig-type"),
-            }),
+            Ok(Event::Start(ref e)) if e.name().as_ref() == tag => Some(extract_attrs(e)),
             Ok(Event::Eof) => break,
             Err(_) => break,
             _ => None,
@@ -473,40 +506,39 @@ fn extract_figures_from_content(content: &str) -> Vec<Figure> {
         buf.clear();
 
         if let Some(attrs) = attrs
-            && let Some(fig) = parse_figure_inner(&mut reader, attrs, &mut buf)
+            && let Some(item) = parse_inner(&mut reader, attrs, &mut buf)
         {
-            figures.push(fig);
+            results.push(item);
         }
     }
 
-    figures
+    results
+}
+
+/// Extract all `<fig>` elements from content using Reader.
+/// Scans the entire content string regardless of nesting depth.
+fn extract_figures_from_content(content: &str) -> Vec<Figure> {
+    scan_elements(
+        content,
+        b"fig",
+        |e| FigAttrs {
+            id: get_attr(e, b"id"),
+            fig_type: get_attr(e, b"fig-type"),
+        },
+        parse_figure_inner,
+    )
 }
 
 /// Extract all `<table-wrap>` elements from content using Reader.
 fn extract_tables_from_content(content: &str) -> Vec<Table> {
-    let mut tables = Vec::new();
-    let mut reader = make_reader(content);
-    let mut buf = Vec::new();
-
-    loop {
-        let attrs = match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"table-wrap" => Some(TableAttrs {
-                id: get_attr(e, b"id"),
-            }),
-            Ok(Event::Eof) => break,
-            Err(_) => break,
-            _ => None,
-        };
-        buf.clear();
-
-        if let Some(attrs) = attrs
-            && let Some(table) = parse_table_inner(&mut reader, attrs, &mut buf)
-        {
-            tables.push(table);
-        }
-    }
-
-    tables
+    scan_elements(
+        content,
+        b"table-wrap",
+        |e| TableAttrs {
+            id: get_attr(e, b"id"),
+        },
+        parse_table_inner,
+    )
 }
 
 struct FigAttrs {
@@ -1088,6 +1120,82 @@ value1   value2   value3
         assert!(
             section.content.contains("Author contribution note."),
             "fn-group content should be extracted, got: {}",
+            section.content
+        );
+    }
+
+    #[test]
+    fn test_supplementary_material_extraction() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Supporting Information</title>
+            <supplementary-material id="sm1">
+                <caption><p>Supplementary dataset S1.</p></caption>
+            </supplementary-material>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        assert!(
+            sections[0].content.contains("Supplementary dataset S1."),
+            "supplementary-material content should be extracted, got: {}",
+            sections[0].content
+        );
+    }
+
+    #[test]
+    fn test_statement_and_verse_group_extraction() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Misc</title>
+            <statement id="st1"><p>Theorem statement text.</p></statement>
+            <verse-group><verse-line>A line of verse.</verse-line></verse-group>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(
+            section.content.contains("Theorem statement text."),
+            "statement content should be extracted, got: {}",
+            section.content
+        );
+        assert!(
+            section.content.contains("A line of verse."),
+            "verse-group content should be extracted, got: {}",
+            section.content
+        );
+    }
+
+    #[test]
+    fn test_unrecognized_tag_is_skipped_without_dropping_siblings() {
+        // A tag that is neither structural nor block-level must be skipped
+        // cleanly, leaving surrounding paragraphs intact.
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Intro</title>
+            <p>Before unknown.</p>
+            <unknown-tag><p>ignored content</p></unknown-tag>
+            <p>After unknown.</p>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert!(section.content.contains("Before unknown."));
+        assert!(section.content.contains("After unknown."));
+        assert!(
+            !section.content.contains("ignored content"),
+            "content of skipped tag should not be extracted, got: {}",
             section.content
         );
     }

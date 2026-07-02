@@ -106,11 +106,11 @@ async fn process_article(
             download_pb.finish_with_message(format!("Failed to download {}", pmcid));
             // Temporary directory will be automatically cleaned up when temp_dir_handle is dropped
             let error_str = e.to_string();
-            let timeout_seconds = client.get_tar_client_config().timeout.as_secs();
+            let timeout_seconds = client.get_cloud_client_config().timeout.as_secs();
             return Err(BatchItemError::new(
                 pmcid,
                 classify_fetch_error(&error_str, timeout_seconds),
-                format!("TAR download/extraction failed: {:#}", anyhow::anyhow!(e)),
+                format!("Cloud download failed: {:#}", anyhow::anyhow!(e)),
             ));
         }
     };

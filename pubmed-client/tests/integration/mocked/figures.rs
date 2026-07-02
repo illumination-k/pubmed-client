@@ -1,4 +1,4 @@
-use pubmed_client::{ClientConfig, ParseError, PmcClient, PmcTarClient, PubMedError};
+use pubmed_client::{ClientConfig, ParseError, PmcClient, PmcCloudClient, PubMedError};
 use tempfile::tempdir;
 use tracing::info;
 use tracing_test::traced_test;
@@ -179,7 +179,7 @@ macro_rules! test_pmcid_figure_extraction {
 #[tokio::test]
 async fn test_extract_figures_with_captions_invalid_pmcid() {
     let config = ClientConfig::new();
-    let client = PmcTarClient::new(config);
+    let client = PmcCloudClient::new(config);
     let temp_dir = tempdir().expect("Failed to create temp dir");
 
     // Test with invalid PMCID
@@ -199,7 +199,7 @@ async fn test_extract_figures_with_captions_invalid_pmcid() {
 #[tokio::test]
 async fn test_extract_figures_with_captions_empty_pmcid() {
     let config = ClientConfig::new();
-    let client = PmcTarClient::new(config);
+    let client = PmcCloudClient::new(config);
     let temp_dir = tempdir().expect("Failed to create temp dir");
 
     // Test with empty PMCID
@@ -219,7 +219,7 @@ async fn test_extract_figures_with_captions_empty_pmcid() {
 #[tokio::test]
 async fn test_extract_figures_with_captions_directory_creation() {
     let config = ClientConfig::new();
-    let client = PmcTarClient::new(config);
+    let client = PmcCloudClient::new(config);
     let temp_dir = tempdir().expect("Failed to create temp dir");
     let nested_path = temp_dir.path().join("figures").join("extracted");
 
@@ -251,7 +251,7 @@ async fn test_extract_figures_with_captions_directory_creation() {
 #[tokio::test]
 async fn test_figure_matching_functions() {
     let config = ClientConfig::new();
-    let _client = PmcTarClient::new(config);
+    let _client = PmcCloudClient::new(config);
 
     // Test the internal matching logic with mock data
     let figure_id = "fig1".to_string();
@@ -280,7 +280,7 @@ async fn test_figure_matching_functions() {
 
     // Test figure ID matching
     let matching_file =
-        PmcTarClient::find_matching_file(&figure, &extracted_files, &image_extensions);
+        PmcCloudClient::find_matching_file(&figure, &extracted_files, &image_extensions);
     assert!(matching_file.is_some());
     assert_eq!(matching_file.unwrap(), "/path/to/fig1.jpg");
 }
@@ -289,7 +289,7 @@ async fn test_figure_matching_functions() {
 #[tokio::test]
 async fn test_figure_matching_by_label() {
     let config = ClientConfig::new();
-    let _client = PmcTarClient::new(config);
+    let _client = PmcCloudClient::new(config);
 
     let extracted_files = vec![
         "/path/to/some_figure1.jpg".to_string(),
@@ -311,7 +311,7 @@ async fn test_figure_matching_by_label() {
     };
 
     let matching_file =
-        PmcTarClient::find_matching_file(&figure, &extracted_files, &image_extensions);
+        PmcCloudClient::find_matching_file(&figure, &extracted_files, &image_extensions);
     assert!(matching_file.is_some());
     assert_eq!(matching_file.unwrap(), "/path/to/some_figure1.jpg");
 }
@@ -320,7 +320,7 @@ async fn test_figure_matching_by_label() {
 #[tokio::test]
 async fn test_figure_matching_by_filename() {
     let config = ClientConfig::new();
-    let _client = PmcTarClient::new(config);
+    let _client = PmcCloudClient::new(config);
 
     let extracted_files = vec![
         "/path/to/graph_data.jpg".to_string(),
@@ -342,7 +342,7 @@ async fn test_figure_matching_by_filename() {
     };
 
     let matching_file =
-        PmcTarClient::find_matching_file(&figure, &extracted_files, &image_extensions);
+        PmcCloudClient::find_matching_file(&figure, &extracted_files, &image_extensions);
     assert!(matching_file.is_some());
     assert_eq!(matching_file.unwrap(), "/path/to/specific_file.png");
 }
@@ -351,7 +351,7 @@ async fn test_figure_matching_by_filename() {
 #[tokio::test]
 async fn test_figure_no_match() {
     let config = ClientConfig::new();
-    let _client = PmcTarClient::new(config);
+    let _client = PmcCloudClient::new(config);
 
     let extracted_files = vec![
         "/path/to/table1.csv".to_string(),
@@ -373,7 +373,7 @@ async fn test_figure_no_match() {
     };
 
     let matching_file =
-        PmcTarClient::find_matching_file(&figure, &extracted_files, &image_extensions);
+        PmcCloudClient::find_matching_file(&figure, &extracted_files, &image_extensions);
     assert!(matching_file.is_none());
 }
 

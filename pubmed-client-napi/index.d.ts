@@ -238,16 +238,17 @@ export declare class PubMedClient {
    */
   exportNbib(pmids: Array<string>): Promise<string>
   /**
-   * Download and extract a PMC tar.gz package to a directory
+   * Download a PMC article's Open Access files to a directory
    *
-   * Downloads the Open Access package for the given PMC ID and extracts it,
-   * returning the list of extracted file paths.
+   * Downloads each of the article's files individually from the PMC OA Cloud
+   * (AWS S3) service for the given PMC ID, returning the list of downloaded
+   * file paths.
    *
    * @param pmcid - PMC ID (e.g., "PMC7906746")
-   * @param outputDir - Directory to extract files into
-   * @returns Array of extracted file paths
+   * @param outputDir - Directory to download files into
+   * @returns Array of downloaded file paths
    */
-  downloadAndExtractTar(pmcid: string, outputDir: string): Promise<Array<string>>
+  downloadFiles(pmcid: string, outputDir: string): Promise<Array<string>>
   /**
    * Extract figures with their captions from a PMC article
    *
@@ -1003,7 +1004,7 @@ export interface EPostResult {
   queryKey: string
 }
 
-/** A figure extracted from a downloaded tar.gz package, with file metadata */
+/** A figure extracted from a downloaded PMC OA Cloud article, with file metadata */
 export interface ExtractedFigure {
   /** Figure metadata */
   figure: Figure

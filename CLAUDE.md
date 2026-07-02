@@ -196,14 +196,14 @@ pubmed/                # PubMed E-utilities API
 
 pmc/                   # PMC (PubMed Central) API
   client.rs            # PmcClient - full-text fetch, availability check, figure extraction
-  tar.rs               # PmcTarClient for tar archive extraction
+  cloud.rs             # PmcCloudClient - per-file download from the PMC OA Cloud (AWS S3)
 ```
 
 ### Key Types
 
 - `Client` — Unified client with `pubmed` and `pmc` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`
 - `PubMedClient` — Search, fetch metadata, ESummary, EPost/History, ELink, EInfo, ECitMatch, EGQuery, ESpell
-- `PmcClient` — Fetch full-text, check availability, extract figures, download tar archives
+- `PmcClient` — Fetch full-text, check availability, extract figures, download OA files from the PMC OA Cloud (AWS S3)
 - `SearchQuery` — Builder pattern for complex queries with filters, date ranges, boolean logic
 - `PubMedArticle` — Article metadata (title, authors, abstract, MeSH, keywords, etc.) — defined in `pubmed-parser`
 - `PmcFullText` — Structured full-text (sections, references, figures, tables) — defined in `pubmed-parser`
@@ -285,7 +285,7 @@ XML fixtures are in `test_data/` at the workspace root (pmc_xml/ and pubmed_xml/
 
 - **`pubmed-parser`** tests: Parsing PubMed XML, PMC XML, supplementary materials
 - **`pubmed-formatter`** tests: Markdown conversion, BibTeX/RIS/CSL-JSON/NBIB export, YAML frontmatter
-- **`pubmed-client`** tests: `comprehensive_pmc_tests`, `comprehensive_pubmed_tests`, `comprehensive_elink_tests`, `comprehensive_einfo_tests`, `test_figure_extraction`, `test_tar_extraction`, `test_pmc_cache`, `test_webenv`, `test_batch_fetch_mocked`
+- **`pubmed-client`** tests: `comprehensive_pmc_tests`, `comprehensive_pubmed_tests`, `comprehensive_elink_tests`, `comprehensive_einfo_tests`, `test_figure_extraction`, `mocked_cloud` (PMC OA Cloud/S3 listing & download), `test_pmc_cache`, `test_webenv`, `test_batch_fetch_mocked`
 
 ## Guidelines
 
@@ -337,7 +337,7 @@ See `.claude/skills/maturin-debugger/SKILL.md` for detailed troubleshooting.
 
 **pubmed-formatter**: `pubmed-parser`, `serde`, `serde_json`, `serde_yaml`, `regex`, `tracing`.
 
-**pubmed-client**: `pubmed-parser`, `pubmed-formatter`, `tokio`, `reqwest`, `serde`, `moka` (caching), `rand`, `tar`, `flate2`, `image`, `futures-util`.
+**pubmed-client**: `pubmed-parser`, `pubmed-formatter`, `tokio`, `reqwest`, `serde`, `moka` (caching), `rand`, `image`, `futures-util`. PMC OA files are downloaded per-file from the PMC OA Cloud (AWS S3) over plain HTTP via `reqwest` — no tar/gzip deps.
 
 Optional (pubmed-client): `redis` (feature: `cache-redis`), `rusqlite` (feature: `cache-sqlite`).
 

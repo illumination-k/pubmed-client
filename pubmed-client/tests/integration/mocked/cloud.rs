@@ -3,13 +3,13 @@ use tempfile::tempdir;
 
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
-async fn test_download_and_extract_tar_invalid_pmcid() {
+async fn test_download_files_invalid_pmcid() {
     let client = PmcClient::new();
     let temp_dir = tempdir().expect("Failed to create temp dir");
 
     // Test with invalid PMCID
     let result = client
-        .download_and_extract_tar("invalid_pmcid", temp_dir.path())
+        .download_files("invalid_pmcid", temp_dir.path())
         .await;
 
     assert!(result.is_err());
@@ -22,12 +22,12 @@ async fn test_download_and_extract_tar_invalid_pmcid() {
 
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
-async fn test_download_and_extract_tar_empty_pmcid() {
+async fn test_download_files_empty_pmcid() {
     let client = PmcClient::new();
     let temp_dir = tempdir().expect("Failed to create temp dir");
 
     // Test with empty PMCID
-    let result = client.download_and_extract_tar("", temp_dir.path()).await;
+    let result = client.download_files("", temp_dir.path()).await;
 
     assert!(result.is_err());
     if let Err(PubMedError::ParseError(ParseError::InvalidPmcid { pmcid })) = result {
@@ -39,16 +39,14 @@ async fn test_download_and_extract_tar_empty_pmcid() {
 
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
-async fn test_download_and_extract_tar_directory_creation() {
+async fn test_download_files_directory_creation() {
     let client = PmcClient::new();
     let temp_dir = tempdir().expect("Failed to create temp dir");
     let nested_path = temp_dir.path().join("nested").join("directory");
 
     // Test with a PMCID that likely won't be available in OA
     // This should fail with PmcNotAvailable, but only after creating the directory
-    let result = client
-        .download_and_extract_tar("PMC1234567", &nested_path)
-        .await;
+    let result = client.download_files("PMC1234567", &nested_path).await;
 
     // Check that the directory was created
     assert!(nested_path.exists());
@@ -64,7 +62,7 @@ async fn test_download_and_extract_tar_directory_creation() {
             assert!(status == 404 || status >= 400);
         }
         PubMedError::ParseError(ParseError::IoError { .. }) => {
-            // Could fail with IO error if the response isn't a valid tar.gz
+            // Could fail with IO error if the cloud response isn't usable
             // This is expected for non-existent PMCIDs
         }
         other => panic!("Unexpected error type: {:?}", other),
@@ -79,12 +77,8 @@ async fn test_pmcid_normalization() {
 
     // Test that PMCID normalization works correctly
     // Both should result in the same error since they're the same PMCID
-    let result1 = client
-        .download_and_extract_tar("1234567", temp_dir.path())
-        .await;
-    let result2 = client
-        .download_and_extract_tar("PMC1234567", temp_dir.path())
-        .await;
+    let result1 = client.download_files("1234567", temp_dir.path()).await;
+    let result2 = client.download_files("PMC1234567", temp_dir.path()).await;
 
     // Both should fail with the same error type
     assert!(result1.is_err());

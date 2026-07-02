@@ -15,7 +15,7 @@ use reqwest::Client;
 use tracing::info;
 
 #[cfg(not(target_arch = "wasm32"))]
-use {crate::pmc::tar::PmcTarClient, std::path::Path};
+use {crate::pmc::cloud::PmcCloudClient, std::path::Path};
 
 use super::common;
 
@@ -27,7 +27,7 @@ pub struct PmcClient {
     rate_limiter: RateLimiter,
     config: ClientConfig,
     #[cfg(not(target_arch = "wasm32"))]
-    tar_client: PmcTarClient,
+    cloud_client: PmcCloudClient,
     cache: Option<PmcCache>,
 }
 
@@ -54,8 +54,8 @@ impl PmcClient {
     }
 
     #[cfg(not(target_arch = "wasm32"))]
-    pub fn get_tar_client_config(&self) -> &ClientConfig {
-        &self.tar_client.config
+    pub fn get_cloud_client_config(&self) -> &ClientConfig {
+        &self.cloud_client.config
     }
 
     /// Create a new PMC client with custom configuration
@@ -106,7 +106,7 @@ impl PmcClient {
 
         Self {
             #[cfg(not(target_arch = "wasm32"))]
-            tar_client: PmcTarClient::with_shared(
+            cloud_client: PmcCloudClient::with_shared(
                 client.clone(),
                 rate_limiter.clone(),
                 config.clone(),
@@ -146,7 +146,7 @@ impl PmcClient {
 
         Self {
             #[cfg(not(target_arch = "wasm32"))]
-            tar_client: PmcTarClient::with_shared(
+            cloud_client: PmcCloudClient::with_shared(
                 client.clone(),
                 rate_limiter.clone(),
                 config.clone(),
@@ -352,16 +352,16 @@ impl PmcClient {
         Ok(oa_api::parse_oa_response(&xml_content, pmcid)?)
     }
 
-    /// Download and extract tar.gz file for a PMC article using the OA API
+    /// Download a PMC article's files from the PMC OA Cloud (AWS S3) service
     ///
     /// # Arguments
     ///
     /// * `pmcid` - PMC ID (with or without "PMC" prefix)
-    /// * `output_dir` - Directory to extract the tar.gz contents to
+    /// * `output_dir` - Directory to download the article's files into
     ///
     /// # Returns
     ///
-    /// Returns a `Result<Vec<String>>` containing the list of extracted file paths
+    /// Returns a `Result<Vec<String>>` containing the list of downloaded file paths
     ///
     /// # Errors
     ///
@@ -380,31 +380,29 @@ impl PmcClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let client = PmcClient::new();
     ///     let output_dir = Path::new("./extracted_articles");
-    ///     let files = client.download_and_extract_tar("PMC7906746", output_dir).await?;
+    ///     let files = client.download_files("PMC7906746", output_dir).await?;
     ///
     ///     for file in files {
-    ///         println!("Extracted: {}", file);
+    ///         println!("Downloaded: {}", file);
     ///     }
     ///     Ok(())
     /// }
     /// ```
     #[cfg(not(target_arch = "wasm32"))]
-    pub async fn download_and_extract_tar<P: AsRef<Path>>(
+    pub async fn download_files<P: AsRef<Path>>(
         &self,
         pmcid: &str,
         output_dir: P,
     ) -> Result<Vec<String>> {
-        self.tar_client
-            .download_and_extract_tar(pmcid, output_dir)
-            .await
+        self.cloud_client.download_files(pmcid, output_dir).await
     }
 
-    /// Download, extract tar.gz file, and match figures with their captions from XML
+    /// Download the article's files and match figures with their captions from XML
     ///
     /// # Arguments
     ///
     /// * `pmcid` - PMC ID (with or without "PMC" prefix)
-    /// * `output_dir` - Directory to extract the tar.gz contents to
+    /// * `output_dir` - Directory to download the article's files into
     ///
     /// # Returns
     ///
@@ -442,7 +440,7 @@ impl PmcClient {
         pmcid: &str,
         output_dir: P,
     ) -> Result<Vec<ExtractedFigure>> {
-        self.tar_client
+        self.cloud_client
             .extract_figures_with_captions(pmcid, output_dir)
             .await
     }

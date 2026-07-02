@@ -83,27 +83,27 @@ impl PyPmcClient {
         })
     }
 
-    /// Download and extract PMC tar.gz archive
+    /// Download a PMC article's Open Access files
     ///
-    /// Downloads the tar.gz file for the specified PMC ID and extracts all files
-    /// to the output directory.
+    /// Downloads each of the article's files individually from the PMC OA Cloud
+    /// (AWS S3) service for the specified PMC ID into the output directory.
     ///
     /// Args:
     ///     pmcid: PMC ID (e.g., "PMC7906746" or "7906746")
-    ///     output_dir: Directory path where files should be extracted
+    ///     output_dir: Directory path where files should be downloaded
     ///
     /// Returns:
-    ///     List of extracted file paths
+    ///     List of downloaded file paths
     ///
     /// Note:
     ///     This method is only available on non-WASM platforms
     ///
     /// Example:
     ///     >>> client = PmcClient()
-    ///     >>> files = client.download_and_extract_tar("PMC7906746", "./output")
+    ///     >>> files = client.download_files("PMC7906746", "./output")
     ///     >>> for file in files:
     ///     ...     print(file)
-    fn download_and_extract_tar(
+    fn download_files(
         &self,
         py: Python,
         pmcid: String,
@@ -115,7 +115,7 @@ impl PyPmcClient {
         py.detach(|| {
             let rt = get_runtime();
             let files = rt
-                .block_on(client.download_and_extract_tar(&pmcid, &output_path))
+                .block_on(client.download_files(&pmcid, &output_path))
                 .map_err(to_py_err)?;
 
             Python::attach(|py| {
@@ -130,12 +130,12 @@ impl PyPmcClient {
 
     /// Extract figures with captions from PMC article
     ///
-    /// Downloads the tar.gz file for the specified PMC ID, extracts all files,
-    /// and matches figures with their captions from the XML metadata.
+    /// Downloads the article's files from the PMC OA Cloud (AWS S3) service,
+    /// then matches figures with their captions from the XML metadata.
     ///
     /// Args:
     ///     pmcid: PMC ID (e.g., "PMC7906746" or "7906746")
-    ///     output_dir: Directory path where files should be extracted
+    ///     output_dir: Directory path where files should be downloaded
     ///
     /// Returns:
     ///     List of ExtractedFigure objects containing metadata and file information

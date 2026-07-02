@@ -18,7 +18,7 @@ use crate::retry::with_retry;
 /// request against the NCBI E-utilities API.
 ///
 /// It borrows from the owning client (`PubMedClient` / `PmcClient` /
-/// `PmcTarClient`), so it is cheap to construct per call.
+/// `PmcCloudClient`), so it is cheap to construct per call.
 pub(crate) struct RequestExecutor<'a> {
     client: &'a Client,
     rate_limiter: &'a RateLimiter,

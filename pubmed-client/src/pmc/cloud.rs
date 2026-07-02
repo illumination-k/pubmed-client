@@ -20,17 +20,16 @@ use tokio::{fs as tokio_fs, task};
 /// Fetches an article's full-text XML, media, and supplementary files as
 /// individual per-article objects from the `pmc-oa-opendata` S3 bucket. This
 /// replaces the retired PMC FTP service and its legacy `oa_package` tar.gz
-/// bundles (removed by NCBI in August 2026). The struct name is retained for
-/// backwards compatibility.
+/// bundles (removed by NCBI in August 2026).
 #[derive(Clone)]
-pub struct PmcTarClient {
+pub struct PmcCloudClient {
     client: Client,
     rate_limiter: RateLimiter,
     pub(crate) config: ClientConfig,
 }
 
-impl PmcTarClient {
-    /// Create a new PMC TAR client with configuration
+impl PmcCloudClient {
+    /// Create a new PMC OA Cloud client with configuration
     pub fn new(config: ClientConfig) -> Self {
         let rate_limiter = config.create_rate_limiter();
 
@@ -61,7 +60,7 @@ impl PmcTarClient {
         }
     }
 
-    /// Create a TAR client sharing an existing HTTP client and rate limiter.
+    /// Create a cloud client sharing an existing HTTP client and rate limiter.
     ///
     /// Used by `PmcClient` to avoid duplicating the HTTP client and rate limiter.
     pub(crate) fn with_shared(
@@ -102,16 +101,16 @@ impl PmcTarClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client::pmc::tar::PmcTarClient;
+    /// use pubmed_client::pmc::cloud::PmcCloudClient;
     /// use pubmed_client::ClientConfig;
     /// use std::path::Path;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let config = ClientConfig::new();
-    ///     let client = PmcTarClient::new(config);
+    ///     let client = PmcCloudClient::new(config);
     ///     let output_dir = Path::new("./extracted_articles");
-    ///     let files = client.download_and_extract_tar("PMC7906746", output_dir).await?;
+    ///     let files = client.download_files("PMC7906746", output_dir).await?;
     ///
     ///     for file in files {
     ///         println!("Downloaded: {}", file);
@@ -120,7 +119,7 @@ impl PmcTarClient {
     /// }
     /// ```
     #[cfg(not(target_arch = "wasm32"))]
-    pub async fn download_and_extract_tar<P: AsRef<Path>>(
+    pub async fn download_files<P: AsRef<Path>>(
         &self,
         pmcid: &str,
         output_dir: P,
@@ -304,14 +303,14 @@ impl PmcTarClient {
     /// # Example
     ///
     /// ```no_run
-    /// use pubmed_client::pmc::tar::PmcTarClient;
+    /// use pubmed_client::pmc::cloud::PmcCloudClient;
     /// use pubmed_client::ClientConfig;
     /// use std::path::Path;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let config = ClientConfig::new();
-    ///     let client = PmcTarClient::new(config);
+    ///     let client = PmcCloudClient::new(config);
     ///     let output_dir = Path::new("./extracted_articles");
     ///     let figures = client.extract_figures_with_captions("PMC7906746", output_dir).await?;
     ///
@@ -345,9 +344,7 @@ impl PmcTarClient {
         .await?;
         let full_text = parse_pmc_xml(&xml_content, &normalized_pmcid)?;
 
-        let extracted_files = self
-            .download_and_extract_tar(&normalized_pmcid, &output_dir)
-            .await?;
+        let extracted_files = self.download_files(&normalized_pmcid, &output_dir).await?;
 
         let figures = self
             .match_figures_with_files(&full_text, &extracted_files, &output_dir)
@@ -416,57 +413,88 @@ impl PmcTarClient {
         }
     }
 
-    /// Find a matching file for a figure based on ID, label, or filename patterns
+    /// Find a matching file for a figure based on ID, label, or filename patterns.
+    ///
+    /// Three rules are tried in order, returning the first extracted file that matches:
+    /// 1. the explicit `graphic_href` (case-sensitive substring of the file name, any extension);
+    /// 2. the figure `id` (case-insensitive substring) with an image extension;
+    /// 3. the figure `label` with whitespace/dots stripped (case-insensitive) with an image extension.
     #[cfg(not(target_arch = "wasm32"))]
     pub fn find_matching_file(
         figure: &Figure,
         extracted_files: &[String],
         image_extensions: &[&str],
     ) -> Option<String> {
-        if let Some(file_name) = &figure.graphic_href {
-            for file_path in extracted_files {
-                if let Some(filename) = Path::new(file_path).file_name()
-                    && filename.to_string_lossy().contains(file_name)
-                {
-                    return Some(file_path.clone());
-                }
-            }
+        // Rule 1: match by explicit graphic href. Case-sensitive and does not
+        // require an image extension, mirroring the original behavior.
+        if let Some(file_name) = &figure.graphic_href
+            && let Some(matched) =
+                Self::find_first_file(extracted_files, false, image_extensions, |filename| {
+                    filename.contains(file_name.as_str())
+                })
+        {
+            return Some(matched);
         }
 
-        for file_path in extracted_files {
-            if let Some(filename) = Path::new(file_path).file_name() {
-                let filename_str = filename.to_string_lossy().to_lowercase();
-                let figure_id_lower = figure.id.to_lowercase();
-
-                if filename_str.contains(&figure_id_lower)
-                    && let Some(extension) = Path::new(file_path).extension()
-                {
-                    let ext_str = extension.to_string_lossy().to_lowercase();
-                    if image_extensions.contains(&ext_str.as_str()) {
-                        return Some(file_path.clone());
-                    }
-                }
-            }
+        // Rule 2: match by figure id (case-insensitive) with an image extension.
+        let figure_id_lower = figure.id.to_lowercase();
+        if let Some(matched) =
+            Self::find_first_file(extracted_files, true, image_extensions, |filename| {
+                filename.to_lowercase().contains(&figure_id_lower)
+            })
+        {
+            return Some(matched);
         }
 
+        // Rule 3: match by label (whitespace/dots stripped) with an image extension.
         if let Some(label) = &figure.label {
             let label_clean = label.to_lowercase().replace([' ', '.'], "");
-            for file_path in extracted_files {
-                if let Some(filename) = Path::new(file_path).file_name() {
-                    let filename_str = filename.to_string_lossy().to_lowercase();
-                    if filename_str.contains(&label_clean)
-                        && let Some(extension) = Path::new(file_path).extension()
-                    {
-                        let ext_str = extension.to_string_lossy().to_lowercase();
-                        if image_extensions.contains(&ext_str.as_str()) {
-                            return Some(file_path.clone());
-                        }
-                    }
-                }
+            if let Some(matched) =
+                Self::find_first_file(extracted_files, true, image_extensions, |filename| {
+                    filename.to_lowercase().contains(&label_clean)
+                })
+            {
+                return Some(matched);
             }
         }
 
         None
+    }
+
+    /// Return the first extracted file whose file name satisfies `predicate`.
+    ///
+    /// When `require_image_ext` is true, the file must additionally have an
+    /// extension (case-insensitive) present in `image_extensions`. The predicate
+    /// receives the raw (non-lower-cased) file name so callers control casing.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn find_first_file(
+        extracted_files: &[String],
+        require_image_ext: bool,
+        image_extensions: &[&str],
+        predicate: impl Fn(&str) -> bool,
+    ) -> Option<String> {
+        for file_path in extracted_files {
+            let path = Path::new(file_path);
+            let Some(filename) = path.file_name() else {
+                continue;
+            };
+            if !predicate(&filename.to_string_lossy()) {
+                continue;
+            }
+            if require_image_ext && !Self::has_image_extension(path, image_extensions) {
+                continue;
+            }
+            return Some(file_path.clone());
+        }
+        None
+    }
+
+    /// Whether `path` has an extension (case-insensitive) in `image_extensions`.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn has_image_extension(path: &Path, image_extensions: &[&str]) -> bool {
+        path.extension()
+            .map(|ext| image_extensions.contains(&ext.to_string_lossy().to_lowercase().as_str()))
+            .unwrap_or(false)
     }
 
     /// Get image dimensions using the image crate
@@ -503,7 +531,7 @@ mod tests {
     #[test]
     fn test_client_creation() {
         let config = ClientConfig::new();
-        let _client = PmcTarClient::new(config);
+        let _client = PmcCloudClient::new(config);
     }
 
     #[test]
@@ -511,7 +539,7 @@ mod tests {
         let config = ClientConfig::new();
         let rate_limiter = config.create_rate_limiter();
         let client = Client::new();
-        let _tar_client = PmcTarClient::with_shared(client, rate_limiter, config);
+        let _cloud_client = PmcCloudClient::with_shared(client, rate_limiter, config);
     }
 
     #[cfg(not(target_arch = "wasm32"))]
@@ -524,7 +552,7 @@ mod tests {
 <Contents><Key>PMC7906746.1/gr1_lrg.jpg</Key><Size>1</Size></Contents>
 </ListBucketResult>"#;
 
-        let keys = PmcTarClient::parse_cloud_listing(xml).unwrap();
+        let keys = PmcCloudClient::parse_cloud_listing(xml).unwrap();
         assert_eq!(
             keys,
             vec![
@@ -539,7 +567,7 @@ mod tests {
     #[test]
     fn test_parse_cloud_listing_skips_folder_markers() {
         let xml = r#"<ListBucketResult><Contents><Key>PMC1.1/</Key></Contents><Contents><Key>PMC1.1/PMC1.1.xml</Key></Contents></ListBucketResult>"#;
-        let keys = PmcTarClient::parse_cloud_listing(xml).unwrap();
+        let keys = PmcCloudClient::parse_cloud_listing(xml).unwrap();
         assert_eq!(keys, vec!["PMC1.1/PMC1.1.xml".to_string()]);
     }
 
@@ -552,7 +580,7 @@ mod tests {
             "PMC1.2/PMC1.2.xml".to_string(),
             "PMC1.2/gr1.jpg".to_string(),
         ];
-        let latest = PmcTarClient::select_latest_version_keys(keys);
+        let latest = PmcCloudClient::select_latest_version_keys(keys);
         assert_eq!(
             latest,
             vec![
@@ -565,6 +593,84 @@ mod tests {
     #[cfg(not(target_arch = "wasm32"))]
     #[test]
     fn test_select_latest_version_keys_empty() {
-        assert!(PmcTarClient::select_latest_version_keys(vec![]).is_empty());
+        assert!(PmcCloudClient::select_latest_version_keys(vec![]).is_empty());
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn figure(id: &str, label: Option<&str>, graphic_href: Option<&str>) -> Figure {
+        Figure {
+            id: id.to_string(),
+            label: label.map(|s| s.to_string()),
+            caption: None,
+            alt_text: None,
+            fig_type: None,
+            graphic_href: graphic_href.map(|s| s.to_string()),
+        }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    const IMAGE_EXTS: &[&str] = &["jpg", "jpeg", "png", "gif", "tif", "tiff"];
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_by_graphic_href() {
+        let files = vec![
+            "PMC1/PMC1.xml".to_string(),
+            "PMC1/gr1_lrg.jpg".to_string(),
+            "PMC1/fig2.png".to_string(),
+        ];
+        // graphic_href match is a case-sensitive substring and ignores extension.
+        let fig = figure("fig-1", None, Some("gr1_lrg.jpg"));
+        assert_eq!(
+            PmcCloudClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            Some("PMC1/gr1_lrg.jpg".to_string())
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_by_figure_id() {
+        let files = vec!["PMC1/PMC1.xml".to_string(), "PMC1/GR1.PNG".to_string()];
+        // id match is case-insensitive and requires an image extension.
+        let fig = figure("gr1", None, None);
+        assert_eq!(
+            PmcCloudClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            Some("PMC1/GR1.PNG".to_string())
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_by_label() {
+        let files = vec!["PMC1/PMC1.xml".to_string(), "PMC1/figure1.jpg".to_string()];
+        // label match strips spaces/dots and is case-insensitive: "Figure 1." -> "figure1".
+        let fig = figure("unrelated-id", Some("Figure 1."), None);
+        assert_eq!(
+            PmcCloudClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            Some("PMC1/figure1.jpg".to_string())
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_id_requires_image_extension() {
+        // A non-image file whose name contains the id must not match rule 2.
+        let files = vec!["PMC1/gr1.xml".to_string()];
+        let fig = figure("gr1", None, None);
+        assert_eq!(
+            PmcCloudClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            None
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_matching_file_no_match() {
+        let files = vec!["PMC1/other.jpg".to_string()];
+        let fig = figure("gr9", Some("Figure 9"), Some("missing.png"));
+        assert_eq!(
+            PmcCloudClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            None
+        );
     }
 }

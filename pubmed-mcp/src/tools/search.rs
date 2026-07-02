@@ -141,6 +141,22 @@ pub struct SearchRequest {
     pub sort: Option<SearchSortOrder>,
 }
 
+/// Maximum number of characters shown in an abstract preview.
+const ABSTRACT_PREVIEW_CHARS: usize = 200;
+
+/// Build a truncated preview of an abstract, safe for multi-byte UTF-8 text.
+///
+/// Truncation happens at a character boundary rather than a fixed byte index;
+/// a byte-index slice would panic when the cut point lands in the middle of a
+/// multi-byte character (e.g. Greek letters, accents, en/em dashes that appear
+/// routinely in PubMed abstracts).
+fn abstract_preview(abstract_text: &str) -> String {
+    match abstract_text.char_indices().nth(ABSTRACT_PREVIEW_CHARS) {
+        Some((idx, _)) => format!("{}...", &abstract_text[..idx]),
+        None => abstract_text.to_string(),
+    }
+}
+
 /// Search PubMed for articles with advanced filtering
 pub async fn search_pubmed(
     server: &super::PubMedServer,
@@ -242,15 +258,52 @@ pub async fn search_pubmed(
         }
 
         if include_abstract && let Some(ref abstract_text) = article.abstract_text {
-            let preview = if abstract_text.len() > 200 {
-                format!("{}...", &abstract_text[..200])
-            } else {
-                abstract_text.clone()
-            };
-            result.push_str(&format!("   Abstract: {}\n", preview));
+            result.push_str(&format!(
+                "   Abstract: {}\n",
+                abstract_preview(abstract_text)
+            ));
         }
         result.push('\n');
     }
 
     text_result(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{ABSTRACT_PREVIEW_CHARS, abstract_preview};
+
+    #[test]
+    fn short_abstract_is_returned_unchanged() {
+        let text = "A short abstract.";
+        assert_eq!(abstract_preview(text), text);
+    }
+
+    #[test]
+    fn long_ascii_abstract_is_truncated_with_ellipsis() {
+        let text = "a".repeat(500);
+        let preview = abstract_preview(&text);
+        assert_eq!(
+            preview,
+            format!("{}...", "a".repeat(ABSTRACT_PREVIEW_CHARS))
+        );
+    }
+
+    #[test]
+    fn multibyte_abstract_does_not_panic_at_boundary() {
+        // Each 'µ' is 2 bytes, so byte 200 falls in the middle of a character.
+        // A byte-index slice would panic here; the char-boundary version must not.
+        let text = "µ".repeat(300);
+        let preview = abstract_preview(&text);
+        assert_eq!(
+            preview,
+            format!("{}...", "µ".repeat(ABSTRACT_PREVIEW_CHARS))
+        );
+    }
+
+    #[test]
+    fn abstract_exactly_at_limit_is_not_truncated() {
+        let text = "x".repeat(ABSTRACT_PREVIEW_CHARS);
+        assert_eq!(abstract_preview(&text), text);
+    }
 }

@@ -663,7 +663,7 @@ impl From<&pubmed_client::Figure> for Figure {
     }
 }
 
-/// A figure extracted from a downloaded tar.gz package, with file metadata
+/// A figure extracted from a downloaded PMC OA Cloud article, with file metadata
 #[napi(object)]
 pub struct ExtractedFigure {
     /// Figure metadata
@@ -1226,23 +1226,20 @@ impl PubMedClient {
         Ok(nbib)
     }
 
-    /// Download and extract a PMC tar.gz package to a directory
+    /// Download a PMC article's Open Access files to a directory
     ///
-    /// Downloads the Open Access package for the given PMC ID and extracts it,
-    /// returning the list of extracted file paths.
+    /// Downloads each of the article's files individually from the PMC OA Cloud
+    /// (AWS S3) service for the given PMC ID, returning the list of downloaded
+    /// file paths.
     ///
     /// @param pmcid - PMC ID (e.g., "PMC7906746")
-    /// @param outputDir - Directory to extract files into
-    /// @returns Array of extracted file paths
+    /// @param outputDir - Directory to download files into
+    /// @returns Array of downloaded file paths
     #[napi]
-    pub async fn download_and_extract_tar(
-        &self,
-        pmcid: String,
-        output_dir: String,
-    ) -> Result<Vec<String>> {
+    pub async fn download_files(&self, pmcid: String, output_dir: String) -> Result<Vec<String>> {
         self.client
             .pmc
-            .download_and_extract_tar(&pmcid, &output_dir)
+            .download_files(&pmcid, &output_dir)
             .await
             .map_err(to_napi_err)
     }
