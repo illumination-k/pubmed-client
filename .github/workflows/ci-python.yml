@@ -61,6 +61,48 @@ jobs:
         working-directory: pubmed-client-py
         run: uv run mypy .
 
+  stub:
+    name: Python Type Stub Check
+    # Local: MISE_ENV=python mise run stubgen:py   # regenerate pubmed_client.pyi
+    #        MISE_ENV=python mise run stubtest:py   # verify it matches the module
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-repo
+
+      - name: Pin Python version
+        run: uv python pin 3.12
+
+      - name: Install dependencies
+        working-directory: pubmed-client-py
+        run: uv sync --dev
+
+      - name: Regenerate type stub from Rust source
+        working-directory: pubmed-client-py
+        run: cargo run --quiet --bin stub_gen
+
+      - name: Verify checked-in stub is up to date
+        # Fails if the Rust API changed without regenerating pubmed_client.pyi.
+        # Fix locally with: MISE_ENV=python mise run stubgen:py
+        run: git diff --exit-code -- pubmed-client-py/pubmed_client.pyi
+
+      - name: Build Python package with maturin
+        working-directory: pubmed-client-py
+        run: uv run --with maturin maturin develop
+
+      - name: Run stubtest
+        # Fails if the compiled module and the stub disagree (missing/extra
+        # classes, methods, or attributes) — including surface the generator
+        # cannot see (the exception hierarchy, __version__).
+        working-directory: pubmed-client-py
+        run: uv run python -m mypy.stubtest pubmed_client --allowlist stubtest-allowlist.txt
+
   test:
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     # Local: MISE_ENV=python mise run py:test

@@ -1,0 +1,12 @@
+# stubtest allowlist for the `pubmed_client` package.
+#
+# stubtest (`python -m mypy.stubtest pubmed_client`) treats the compiled module
+# as the source of truth and flags anything in the stub that disagrees with it.
+# Each line is a regular expression matching a fully-qualified name to ignore.
+#
+# `pubmed_client.pubmed_client` is the internal compiled extension submodule
+# (`pubmed_client/pubmed_client.<abi>.so`). maturin builds it as a submodule and
+# re-exports its contents from the package `__init__.py` via `from .pubmed_client
+# import *`. The public typing contract lives in `pubmed_client/__init__.pyi`, so
+# the private submodule itself intentionally has no separate stub.
+pubmed_client\.pubmed_client

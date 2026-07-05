@@ -267,6 +267,37 @@ Run type checking with mypy:
 mypy your_script.py
 ```
 
+### Maintaining the type stub
+
+`pubmed_client.pyi` is **generated**, not hand-edited. It is produced from the
+`#[gen_stub_pyclass]` / `#[gen_stub_pymethods]` annotations in the Rust source by
+the `stub_gen` binary, which then splices in the members `pyo3-stub-gen` cannot
+introspect (`__version__` and the `create_exception!` hierarchy).
+
+When you add or change a PyO3 class, method, or attribute:
+
+1. Annotate the new `#[pyclass]` with `#[gen_stub_pyclass]` and every
+   `#[pymethods]` block with `#[gen_stub_pymethods]` (module-level items added via
+   `m.add(...)`, such as new exceptions, also need to be listed in `stub_gen.rs`).
+2. Regenerate the stub:
+
+   ```bash
+   MISE_ENV=python mise run stubgen:py     # or: cargo run --bin stub_gen
+   ```
+
+3. Verify it matches the compiled module:
+
+   ```bash
+   MISE_ENV=python mise run stubtest:py    # maturin develop + python -m mypy.stubtest
+   ```
+
+4. Commit the regenerated `pubmed_client.pyi`.
+
+CI enforces both halves: the `Python Type Stub Check` job regenerates the stub and
+fails on `git diff` if the checked-in copy is stale, then runs `stubtest` so the
+stub can never silently drift from the compiled module. `stubtest-allowlist.txt`
+records the intentionally-unstubbed internal extension submodule.
+
 ## Development
 
 ### Prerequisites
