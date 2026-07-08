@@ -15,9 +15,15 @@
 
 pub mod common;
 pub mod error;
+pub mod europe_pmc;
 pub mod pmc;
 pub mod pubmed;
 
 // Re-export main types for convenience
 pub use common::{Affiliation, Author, HistoryDate, PmcId, PubMedId, PublicationDate};
 pub use error::{ParseError, Result};
+pub use europe_pmc::{
+    EuropePmcCitation, EuropePmcCitationList, EuropePmcDatabaseLink, EuropePmcDatabaseLinkList,
+    EuropePmcDbCrossReferenceInfo, EuropePmcReference, EuropePmcReferenceList, EuropePmcResult,
+    EuropePmcSearchResponse,
+};
