@@ -42,6 +42,19 @@ description = "Build Python package with maturin"
 dir = "pubmed-client-py"
 run = ["uv run maturin build"]
 
+[tasks."stubgen:py"]
+description = "Regenerate pubmed_client.pyi from the Rust source"
+dir = "pubmed-client-py"
+run = ["cargo run --quiet --bin stub_gen"]
+
+[tasks."stubtest:py"]
+description = "Verify pubmed_client.pyi matches the compiled module (stubtest)"
+dir = "pubmed-client-py"
+run = [
+  "uv run --frozen --with maturin maturin develop",
+  "uv run --frozen python -m mypy.stubtest pubmed_client --allowlist stubtest-allowlist.txt",
+]
+
 [tasks."clean:py"]
 description = "Clean Python build artifacts"
 dir = "pubmed-client-py"

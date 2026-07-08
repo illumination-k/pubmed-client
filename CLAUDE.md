@@ -227,6 +227,8 @@ WebAssembly bindings via wasm-pack. Published as `pubmed-client-wasm` on npm. Ke
 
 Python bindings via PyO3/maturin. Published as `pubmed-client-py` on PyPI. Synchronous API with internal Tokio runtime. Key types: `Client`, `PubMedClient`, `PmcClient`, `SearchQuery`, `ClientConfig`.
 
+**Type stub (`pubmed_client.pyi`) is generated, never hand-edited.** It is produced from the `#[gen_stub_pyclass]`/`#[gen_stub_pymethods]` annotations by `src/bin/stub_gen.rs`, which also splices in the members `pyo3-stub-gen` can't see (`__version__` and the `create_exception!` hierarchy — the latter listed explicitly in `stub_gen.rs`). Every new `#[pyclass]` needs `#[gen_stub_pyclass]` and every `#[pymethods]` block needs `#[gen_stub_pymethods]`, or it silently disappears from the stub. After changing the PyO3 API: `MISE_ENV=python mise run stubgen:py` to regenerate, `MISE_ENV=python mise run stubtest:py` to verify against the compiled module, then commit the `.pyi`. CI's `Python Type Stub Check` job (`ci-python.yml`) fails on `git diff` if the checked-in stub is stale and runs `stubtest` so it can't drift from runtime. `stubtest-allowlist.txt` records intentionally-unstubbed names.
+
 ### R Bindings (`pubmed-client-r/`)
 
 R bindings via [extendr](https://extendr.github.io/). R package name: `pubmedclient`. Synchronous API with internal Tokio runtime (same pattern as Python). Currently an **MVP** covering core operations: `pubmed_client()`, `pubmed_search()`, `pubmed_fetch()`, `pubmed_search_and_fetch()`, `pmc_fulltext()`, `pmc_to_markdown()`.

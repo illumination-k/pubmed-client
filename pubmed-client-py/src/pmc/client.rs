@@ -4,7 +4,7 @@
 
 use pyo3::prelude::*;
 use pyo3::types::PyList;
-use pyo3_stub_gen_derive::gen_stub_pyclass;
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -31,6 +31,7 @@ pub struct PyPmcClient {
     pub client: Arc<PmcClient>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyPmcClient {
     /// Create a new PMC client with default configuration

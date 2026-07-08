@@ -3,7 +3,6 @@
 //! This module provides Python bindings for the Rust-based PubMed client library.
 
 use pyo3::prelude::*;
-use pyo3_stub_gen::define_stub_info_gatherer;
 
 // Module declarations
 mod client;
@@ -127,4 +126,21 @@ fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
 // Stub Generation Support
 // ================================================================================================
 
-define_stub_info_gatherer!(stub_info);
+/// Gather stub information for the compiled `pubmed_client` module.
+///
+/// This mirrors what [`pyo3_stub_gen::define_stub_info_gatherer`] would produce, but pins the
+/// default module name to the single-segment `pubmed_client` instead of reading the dotted
+/// `module-name = "pubmed_client_py.pubmed_client"` from `pyproject.toml`. maturin builds the
+/// extension as a submodule inside an auto-generated `pubmed_client` package, but from a typing
+/// perspective the public surface is the flat top-level `pubmed_client` module — so the generated
+/// `pubmed_client.pyi` must describe that flat module, not a `pubmed_client_py.pubmed_client`
+/// submodule (which pyo3-stub-gen rejects under the pure-Rust layout).
+pub fn stub_info() -> pyo3_stub_gen::Result<pyo3_stub_gen::StubInfo> {
+    let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    pyo3_stub_gen::StubInfo::from_project_root(
+        "pubmed_client".to_string(),
+        manifest_dir.to_path_buf(),
+        false,
+        pyo3_stub_gen::StubGenConfig::default(),
+    )
+}
