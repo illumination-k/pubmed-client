@@ -109,70 +109,108 @@ pub fn strip_xml_tags(content: &str) -> String {
 ///
 /// Decodes both named entities (`&amp;`, `&lt;`, `&gt;`, `&quot;`, `&apos;`)
 /// and numeric entities (`&#169;`, `&#x00A9;`).
+///
+/// Malformed or unrecognized sequences (missing `;`, unknown names, out-of-range
+/// or non-parsable numeric values) are preserved verbatim rather than dropped, so
+/// this never silently corrupts article text.
 pub fn decode_xml_entities(content: &str) -> Cow<'_, str> {
     if !content.contains('&') {
         return Cow::Borrowed(content);
     }
 
     let mut result = String::with_capacity(content.len());
-    let mut chars = content.chars().peekable();
+    let mut chars = content.chars();
 
     while let Some(c) = chars.next() {
-        if c == '&' {
-            // Collect entity
-            let mut entity = String::new();
-            let mut found_semicolon = false;
-            for ec in chars.by_ref() {
-                if ec == ';' {
-                    found_semicolon = true;
-                    break;
-                }
-                entity.push(ec);
-                if entity.len() > 10 {
-                    break;
-                }
-            }
+        if c != '&' {
+            result.push(c);
+            continue;
+        }
 
-            if found_semicolon {
-                match entity.as_str() {
-                    "amp" => result.push('&'),
-                    "lt" => result.push('<'),
-                    "gt" => result.push('>'),
-                    "quot" => result.push('"'),
-                    "apos" => result.push('\''),
-                    s if s.starts_with('#') => {
-                        let code = if s.starts_with("#x") || s.starts_with("#X") {
-                            u32::from_str_radix(&s[2..], 16).ok()
-                        } else {
-                            s[1..].parse::<u32>().ok()
-                        };
-                        if let Some(ch) = code.and_then(char::from_u32) {
-                            result.push(ch);
-                        } else {
-                            // Unknown numeric entity - preserve as-is
-                            result.push('&');
-                            result.push_str(&entity);
-                            result.push(';');
-                        }
-                    }
-                    _ => {
-                        // Unknown named entity - preserve as-is
-                        result.push('&');
-                        result.push_str(&entity);
-                        result.push(';');
-                    }
-                }
-            } else {
-                // Malformed entity (no semicolon found) - preserve as-is
+        // Collect the entity body following '&', up to (and excluding) the ';'.
+        let (entity, found_semicolon) = collect_entity_body(&mut chars);
+
+        match decode_entity(&entity, found_semicolon) {
+            Some(decoded) => result.push(decoded),
+            // Unrecognized/malformed — reconstruct the original bytes verbatim.
+            None => {
                 result.push('&');
                 result.push_str(&entity);
+                if found_semicolon {
+                    result.push(';');
+                }
             }
-        } else {
-            result.push(c);
         }
     }
 
     Cow::Owned(result)
+}
+
+/// Collect the characters of an entity body immediately following a `&`.
+///
+/// Reads until a terminating `;` is found (returning `true`) or the body grows
+/// past the longest entity we recognize (returning `false`). The cap bounds work
+/// on pathological input like `&aaaaaaaaaaaaaaa` that has no terminator nearby.
+fn collect_entity_body(chars: &mut impl Iterator<Item = char>) -> (String, bool) {
+    let mut entity = String::new();
+    for ec in chars.by_ref() {
+        if ec == ';' {
+            return (entity, true);
+        }
+        entity.push(ec);
+        if entity.len() > 10 {
+            break;
+        }
+    }
+    (entity, false)
+}
+
+/// Decode a single collected entity body into its character.
+///
+/// Returns `None` when the sequence is not a recognizable entity (no terminating
+/// `;`, unknown name, or a numeric value that fails to parse / is out of range),
+/// signalling the caller to preserve the original text.
+fn decode_entity(entity: &str, found_semicolon: bool) -> Option<char> {
+    if !found_semicolon {
+        return None;
+    }
+    match entity.strip_prefix('#') {
+        Some(numeric) => decode_numeric_entity(numeric),
+        None => decode_named_entity(entity),
+    }
+}
+
+/// Decode a predefined named entity body (the text between `&` and `;`).
+fn decode_named_entity(name: &str) -> Option<char> {
+    match name {
+        "amp" => Some('&'),
+        "lt" => Some('<'),
+        "gt" => Some('>'),
+        "quot" => Some('"'),
+        "apos" => Some('\''),
+        _ => None,
+    }
+}
+
+/// Decode a numeric entity body (the text after `&#`), dispatching on the
+/// `x`/`X` hex marker.
+fn decode_numeric_entity(body: &str) -> Option<char> {
+    match body.strip_prefix(['x', 'X']) {
+        Some(hex) => decode_numeric_hex(hex),
+        None => decode_numeric_decimal(body),
+    }
+}
+
+/// Decode a decimal numeric entity body (e.g. `169` from `&#169;`).
+fn decode_numeric_decimal(digits: &str) -> Option<char> {
+    digits.parse::<u32>().ok().and_then(char::from_u32)
+}
+
+/// Decode a hexadecimal numeric entity body (e.g. `A9` from `&#xA9;`).
+fn decode_numeric_hex(digits: &str) -> Option<char> {
+    u32::from_str_radix(digits, 16)
+        .ok()
+        .and_then(char::from_u32)
 }
 
 /// Check if a tag is self-closing
@@ -313,5 +351,58 @@ mod tests {
             decode_xml_entities("&#169; 2021 Fran&#231;ois &amp; Co"),
             "© 2021 François & Co"
         );
+    }
+
+    #[test]
+    fn test_decode_xml_entities_malformed_and_truncated() {
+        // Truncated sequences with no terminating ';' are preserved verbatim.
+        assert_eq!(decode_xml_entities("&"), "&");
+        assert_eq!(decode_xml_entities("&amp"), "&amp");
+        assert_eq!(decode_xml_entities("&#"), "&#");
+        assert_eq!(decode_xml_entities("&#x"), "&#x");
+        assert_eq!(decode_xml_entities("&#169"), "&#169");
+
+        // Empty and malformed numeric bodies (terminated) are preserved as-is.
+        assert_eq!(decode_xml_entities("&#;"), "&#;");
+        assert_eq!(decode_xml_entities("&#x;"), "&#x;");
+        assert_eq!(decode_xml_entities("&#xZZ;"), "&#xZZ;");
+        assert_eq!(decode_xml_entities("&#12x4;"), "&#12x4;");
+
+        // Unknown named entity is preserved with its delimiters intact.
+        assert_eq!(decode_xml_entities("&unknown;"), "&unknown;");
+        assert_eq!(decode_xml_entities("&nbsp;"), "&nbsp;");
+
+        // Out-of-range code points (beyond U+10FFFF or surrogate range) fail to
+        // convert and are preserved rather than dropped.
+        assert_eq!(decode_xml_entities("&#xD800;"), "&#xD800;"); // surrogate
+        assert_eq!(decode_xml_entities("&#1114112;"), "&#1114112;"); // > U+10FFFF
+
+        // Overlong bodies (no ';' within the cap) are preserved and scanning
+        // resumes cleanly afterwards.
+        assert_eq!(
+            decode_xml_entities("&abcdefghijklmnop;tail"),
+            "&abcdefghijklmnop;tail"
+        );
+
+        // Bare '&' embedded in ordinary text, and entities at string boundaries.
+        assert_eq!(decode_xml_entities("a & b"), "a & b");
+        assert_eq!(decode_xml_entities("&amp;start"), "&start");
+        assert_eq!(decode_xml_entities("end&amp;"), "end&");
+
+        // The scanner reads greedily to the first ';', so an unterminated '&'
+        // absorbs the following (otherwise valid) entity body into one unknown
+        // run, which is then preserved verbatim.
+        assert_eq!(decode_xml_entities("&foo &amp; bar"), "&foo &amp; bar");
+        // A terminated malformed sequence followed by a valid one: the first is
+        // preserved, the second still decodes.
+        assert_eq!(decode_xml_entities("&#xZZ; &lt;"), "&#xZZ; <");
+    }
+
+    #[test]
+    fn test_decode_xml_entities_hex_case_insensitive() {
+        // Both the 'x' marker and the hex digits are case-insensitive.
+        assert_eq!(decode_xml_entities("&#Xa9;"), "©");
+        assert_eq!(decode_xml_entities("&#xa9;"), "©");
+        assert_eq!(decode_xml_entities("&#xAF;"), "¯");
     }
 }
