@@ -8,10 +8,16 @@ use crate::pmc::extracted::ExtractedFigure;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
+#[cfg(not(target_arch = "wasm32"))]
+use crate::request::fetch_with_retry;
 use pubmed_parser::pmc::{Figure, PmcArticle, Section};
 use reqwest::Client;
+#[cfg(not(target_arch = "wasm32"))]
+use reqwest::Response;
 use tracing::debug;
 
+#[cfg(not(target_arch = "wasm32"))]
+use futures_util::{StreamExt, TryStreamExt, stream};
 #[cfg(not(target_arch = "wasm32"))]
 use tokio::{fs as tokio_fs, task};
 
@@ -165,30 +171,42 @@ impl PmcCloudClient {
             return Ok(Vec::new());
         }
 
-        let base_url = self.config.effective_oa_cloud_base_url();
-        let mut downloaded = Vec::with_capacity(keys.len());
+        let base_url = self
+            .config
+            .effective_oa_cloud_base_url()
+            .trim_end_matches('/');
+        let concurrency = self.config.effective_oa_download_concurrency();
 
-        for key in keys {
-            // The object filename is the last path segment of the S3 key,
-            // e.g. `PMC7906746.1/gr1_lrg.jpg` -> `gr1_lrg.jpg`.
-            let Some(file_name) = key.rsplit('/').next().filter(|s| !s.is_empty()) else {
-                continue;
-            };
+        // The article's files are independent S3 objects and — unlike eutils —
+        // the OA Cloud bucket is not subject to the NCBI rate limit, so we fetch
+        // them concurrently (bounded by `concurrency`). `buffered` preserves the
+        // listing order so figure matching stays deterministic.
+        let downloaded = stream::iter(keys)
+            .map(|key| async move {
+                // The object filename is the last path segment of the S3 key,
+                // e.g. `PMC7906746.1/gr1_lrg.jpg` -> `gr1_lrg.jpg`.
+                let Some(file_name) = key.rsplit('/').next().filter(|s| !s.is_empty()) else {
+                    return Ok::<Option<String>, PubMedError>(None);
+                };
 
-            let url = format!("{}/{}", base_url.trim_end_matches('/'), key);
-            let response = self.executor().get(&url).await?;
-            let bytes = response.bytes().await.map_err(PubMedError::from)?;
+                let url = format!("{}/{}", base_url, key);
+                let response = self.s3_get(&url).await?;
+                let bytes = response.bytes().await.map_err(PubMedError::from)?;
 
-            let output_path = output_dir.join(file_name);
-            tokio_fs::write(&output_path, &bytes)
-                .await
-                .map_err(|e| ParseError::IoError {
-                    message: format!("Failed to write cloud file {}: {}", file_name, e),
-                })?;
+                let output_path = output_dir.join(file_name);
+                tokio_fs::write(&output_path, &bytes)
+                    .await
+                    .map_err(|e| ParseError::IoError {
+                        message: format!("Failed to write cloud file {}: {}", file_name, e),
+                    })?;
 
-            debug!("Downloaded cloud file: {}", output_path.display());
-            downloaded.push(output_path.to_string_lossy().to_string());
-        }
+                debug!("Downloaded cloud file: {}", output_path.display());
+                Ok(Some(output_path.to_string_lossy().to_string()))
+            })
+            .buffered(concurrency)
+            .try_filter_map(|opt| async move { Ok(opt) })
+            .try_collect::<Vec<String>>()
+            .await?;
 
         Ok(downloaded)
     }
@@ -211,7 +229,7 @@ impl PmcCloudClient {
         );
 
         debug!("Listing PMC OA Cloud objects: {}", url);
-        let response = self.executor().get(&url).await?;
+        let response = self.s3_get(&url).await?;
         let body = response.text().await?;
 
         let keys = Self::parse_cloud_listing(&body)?;
@@ -515,6 +533,24 @@ impl PmcCloudClient {
 
     fn executor(&self) -> RequestExecutor<'_> {
         RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
+    }
+
+    /// GET a PMC OA Cloud (AWS S3) URL.
+    ///
+    /// The `pmc-oa-opendata` bucket is AWS Open Data, not an NCBI E-utilities
+    /// endpoint, so these requests are **not** rate-limited by the NCBI quota —
+    /// their parallelism is bounded by [`ClientConfig::effective_oa_download_concurrency`]
+    /// instead. Retry and status-aware error mapping still apply.
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn s3_get(&self, url: &str) -> Result<Response> {
+        debug!("Making PMC OA Cloud (S3) request to: {url}");
+        fetch_with_retry(
+            || self.client.get(url),
+            &self.config.retry_config,
+            None,
+            "PMC OA Cloud request",
+        )
+        .await
     }
 }
 

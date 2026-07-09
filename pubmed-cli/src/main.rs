@@ -69,6 +69,9 @@ enum Commands {
         /// HTTP request timeout in seconds (default: 120)
         #[arg(short, long)]
         timeout: Option<u64>,
+        /// Number of articles to download concurrently (default: 4)
+        #[arg(short = 'j', long)]
+        concurrency: Option<usize>,
         /// Overwrite existing files (default: skip existing files)
         #[arg(long)]
         overwrite: bool,
@@ -94,6 +97,9 @@ enum Commands {
         /// HTTP request timeout in seconds (default: 60)
         #[arg(short, long)]
         timeout: Option<u64>,
+        /// Number of articles to fetch concurrently (default: 4)
+        #[arg(short = 'j', long)]
+        concurrency: Option<usize>,
         /// Append to existing file instead of overwriting
         #[arg(short, long)]
         append: bool,
@@ -150,6 +156,7 @@ async fn main() -> Result<()> {
             s3_region,
             failed_output,
             timeout,
+            concurrency,
             overwrite,
         } => {
             let options = commands::figures::FiguresOptions {
@@ -159,6 +166,7 @@ async fn main() -> Result<()> {
                 s3_region: s3_region.clone(),
                 failed_output: failed_output.clone(),
                 timeout_seconds: *timeout,
+                concurrency: *concurrency,
                 overwrite: *overwrite,
             };
             commands::figures::execute(options, &ctx).await
@@ -171,6 +179,7 @@ async fn main() -> Result<()> {
             s3_region,
             failed_output,
             timeout,
+            concurrency,
             append,
         } => {
             let options = commands::metadata::MetadataOptions {
@@ -180,6 +189,7 @@ async fn main() -> Result<()> {
                 s3_region: s3_region.clone(),
                 failed_output: failed_output.clone(),
                 timeout_seconds: *timeout,
+                concurrency: *concurrency,
                 append: *append,
             };
             commands::metadata::execute(options, &ctx).await

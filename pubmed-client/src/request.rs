@@ -12,7 +12,7 @@ use tracing::{debug, warn};
 use crate::config::ClientConfig;
 use crate::error::{PubMedError, Result};
 use crate::rate_limit::RateLimiter;
-use crate::retry::with_retry;
+use crate::retry::{RetryConfig, with_retry};
 
 /// Bundles the pieces every endpoint needs to issue a rate-limited, retrying
 /// request against the NCBI E-utilities API.
@@ -99,41 +99,69 @@ impl<'a> RequestExecutor<'a> {
 
     /// Core request loop shared by GET and POST.
     ///
-    /// Acquires a rate-limit token, sends a freshly-built request, retries on
-    /// transient failures (5xx / 429) with exponential backoff, and converts any
-    /// non-success status into an [`PubMedError::ApiError`] whose message
-    /// includes the HTTP status code.
+    /// Applies the NCBI rate limit (via [`fetch_with_retry`] with the executor's
+    /// rate limiter) before each attempt.
     async fn send<F>(&self, build: F) -> Result<Response>
     where
         F: Fn() -> reqwest::RequestBuilder,
     {
-        let response = with_retry(
-            || async {
-                self.rate_limiter.acquire().await?;
-                let response = build().send().await.map_err(PubMedError::from)?;
-
-                // Server errors and rate limiting are retryable.
-                let status = response.status();
-                if status.is_server_error() || status.as_u16() == 429 {
-                    return Err(api_error(status));
-                }
-
-                Ok(response)
-            },
+        fetch_with_retry(
+            build,
             &self.config.retry_config,
+            Some(self.rate_limiter),
             "NCBI API request",
         )
-        .await?;
-
-        // Any remaining non-success status (e.g. 4xx) is a terminal error.
-        let status = response.status();
-        if !status.is_success() {
-            warn!(status = status.as_u16(), "API request failed");
-            return Err(api_error(status));
-        }
-
-        Ok(response)
+        .await
     }
+}
+
+/// Transport core shared by every HTTP request in the crate.
+///
+/// Sends the request built by `build`, retrying transient failures (5xx / 429)
+/// with exponential backoff and mapping any non-success status into an
+/// [`PubMedError::ApiError`] that preserves the HTTP status code.
+///
+/// `rate_limiter` layers on the NCBI E-utilities quota: when `Some`, a token is
+/// acquired before *each* attempt. Non-NCBI callers — currently the PMC OA Cloud
+/// (AWS S3) bucket, whose parallelism is bounded by a download concurrency limit
+/// rather than the eutils quota — pass `None` to skip rate limiting entirely.
+pub(crate) async fn fetch_with_retry<F>(
+    build: F,
+    retry_config: &RetryConfig,
+    rate_limiter: Option<&RateLimiter>,
+    context: &str,
+) -> Result<Response>
+where
+    F: Fn() -> reqwest::RequestBuilder,
+{
+    let response = with_retry(
+        || async {
+            if let Some(limiter) = rate_limiter {
+                limiter.acquire().await?;
+            }
+            let response = build().send().await.map_err(PubMedError::from)?;
+
+            // Server errors and rate limiting are retryable.
+            let status = response.status();
+            if status.is_server_error() || status.as_u16() == 429 {
+                return Err(api_error(status));
+            }
+
+            Ok(response)
+        },
+        retry_config,
+        context,
+    )
+    .await?;
+
+    // Any remaining non-success status (e.g. 4xx) is a terminal error.
+    let status = response.status();
+    if !status.is_success() {
+        warn!(status = status.as_u16(), "HTTP request failed");
+        return Err(api_error(status));
+    }
+
+    Ok(response)
 }
 
 /// Build an [`PubMedError::ApiError`] that preserves the HTTP status code in the

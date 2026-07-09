@@ -55,6 +55,17 @@ pub struct ClientConfig {
     /// need to be changed unless using a proxy or test environment.
     pub oa_cloud_base_url: Option<String>,
 
+    /// Maximum number of PMC OA Cloud (AWS S3) files to download concurrently
+    /// per article.
+    ///
+    /// Downloads from the `pmc-oa-opendata` S3 bucket are **not** subject to the
+    /// NCBI E-utilities rate limit (that quota only applies to eutils), so an
+    /// article's individual files (full-text XML, figures, supplementary media)
+    /// are fetched concurrently. This bounds that concurrency.
+    ///
+    /// Default: 8. A value of 0 is treated as 1 (sequential).
+    pub oa_download_concurrency: Option<usize>,
+
     /// Email address for identification (recommended by NCBI)
     ///
     /// NCBI recommends including an email address in requests for contact
@@ -98,6 +109,7 @@ impl ClientConfig {
             user_agent: None,
             base_url: None,
             oa_cloud_base_url: None,
+            oa_download_concurrency: None,
             email: None,
             tool: None,
             retry_config: RetryConfig::default(),
@@ -239,6 +251,26 @@ impl ClientConfig {
     /// ```
     pub fn with_oa_cloud_base_url<S: Into<String>>(mut self, base_url: S) -> Self {
         self.oa_cloud_base_url = Some(base_url.into());
+        self
+    }
+
+    /// Set the maximum number of PMC OA Cloud (AWS S3) files downloaded
+    /// concurrently per article.
+    ///
+    /// # Arguments
+    ///
+    /// * `concurrency` - Maximum simultaneous S3 file downloads (0 is treated as 1)
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use pubmed_client::config::ClientConfig;
+    ///
+    /// let config = ClientConfig::new()
+    ///     .with_oa_download_concurrency(16);
+    /// ```
+    pub fn with_oa_download_concurrency(mut self, concurrency: usize) -> Self {
+        self.oa_download_concurrency = Some(concurrency);
         self
     }
 
@@ -483,6 +515,13 @@ impl ClientConfig {
             .unwrap_or("https://pmc-oa-opendata.s3.amazonaws.com")
     }
 
+    /// Get the effective per-article S3 download concurrency.
+    ///
+    /// Returns the configured value (with 0 normalized to 1) or the default of 8.
+    pub fn effective_oa_download_concurrency(&self) -> usize {
+        self.oa_download_concurrency.unwrap_or(8).max(1)
+    }
+
     /// Get the User-Agent string
     ///
     /// Returns the configured User-Agent or a default based on the crate name and version.
@@ -608,6 +647,26 @@ mod tests {
         );
         assert!(config.effective_user_agent().starts_with("pubmed-client/"));
         assert_eq!(config.effective_tool(), "pubmed-client");
+    }
+
+    #[test]
+    fn test_oa_download_concurrency() {
+        // Default when unset.
+        assert_eq!(ClientConfig::new().effective_oa_download_concurrency(), 8);
+        // Custom value is honored.
+        assert_eq!(
+            ClientConfig::new()
+                .with_oa_download_concurrency(16)
+                .effective_oa_download_concurrency(),
+            16
+        );
+        // Zero is normalized to sequential (1).
+        assert_eq!(
+            ClientConfig::new()
+                .with_oa_download_concurrency(0)
+                .effective_oa_download_concurrency(),
+            1
+        );
     }
 
     #[test]

@@ -3386,6 +3386,7 @@ dependencies = [
  "aws-smithy-mocks-experimental",
  "aws-smithy-runtime-api",
  "clap 4.5.40",
+ "futures-util",
  "indicatif 0.17.11",
  "pubmed-client",
  "serde",

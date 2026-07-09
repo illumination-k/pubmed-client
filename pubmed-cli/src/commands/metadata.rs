@@ -20,6 +20,7 @@ pub struct MetadataOptions {
     pub s3_region: Option<String>,
     pub failed_output: Option<PathBuf>,
     pub timeout_seconds: Option<u64>,
+    pub concurrency: Option<usize>,
     pub append: bool,
 }
 
@@ -42,16 +43,21 @@ pub async fn execute(options: MetadataOptions, ctx: &ClientContext<'_>) -> Resul
     // the same code path works for both local and S3 storage backends.
     let buffer: Mutex<Vec<u8>> = Mutex::new(Vec::new());
 
+    let concurrency = options.concurrency.unwrap_or(4);
     processor
-        .run(&options.pmcids, async |multi_progress, pmcid| {
-            let metadata = fetch_article_metadata(&client, pmcid, multi_progress).await?;
-            let json_line = serde_json::to_string(&metadata)
-                .map_err(|e| BatchItemError::new(pmcid, FailureKind::Other, e.to_string()))?;
-            let mut buf = buffer.lock().unwrap_or_else(|e| e.into_inner());
-            buf.extend_from_slice(json_line.as_bytes());
-            buf.push(b'\n');
-            Ok(())
-        })
+        .run_concurrent(
+            &options.pmcids,
+            concurrency,
+            async |multi_progress, pmcid| {
+                let metadata = fetch_article_metadata(&client, pmcid, multi_progress).await?;
+                let json_line = serde_json::to_string(&metadata)
+                    .map_err(|e| BatchItemError::new(pmcid, FailureKind::Other, e.to_string()))?;
+                let mut buf = buffer.lock().unwrap_or_else(|e| e.into_inner());
+                buf.extend_from_slice(json_line.as_bytes());
+                buf.push(b'\n');
+                Ok(())
+            },
+        )
         .await;
 
     processor.finish();
