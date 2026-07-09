@@ -354,21 +354,75 @@ impl PmcCloudClient {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
-        let xml_content = common::fetch_pmc_xml(
-            &self.executor(),
-            self.config.effective_base_url(),
-            &normalized_pmcid,
-        )
-        .await?;
-        let full_text = parse_pmc_xml(&xml_content, &normalized_pmcid)?;
-
+        // Download the article's OA package once. It already contains the JATS
+        // full-text XML, so we parse that rather than issuing a second,
+        // rate-limited eutils fetch of the same document.
         let extracted_files = self.download_files(&normalized_pmcid, &output_dir).await?;
+
+        let full_text = self
+            .parse_article_xml(&normalized_pmcid, &extracted_files)
+            .await?;
 
         let figures = self
             .match_figures_with_files(&full_text, &extracted_files, &output_dir)
             .await?;
 
         Ok(figures)
+    }
+
+    /// Parse the article's JATS XML, preferring the copy already downloaded from
+    /// the OA Cloud so no redundant eutils request is made.
+    ///
+    /// OA packages always include the full-text XML; the eutils fallback only
+    /// triggers in the unexpected case where the downloaded files contain no
+    /// `.xml`, so behavior never regresses relative to the previous eutils-only
+    /// path.
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn parse_article_xml(
+        &self,
+        normalized_pmcid: &str,
+        extracted_files: &[String],
+    ) -> Result<PmcArticle> {
+        if let Some(xml_path) = Self::find_downloaded_xml(extracted_files, normalized_pmcid) {
+            let xml_content =
+                tokio_fs::read_to_string(&xml_path)
+                    .await
+                    .map_err(|e| ParseError::IoError {
+                        message: format!("Failed to read downloaded XML {}: {}", xml_path, e),
+                    })?;
+            return Ok(parse_pmc_xml(&xml_content, normalized_pmcid)?);
+        }
+
+        debug!(
+            pmcid = %normalized_pmcid,
+            "OA Cloud package had no XML; falling back to eutils fetch"
+        );
+        let xml_content = common::fetch_pmc_xml(
+            &self.executor(),
+            self.config.effective_base_url(),
+            normalized_pmcid,
+        )
+        .await?;
+        Ok(parse_pmc_xml(&xml_content, normalized_pmcid)?)
+    }
+
+    /// Find the downloaded article XML among the OA package's files.
+    ///
+    /// The JATS file is named `<PMCID>.<version>.xml`, so we match on a file
+    /// name that ends in `.xml` and contains the PMCID (case-insensitive).
+    #[cfg(not(target_arch = "wasm32"))]
+    fn find_downloaded_xml(extracted_files: &[String], normalized_pmcid: &str) -> Option<String> {
+        let pmcid_lower = normalized_pmcid.to_lowercase();
+        extracted_files
+            .iter()
+            .find(|path| {
+                let name = Path::new(path)
+                    .file_name()
+                    .map(|n| n.to_string_lossy().to_lowercase())
+                    .unwrap_or_default();
+                name.ends_with(".xml") && name.contains(&pmcid_lower)
+            })
+            .cloned()
     }
 
     /// Match figures from XML with extracted files
@@ -623,6 +677,44 @@ mod tests {
                 "PMC1.2/PMC1.2.xml".to_string(),
                 "PMC1.2/gr1.jpg".to_string(),
             ]
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_downloaded_xml() {
+        let files = vec![
+            "/tmp/PMC9991720/gr1_lrg.jpg".to_string(),
+            "/tmp/PMC9991720/PMC9991720.1.xml".to_string(),
+            "/tmp/PMC9991720/PMC9991720.1.json".to_string(),
+        ];
+        assert_eq!(
+            PmcCloudClient::find_downloaded_xml(&files, "PMC9991720"),
+            Some("/tmp/PMC9991720/PMC9991720.1.xml".to_string())
+        );
+        // Case-insensitive on both the file name and the PMCID.
+        assert_eq!(
+            PmcCloudClient::find_downloaded_xml(
+                &["/tmp/pmc9991720.1.XML".to_string()],
+                "PMC9991720"
+            ),
+            Some("/tmp/pmc9991720.1.XML".to_string())
+        );
+        // No XML present -> None (triggers the eutils fallback).
+        assert_eq!(
+            PmcCloudClient::find_downloaded_xml(
+                &["/tmp/PMC9991720/gr1.jpg".to_string()],
+                "PMC9991720"
+            ),
+            None
+        );
+        // An unrelated XML must not match.
+        assert_eq!(
+            PmcCloudClient::find_downloaded_xml(
+                &["/tmp/PMC0000001.1.xml".to_string()],
+                "PMC9991720"
+            ),
+            None
         );
     }
 
