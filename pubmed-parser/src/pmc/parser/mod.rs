@@ -79,8 +79,11 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
     // Sections from <body> (extract_sections_enhanced finds <body> internally)
     let sections = section::extract_sections_enhanced(xml_content);
 
-    // References from <back> (extract_references_detailed finds <ref-list>/<back> internally)
-    let references = reference::extract_references_detailed(xml_content).unwrap_or_default();
+    // References live in <back> per JATS. Search the already-extracted <back> slice
+    // rather than re-scanning the whole document for `<ref-list>`/`<references>`/`<back>`;
+    // fall back to the full XML only when no <back> element was found.
+    let references_scope = if back.is_empty() { xml_content } else { back };
+    let references = reference::extract_references_detailed(references_scope).unwrap_or_default();
 
     // Assemble <permissions>: copyright + license
     let license = if license.is_some() || license_url.is_some() {
