@@ -19,6 +19,7 @@ pub struct FiguresOptions {
     pub s3_region: Option<String>,
     pub failed_output: Option<PathBuf>,
     pub timeout_seconds: Option<u64>,
+    pub concurrency: Option<usize>,
     pub overwrite: bool,
 }
 
@@ -32,17 +33,22 @@ pub async fn execute(options: FiguresOptions, ctx: &ClientContext<'_>) -> Result
 
     let mut processor = BatchProcessor::new(options.pmcids.len())?;
 
+    let concurrency = options.concurrency.unwrap_or(4);
     processor
-        .run(&options.pmcids, async |multi_progress, pmcid| {
-            process_article(
-                &client,
-                pmcid,
-                storage.as_ref(),
-                options.overwrite,
-                multi_progress,
-            )
-            .await
-        })
+        .run_concurrent(
+            &options.pmcids,
+            concurrency,
+            async |multi_progress, pmcid| {
+                process_article(
+                    &client,
+                    pmcid,
+                    storage.as_ref(),
+                    options.overwrite,
+                    multi_progress,
+                )
+                .await
+            },
+        )
         .await;
 
     processor.finish();

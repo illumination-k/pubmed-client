@@ -8,10 +8,16 @@ use crate::pmc::extracted::ExtractedFigure;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
+#[cfg(not(target_arch = "wasm32"))]
+use crate::request::fetch_with_retry;
 use pubmed_parser::pmc::{Figure, PmcArticle, Section};
 use reqwest::Client;
+#[cfg(not(target_arch = "wasm32"))]
+use reqwest::Response;
 use tracing::debug;
 
+#[cfg(not(target_arch = "wasm32"))]
+use futures_util::{StreamExt, TryStreamExt, stream};
 #[cfg(not(target_arch = "wasm32"))]
 use tokio::{fs as tokio_fs, task};
 
@@ -165,30 +171,42 @@ impl PmcCloudClient {
             return Ok(Vec::new());
         }
 
-        let base_url = self.config.effective_oa_cloud_base_url();
-        let mut downloaded = Vec::with_capacity(keys.len());
+        let base_url = self
+            .config
+            .effective_oa_cloud_base_url()
+            .trim_end_matches('/');
+        let concurrency = self.config.effective_oa_download_concurrency();
 
-        for key in keys {
-            // The object filename is the last path segment of the S3 key,
-            // e.g. `PMC7906746.1/gr1_lrg.jpg` -> `gr1_lrg.jpg`.
-            let Some(file_name) = key.rsplit('/').next().filter(|s| !s.is_empty()) else {
-                continue;
-            };
+        // The article's files are independent S3 objects and — unlike eutils —
+        // the OA Cloud bucket is not subject to the NCBI rate limit, so we fetch
+        // them concurrently (bounded by `concurrency`). `buffered` preserves the
+        // listing order so figure matching stays deterministic.
+        let downloaded = stream::iter(keys)
+            .map(|key| async move {
+                // The object filename is the last path segment of the S3 key,
+                // e.g. `PMC7906746.1/gr1_lrg.jpg` -> `gr1_lrg.jpg`.
+                let Some(file_name) = key.rsplit('/').next().filter(|s| !s.is_empty()) else {
+                    return Ok::<Option<String>, PubMedError>(None);
+                };
 
-            let url = format!("{}/{}", base_url.trim_end_matches('/'), key);
-            let response = self.executor().get(&url).await?;
-            let bytes = response.bytes().await.map_err(PubMedError::from)?;
+                let url = format!("{}/{}", base_url, key);
+                let response = self.s3_get(&url).await?;
+                let bytes = response.bytes().await.map_err(PubMedError::from)?;
 
-            let output_path = output_dir.join(file_name);
-            tokio_fs::write(&output_path, &bytes)
-                .await
-                .map_err(|e| ParseError::IoError {
-                    message: format!("Failed to write cloud file {}: {}", file_name, e),
-                })?;
+                let output_path = output_dir.join(file_name);
+                tokio_fs::write(&output_path, &bytes)
+                    .await
+                    .map_err(|e| ParseError::IoError {
+                        message: format!("Failed to write cloud file {}: {}", file_name, e),
+                    })?;
 
-            debug!("Downloaded cloud file: {}", output_path.display());
-            downloaded.push(output_path.to_string_lossy().to_string());
-        }
+                debug!("Downloaded cloud file: {}", output_path.display());
+                Ok(Some(output_path.to_string_lossy().to_string()))
+            })
+            .buffered(concurrency)
+            .try_filter_map(|opt| async move { Ok(opt) })
+            .try_collect::<Vec<String>>()
+            .await?;
 
         Ok(downloaded)
     }
@@ -211,7 +229,7 @@ impl PmcCloudClient {
         );
 
         debug!("Listing PMC OA Cloud objects: {}", url);
-        let response = self.executor().get(&url).await?;
+        let response = self.s3_get(&url).await?;
         let body = response.text().await?;
 
         let keys = Self::parse_cloud_listing(&body)?;
@@ -336,21 +354,75 @@ impl PmcCloudClient {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
-        let xml_content = common::fetch_pmc_xml(
-            &self.executor(),
-            self.config.effective_base_url(),
-            &normalized_pmcid,
-        )
-        .await?;
-        let full_text = parse_pmc_xml(&xml_content, &normalized_pmcid)?;
-
+        // Download the article's OA package once. It already contains the JATS
+        // full-text XML, so we parse that rather than issuing a second,
+        // rate-limited eutils fetch of the same document.
         let extracted_files = self.download_files(&normalized_pmcid, &output_dir).await?;
+
+        let full_text = self
+            .parse_article_xml(&normalized_pmcid, &extracted_files)
+            .await?;
 
         let figures = self
             .match_figures_with_files(&full_text, &extracted_files, &output_dir)
             .await?;
 
         Ok(figures)
+    }
+
+    /// Parse the article's JATS XML, preferring the copy already downloaded from
+    /// the OA Cloud so no redundant eutils request is made.
+    ///
+    /// OA packages always include the full-text XML; the eutils fallback only
+    /// triggers in the unexpected case where the downloaded files contain no
+    /// `.xml`, so behavior never regresses relative to the previous eutils-only
+    /// path.
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn parse_article_xml(
+        &self,
+        normalized_pmcid: &str,
+        extracted_files: &[String],
+    ) -> Result<PmcArticle> {
+        if let Some(xml_path) = Self::find_downloaded_xml(extracted_files, normalized_pmcid) {
+            let xml_content =
+                tokio_fs::read_to_string(&xml_path)
+                    .await
+                    .map_err(|e| ParseError::IoError {
+                        message: format!("Failed to read downloaded XML {}: {}", xml_path, e),
+                    })?;
+            return Ok(parse_pmc_xml(&xml_content, normalized_pmcid)?);
+        }
+
+        debug!(
+            pmcid = %normalized_pmcid,
+            "OA Cloud package had no XML; falling back to eutils fetch"
+        );
+        let xml_content = common::fetch_pmc_xml(
+            &self.executor(),
+            self.config.effective_base_url(),
+            normalized_pmcid,
+        )
+        .await?;
+        Ok(parse_pmc_xml(&xml_content, normalized_pmcid)?)
+    }
+
+    /// Find the downloaded article XML among the OA package's files.
+    ///
+    /// The JATS file is named `<PMCID>.<version>.xml`, so we match on a file
+    /// name that ends in `.xml` and contains the PMCID (case-insensitive).
+    #[cfg(not(target_arch = "wasm32"))]
+    fn find_downloaded_xml(extracted_files: &[String], normalized_pmcid: &str) -> Option<String> {
+        let pmcid_lower = normalized_pmcid.to_lowercase();
+        extracted_files
+            .iter()
+            .find(|path| {
+                let name = Path::new(path)
+                    .file_name()
+                    .map(|n| n.to_string_lossy().to_lowercase())
+                    .unwrap_or_default();
+                name.ends_with(".xml") && name.contains(&pmcid_lower)
+            })
+            .cloned()
     }
 
     /// Match figures from XML with extracted files
@@ -516,6 +588,24 @@ impl PmcCloudClient {
     fn executor(&self) -> RequestExecutor<'_> {
         RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
     }
+
+    /// GET a PMC OA Cloud (AWS S3) URL.
+    ///
+    /// The `pmc-oa-opendata` bucket is AWS Open Data, not an NCBI E-utilities
+    /// endpoint, so these requests are **not** rate-limited by the NCBI quota —
+    /// their parallelism is bounded by [`ClientConfig::effective_oa_download_concurrency`]
+    /// instead. Retry and status-aware error mapping still apply.
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn s3_get(&self, url: &str) -> Result<Response> {
+        debug!("Making PMC OA Cloud (S3) request to: {url}");
+        fetch_with_retry(
+            || self.client.get(url),
+            &self.config.retry_config,
+            None,
+            "PMC OA Cloud request",
+        )
+        .await
+    }
 }
 
 #[cfg(test)]
@@ -587,6 +677,44 @@ mod tests {
                 "PMC1.2/PMC1.2.xml".to_string(),
                 "PMC1.2/gr1.jpg".to_string(),
             ]
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn test_find_downloaded_xml() {
+        let files = vec![
+            "/tmp/PMC9991720/gr1_lrg.jpg".to_string(),
+            "/tmp/PMC9991720/PMC9991720.1.xml".to_string(),
+            "/tmp/PMC9991720/PMC9991720.1.json".to_string(),
+        ];
+        assert_eq!(
+            PmcCloudClient::find_downloaded_xml(&files, "PMC9991720"),
+            Some("/tmp/PMC9991720/PMC9991720.1.xml".to_string())
+        );
+        // Case-insensitive on both the file name and the PMCID.
+        assert_eq!(
+            PmcCloudClient::find_downloaded_xml(
+                &["/tmp/pmc9991720.1.XML".to_string()],
+                "PMC9991720"
+            ),
+            Some("/tmp/pmc9991720.1.XML".to_string())
+        );
+        // No XML present -> None (triggers the eutils fallback).
+        assert_eq!(
+            PmcCloudClient::find_downloaded_xml(
+                &["/tmp/PMC9991720/gr1.jpg".to_string()],
+                "PMC9991720"
+            ),
+            None
+        );
+        // An unrelated XML must not match.
+        assert_eq!(
+            PmcCloudClient::find_downloaded_xml(
+                &["/tmp/PMC0000001.1.xml".to_string()],
+                "PMC9991720"
+            ),
+            None
         );
     }
 

@@ -21,6 +21,7 @@ pubmed-client = { workspace = true }
 clap = { version = "4.0", features = ["derive", "env", "string"] }
 
 # Async runtime
+futures-util = "0.3"
 tokio = { version = "1.0", features = ["full"] }
 
 # Serialization

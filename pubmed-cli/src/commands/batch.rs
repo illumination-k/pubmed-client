@@ -157,6 +157,63 @@ impl BatchProcessor {
         }
     }
 
+    /// Process every ID in `ids` with up to `concurrency` items in flight.
+    ///
+    /// Behaves like [`BatchProcessor::run`] but overlaps the per-item work so
+    /// network-bound commands (e.g. downloading an article's files from the PMC
+    /// OA Cloud) don't idle waiting on each other. NCBI E-utilities requests
+    /// inside `process` remain governed by the client's shared rate limiter, so
+    /// raising concurrency never exceeds the NCBI quota — it only pipelines the
+    /// non-eutils (S3) work and hides per-request latency.
+    ///
+    /// Results are recorded in completion order; the main progress bar advances
+    /// as each item finishes. A `concurrency` of 0 or 1 runs sequentially.
+    pub async fn run_concurrent<F>(&mut self, ids: &[String], concurrency: usize, process: F)
+    where
+        F: AsyncFn(&MultiProgress, &str) -> Result<(), BatchItemError>,
+    {
+        use futures_util::stream::{self, StreamExt};
+
+        // Clone the progress handles so the streaming borrow does not conflict
+        // with the `&mut self` needed to record failures afterwards. Both are
+        // cheap Arc-backed handles.
+        let multi_progress = self.multi_progress.clone();
+        let main_pb = self.main_pb.clone();
+
+        // Borrow `process` and the progress handle so each spawned future copies
+        // a reference instead of moving the (non-`Copy`) closure.
+        let process = &process;
+        let multi_progress = &multi_progress;
+
+        let mut collected: Vec<BatchItemError> = Vec::new();
+        {
+            let mut in_flight = stream::iter(ids.iter())
+                .map(|id| async move {
+                    debug!(id = %id, "Processing batch item");
+                    let result = process(multi_progress, id).await;
+                    (id.as_str(), result)
+                })
+                .buffer_unordered(concurrency.max(1));
+
+            while let Some((id, result)) = in_flight.next().await {
+                match result {
+                    Ok(()) => {
+                        debug!(id = %id, "Successfully processed batch item");
+                        main_pb.set_message(format!("Completed {}", id));
+                    }
+                    Err(e) => {
+                        error!(id = %id, kind = %e.kind, message = %e.message, "Failed to process batch item");
+                        main_pb.set_message(format!("Failed {}", id));
+                        collected.push(e);
+                    }
+                }
+                main_pb.inc(1);
+            }
+        }
+
+        self.failures.extend(collected);
+    }
+
     /// Record the outcome of processing a single item, updating the progress
     /// bar and the failure list. Useful when a command needs a custom loop
     /// instead of [`BatchProcessor::run`].
@@ -294,6 +351,39 @@ mod tests {
         assert_eq!(
             failed_output_filename(Path::new("dir/failed.")).unwrap(),
             "failed.json"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_run_concurrent_processes_all_and_collects_failures() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+
+        let ids: Vec<String> = (0..10).map(|i| format!("PMC{i}")).collect();
+        let processed = AtomicUsize::new(0);
+
+        let mut processor = BatchProcessor::new(ids.len()).unwrap();
+        processor
+            .run_concurrent(&ids, 4, async |_mp, id| {
+                processed.fetch_add(1, Ordering::SeqCst);
+                // Fail every item whose numeric suffix is even.
+                let n: usize = id.trim_start_matches("PMC").parse().unwrap();
+                if n.is_multiple_of(2) {
+                    Err(BatchItemError::new(id, FailureKind::Empty, "even"))
+                } else {
+                    Ok(())
+                }
+            })
+            .await;
+
+        // Every id runs exactly once regardless of concurrency.
+        assert_eq!(processed.load(Ordering::SeqCst), ids.len());
+        // The 5 even ids (0,2,4,6,8) are recorded as failures.
+        assert_eq!(processor.failures().len(), 5);
+        assert!(
+            processor
+                .failures()
+                .iter()
+                .all(|f| matches!(f.kind, FailureKind::Empty))
         );
     }
 
