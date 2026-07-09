@@ -573,144 +573,137 @@ impl PubMedClient {
         let query = query.to_string();
         let batch_size = batch_size.max(1); // Ensure at least 1
 
+        // The unfold body is a thin dispatcher; each state arm is handled by a
+        // dedicated, individually testable async method.
         stream::unfold(
             SearchAllState::Initial { query, batch_size },
             move |state| async move {
                 match state {
                     SearchAllState::Initial { query, batch_size } => {
-                        // Perform initial search with history
-                        match self.search_with_history(&query, batch_size).await {
-                            Ok(result) => {
-                                let session = result.history_session();
-                                let total = result.total_count;
-
-                                if result.pmids.is_empty() {
-                                    return None;
-                                }
-
-                                // Fetch first batch of articles
-                                match session {
-                                    Some(session) => {
-                                        match self.fetch_from_history(&session, 0, batch_size).await
-                                        {
-                                            Ok(articles) => {
-                                                let next_state = SearchAllState::Fetching {
-                                                    session,
-                                                    total,
-                                                    batch_size,
-                                                    current_offset: batch_size,
-                                                    pending_articles: articles,
-                                                    article_index: 0,
-                                                };
-                                                self.next_article_from_state(next_state)
-                                            }
-                                            Err(e) => Some((Err(e), SearchAllState::Done)),
-                                        }
-                                    }
-                                    None => {
-                                        // No history session, can't stream
-                                        Some((
-                                            Err(PubMedError::WebEnvNotAvailable),
-                                            SearchAllState::Done,
-                                        ))
-                                    }
-                                }
-                            }
-                            Err(e) => Some((Err(e), SearchAllState::Done)),
-                        }
+                        self.advance_initial(query, batch_size).await
                     }
-                    SearchAllState::Fetching {
-                        session,
-                        total,
-                        batch_size,
-                        current_offset,
-                        pending_articles,
-                        article_index,
-                    } => {
-                        if article_index < pending_articles.len() {
-                            // Return next article from current batch
-                            let article = pending_articles[article_index].clone();
-                            Some((
-                                Ok(article),
-                                SearchAllState::Fetching {
-                                    session,
-                                    total,
-                                    batch_size,
-                                    current_offset,
-                                    pending_articles,
-                                    article_index: article_index + 1,
-                                },
-                            ))
-                        } else if current_offset < total {
-                            // Fetch next batch
-                            match self
-                                .fetch_from_history(&session, current_offset, batch_size)
-                                .await
-                            {
-                                Ok(articles) => {
-                                    if articles.is_empty() {
-                                        return None;
-                                    }
-                                    let next_state = SearchAllState::Fetching {
-                                        session,
-                                        total,
-                                        batch_size,
-                                        current_offset: current_offset + batch_size,
-                                        pending_articles: articles,
-                                        article_index: 0,
-                                    };
-                                    self.next_article_from_state(next_state)
-                                }
-                                Err(e) => Some((Err(e), SearchAllState::Done)),
-                            }
-                        } else {
-                            // All done
-                            None
-                        }
-                    }
+                    state @ SearchAllState::Fetching { .. } => self.advance_fetching(state).await,
                     SearchAllState::Done => None,
                 }
             },
         )
     }
 
-    /// Helper to get next article from state
+    /// Advance the stream from the `Initial` state.
+    ///
+    /// Runs the history-enabled search, then hands off to the fetching state to
+    /// retrieve and yield the first article. Returns `None` (ending the stream)
+    /// when the search matches nothing, and yields an error paired with `Done`
+    /// when the search fails or the server returns no usable history session.
     #[cfg(not(target_arch = "wasm32"))]
-    fn next_article_from_state(
+    async fn advance_initial(
+        &self,
+        query: String,
+        batch_size: usize,
+    ) -> Option<(Result<PubMedArticle>, SearchAllState)> {
+        let result = match self.search_with_history(&query, batch_size).await {
+            Ok(result) => result,
+            Err(e) => return Some((Err(e), SearchAllState::Done)),
+        };
+
+        // No matches: nothing to stream.
+        if result.pmids.is_empty() {
+            return None;
+        }
+
+        // History server is required to paginate; without it we cannot stream.
+        let Some(session) = result.history_session() else {
+            return Some((Err(PubMedError::WebEnvNotAvailable), SearchAllState::Done));
+        };
+
+        // Enter the fetching state with an empty buffer at offset 0; the
+        // fetching handler performs the first EFetch and yields its first
+        // article.
+        self.advance_fetching(SearchAllState::Fetching {
+            session,
+            total: result.total_count,
+            batch_size,
+            current_offset: 0,
+            pending_articles: Vec::new(),
+            article_index: 0,
+        })
+        .await
+    }
+
+    /// Advance the stream from the `Fetching` state.
+    ///
+    /// Yields the next buffered article, or fetches the next batch from the
+    /// history server when the buffer is exhausted. The stream ends (`None`)
+    /// once the buffer is empty and either the full result set has been covered
+    /// (`current_offset >= total`) or the server returns an empty batch. Fetch
+    /// errors are yielded paired with `Done`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called with a state other than `Fetching`. The dispatcher in
+    /// `search_all` guarantees this never happens.
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn advance_fetching(
         &self,
         state: SearchAllState,
     ) -> Option<(Result<PubMedArticle>, SearchAllState)> {
-        match state {
-            SearchAllState::Fetching {
-                ref pending_articles,
-                article_index,
-                ..
-            } if article_index < pending_articles.len() => {
-                let article = pending_articles[article_index].clone();
-                let SearchAllState::Fetching {
+        let SearchAllState::Fetching {
+            session,
+            total,
+            batch_size,
+            current_offset,
+            pending_articles,
+            article_index,
+        } = state
+        else {
+            unreachable!("advance_fetching must be called with a Fetching state");
+        };
+
+        // Yield the next article already buffered from the current batch.
+        if article_index < pending_articles.len() {
+            let article = pending_articles[article_index].clone();
+            return Some((
+                Ok(article),
+                SearchAllState::Fetching {
                     session,
                     total,
                     batch_size,
                     current_offset,
                     pending_articles,
-                    article_index,
-                } = state
-                else {
-                    unreachable!()
-                };
+                    article_index: article_index + 1,
+                },
+            ));
+        }
+
+        // Buffer exhausted and the whole result set has been covered.
+        if current_offset >= total {
+            return None;
+        }
+
+        // Fetch the next batch and yield its first article. `current_offset`
+        // advances by `batch_size` (the server-side record window), not by the
+        // number of articles parsed, so a page that drops an unparseable record
+        // never causes the next page to overlap and duplicate records.
+        match self
+            .fetch_from_history(&session, current_offset, batch_size)
+            .await
+        {
+            Ok(articles) => {
+                // A short/empty batch means the server has no more records.
+                let first = articles.first()?.clone();
                 Some((
-                    Ok(article),
+                    Ok(first),
                     SearchAllState::Fetching {
                         session,
                         total,
                         batch_size,
-                        current_offset,
-                        pending_articles,
-                        article_index: article_index + 1,
+                        current_offset: current_offset + batch_size,
+                        pending_articles: articles,
+                        article_index: 1,
                     },
                 ))
             }
-            _ => None,
+            Err(e) => Some((Err(e), SearchAllState::Done)),
         }
     }
 }

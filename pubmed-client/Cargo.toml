@@ -128,6 +128,10 @@ path = "tests/integration/mocked/rate_limiting.rs"
 name = "mocked_europe_pmc"
 path = "tests/integration/mocked/europe_pmc.rs"
 
+[[test]]
+name = "mocked_search_all"
+path = "tests/integration/mocked/search_all.rs"
+
 # --- API tests (opt-in, require network + PUBMED_REAL_API_TESTS=1) ---
 
 [[test]]
