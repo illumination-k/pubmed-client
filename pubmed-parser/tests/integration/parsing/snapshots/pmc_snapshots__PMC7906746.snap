@@ -37,7 +37,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff1",
-              "institution": "aff1",
+              "institution": "Departamento de Molestias Infecciosas e Parasitarias and Instituto de Medicina Tropical da Faculdade de Medicina da Universidade de São Paulo, São Paulo, SP 05403–000, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -58,7 +58,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff1",
-              "institution": "aff1",
+              "institution": "Departamento de Molestias Infecciosas e Parasitarias and Instituto de Medicina Tropical da Faculdade de Medicina da Universidade de São Paulo, São Paulo, SP 05403–000, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -79,7 +79,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff2",
-              "institution": "aff2",
+              "institution": "Fundação Hospitalar de Hematologia e Hemoterapia do Amazonas, Manaus, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -100,7 +100,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff3",
-              "institution": "aff3",
+              "institution": "Departamento de Engenharia de Sistemas Eletrônicos, Escola Politécnica da Universidade de São Paulo, São Paulo, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -121,7 +121,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff2",
-              "institution": "aff2",
+              "institution": "Fundação Hospitalar de Hematologia e Hemoterapia do Amazonas, Manaus, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -142,7 +142,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff2",
-              "institution": "aff2",
+              "institution": "Fundação Hospitalar de Hematologia e Hemoterapia do Amazonas, Manaus, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -163,7 +163,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff4",
-              "institution": "aff4",
+              "institution": "Institute for Applied Economic Research–Ipea, Brasília, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -184,7 +184,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff5",
-              "institution": "aff5",
+              "institution": "MRC Centre for Global Infectious Disease Analysis, J-IDEA, Imperial College London, London, UK",
               "department": null,
               "address": null,
               "country": null
@@ -205,7 +205,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff6",
-              "institution": "aff6",
+              "institution": "Institute of Mathematics and Statistics, University of São Paulo, São Paulo, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -226,7 +226,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff7",
-              "institution": "aff7",
+              "institution": "Department of Zoology, University of Oxford, Oxford, UK",
               "department": null,
               "address": null,
               "country": null
@@ -247,7 +247,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff8",
-              "institution": "aff8",
+              "institution": "Center of Mathematics, Computing and Cognition–Universidade Federal do ABC, São Paulo, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -268,14 +268,14 @@ expression: article
           "affiliations": [
             {
               "id": "aff9",
-              "institution": "aff9",
+              "institution": "Fundação Hemominas–Fundação Centro de Hematologia e Hemoterapia de Minas Gerais, Belo Horizonte, Brazil",
               "department": null,
               "address": null,
               "country": null
             },
             {
               "id": "aff10",
-              "institution": "aff10",
+              "institution": "Faculdade Ciências Médicas de Minas Gerais, Belo Horizonte, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -296,7 +296,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff5",
-              "institution": "aff5",
+              "institution": "MRC Centre for Global Infectious Disease Analysis, J-IDEA, Imperial College London, London, UK",
               "department": null,
               "address": null,
               "country": null
@@ -317,7 +317,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff11",
-              "institution": "aff11",
+              "institution": "Department of Global Health and Population, Harvard T H Chan School of Public Health, Boston, MA, USA",
               "department": null,
               "address": null,
               "country": null
@@ -338,7 +338,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff12",
-              "institution": "aff12",
+              "institution": "Oxford School of Global and Area Studies, Latin American Centre, University of Oxford, Oxford, UK",
               "department": null,
               "address": null,
               "country": null
@@ -359,7 +359,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff3",
-              "institution": "aff3",
+              "institution": "Departamento de Engenharia de Sistemas Eletrônicos, Escola Politécnica da Universidade de São Paulo, São Paulo, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -380,7 +380,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff13",
-              "institution": "aff13",
+              "institution": "Centro de Ciências Ambientais, Universidade Federal do Amazonas, Manaus, Brazil",
               "department": null,
               "address": null,
               "country": null
@@ -401,7 +401,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff5",
-              "institution": "aff5",
+              "institution": "MRC Centre for Global Infectious Disease Analysis, J-IDEA, Imperial College London, London, UK",
               "department": null,
               "address": null,
               "country": null
@@ -422,7 +422,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff7",
-              "institution": "aff7",
+              "institution": "Department of Zoology, University of Oxford, Oxford, UK",
               "department": null,
               "address": null,
               "country": null
@@ -443,7 +443,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff14",
-              "institution": "aff14",
+              "institution": "Centre for Mathematical Modelling of Infectious Diseases, London School of Hygiene & Tropical Medicine, London, UK",
               "department": null,
               "address": null,
               "country": null
@@ -464,14 +464,14 @@ expression: article
           "affiliations": [
             {
               "id": "aff15",
-              "institution": "aff15",
+              "institution": "Vitalant Research Institute, San Francisco, CA, USA",
               "department": null,
               "address": null,
               "country": null
             },
             {
               "id": "aff16",
-              "institution": "aff16",
+              "institution": "University of California, San Francisco, CA, USA",
               "department": null,
               "address": null,
               "country": null
@@ -492,7 +492,7 @@ expression: article
           "affiliations": [
             {
               "id": "aff7",
-              "institution": "aff7",
+              "institution": "Department of Zoology, University of Oxford, Oxford, UK",
               "department": null,
               "address": null,
               "country": null
@@ -513,21 +513,21 @@ expression: article
           "affiliations": [
             {
               "id": "aff1",
-              "institution": "aff1",
+              "institution": "Departamento de Molestias Infecciosas e Parasitarias and Instituto de Medicina Tropical da Faculdade de Medicina da Universidade de São Paulo, São Paulo, SP 05403–000, Brazil",
               "department": null,
               "address": null,
               "country": null
             },
             {
               "id": "aff5",
-              "institution": "aff5",
+              "institution": "MRC Centre for Global Infectious Disease Analysis, J-IDEA, Imperial College London, London, UK",
               "department": null,
               "address": null,
               "country": null
             },
             {
               "id": "aff7",
-              "institution": "aff7",
+              "institution": "Department of Zoology, University of Oxford, Oxford, UK",
               "department": null,
               "address": null,
               "country": null
