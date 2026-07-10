@@ -30,16 +30,16 @@ pub fn make_reader(content: &str) -> Reader<&[u8]> {
 /// collecting all `Text` events and ignoring child element tags.
 ///
 /// Returns the concatenated text content (whitespace-trimmed by Reader config).
-pub fn read_text_content(
-    reader: &mut Reader<&[u8]>,
-    parent_tag: &[u8],
-    buf: &mut Vec<u8>,
-) -> Result<String> {
+///
+/// Uses the borrowing `read_event()` (zero-copy from the source slice) rather than
+/// `read_event_into(&mut buf)`, which would copy every event's bytes into a scratch
+/// `Vec`. On the hot PMC path this avoids a large amount of `memmove` traffic.
+pub fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> Result<String> {
     let mut text = String::new();
     let mut depth: u32 = 1;
 
     loop {
-        match reader.read_event_into(buf) {
+        match reader.read_event() {
             Ok(Event::Start(ref e)) => {
                 if e.name().as_ref() == parent_tag {
                     depth += 1;
@@ -67,7 +67,6 @@ pub fn read_text_content(
             Err(e) => return Err(ParseError::XmlError(e.to_string())),
             _ => {}
         }
-        buf.clear();
     }
 
     // Reuse the existing buffer instead of allocating a second String via
@@ -107,10 +106,10 @@ pub fn get_attr(e: &BytesStart, name: &[u8]) -> Option<String> {
 
 /// Skip an entire element. The reader must have just consumed `Event::Start` for the tag.
 ///
-/// Uses `read_to_end_into` to efficiently skip all child content.
-pub fn skip_element(reader: &mut Reader<&[u8]>, tag: QName, buf: &mut Vec<u8>) -> Result<()> {
+/// Uses the borrowing `read_to_end` (zero-copy) to efficiently skip all child content.
+pub fn skip_element(reader: &mut Reader<&[u8]>, tag: QName) -> Result<()> {
     reader
-        .read_to_end_into(tag, buf)
+        .read_to_end(tag)
         .map_err(|e| ParseError::XmlError(e.to_string()))?;
     Ok(())
 }
@@ -120,23 +119,24 @@ pub fn skip_element(reader: &mut Reader<&[u8]>, tag: QName, buf: &mut Vec<u8>) -
 mod tests {
     use super::*;
 
+    /// Advance the reader until a `Start` event for `tag` is consumed.
+    fn advance_to(reader: &mut Reader<&[u8]>, tag: &[u8]) {
+        loop {
+            match reader.read_event() {
+                Ok(Event::Start(ref e)) if e.name().as_ref() == tag => break,
+                Ok(Event::Eof) => panic!("unexpected EOF"),
+                _ => {}
+            }
+        }
+    }
+
     #[test]
     fn test_read_text_content_simple() {
         let xml = "<root><title>Hello World</title></root>";
         let mut reader = make_reader(xml);
-        let mut buf = Vec::new();
+        advance_to(&mut reader, b"title");
 
-        // Advance to <root>
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) if e.name().as_ref() == b"title" => break,
-                Ok(Event::Eof) => panic!("unexpected EOF"),
-                _ => {}
-            }
-            buf.clear();
-        }
-
-        let text = read_text_content(&mut reader, b"title", &mut buf).unwrap();
+        let text = read_text_content(&mut reader, b"title").unwrap();
         assert_eq!(text, "Hello World");
     }
 
@@ -144,19 +144,9 @@ mod tests {
     fn test_read_text_content_mixed() {
         let xml = "<p>Normal <b>bold</b> text</p>";
         let mut reader = make_reader(xml);
-        let mut buf = Vec::new();
+        advance_to(&mut reader, b"p");
 
-        // Advance past <p>
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) if e.name().as_ref() == b"p" => break,
-                Ok(Event::Eof) => panic!("unexpected EOF"),
-                _ => {}
-            }
-            buf.clear();
-        }
-
-        let text = read_text_content(&mut reader, b"p", &mut buf).unwrap();
+        let text = read_text_content(&mut reader, b"p").unwrap();
         assert_eq!(text, "Normal bold text");
     }
 
@@ -164,19 +154,9 @@ mod tests {
     fn test_read_text_content_nested_same_tag() {
         let xml = "<sec><sec><title>Inner</title></sec></sec>";
         let mut reader = make_reader(xml);
-        let mut buf = Vec::new();
+        advance_to(&mut reader, b"sec");
 
-        // Advance past outer <sec>
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) if e.name().as_ref() == b"sec" => break,
-                Ok(Event::Eof) => panic!("unexpected EOF"),
-                _ => {}
-            }
-            buf.clear();
-        }
-
-        let text = read_text_content(&mut reader, b"sec", &mut buf).unwrap();
+        let text = read_text_content(&mut reader, b"sec").unwrap();
         assert_eq!(text, "Inner");
     }
 
@@ -184,18 +164,9 @@ mod tests {
     fn test_read_text_content_entities() {
         let xml = "<p>CO&amp;2 &lt;levels&gt;</p>";
         let mut reader = make_reader(xml);
-        let mut buf = Vec::new();
+        advance_to(&mut reader, b"p");
 
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) if e.name().as_ref() == b"p" => break,
-                Ok(Event::Eof) => panic!("unexpected EOF"),
-                _ => {}
-            }
-            buf.clear();
-        }
-
-        let text = read_text_content(&mut reader, b"p", &mut buf).unwrap();
+        let text = read_text_content(&mut reader, b"p").unwrap();
         assert_eq!(text, "CO&2 <levels>");
     }
 
@@ -203,9 +174,8 @@ mod tests {
     fn test_get_attr() {
         let xml = r#"<article id="test-id" article-type="research-article">"#;
         let mut reader = make_reader(xml);
-        let mut buf = Vec::new();
 
-        if let Ok(Event::Start(ref e)) = reader.read_event_into(&mut buf) {
+        if let Ok(Event::Start(ref e)) = reader.read_event() {
             assert_eq!(get_attr(e, b"id"), Some("test-id".to_string()));
             assert_eq!(
                 get_attr(e, b"article-type"),
@@ -221,10 +191,9 @@ mod tests {
     fn test_get_attr_namespaced() {
         let xml = r#"<graphic xlink:href="fig1.jpg"/>"#;
         let mut reader = make_reader(xml);
-        let mut buf = Vec::new();
 
         // expand_empty_elements turns this into Start + End
-        if let Ok(Event::Start(ref e)) = reader.read_event_into(&mut buf) {
+        if let Ok(Event::Start(ref e)) = reader.read_event() {
             assert_eq!(get_attr(e, b"xlink:href"), Some("fig1.jpg".to_string()));
         } else {
             panic!("expected Start event");
@@ -235,26 +204,23 @@ mod tests {
     fn test_skip_element() {
         let xml = "<root><skip><nested>deep</nested></skip><target>found</target></root>";
         let mut reader = make_reader(xml);
-        let mut buf = Vec::new();
 
         // Advance to <root>
-        reader.read_event_into(&mut buf).unwrap();
-        buf.clear();
+        reader.read_event().unwrap();
 
         // Read <skip> — clone name to avoid borrow conflict
-        let skip_name = if let Ok(Event::Start(ref e)) = reader.read_event_into(&mut buf) {
+        let skip_name = if let Ok(Event::Start(ref e)) = reader.read_event() {
             assert_eq!(e.name().as_ref(), b"skip");
             e.name().0.to_vec()
         } else {
             panic!("expected <skip>");
         };
-        skip_element(&mut reader, QName(&skip_name), &mut buf).unwrap();
-        buf.clear();
+        skip_element(&mut reader, QName(&skip_name)).unwrap();
 
         // Next should be <target>
-        if let Ok(Event::Start(ref e)) = reader.read_event_into(&mut buf) {
+        if let Ok(Event::Start(ref e)) = reader.read_event() {
             assert_eq!(e.name().as_ref(), b"target");
-            let text = read_text_content(&mut reader, b"target", &mut buf).unwrap();
+            let text = read_text_content(&mut reader, b"target").unwrap();
             assert_eq!(text, "found");
         } else {
             panic!("expected <target>");
@@ -265,18 +231,9 @@ mod tests {
     fn test_read_text_content_empty_element() {
         let xml = "<root><title></title></root>";
         let mut reader = make_reader(xml);
-        let mut buf = Vec::new();
+        advance_to(&mut reader, b"title");
 
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) if e.name().as_ref() == b"title" => break,
-                Ok(Event::Eof) => panic!("unexpected EOF"),
-                _ => {}
-            }
-            buf.clear();
-        }
-
-        let text = read_text_content(&mut reader, b"title", &mut buf).unwrap();
+        let text = read_text_content(&mut reader, b"title").unwrap();
         assert_eq!(text, "");
     }
 }

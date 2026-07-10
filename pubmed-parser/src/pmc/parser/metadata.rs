@@ -20,10 +20,9 @@ enum TextAction {
 
 fn read_first_text(content: &str, tag: &[u8]) -> Option<String> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(&mut buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == tag => {
                 TextAction::Read(e.name().as_ref().to_vec())
             }
@@ -31,17 +30,16 @@ fn read_first_text(content: &str, tag: &[u8]) -> Option<String> {
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) => {
-                return read_text_content(&mut reader, &name, &mut buf)
+                return read_text_content(&mut reader, &name)
                     .ok()
                     .map(|s| s.trim().to_string())
                     .filter(|s| !s.is_empty());
             }
             TextAction::ReadSkip(name) => {
-                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+                let _ = skip_element(&mut reader, QName(&name));
             }
             TextAction::Break => return None,
             TextAction::Continue => {}
@@ -51,12 +49,11 @@ fn read_first_text(content: &str, tag: &[u8]) -> Option<String> {
 
 fn read_texts_within_parent(content: &str, parent: &[u8], child: &[u8]) -> Vec<String> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
     let mut parent_depth = 0_u32;
     let mut values = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(&mut buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == parent => {
                 parent_depth += 1;
                 TextAction::Continue
@@ -72,11 +69,10 @@ fn read_texts_within_parent(content: &str, parent: &[u8], child: &[u8]) -> Vec<S
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) => {
-                if let Ok(text) = read_text_content(&mut reader, &name, &mut buf) {
+                if let Ok(text) = read_text_content(&mut reader, &name) {
                     let text = text.trim().to_string();
                     if !text.is_empty() {
                         values.push(text);
@@ -84,7 +80,7 @@ fn read_texts_within_parent(content: &str, parent: &[u8], child: &[u8]) -> Vec<S
                 }
             }
             TextAction::ReadSkip(name) => {
-                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+                let _ = skip_element(&mut reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -101,10 +97,9 @@ fn read_first_text_matching_attr(
     value: &str,
 ) -> Option<String> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(&mut buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e))
                 if e.name().as_ref() == tag && get_attr(e, attr).as_deref() == Some(value) =>
             {
@@ -118,17 +113,16 @@ fn read_first_text_matching_attr(
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) => {
-                return read_text_content(&mut reader, &name, &mut buf)
+                return read_text_content(&mut reader, &name)
                     .ok()
                     .map(|s| s.trim().to_string())
                     .filter(|s| !s.is_empty());
             }
             TextAction::ReadSkip(name) => {
-                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+                let _ = skip_element(&mut reader, QName(&name));
             }
             TextAction::Break => return None,
             TextAction::Continue => {}
@@ -138,10 +132,9 @@ fn read_first_text_matching_attr(
 
 fn read_first_attr(content: &str, tag: &[u8], attrs: &[&[u8]]) -> Option<String> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let result = match reader.read_event_into(&mut buf) {
+        let result = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == tag => {
                 attrs.iter().find_map(|attr| get_attr(e, attr))
             }
@@ -149,7 +142,6 @@ fn read_first_attr(content: &str, tag: &[u8], attrs: &[&[u8]]) -> Option<String>
             Err(_) => return None,
             _ => None,
         };
-        buf.clear();
 
         if result.is_some() {
             return result;
@@ -168,14 +160,13 @@ fn parse_u8(text: String) -> Option<u8> {
 fn read_date_parts(
     reader: &mut Reader<&[u8]>,
     parent_tag: &[u8],
-    buf: &mut Vec<u8>,
 ) -> (Option<u16>, Option<u8>, Option<u8>) {
     let mut year = None;
     let mut month = None;
     let mut day = None;
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
                 b"year" | b"month" | b"day" => TextAction::Read(e.name().as_ref().to_vec()),
                 other => TextAction::ReadSkip(other.to_vec()),
@@ -185,26 +176,19 @@ fn read_date_parts(
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) if name == b"year" => {
-                year = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(parse_u16);
+                year = read_text_content(reader, &name).ok().and_then(parse_u16);
             }
             TextAction::Read(name) if name == b"month" => {
-                month = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(parse_u8);
+                month = read_text_content(reader, &name).ok().and_then(parse_u8);
             }
             TextAction::Read(name) if name == b"day" => {
-                day = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(parse_u8);
+                day = read_text_content(reader, &name).ok().and_then(parse_u8);
             }
             TextAction::Read(name) | TextAction::ReadSkip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -219,15 +203,12 @@ fn clean_text(text: String) -> Option<String> {
     if text.is_empty() { None } else { Some(text) }
 }
 
-fn read_award_group(
-    reader: &mut Reader<&[u8]>,
-    buf: &mut Vec<u8>,
-) -> (Option<String>, Option<String>) {
+fn read_award_group(reader: &mut Reader<&[u8]>) -> (Option<String>, Option<String>) {
     let mut source = None;
     let mut award_id = None;
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"funding-source" => {
                 TextAction::Read(e.name().as_ref().to_vec())
             }
@@ -240,21 +221,16 @@ fn read_award_group(
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) if name.as_slice() == b"funding-source" => {
-                source = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(clean_text);
+                source = read_text_content(reader, &name).ok().and_then(clean_text);
             }
             TextAction::Read(name) if name.as_slice() == b"award-id" => {
-                award_id = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(clean_text);
+                award_id = read_text_content(reader, &name).ok().and_then(clean_text);
             }
             TextAction::Read(name) | TextAction::ReadSkip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -267,12 +243,12 @@ fn read_award_group(
     (source, award_id)
 }
 
-fn read_funding_group(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Vec<FundingInfo> {
+fn read_funding_group(reader: &mut Reader<&[u8]>) -> Vec<FundingInfo> {
     let mut statement = None;
     let mut awards = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"funding-statement" => {
                 TextAction::Read(e.name().as_ref().to_vec())
             }
@@ -285,20 +261,17 @@ fn read_funding_group(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Vec<Fund
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) if name.as_slice() == b"funding-statement" => {
-                statement = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(clean_text);
+                statement = read_text_content(reader, &name).ok().and_then(clean_text);
             }
             TextAction::Read(name) if name.as_slice() == b"award-group" => {
-                let (source, award_id) = read_award_group(reader, buf);
+                let (source, award_id) = read_award_group(reader);
                 awards.push((source, award_id));
             }
             TextAction::Read(name) | TextAction::ReadSkip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -322,11 +295,11 @@ struct SectionParts {
     text_parts: Vec<String>,
 }
 
-fn read_section_parts(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> SectionParts {
+fn read_section_parts(reader: &mut Reader<&[u8]>) -> SectionParts {
     let mut parts = SectionParts::default();
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
                 b"title" | b"p" | b"sec" => TextAction::Read(e.name().as_ref().to_vec()),
                 other => TextAction::ReadSkip(other.to_vec()),
@@ -336,14 +309,10 @@ fn read_section_parts(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> SectionP
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) if name.as_slice() == b"title" => {
-                if let Some(text) = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(clean_text)
-                {
+                if let Some(text) = read_text_content(reader, &name).ok().and_then(clean_text) {
                     if parts.title.is_none() {
                         parts.title = Some(text.clone());
                     }
@@ -351,21 +320,18 @@ fn read_section_parts(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> SectionP
                 }
             }
             TextAction::Read(name) if name.as_slice() == b"p" => {
-                if let Some(text) = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(clean_text)
-                {
+                if let Some(text) = read_text_content(reader, &name).ok().and_then(clean_text) {
                     parts.paragraphs.push(text.clone());
                     parts.text_parts.push(text);
                 }
             }
             TextAction::Read(name) if name.as_slice() == b"sec" => {
-                let nested = read_section_parts(reader, buf);
+                let nested = read_section_parts(reader);
                 parts.paragraphs.extend(nested.paragraphs);
                 parts.text_parts.extend(nested.text_parts);
             }
             TextAction::Read(name) | TextAction::ReadSkip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -375,12 +341,12 @@ fn read_section_parts(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> SectionP
     parts
 }
 
-fn read_caption(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Option<String> {
+fn read_caption(reader: &mut Reader<&[u8]>) -> Option<String> {
     let mut title = None;
     let mut text_parts = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => TextAction::Read(e.name().as_ref().to_vec()),
             Ok(Event::Text(ref e)) => {
                 if let Ok(text) = e.unescape()
@@ -395,13 +361,10 @@ fn read_caption(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Option<String>
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) if name.as_slice() == b"title" => {
-                let text = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(clean_text);
+                let text = read_text_content(reader, &name).ok().and_then(clean_text);
                 if title.is_none() {
                     title = text.clone();
                 }
@@ -410,15 +373,12 @@ fn read_caption(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Option<String>
                 }
             }
             TextAction::Read(name) => {
-                if let Some(text) = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(clean_text)
-                {
+                if let Some(text) = read_text_content(reader, &name).ok().and_then(clean_text) {
                     text_parts.push(text);
                 }
             }
             TextAction::ReadSkip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -428,9 +388,9 @@ fn read_caption(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>) -> Option<String>
     title.or_else(|| clean_text(text_parts.join(" ")))
 }
 
-fn read_media(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>, caption: &mut Option<String>) {
+fn read_media(reader: &mut Reader<&[u8]>, caption: &mut Option<String>) {
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"caption" => {
                 TextAction::Read(e.name().as_ref().to_vec())
             }
@@ -440,18 +400,17 @@ fn read_media(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>, caption: &mut Optio
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) if name.as_slice() == b"caption" => {
                 if caption.is_none() {
-                    *caption = read_caption(reader, buf);
+                    *caption = read_caption(reader);
                 } else {
-                    let _ = skip_element(reader, QName(&name), buf);
+                    let _ = skip_element(reader, QName(&name));
                 }
             }
             TextAction::Read(name) | TextAction::ReadSkip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -461,7 +420,6 @@ fn read_media(reader: &mut Reader<&[u8]>, buf: &mut Vec<u8>, caption: &mut Optio
 
 fn read_supplementary_material(
     reader: &mut Reader<&[u8]>,
-    buf: &mut Vec<u8>,
     id: Option<String>,
     content_type: Option<String>,
     href: Option<String>,
@@ -472,7 +430,7 @@ fn read_supplementary_material(
     let mut href = href;
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"label" => {
                 TextAction::Read(e.name().as_ref().to_vec())
             }
@@ -493,22 +451,19 @@ fn read_supplementary_material(
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) if name.as_slice() == b"label" => {
-                label = read_text_content(reader, &name, buf)
-                    .ok()
-                    .and_then(clean_text);
+                label = read_text_content(reader, &name).ok().and_then(clean_text);
             }
             TextAction::Read(name) if name.as_slice() == b"caption" => {
-                caption = read_caption(reader, buf);
+                caption = read_caption(reader);
             }
             TextAction::Read(name) if name.as_slice() == b"media" => {
-                read_media(reader, buf, &mut caption);
+                read_media(reader, &mut caption);
             }
             TextAction::Read(name) | TextAction::ReadSkip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -537,9 +492,8 @@ pub(crate) fn extract_journal_info(content: &str) -> JournalMeta {
     let mut issn_electronic = None;
 
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
     loop {
-        let action = match reader.read_event_into(&mut buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"issn" => {
                 let pub_type = get_attr(e, b"pub-type");
                 Some((e.name().as_ref().to_vec(), pub_type))
@@ -548,10 +502,9 @@ pub(crate) fn extract_journal_info(content: &str) -> JournalMeta {
             Err(_) => break,
             _ => None,
         };
-        buf.clear();
 
         if let Some((name, pub_type)) = action
-            && let Ok(value) = read_text_content(&mut reader, &name, &mut buf)
+            && let Ok(value) = read_text_content(&mut reader, &name)
             && let Some(value) = clean_text(value)
         {
             match pub_type.as_deref() {
@@ -589,23 +542,18 @@ pub(crate) fn extract_issue(content: &str) -> Option<String> {
 pub(crate) fn extract_pub_dates(content: &str) -> Vec<PublicationDate> {
     let mut dates = Vec::new();
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let pub_type = match reader.read_event_into(&mut buf) {
+        let pub_type = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"pub-date" => {
                 get_attr(e, b"pub-type").or_else(|| get_attr(e, b"date-type"))
             }
             Ok(Event::Eof) => break,
             Err(_) => break,
-            _ => {
-                buf.clear();
-                continue;
-            }
+            _ => continue,
         };
-        buf.clear();
 
-        let (year, month, day) = read_date_parts(&mut reader, b"pub-date", &mut buf);
+        let (year, month, day) = read_date_parts(&mut reader, b"pub-date");
         dates.push(PublicationDate {
             pub_type,
             year,
@@ -641,17 +589,12 @@ pub(crate) fn extract_keywords(content: &str) -> Vec<String> {
 /// Read child `<{child}>` texts until the current `<{group}>` element closes
 /// (depth-aware, so nested same-name groups roll up into the enclosing one).
 /// The reader must have just consumed the opening `<{group}>` start tag.
-fn read_group_child_texts(
-    reader: &mut Reader<&[u8]>,
-    buf: &mut Vec<u8>,
-    group: &[u8],
-    child: &[u8],
-) -> Vec<String> {
+fn read_group_child_texts(reader: &mut Reader<&[u8]>, group: &[u8], child: &[u8]) -> Vec<String> {
     let mut depth = 1_u32;
     let mut values = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == group => {
                 depth += 1;
                 TextAction::Continue
@@ -671,18 +614,17 @@ fn read_group_child_texts(
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) => {
-                if let Ok(text) = read_text_content(reader, &name, buf)
+                if let Ok(text) = read_text_content(reader, &name)
                     && !text.is_empty()
                 {
                     values.push(text);
                 }
             }
             TextAction::ReadSkip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -696,11 +638,10 @@ fn read_group_child_texts(
 /// `xml:lang`. From `<kwd-group>/<kwd>`.
 pub(crate) fn extract_keyword_groups(content: &str) -> Vec<KeywordGroup> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
     let mut groups = Vec::new();
 
     loop {
-        let attrs = match reader.read_event_into(&mut buf) {
+        let attrs = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"kwd-group" => {
                 Some((get_attr(e, b"kwd-group-type"), get_attr(e, b"xml:lang")))
             }
@@ -708,10 +649,9 @@ pub(crate) fn extract_keyword_groups(content: &str) -> Vec<KeywordGroup> {
             Err(_) => break,
             _ => None,
         };
-        buf.clear();
 
         if let Some((group_type, lang)) = attrs {
-            let keywords = read_group_child_texts(&mut reader, &mut buf, b"kwd-group", b"kwd");
+            let keywords = read_group_child_texts(&mut reader, b"kwd-group", b"kwd");
             if !keywords.is_empty() {
                 groups.push(KeywordGroup {
                     group_type,
@@ -737,11 +677,10 @@ pub(crate) fn extract_subject_groups(content: &str) -> Vec<SubjectGroup> {
     let cats = &content[start..start + end + "</article-categories>".len()];
 
     let mut reader = make_reader(cats);
-    let mut buf = Vec::new();
     let mut groups = Vec::new();
 
     loop {
-        let group_type = match reader.read_event_into(&mut buf) {
+        let group_type = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"subj-group" => {
                 Some(get_attr(e, b"subj-group-type"))
             }
@@ -749,10 +688,9 @@ pub(crate) fn extract_subject_groups(content: &str) -> Vec<SubjectGroup> {
             Err(_) => break,
             _ => None,
         };
-        buf.clear();
 
         if let Some(group_type) = group_type {
-            let subjects = read_group_child_texts(&mut reader, &mut buf, b"subj-group", b"subject");
+            let subjects = read_group_child_texts(&mut reader, b"subj-group", b"subject");
             if !subjects.is_empty() {
                 groups.push(SubjectGroup {
                     group_type,
@@ -769,11 +707,10 @@ pub(crate) fn extract_subject_groups(content: &str) -> Vec<SubjectGroup> {
 /// From `<related-article>` attributes.
 pub(crate) fn extract_related_articles(content: &str) -> Vec<RelatedArticle> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
     let mut out = Vec::new();
 
     loop {
-        match reader.read_event_into(&mut buf) {
+        match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"related-article" => {
                 out.push(RelatedArticle {
                     related_article_type: get_attr(e, b"related-article-type"),
@@ -786,7 +723,6 @@ pub(crate) fn extract_related_articles(content: &str) -> Vec<RelatedArticle> {
             Err(_) => break,
             _ => {}
         }
-        buf.clear();
     }
 
     out
@@ -795,12 +731,11 @@ pub(crate) fn extract_related_articles(content: &str) -> Vec<RelatedArticle> {
 /// Extract author notes (`<corresp>` / `<fn>` text) from `<author-notes>`.
 pub(crate) fn extract_author_notes(content: &str) -> Vec<String> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
     let mut notes = Vec::new();
     let mut in_notes = 0_u32;
 
     loop {
-        let action = match reader.read_event_into(&mut buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"author-notes" => {
                 in_notes += 1;
                 TextAction::Continue
@@ -818,18 +753,17 @@ pub(crate) fn extract_author_notes(content: &str) -> Vec<String> {
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) => {
-                if let Ok(text) = read_text_content(&mut reader, &name, &mut buf)
+                if let Ok(text) = read_text_content(&mut reader, &name)
                     && !text.is_empty()
                 {
                     notes.push(text);
                 }
             }
             TextAction::ReadSkip(name) => {
-                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+                let _ = skip_element(&mut reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -843,19 +777,17 @@ pub(crate) fn extract_author_notes(content: &str) -> Vec<String> {
 pub(crate) fn extract_funding(content: &str) -> Vec<FundingInfo> {
     let mut funding = Vec::new();
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let is_group = match reader.read_event_into(&mut buf) {
+        let is_group = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"funding-group" => true,
             Ok(Event::Eof) => break,
             Err(_) => break,
             _ => false,
         };
-        buf.clear();
 
         if is_group {
-            funding.extend(read_funding_group(&mut reader, &mut buf));
+            funding.extend(read_funding_group(&mut reader));
         }
     }
 
@@ -872,18 +804,16 @@ pub(crate) fn extract_conflict_of_interest(content: &str) -> Option<String> {
     }
 
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
     loop {
-        let is_section = match reader.read_event_into(&mut buf) {
+        let is_section = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"sec" => true,
             Ok(Event::Eof) => break,
             Err(_) => break,
             _ => false,
         };
-        buf.clear();
 
         if is_section {
-            let parts = read_section_parts(&mut reader, &mut buf);
+            let parts = read_section_parts(&mut reader);
             if let Some(title) = parts.title {
                 let lower = title.to_lowercase();
                 if lower.contains("conflict") || lower.contains("competing") {
@@ -907,10 +837,9 @@ pub(crate) fn extract_acknowledgments(content: &str) -> Option<String> {
 /// Extract data availability statement
 pub(crate) fn extract_data_availability(content: &str) -> Option<String> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(&mut buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"sec" => {
                 TextAction::Read(e.name().as_ref().to_vec())
             }
@@ -921,11 +850,10 @@ pub(crate) fn extract_data_availability(content: &str) -> Option<String> {
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
         };
-        buf.clear();
 
         match action {
             TextAction::Read(name) if name.as_slice() == b"sec" => {
-                let parts = read_section_parts(&mut reader, &mut buf);
+                let parts = read_section_parts(&mut reader);
                 if let Some(text) = clean_text(parts.text_parts.join(" ")) {
                     let lower = text.to_lowercase();
                     if lower.contains("data") && lower.contains("availab") {
@@ -934,7 +862,7 @@ pub(crate) fn extract_data_availability(content: &str) -> Option<String> {
                 }
             }
             TextAction::Read(name) if name.as_slice() == b"supplementary-material" => {
-                if let Ok(text) = read_text_content(&mut reader, &name, &mut buf)
+                if let Ok(text) = read_text_content(&mut reader, &name)
                     && let Some(text) = clean_text(text)
                 {
                     let lower = text.to_lowercase();
@@ -944,7 +872,7 @@ pub(crate) fn extract_data_availability(content: &str) -> Option<String> {
                 }
             }
             TextAction::Read(name) | TextAction::ReadSkip(name) => {
-                let _ = skip_element(&mut reader, QName(&name), &mut buf);
+                let _ = skip_element(&mut reader, QName(&name));
             }
             TextAction::Break => break,
             TextAction::Continue => {}
@@ -958,10 +886,9 @@ pub(crate) fn extract_data_availability(content: &str) -> Option<String> {
 pub(crate) fn extract_supplementary_materials(content: &str) -> Vec<SupplementaryMaterial> {
     let mut materials = Vec::new();
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let attrs = match reader.read_event_into(&mut buf) {
+        let attrs = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"supplementary-material" => Some((
                 get_attr(e, b"id"),
                 get_attr(e, b"content-type"),
@@ -971,14 +898,12 @@ pub(crate) fn extract_supplementary_materials(content: &str) -> Vec<Supplementar
             Err(_) => break,
             _ => None,
         };
-        buf.clear();
 
         if let Some((id, content_type, href)) = attrs {
             let supp_num = materials.len() + 1;
             let fallback_id = format!("supp_{supp_num}");
             materials.push(read_supplementary_material(
                 &mut reader,
-                &mut buf,
                 id,
                 content_type,
                 href,
@@ -1022,16 +947,14 @@ pub(crate) fn extract_license(content: &str) -> Option<String> {
 /// and structured abstracts with sections (`<abstract><sec><title>Background</title><p>...</p></sec>...</abstract>`).
 pub(crate) fn extract_abstract(content: &str) -> Option<String> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let found = match reader.read_event_into(&mut buf) {
+        let found = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"abstract" => true,
             Ok(Event::Eof) => return None,
             Err(_) => return None,
             _ => false,
         };
-        buf.clear();
 
         if !found {
             continue;
@@ -1040,7 +963,7 @@ pub(crate) fn extract_abstract(content: &str) -> Option<String> {
         let mut paragraphs = Vec::new();
         let mut fallback_parts = Vec::new();
         loop {
-            let action = match reader.read_event_into(&mut buf) {
+            let action = match reader.read_event() {
                 Ok(Event::Start(ref e)) if e.name().as_ref() == b"p" => {
                     TextAction::Read(e.name().as_ref().to_vec())
                 }
@@ -1057,11 +980,10 @@ pub(crate) fn extract_abstract(content: &str) -> Option<String> {
                 Err(_) => TextAction::Break,
                 _ => TextAction::Continue,
             };
-            buf.clear();
 
             match action {
                 TextAction::Read(name) => {
-                    if let Some(text) = read_text_content(&mut reader, &name, &mut buf)
+                    if let Some(text) = read_text_content(&mut reader, &name)
                         .ok()
                         .and_then(clean_text)
                     {
@@ -1069,7 +991,7 @@ pub(crate) fn extract_abstract(content: &str) -> Option<String> {
                     }
                 }
                 TextAction::ReadSkip(name) => {
-                    let _ = skip_element(&mut reader, QName(&name), &mut buf);
+                    let _ = skip_element(&mut reader, QName(&name));
                 }
                 TextAction::Break => {
                     let text = if paragraphs.is_empty() {
@@ -1091,11 +1013,10 @@ pub(crate) fn extract_abstract(content: &str) -> Option<String> {
 pub(crate) fn extract_history_dates(content: &str) -> Vec<HistoryDate> {
     let mut dates = Vec::new();
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
     let mut in_history = false;
 
     loop {
-        let date_type = match reader.read_event_into(&mut buf) {
+        let date_type = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == b"history" => {
                 in_history = true;
                 None
@@ -1111,10 +1032,9 @@ pub(crate) fn extract_history_dates(content: &str) -> Vec<HistoryDate> {
             Err(_) => break,
             _ => None,
         };
-        buf.clear();
 
         if let Some(date_type) = date_type {
-            let (year, month, day) = read_date_parts(&mut reader, b"date", &mut buf);
+            let (year, month, day) = read_date_parts(&mut reader, b"date");
             dates.push(HistoryDate {
                 date_type,
                 year,

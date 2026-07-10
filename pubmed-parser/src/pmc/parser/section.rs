@@ -60,12 +60,11 @@ fn extract_abstract_section(content: &str) -> Option<Section> {
 
     // Extract text content using Reader
     let mut reader = make_reader(abstract_xml);
-    let mut buf = Vec::new();
     let mut text_parts = Vec::new();
     let mut in_abstract = false;
 
     loop {
-        let action = match reader.read_event_into(&mut buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
                 b"abstract" => SectionAction::EnterAbstract,
                 b"p" if in_abstract => SectionAction::ReadParagraph,
@@ -77,12 +76,11 @@ fn extract_abstract_section(content: &str) -> Option<Section> {
             Err(_) => SectionAction::Break,
             _ => SectionAction::Continue,
         };
-        buf.clear();
 
         match action {
             SectionAction::EnterAbstract => in_abstract = true,
             SectionAction::ReadParagraph => {
-                if let Ok(text) = read_text_content(&mut reader, b"p", &mut buf) {
+                if let Ok(text) = read_text_content(&mut reader, b"p") {
                     // `read_text_content` already returns trimmed text.
                     if !text.is_empty() {
                         text_parts.push(text);
@@ -90,7 +88,7 @@ fn extract_abstract_section(content: &str) -> Option<Section> {
                 }
             }
             SectionAction::SkipTitle => {
-                let _ = read_text_content(&mut reader, b"title", &mut buf);
+                let _ = read_text_content(&mut reader, b"title");
             }
             SectionAction::Break => break,
             _ => {}
@@ -162,7 +160,6 @@ fn is_block_level(tag: &[u8]) -> bool {
 /// Extract body sections using Reader with depth-aware `<sec>` parsing
 fn extract_body_sections(content: &str) -> Vec<Section> {
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
     let mut sections = Vec::new();
     let mut has_sec_tags = false;
     let mut body_paragraphs = Vec::new();
@@ -170,7 +167,7 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
     let mut body_tables = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(&mut buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
                 b"sec" => SectionAction::ReadSection(get_attr(e, b"id")),
                 b"p" if !has_sec_tags => SectionAction::ReadBodyParagraph,
@@ -191,18 +188,16 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
             Err(_) => SectionAction::Break,
             _ => SectionAction::Continue,
         };
-        buf.clear();
 
         match action {
             SectionAction::ReadSection(id) => {
                 has_sec_tags = true;
-                if let Some(section) = parse_section_from_body(&mut reader, id, &mut buf) {
+                if let Some(section) = parse_section_from_body(&mut reader, id) {
                     sections.push(section);
                 }
             }
             SectionAction::ReadBodyParagraph => {
-                let (text, inline_figs, inline_tables) =
-                    read_paragraph_with_inline(&mut reader, &mut buf);
+                let (text, inline_figs, inline_tables) = read_paragraph_with_inline(&mut reader);
                 if !text.is_empty() {
                     body_paragraphs.push(text);
                 }
@@ -210,17 +205,17 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
                 body_tables.extend(inline_tables);
             }
             SectionAction::ReadFigure(attrs) => {
-                if let Some(fig) = parse_figure_inner(&mut reader, attrs, &mut buf) {
+                if let Some(fig) = parse_figure_inner(&mut reader, attrs) {
                     body_figures.push(fig);
                 }
             }
             SectionAction::ReadTable(attrs) => {
-                if let Some(table) = parse_table_inner(&mut reader, attrs, &mut buf) {
+                if let Some(table) = parse_table_inner(&mut reader, attrs) {
                     body_tables.push(table);
                 }
             }
             SectionAction::ReadTextElement(tag) => {
-                if let Ok(text) = read_text_content(&mut reader, &tag, &mut buf) {
+                if let Ok(text) = read_text_content(&mut reader, &tag) {
                     // `read_text_content` already returns trimmed text.
                     if !text.is_empty() {
                         body_paragraphs.push(text);
@@ -284,23 +279,18 @@ struct SectionParts {
 impl SectionParts {
     /// Apply one classified action to the accumulators.
     /// Returns `true` when the enclosing `<sec>` is finished (Break/EOF).
-    fn apply(
-        &mut self,
-        action: SectionAction,
-        reader: &mut quick_xml::Reader<&[u8]>,
-        buf: &mut Vec<u8>,
-    ) -> bool {
+    fn apply(&mut self, action: SectionAction, reader: &mut quick_xml::Reader<&[u8]>) -> bool {
         match action {
             SectionAction::SkipTitle => {
                 // `read_text_content` already returns trimmed text.
-                if let Ok(t) = read_text_content(reader, b"title", buf)
+                if let Ok(t) = read_text_content(reader, b"title")
                     && !t.is_empty()
                 {
                     self.title = Some(t);
                 }
             }
             SectionAction::ReadParagraph => {
-                let (text, inline_figs, inline_tables) = read_paragraph_with_inline(reader, buf);
+                let (text, inline_figs, inline_tables) = read_paragraph_with_inline(reader);
                 if !text.is_empty() {
                     self.content_parts.push(text);
                 }
@@ -309,29 +299,29 @@ impl SectionParts {
             }
             SectionAction::ReadSection(sub_id) => {
                 // Recursive: properly handles nested sections
-                if let Some(sub) = parse_section_from_body(reader, sub_id, buf) {
+                if let Some(sub) = parse_section_from_body(reader, sub_id) {
                     self.subsections.push(sub);
                 }
             }
             SectionAction::ReadFigure(attrs) => {
-                if let Some(fig) = parse_figure_inner(reader, attrs, buf) {
+                if let Some(fig) = parse_figure_inner(reader, attrs) {
                     self.figures.push(fig);
                 }
             }
             SectionAction::ReadTable(attrs) => {
-                if let Some(table) = parse_table_inner(reader, attrs, buf) {
+                if let Some(table) = parse_table_inner(reader, attrs) {
                     self.tables.push(table);
                 }
             }
             SectionAction::ReadTextElement(tag) => {
-                if let Ok(text) = read_text_content(reader, &tag, buf)
+                if let Ok(text) = read_text_content(reader, &tag)
                     && !text.is_empty()
                 {
                     self.content_parts.push(text);
                 }
             }
             SectionAction::SkipTag(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             SectionAction::Break => return true,
             // Remaining variants never arise from `classify_section_child`.
@@ -379,21 +369,19 @@ impl SectionParts {
 fn parse_section_from_body(
     reader: &mut quick_xml::Reader<&[u8]>,
     id: Option<String>,
-    buf: &mut Vec<u8>,
 ) -> Option<Section> {
     let mut parts = SectionParts::default();
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => classify_section_child(e),
             Ok(Event::End(ref e)) if e.name().as_ref() == b"sec" => SectionAction::Break,
             Ok(Event::Eof) => SectionAction::Break,
             Err(_) => SectionAction::Break,
             _ => SectionAction::Continue,
         };
-        buf.clear();
 
-        if parts.apply(action, reader, buf) {
+        if parts.apply(action, reader) {
             break;
         }
     }
@@ -407,7 +395,6 @@ fn parse_section_from_body(
 /// Detects `<fig>` and `<table-wrap>` inside `<p>` and parses them as structured data.
 fn read_paragraph_with_inline(
     reader: &mut quick_xml::Reader<&[u8]>,
-    buf: &mut Vec<u8>,
 ) -> (String, Vec<Figure>, Vec<Table>) {
     let mut text = String::new();
     let mut figures = Vec::new();
@@ -418,7 +405,7 @@ fn read_paragraph_with_inline(
     let mut deferred_tables: Vec<TableAttrs> = Vec::new();
 
     loop {
-        match reader.read_event_into(buf) {
+        match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
                 b"p" => depth += 1,
                 b"fig" => {
@@ -444,31 +431,23 @@ fn read_paragraph_with_inline(
                 if e.name().as_ref() == b"p" {
                     depth -= 1;
                     if depth == 0 {
-                        buf.clear();
                         break;
                     }
                 }
             }
-            Ok(Event::Eof) => {
-                buf.clear();
-                break;
-            }
-            Err(_) => {
-                buf.clear();
-                break;
-            }
+            Ok(Event::Eof) => break,
+            Err(_) => break,
             _ => {}
         }
-        buf.clear();
 
-        // Process deferred figures/tables (buf is cleared, safe to use)
+        // Process deferred figures/tables
         for attrs in deferred_figs.drain(..) {
-            if let Some(fig) = parse_figure_inner(reader, attrs, buf) {
+            if let Some(fig) = parse_figure_inner(reader, attrs) {
                 figures.push(fig);
             }
         }
         for attrs in deferred_tables.drain(..) {
-            if let Some(table) = parse_table_inner(reader, attrs, buf) {
+            if let Some(table) = parse_table_inner(reader, attrs) {
                 tables.push(table);
             }
         }
@@ -490,23 +469,21 @@ fn scan_elements<A, T>(
     content: &str,
     tag: &[u8],
     extract_attrs: impl Fn(&quick_xml::events::BytesStart) -> A,
-    parse_inner: impl Fn(&mut quick_xml::Reader<&[u8]>, A, &mut Vec<u8>) -> Option<T>,
+    parse_inner: impl Fn(&mut quick_xml::Reader<&[u8]>, A) -> Option<T>,
 ) -> Vec<T> {
     let mut results = Vec::new();
     let mut reader = make_reader(content);
-    let mut buf = Vec::new();
 
     loop {
-        let attrs = match reader.read_event_into(&mut buf) {
+        let attrs = match reader.read_event() {
             Ok(Event::Start(ref e)) if e.name().as_ref() == tag => Some(extract_attrs(e)),
             Ok(Event::Eof) => break,
             Err(_) => break,
             _ => None,
         };
-        buf.clear();
 
         if let Some(attrs) = attrs
-            && let Some(item) = parse_inner(&mut reader, attrs, &mut buf)
+            && let Some(item) = parse_inner(&mut reader, attrs)
         {
             results.push(item);
         }
@@ -551,18 +528,14 @@ struct TableAttrs {
 }
 
 /// Parse figure content after `Event::Start` for `<fig>` has been consumed.
-fn parse_figure_inner(
-    reader: &mut quick_xml::Reader<&[u8]>,
-    attrs: FigAttrs,
-    buf: &mut Vec<u8>,
-) -> Option<Figure> {
+fn parse_figure_inner(reader: &mut quick_xml::Reader<&[u8]>, attrs: FigAttrs) -> Option<Figure> {
     let mut label: Option<String> = None;
     let mut caption: Option<String> = None;
     let mut alt_text: Option<String> = None;
     let mut file_name: Option<String> = None;
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
                 b"label" => FigAction::ReadLabel,
                 b"caption" => FigAction::ReadCaption,
@@ -578,14 +551,13 @@ fn parse_figure_inner(
             Err(_) => FigAction::Done,
             _ => FigAction::Continue,
         };
-        buf.clear();
 
         match action {
             FigAction::ReadLabel => {
-                label = read_text_content(reader, b"label", buf).ok();
+                label = read_text_content(reader, b"label").ok();
             }
             FigAction::ReadCaption => {
-                caption = match read_text_content(reader, b"caption", buf) {
+                caption = match read_text_content(reader, b"caption") {
                     Ok(text) => Some(text),
                     Err(e) => {
                         warn!(
@@ -598,14 +570,14 @@ fn parse_figure_inner(
                 };
             }
             FigAction::ReadAltText => {
-                alt_text = read_text_content(reader, b"alt-text", buf).ok();
+                alt_text = read_text_content(reader, b"alt-text").ok();
             }
             FigAction::ReadGraphic(href) => {
                 file_name = href;
-                let _ = skip_element(reader, QName(b"graphic"), buf);
+                let _ = skip_element(reader, QName(b"graphic"));
             }
             FigAction::Skip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             FigAction::Done => break,
             FigAction::Continue => {}
@@ -640,17 +612,13 @@ enum FigAction {
 }
 
 /// Parse table-wrap content after `Event::Start` for `<table-wrap>` has been consumed.
-fn parse_table_inner(
-    reader: &mut quick_xml::Reader<&[u8]>,
-    attrs: TableAttrs,
-    buf: &mut Vec<u8>,
-) -> Option<Table> {
+fn parse_table_inner(reader: &mut quick_xml::Reader<&[u8]>, attrs: TableAttrs) -> Option<Table> {
     let mut label: Option<String> = None;
     let mut caption: Option<String> = None;
     let mut footnotes = Vec::new();
 
     loop {
-        let action = match reader.read_event_into(buf) {
+        let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
                 b"label" => TableAction::ReadLabel,
                 b"caption" => TableAction::ReadCaption,
@@ -662,14 +630,13 @@ fn parse_table_inner(
             Err(_) => TableAction::Done,
             _ => TableAction::Continue,
         };
-        buf.clear();
 
         match action {
             TableAction::ReadLabel => {
-                label = read_text_content(reader, b"label", buf).ok();
+                label = read_text_content(reader, b"label").ok();
             }
             TableAction::ReadCaption => {
-                caption = match read_text_content(reader, b"caption", buf) {
+                caption = match read_text_content(reader, b"caption") {
                     Ok(text) => Some(text),
                     Err(e) => {
                         warn!(
@@ -682,7 +649,7 @@ fn parse_table_inner(
                 };
             }
             TableAction::ReadFootnote => {
-                if let Ok(text) = read_text_content(reader, b"table-wrap-foot", buf) {
+                if let Ok(text) = read_text_content(reader, b"table-wrap-foot") {
                     // Already trimmed by `read_text_content`.
                     if !text.is_empty() {
                         footnotes.push(text);
@@ -690,7 +657,7 @@ fn parse_table_inner(
                 }
             }
             TableAction::Skip(name) => {
-                let _ = skip_element(reader, QName(&name), buf);
+                let _ = skip_element(reader, QName(&name));
             }
             TableAction::Done => break,
             TableAction::Continue => {}
