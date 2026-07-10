@@ -37,14 +37,14 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
             },
             {
               "id": "af2-vaccines-12-00072",
-              "institution": "af2-vaccines-12-00072",
+              "institution": "General Hospital of Zone 1, Colima Delegation, Mexican Institute of Social Security, Villa de Álvarez, Colima 28984, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -77,7 +77,7 @@ expression: article
           "affiliations": [
             {
               "id": "af3-vaccines-12-00072",
-              "institution": "af3-vaccines-12-00072",
+              "institution": "Clinical Epidemiology Research Unit, Mexican Institute of Social Security, Villa de Alvarez, Colima 28984, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -98,7 +98,7 @@ expression: article
           "affiliations": [
             {
               "id": "af2-vaccines-12-00072",
-              "institution": "af2-vaccines-12-00072",
+              "institution": "General Hospital of Zone 1, Colima Delegation, Mexican Institute of Social Security, Villa de Álvarez, Colima 28984, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -123,7 +123,7 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -144,7 +144,7 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -169,14 +169,14 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
             },
             {
               "id": "af4-vaccines-12-00072",
-              "institution": "af4-vaccines-12-00072",
+              "institution": "Cancerology State Institute, Colima State Health Services, Colima 28085, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -203,7 +203,7 @@ expression: article
           "affiliations": [
             {
               "id": "af5-vaccines-12-00072",
-              "institution": "af5-vaccines-12-00072",
+              "institution": "Research Center in Minority Institutions, Robert Stempel College of Public Health, Florida International University, Miami, FL 33199, USA",
               "department": null,
               "address": null,
               "country": null
@@ -228,7 +228,7 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -253,7 +253,7 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -278,7 +278,7 @@ expression: article
           "affiliations": [
             {
               "id": "af6-vaccines-12-00072",
-              "institution": "af6-vaccines-12-00072",
+              "institution": "Molecular Medicine Laboratory, Academic Unit of Human Medicine and Health Sciences, Autonomous University of Zacatecas, Zacatecas 98160, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -299,7 +299,7 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -323,7 +323,7 @@ expression: article
           "affiliations": [
             {
               "id": "af7-vaccines-12-00072",
-              "institution": "af7-vaccines-12-00072",
+              "institution": "Molecular and Structural Physiology Laboratory, School of Biological Sciences, Autonomous University of Nuevo Leon, San Nicolas de los Garza 66455, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -344,7 +344,7 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -368,7 +368,7 @@ expression: article
           "affiliations": [
             {
               "id": "af4-vaccines-12-00072",
-              "institution": "af4-vaccines-12-00072",
+              "institution": "Cancerology State Institute, Colima State Health Services, Colima 28085, Mexico",
               "department": null,
               "address": null,
               "country": null
@@ -392,21 +392,21 @@ expression: article
           "affiliations": [
             {
               "id": "af1-vaccines-12-00072",
-              "institution": "af1-vaccines-12-00072",
+              "institution": "School of Medicine, University of Colima, Colima 28040, Mexico",
               "department": null,
               "address": null,
               "country": null
             },
             {
               "id": "af4-vaccines-12-00072",
-              "institution": "af4-vaccines-12-00072",
+              "institution": "Cancerology State Institute, Colima State Health Services, Colima 28085, Mexico",
               "department": null,
               "address": null,
               "country": null
             },
             {
               "id": "af8-vaccines-12-00072",
-              "institution": "af8-vaccines-12-00072",
+              "institution": "Department of Dietetics and Nutrition, Robert Stempel College of Public Health and Social Work, Florida International University, Miami, FL 33199, USA",
               "department": null,
               "address": null,
               "country": null
