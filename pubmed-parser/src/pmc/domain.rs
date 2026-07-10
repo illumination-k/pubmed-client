@@ -346,6 +346,12 @@ pub struct Section {
     pub tables: Vec<Table>,
     /// Display formulas within this section. From `<disp-formula>` elements.
     pub formulas: Vec<Formula>,
+    /// Reference ids cited in this section's paragraphs, in document order.
+    /// From `<xref ref-type="bibr" rid="...">`; each id targets a
+    /// [`Reference::id`] in [`Back::references`], so consumers can join the two
+    /// for citation-context / citation-graph analysis. A grouped citation
+    /// (`rid="B1 B2"`) contributes each id separately.
+    pub cited_reference_ids: Vec<String>,
 }
 
 /// Figure.
@@ -970,6 +976,14 @@ impl Section {
             .collect()
     }
 
+    /// All cited reference ids in this section and its subsections (recursive),
+    /// in document order. See [`Section::cited_reference_ids`].
+    pub fn all_cited_reference_ids(&self) -> Vec<&String> {
+        self.iter_subtree()
+            .flat_map(|s| s.cited_reference_ids.iter())
+            .collect()
+    }
+
     /// Whitespace-delimited word count of this section's own `content`
     /// (not including subsections). Useful for readability/length metrics.
     pub fn word_count(&self) -> usize {
@@ -1107,6 +1121,15 @@ impl PmcArticle {
     pub fn all_formulas(&self) -> Vec<&Formula> {
         self.all_sections()
             .flat_map(|s| s.formulas.iter())
+            .collect()
+    }
+
+    /// All cited reference ids across the whole article body, in document order
+    /// (recursive over sections). Each id targets a [`Reference::id`] in
+    /// [`Back::references`]. See [`Section::cited_reference_ids`].
+    pub fn all_cited_reference_ids(&self) -> Vec<&String> {
+        self.all_sections()
+            .flat_map(|s| s.cited_reference_ids.iter())
             .collect()
     }
 
@@ -1258,6 +1281,7 @@ mod tests {
             figures: Vec::new(),
             tables: Vec::new(),
             formulas: Vec::new(),
+            cited_reference_ids: Vec::new(),
         }
     }
 

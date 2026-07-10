@@ -603,7 +603,41 @@ expression: article
           }
         ],
         "tables": [],
-        "formulas": []
+        "formulas": [],
+        "cited_reference_ids": [
+          "bib1",
+          "bib2",
+          "bib3",
+          "bib4",
+          "bib5",
+          "bib6",
+          "bib7",
+          "bib8",
+          "bib9",
+          "bib10",
+          "bib2",
+          "bib2",
+          "bib11",
+          "bib2",
+          "bib12",
+          "bib13",
+          "bib13",
+          "bib14",
+          "bib15",
+          "bib16",
+          "bib17",
+          "bib18",
+          "bib16",
+          "bib19",
+          "bib16",
+          "bib20",
+          "bib21",
+          "bib22",
+          "bib15",
+          "bib16",
+          "bib16",
+          "bib18"
+        ]
       }
     ]
   },
