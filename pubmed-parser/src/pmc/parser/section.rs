@@ -43,6 +43,7 @@ pub(crate) fn extract_sections_enhanced(content: &str) -> Vec<Section> {
                     figures: float_figures,
                     tables: Vec::new(),
                     formulas: Vec::new(),
+                    cited_reference_ids: Vec::new(),
                 });
             }
         }
@@ -111,6 +112,10 @@ fn extract_abstract_section(content: &str) -> Option<Section> {
             figures,
             tables,
             formulas: Vec::new(),
+            // Abstract paragraph text is collected via `read_text_content`,
+            // which does not track `<xref>` targets; abstracts rarely carry
+            // bibliographic citations, so this is left empty by design.
+            cited_reference_ids: Vec::new(),
         })
     } else {
         None
@@ -165,6 +170,7 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
     let mut body_paragraphs = Vec::new();
     let mut body_figures = Vec::new();
     let mut body_tables = Vec::new();
+    let mut body_cited_refs = Vec::new();
 
     loop {
         let action = match reader.read_event() {
@@ -197,12 +203,14 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
                 }
             }
             SectionAction::ReadBodyParagraph => {
-                let (text, inline_figs, inline_tables) = read_paragraph_with_inline(&mut reader);
+                let (text, inline_figs, inline_tables, cited) =
+                    read_paragraph_with_inline(&mut reader);
                 if !text.is_empty() {
                     body_paragraphs.push(text);
                 }
                 body_figures.extend(inline_figs);
                 body_tables.extend(inline_tables);
+                body_cited_refs.extend(cited);
             }
             SectionAction::ReadFigure(attrs) => {
                 if let Some(fig) = parse_figure_inner(&mut reader, attrs) {
@@ -240,6 +248,7 @@ fn extract_body_sections(content: &str) -> Vec<Section> {
             figures: body_figures,
             tables: body_tables,
             formulas: Vec::new(),
+            cited_reference_ids: body_cited_refs,
         });
     }
 
@@ -274,6 +283,7 @@ struct SectionParts {
     subsections: Vec<Section>,
     figures: Vec<Figure>,
     tables: Vec<Table>,
+    cited_reference_ids: Vec<String>,
 }
 
 impl SectionParts {
@@ -290,12 +300,13 @@ impl SectionParts {
                 }
             }
             SectionAction::ReadParagraph => {
-                let (text, inline_figs, inline_tables) = read_paragraph_with_inline(reader);
+                let (text, inline_figs, inline_tables, cited) = read_paragraph_with_inline(reader);
                 if !text.is_empty() {
                     self.content_parts.push(text);
                 }
                 self.figures.extend(inline_figs);
                 self.tables.extend(inline_tables);
+                self.cited_reference_ids.extend(cited);
             }
             SectionAction::ReadSection(sub_id) => {
                 // Recursive: properly handles nested sections
@@ -356,6 +367,7 @@ impl SectionParts {
             figures: self.figures,
             tables: self.tables,
             formulas: Vec::new(),
+            cited_reference_ids: self.cited_reference_ids,
         })
     }
 }
@@ -389,16 +401,36 @@ fn parse_section_from_body(
     parts.into_section(id)
 }
 
+/// Append the bibliographic reference targets of an `<xref>` start event to
+/// `out`, in document order.
+///
+/// Only `<xref ref-type="bibr">` contributes — other cross-reference kinds
+/// (`fig`, `table`, `disp-formula`, …) are ignored here. The `rid` attribute is
+/// JATS `IDREFS`, so a grouped citation such as `rid="B1 B2 B3"` yields each id
+/// separately. The `<xref>`'s visible text (the citation marker) is left in the
+/// surrounding paragraph content untouched.
+fn collect_bibr_rids(e: &quick_xml::events::BytesStart, out: &mut Vec<String>) {
+    if get_attr(e, b"ref-type").as_deref() != Some("bibr") {
+        return;
+    }
+    if let Some(rid) = get_attr(e, b"rid") {
+        out.extend(rid.split_whitespace().map(str::to_string));
+    }
+}
+
 /// Read a `<p>` element, collecting text while extracting inline figures and tables.
 ///
 /// Uses Cow<str> from unescape() to avoid allocations when text has no XML entities.
 /// Detects `<fig>` and `<table-wrap>` inside `<p>` and parses them as structured data.
+/// Also records the `rid` targets of `<xref ref-type="bibr">` citations so callers
+/// can link the paragraph to the references it cites.
 fn read_paragraph_with_inline(
     reader: &mut quick_xml::Reader<&[u8]>,
-) -> (String, Vec<Figure>, Vec<Table>) {
+) -> (String, Vec<Figure>, Vec<Table>, Vec<String>) {
     let mut text = String::new();
     let mut figures = Vec::new();
     let mut tables = Vec::new();
+    let mut cited_ref_ids = Vec::new();
     let mut depth: u32 = 1; // We're inside <p>
     // Deferred figure/table parsing to avoid borrow conflicts
     let mut deferred_figs: Vec<FigAttrs> = Vec::new();
@@ -408,6 +440,7 @@ fn read_paragraph_with_inline(
         match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
                 b"p" => depth += 1,
+                b"xref" => collect_bibr_rids(e, &mut cited_ref_ids),
                 b"fig" => {
                     deferred_figs.push(FigAttrs {
                         id: get_attr(e, b"id"),
@@ -453,7 +486,7 @@ fn read_paragraph_with_inline(
         }
     }
 
-    (trim_in_place(text), figures, tables)
+    (trim_in_place(text), figures, tables, cited_ref_ids)
 }
 
 // --- Figure and Table extraction using Reader scan ---
@@ -1138,6 +1171,135 @@ value1   value2   value3
             "verse-group content should be extracted, got: {}",
             section.content
         );
+    }
+
+    // --- Tests for in-text citation linkage (<xref ref-type="bibr">) ---
+
+    #[test]
+    fn test_cited_reference_ids_captured_per_section() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Introduction</title>
+            <p>Prior work established this <xref ref-type="bibr" rid="B1">1</xref>,
+               and later studies confirmed it <xref ref-type="bibr" rid="B2">2</xref>.</p>
+            <p>A follow-up <xref ref-type="bibr" rid="B3">3</xref> extended the results.</p>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let section = &sections[0];
+        assert_eq!(
+            section.cited_reference_ids,
+            vec!["B1".to_string(), "B2".to_string(), "B3".to_string()]
+        );
+        // The visible citation markers stay in the content unchanged.
+        assert!(section.content.contains('1'));
+        assert!(section.content.contains("Prior work established this"));
+    }
+
+    #[test]
+    fn test_grouped_citation_rids_split() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Methods</title>
+            <p>Several groups reported this <xref ref-type="bibr" rid="B1 B2 B3">1-3</xref>.</p>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        assert_eq!(
+            sections[0].cited_reference_ids,
+            vec!["B1".to_string(), "B2".to_string(), "B3".to_string()]
+        );
+    }
+
+    #[test]
+    fn test_non_bibr_xref_not_captured_as_citation() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Results</title>
+            <p>As shown in <xref ref-type="fig" rid="fig1">Figure 1</xref>, the effect
+               is significant <xref ref-type="bibr" rid="B5">5</xref>.</p>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        // Only the bibr xref contributes; the figure xref is ignored.
+        assert_eq!(sections[0].cited_reference_ids, vec!["B5".to_string()]);
+    }
+
+    #[test]
+    fn test_cited_reference_ids_empty_without_citations() {
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Discussion</title>
+            <p>No citations in this paragraph.</p>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        assert!(sections[0].cited_reference_ids.is_empty());
+    }
+
+    #[test]
+    fn test_cited_reference_ids_in_body_without_sections() {
+        let content = r#"
+        <body>
+            <p>Early results <xref ref-type="bibr" rid="B1">1</xref> were promising.</p>
+            <p>Later work <xref ref-type="bibr" rid="B2">2</xref> disagreed.</p>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        assert_eq!(sections[0].section_type, Some("body".to_string()));
+        assert_eq!(
+            sections[0].cited_reference_ids,
+            vec!["B1".to_string(), "B2".to_string()]
+        );
+    }
+
+    #[test]
+    fn test_cited_reference_ids_scoped_to_own_section() {
+        // Each <sec> keeps only the citations from its own paragraphs; the
+        // recursive accessor on the domain model aggregates subsections.
+        let content = r#"
+        <body>
+        <sec id="sec1">
+            <title>Outer</title>
+            <p>Outer cite <xref ref-type="bibr" rid="B1">1</xref>.</p>
+            <sec id="sec1.1">
+                <title>Inner</title>
+                <p>Inner cite <xref ref-type="bibr" rid="B2">2</xref>.</p>
+            </sec>
+        </sec>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        assert_eq!(sections.len(), 1);
+        let outer = &sections[0];
+        assert_eq!(outer.cited_reference_ids, vec!["B1".to_string()]);
+        assert_eq!(outer.subsections.len(), 1);
+        assert_eq!(
+            outer.subsections[0].cited_reference_ids,
+            vec!["B2".to_string()]
+        );
+        // Recursive accessor collects both, in document order.
+        let all: Vec<&String> = outer.all_cited_reference_ids();
+        assert_eq!(all, vec![&"B1".to_string(), &"B2".to_string()]);
     }
 
     #[test]

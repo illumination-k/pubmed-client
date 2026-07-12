@@ -529,6 +529,7 @@ impl From<JsSection> for pubmed_client::pmc::Section {
                 })
                 .collect(),
             formulas: Vec::new(),
+            cited_reference_ids: Vec::new(),
         }
     }
 }

@@ -570,7 +570,8 @@ expression: article
           }
         ],
         "tables": [],
-        "formulas": []
+        "formulas": [],
+        "cited_reference_ids": []
       },
       {
         "id": "sec1-vaccines-12-00072",
@@ -581,7 +582,31 @@ expression: article
         "subsections": [],
         "figures": [],
         "tables": [],
-        "formulas": []
+        "formulas": [],
+        "cited_reference_ids": [
+          "B1-vaccines-12-00072",
+          "B2-vaccines-12-00072",
+          "B2-vaccines-12-00072",
+          "B3-vaccines-12-00072",
+          "B4-vaccines-12-00072",
+          "B5-vaccines-12-00072",
+          "B1-vaccines-12-00072",
+          "B3-vaccines-12-00072",
+          "B6-vaccines-12-00072",
+          "B7-vaccines-12-00072",
+          "B3-vaccines-12-00072",
+          "B3-vaccines-12-00072",
+          "B7-vaccines-12-00072",
+          "B8-vaccines-12-00072",
+          "B9-vaccines-12-00072",
+          "B10-vaccines-12-00072",
+          "B11-vaccines-12-00072",
+          "B12-vaccines-12-00072",
+          "B13-vaccines-12-00072",
+          "B14-vaccines-12-00072",
+          "B6-vaccines-12-00072",
+          "B6-vaccines-12-00072"
+        ]
       },
       {
         "id": "sec2-vaccines-12-00072",
@@ -599,7 +624,8 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": []
           },
           {
             "id": "sec2dot2-vaccines-12-00072",
@@ -610,7 +636,12 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": [
+              "B15-vaccines-12-00072",
+              "B16-vaccines-12-00072",
+              "B17-vaccines-12-00072"
+            ]
           },
           {
             "id": "sec2dot3-vaccines-12-00072",
@@ -621,7 +652,10 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": [
+              "B18-vaccines-12-00072"
+            ]
           },
           {
             "id": "sec2dot4-vaccines-12-00072",
@@ -632,12 +666,21 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": [
+              "B19-vaccines-12-00072",
+              "B20-vaccines-12-00072",
+              "B21-vaccines-12-00072",
+              "B21-vaccines-12-00072",
+              "B22-vaccines-12-00072",
+              "B21-vaccines-12-00072"
+            ]
           }
         ],
         "figures": [],
         "tables": [],
-        "formulas": []
+        "formulas": [],
+        "cited_reference_ids": []
       },
       {
         "id": "sec3-vaccines-12-00072",
@@ -655,7 +698,8 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": []
           },
           {
             "id": "sec3dot2-vaccines-12-00072",
@@ -666,7 +710,13 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": [
+              "B23-vaccines-12-00072",
+              "B24-vaccines-12-00072",
+              "B25-vaccines-12-00072",
+              "B26-vaccines-12-00072"
+            ]
           },
           {
             "id": "sec3dot3-vaccines-12-00072",
@@ -677,7 +727,8 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": []
           },
           {
             "id": "sec3dot4-vaccines-12-00072",
@@ -688,7 +739,8 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": []
           },
           {
             "id": "sec3dot5-vaccines-12-00072",
@@ -699,7 +751,11 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": [
+              "B21-vaccines-12-00072",
+              "B22-vaccines-12-00072"
+            ]
           },
           {
             "id": "sec3dot6-vaccines-12-00072",
@@ -710,7 +766,8 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": []
           },
           {
             "id": "sec3dot7-vaccines-12-00072",
@@ -721,12 +778,17 @@ expression: article
             "subsections": [],
             "figures": [],
             "tables": [],
-            "formulas": []
+            "formulas": [],
+            "cited_reference_ids": [
+              "B27-vaccines-12-00072",
+              "B28-vaccines-12-00072"
+            ]
           }
         ],
         "figures": [],
         "tables": [],
-        "formulas": []
+        "formulas": [],
+        "cited_reference_ids": []
       },
       {
         "id": "sec4-vaccines-12-00072",
@@ -737,7 +799,35 @@ expression: article
         "subsections": [],
         "figures": [],
         "tables": [],
-        "formulas": []
+        "formulas": [],
+        "cited_reference_ids": [
+          "B8-vaccines-12-00072",
+          "B7-vaccines-12-00072",
+          "B9-vaccines-12-00072",
+          "B10-vaccines-12-00072",
+          "B11-vaccines-12-00072",
+          "B12-vaccines-12-00072",
+          "B7-vaccines-12-00072",
+          "B29-vaccines-12-00072",
+          "B8-vaccines-12-00072",
+          "B7-vaccines-12-00072",
+          "B7-vaccines-12-00072",
+          "B8-vaccines-12-00072",
+          "B3-vaccines-12-00072",
+          "B3-vaccines-12-00072",
+          "B30-vaccines-12-00072",
+          "B31-vaccines-12-00072",
+          "B32-vaccines-12-00072",
+          "B33-vaccines-12-00072",
+          "B30-vaccines-12-00072",
+          "B34-vaccines-12-00072",
+          "B32-vaccines-12-00072",
+          "B35-vaccines-12-00072",
+          "B3-vaccines-12-00072",
+          "B4-vaccines-12-00072",
+          "B36-vaccines-12-00072",
+          "B37-vaccines-12-00072"
+        ]
       },
       {
         "id": "sec5-vaccines-12-00072",
@@ -748,7 +838,8 @@ expression: article
         "subsections": [],
         "figures": [],
         "tables": [],
-        "formulas": []
+        "formulas": [],
+        "cited_reference_ids": []
       }
     ]
   },
