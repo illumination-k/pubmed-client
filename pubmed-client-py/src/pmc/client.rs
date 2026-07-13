@@ -3,7 +3,6 @@
 //! This module provides Python wrappers for the PMC client.
 
 use pyo3::prelude::*;
-use pyo3::types::PyList;
 use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -109,23 +108,14 @@ impl PyPmcClient {
         py: Python,
         pmcid: String,
         output_dir: String,
-    ) -> PyResult<Py<PyList>> {
+    ) -> PyResult<Vec<String>> {
         let client = self.client.clone();
         let output_path = PathBuf::from(output_dir);
 
         py.detach(|| {
             let rt = get_runtime();
-            let files = rt
-                .block_on(client.download_files(&pmcid, &output_path))
-                .map_err(to_py_err)?;
-
-            Python::attach(|py| {
-                let list = PyList::empty(py);
-                for file in files {
-                    list.append(file)?;
-                }
-                Ok(list.into())
-            })
+            rt.block_on(client.download_files(&pmcid, &output_path))
+                .map_err(to_py_err)
         })
     }
 
@@ -157,7 +147,7 @@ impl PyPmcClient {
         py: Python,
         pmcid: String,
         output_dir: String,
-    ) -> PyResult<Py<PyList>> {
+    ) -> PyResult<Vec<PyExtractedFigure>> {
         let client = self.client.clone();
         let output_path = PathBuf::from(output_dir);
 
@@ -167,14 +157,10 @@ impl PyPmcClient {
                 .block_on(client.extract_figures_with_captions(&pmcid, &output_path))
                 .map_err(to_py_err)?;
 
-            Python::attach(|py| {
-                let list = PyList::empty(py);
-                for fig in &extracted_figures {
-                    let py_fig = PyExtractedFigure::from(fig);
-                    list.append(py_fig)?;
-                }
-                Ok(list.into())
-            })
+            Ok(extracted_figures
+                .iter()
+                .map(PyExtractedFigure::from)
+                .collect())
         })
     }
 

@@ -671,7 +671,7 @@ class PmcClient:
         Returns:
             PMC ID if available, None otherwise
         """
-    def download_files(self, pmcid: builtins.str, output_dir: builtins.str) -> list:
+    def download_files(self, pmcid: builtins.str, output_dir: builtins.str) -> builtins.list[builtins.str]:
         r"""
         Download a PMC article's Open Access files
 
@@ -694,7 +694,7 @@ class PmcClient:
             >>> for file in files:
             ...     print(file)
         """
-    def extract_figures_with_captions(self, pmcid: builtins.str, output_dir: builtins.str) -> list:
+    def extract_figures_with_captions(self, pmcid: builtins.str, output_dir: builtins.str) -> builtins.list[ExtractedFigure]:
         r"""
         Extract figures with captions from PMC article
 
