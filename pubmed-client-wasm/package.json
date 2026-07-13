@@ -1,6 +1,6 @@
 {
   "name": "pubmed-client-wasm",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "WebAssembly bindings for the PubMed client library",
   "main": "pkg/pubmed_client_wasm.js",
   "types": "pkg/pubmed_client_wasm.d.ts",
