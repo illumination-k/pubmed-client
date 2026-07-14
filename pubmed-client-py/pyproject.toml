@@ -136,11 +136,12 @@ extend-select = [
 
 [tool.mypy]
 python_version = "3.12"
-warn_return_any = true
+# strict is what the release pipeline used to pass as `--strict` on the command
+# line. Keeping it in config means CI, the release pipeline, and `mise run
+# lint:py` all type check at the same strictness — a generated stub that only
+# --strict rejects (e.g. a bare `list` return) can no longer reach a release.
+strict = true
 warn_unused_configs = true
-check_untyped_defs = true
-disallow_untyped_defs = true
-disallow_untyped_calls = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

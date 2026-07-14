@@ -195,6 +195,8 @@ jobs:
           uv run pytest -v -m "not integration"
 
       - name: Type check
+        # Same command as ci-python.yml's lint job; strictness lives in
+        # pyproject.toml's [tool.mypy] so the two cannot drift apart.
         run: |
           cd pubmed-client-py
-          uv run mypy tests/ --strict
+          uv run mypy .
