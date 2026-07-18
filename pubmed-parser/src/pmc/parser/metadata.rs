@@ -1,3 +1,5 @@
+use std::mem;
+
 use crate::common::{HistoryDate, PublicationDate};
 use crate::pmc::domain::{
     FundingInfo, JournalMeta, KeywordGroup, RelatedArticle, SubjectGroup, SupplementaryMaterial,
@@ -8,7 +10,9 @@ use quick_xml::events::Event;
 use quick_xml::name::QName;
 use tracing::warn;
 
-use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
+use super::reader_utils::{
+    get_attr, make_reader, read_text_content, resolve_general_ref, skip_element,
+};
 use super::xml_utils::decode_xml_entities;
 
 enum TextAction {
@@ -341,26 +345,49 @@ fn read_section_parts(reader: &mut Reader<&[u8]>) -> SectionParts {
     parts
 }
 
+/// Flush a text run accumulated across `Text`/`GeneralRef` events into `parts`
+/// as a single cleaned part. Call at every event that ends a contiguous run.
+fn flush_pending(pending: &mut String, parts: &mut Vec<String>) {
+    if let Some(text) = clean_text(mem::take(pending)) {
+        parts.push(text);
+    }
+}
+
 fn read_caption(reader: &mut Reader<&[u8]>) -> Option<String> {
     let mut title = None;
     let mut text_parts = Vec::new();
+    // Text directly inside <caption> is accumulated across Text and GeneralRef
+    // events (a run like "AT&amp;T" arrives as three events) and flushed as one
+    // part at the next element boundary.
+    let mut pending = String::new();
 
     loop {
         let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => TextAction::Read(e.name().as_ref().to_vec()),
             Ok(Event::Text(ref e)) => {
-                if let Ok(text) = e.unescape()
-                    && let Some(text) = clean_text(text.into_owned())
-                {
-                    text_parts.push(text);
+                if let Ok(text) = e.decode() {
+                    pending.push_str(&text);
+                }
+                TextAction::Continue
+            }
+            Ok(Event::GeneralRef(ref e)) => {
+                if let Ok(text) = resolve_general_ref(e) {
+                    pending.push_str(&text);
                 }
                 TextAction::Continue
             }
             Ok(Event::End(ref e)) if e.name().as_ref() == b"caption" => TextAction::Break,
             Ok(Event::Eof) => TextAction::Break,
             Err(_) => TextAction::Break,
-            _ => TextAction::Continue,
+            _ => {
+                flush_pending(&mut pending, &mut text_parts);
+                TextAction::Continue
+            }
         };
+
+        if !matches!(action, TextAction::Continue) {
+            flush_pending(&mut pending, &mut text_parts);
+        }
 
         match action {
             TextAction::Read(name) if name.as_slice() == b"title" => {
@@ -962,24 +989,38 @@ pub(crate) fn extract_abstract(content: &str) -> Option<String> {
 
         let mut paragraphs = Vec::new();
         let mut fallback_parts = Vec::new();
+        // Accumulates a text run split across Text and GeneralRef events so it
+        // is flushed into `fallback_parts` as a single part.
+        let mut pending = String::new();
         loop {
             let action = match reader.read_event() {
                 Ok(Event::Start(ref e)) if e.name().as_ref() == b"p" => {
                     TextAction::Read(e.name().as_ref().to_vec())
                 }
                 Ok(Event::Text(ref e)) => {
-                    if let Ok(text) = e.unescape()
-                        && let Some(text) = clean_text(text.into_owned())
-                    {
-                        fallback_parts.push(text);
+                    if let Ok(text) = e.decode() {
+                        pending.push_str(&text);
+                    }
+                    TextAction::Continue
+                }
+                Ok(Event::GeneralRef(ref e)) => {
+                    if let Ok(text) = resolve_general_ref(e) {
+                        pending.push_str(&text);
                     }
                     TextAction::Continue
                 }
                 Ok(Event::End(ref e)) if e.name().as_ref() == b"abstract" => TextAction::Break,
                 Ok(Event::Eof) => TextAction::Break,
                 Err(_) => TextAction::Break,
-                _ => TextAction::Continue,
+                _ => {
+                    flush_pending(&mut pending, &mut fallback_parts);
+                    TextAction::Continue
+                }
             };
+
+            if !matches!(action, TextAction::Continue) {
+                flush_pending(&mut pending, &mut fallback_parts);
+            }
 
             match action {
                 TextAction::Read(name) => {

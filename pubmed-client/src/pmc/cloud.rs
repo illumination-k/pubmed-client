@@ -1,4 +1,4 @@
-use std::{path::Path, time::Duration};
+use std::{mem, path::Path, time::Duration};
 
 use crate::common::PmcId;
 use crate::config::ClientConfig;
@@ -242,27 +242,50 @@ impl PmcCloudClient {
         use quick_xml::Reader;
         use quick_xml::events::Event;
 
+        use quick_xml::escape::resolve_predefined_entity;
+
         let mut reader = Reader::from_str(xml_content);
         reader.config_mut().trim_text(true);
 
         let mut buf = Vec::new();
         let mut keys = Vec::new();
         let mut in_key = false;
+        // A key containing an escaped character (e.g. `&amp;`) arrives as
+        // multiple Text/GeneralRef events, so accumulate until </Key>.
+        let mut key = String::new();
 
         loop {
             match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) if e.name().as_ref() == b"Key" => in_key = true,
-                Ok(Event::End(ref e)) if e.name().as_ref() == b"Key" => in_key = false,
-                Ok(Event::Text(ref e)) if in_key => {
-                    let text = e
-                        .unescape()
-                        .map_err(|err| {
-                            ParseError::XmlError(format!("Invalid UTF-8 in S3 Key: {}", err))
-                        })?
-                        .to_string();
+                Ok(Event::Start(ref e)) if e.name().as_ref() == b"Key" => {
+                    in_key = true;
+                    key.clear();
+                }
+                Ok(Event::End(ref e)) if e.name().as_ref() == b"Key" => {
+                    in_key = false;
                     // Skip folder-marker keys (zero-byte objects ending in `/`).
-                    if !text.ends_with('/') {
-                        keys.push(text);
+                    if !key.is_empty() && !key.ends_with('/') {
+                        keys.push(mem::take(&mut key));
+                    }
+                }
+                Ok(Event::Text(ref e)) if in_key => {
+                    let text = e.decode().map_err(|err| {
+                        ParseError::XmlError(format!("Invalid UTF-8 in S3 Key: {}", err))
+                    })?;
+                    key.push_str(&text);
+                }
+                Ok(Event::GeneralRef(ref e)) if in_key => {
+                    let char_ref = e.resolve_char_ref().map_err(|err| {
+                        ParseError::XmlError(format!("Invalid reference in S3 Key: {}", err))
+                    })?;
+                    if let Some(ch) = char_ref {
+                        key.push(ch);
+                    } else {
+                        let name = e.decode().map_err(|err| {
+                            ParseError::XmlError(format!("Invalid UTF-8 in S3 Key: {}", err))
+                        })?;
+                        if let Some(text) = resolve_predefined_entity(&name) {
+                            key.push_str(text);
+                        }
                     }
                 }
                 Ok(Event::Eof) => break,

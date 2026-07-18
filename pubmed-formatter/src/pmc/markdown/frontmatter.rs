@@ -80,7 +80,7 @@ pub(super) fn generate_yaml_frontmatter(article: &PmcArticle) -> String {
             .map(|p| clean_content(p)),
     };
 
-    match serde_yaml::to_string(&metadata) {
+    match serde_norway::to_string(&metadata) {
         Ok(yaml_content) => format!("---\n{}---\n", yaml_content),
         Err(e) => {
             tracing::warn!("Failed to serialize YAML frontmatter: {}", e);

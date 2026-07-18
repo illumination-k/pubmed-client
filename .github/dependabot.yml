@@ -1,0 +1,60 @@
+# Automated dependency updates (https://github.com/illumination-k/pubmed-client/issues/207).
+#
+# Notes:
+# - The R bindings crate (pubmed-client-r/src/rust) is intentionally not covered:
+#   it depends on the *published* pubmed-client, whose version is kept in
+#   lock-step with the workspace by scripts/sync-versions.sh, not by Dependabot.
+# - Minor/patch updates are grouped per ecosystem to keep PR noise down;
+#   major updates still get individual PRs.
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      cargo-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: "npm"
+    directory: "/pubmed-client-napi"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # Internal platform packages; versions are managed by scripts/sync-versions.sh.
+      - dependency-name: "pubmed-client-*"
+    groups:
+      napi-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "npm"
+    directory: "/pubmed-client-wasm"
+    schedule:
+      interval: "weekly"
+    groups:
+      wasm-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "npm"
+    directory: "/website"
+    schedule:
+      interval: "weekly"
+    groups:
+      website-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "uv"
+    directory: "/pubmed-client-py"
+    schedule:
+      interval: "weekly"
+    groups:
+      py-minor-patch:
+        update-types: ["minor", "patch"]

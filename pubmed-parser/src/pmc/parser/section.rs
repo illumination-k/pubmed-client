@@ -1,6 +1,8 @@
 use crate::pmc::domain::{Figure, Section, Table};
 
-use super::reader_utils::{get_attr, make_reader, read_text_content, skip_element, trim_in_place};
+use super::reader_utils::{
+    get_attr, make_reader, read_text_content, resolve_general_ref, skip_element, trim_in_place,
+};
 use quick_xml::events::Event;
 use quick_xml::name::QName;
 use tracing::warn;
@@ -420,7 +422,7 @@ fn collect_bibr_rids(e: &quick_xml::events::BytesStart, out: &mut Vec<String>) {
 
 /// Read a `<p>` element, collecting text while extracting inline figures and tables.
 ///
-/// Uses Cow<str> from unescape() to avoid allocations when text has no XML entities.
+/// Uses Cow<str> from decode() to avoid allocations for plain UTF-8 text.
 /// Detects `<fig>` and `<table-wrap>` inside `<p>` and parses them as structured data.
 /// Also records the `rid` targets of `<xref ref-type="bibr">` citations so callers
 /// can link the paragraph to the references it cites.
@@ -455,9 +457,14 @@ fn read_paragraph_with_inline(
                 _ => {} // Skip child tags, keep reading for text
             },
             Ok(Event::Text(ref e)) => {
-                // Use Cow: borrows when no entities, only allocates when unescaping
-                if let Ok(unescaped) = e.unescape() {
-                    text.push_str(&unescaped);
+                // Use Cow: borrows for UTF-8 input, only allocates when decoding
+                if let Ok(decoded) = e.decode() {
+                    text.push_str(&decoded);
+                }
+            }
+            Ok(Event::GeneralRef(ref e)) => {
+                if let Ok(resolved) = resolve_general_ref(e) {
+                    text.push_str(&resolved);
                 }
             }
             Ok(Event::End(ref e)) => {
