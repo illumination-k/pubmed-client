@@ -43,7 +43,7 @@
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^1.0.0",
     "happy-dom": "^12.0.0",
-    "typescript": "^5.0.0",
+    "typescript": "^7.0.2",
     "vitest": "^1.0.0",
     "wasm-pack": "^0.12.1"
   },
