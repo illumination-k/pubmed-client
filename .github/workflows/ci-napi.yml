@@ -50,7 +50,7 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           lfs: true
           fetch-depth: 0
@@ -101,7 +101,7 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           lfs: true
           fetch-depth: 0
@@ -118,14 +118,14 @@ jobs:
       # Setup zig for cross-compilation (musl and aarch64-linux-gnu)
       - name: Setup zig
         if: contains(matrix.settings.target, 'musl') || matrix.settings.target == 'aarch64-unknown-linux-gnu'
-        uses: mlugg/setup-zig@fa65c4058643678a4e4a9a60513944a7d8d35440 # v2.1.0 # zizmor: ignore[cache-poisoning]
+        uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2.1.0 # zizmor: ignore[cache-poisoning]
         with:
           version: 0.14.1
           cache-key: ${{ runner.os }}-${{ matrix.settings.target }}
 
       - name: Install cargo-zigbuild
         if: contains(matrix.settings.target, 'musl') || matrix.settings.target == 'aarch64-unknown-linux-gnu'
-        uses: taiki-e/install-action@e0db384ad69f5ba2c6dd0129d8934e0d0ba465c1 # v2.65.10
+        uses: taiki-e/install-action@07b4745e0c39a41822af610387492e3e53aa222b # v2.83.4
         with:
           tool: cargo-zigbuild
 
@@ -133,7 +133,7 @@ jobs:
         run: ${{ matrix.settings.build }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: bindings-${{ matrix.settings.target }}
           path: |
@@ -154,7 +154,7 @@ jobs:
         working-directory: pubmed-client-napi
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           lfs: true
           fetch-depth: 0
@@ -167,7 +167,7 @@ jobs:
         run: pnpm install
 
       - name: Download artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: bindings-x86_64-unknown-linux-gnu
           path: .
