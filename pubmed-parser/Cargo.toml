@@ -27,7 +27,7 @@ urlencoding = { workspace = true }
 criterion = { version = "0.5", features = ["html_reports"] }
 insta = { version = "1", features = ["json"] }
 pubmed-test-utils = { workspace = true }
-rstest = "0.18"
+rstest = "0.26"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-test = "0.2"
 
