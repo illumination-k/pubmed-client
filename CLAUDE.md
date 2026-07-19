@@ -337,7 +337,7 @@ See `.claude/skills/maturin-debugger/SKILL.md` for detailed troubleshooting.
 
 **pubmed-parser**: `quick-xml`, `serde`, `serde_json`, `regex`, `thiserror`, `tracing`, `urlencoding`.
 
-**pubmed-formatter**: `pubmed-parser`, `serde`, `serde_json`, `serde_yaml`, `regex`, `tracing`.
+**pubmed-formatter**: `pubmed-parser`, `serde`, `serde_json`, `serde_norway` (maintained `serde_yaml` fork), `regex`, `tracing`.
 
 **pubmed-client**: `pubmed-parser`, `pubmed-formatter`, `tokio`, `reqwest`, `serde`, `moka` (caching), `rand`, `image`, `futures-util`. PMC OA files are downloaded per-file from the PMC OA Cloud (AWS S3) over plain HTTP via `reqwest` — no tar/gzip deps.
 

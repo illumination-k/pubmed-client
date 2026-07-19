@@ -6,7 +6,7 @@
 use std::{fmt::Display, future::Future};
 
 use crate::time::{Duration, sleep};
-use rand::Rng;
+use rand::RngExt;
 use tracing::{debug, warn};
 
 /// Configuration for retry behavior
@@ -74,8 +74,8 @@ impl RetryConfig {
 
         let final_delay = if self.use_jitter {
             // Add jitter: random value between 0.5 and 1.5 of the calculated delay
-            let mut rng = rand::thread_rng();
-            let jitter_factor = rng.gen_range(0.5..1.5);
+            let mut rng = rand::rng();
+            let jitter_factor = rng.random_range(0.5..1.5);
             capped_delay * jitter_factor
         } else {
             capped_delay

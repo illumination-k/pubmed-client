@@ -28,11 +28,11 @@ pubmed-client = { path = "pubmed-client", version = "0.3.0" }
 pubmed-formatter = { path = "pubmed-formatter", version = "0.3.0" }
 pubmed-parser = { path = "pubmed-parser", version = "0.3.0" }
 pubmed-test-utils = { path = "pubmed-test-utils" }
-quick-xml = { version = "0.36", features = ["serialize"] }
+quick-xml = { version = "0.41", features = ["serialize"] }
 regex = "1.10"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 tracing = "0.1"
 urlencoding = "2.1"
 

@@ -21,10 +21,12 @@ moka = { version = "0.12", features = ["future"] }
 pubmed-formatter = { workspace = true }
 pubmed-parser = { workspace = true }
 quick-xml = { workspace = true }
-rand = "0.8"
-redis = { version = "0.27", features = ["tokio-comp"], optional = true }
+rand = "0.10"
+redis = { version = "1", features = ["tokio-comp"], optional = true }
 regex = { workspace = true }
-rusqlite = { version = "0.31", features = ["bundled"], optional = true }
+# rusqlite 0.40 requires Rust 1.94+ (libsqlite3-sys 0.38 uses `cfg_select!`);
+# 0.39 is the newest that builds on the pinned 1.93 toolchain.
+rusqlite = { version = "0.39", features = ["bundled"], optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
@@ -37,12 +39,12 @@ tokio = { version = "1.0", features = ["full"] }
 tokio-retry = "0.3"
 tokio-util = "0.7"
 futures-util = "0.3"
-image = "0.24"
+image = "0.25"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 reqwest = { version = "0.13", features = ["json", "form"], default-features = false }
 tokio = { version = "1.0", features = ["macros", "rt", "time"], default-features = false }
-getrandom = { version = "0.2", features = ["js"] }
+getrandom = { version = "0.4", features = ["wasm_js"] }
 js-sys = "0.3"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
@@ -57,7 +59,6 @@ cache-sqlite = ["dep:rusqlite"]
 
 [dev-dependencies]
 chrono = "0.4"
-clap = { version = "3.2", features = ["derive"] }
 paste = "1.0"
 proptest = "1"
 pubmed-test-utils = { workspace = true }

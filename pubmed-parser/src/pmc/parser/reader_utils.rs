@@ -4,7 +4,8 @@
 //! the PMC section and metadata parsers.
 
 use quick_xml::Reader;
-use quick_xml::events::{BytesStart, Event};
+use quick_xml::escape::resolve_predefined_entity;
+use quick_xml::events::{BytesRef, BytesStart, Event};
 use quick_xml::name::QName;
 
 use crate::error::{ParseError, Result};
@@ -21,6 +22,28 @@ pub fn make_reader(content: &str) -> Reader<&[u8]> {
     let mut reader = Reader::from_str(content);
     reader.config_mut().expand_empty_elements = true;
     reader
+}
+
+/// Resolve an `Event::GeneralRef` (`&name;` or `&#…;`) to its text.
+///
+/// quick-xml no longer resolves references inside `Text` events; they arrive
+/// as separate `GeneralRef` events. Character references and the five
+/// predefined XML entities are resolved here; unknown (DTD-defined) entities
+/// are kept verbatim as `&name;` so no text is silently lost.
+pub fn resolve_general_ref(r: &BytesRef) -> Result<String> {
+    if let Some(ch) = r
+        .resolve_char_ref()
+        .map_err(|e| ParseError::XmlError(e.to_string()))?
+    {
+        return Ok(ch.to_string());
+    }
+    let name = r
+        .decode()
+        .map_err(|e| ParseError::XmlError(e.to_string()))?;
+    if let Some(text) = resolve_predefined_entity(&name) {
+        return Ok(text.to_string());
+    }
+    Ok(format!("&{name};"))
 }
 
 /// Read all text content inside the current element, stripping child tags.
@@ -50,10 +73,13 @@ pub fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> Resul
                 // Mixed content (e.g. "<p>text <b>bold</b> more</p>") arrives as
                 // multiple Text events; the source whitespace around inline tags
                 // is preserved in the events, so we simply concatenate.
-                let unescaped = e
-                    .unescape()
+                let decoded = e
+                    .decode()
                     .map_err(|err| ParseError::XmlError(err.to_string()))?;
-                text.push_str(&unescaped);
+                text.push_str(&decoded);
+            }
+            Ok(Event::GeneralRef(ref e)) => {
+                text.push_str(&resolve_general_ref(e)?);
             }
             Ok(Event::End(ref e)) => {
                 if e.name().as_ref() == parent_tag {
