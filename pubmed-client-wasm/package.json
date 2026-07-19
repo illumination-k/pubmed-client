@@ -45,7 +45,7 @@
     "happy-dom": "^12.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0",
-    "wasm-pack": "^0.12.1"
+    "wasm-pack": "^0.15.0"
   },
   "engines": {
     "node": ">=20.0.0"
