@@ -10,6 +10,7 @@ use crate::pmc::oa_api::OaSubsetInfo;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
+use crate::tls::install_default_crypto_provider;
 use pubmed_parser::pmc::PmcArticle;
 use reqwest::Client;
 use tracing::info;
@@ -78,6 +79,9 @@ impl PmcClient {
     pub fn with_config(config: ClientConfig) -> Self {
         let rate_limiter = config.create_rate_limiter();
         let base_url = config.effective_base_url().to_string();
+
+        // rustls has no built-in provider under `rustls-tls`; install one first.
+        install_default_crypto_provider();
 
         // reqwest's client builder only fails if the TLS backend cannot be
         // initialized — an unrecoverable process-level environment error — so
