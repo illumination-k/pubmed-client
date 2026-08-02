@@ -1,6 +1,6 @@
 {
   "name": "pubmed-client",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Node.js native bindings for PubMed/PMC API client",
   "type": "module",
   "main": "index.js",
@@ -74,13 +74,13 @@
     "vitest": "^2.1.8"
   },
   "optionalDependencies": {
-    "pubmed-client-darwin-x64": "0.3.0",
-    "pubmed-client-win32-x64-msvc": "0.3.0",
-    "pubmed-client-linux-x64-gnu": "0.3.0",
-    "pubmed-client-linux-x64-musl": "0.3.0",
-    "pubmed-client-darwin-arm64": "0.3.0",
-    "pubmed-client-linux-arm64-gnu": "0.3.0",
-    "pubmed-client-linux-arm64-musl": "0.3.0"
+    "pubmed-client-darwin-x64": "0.3.1",
+    "pubmed-client-win32-x64-msvc": "0.3.1",
+    "pubmed-client-linux-x64-gnu": "0.3.1",
+    "pubmed-client-linux-x64-musl": "0.3.1",
+    "pubmed-client-darwin-arm64": "0.3.1",
+    "pubmed-client-linux-arm64-gnu": "0.3.1",
+    "pubmed-client-linux-arm64-musl": "0.3.1"
   },
   "pnpm": {
     "ignoredOptionalDependencies": [
