@@ -18,6 +18,7 @@ pubmed-client-rs/                    # Cargo workspace root
 ├── pubmed-client-napi/              # Native Node.js bindings via napi-rs (npm: pubmed-client)
 ├── pubmed-client-wasm/              # WASM bindings for browsers/Node.js (npm: pubmed-client-wasm)
 ├── pubmed-client-py/                # Python bindings via PyO3 (PyPI: pubmed-client-py)
+├── pubmed-client-go/                # Go bindings via cgo (Go module: .../pubmed-client-go)
 ├── pubmed-client-r/                 # R bindings via extendr (R package: pubmedclient) — NOT a workspace member
 ├── pubmed-cli/                      # Command-line interface
 ├── pubmed-mcp/                      # MCP server for AI assistant integration
@@ -66,6 +67,12 @@ uv run --with maturin maturin develop
 uv run pytest
 uv run pytest -m "not integration"   # Unit tests only
 
+# Go (from pubmed-client-go/)
+make build                           # cargo staticlib → lib/$GOOS_$GOARCH/, required before any go command
+make test                            # offline tests (stub HTTP server)
+make check                           # gofmt + go vet
+cargo test -p pubmed-client-go       # Rust FFI boundary tests
+
 # MCP server
 cargo test -p pubmed-mcp
 cargo build --release -p pubmed-mcp
@@ -94,6 +101,10 @@ pnpm run typecheck
 uv run ruff check .
 uv run ruff format .
 uv run mypy tests/ --strict
+
+# Go (requires MISE_ENV=go)
+mise r lint:go                       # gofmt check + go vet
+mise r fmt:go                        # gofmt -w
 ```
 
 ### Code Coverage
@@ -228,6 +239,19 @@ WebAssembly bindings via wasm-pack. Published as `pubmed-client-wasm` on npm. Ke
 Python bindings via PyO3/maturin. Published as `pubmed-client-py` on PyPI. Synchronous API with internal Tokio runtime. Key types: `Client`, `PubMedClient`, `PmcClient`, `SearchQuery`, `ClientConfig`.
 
 **Type stub (`pubmed_client.pyi`) is generated, never hand-edited.** It is produced from the `#[gen_stub_pyclass]`/`#[gen_stub_pymethods]` annotations by `src/bin/stub_gen.rs`, which also splices in the members `pyo3-stub-gen` can't see (`__version__` and the `create_exception!` hierarchy — the latter listed explicitly in `stub_gen.rs`). Every new `#[pyclass]` needs `#[gen_stub_pyclass]` and every `#[pymethods]` block needs `#[gen_stub_pymethods]`, or it silently disappears from the stub. After changing the PyO3 API: `MISE_ENV=python mise run stubgen:py` to regenerate, `MISE_ENV=python mise run stubtest:py` to verify against the compiled module, then commit the `.pyi`. CI's `Python Type Stub Check` job (`ci-python.yml`) fails on `git diff` if the checked-in stub is stale and runs `stubtest` so it can't drift from runtime. `stubtest-allowlist.txt` records intentionally-unstubbed names.
+
+### Go Bindings (`pubmed-client-go/`)
+
+Go bindings via cgo. Go module: `github.com/illumination-k/pubmed-client/pubmed-client-go`, package name `pubmedclient`. Synchronous API with an internal Tokio runtime (same pattern as Python/R). Currently an **MVP**: `New`, `Close`, `SearchArticles`, `FetchArticle`, `FetchArticles`, `SearchAndFetch`, `FetchFullText`, `FetchMarkdown`, `CheckPMCAvailability`, `Version`.
+
+- **Two layers**: a C-ABI shim crate at `rust/` (crate `pubmed-client-go`, `crate-type = ["staticlib", "lib"]`, `publish = false`) and the Go package at the directory root. Unlike the R crate this **is** a workspace member — no external toolchain is needed to compile it — so workspace clippy/nextest cover it automatically.
+- **JSON boundary**: values cross FFI as JSON strings rather than mirrored C structs. Each call returns one owned `char *` (null + `out_err` on failure); Go re-parses into the typed structs in `models.go`. This keeps the C surface at ~11 functions, and because `encoding/json` ignores unknown keys the Rust models can gain fields without breaking Go. `PmcArticleDto` in `rust/src/lib.rs` flattens the nested JATS tree via `PmcArticle`'s accessors.
+- **Panics are caught** (`catch_unwind`) at every boundary function — an `extern "C"` fn that unwinds would abort the Go process.
+- **rustls, not native-tls**: the shim depends on `pubmed-client` with `default-features = false, features = ["rustls-tls"]` so the archive needs no system OpenSSL. Build it with `cargo build -p pubmed-client-go`; under `cargo build --workspace` feature unification pulls `native-tls` back in and the archive would reference OpenSSL again.
+- **The `pubmed-client` dep is path-only** (no `version`, not `workspace = true`): inheriting a workspace dependency forbids overriding `default-features`, and the crate is never published. Nothing for `scripts/sync-versions.sh` to sync.
+- Build: `make build` compiles the archive into `lib/$GOOS_$GOARCH/` (gitignored, ~75 MB). Required before any `go build`/`go vet`/`go test`. `ffi.go` is the only file that touches C; the cgo link line carries per-platform `LDFLAGS`.
+- Tests: offline Go tests point `Config.BaseURL` at an `httptest` server, exercising the whole chain (Go → cgo → Rust → HTTP → XML parse → JSON → Go structs) with no network. Live tests are behind the `integration` build tag plus `PUBMED_REAL_API_TESTS=1`. The Rust shim has its own boundary tests (null pointers, invalid JSON, double free).
+- CI: `.github/workflows/ci-go.yml` — `lint` job (gofmt + vet) and a `test` matrix over ubuntu/macOS, since the cgo link line differs per platform. Windows is unverified (cgo needs the `x86_64-pc-windows-gnu` target, not Cargo's default msvc).
 
 ### R Bindings (`pubmed-client-r/`)
 

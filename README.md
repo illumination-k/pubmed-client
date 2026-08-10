@@ -24,13 +24,14 @@ Search and retrieve biomedical literature from [PubMed](https://pubmed.ncbi.nlm.
 
 ## Installation
 
-| Language         | Command                          |
-| ---------------- | -------------------------------- |
-| Rust             | `cargo add pubmed-client`        |
-| Node.js (native) | `npm install pubmed-client`      |
-| WebAssembly      | `npm install pubmed-client-wasm` |
-| Python           | `pip install pubmed-client-py`   |
-| CLI              | `cargo install pubmed-cli`       |
+| Language         | Command                                |
+| ---------------- | -------------------------------------- |
+| Rust             | `cargo add pubmed-client`              |
+| Node.js (native) | `npm install pubmed-client`            |
+| WebAssembly      | `npm install pubmed-client-wasm`       |
+| Python           | `pip install pubmed-client-py`         |
+| Go               | [build from source](pubmed-client-go/) |
+| CLI              | `cargo install pubmed-cli`             |
 
 ## Quick Start
 
@@ -83,6 +84,21 @@ for article in articles:
     print(f"{article.pmid}: {article.title}")
 ```
 
+### Go
+
+```go
+client, err := pubmedclient.New(&pubmedclient.Config{Email: "you@example.com"})
+if err != nil {
+	log.Fatal(err)
+}
+defer client.Close()
+
+articles, err := client.SearchAndFetch("covid-19 treatment", 10)
+for _, article := range articles {
+	fmt.Printf("%s: %s\n", article.PMID, article.Title)
+}
+```
+
 ### CLI
 
 ```bash
@@ -111,5 +127,7 @@ Full documentation, examples, and API reference are available at:
 | [`pubmed-client-napi`](pubmed-client-napi/) | Native Node.js bindings (napi-rs) |
 | [`pubmed-client-wasm`](pubmed-client-wasm/) | WebAssembly bindings              |
 | [`pubmed-client-py`](pubmed-client-py/)     | Python bindings (PyO3)            |
+| [`pubmed-client-go`](pubmed-client-go/)     | Go bindings (cgo)                 |
+| [`pubmed-client-r`](pubmed-client-r/)       | R bindings (extendr)              |
 | [`pubmed-cli`](pubmed-cli/)                 | Command-line interface            |
 | [`pubmed-mcp`](pubmed-mcp/)                 | MCP server for AI assistants      |

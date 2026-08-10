@@ -1,0 +1,36 @@
+# Loaded with MISE_ENV=go
+# Go toolchain and tasks for the cgo bindings
+# Used by: ci-go.yml
+
+[tools]
+go = "1.24"
+
+# ── Go binding tasks ──────────────────────────────────────────────────────────
+#
+# Every task builds the Rust static archive first: the cgo package cannot even
+# be type-checked without it.
+
+[tasks."go:build"]
+description = "Build the Rust static library and the Go bindings"
+dir = "pubmed-client-go"
+run = ["make build", "go build ./..."]
+
+[tasks."go:test"]
+description = "Run the offline Go binding tests"
+dir = "pubmed-client-go"
+run = ["make test"]
+
+[tasks."go:test-integration"]
+description = "Run the Go binding tests against the live NCBI API"
+dir = "pubmed-client-go"
+run = ["make test-integration"]
+
+[tasks."fmt:go"]
+description = "Format Go code with gofmt"
+dir = "pubmed-client-go"
+run = ["gofmt -w ."]
+
+[tasks."lint:go"]
+description = "Check Go formatting and run go vet"
+dir = "pubmed-client-go"
+run = ["make check"]

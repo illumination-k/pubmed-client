@@ -2,6 +2,7 @@
 members = [
   "pubmed-cli",
   "pubmed-client",
+  "pubmed-client-go/rust",
   "pubmed-client-napi",
   "pubmed-client-py",
   "pubmed-client-wasm",

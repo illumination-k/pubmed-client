@@ -1,0 +1,6 @@
+# Static archives staged by `make build`. They are ~75 MB each, so they are
+# built from source rather than committed.
+lib/
+
+# Binaries left behind by `go build ./examples/...`.
+/basic
