@@ -62,6 +62,11 @@ jobs:
       - name: Run unit tests
         run: mise run test:rs
 
+      # The default feature set does not compile the Redis / SQLite cache
+      # backends, so they need their own run to be covered by this job.
+      - name: Run cache backend tests
+        run: mise run test:rs:cache-backends
+
       # pubmed-client-py is excluded from doc tests since its doc written for Python Users
       - name: Run doc tests
         run: mise run doctest:rs

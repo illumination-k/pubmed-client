@@ -500,4 +500,225 @@ mod tests {
         cache.sync().await;
         assert_eq!(cache.entry_count(), 0);
     }
+
+    // -----------------------------------------------------------------------
+    // create_cache — backend selection and fallback
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_create_cache_memory_backend() {
+        let cache = create_cache(&CacheConfig::default());
+        assert_eq!(cache.entry_count(), 0);
+    }
+
+    /// The SQLite arm must actually build a `SqliteCache`, not silently fall
+    /// back to memory. `SqliteCache::new` is the only thing that creates the
+    /// `cache` table, so the table's existence is the observable proof.
+    #[cfg(feature = "cache-sqlite")]
+    #[test]
+    fn test_create_cache_sqlite_backend_initializes_database() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("cache.sqlite");
+
+        let cache = create_cache(&CacheConfig {
+            backend: CacheBackendConfig::Sqlite { path: path.clone() },
+            ..Default::default()
+        });
+        assert_eq!(cache.entry_count(), 0);
+
+        let conn = rusqlite::Connection::open(&path).unwrap();
+        let table: String = conn
+            .query_row(
+                "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'cache'",
+                [],
+                |row| row.get(0),
+            )
+            .expect("create_cache should have created the `cache` table");
+        assert_eq!(table, "cache");
+    }
+
+    /// An unopenable database path must degrade to the memory backend rather
+    /// than panicking — the fallback documented on `create_cache`.
+    #[cfg(feature = "cache-sqlite")]
+    #[test]
+    fn test_create_cache_sqlite_falls_back_to_memory_on_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("missing-dir").join("cache.sqlite");
+
+        let cache = create_cache(&CacheConfig {
+            backend: CacheBackendConfig::Sqlite { path: path.clone() },
+            ..Default::default()
+        });
+
+        assert!(!path.exists(), "the SQLite path must not have been created");
+        assert_eq!(cache.entry_count(), 0);
+    }
+
+    /// A malformed Redis URL fails in `Client::open`, with no server involved,
+    /// so the fallback arm is reachable offline.
+    #[cfg(feature = "cache-redis")]
+    #[test]
+    fn test_create_cache_redis_falls_back_to_memory_on_bad_url() {
+        let cache = create_cache(&CacheConfig {
+            backend: CacheBackendConfig::Redis {
+                url: "not-a-redis-url".to_string(),
+            },
+            ..Default::default()
+        });
+        assert_eq!(cache.entry_count(), 0);
+    }
+
+    // -----------------------------------------------------------------------
+    // SQLite backend
+    // -----------------------------------------------------------------------
+
+    #[cfg(feature = "cache-sqlite")]
+    fn sqlite_cache(dir: &tempfile::TempDir, ttl: Duration) -> TypedCache<String> {
+        let path = dir.path().join("cache.sqlite");
+        TypedCache::new(SqliteCache::<String>::new(&path, ttl).unwrap())
+    }
+
+    #[cfg(feature = "cache-sqlite")]
+    #[tokio::test]
+    async fn test_sqlite_cache_round_trip() {
+        let dir = tempfile::tempdir().unwrap();
+        let cache = sqlite_cache(&dir, Duration::from_secs(60));
+
+        assert_eq!(cache.get("key1").await, None);
+
+        cache.insert("key1".to_string(), "value1".to_string()).await;
+        assert_eq!(cache.get("key1").await, Some("value1".to_string()));
+        assert_eq!(cache.get("nonexistent").await, None);
+    }
+
+    /// `INSERT OR REPLACE` semantics: a second insert must overwrite, not
+    /// collide on the primary key and leave the old value in place.
+    #[cfg(feature = "cache-sqlite")]
+    #[tokio::test]
+    async fn test_sqlite_cache_insert_replaces_existing_key() {
+        let dir = tempfile::tempdir().unwrap();
+        let cache = sqlite_cache(&dir, Duration::from_secs(60));
+
+        cache.insert("key1".to_string(), "first".to_string()).await;
+        cache.insert("key1".to_string(), "second".to_string()).await;
+
+        assert_eq!(cache.get("key1").await, Some("second".to_string()));
+        assert_eq!(cache.entry_count(), 1);
+    }
+
+    /// A zero TTL stamps `expires_at` at the current second, and the read
+    /// predicate is `expires_at > now`, so the entry is already stale on
+    /// insert. This pins the expiry filter without sleeping.
+    #[cfg(feature = "cache-sqlite")]
+    #[tokio::test]
+    async fn test_sqlite_cache_expired_entry_is_a_miss() {
+        let dir = tempfile::tempdir().unwrap();
+        let cache = sqlite_cache(&dir, Duration::ZERO);
+
+        cache.insert("key1".to_string(), "value1".to_string()).await;
+
+        assert_eq!(cache.get("key1").await, None);
+        assert_eq!(
+            cache.entry_count(),
+            0,
+            "entry_count must exclude expired rows"
+        );
+    }
+
+    #[cfg(feature = "cache-sqlite")]
+    #[tokio::test]
+    async fn test_sqlite_cache_clear_and_entry_count() {
+        let dir = tempfile::tempdir().unwrap();
+        let cache = sqlite_cache(&dir, Duration::from_secs(60));
+
+        assert_eq!(cache.entry_count(), 0);
+
+        cache.insert("key1".to_string(), "value1".to_string()).await;
+        cache.insert("key2".to_string(), "value2".to_string()).await;
+        assert_eq!(cache.entry_count(), 2);
+
+        cache.clear().await;
+        assert_eq!(cache.entry_count(), 0);
+        assert_eq!(cache.get("key1").await, None);
+    }
+
+    /// The point of the SQLite backend over the memory one: entries outlive the
+    /// process. A fresh handle on the same file must see the earlier write.
+    #[cfg(feature = "cache-sqlite")]
+    #[tokio::test]
+    async fn test_sqlite_cache_persists_across_instances() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("cache.sqlite");
+
+        {
+            let cache = TypedCache::new(
+                SqliteCache::<String>::new(&path, Duration::from_secs(60)).unwrap(),
+            );
+            cache.insert("key1".to_string(), "value1".to_string()).await;
+        }
+
+        let reopened =
+            TypedCache::new(SqliteCache::<String>::new(&path, Duration::from_secs(60)).unwrap());
+        assert_eq!(reopened.get("key1").await, Some("value1".to_string()));
+        assert_eq!(reopened.entry_count(), 1);
+    }
+
+    // -----------------------------------------------------------------------
+    // Redis backend
+    // -----------------------------------------------------------------------
+
+    /// `RedisCache::new` only parses the URL — no connection is opened — so
+    /// rejection of a malformed URL is verifiable without a server.
+    #[cfg(feature = "cache-redis")]
+    #[test]
+    fn test_redis_cache_new_rejects_invalid_url() {
+        assert!(RedisCache::<String>::new("not-a-redis-url", Duration::from_secs(60)).is_err());
+        assert!(RedisCache::<String>::new("redis://127.0.0.1/", Duration::from_secs(60)).is_ok());
+    }
+
+    /// An unreachable Redis must degrade to a miss, never an error or a panic:
+    /// every `RedisCache` method swallows connection failures by design.
+    #[cfg(feature = "cache-redis")]
+    #[tokio::test]
+    async fn test_redis_cache_unreachable_server_degrades_to_miss() {
+        // Port 1 is reserved and never listening.
+        let cache = TypedCache::new(
+            RedisCache::<String>::new("redis://127.0.0.1:1/", Duration::from_secs(60)).unwrap(),
+        );
+
+        cache.insert("key1".to_string(), "value1".to_string()).await;
+        assert_eq!(cache.get("key1").await, None);
+        cache.clear().await;
+        assert_eq!(cache.entry_count(), 0);
+    }
+
+    /// Round-trip against a real server. Requires `REDIS_URL` and is `#[ignore]`d
+    /// by default:
+    ///
+    /// ```sh
+    /// docker run --rm -p 6379:6379 redis
+    /// REDIS_URL=redis://127.0.0.1/ cargo test -p pubmed-client \
+    ///     --features cache-redis -- --ignored redis
+    /// ```
+    ///
+    /// It calls `FLUSHDB`, so point it at a throwaway database only.
+    #[cfg(feature = "cache-redis")]
+    #[tokio::test]
+    #[ignore = "requires a running Redis server; set REDIS_URL"]
+    async fn test_redis_cache_round_trip() {
+        let Ok(url) = std::env::var("REDIS_URL") else {
+            panic!("REDIS_URL must be set to run this test");
+        };
+        let cache =
+            TypedCache::new(RedisCache::<String>::new(&url, Duration::from_secs(60)).unwrap());
+
+        cache.clear().await;
+        assert_eq!(cache.get("key1").await, None);
+
+        cache.insert("key1".to_string(), "value1".to_string()).await;
+        assert_eq!(cache.get("key1").await, Some("value1".to_string()));
+
+        cache.clear().await;
+        assert_eq!(cache.get("key1").await, None);
+    }
 }

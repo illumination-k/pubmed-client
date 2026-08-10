@@ -41,7 +41,7 @@ crate.
 1. **Start with `hotspot`.** It ranks `commits × cognitive_max` — "frequently changed
    _and_ complex". The top ~5 files are where bugs concentrate and refactors pay off.
 2. **Drill into `complexity`** for those files. The per-function list gives exact line
-   ranges (`file:Func (L238-317): cog=50`). Sort by **cognitive**, not cyclomatic.
+   ranges (`file:Func (L238-317): cog=33`). Sort by **cognitive**, not cyclomatic.
 3. **Cross-check `similarity` + `wrapper`** to see whether the complexity is genuine
    logic or copy-paste / thin forwarding that should be unified.
 4. **For structure questions, run `coupling`.** Read `instability` (`Ce/(Ca+Ce)`),
@@ -76,9 +76,9 @@ boilerplate** — learn to skip them so the real findings stand out.
 - **`PmcArticle::doi`/`title`/`volume`/… in `pmc/domain.rs`** forwarding to nested
   `front.article_meta.*` are the **flat accessor layer** CLAUDE.md describes ("Single
   PMC model layer; flat read access via accessor methods"). Intentional.
-- **Builder-setter cohesion** — `WasmClientConfig` (LCOM4=5), `ClientConfig` (LCOM4=6),
-  `RetryConfig` — each `with_*` setter touches a different field, so a high LCOM4 is the
-  expected shape of a builder, not a defect.
+- **Builder-setter cohesion** — `WasmClientConfig`, `ClientConfig`, `RetryConfig`, and
+  the Go `SearchQuery` — each `with_*` / recorded setter touches a different field, so a
+  high LCOM4 is the expected shape of a builder, not a defect.
 - **`SearchQuery::published_between` / `entry_date_between` / `modification_date_between`**
   (≈98% similar) and `and`/`or`, `negate`/`group` in `query/boolean.rs` are
   builder-pattern variants. A shared private helper is _possible_ but low-value/low-risk.
@@ -87,26 +87,48 @@ boilerplate** — learn to skip them so the real findings stand out.
 
 ### Real, actionable signal
 
-- **`pubmed-parser/src/pmc/parser/` is the complexity epicentre.**
-  `author.rs:extract_reference_authors` (cog=50, the workspace max),
-  `section.rs:parse_section_from_body` (cog=39) and `extract_body_sections` (cog=29),
-  `xml_utils.rs:decode_xml_entities` (cog=37). `section.rs`, `metadata.rs`, `author.rs`
-  are also top hotspots. These are genuine parsing logic — split/simplify candidates.
-- **`pubmed-client/src/pmc/tar.rs` is the #1 hotspot** (score 340, heavy churn +
-  `find_matching_file` cog=34). Watch this file on every change.
+Named files below are where the debt sat at the last full sweep. Treat them as a
+starting point, not a current inventory — **re-run the profile before quoting a
+number.** The open findings, with their evidence, live under the umbrella issue
+[#254](https://github.com/illumination-k/pubmed-client/issues/254).
+
+- **`pubmed-parser/src/pmc/parser/` is the complexity epicentre**, and has been across
+  successive sweeps. `metadata.rs` and `section.rs` take the top two `hotspot` slots
+  (both ~1300-1450 LOC, `commits × cognitive_max` within a few points of each other),
+  and the workspace's densest Rust functions are the JATS element readers inside them —
+  `metadata.rs:extract_abstract`, `section.rs:extract_body_sections`,
+  `section.rs:read_paragraph_with_inline`. Genuine parsing logic, so the fix is
+  splitting by JATS element group, not clever-ing the loops (#205, #249).
+  - Ignore the `cognitive` max in the raw report if it points at
+    `pubmed-client-py/examples/*.py` — the Python examples are deliberately linear
+    display code and outrank every Rust function.
+- **`hubs` flags `parse_pmc_xml` as the only Henry-Kafura bottleneck** (fan_out ≈ 33 —
+  it calls every extractor). That is the shape of an assembler, and it should shrink on
+  its own once the two files above are split. Re-measure after, don't pre-emptively cut.
 - **Genuine accidental duplicates** worth unifying (same logic, _within the Rust core_):
-  - `format_first_pub_date` is **100% duplicated** across
-    `pubmed-formatter/src/pmc/markdown/frontmatter.rs` and `.../markdown/metadata.rs`.
-  - `format_author_name` is ~94% duplicated across `pubmed-parser/src/common/models.rs`
-    and `pubmed-parser/src/pubmed/parser/extractors.rs`.
   - `PubMedId::try_from_u32` / `PmcId::try_from_u32` in `common/ids.rs` and
     `PmcXmlTestCase::new` / `PubMedXmlTestCase::new` in `pubmed-test-utils` are
     type-paired — macro candidates if the pattern grows.
+  - `pubmed-cli/src/commands/`: `Citations::execute` ≈ `Related::execute` (~94%);
+    `pubmed-mcp/src/tools/elink.rs`: `get_related_articles` ≈ `get_citations` (~90%).
+    Both pairs differ only in which ELink call they make (#252, #209).
+  - **The pattern to copy** when unifying a set of same-shaped endpoints is
+    `pubmed-client/src/europe_pmc/paged.rs`: one private generic helper plus a small
+    trait, with the per-endpoint public methods kept as-is so the API does not move.
 - **`wrapper` to shared helpers** is actionable when a thin per-module wrapper exists
   only to forward to a canonical helper (e.g. `PmcClient::normalize_pmcid` →
   `common::normalize_pmcid`). The repo prefers one unified helper over parallel variants.
+- **`visibility` is worth a periodic pass on `pubmed-parser`.** Parser-internal helpers
+  (`pmc/parser/reader_utils.rs`, `common/xml_utils.rs`) are `pub` while every caller is
+  in-crate, so they are published API by accident. Narrowing is compiler-verified — a
+  wrong row costs a failed build, not lost code — but it is still a semver-visible
+  change, so batch it into a minor bump (#251).
+- **`untested` is an upper bound, so verify by hand before filing.** Most rows are
+  integration-tested through call sites the static graph cannot attribute. The way to
+  confirm a real gap is to grep the test tree for the type, as with the SQLite/Redis
+  cache backends (#253) — flagged _and_ genuinely untested.
 - **`coupling` on `pubmed-client`**: `crate::error` is a high-Fan-In/low-Fan-Out stable
-  hub (healthy); `pmc::client` / `pmc::tar` are intentionally high-instability leaves.
+  hub (healthy); `pmc::client` / `pmc::cloud` are intentionally high-instability leaves.
   The signal to watch is **cycle count > 0** (currently 0) — flag any new cross-crate
   cycle or new dependency that inverts the `parser → formatter → client` layering.
 
@@ -116,3 +138,18 @@ Adjust thresholds in [`agent-lens.toml`](../../../agent-lens.toml), or override
 per-invocation with `agent-lens analyze <tool> <path> --format md` flags
 (`--threshold`, `--min-lines`, `--top`, `--diff-only`, `--since`, `--exclude`). Full
 reference: `agent-lens help --md`.
+
+Beyond the four profiles, these one-off analyzers have earned their keep here:
+`visibility` (over-exposed `pub`), `untested` (missing test paths), `hubs`
+(bottlenecks / feature envy), `cycles`, `delegation`, and `risk` (churn × blast
+radius — read it as "check callers before editing", not as a defect list).
+
+To turn a profile into a gate once the current debt is paid down, snapshot it:
+
+```bash
+agent-lens baseline create quality > .agent-lens/baseline-quality.json
+agent-lens baseline compare quality .agent-lens/baseline-quality.json   # exit 2 on regression
+```
+
+Snapshotting before the #205 / #249 splits land would bake today's complexity tail in
+as acceptable, so hold off until then.

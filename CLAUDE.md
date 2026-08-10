@@ -22,6 +22,7 @@ pubmed-client-rs/                    # Cargo workspace root
 ├── pubmed-client-r/                 # R bindings via extendr (R package: pubmedclient) — NOT a workspace member
 ├── pubmed-cli/                      # Command-line interface
 ├── pubmed-mcp/                      # MCP server for AI assistant integration
+├── pubmed-test-utils/               # Shared XML fixture loaders for tests (crate: pubmed-test-utils, not published)
 └── website/                         # Docusaurus v3 landing page (GitHub Pages)
 ```
 
@@ -131,7 +132,7 @@ The codebase is split into three core Rust crates with a clear layering:
 ### Parser (`pubmed-parser/src/`)
 
 ```
-lib.rs                 # Re-exports: common, error, pmc, pubmed modules
+lib.rs                 # Re-exports: common, error, europe_pmc, pmc, pubmed modules
 error.rs               # ParseError enum and Result type alias
 
 common/                # Shared types between PubMed and PMC
@@ -161,7 +162,16 @@ pmc/                   # PMC XML parsing
     metadata.rs        # Metadata extraction
     reference.rs       # Reference extraction
     section.rs         # Section parsing
-    xml_utils.rs       # XML utilities
+    reader_utils.rs    # quick-xml reader helpers shared by metadata.rs / section.rs
+    xml_utils.rs       # Re-export shim over common/xml_utils.rs
+
+europe_pmc/            # Europe PMC JSON response models & parsers
+  models.rs            # EuropePmcResult and shared record fields
+  search.rs            # EuropePmcSearchResponse, parse_search_response
+  references.rs        # EuropePmcReference(List), parse_references_response
+  citations.rs         # EuropePmcCitation(List), parse_citations_response
+  links.rs             # EuropePmcDatabaseLink(List), parse_database_links_response
+  de.rs                # Custom serde deserializers for Europe PMC quirks
 ```
 
 ### Formatter (`pubmed-formatter/src/`)
@@ -174,9 +184,16 @@ pubmed/
                        # Batch helpers: articles_to_bibtex(), articles_to_ris(), articles_to_csl_json()
 
 pmc/
-  markdown.rs          # PmcMarkdownConverter (builder pattern)
-                       # MarkdownConfig, HeadingStyle, ReferenceStyle
-                       # Supports: TOC, YAML frontmatter, figure paths, ORCID links
+  markdown/            # PmcMarkdownConverter (builder pattern)
+    mod.rs             # PmcMarkdownConverter, convert(), convert_with_figures()
+    config.rs          # MarkdownConfig, HeadingStyle, ReferenceStyle
+    frontmatter.rs     # YAML frontmatter generation
+    metadata.rs        # Title / authors / journal / DOI block
+    sections.rs        # Body sections, figures, tables
+    references.rs      # Reference list rendering
+    heading.rs         # Heading style formatting
+    toc.rs             # Table of contents
+    entities.rs        # XML entity / inline markup cleanup
 ```
 
 ### Client (`pubmed-client/src/`)
@@ -187,8 +204,11 @@ cache.rs               # Response caching (pluggable: memory/Redis/SQLite)
 config.rs              # ClientConfig (API keys, rate limiting, caching, timeouts)
 error.rs               # PubMedError enum (wraps ParseError from pubmed-parser)
 rate_limit.rs          # Token bucket rate limiter for NCBI API compliance
+request.rs             # RequestExecutor — URL building + rate limit + retry + error mapping,
+                       # shared by every endpoint module in the crate
 retry.rs               # Retry with exponential backoff
 time.rs                # Cross-platform time utilities (native + WASM)
+tls.rs                 # rustls crypto provider installation (rustls-tls feature)
 
 pubmed/                # PubMed E-utilities API
   client/              # PubMedClient (split into focused modules)
@@ -214,6 +234,19 @@ pubmed/                # PubMed E-utilities API
 pmc/                   # PMC (PubMed Central) API
   client.rs            # PmcClient - full-text fetch, availability check, figure extraction
   cloud.rs             # PmcCloudClient - per-file download from the PMC OA Cloud (AWS S3)
+  common.rs            # Shared PMC helpers (normalize_pmcid, ...)
+  extracted.rs         # ExtractedFigure / downloaded-file result types
+
+europe_pmc/            # Europe PMC REST API (EBI; complements NCBI E-utilities)
+  client.rs            # EuropePmcClient - construction, cache, executor plumbing
+  id.rs                # EuropePmcId / EuropePmcSource — (source, id) addressing
+  search.rs            # Cross-source search (cursorMark pagination)
+  fulltext.rs          # JATS full text -> PmcArticle, and raw XML
+  paged.rs             # PagedList trait + shared page-number pagination
+  references.rs        # /references endpoint
+  citations.rs         # /citations endpoint
+  links.rs             # /databaseLinks endpoint
+  supplementary.rs     # Supplementary file download (non-WASM)
 ```
 
 ### Key Types
@@ -221,9 +254,10 @@ pmc/                   # PMC (PubMed Central) API
 - `Client` — Unified client with `pubmed` and `pmc` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`
 - `PubMedClient` — Search, fetch metadata, ESummary, EPost/History, ELink, EInfo, ECitMatch, EGQuery, ESpell
 - `PmcClient` — Fetch full-text, check availability, extract figures, download OA files from the PMC OA Cloud (AWS S3)
+- `EuropePmcClient` — Europe PMC REST API: cross-source search, JATS full text, references/citations/database links, supplementary downloads. Addressed by `EuropePmcId` (`(source, id)`); needs no API key
 - `SearchQuery` — Builder pattern for complex queries with filters, date ranges, boolean logic
 - `PubMedArticle` — Article metadata (title, authors, abstract, MeSH, keywords, etc.) — defined in `pubmed-parser`
-- `PmcFullText` — Structured full-text (sections, references, figures, tables) — defined in `pubmed-parser`
+- `PmcArticle` — Structured JATS full-text (front/body/back; sections, references, figures, tables) — defined in `pubmed-parser`
 - `PmcMarkdownConverter` — Configurable markdown output with YAML frontmatter — defined in `pubmed-formatter`
 - `ExportFormat` — Trait for BibTeX/RIS/CSL-JSON/NBIB export — defined in `pubmed-formatter`
 - `ClientConfig` — API key, email, tool name, rate limit, cache (memory/Redis/SQLite), timeout, retry config
