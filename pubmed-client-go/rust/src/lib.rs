@@ -213,7 +213,7 @@ pub extern "C" fn pubmed_client_version() -> *const c_char {
     VERSION.as_ptr().cast()
 }
 
-/// Create a client from a JSON configuration blob (see [`ConfigDto`]).
+/// Create a client from a JSON configuration blob (see `ConfigDto`).
 ///
 /// Pass null for `config_json` to use the library defaults. Returns null and
 /// sets `*out_err` on failure. The handle must be released with
@@ -435,7 +435,7 @@ impl<'a> From<&'a PmcArticle> for PmcArticleDto<'a> {
 }
 
 /// Fetch PMC full text for a PMCID, returning a JSON object (see
-/// [`PmcArticleDto`]).
+/// `PmcArticleDto`).
 ///
 /// # Safety
 ///

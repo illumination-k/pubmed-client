@@ -24,12 +24,12 @@ The package links against a static archive produced by the Rust crate in [`rust/
 about 75 MB, so it is built from source rather than committed:
 
 ```bash
-cd pubmed-client-go
-make build          # cargo build --release -p pubmed-client-go, staged into lib/$GOOS_$GOARCH/
-go build ./...
+MISE_ENV=go mise run go:build   # cargo build --release -p pubmed-client-go → lib/$GOOS_$GOARCH/
+cd pubmed-client-go && go build ./...
 ```
 
-`make build` must be re-run after any change to the Rust crates.
+`go:build` must be re-run after any change to the Rust crates. Every other Go task depends on it,
+so `go:test` and `lint:go` build the archive for you.
 
 Because a `go get` of this module will not build the archive for you, depend on it from a checkout
 with a `replace` directive:
@@ -141,16 +141,19 @@ if errors.As(err, &ffiErr) {
 
 ## Testing
 
+All tasks live in `mise.go.toml` at the workspace root and need `MISE_ENV=go`:
+
 ```bash
-make test              # offline: unit tests plus end-to-end tests against a local stub server
-make test-integration  # live NCBI API, opt-in
-make check             # gofmt + go vet
+MISE_ENV=go mise run go:test              # offline: unit tests plus end-to-end tests against a stub server
+MISE_ENV=go mise run go:test-integration  # live NCBI API, opt-in
+MISE_ENV=go mise run lint:go              # gofmt + go vet
+MISE_ENV=go mise run fmt:go               # gofmt -w
 ```
 
 The offline suite points `Config.BaseURL` at an `httptest` server, so it exercises the whole chain
 (Go → cgo → Rust → HTTP → XML parsing → JSON → Go structs) without network access.
 
-Integration tests additionally require `PUBMED_REAL_API_TESTS=1` (set by `make test-integration`)
+Integration tests additionally require `PUBMED_REAL_API_TESTS=1` (set by `go:test-integration`)
 and honour `NCBI_API_KEY` and `PUBMED_EMAIL`.
 
 The Rust FFI layer has its own tests covering the boundary conventions:

@@ -67,10 +67,10 @@ uv run --with maturin maturin develop
 uv run pytest
 uv run pytest -m "not integration"   # Unit tests only
 
-# Go (from pubmed-client-go/)
-make build                           # cargo staticlib → lib/$GOOS_$GOARCH/, required before any go command
-make test                            # offline tests (stub HTTP server)
-make check                           # gofmt + go vet
+# Go (requires MISE_ENV=go; run from anywhere in the workspace)
+mise run go:build                    # cargo staticlib → lib/$GOOS_$GOARCH/, required before any go command
+mise run go:test                     # offline tests (stub HTTP server); depends on go:build
+mise run go:test-integration         # live NCBI API, opt-in
 cargo test -p pubmed-client-go       # Rust FFI boundary tests
 
 # MCP server
@@ -249,7 +249,9 @@ Go bindings via cgo. Go module: `github.com/illumination-k/pubmed-client/pubmed-
 - **Panics are caught** (`catch_unwind`) at every boundary function — an `extern "C"` fn that unwinds would abort the Go process.
 - **rustls, not native-tls**: the shim depends on `pubmed-client` with `default-features = false, features = ["rustls-tls"]` so the archive needs no system OpenSSL. Build it with `cargo build -p pubmed-client-go`; under `cargo build --workspace` feature unification pulls `native-tls` back in and the archive would reference OpenSSL again.
 - **The `pubmed-client` dep is path-only** (no `version`, not `workspace = true`): inheriting a workspace dependency forbids overriding `default-features`, and the crate is never published. Nothing for `scripts/sync-versions.sh` to sync.
-- Build: `make build` compiles the archive into `lib/$GOOS_$GOARCH/` (gitignored, ~75 MB). Required before any `go build`/`go vet`/`go test`. `ffi.go` is the only file that touches C; the cgo link line carries per-platform `LDFLAGS`.
+- Build: there is no Makefile — everything is a mise task in `mise.go.toml` (`MISE_ENV=go`). `go:build` compiles the archive into `lib/$GOOS_$GOARCH/` (gitignored, ~75 MB); `go:test` and `lint:go` `depends` on it, since a cgo package cannot even be type-checked without the archive. `ffi.go` is the only file that touches C; the cgo link line carries per-platform `LDFLAGS`.
+- `lint:go` captures `gofmt -l` **stdout only**. Merging stderr picks up mise's own debug chatter (CI runs mise at debug level) and reports a spurious formatting failure on a clean tree.
+- mise runs task scripts with `sh`, not bash — no `pipefail`.
 - Tests: offline Go tests point `Config.BaseURL` at an `httptest` server, exercising the whole chain (Go → cgo → Rust → HTTP → XML parse → JSON → Go structs) with no network. Live tests are behind the `integration` build tag plus `PUBMED_REAL_API_TESTS=1`. The Rust shim has its own boundary tests (null pointers, invalid JSON, double free).
 - CI: `.github/workflows/ci-go.yml` — `lint` job (gofmt + vet) and a `test` matrix over ubuntu/macOS, since the cgo link line differs per platform. Windows is unverified (cgo needs the `x86_64-pc-windows-gnu` target, not Cargo's default msvc).
 

@@ -38,7 +38,8 @@ permissions:
 
 jobs:
   # Formatting and vet are platform-independent, so they run once. `go vet`
-  # still needs the static archive because the package is cgo.
+  # still needs the static archive because the package is cgo, so `lint:go`
+  # depends on `go:build`.
   lint:
     name: gofmt and go vet
     # Local: MISE_ENV=go mise run lint:go
@@ -46,9 +47,6 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: pubmed-client-go
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -59,7 +57,7 @@ jobs:
         uses: ./.github/actions/setup-repo
 
       - name: Check formatting and vet
-        run: make check
+        run: mise run lint:go
 
   # Both hosts are covered because the cgo link line differs per platform:
   # Linux needs -lm/-ldl/-lpthread, macOS needs the CoreFoundation/Security
@@ -75,9 +73,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-    defaults:
-      run:
-        working-directory: pubmed-client-go
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -88,9 +83,7 @@ jobs:
         uses: ./.github/actions/setup-repo
 
       # Offline: the end-to-end tests drive a local httptest server through the
-      # client's BaseURL override, so no NCBI traffic is involved.
+      # client's BaseURL override, so no NCBI traffic is involved. The task also
+      # builds the examples to prove they still link.
       - name: Run tests
-        run: make test
-
-      - name: Build the example
-        run: go build ./examples/...
+        run: mise run go:test

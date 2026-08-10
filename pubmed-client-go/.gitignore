@@ -1,6 +1,7 @@
-# Static archives staged by `make build`. They are ~75 MB each, so they are
-# built from source rather than committed.
+# Static archives staged by `mise run go:build`. They are ~75 MB each, so they
+# are built from source rather than committed.
 lib/
 
-# Binaries left behind by `go build ./examples/...`.
+# Binary left behind by a bare `go build ./examples/...`. The `go:test` task
+# sends its output to a temp dir, so this only appears on a manual build.
 /basic
