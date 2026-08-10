@@ -7,9 +7,10 @@
 //! Go marshals its `Article` with `omitempty`, so unset fields arrive missing
 //! rather than null, which `PubMedArticle` (no `#[serde(default)]`) would
 //! reject. Each incoming object is therefore merged over a template before
-//! deserializing — see [`merge`]. The template is written out field by field on
-//! purpose: a new field on `PubMedArticle` or on any type it nests breaks this
-//! file at compile time instead of silently failing to deserialize at runtime.
+//! deserializing — see the `merge` function below. The template is written out
+//! field by field on purpose: a new field on `PubMedArticle` or on any type it
+//! nests breaks this file at compile time instead of silently failing to
+//! deserialize at runtime.
 //!
 //! The call is pure: no client handle, no runtime, no network.
 

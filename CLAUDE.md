@@ -93,6 +93,12 @@ mise tasks require `MISE_ENV` to load per-area configs. See `DEVELOPMENT.md` for
 mise r lint                          # dprint + cargo fmt + clippy + actionlint
 mise r fmt                           # dprint + cargo fmt + ruff format
 
+# Rustdoc is NOT covered by `mise r lint`, and CI builds it with -D warnings —
+# a broken intra-doc link (e.g. to a private item) fails `docs.yml` and the
+# `Lint and Format` job while `mise r lint` stays green. Run it before pushing:
+RUSTDOCFLAGS="-D warnings --cfg docsrs" PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 \
+  cargo doc --all-features --no-deps
+
 # NAPI/WASM TypeScript (from respective directories)
 pnpm run check                       # Biome lint + format
 pnpm run typecheck
