@@ -3,13 +3,13 @@
 Go bindings for [pubmed-client](https://github.com/illumination-k/pubmed-client) — an async
 Rust client for the PubMed and PMC (PubMed Central) APIs.
 
-The bindings wrap the Rust crate through cgo. Calls are synchronous: a shared Tokio runtime
-drives the async client and blocks until the request completes.
+The bindings wrap the Rust crate through cgo. Calls are synchronous but cancellable: a shared
+Tokio runtime drives the async client and blocks until the request completes or the caller's
+`context.Context` is done.
 
-> **Status: MVP.** The surface covers PubMed search and metadata plus PMC full text and Markdown.
-> Citation export, figure extraction, ELink/EInfo/ESpell and the query builder are available in
-> the [Rust](../pubmed-client), [Python](../pubmed-client-py) and [Node](../pubmed-client-napi)
-> bindings but not yet here.
+The surface covers PubMed search and metadata (ESearch, EFetch, ESummary), the discovery APIs
+(ELink, EInfo, EGQuery, ECitMatch, ESpell), PMC full text, XML, Markdown and Open Access
+downloads, a query builder, and citation export.
 
 ## Requirements
 
@@ -58,6 +58,7 @@ Linux and macOS (amd64 and arm64) are built and tested in CI. Windows link flags
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -74,7 +75,7 @@ func main() {
 	}
 	defer client.Close()
 
-	articles, err := client.SearchAndFetch("CRISPR gene editing", 5)
+	articles, err := client.SearchAndFetch(context.Background(), "CRISPR gene editing", 5)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,31 +85,122 @@ func main() {
 }
 ```
 
-A fuller example lives in [`examples/basic`](examples/basic/main.go).
+Fuller examples live in [`examples/basic`](examples/basic/main.go) (search, export, full text)
+and [`examples/discovery`](examples/discovery/main.go) (query builder, ESummary, ELink, EInfo,
+ESpell).
 
 ### API
 
-| Method                                                                 | Description                                        |
-| ---------------------------------------------------------------------- | -------------------------------------------------- |
-| `New(*Config) (*Client, error)`                                        | Create a client; nil config means library defaults |
-| `(*Client).Close() error`                                              | Release the Rust client; idempotent                |
-| `(*Client).SearchArticles(query string, limit int) ([]string, error)`  | Search PubMed, return PMIDs                        |
-| `(*Client).FetchArticle(pmid string) (*Article, error)`                | Metadata for one PMID                              |
-| `(*Client).FetchArticles(pmids []string) ([]Article, error)`           | Batched metadata                                   |
-| `(*Client).SearchAndFetch(query string, limit int) ([]Article, error)` | Search, then fetch each hit                        |
-| `(*Client).FetchFullText(pmcid string) (*PMCArticle, error)`           | PMC full text                                      |
-| `(*Client).FetchMarkdown(pmcid string) (string, error)`                | PMC full text rendered to Markdown                 |
-| `(*Client).CheckPMCAvailability(pmid string) (string, bool, error)`    | Is PMC full text available?                        |
-| `Version() string`                                                     | Version of the underlying Rust crate               |
+Every call takes a `context.Context` first. `Config` accepts `APIKey`, `Email`, `Tool`,
+`RateLimit`, `Timeout`, `UserAgent`, `BaseURL` and `Cache`; the zero value is valid.
 
-`Config` accepts `APIKey`, `Email`, `Tool`, `RateLimit`, `Timeout`, `UserAgent`, `BaseURL` and
-`Cache`. The zero value is valid.
+#### Lifecycle
 
-Queries accept PubMed's full syntax, including field tags:
+| Method                          | Description                                        |
+| ------------------------------- | -------------------------------------------------- |
+| `New(*Config) (*Client, error)` | Create a client; nil config means library defaults |
+| `(*Client).Close() error`       | Release the Rust client; idempotent                |
+| `Version() string`              | Version of the underlying Rust crate               |
+
+#### PubMed search and metadata
+
+| Method                                   | Description                                     |
+| ---------------------------------------- | ----------------------------------------------- |
+| `SearchArticles(ctx, query, limit)`      | Search PubMed, return PMIDs                     |
+| `SearchArticlesWithOptions(…, options)`  | As above, with a result ordering                |
+| `Search(ctx, *SearchQuery)`              | Run a built query, honouring its limit and sort |
+| `FetchArticle(ctx, pmid)`                | Metadata for one PMID                           |
+| `FetchArticles(ctx, pmids)`              | Batched metadata                                |
+| `FetchAllByPMIDs(ctx, pmids)`            | Batched metadata for very large PMID lists      |
+| `SearchAndFetch(ctx, query, limit)`      | Search, then fetch each hit                     |
+| `SearchAndFetchWithOptions(…, options)`  | As above, with a result ordering                |
+| `SearchAndFetchQuery(ctx, *SearchQuery)` | Run a built query and fetch each hit            |
+| `SearchWithFullText(ctx, query, limit)`  | Search and attach PMC full text where available |
+
+#### ESummary
+
+| Method                                       | Description                     |
+| -------------------------------------------- | ------------------------------- |
+| `FetchSummary(ctx, pmid)`                    | Lightweight record for one PMID |
+| `FetchSummaries(ctx, pmids)`                 | Lightweight records, batched    |
+| `SearchAndFetchSummaries(ctx, query, limit)` | Search, then summarise each hit |
+
+#### ELink, EInfo, EGQuery, ECitMatch, ESpell
+
+| Method                              | Description                                    |
+| ----------------------------------- | ---------------------------------------------- |
+| `GetRelatedArticles(ctx, pmids)`    | Articles PubMed considers related              |
+| `GetPMCLinks(ctx, pmids)`           | PMC identifiers with full text available       |
+| `GetCitations(ctx, pmids)`          | Articles citing the given PMIDs                |
+| `GetDatabaseList(ctx)`              | Every Entrez database name                     |
+| `GetDatabaseInfo(ctx, database)`    | Record count, searchable fields, links         |
+| `GlobalQuery(ctx, term)`            | Match counts across every Entrez database      |
+| `MatchCitations(ctx, citations)`    | Resolve bibliographic citations to PMIDs       |
+| `SpellCheck(ctx, term)`             | Spelling suggestions for a search term         |
+| `SpellCheckDB(ctx, term, database)` | As above, against a database other than PubMed |
+
+The ELink calls take `[]uint32` rather than PMID strings, matching NCBI's own UID parameter.
+
+#### PMC
+
+| Method                                          | Description                                 |
+| ----------------------------------------------- | ------------------------------------------- |
+| `FetchFullText(ctx, pmcid)`                     | Structured full text                        |
+| `FetchXML(ctx, pmcid)`                          | Raw JATS XML                                |
+| `FetchMarkdown(ctx, pmcid)`                     | Full text rendered to Markdown              |
+| `FetchMarkdownWithOptions(ctx, pmcid, options)` | As above, with the rendering tuned          |
+| `CheckPMCAvailability(ctx, pmid)`               | Is PMC full text available?                 |
+| `IsOASubset(ctx, pmcid)`                        | Open Access status, licence, retraction     |
+| `DownloadFiles(ctx, pmcid, dir)`                | Download an OA article's files              |
+| `ExtractFigures(ctx, pmcid, dir)`               | Download figures paired with their captions |
+| `ClearPMCCache(ctx)`                            | Drop cached PMC responses                   |
+
+#### Query builder and export
+
+`SearchQuery` records the builder calls you make and replays them against the Rust `SearchQuery`,
+so field tags have one implementation across every language binding:
 
 ```go
-pmids, err := client.SearchArticles("cancer[ti] AND 2023[pdat] AND review[pt]", 20)
+query := pubmedclient.NewSearchQuery().
+	TitleOrAbstract("CRISPR").
+	MeshTerm("Gene Editing").
+	PublishedAfter(pubmedclient.Year(2020)).
+	ArticleType("Review").
+	HumanStudiesOnly().
+	Limit(20).
+	Sort(pubmedclient.SortPublicationDate)
+
+if err := query.Validate(); err != nil {
+	log.Fatal(err)
+}
+articles, err := client.SearchAndFetchQuery(ctx, query)
 ```
+
+`Build()` returns the assembled query string, and `String()` is the same thing for logging.
+Raw PubMed syntax still works everywhere a query string is accepted:
+
+```go
+pmids, err := client.SearchArticles(ctx, "cancer[ti] AND 2023[pdat] AND review[pt]", 20)
+```
+
+Citation export renders in Rust, so the output matches the CLI and the other bindings:
+
+```go
+bibtex, err := pubmedclient.ExportArticles(articles, pubmedclient.FormatBibTeX)
+ris, err := articles[0].ToRIS()
+```
+
+Formats: `FormatBibTeX`, `FormatRIS`, `FormatCSLJSON`, `FormatNBIB`.
+
+### Contexts and cancellation
+
+Cancelling a context aborts the in-flight HTTP request rather than merely reporting the
+cancellation once it finishes: the call is handed a cancellation token that a watchdog goroutine
+fires, and the Rust side drops the request future. The call then returns the context's own error,
+so `errors.Is(err, context.Canceled)` and `context.DeadlineExceeded` work as expected.
+
+`Config.Timeout` still bounds each individual HTTP request, which is the right tool for a
+per-request ceiling; a context deadline bounds the whole call.
 
 ### Rate limits
 
@@ -118,26 +210,37 @@ with a shared token bucket, so a `*Client` shared across goroutines stays within
 ### Concurrency and lifetime
 
 A `*Client` is safe for concurrent use. It owns memory outside the Go heap, so call `Close` when
-done — a finalizer is registered as a safety net, but relying on it is not recommended. Calls made
-after `Close` return `ErrClosed`.
+done — a finalizer is registered as a safety net, but relying on it is not recommended. `Close`
+waits for in-flight calls to finish, so cancelling a context and closing immediately is safe.
+Calls made after `Close` return `ErrClosed`.
 
 ### Errors
 
-Failures from the Rust side arrive as `*Error`, carrying the failing operation and the message:
+Failures arrive as `*Error`, carrying the failing operation, a `Kind`, and the message from
+`pubmed-client`. The common causes also match package sentinels:
 
 ```go
+if errors.Is(err, pubmedclient.ErrPMCNotAvailable) {
+	// expected: most PubMed articles are not in the PMC Open Access subset
+}
+
 var ffiErr *pubmedclient.Error
 if errors.As(err, &ffiErr) {
-	log.Printf("%s failed: %s", ffiErr.Op, ffiErr.Message)
+	log.Printf("%s failed (%s): %s", ffiErr.Op, ffiErr.Kind, ffiErr.Message)
 }
 ```
 
+Sentinels: `ErrClosed`, `ErrInvalidArgument`, `ErrNotFound`, `ErrPMCNotAvailable`,
+`ErrRateLimited`, `ErrInvalidQuery`. `Error.Status` carries the HTTP status when `Kind` is
+`KindAPI`.
+
 ### Known limitations
 
-- No `context.Context` support. Calls block for the duration of the request and cannot be
-  cancelled; bound them with `Config.Timeout` instead.
 - `PMCArticle` is a flattened projection of the JATS tree, not the full DTD model. Table cell
-  contents in particular are omitted — use `FetchMarkdown` when the rendered table is needed.
+  contents in particular are omitted — use `FetchXML` or `FetchMarkdown` when the rendered table
+  is needed.
+- The history-server API (`EPost`, WebEnv sessions) is not exposed directly; `FetchAllByPMIDs`
+  uses it internally for large PMID lists.
 
 ## Testing
 
@@ -150,13 +253,15 @@ MISE_ENV=go mise run lint:go              # gofmt + go vet
 MISE_ENV=go mise run fmt:go               # gofmt -w
 ```
 
-The offline suite points `Config.BaseURL` at an `httptest` server, so it exercises the whole chain
-(Go → cgo → Rust → HTTP → XML parsing → JSON → Go structs) without network access.
+The offline suite points `Config.BaseURL` at an `httptest` server covering every E-utilities
+endpoint the bindings call, so it exercises the whole chain (Go → cgo → Rust → HTTP → parsing →
+JSON → Go structs) without network access.
 
 Integration tests additionally require `PUBMED_REAL_API_TESTS=1` (set by `go:test-integration`)
 and honour `NCBI_API_KEY` and `PUBMED_EMAIL`.
 
-The Rust FFI layer has its own tests covering the boundary conventions:
+The Rust FFI layer has its own tests covering the boundary conventions, cancellation, the query
+replay and the export merge:
 
 ```bash
 cargo test -p pubmed-client-go
@@ -167,17 +272,33 @@ cargo test -p pubmed-client-go
 ```
 pubmed-client-go/
 ├── rust/            # C-ABI shim crate (staticlib), a Cargo workspace member
+│   └── src/
+│       ├── error.rs   # the JSON error envelope and its kind taxonomy
+│       ├── ffi.rs     # argument borrowing, result ownership, panic containment
+│       ├── cancel.rs  # the Tokio runtime and the cancellation token
+│       ├── client.rs  # handle lifecycle and configuration decoding
+│       ├── dto.rs     # projections of Rust models onto the JSON Go decodes
+│       ├── pubmed.rs  # E-utilities calls
+│       ├── pmc.rs     # PMC full text, XML, Markdown, OA downloads
+│       ├── query.rs   # replay of the Go query builder onto SearchQuery
+│       └── export.rs  # citation export
 ├── include/         # C header consumed by cgo
 ├── ffi.go           # the only file that talks to C
-├── client.go        # public Go API
+├── client.go        # Client, Config, context plumbing
+├── pubmed.go        # PubMed and E-utilities methods
+├── pmc.go           # PMC methods and Markdown options
+├── query.go         # SearchQuery builder
+├── export.go        # citation export
 ├── models.go        # Go structs mirroring the JSON boundary
-├── errors.go
-└── examples/basic/
+├── errors.go        # Error, Kind, sentinels
+└── examples/
 ```
 
 Values cross the FFI boundary as JSON: each call returns one owned C string that Go re-parses into
-the typed structs in `models.go`. That keeps the C surface at a handful of functions while both
-sides stay fully typed, and lets the Rust models gain fields without breaking Go.
+the typed structs in `models.go`. That keeps the C surface small while both sides stay fully
+typed, and lets the Rust models gain fields without breaking Go. Errors cross as a JSON envelope
+(`{"kind": …, "message": …}`), which is what makes the sentinels above possible without matching
+on message text.
 
 ## License
 

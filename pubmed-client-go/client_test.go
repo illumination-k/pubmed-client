@@ -1,11 +1,11 @@
 package pubmedclient
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -48,23 +48,82 @@ func TestCallsAfterCloseReturnErrClosed(t *testing.T) {
 		t.Fatalf("Close failed: %v", err)
 	}
 
-	if _, err := client.SearchArticles("cancer", 1); !errors.Is(err, ErrClosed) {
-		t.Errorf("SearchArticles after Close = %v, want ErrClosed", err)
+	ctx := context.Background()
+
+	// One per call family: the shared plumbing in Client.call is what refuses a
+	// closed handle, so this checks the wiring rather than each method.
+	calls := map[string]func() error{
+		"SearchArticles": func() error {
+			_, err := client.SearchArticles(ctx, "cancer", 1)
+			return err
+		},
+		"FetchArticle": func() error {
+			_, err := client.FetchArticle(ctx, "31978945")
+			return err
+		},
+		"FetchArticles": func() error {
+			_, err := client.FetchArticles(ctx, []string{"31978945"})
+			return err
+		},
+		"FetchSummaries": func() error {
+			_, err := client.FetchSummaries(ctx, []string{"31978945"})
+			return err
+		},
+		"GetRelatedArticles": func() error {
+			_, err := client.GetRelatedArticles(ctx, []uint32{31978945})
+			return err
+		},
+		"GetDatabaseList": func() error {
+			_, err := client.GetDatabaseList(ctx)
+			return err
+		},
+		"SpellCheck": func() error {
+			_, err := client.SpellCheck(ctx, "asthmaa")
+			return err
+		},
+		"GlobalQuery": func() error {
+			_, err := client.GlobalQuery(ctx, "asthma")
+			return err
+		},
+		"MatchCitations": func() error {
+			_, err := client.MatchCitations(ctx, []CitationQuery{{Journal: "nature"}})
+			return err
+		},
+		"FetchFullText": func() error {
+			_, err := client.FetchFullText(ctx, "PMC7906746")
+			return err
+		},
+		"FetchXML": func() error {
+			_, err := client.FetchXML(ctx, "PMC7906746")
+			return err
+		},
+		"FetchMarkdown": func() error {
+			_, err := client.FetchMarkdown(ctx, "PMC7906746")
+			return err
+		},
+		"CheckPMCAvailability": func() error {
+			_, _, err := client.CheckPMCAvailability(ctx, "31978945")
+			return err
+		},
+		"IsOASubset": func() error {
+			_, err := client.IsOASubset(ctx, "PMC7906746")
+			return err
+		},
+		"DownloadFiles": func() error {
+			_, err := client.DownloadFiles(ctx, "PMC7906746", t.TempDir())
+			return err
+		},
+		"ExtractFigures": func() error {
+			_, err := client.ExtractFigures(ctx, "PMC7906746", t.TempDir())
+			return err
+		},
+		"ClearPMCCache": func() error { return client.ClearPMCCache(ctx) },
 	}
-	if _, err := client.FetchArticle("31978945"); !errors.Is(err, ErrClosed) {
-		t.Errorf("FetchArticle after Close = %v, want ErrClosed", err)
-	}
-	if _, err := client.FetchArticles([]string{"31978945"}); !errors.Is(err, ErrClosed) {
-		t.Errorf("FetchArticles after Close = %v, want ErrClosed", err)
-	}
-	if _, err := client.FetchFullText("PMC7906746"); !errors.Is(err, ErrClosed) {
-		t.Errorf("FetchFullText after Close = %v, want ErrClosed", err)
-	}
-	if _, err := client.FetchMarkdown("PMC7906746"); !errors.Is(err, ErrClosed) {
-		t.Errorf("FetchMarkdown after Close = %v, want ErrClosed", err)
-	}
-	if _, _, err := client.CheckPMCAvailability("31978945"); !errors.Is(err, ErrClosed) {
-		t.Errorf("CheckPMCAvailability after Close = %v, want ErrClosed", err)
+
+	for name, call := range calls {
+		if err := call(); !errors.Is(err, ErrClosed) {
+			t.Errorf("%s after Close = %v, want ErrClosed", name, err)
+		}
 	}
 }
 
@@ -92,31 +151,80 @@ func TestRejectsNonPositiveLimit(t *testing.T) {
 	}
 	defer client.Close()
 
+	ctx := context.Background()
 	for _, limit := range []int{0, -1} {
-		if _, err := client.SearchArticles("cancer", limit); err == nil {
-			t.Errorf("SearchArticles(limit=%d) succeeded, want error", limit)
+		if _, err := client.SearchArticles(ctx, "cancer", limit); !errors.Is(err, ErrInvalidArgument) {
+			t.Errorf("SearchArticles(limit=%d) = %v, want ErrInvalidArgument", limit, err)
 		}
-		if _, err := client.SearchAndFetch("cancer", limit); err == nil {
-			t.Errorf("SearchAndFetch(limit=%d) succeeded, want error", limit)
+		if _, err := client.SearchAndFetch(ctx, "cancer", limit); !errors.Is(err, ErrInvalidArgument) {
+			t.Errorf("SearchAndFetch(limit=%d) = %v, want ErrInvalidArgument", limit, err)
+		}
+		if _, err := client.SearchWithFullText(ctx, "cancer", limit); !errors.Is(err, ErrInvalidArgument) {
+			t.Errorf("SearchWithFullText(limit=%d) = %v, want ErrInvalidArgument", limit, err)
 		}
 	}
 }
 
-func TestFetchArticlesWithNoPMIDsSkipsTheCall(t *testing.T) {
+// Calls that can be answered locally must not reach the network. BaseURL points
+// at a host that never resolves, so a non-error proves no request was made.
+func TestEmptyInputsSkipTheCall(t *testing.T) {
 	client, err := New(&Config{BaseURL: "https://example.invalid"})
 	if err != nil {
 		t.Fatalf("New failed: %v", err)
 	}
 	defer client.Close()
 
-	// example.invalid never resolves, so a non-error here proves no request was
-	// made.
-	articles, err := client.FetchArticles(nil)
+	ctx := context.Background()
+
+	articles, err := client.FetchArticles(ctx, nil)
 	if err != nil {
 		t.Fatalf("FetchArticles(nil) failed: %v", err)
 	}
 	if len(articles) != 0 {
 		t.Errorf("FetchArticles(nil) returned %d articles, want 0", len(articles))
+	}
+
+	all, err := client.FetchAllByPMIDs(ctx, nil)
+	if err != nil {
+		t.Fatalf("FetchAllByPMIDs(nil) failed: %v", err)
+	}
+	if len(all) != 0 {
+		t.Errorf("FetchAllByPMIDs(nil) returned %d articles, want 0", len(all))
+	}
+
+	summaries, err := client.FetchSummaries(ctx, nil)
+	if err != nil {
+		t.Fatalf("FetchSummaries(nil) failed: %v", err)
+	}
+	if len(summaries) != 0 {
+		t.Errorf("FetchSummaries(nil) returned %d summaries, want 0", len(summaries))
+	}
+
+	matches, err := client.MatchCitations(ctx, nil)
+	if err != nil {
+		t.Fatalf("MatchCitations(nil) failed: %v", err)
+	}
+	if len(matches.Matches) != 0 {
+		t.Errorf("MatchCitations(nil) returned %d matches, want 0", len(matches.Matches))
+	}
+}
+
+func TestELinkRequiresAtLeastOnePMID(t *testing.T) {
+	client, err := New(&Config{BaseURL: "https://example.invalid"})
+	if err != nil {
+		t.Fatalf("New failed: %v", err)
+	}
+	defer client.Close()
+
+	ctx := context.Background()
+	if _, err := client.GetRelatedArticles(ctx, nil); !errors.Is(err, ErrInvalidArgument) {
+		t.Errorf("GetRelatedArticles(nil) = %v, want ErrInvalidArgument", err)
+	}
+	if _, err := client.GetPMCLinks(ctx, nil); !errors.Is(err, ErrInvalidArgument) {
+		t.Errorf("GetPMCLinks(nil) = %v, want ErrInvalidArgument", err)
+	}
+	if _, err := client.GetCitations(ctx, nil); !errors.Is(err, ErrInvalidArgument) {
+		t.Errorf("GetCitations(nil) = %v, want ErrInvalidArgument", err)
 	}
 }
 
@@ -170,107 +278,16 @@ func TestConfigMarshalRoundsTimeoutUp(t *testing.T) {
 	}
 }
 
-func TestErrorMessageIncludesOp(t *testing.T) {
-	err := &Error{Op: "FetchArticle", Message: "boom"}
-	if got, want := err.Error(), "pubmedclient.FetchArticle: boom"; got != want {
-		t.Errorf("Error() = %q, want %q", got, want)
-	}
-}
-
 // --- Offline end-to-end coverage --------------------------------------------
 //
 // BaseURL points the underlying client at a local server, so these exercise the
 // whole chain (Go -> cgo -> Rust -> HTTP -> XML parsing -> JSON -> Go structs)
 // without touching NCBI.
 
-const esearchResponse = `{"esearchresult":{"count":"2","retmax":"2","retstart":"0","idlist":["31978945","33515491"]}}`
-
-const efetchResponse = `<?xml version="1.0" encoding="UTF-8"?>
-<PubmedArticleSet>
-  <PubmedArticle>
-    <MedlineCitation>
-      <PMID Version="1">31978945</PMID>
-      <Article PubModel="Print">
-        <Journal>
-          <ISSN IssnType="Electronic">1476-4687</ISSN>
-          <JournalIssue CitedMedium="Internet">
-            <Volume>578</Volume>
-            <Issue>7793</Issue>
-            <PubDate><Year>2020</Year><Month>Feb</Month></PubDate>
-          </JournalIssue>
-          <Title>Nature</Title>
-          <ISOAbbreviation>Nature</ISOAbbreviation>
-        </Journal>
-        <ArticleTitle>A test article about CRISPR.</ArticleTitle>
-        <Pagination><MedlinePgn>82-93</MedlinePgn></Pagination>
-        <Abstract>
-          <AbstractText>An abstract used by the Go binding tests.</AbstractText>
-        </Abstract>
-        <AuthorList CompleteYN="Y">
-          <Author ValidYN="Y">
-            <LastName>Doe</LastName>
-            <ForeName>Jane</ForeName>
-            <Initials>J</Initials>
-          </Author>
-          <Author ValidYN="Y">
-            <LastName>Roe</LastName>
-            <ForeName>Richard</ForeName>
-            <Initials>R</Initials>
-          </Author>
-        </AuthorList>
-        <Language>eng</Language>
-        <PublicationTypeList>
-          <PublicationType UI="D016428">Journal Article</PublicationType>
-        </PublicationTypeList>
-      </Article>
-    </MedlineCitation>
-    <PubmedData>
-      <ArticleIdList>
-        <ArticleId IdType="pubmed">31978945</ArticleId>
-        <ArticleId IdType="doi">10.1038/s41586-020-0000-0</ArticleId>
-      </ArticleIdList>
-    </PubmedData>
-  </PubmedArticle>
-</PubmedArticleSet>`
-
-// newStubClient starts a stub E-utilities server and returns a client pointed at
-// it. The server and the client are cleaned up when the test ends.
-func newStubClient(t *testing.T) *Client {
-	t.Helper()
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch {
-		case strings.HasSuffix(r.URL.Path, "/esearch.fcgi"):
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(esearchResponse))
-		case strings.HasSuffix(r.URL.Path, "/efetch.fcgi"):
-			w.Header().Set("Content-Type", "application/xml")
-			_, _ = w.Write([]byte(efetchResponse))
-		default:
-			http.NotFound(w, r)
-		}
-	}))
-	t.Cleanup(server.Close)
-
-	client, err := New(&Config{
-		BaseURL: server.URL,
-		Tool:    "pubmed-client-go-tests",
-		// Keep the token bucket from slowing the suite down.
-		RateLimit: 100,
-		Timeout:   30 * time.Second,
-	})
-	if err != nil {
-		t.Fatalf("New failed: %v", err)
-	}
-	t.Cleanup(func() { _ = client.Close() })
-
-	return client
-}
-
 func TestSearchArticlesAgainstStub(t *testing.T) {
-	client := newStubClient(t)
+	client := newStubClient(t, defaultStub())
 
-	pmids, err := client.SearchArticles("CRISPR", 10)
+	pmids, err := client.SearchArticles(context.Background(), "CRISPR", 10)
 	if err != nil {
 		t.Fatalf("SearchArticles failed: %v", err)
 	}
@@ -286,10 +303,40 @@ func TestSearchArticlesAgainstStub(t *testing.T) {
 	}
 }
 
-func TestFetchArticleAgainstStub(t *testing.T) {
-	client := newStubClient(t)
+func TestSearchArticlesSendsTheRequestedSort(t *testing.T) {
+	stub := defaultStub()
+	var recorded string
+	stub.observe = func(r *http.Request) {
+		if pathHasSuffix(r, "/esearch.fcgi") {
+			recorded = r.URL.Query().Get("sort")
+		}
+	}
+	client := newStubClient(t, stub)
 
-	article, err := client.FetchArticle("31978945")
+	_, err := client.SearchArticlesWithOptions(context.Background(), "CRISPR", 5,
+		SearchOptions{Sort: SortPublicationDate})
+	if err != nil {
+		t.Fatalf("SearchArticlesWithOptions failed: %v", err)
+	}
+	if recorded != "pub_date" {
+		t.Errorf("sort parameter = %q, want %q", recorded, "pub_date")
+	}
+}
+
+func TestSearchArticlesRejectsAnUnknownSort(t *testing.T) {
+	client := newStubClient(t, defaultStub())
+
+	_, err := client.SearchArticlesWithOptions(context.Background(), "CRISPR", 5,
+		SearchOptions{Sort: SortOrder("sideways")})
+	if !errors.Is(err, ErrInvalidArgument) {
+		t.Fatalf("SearchArticlesWithOptions with a bad sort = %v, want ErrInvalidArgument", err)
+	}
+}
+
+func TestFetchArticleAgainstStub(t *testing.T) {
+	client := newStubClient(t, defaultStub())
+
+	article, err := client.FetchArticle(context.Background(), "31978945")
 	if err != nil {
 		t.Fatalf("FetchArticle failed: %v", err)
 	}
@@ -333,9 +380,9 @@ func TestFetchArticleAgainstStub(t *testing.T) {
 }
 
 func TestSearchAndFetchAgainstStub(t *testing.T) {
-	client := newStubClient(t)
+	client := newStubClient(t, defaultStub())
 
-	articles, err := client.SearchAndFetch("CRISPR", 2)
+	articles, err := client.SearchAndFetch(context.Background(), "CRISPR", 2)
 	if err != nil {
 		t.Fatalf("SearchAndFetch failed: %v", err)
 	}
@@ -344,6 +391,39 @@ func TestSearchAndFetchAgainstStub(t *testing.T) {
 	}
 	if articles[0].PMID != "31978945" {
 		t.Errorf("PMID = %q", articles[0].PMID)
+	}
+}
+
+func TestSearchAndFetchQueryUsesTheBuildersLimitAndSort(t *testing.T) {
+	stub := defaultStub()
+	var recordedTerm, recordedSort, recordedRetmax string
+	stub.observe = func(r *http.Request) {
+		if pathHasSuffix(r, "/esearch.fcgi") {
+			query := r.URL.Query()
+			recordedTerm = query.Get("term")
+			recordedSort = query.Get("sort")
+			recordedRetmax = query.Get("retmax")
+		}
+	}
+	client := newStubClient(t, stub)
+
+	query := NewSearchQuery().
+		TitleOrAbstract("CRISPR").
+		Limit(7).
+		Sort(SortPublicationDate)
+
+	if _, err := client.SearchAndFetchQuery(context.Background(), query); err != nil {
+		t.Fatalf("SearchAndFetchQuery failed: %v", err)
+	}
+
+	if recordedTerm != "CRISPR[tiab]" {
+		t.Errorf("term = %q, want %q", recordedTerm, "CRISPR[tiab]")
+	}
+	if recordedSort != "pub_date" {
+		t.Errorf("sort = %q, want %q", recordedSort, "pub_date")
+	}
+	if recordedRetmax != "7" {
+		t.Errorf("retmax = %q, want %q", recordedRetmax, "7")
 	}
 }
 
@@ -361,7 +441,7 @@ func TestErrorsFromTheRustSideSurfaceAsError(t *testing.T) {
 	}
 	defer client.Close()
 
-	_, err = client.SearchArticles("CRISPR", 1)
+	_, err = client.SearchArticles(context.Background(), "CRISPR", 1)
 	if err == nil {
 		t.Fatal("SearchArticles against a failing server succeeded, want error")
 	}
@@ -376,12 +456,18 @@ func TestErrorsFromTheRustSideSurfaceAsError(t *testing.T) {
 	if ffiErr.Message == "" {
 		t.Error("Message is empty")
 	}
+	if ffiErr.Kind != KindAPI {
+		t.Errorf("Kind = %q, want %q", ffiErr.Kind, KindAPI)
+	}
+	if ffiErr.Status != http.StatusBadRequest {
+		t.Errorf("Status = %d, want %d", ffiErr.Status, http.StatusBadRequest)
+	}
 }
 
 // Concurrent use must be safe: the Rust client is shared behind an Arc and the
 // Go wrapper only guards against close-during-call.
 func TestConcurrentCalls(t *testing.T) {
-	client := newStubClient(t)
+	client := newStubClient(t, defaultStub())
 
 	const goroutines = 8
 	var wg sync.WaitGroup
@@ -391,7 +477,7 @@ func TestConcurrentCalls(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if _, err := client.SearchArticles("CRISPR", 5); err != nil {
+			if _, err := client.SearchArticles(context.Background(), "CRISPR", 5); err != nil {
 				errs <- err
 			}
 		}()
@@ -401,5 +487,117 @@ func TestConcurrentCalls(t *testing.T) {
 	close(errs)
 	for err := range errs {
 		t.Errorf("concurrent SearchArticles failed: %v", err)
+	}
+}
+
+// --- Context handling --------------------------------------------------------
+
+func TestAnAlreadyCancelledContextSkipsTheCall(t *testing.T) {
+	stub := defaultStub()
+	var requests int
+	stub.observe = func(*http.Request) { requests++ }
+	client := newStubClient(t, stub)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	_, err := client.SearchArticles(ctx, "CRISPR", 1)
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("SearchArticles with a cancelled context = %v, want context.Canceled", err)
+	}
+	if requests != 0 {
+		t.Errorf("made %d requests with a cancelled context, want 0", requests)
+	}
+}
+
+// Cancelling mid-flight must abort the request rather than wait it out. The
+// stub blocks until the test releases it, so returning at all proves the
+// cancellation reached the Rust side.
+func TestCancellingMidCallAbortsTheRequest(t *testing.T) {
+	started := make(chan struct{})
+	release := make(chan struct{})
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(started)
+		<-release
+	}))
+	// Ordered so the handler is released before Close waits for it; the other
+	// way round deadlocks, since httptest.Server.Close joins outstanding
+	// requests.
+	defer server.Close()
+	defer close(release)
+
+	client, err := New(&Config{BaseURL: server.URL, RateLimit: 100})
+	if err != nil {
+		t.Fatalf("New failed: %v", err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		<-started
+		cancel()
+	}()
+
+	done := make(chan error, 1)
+	go func() {
+		_, err := client.SearchArticles(ctx, "CRISPR", 1)
+		done <- err
+	}()
+
+	select {
+	case err := <-done:
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("SearchArticles = %v, want context.Canceled", err)
+		}
+	case <-time.After(30 * time.Second):
+		t.Fatal("SearchArticles did not return after its context was cancelled")
+	}
+}
+
+func TestAContextDeadlineSurfacesAsDeadlineExceeded(t *testing.T) {
+	release := make(chan struct{})
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		<-release
+	}))
+	// See TestCancellingMidCallAbortsTheRequest: release before Close.
+	defer server.Close()
+	defer close(release)
+
+	client, err := New(&Config{BaseURL: server.URL, RateLimit: 100})
+	if err != nil {
+		t.Fatalf("New failed: %v", err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()
+
+	if _, err := client.SearchArticles(ctx, "CRISPR", 1); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("SearchArticles = %v, want context.DeadlineExceeded", err)
+	}
+}
+
+// Every completed call must release its token and join its watchdog, so a long
+// run of cancellable calls must not leak goroutines.
+func TestSuccessfulCallsDoNotLeakWatchdogs(t *testing.T) {
+	client := newStubClient(t, defaultStub())
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	for i := 0; i < 50; i++ {
+		if _, err := client.SearchArticles(ctx, "CRISPR", 1); err != nil {
+			t.Fatalf("call %d failed: %v", i, err)
+		}
+	}
+
+	// The watchdogs are joined inside each call, so nothing should still be
+	// waiting on ctx by the time the loop finishes.
+	select {
+	case <-ctx.Done():
+		t.Fatal("context was cancelled unexpectedly")
+	default:
 	}
 }

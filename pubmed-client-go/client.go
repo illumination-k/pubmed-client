@@ -1,10 +1,6 @@
 // Package pubmedclient provides Go bindings for the PubMed and PMC (PubMed
 // Central) APIs, backed by the Rust `pubmed-client` crate through cgo.
 //
-// The surface is intentionally small (an MVP, mirroring the R bindings):
-// search PubMed, fetch article metadata, and retrieve PMC full text or
-// Markdown.
-//
 //	client, err := pubmedclient.New(&pubmedclient.Config{
 //		Email: "you@example.com",
 //		Tool:  "my-app",
@@ -14,21 +10,39 @@
 //	}
 //	defer client.Close()
 //
-//	articles, err := client.SearchAndFetch("CRISPR gene editing", 5)
+//	articles, err := client.SearchAndFetch(ctx, "CRISPR gene editing", 5)
 //
-// Building this package requires the Rust static library; see the README and
-// the Makefile in this directory.
+// The surface covers PubMed search and metadata (ESearch, EFetch, ESummary),
+// the discovery APIs (ELink, EInfo, EGQuery, ECitMatch, ESpell), PMC full text,
+// XML, Markdown and Open Access downloads, a query builder, and citation
+// export. Building this package requires the Rust static library; see the
+// README.
+//
+// # Contexts
+//
+// Every call takes a [context.Context] and honours cancellation: a cancelled
+// context aborts the in-flight HTTP request rather than merely reporting the
+// cancellation afterwards, and the call returns the context's error.
 //
 // # Rate limits
 //
 // NCBI limits unauthenticated clients to 3 requests/second (10 with an API
 // key). The underlying client enforces this with a shared token bucket, so
 // concurrent calls from many goroutines stay within the limit.
+//
+// # Errors
+//
+// Failures arrive as [*Error], carrying the failing operation, a [Kind], and a
+// message. The common causes also match the package sentinels:
+//
+//	if errors.Is(err, pubmedclient.ErrPMCNotAvailable) {
+//		// expected for articles outside the PMC Open Access subset
+//	}
 package pubmedclient
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"runtime"
 	"sync"
 	"time"
@@ -104,13 +118,13 @@ func (c *Config) marshal() (string, error) {
 
 	encoded, err := json.Marshal(payload)
 	if err != nil {
-		return "", &Error{Op: "New", Message: "failed to encode config: " + err.Error()}
+		return "", encodeError("New", "config", err)
 	}
 	return string(encoded), nil
 }
 
 // Client is a PubMed and PMC client. It is safe for concurrent use by multiple
-// goroutines; calls block until the request completes.
+// goroutines; calls block until the request completes or the context is done.
 //
 // A Client owns memory outside Go's heap, so it must be released with
 // [Client.Close] when no longer needed.
@@ -142,6 +156,9 @@ func New(config *Config) (*Client, error) {
 
 // Close releases the underlying Rust client. It is idempotent, and every
 // subsequent call on the Client returns [ErrClosed].
+//
+// Close blocks until any in-flight call has finished, so cancelling a context
+// and closing immediately is safe.
 func (c *Client) Close() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -156,164 +173,93 @@ func (c *Client) Close() error {
 	return nil
 }
 
-// call runs fn with the live handle, refusing to touch a closed client.
-func (c *Client) call(fn func(handle) (string, error)) (string, error) {
+// call runs fn with the live handle and a cancellation token wired to ctx.
+//
+// The token is what makes cancellation real rather than advisory: a watchdog
+// goroutine fires it when ctx is done, the Rust side drops the request future,
+// and the blocked call returns promptly. A context that can never be cancelled
+// (such as [context.Background]) skips the token and the goroutine entirely.
+func (c *Client) call(ctx context.Context, op string, fn func(handle, token) (string, error)) (string, error) {
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
+
+	// Held for the whole call, which is why Close waits for callers to finish
+	// rather than freeing the handle out from under them.
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
 	if c.closed {
 		return "", ErrClosed
 	}
-	return fn(c.handle)
+
+	done := ctx.Done()
+	if done == nil {
+		return fn(c.handle, nil)
+	}
+
+	cancel := newToken()
+	stop := make(chan struct{})
+	watchdogDone := make(chan struct{})
+	go func() {
+		defer close(watchdogDone)
+		select {
+		case <-done:
+			triggerToken(cancel)
+		case <-stop:
+		}
+	}()
+	// Join the watchdog before freeing: it may be mid-select, and triggering a
+	// freed token would be a use-after-free.
+	defer func() {
+		close(stop)
+		<-watchdogDone
+		freeToken(cancel)
+	}()
+
+	raw, err := fn(c.handle, cancel)
+	if err != nil {
+		// Report the context's own error, so errors.Is(err, context.Canceled)
+		// and context.DeadlineExceeded work as callers expect.
+		if ctxErr := ctx.Err(); ctxErr != nil {
+			return "", ctxErr
+		}
+		return "", err
+	}
+	return raw, nil
 }
 
 // decode parses a JSON response from the Rust side into target.
 func decode(op, raw string, target any) error {
 	if err := json.Unmarshal([]byte(raw), target); err != nil {
-		return &Error{Op: op, Message: "failed to decode response: " + err.Error()}
+		return decodeError(op, err)
 	}
 	return nil
+}
+
+// callJSON runs a call and decodes its JSON response into target.
+func (c *Client) callJSON(ctx context.Context, op string, target any, fn func(handle, token) (string, error)) error {
+	raw, err := c.call(ctx, op, fn)
+	if err != nil {
+		return err
+	}
+	return decode(op, raw, target)
 }
 
 // checkLimit rejects limits the Rust side would reject anyway, but with a
 // clearer message and without a round trip.
 func checkLimit(op string, limit int) error {
 	if limit <= 0 {
-		return &Error{Op: op, Message: fmt.Sprintf("limit must be positive, got %d", limit)}
+		return limitError(op, limit)
 	}
 	return nil
 }
 
-// SearchArticles searches PubMed and returns up to limit matching PMIDs.
-//
-// The query accepts PubMed's full syntax, including field tags such as
-// "cancer[ti] AND 2023[pdat]".
-func (c *Client) SearchArticles(query string, limit int) ([]string, error) {
-	if err := checkLimit("SearchArticles", limit); err != nil {
-		return nil, err
-	}
-
-	raw, err := c.call(func(h handle) (string, error) {
-		return ffiSearchArticles(h, query, limit)
-	})
+// marshalArg encodes a call argument that crosses the boundary as JSON.
+func marshalArg(op, what string, value any) (string, error) {
+	encoded, err := json.Marshal(value)
 	if err != nil {
-		return nil, err
+		return "", encodeError(op, what, err)
 	}
-
-	var pmids []string
-	if err := decode("SearchArticles", raw, &pmids); err != nil {
-		return nil, err
-	}
-	return pmids, nil
-}
-
-// FetchArticle fetches the full metadata for a single PMID.
-func (c *Client) FetchArticle(pmid string) (*Article, error) {
-	raw, err := c.call(func(h handle) (string, error) {
-		return ffiFetchArticle(h, pmid)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var article Article
-	if err := decode("FetchArticle", raw, &article); err != nil {
-		return nil, err
-	}
-	return &article, nil
-}
-
-// FetchArticles fetches metadata for several PMIDs in one batched request.
-// Passing no PMIDs returns an empty slice without contacting NCBI.
-func (c *Client) FetchArticles(pmids []string) ([]Article, error) {
-	if len(pmids) == 0 {
-		return []Article{}, nil
-	}
-
-	encoded, err := json.Marshal(pmids)
-	if err != nil {
-		return nil, &Error{Op: "FetchArticles", Message: "failed to encode pmids: " + err.Error()}
-	}
-
-	raw, err := c.call(func(h handle) (string, error) {
-		return ffiFetchArticles(h, string(encoded))
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var articles []Article
-	if err := decode("FetchArticles", raw, &articles); err != nil {
-		return nil, err
-	}
-	return articles, nil
-}
-
-// SearchAndFetch searches PubMed and fetches metadata for each hit, combining
-// [Client.SearchArticles] and [Client.FetchArticles] into one call.
-func (c *Client) SearchAndFetch(query string, limit int) ([]Article, error) {
-	if err := checkLimit("SearchAndFetch", limit); err != nil {
-		return nil, err
-	}
-
-	raw, err := c.call(func(h handle) (string, error) {
-		return ffiSearchAndFetch(h, query, limit)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var articles []Article
-	if err := decode("SearchAndFetch", raw, &articles); err != nil {
-		return nil, err
-	}
-	return articles, nil
-}
-
-// FetchFullText retrieves the full text of a PMC article. The pmcid may be
-// given with or without the "PMC" prefix.
-//
-// Full text is only available for articles in the PMC Open Access subset; use
-// [Client.CheckPMCAvailability] to test a PMID first.
-func (c *Client) FetchFullText(pmcid string) (*PMCArticle, error) {
-	raw, err := c.call(func(h handle) (string, error) {
-		return ffiFetchFullText(h, pmcid)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var article PMCArticle
-	if err := decode("FetchFullText", raw, &article); err != nil {
-		return nil, err
-	}
-	return &article, nil
-}
-
-// FetchMarkdown retrieves a PMC article and renders it as Markdown.
-func (c *Client) FetchMarkdown(pmcid string) (string, error) {
-	return c.call(func(h handle) (string, error) {
-		return ffiFetchMarkdown(h, pmcid)
-	})
-}
-
-// CheckPMCAvailability reports whether a PMID has PMC full text available,
-// returning the PMCID when it does.
-func (c *Client) CheckPMCAvailability(pmid string) (pmcid string, available bool, err error) {
-	raw, err := c.call(func(h handle) (string, error) {
-		return ffiCheckPMCAvailability(h, pmid)
-	})
-	if err != nil {
-		return "", false, err
-	}
-
-	// JSON `null` when unavailable, otherwise the PMCID as a JSON string.
-	var result *string
-	if err := decode("CheckPMCAvailability", raw, &result); err != nil {
-		return "", false, err
-	}
-	if result == nil {
-		return "", false, nil
-	}
-	return *result, true, nil
+	return string(encoded), nil
 }
