@@ -10,7 +10,22 @@ use crate::error::Result;
 
 use super::client::EuropePmcClient;
 use super::id::EuropePmcId;
-use super::references::DEFAULT_PAGE_SIZE;
+use super::paged::PagedList;
+
+/// Path segment of the `databaseLinks` list endpoint.
+const SEGMENT: &str = "databaseLinks";
+
+impl PagedList for EuropePmcDatabaseLinkList {
+    type Item = EuropePmcDatabaseLink;
+
+    fn hit_count(&self) -> u64 {
+        self.hit_count
+    }
+
+    fn into_items(self) -> Vec<Self::Item> {
+        self.links
+    }
+}
 
 impl EuropePmcClient {
     /// Fetch a single page of external database cross-references for a record.
@@ -21,41 +36,14 @@ impl EuropePmcClient {
         page: u32,
         page_size: u32,
     ) -> Result<EuropePmcDatabaseLinkList> {
-        let endpoint = format!("{}/{}/databaseLinks", id.source, id.id);
-        let page = page.to_string();
-        let page_size = page_size.to_string();
-        let response = self
-            .executor()
-            .get_endpoint(
-                &self.base_url,
-                &endpoint,
-                &[
-                    ("format", "json"),
-                    ("page", page.as_str()),
-                    ("pageSize", page_size.as_str()),
-                ],
-            )
-            .await?;
-        let text = response.text().await?;
-        Ok(parse_database_links_response(&text)?)
+        self.get_list_page(id, SEGMENT, page, page_size, parse_database_links_response)
+            .await
     }
 
     /// Fetch all external database cross-references for a record.
     #[instrument(skip(self), fields(id = %id))]
     pub async fn get_database_links(&self, id: &EuropePmcId) -> Result<Vec<EuropePmcDatabaseLink>> {
-        let mut collected = Vec::new();
-        let mut page = 1;
-        loop {
-            let list = self
-                .get_database_links_page(id, page, DEFAULT_PAGE_SIZE)
-                .await?;
-            let count = list.links.len();
-            collected.extend(list.links);
-            if count < DEFAULT_PAGE_SIZE as usize || collected.len() as u64 >= list.hit_count {
-                break;
-            }
-            page += 1;
-        }
-        Ok(collected)
+        self.collect_list_pages(id, SEGMENT, parse_database_links_response)
+            .await
     }
 }
