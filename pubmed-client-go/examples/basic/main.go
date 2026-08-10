@@ -7,9 +7,12 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	pubmedclient "github.com/illumination-k/pubmed-client/pubmed-client-go"
 )
@@ -26,9 +29,14 @@ func main() {
 	}
 	defer client.Close()
 
+	// Cancelling the context aborts the in-flight request, so this bounds the
+	// whole example rather than each individual call.
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
 	fmt.Printf("pubmed-client %s\n\n", pubmedclient.Version())
 
-	articles, err := client.SearchAndFetch("CRISPR gene editing", 3)
+	articles, err := client.SearchAndFetch(ctx, "CRISPR gene editing", 3)
 	if err != nil {
 		log.Fatalf("search failed: %v", err)
 	}
@@ -50,17 +58,30 @@ func main() {
 		fmt.Println()
 	}
 
+	// Citation export runs entirely in Rust, so the output matches the CLI.
+	bibtex, err := pubmedclient.ExportArticles(articles, pubmedclient.FormatBibTeX)
+	if err != nil {
+		log.Fatalf("failed to export citations: %v", err)
+	}
+	fmt.Printf("--- BibTeX (first 300 chars) ---\n%s\n\n", truncate(bibtex, 300))
+
 	// Full text is only available for the PMC Open Access subset.
 	const pmcid = "PMC7906746"
 
-	fullText, err := client.FetchFullText(pmcid)
+	fullText, err := client.FetchFullText(ctx, pmcid)
 	if err != nil {
+		if errors.Is(err, pubmedclient.ErrPMCNotAvailable) {
+			log.Fatalf("%s is not in the PMC Open Access subset", pmcid)
+		}
 		log.Fatalf("failed to fetch full text for %s: %v", pmcid, err)
 	}
 	fmt.Printf("%s: %d sections, %d references, %d figures\n",
 		fullText.PMCID, len(fullText.Sections), len(fullText.References), fullText.FigureCount)
 
-	markdown, err := client.FetchMarkdown(pmcid)
+	markdown, err := client.FetchMarkdownWithOptions(ctx, pmcid, pubmedclient.MarkdownOptions{
+		YAMLFrontmatter: pubmedclient.Bool(true),
+		IncludeTOC:      pubmedclient.Bool(true),
+	})
 	if err != nil {
 		log.Fatalf("failed to render %s: %v", pmcid, err)
 	}

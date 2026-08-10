@@ -296,7 +296,7 @@ impl PmcClient {
                     for linksetdb in linksetdbs {
                         if linksetdb["dbto"] == "pmc"
                             && let Some(links) = linksetdb["links"].as_array()
-                            && let Some(pmcid) = links.first()
+                            && let Some(pmcid) = links.first().and_then(json_uid)
                         {
                             return Ok(Some(format!("PMC{pmcid}")));
                         }
@@ -512,9 +512,35 @@ impl Default for PmcClient {
     }
 }
 
+/// Read an Entrez UID out of an ELink `links` entry.
+///
+/// NCBI writes these as JSON strings, but has used bare numbers too, so both
+/// are accepted. Formatting the `Value` directly would embed its JSON quotes in
+/// the id.
+fn json_uid(value: &serde_json::Value) -> Option<String> {
+    match value {
+        serde_json::Value::String(uid) => Some(uid.clone()),
+        serde_json::Value::Number(uid) => Some(uid.to_string()),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_json_uid_accepts_strings_and_numbers() {
+        assert_eq!(
+            json_uid(&serde_json::json!("7092803")).as_deref(),
+            Some("7092803")
+        );
+        assert_eq!(
+            json_uid(&serde_json::json!(7092803)).as_deref(),
+            Some("7092803")
+        );
+        assert_eq!(json_uid(&serde_json::json!(null)), None);
+    }
 
     #[test]
     fn test_normalize_pmcid() {
