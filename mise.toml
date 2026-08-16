@@ -4,6 +4,7 @@
 #   MISE_ENV=rust        → mise.rust.toml  (cargo-nextest, cargo-llvm-cov + Rust tasks)
 #   MISE_ENV=node        → mise.node.toml  (node, pnpm + NAPI/WASM/website tasks)
 #   MISE_ENV=python      → mise.python.toml (uv + PYO3 env + Python tasks)
+#   MISE_ENV=go          → mise.go.toml    (go + cgo binding tasks)
 #
 # For full local setup: mise run setup:all
 
