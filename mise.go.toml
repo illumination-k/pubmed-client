@@ -1,0 +1,71 @@
+# Loaded with MISE_ENV=go
+# Go toolchain and tasks for the cgo bindings
+# Used by: ci-go.yml
+
+[tools]
+go = "1.24"
+
+# ── Go binding tasks ──────────────────────────────────────────────────────────
+#
+# The Go package is cgo, so it cannot even be type-checked without the Rust
+# static archive. Every task that invokes the Go toolchain therefore depends on
+# `go:build` — the one exception is `fmt:go`, since gofmt only parses source.
+
+[tasks."go:build"]
+description = "Build the Rust static archive the cgo package links against"
+dir = "pubmed-client-go"
+run = """
+set -eu
+
+# `-p pubmed-client-go` matters: under `cargo build --workspace` Cargo unifies
+# features across the whole graph and pulls native-tls back in via the other
+# members, which would make the archive reference system OpenSSL.
+cargo build --release -p pubmed-client-go
+
+target_dir="${CARGO_TARGET_DIR:-{{config_root}}/target}"
+lib_dir="lib/$(go env GOOS)_$(go env GOARCH)"
+
+mkdir -p "$lib_dir"
+cp "$target_dir/release/libpubmed_client_go.a" "$lib_dir/libpubmed_client_go.a"
+"""
+
+[tasks."go:test"]
+description = "Run the offline Go binding tests"
+depends = ["go:build"]
+dir = "pubmed-client-go"
+run = [
+  "go test ./...",
+  # Prove the examples still link; -o a temp dir so no binary is left behind.
+  "go build -o \"$(mktemp -d)/\" ./examples/...",
+]
+
+[tasks."go:test-integration"]
+description = "Run the Go binding tests against the live NCBI API"
+depends = ["go:build"]
+dir = "pubmed-client-go"
+run = ["PUBMED_REAL_API_TESTS=1 go test -tags=integration -timeout 10m ./..."]
+
+[tasks."fmt:go"]
+description = "Format Go code with gofmt"
+dir = "pubmed-client-go"
+run = ["gofmt -w ."]
+
+[tasks."lint:go"]
+description = "Check Go formatting and run go vet"
+depends = ["go:build"]
+dir = "pubmed-client-go"
+run = """
+set -eu
+
+# Capture stdout only: gofmt writes the offending file names there, and mixing
+# in stderr would pick up unrelated tool chatter (mise runs CI at debug level)
+# and report a spurious failure on a correctly formatted tree.
+unformatted="$(gofmt -l .)"
+if [ -n "$unformatted" ]; then
+  echo "gofmt needed for:" >&2
+  echo "$unformatted" >&2
+  exit 1
+fi
+
+go vet ./...
+"""

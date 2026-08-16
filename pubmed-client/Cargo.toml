@@ -35,6 +35,10 @@ tracing = { workspace = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 reqwest = { version = "0.13", default-features = false, features = ["json", "stream", "form"] }
+# Pulled in only by `rustls-tls`, to pick ring as the rustls crypto provider.
+# reqwest's own `rustls` feature would select aws-lc-rs, which builds C via
+# cmake and fails on windows-msvc runners.
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"], optional = true }
 tokio = { version = "1.0", features = ["full"] }
 tokio-retry = "0.3"
 tokio-util = "0.7"
@@ -52,7 +56,7 @@ wasm-bindgen-futures = "0.4"
 [features]
 default = ["native-tls"]
 native-tls = ["reqwest/native-tls"]
-rustls-tls = ["reqwest/rustls"]
+rustls-tls = ["reqwest/rustls-no-provider", "dep:rustls"]
 integration-tests = []
 cache-redis = ["dep:redis"]
 cache-sqlite = ["dep:rusqlite"]

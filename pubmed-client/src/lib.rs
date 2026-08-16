@@ -272,6 +272,7 @@ pub mod rate_limit;
 pub(crate) mod request;
 pub mod retry;
 pub mod time;
+pub(crate) mod tls;
 
 // Common types from pubmed-parser are surfaced only at the crate root (below);
 // the module itself is kept crate-internal to avoid duplicate public paths.
