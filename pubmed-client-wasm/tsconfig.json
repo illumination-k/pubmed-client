@@ -21,7 +21,6 @@
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./tests/*"],
       "@/wasm/*": ["./tests/wasm/*"],
