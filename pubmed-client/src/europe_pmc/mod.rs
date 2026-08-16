@@ -15,6 +15,7 @@ mod client;
 mod fulltext;
 mod id;
 mod links;
+mod paged;
 mod references;
 mod search;
 #[cfg(not(target_arch = "wasm32"))]

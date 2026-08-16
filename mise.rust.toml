@@ -31,6 +31,13 @@ run = [
 description = "Run tests for entire workspace using nextest"
 run = ["cargo nextest run --workspace"]
 
+[tasks."test:rs:cache-backends"]
+description = "Run pubmed-client tests with the optional cache backends enabled"
+# `test:rs` builds with default features, so the `cache-redis` / `cache-sqlite`
+# code is not even compiled there. Only the coverage job (`--all-features`) used
+# to reach it, which meant a broken backend could pass the Test Suite job.
+run = ["cargo nextest run -p pubmed-client --features cache-sqlite,cache-redis"]
+
 [tasks."doctest:rs"]
 description = "Run doc tests for entire workspace"
 run = ["cargo test --doc --workspace --exclude pubmed-client-py"]
@@ -72,4 +79,4 @@ samply record target/profiling/examples/profile_parsing {{arg(i=0, name='mode', 
 
 [tasks."ci:rs"]
 description = "Equivalent to rust.yml: unit tests + doc tests"
-depends = ["lint:rs", "test:rs", "doctest:rs"]
+depends = ["lint:rs", "test:rs", "test:rs:cache-backends", "doctest:rs"]
