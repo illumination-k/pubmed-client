@@ -2,7 +2,10 @@
 
 pub mod ids;
 pub mod models;
-pub mod xml_utils;
+
+// Crate-internal: these helpers only ever serve the PubMed and PMC parsers in
+// this crate, and are not part of the published surface.
+pub(crate) mod xml_utils;
 
 // Re-export common types
 pub use ids::{PmcId, PubMedId};

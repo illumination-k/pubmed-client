@@ -5,6 +5,7 @@
   "yaml": {},
   "excludes": [
     "**/*-lock.json",
+    "**/pnpm-lock.yaml",
     "**/test_data/**",
     "tmp_*/**",
     "specs/**"

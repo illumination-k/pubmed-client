@@ -204,7 +204,7 @@ impl PmcClient {
     /// }
     /// ```
     pub async fn fetch_full_text(&self, pmcid: &str) -> Result<PmcArticle> {
-        let normalized_pmcid = self.normalize_pmcid(pmcid);
+        let normalized_pmcid = common::normalize_pmcid(pmcid);
         let cache_key = format!("pmc:{}", normalized_pmcid);
 
         // Check cache first if available
@@ -496,10 +496,6 @@ impl PmcClient {
         }
     }
 
-    fn normalize_pmcid(&self, pmcid: &str) -> String {
-        common::normalize_pmcid(pmcid)
-    }
-
     /// Build a request executor borrowing this client's HTTP client, rate limiter, and config.
     fn executor(&self) -> RequestExecutor<'_> {
         RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
@@ -540,14 +536,6 @@ mod tests {
             Some("7092803")
         );
         assert_eq!(json_uid(&serde_json::json!(null)), None);
-    }
-
-    #[test]
-    fn test_normalize_pmcid() {
-        let client = PmcClient::new();
-
-        assert_eq!(client.normalize_pmcid("1234567"), "PMC1234567");
-        assert_eq!(client.normalize_pmcid("PMC1234567"), "PMC1234567");
     }
 
     #[test]

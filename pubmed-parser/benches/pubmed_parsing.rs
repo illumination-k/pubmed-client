@@ -1,7 +1,9 @@
 // Benchmark harness — unwrap/expect are fine here.
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
-use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
+use std::hint::black_box;
+
+use criterion::{BenchmarkId, Criterion, Throughput, criterion_group, criterion_main};
 use std::fs;
 use std::path::{Path, PathBuf};
 
