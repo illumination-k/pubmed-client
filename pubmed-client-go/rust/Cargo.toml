@@ -1,0 +1,43 @@
+[package]
+name = "pubmed-client-go"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+# Only ever consumed through the Go package in the parent directory.
+publish = false
+repository.workspace = true
+description = "C-ABI shim exposing pubmed-client to the Go bindings (not published)"
+
+[lib]
+name = "pubmed_client_go"
+# `staticlib` produces the `libpubmed_client_go.a` that cgo links into the Go
+# package; `lib` keeps the crate usable as a normal Rust library so
+# `cargo check`/`cargo clippy` over the workspace still see it.
+crate-type = ["staticlib", "lib"]
+
+[dependencies]
+# rustls-tls (not the default native-tls) keeps TLS pure-Rust and statically
+# linked into the archive. With native-tls the `.a` references system OpenSSL
+# symbols that cgo's link line would have to resolve, forcing every Go user to
+# have libssl-dev installed; rustls avoids needing -lssl/-lcrypto entirely.
+#
+# Declared with a bare `path` rather than `workspace = true`: inheriting the
+# workspace dependency forbids overriding `default-features`, and this crate is
+# never published so `cargo publish`'s "path deps need a version" rule does not
+# apply. Keeping it path-only also means `scripts/sync-versions.sh` has nothing
+# to sync here.
+#
+# NOTE: build this crate with `cargo build -p pubmed-client-go` (as the Makefile
+# does). Under `cargo build --workspace`, Cargo unifies features across the
+# whole graph and pulls `native-tls` back in via the other members, which would
+# make the archive reference OpenSSL again.
+pubmed-client = { path = "../../pubmed-client", default-features = false, features = ["rustls-tls"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+# `macros` + `sync` back the cancellation token in `src/cancel.rs`
+# (`tokio::select!` over a `watch` channel); `time` is only used by its tests.
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", "time"] }
+
+[lints]
+workspace = true

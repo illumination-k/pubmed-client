@@ -9,7 +9,6 @@ pub(crate) mod metadata;
 pub(crate) mod reader_utils;
 pub(crate) mod reference;
 pub(crate) mod section;
-pub(crate) mod xml_utils;
 
 /// Extract a section slice from XML content without allocating.
 ///
@@ -263,8 +262,8 @@ mod tests {
 
     // Note: Most detailed tests have been moved to the individual parser modules:
     // - AuthorParser tests in author_parser.rs
-    // - section module functions tests in section.rs
+    // - section module functions tests in section/ (one module per JATS element)
     // - reference module functions tests in reference.rs
     // - metadata module functions tests in metadata.rs
-    // - XmlUtils tests in xml_utils.rs
+    // - shared XML helper tests in common/xml_utils.rs
 }
