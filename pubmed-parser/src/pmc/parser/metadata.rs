@@ -13,7 +13,7 @@ use tracing::warn;
 use super::reader_utils::{
     get_attr, make_reader, read_text_content, resolve_general_ref, skip_element,
 };
-use super::xml_utils::decode_xml_entities;
+use crate::common::xml_utils::decode_xml_entities;
 
 enum TextAction {
     Read(Vec<u8>),
