@@ -18,7 +18,7 @@ use crate::error::{ParseError, Result};
 ///
 /// Note: `trim_text` is intentionally false to preserve internal whitespace in mixed content.
 /// Functions that need trimmed results should trim the final collected text.
-pub fn make_reader(content: &str) -> Reader<&[u8]> {
+pub(super) fn make_reader(content: &str) -> Reader<&[u8]> {
     let mut reader = Reader::from_str(content);
     reader.config_mut().expand_empty_elements = true;
     reader
@@ -30,7 +30,7 @@ pub fn make_reader(content: &str) -> Reader<&[u8]> {
 /// as separate `GeneralRef` events. Character references and the five
 /// predefined XML entities are resolved here; unknown (DTD-defined) entities
 /// are kept verbatim as `&name;` so no text is silently lost.
-pub fn resolve_general_ref(r: &BytesRef) -> Result<String> {
+pub(super) fn resolve_general_ref(r: &BytesRef) -> Result<String> {
     if let Some(ch) = r
         .resolve_char_ref()
         .map_err(|e| ParseError::XmlError(e.to_string()))?
@@ -57,7 +57,7 @@ pub fn resolve_general_ref(r: &BytesRef) -> Result<String> {
 /// Uses the borrowing `read_event()` (zero-copy from the source slice) rather than
 /// `read_event_into(&mut buf)`, which would copy every event's bytes into a scratch
 /// `Vec`. On the hot PMC path this avoids a large amount of `memmove` traffic.
-pub fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> Result<String> {
+pub(super) fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> Result<String> {
     let mut text = String::new();
     let mut depth: u32 = 1;
 
@@ -105,7 +105,7 @@ pub fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> Resul
 /// Trim leading/trailing whitespace from an owned `String` in place, reusing its
 /// allocation rather than allocating a fresh `String` (as `trim().to_string()`
 /// would). On the hot PMC parsing path this saves one allocation per text node.
-pub(crate) fn trim_in_place(mut text: String) -> String {
+pub(super) fn trim_in_place(mut text: String) -> String {
     let trimmed_len = text.trim().len();
     if trimmed_len == text.len() {
         return text;
@@ -124,7 +124,7 @@ pub(crate) fn trim_in_place(mut text: String) -> String {
 /// Extract an attribute value from a `BytesStart` event.
 ///
 /// Returns `Some(String)` if the attribute exists, `None` otherwise.
-pub fn get_attr(e: &BytesStart, name: &[u8]) -> Option<String> {
+pub(super) fn get_attr(e: &BytesStart, name: &[u8]) -> Option<String> {
     e.try_get_attribute(name)
         .ok()?
         .map(|a| String::from_utf8_lossy(&a.value).into_owned())
@@ -133,7 +133,7 @@ pub fn get_attr(e: &BytesStart, name: &[u8]) -> Option<String> {
 /// Skip an entire element. The reader must have just consumed `Event::Start` for the tag.
 ///
 /// Uses the borrowing `read_to_end` (zero-copy) to efficiently skip all child content.
-pub fn skip_element(reader: &mut Reader<&[u8]>, tag: QName) -> Result<()> {
+pub(super) fn skip_element(reader: &mut Reader<&[u8]>, tag: QName) -> Result<()> {
     reader
         .read_to_end(tag)
         .map_err(|e| ParseError::XmlError(e.to_string()))?;
