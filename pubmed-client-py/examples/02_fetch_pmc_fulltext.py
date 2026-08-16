@@ -50,7 +50,7 @@ def display_pmc_article(article: pubmed_client.PmcFullText) -> None:
     sections = article.sections()
     print(f"\nArticle Sections ({len(sections)}):")
     for i, section in enumerate(sections[:5], start=1):  # First 5 sections
-        section_title = section.title if section.title else f"Section {i}"
+        section_title = section.title or f"Section {i}"
         content_length = len(section.content)
         section_type = f" [{section.section_type}]" if section.section_type else ""
 
@@ -64,7 +64,7 @@ def display_pmc_article(article: pubmed_client.PmcFullText) -> None:
     print(f"\nFigures ({len(figures)}):")
     if figures:
         for i, figure in enumerate(figures[:3], start=1):  # First 3 figures
-            print(f"  {i}. {figure.label if figure.label else figure.id}")
+            print(f"  {i}. {figure.label or figure.id}")
             if figure.caption:
                 caption_preview = (
                     figure.caption[:100] + "..." if len(figure.caption) > 100 else figure.caption
@@ -80,7 +80,7 @@ def display_pmc_article(article: pubmed_client.PmcFullText) -> None:
     print(f"\nTables ({len(tables)}):")
     if tables:
         for i, table in enumerate(tables[:3], start=1):  # First 3 tables
-            print(f"  {i}. {table.label if table.label else table.id}")
+            print(f"  {i}. {table.label or table.id}")
         if len(tables) > 3:
             print(f"  ... and {len(tables) - 3} more tables")
     else:

@@ -10,7 +10,22 @@ use crate::error::Result;
 
 use super::client::EuropePmcClient;
 use super::id::EuropePmcId;
-use super::references::DEFAULT_PAGE_SIZE;
+use super::paged::PagedList;
+
+/// Path segment of the `citations` list endpoint.
+const SEGMENT: &str = "citations";
+
+impl PagedList for EuropePmcCitationList {
+    type Item = EuropePmcCitation;
+
+    fn hit_count(&self) -> u64 {
+        self.hit_count
+    }
+
+    fn into_items(self) -> Vec<Self::Item> {
+        self.citations
+    }
+}
 
 impl EuropePmcClient {
     /// Fetch a single page of the citation list (citing articles) for a record.
@@ -21,39 +36,14 @@ impl EuropePmcClient {
         page: u32,
         page_size: u32,
     ) -> Result<EuropePmcCitationList> {
-        let endpoint = format!("{}/{}/citations", id.source, id.id);
-        let page = page.to_string();
-        let page_size = page_size.to_string();
-        let response = self
-            .executor()
-            .get_endpoint(
-                &self.base_url,
-                &endpoint,
-                &[
-                    ("format", "json"),
-                    ("page", page.as_str()),
-                    ("pageSize", page_size.as_str()),
-                ],
-            )
-            .await?;
-        let text = response.text().await?;
-        Ok(parse_citations_response(&text)?)
+        self.get_list_page(id, SEGMENT, page, page_size, parse_citations_response)
+            .await
     }
 
     /// Fetch all citing articles for a record, following page numbers until exhausted.
     #[instrument(skip(self), fields(id = %id))]
     pub async fn get_citations(&self, id: &EuropePmcId) -> Result<Vec<EuropePmcCitation>> {
-        let mut collected = Vec::new();
-        let mut page = 1;
-        loop {
-            let list = self.get_citations_page(id, page, DEFAULT_PAGE_SIZE).await?;
-            let count = list.citations.len();
-            collected.extend(list.citations);
-            if count < DEFAULT_PAGE_SIZE as usize || collected.len() as u64 >= list.hit_count {
-                break;
-            }
-            page += 1;
-        }
-        Ok(collected)
+        self.collect_list_pages(id, SEGMENT, parse_citations_response)
+            .await
     }
 }
