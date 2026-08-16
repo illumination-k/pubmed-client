@@ -18,6 +18,7 @@ use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::ESearchResult;
 use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
+use crate::tls::install_default_crypto_provider;
 use reqwest::{Client, Response};
 use tracing::{debug, info, instrument, warn};
 
@@ -95,6 +96,9 @@ impl PubMedClient {
     pub fn with_config(config: ClientConfig) -> Self {
         let rate_limiter = config.create_rate_limiter();
         let base_url = config.effective_base_url().to_string();
+
+        // rustls has no built-in provider under `rustls-tls`; install one first.
+        install_default_crypto_provider();
 
         // reqwest's client builder only fails if the TLS backend cannot be
         // initialized — an unrecoverable process-level environment error — so
