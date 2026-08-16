@@ -24,13 +24,13 @@ use tracing::debug;
 /// # Example
 ///
 /// ```ignore
-/// use pubmed_parser::common::xml_utils::strip_inline_html_tags;
+/// use crate::common::xml_utils::strip_inline_html_tags;
 ///
 /// let xml = "<AbstractText>CO<sup>2</sup> levels</AbstractText>";
 /// let cleaned = strip_inline_html_tags(xml);
 /// assert_eq!(cleaned, "<AbstractText>CO2 levels</AbstractText>");
 /// ```
-pub fn strip_inline_html_tags(xml: &str) -> Cow<'_, str> {
+pub(crate) fn strip_inline_html_tags(xml: &str) -> Cow<'_, str> {
     use regex::Regex;
     use std::sync::OnceLock;
 
@@ -77,7 +77,7 @@ pub fn strip_inline_html_tags(xml: &str) -> Cow<'_, str> {
 /// # Returns
 ///
 /// A string with all XML tags removed
-pub fn strip_xml_tags(content: &str) -> String {
+pub(crate) fn strip_xml_tags(content: &str) -> String {
     let bytes = content.as_bytes();
     let mut result = Vec::with_capacity(bytes.len());
     let mut in_tag = false;
@@ -113,7 +113,7 @@ pub fn strip_xml_tags(content: &str) -> String {
 /// Malformed or unrecognized sequences (missing `;`, unknown names, out-of-range
 /// or non-parsable numeric values) are preserved verbatim rather than dropped, so
 /// this never silently corrupts article text.
-pub fn decode_xml_entities(content: &str) -> Cow<'_, str> {
+pub(crate) fn decode_xml_entities(content: &str) -> Cow<'_, str> {
     if !content.contains('&') {
         return Cow::Borrowed(content);
     }
@@ -213,19 +213,6 @@ fn decode_numeric_hex(digits: &str) -> Option<char> {
         .and_then(char::from_u32)
 }
 
-/// Check if a tag is self-closing
-///
-/// # Arguments
-///
-/// * `tag` - The XML tag to check
-///
-/// # Returns
-///
-/// true if the tag is self-closing (ends with "/>"), false otherwise
-pub fn is_self_closing_tag(tag: &str) -> bool {
-    tag.trim_end().ends_with("/>")
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -316,12 +303,6 @@ mod tests {
         let content = "<p>This is <b>bold</b> text</p>";
         let result = strip_xml_tags(content);
         assert_eq!(result, "This is bold text");
-    }
-
-    #[test]
-    fn test_is_self_closing_tag() {
-        assert!(is_self_closing_tag("<img src=\"test.jpg\"/>"));
-        assert!(!is_self_closing_tag("<img src=\"test.jpg\">"));
     }
 
     #[test]

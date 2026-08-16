@@ -18,9 +18,11 @@ pubmed-client-rs/                    # Cargo workspace root
 ├── pubmed-client-napi/              # Native Node.js bindings via napi-rs (npm: pubmed-client)
 ├── pubmed-client-wasm/              # WASM bindings for browsers/Node.js (npm: pubmed-client-wasm)
 ├── pubmed-client-py/                # Python bindings via PyO3 (PyPI: pubmed-client-py)
+├── pubmed-client-go/                # Go bindings via cgo (Go module: .../pubmed-client-go)
 ├── pubmed-client-r/                 # R bindings via extendr (R package: pubmedclient) — NOT a workspace member
 ├── pubmed-cli/                      # Command-line interface
 ├── pubmed-mcp/                      # MCP server for AI assistant integration
+├── pubmed-test-utils/               # Shared XML fixture loaders for tests (crate: pubmed-test-utils, not published)
 └── website/                         # Docusaurus v3 landing page (GitHub Pages)
 ```
 
@@ -66,6 +68,12 @@ uv run --with maturin maturin develop
 uv run pytest
 uv run pytest -m "not integration"   # Unit tests only
 
+# Go (requires MISE_ENV=go; run from anywhere in the workspace)
+mise run go:build                    # cargo staticlib → lib/$GOOS_$GOARCH/, required before any go command
+mise run go:test                     # offline tests (stub HTTP server); depends on go:build
+mise run go:test-integration         # live NCBI API, opt-in
+cargo test -p pubmed-client-go       # Rust FFI boundary tests
+
 # MCP server
 cargo test -p pubmed-mcp
 cargo build --release -p pubmed-mcp
@@ -86,6 +94,12 @@ mise tasks require `MISE_ENV` to load per-area configs. See `DEVELOPMENT.md` for
 mise r lint                          # dprint + cargo fmt + clippy + actionlint
 mise r fmt                           # dprint + cargo fmt + ruff format
 
+# Rustdoc is NOT covered by `mise r lint`, and CI builds it with -D warnings —
+# a broken intra-doc link (e.g. to a private item) fails `docs.yml` and the
+# `Lint and Format` job while `mise r lint` stays green. Run it before pushing:
+RUSTDOCFLAGS="-D warnings --cfg docsrs" PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 \
+  cargo doc --all-features --no-deps
+
 # NAPI/WASM TypeScript (from respective directories)
 pnpm run check                       # Biome lint + format
 pnpm run typecheck
@@ -94,6 +108,10 @@ pnpm run typecheck
 uv run ruff check .
 uv run ruff format .
 uv run mypy tests/ --strict
+
+# Go (requires MISE_ENV=go)
+mise r lint:go                       # gofmt check + go vet
+mise r fmt:go                        # gofmt -w
 ```
 
 ### Code Coverage
@@ -114,7 +132,7 @@ The codebase is split into three core Rust crates with a clear layering:
 ### Parser (`pubmed-parser/src/`)
 
 ```
-lib.rs                 # Re-exports: common, error, pmc, pubmed modules
+lib.rs                 # Re-exports: common, error, europe_pmc, pmc, pubmed modules
 error.rs               # ParseError enum and Result type alias
 
 common/                # Shared types between PubMed and PMC
@@ -144,7 +162,16 @@ pmc/                   # PMC XML parsing
     metadata.rs        # Metadata extraction
     reference.rs       # Reference extraction
     section.rs         # Section parsing
-    xml_utils.rs       # XML utilities
+    reader_utils.rs    # quick-xml reader helpers shared by metadata.rs / section.rs
+    xml_utils.rs       # Re-export shim over common/xml_utils.rs
+
+europe_pmc/            # Europe PMC JSON response models & parsers
+  models.rs            # EuropePmcResult and shared record fields
+  search.rs            # EuropePmcSearchResponse, parse_search_response
+  references.rs        # EuropePmcReference(List), parse_references_response
+  citations.rs         # EuropePmcCitation(List), parse_citations_response
+  links.rs             # EuropePmcDatabaseLink(List), parse_database_links_response
+  de.rs                # Custom serde deserializers for Europe PMC quirks
 ```
 
 ### Formatter (`pubmed-formatter/src/`)
@@ -157,9 +184,16 @@ pubmed/
                        # Batch helpers: articles_to_bibtex(), articles_to_ris(), articles_to_csl_json()
 
 pmc/
-  markdown.rs          # PmcMarkdownConverter (builder pattern)
-                       # MarkdownConfig, HeadingStyle, ReferenceStyle
-                       # Supports: TOC, YAML frontmatter, figure paths, ORCID links
+  markdown/            # PmcMarkdownConverter (builder pattern)
+    mod.rs             # PmcMarkdownConverter, convert(), convert_with_figures()
+    config.rs          # MarkdownConfig, HeadingStyle, ReferenceStyle
+    frontmatter.rs     # YAML frontmatter generation
+    metadata.rs        # Title / authors / journal / DOI block
+    sections.rs        # Body sections, figures, tables
+    references.rs      # Reference list rendering
+    heading.rs         # Heading style formatting
+    toc.rs             # Table of contents
+    entities.rs        # XML entity / inline markup cleanup
 ```
 
 ### Client (`pubmed-client/src/`)
@@ -170,8 +204,11 @@ cache.rs               # Response caching (pluggable: memory/Redis/SQLite)
 config.rs              # ClientConfig (API keys, rate limiting, caching, timeouts)
 error.rs               # PubMedError enum (wraps ParseError from pubmed-parser)
 rate_limit.rs          # Token bucket rate limiter for NCBI API compliance
+request.rs             # RequestExecutor — URL building + rate limit + retry + error mapping,
+                       # shared by every endpoint module in the crate
 retry.rs               # Retry with exponential backoff
 time.rs                # Cross-platform time utilities (native + WASM)
+tls.rs                 # rustls crypto provider installation (rustls-tls feature)
 
 pubmed/                # PubMed E-utilities API
   client/              # PubMedClient (split into focused modules)
@@ -197,6 +234,19 @@ pubmed/                # PubMed E-utilities API
 pmc/                   # PMC (PubMed Central) API
   client.rs            # PmcClient - full-text fetch, availability check, figure extraction
   cloud.rs             # PmcCloudClient - per-file download from the PMC OA Cloud (AWS S3)
+  common.rs            # Shared PMC helpers (normalize_pmcid, ...)
+  extracted.rs         # ExtractedFigure / downloaded-file result types
+
+europe_pmc/            # Europe PMC REST API (EBI; complements NCBI E-utilities)
+  client.rs            # EuropePmcClient - construction, cache, executor plumbing
+  id.rs                # EuropePmcId / EuropePmcSource — (source, id) addressing
+  search.rs            # Cross-source search (cursorMark pagination)
+  fulltext.rs          # JATS full text -> PmcArticle, and raw XML
+  paged.rs             # PagedList trait + shared page-number pagination
+  references.rs        # /references endpoint
+  citations.rs         # /citations endpoint
+  links.rs             # /databaseLinks endpoint
+  supplementary.rs     # Supplementary file download (non-WASM)
 ```
 
 ### Key Types
@@ -204,9 +254,10 @@ pmc/                   # PMC (PubMed Central) API
 - `Client` — Unified client with `pubmed` and `pmc` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`
 - `PubMedClient` — Search, fetch metadata, ESummary, EPost/History, ELink, EInfo, ECitMatch, EGQuery, ESpell
 - `PmcClient` — Fetch full-text, check availability, extract figures, download OA files from the PMC OA Cloud (AWS S3)
+- `EuropePmcClient` — Europe PMC REST API: cross-source search, JATS full text, references/citations/database links, supplementary downloads. Addressed by `EuropePmcId` (`(source, id)`); needs no API key
 - `SearchQuery` — Builder pattern for complex queries with filters, date ranges, boolean logic
 - `PubMedArticle` — Article metadata (title, authors, abstract, MeSH, keywords, etc.) — defined in `pubmed-parser`
-- `PmcFullText` — Structured full-text (sections, references, figures, tables) — defined in `pubmed-parser`
+- `PmcArticle` — Structured JATS full-text (front/body/back; sections, references, figures, tables) — defined in `pubmed-parser`
 - `PmcMarkdownConverter` — Configurable markdown output with YAML frontmatter — defined in `pubmed-formatter`
 - `ExportFormat` — Trait for BibTeX/RIS/CSL-JSON/NBIB export — defined in `pubmed-formatter`
 - `ClientConfig` — API key, email, tool name, rate limit, cache (memory/Redis/SQLite), timeout, retry config
@@ -228,6 +279,26 @@ WebAssembly bindings via wasm-pack. Published as `pubmed-client-wasm` on npm. Ke
 Python bindings via PyO3/maturin. Published as `pubmed-client-py` on PyPI. Synchronous API with internal Tokio runtime. Key types: `Client`, `PubMedClient`, `PmcClient`, `SearchQuery`, `ClientConfig`.
 
 **Type stub (`pubmed_client.pyi`) is generated, never hand-edited.** It is produced from the `#[gen_stub_pyclass]`/`#[gen_stub_pymethods]` annotations by `src/bin/stub_gen.rs`, which also splices in the members `pyo3-stub-gen` can't see (`__version__` and the `create_exception!` hierarchy — the latter listed explicitly in `stub_gen.rs`). Every new `#[pyclass]` needs `#[gen_stub_pyclass]` and every `#[pymethods]` block needs `#[gen_stub_pymethods]`, or it silently disappears from the stub. After changing the PyO3 API: `MISE_ENV=python mise run stubgen:py` to regenerate, `MISE_ENV=python mise run stubtest:py` to verify against the compiled module, then commit the `.pyi`. CI's `Python Type Stub Check` job (`ci-python.yml`) fails on `git diff` if the checked-in stub is stale and runs `stubtest` so it can't drift from runtime. `stubtest-allowlist.txt` records intentionally-unstubbed names.
+
+### Go Bindings (`pubmed-client-go/`)
+
+Go bindings via cgo. Go module: `github.com/illumination-k/pubmed-client/pubmed-client-go`, package name `pubmedclient`. Synchronous but cancellable API with an internal Tokio runtime (same pattern as Python/R). Covers PubMed search/metadata (ESearch, EFetch, ESummary), the discovery APIs (ELink, EInfo, EGQuery, ECitMatch, ESpell), PMC full text / XML / Markdown / OA downloads, a query builder, and citation export.
+
+- **Two layers**: a C-ABI shim crate at `rust/` (crate `pubmed-client-go`, `crate-type = ["staticlib", "lib"]`, `publish = false`) and the Go package at the directory root. Unlike the R crate this **is** a workspace member — no external toolchain is needed to compile it — so workspace clippy/nextest cover it automatically.
+- **JSON boundary**: values cross FFI as JSON strings rather than mirrored C structs. Each call returns one owned `char *` (null + `out_err` on failure); Go re-parses into the typed structs in `models.go`. This keeps the C surface at a few dozen functions, and because `encoding/json` ignores unknown keys the Rust models can gain fields without breaking Go. `PmcArticleDto` in `rust/src/dto.rs` flattens the nested JATS tree via `PmcArticle`'s accessors.
+- **Errors cross as a JSON envelope** (`{"kind": …, "message": …, "status": …}`, see `rust/src/error.rs`). The `kind` is what lets Go expose sentinels (`ErrNotFound`, `ErrPMCNotAvailable`, `ErrRateLimited`, …) instead of matching on message text. Go treats an unparseable envelope as `KindUnknown` with the whole string as the message, so new kinds never break an older caller. `From<PubMedError>` matches exhaustively on purpose: a new upstream variant should fail the build rather than silently degrade to `internal`.
+- **`context.Context` is real cancellation, not advisory.** Every call takes a nullable `PubmedCancel` token (`rust/src/cancel.rs`, a `tokio::sync::watch` channel selected against the request future). Go's `Client.call` allocates one, wires a watchdog goroutine to `ctx.Done()`, and joins that goroutine before freeing the token — firing a freed token would be a use-after-free. A context that can never be cancelled (`context.Background()`) skips the token and the goroutine. Note `watch::Sender::send` fails when there are no receivers, so the trigger uses `send_replace`; `send` would silently lose a token fired before the call subscribed.
+- **The query builder is replayed, not reimplemented** (`rust/src/query.rs`). Go's `SearchQuery` records the builder calls as a JSON op list and ships them to Rust, which replays them onto the real `SearchQuery`. Field tags therefore have one implementation across every binding. Ops serialize through a hand-written `MarshalJSON` rather than struct tags: the operations take genuinely different arguments, and `omitempty` on a shared struct would quietly drop a zero year or an empty term.
+- **Export moves data back into Rust** (`rust/src/export.rs`). Go marshals `Article` with `omitempty`, so unset fields arrive missing, which `PubMedArticle` (no `#[serde(default)]`) rejects — including nested `Author.affiliations` and `MeshTerm.qualifiers`. Each object is merged over a template first; arrays in the template carry a prototype element applied to each incoming element, and a missing array defaults to empty. The template is written out field by field so a new model field breaks the build instead of failing at runtime.
+- **Panics are caught** (`catch_unwind`) at every boundary function — an `extern "C"` fn that unwinds would abort the Go process.
+- `guard` in `rust/src/ffi.rs` is `pub(crate)` on purpose: it writes through `out_err` without being an `unsafe fn`, which clippy's `not_unsafe_ptr_arg_deref` rejects for publicly reachable functions.
+- **rustls, not native-tls**: the shim depends on `pubmed-client` with `default-features = false, features = ["rustls-tls"]` so the archive needs no system OpenSSL. Build it with `cargo build -p pubmed-client-go`; under `cargo build --workspace` feature unification pulls `native-tls` back in and the archive would reference OpenSSL again.
+- **The `pubmed-client` dep is path-only** (no `version`, not `workspace = true`): inheriting a workspace dependency forbids overriding `default-features`, and the crate is never published. Nothing for `scripts/sync-versions.sh` to sync.
+- Build: there is no Makefile — everything is a mise task in `mise.go.toml` (`MISE_ENV=go`). `go:build` compiles the archive into `lib/$GOOS_$GOARCH/` (gitignored, ~75 MB); `go:test` and `lint:go` `depends` on it, since a cgo package cannot even be type-checked without the archive. `ffi.go` is the only file that touches C; the cgo link line carries per-platform `LDFLAGS`.
+- `lint:go` captures `gofmt -l` **stdout only**. Merging stderr picks up mise's own debug chatter (CI runs mise at debug level) and reports a spurious formatting failure on a clean tree.
+- mise runs task scripts with `sh`, not bash — no `pipefail`.
+- Tests: offline Go tests point `Config.BaseURL` at an `httptest` server (`stub_test.go`, one canned payload per E-utilities endpoint), exercising the whole chain (Go → cgo → Rust → HTTP → parse → JSON → Go structs) with no network. Live tests are behind the `integration` build tag plus `PUBMED_REAL_API_TESTS=1`. The Rust shim has its own boundary tests (null pointers, invalid JSON, double free, cancellation, query replay, export merge). When writing a test that blocks an `httptest` handler until the test releases it, register `defer server.Close()` **before** `defer close(release)` — `Server.Close` joins outstanding requests, so the other order deadlocks.
+- CI: `.github/workflows/ci-go.yml` — `lint` job (gofmt + vet) and a `test` matrix over ubuntu/macOS, since the cgo link line differs per platform. Windows is unverified (cgo needs the `x86_64-pc-windows-gnu` target, not Cargo's default msvc).
 
 ### R Bindings (`pubmed-client-r/`)
 

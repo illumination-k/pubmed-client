@@ -10,6 +10,7 @@ use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
 #[cfg(not(target_arch = "wasm32"))]
 use crate::request::fetch_with_retry;
+use crate::tls::install_default_crypto_provider;
 use pubmed_parser::pmc::{Figure, PmcArticle, Section};
 use reqwest::Client;
 #[cfg(not(target_arch = "wasm32"))]
@@ -38,6 +39,9 @@ impl PmcCloudClient {
     /// Create a new PMC OA Cloud client with configuration
     pub fn new(config: ClientConfig) -> Self {
         let rate_limiter = config.create_rate_limiter();
+
+        // rustls has no built-in provider under `rustls-tls`; install one first.
+        install_default_crypto_provider();
 
         #[allow(clippy::expect_used)]
         let client = {
