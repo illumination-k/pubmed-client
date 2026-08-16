@@ -71,6 +71,7 @@ ignore = [
   # "T20", # flake8-print (https://pypi.org/project/flake8-print/)
   "ANN", # flkae8-annotations (https://pypi.org/project/flake8-annotations/)
   "INP001", # File {file} is part of an implicit namespace package. Add an `__init__.py`.
+  "CPY001", # Missing copyright notice at top of file (this project uses no file headers)
 
   # fmt confilict ignore
   # https://docs.astral.sh/ruff/formatter/#format-suppression
