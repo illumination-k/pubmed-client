@@ -204,7 +204,7 @@ impl PmcClient {
     /// }
     /// ```
     pub async fn fetch_full_text(&self, pmcid: &str) -> Result<PmcArticle> {
-        let normalized_pmcid = self.normalize_pmcid(pmcid);
+        let normalized_pmcid = common::normalize_pmcid(pmcid);
         let cache_key = format!("pmc:{}", normalized_pmcid);
 
         // Check cache first if available
@@ -296,7 +296,7 @@ impl PmcClient {
                     for linksetdb in linksetdbs {
                         if linksetdb["dbto"] == "pmc"
                             && let Some(links) = linksetdb["links"].as_array()
-                            && let Some(pmcid) = links.first()
+                            && let Some(pmcid) = links.first().and_then(json_uid)
                         {
                             return Ok(Some(format!("PMC{pmcid}")));
                         }
@@ -496,10 +496,6 @@ impl PmcClient {
         }
     }
 
-    fn normalize_pmcid(&self, pmcid: &str) -> String {
-        common::normalize_pmcid(pmcid)
-    }
-
     /// Build a request executor borrowing this client's HTTP client, rate limiter, and config.
     fn executor(&self) -> RequestExecutor<'_> {
         RequestExecutor::new(&self.client, &self.rate_limiter, &self.config)
@@ -512,16 +508,34 @@ impl Default for PmcClient {
     }
 }
 
+/// Read an Entrez UID out of an ELink `links` entry.
+///
+/// NCBI writes these as JSON strings, but has used bare numbers too, so both
+/// are accepted. Formatting the `Value` directly would embed its JSON quotes in
+/// the id.
+fn json_uid(value: &serde_json::Value) -> Option<String> {
+    match value {
+        serde_json::Value::String(uid) => Some(uid.clone()),
+        serde_json::Value::Number(uid) => Some(uid.to_string()),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_normalize_pmcid() {
-        let client = PmcClient::new();
-
-        assert_eq!(client.normalize_pmcid("1234567"), "PMC1234567");
-        assert_eq!(client.normalize_pmcid("PMC1234567"), "PMC1234567");
+    fn test_json_uid_accepts_strings_and_numbers() {
+        assert_eq!(
+            json_uid(&serde_json::json!("7092803")).as_deref(),
+            Some("7092803")
+        );
+        assert_eq!(
+            json_uid(&serde_json::json!(7092803)).as_deref(),
+            Some("7092803")
+        );
+        assert_eq!(json_uid(&serde_json::json!(null)), None);
     }
 
     #[test]
