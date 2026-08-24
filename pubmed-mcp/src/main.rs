@@ -220,24 +220,17 @@ impl PubMedServer {
     }
 }
 
-#[tool_handler]
+// `router = self.tool_router` keeps tool listing/dispatch on the per-instance
+// router (which `with_options` filters); the rmcp 3.x default is the static
+// `Self::tool_router()`, which would ignore the `--tools` filtering.
+#[tool_handler(router = self.tool_router)]
 impl ServerHandler for PubMedServer {
     fn get_info(&self) -> ServerInfo {
-        ServerInfo {
-            protocol_version: ProtocolVersion::V_2025_03_26,
-            capabilities: ServerCapabilities::builder().enable_tools().build(),
-            server_info: Implementation {
-                name: "pubmed-mcp".to_string(),
-                version: env!("CARGO_PKG_VERSION").to_string(),
-                title: None,
-                description: None,
-                icons: None,
-                website_url: None,
-            },
-            instructions: Some(
-                "PubMed MCP Server - Search and retrieve biomedical literature from PubMed and PMC databases.".to_string(),
-            ),
-        }
+        ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
+            .with_server_info(Implementation::new("pubmed-mcp", env!("CARGO_PKG_VERSION")))
+            .with_instructions(
+                "PubMed MCP Server - Search and retrieve biomedical literature from PubMed and PMC databases.",
+            )
     }
 }
 

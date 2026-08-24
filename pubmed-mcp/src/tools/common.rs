@@ -22,7 +22,7 @@ pub fn invalid_params(msg: impl Display) -> ErrorData {
 }
 
 pub fn text_result(s: impl Into<String>) -> Result<CallToolResult, ErrorData> {
-    Ok(CallToolResult::success(vec![Content::text(s.into())]))
+    Ok(CallToolResult::success(vec![ContentBlock::text(s.into())]))
 }
 
 pub fn normalize_pmc_id(pmc_id: &str) -> String {
