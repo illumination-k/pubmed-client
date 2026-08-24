@@ -22,13 +22,13 @@ tracing.workspace = true
 # MCP Server dependencies
 axum = "0.8"
 clap = { version = "4", features = ["derive"] }
-rmcp = { version = "0.16", features = ["server", "transport-io", "transport-streamable-http-server"] }
+rmcp = { version = "3.1", features = ["server", "transport-io", "transport-streamable-http-server"] }
 schemars = "1.0"
 tokio = { version = "1.0", features = ["full"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [dev-dependencies]
-rmcp = { version = "0.16", features = ["client", "transport-child-process"] }
+rmcp = { version = "3.1", features = ["client", "transport-child-process"] }
 
 [[bin]]
 name = "pubmed-mcp"

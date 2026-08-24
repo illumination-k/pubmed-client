@@ -21,8 +21,12 @@ async fn test_mcp_server_initialize() -> Result<()> {
 
     // Verify server info. The version is sourced from CARGO_PKG_VERSION (the
     // unified workspace version), so assert against the same to stay bump-proof.
-    assert_eq!(peer_info.server_info.name, "pubmed-mcp");
-    assert_eq!(peer_info.server_info.version, env!("CARGO_PKG_VERSION"));
+    let server_info = peer_info
+        .server_info
+        .as_ref()
+        .expect("Server info should be available");
+    assert_eq!(server_info.name, "pubmed-mcp");
+    assert_eq!(server_info.version, env!("CARGO_PKG_VERSION"));
 
     Ok(())
 }
@@ -79,6 +83,38 @@ async fn test_mcp_server_list_tools() -> Result<()> {
 }
 
 #[tokio::test]
+async fn test_mcp_server_tool_filtering() -> Result<()> {
+    // Start the MCP server with only two tools enabled. This exercises the
+    // per-instance ToolRouter wiring (`#[tool_handler(router = self.tool_router)]`):
+    // if listing fell back to the static router, every tool would show up.
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--tools")
+                    .arg("search,markdown");
+            },
+        ))?)
+        .await?;
+
+    let tools = client.list_all_tools().await?;
+    let names: Vec<&str> = tools.iter().map(|tool| tool.name.as_ref()).collect();
+    assert_eq!(
+        tools.len(),
+        2,
+        "only the enabled tools should be listed, got: {names:?}"
+    );
+    assert!(names.contains(&"search_pubmed"));
+    assert!(names.contains(&"get_pmc_markdown"));
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn test_mcp_server_capabilities() -> Result<()> {
     // Start the MCP server
     let client = ()
@@ -93,7 +129,11 @@ async fn test_mcp_server_capabilities() -> Result<()> {
     let peer_info = client.peer_info().expect("Peer info should be available");
 
     // Verify server info
-    assert_eq!(peer_info.server_info.name, "pubmed-mcp");
+    let server_info = peer_info
+        .server_info
+        .as_ref()
+        .expect("Server info should be available");
+    assert_eq!(server_info.name, "pubmed-mcp");
 
     // Get server capabilities through peer info
     assert!(
