@@ -95,7 +95,13 @@ jobs:
         uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
 
       - name: Install nextest
-        uses: taiki-e/install-action@37f7c5781271959fb65b6b35224e28652ff2b63d # nextest
+        # `tool` is required: install-action reads the tool name from its own ref
+        # (`@nextest`) only when the input is absent, and pinning to a SHA leaves
+        # it with nothing to read — the step then succeeds having installed
+        # nothing, and the next step fails with "no such command: `nextest`".
+        uses: taiki-e/install-action@37f7c5781271959fb65b6b35224e28652ff2b63d # v2.87.0
+        with:
+          tool: nextest
 
       - name: Run tests
         # See the coverage job in ci-rust.yml: `--all-features` enables
