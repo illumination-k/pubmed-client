@@ -52,10 +52,14 @@ impl EuropePmcClient {
     /// Fetch the raw JATS XML full text for a Europe PMC record.
     ///
     /// Works for any source that has full text available. Returns the response
-    /// body verbatim (`/{source}/{id}/fullTextXML`).
+    /// body verbatim.
+    ///
+    /// Unlike the list endpoints, Europe PMC addresses full text by the record
+    /// id alone (`/{id}/fullTextXML`) rather than by `(source, id)`; a
+    /// source-qualified path answers 404.
     #[instrument(skip(self), fields(id = %id))]
     pub async fn fetch_full_text_xml(&self, id: &EuropePmcId) -> Result<String> {
-        let endpoint = format!("{}/{}/fullTextXML", id.source, id.id);
+        let endpoint = format!("{}/fullTextXML", id.id);
         let response = self
             .executor()
             .get_endpoint(&self.base_url, &endpoint, &[])

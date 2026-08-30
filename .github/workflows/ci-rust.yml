@@ -90,7 +90,10 @@ jobs:
         run: rustup component add llvm-tools-preview
 
       - name: Run tests with coverage instrumentation
-        run: cargo llvm-cov nextest --workspace --all-features --no-report
+        # `--all-features` would turn on pubmed-client-py's `extension-module`,
+        # which makes pyo3 drop the libpython link flags and every test harness
+        # in that crate fail to link. It has no Rust tests to cover anyway.
+        run: cargo llvm-cov nextest --workspace --exclude pubmed-client-py --all-features --no-report
 
       - name: Generate LCOV report
         run: cargo llvm-cov report --lcov --output-path lcov.info

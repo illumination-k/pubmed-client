@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 use serde::Deserialize;
 
-use pubmed_client::{Client, ClientConfig};
+use pubmed_client::{Client, ClientConfig, EuropePmcClient};
 
 use crate::cancel::enter_runtime;
 use crate::error::ShimError;
@@ -48,10 +48,27 @@ struct ConfigDto {
     timeout_seconds: Option<u64>,
     user_agent: Option<String>,
     base_url: Option<String>,
+    /// Overrides the Europe PMC REST base URL.
+    ///
+    /// Europe PMC is hosted by EBI on a different host and path scheme from the
+    /// NCBI E-utilities, so `base_url` (the eutils override) does not reach it
+    /// and it needs its own knob.
+    europe_pmc_base_url: Option<String>,
     cache: bool,
 }
 
 impl ConfigDto {
+    /// Build the client this configuration describes.
+    fn into_client(self) -> Client {
+        let europe_pmc_base_url = self.europe_pmc_base_url.clone();
+        let config = self.into_config();
+        let mut client = Client::with_config(config.clone());
+        if let Some(base_url) = europe_pmc_base_url {
+            client.europe_pmc = EuropePmcClient::with_config(config).with_base_url(base_url);
+        }
+        client
+    }
+
     fn into_config(self) -> ClientConfig {
         let mut config = ClientConfig::new();
         if let Some(api_key) = self.api_key {
@@ -121,7 +138,7 @@ pub unsafe extern "C" fn pubmed_client_new(
 
             // Enter the runtime: the HTTP client builder expects a reactor context.
             let _guard = enter_runtime();
-            let client = Client::with_config(config.into_config());
+            let client = config.into_client();
             Ok(Box::into_raw(Box::new(PubmedClient {
                 inner: Arc::new(client),
             })))

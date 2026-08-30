@@ -242,6 +242,73 @@ char *pmc_clear_cache(const PubmedClient *client, const PubmedCancel *cancel,
                       char **out_err);
 
 /* ---------------------------------------------------------------------------
+ * Europe PMC
+ *
+ * Europe PMC records are addressed by a source database plus an id. Every call
+ * below takes both; `source` may be NULL, in which case a "PMC"-prefixed id is
+ * read as a PMC record and anything else as a PubMed (MED) record. An id given
+ * in fully-qualified "SOURCE/ID" form wins over `source`.
+ *
+ * `options_json` on the search calls may be NULL for the defaults, otherwise
+ * {"result_type": "idlist"|"lite"|"core", "page_size": number,
+ *  "cursor_mark": string, "sort": string} (see `SearchOptionsDto` in
+ * ../rust/src/europe_pmc.rs).
+ * ------------------------------------------------------------------------- */
+
+/*
+ * Search across pages until `limit` records are collected. Returns a JSON array
+ * of Europe PMC records.
+ */
+char *europe_pmc_search(const PubmedClient *client, const char *query,
+                        size_t limit, const char *options_json,
+                        const PubmedCancel *cancel, char **out_err);
+
+/*
+ * Fetch one page of search results. Returns a JSON object with the total hit
+ * count, the next cursor, and the page's records.
+ */
+char *europe_pmc_search_page(const PubmedClient *client, const char *query,
+                             const char *options_json,
+                             const PubmedCancel *cancel, char **out_err);
+
+/*
+ * Fetch and parse full text. Returns a JSON article object. Supports
+ * PMC-sourced records only; use `europe_pmc_fetch_xml` for other sources.
+ */
+char *europe_pmc_fetch_full_text(const PubmedClient *client, const char *id,
+                                 const char *source,
+                                 const PubmedCancel *cancel, char **out_err);
+
+/* Fetch the raw JATS XML for a record. Returns the XML, not JSON. */
+char *europe_pmc_fetch_xml(const PubmedClient *client, const char *id,
+                           const char *source, const PubmedCancel *cancel,
+                           char **out_err);
+
+/* Fetch every work cited by a record. Returns a JSON array. */
+char *europe_pmc_get_references(const PubmedClient *client, const char *id,
+                                const char *source, const PubmedCancel *cancel,
+                                char **out_err);
+
+/* Fetch every article citing a record. Returns a JSON array. */
+char *europe_pmc_get_citations(const PubmedClient *client, const char *id,
+                               const char *source, const PubmedCancel *cancel,
+                               char **out_err);
+
+/* Fetch external database cross-references. Returns a JSON array. */
+char *europe_pmc_get_database_links(const PubmedClient *client, const char *id,
+                                    const char *source,
+                                    const PubmedCancel *cancel,
+                                    char **out_err);
+
+/*
+ * Download a record's supplementary-files ZIP to `output_path`. Returns the
+ * written path as a JSON string.
+ */
+char *europe_pmc_download_supplementary_files(
+    const PubmedClient *client, const char *id, const char *source,
+    const char *output_path, const PubmedCancel *cancel, char **out_err);
+
+/* ---------------------------------------------------------------------------
  * Pure functions (no client, no network)
  * ------------------------------------------------------------------------- */
 

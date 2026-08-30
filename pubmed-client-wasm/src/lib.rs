@@ -14,8 +14,10 @@ pub use client::WasmPubMedClient;
 pub use config::WasmClientConfig;
 pub use models::{
     JsArticle, JsAuthor, JsCitationMatch, JsCitationQuery, JsDatabaseCount, JsEPostResult,
-    JsFigure, JsFullText, JsFunding, JsGlobalQueryResults, JsJournal, JsMarkdownOptions,
-    JsOaSubsetInfo, JsReference, JsSection, JsSpellCheckResult, JsSummary, JsTable,
+    JsEuropePmcCitation, JsEuropePmcDatabaseLink, JsEuropePmcDbCrossReferenceInfo,
+    JsEuropePmcReference, JsEuropePmcResult, JsEuropePmcSearchPage, JsFigure, JsFullText,
+    JsFunding, JsGlobalQueryResults, JsJournal, JsMarkdownOptions, JsOaSubsetInfo, JsReference,
+    JsSection, JsSpellCheckResult, JsSummary, JsTable,
 };
 pub use query::WasmSearchQuery;
 

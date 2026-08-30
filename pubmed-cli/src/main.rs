@@ -124,6 +124,9 @@ enum Commands {
     Info(commands::info::Info),
     /// Export article citations in various formats (BibTeX, RIS, CSL-JSON, NBIB)
     Export(commands::export::Export),
+    /// Search and retrieve from Europe PMC (preprints, patents, PubMed and PMC)
+    #[command(name = "europe-pmc", alias = "epmc")]
+    EuropePmc(commands::europe_pmc::EuropePmc),
 }
 
 #[tokio::main]
@@ -202,5 +205,6 @@ async fn main() -> Result<()> {
         Commands::Citations(cmd) => cmd.execute(&ctx).await,
         Commands::Info(cmd) => cmd.execute(&ctx).await,
         Commands::Export(cmd) => cmd.execute(&ctx).await,
+        Commands::EuropePmc(cmd) => cmd.execute(&ctx).await,
     }
 }

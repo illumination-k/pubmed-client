@@ -50,6 +50,14 @@ searchArticles().catch(console.error);
 - Retrieve structured full-text content
 - Convert articles to Markdown format (with configurable options)
 
+### Europe PMC
+
+- Cross-source search covering preprints (`PPR`), patents (`PAT`), Agricola (`AGR`) and Chinese
+  Biological Abstracts (`CBA`) as well as PubMed (`MED`) and PMC
+- JATS full text, parsed or raw XML
+- Reference and citation graphs, and cross-references to external databases
+- No API key required
+
 ### Query Builder
 
 - Fluent `WasmSearchQuery` builder with field filters (title, author, MeSH, journal, ORCID, …)
@@ -231,6 +239,44 @@ console.log(`Found ${related.related_pmids.length} related articles`);
 - `pmids` (number[]): Array of PubMed IDs
 
 **Returns:** Promise<RelatedArticles>
+
+### Europe PMC methods
+
+[Europe PMC](https://europepmc.org) records are addressed by a source database plus an id. Every
+method accepts the id bare (`'PMC3258128'`, `'33515491'`), with an explicit `source`, or fully
+qualified (`'PPR/PPR123456'`). Given no source, a `PMC`-prefixed id is read as a PMC record and
+anything else as a PubMed record.
+
+| Method                                                                         | Returns                     |
+| ------------------------------------------------------------------------------ | --------------------------- |
+| `europe_pmc_search(query, limit, result_type?, sort?)`                         | `JsEuropePmcResult[]`       |
+| `europe_pmc_search_page(query, result_type?, page_size?, cursor_mark?, sort?)` | `JsEuropePmcSearchPage`     |
+| `europe_pmc_fetch_full_text(id, source?)`                                      | `JsFullText`                |
+| `europe_pmc_fetch_full_text_xml(id, source?)`                                  | `string`                    |
+| `europe_pmc_get_references(id, source?)`                                       | `JsEuropePmcReference[]`    |
+| `europe_pmc_get_citations(id, source?)`                                        | `JsEuropePmcCitation[]`     |
+| `europe_pmc_get_database_links(id, source?)`                                   | `JsEuropePmcDatabaseLink[]` |
+
+```javascript
+const client = new WasmPubMedClient();
+
+// Cross-source search, including preprints
+const results = await client.europe_pmc_search('TITLE:CRISPR AND SRC:PPR', 10);
+for (const result of results) {
+  console.log(result.europe_pmc_id, result.title);
+}
+
+// Citation graph in both directions
+const references = await client.europe_pmc_get_references('PMC3258128');
+const citations = await client.europe_pmc_get_citations('33515491', 'MED');
+
+// `result_type: 'core'` returns far more than is modelled; the remainder
+// crosses as a JSON object string rather than a shape Europe PMC may change
+const core = await client.europe_pmc_search('malaria vaccine', 5, 'core');
+console.log(JSON.parse(core[0].extra_json).citedByCount);
+```
+
+Note that supplementary-file download is native-only and is not part of the WASM surface.
 
 ### WasmSearchQuery
 

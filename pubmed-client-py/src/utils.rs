@@ -114,3 +114,61 @@ pub fn to_py_err(err: ::pubmed_client::error::PubMedError) -> PyErr {
         }
     }
 }
+
+// ================================================================================================
+// JSON Conversion
+// ================================================================================================
+
+/// Convert a `serde_json` value into the closest native Python object.
+///
+/// Used for the untyped remainder of Europe PMC responses (`extra`), whose
+/// shape the API is free to change; pinning it to a `#[pyclass]` would break
+/// the moment Europe PMC adds a field, so it is handed to Python as plain
+/// dicts, lists and scalars instead.
+pub fn json_to_py(py: Python<'_>, value: &serde_json::Value) -> PyResult<Py<PyAny>> {
+    use pyo3::IntoPyObjectExt;
+    use pyo3::types::PyList;
+    use serde_json::Value;
+
+    match value {
+        Value::Null => Ok(py.None()),
+        Value::Bool(b) => b.into_py_any(py),
+        Value::Number(n) => {
+            if let Some(i) = n.as_i64() {
+                i.into_py_any(py)
+            } else if let Some(u) = n.as_u64() {
+                u.into_py_any(py)
+            } else if let Some(f) = n.as_f64() {
+                f.into_py_any(py)
+            } else {
+                // serde_json only reaches here for arbitrary-precision numbers,
+                // which have no lossless Python scalar; keep the digits.
+                n.to_string().into_py_any(py)
+            }
+        }
+        Value::String(s) => s.into_py_any(py),
+        Value::Array(items) => {
+            let list = PyList::empty(py);
+            for item in items {
+                list.append(json_to_py(py, item)?)?;
+            }
+            list.into_py_any(py)
+        }
+        Value::Object(map) => json_map_to_py(py, map),
+    }
+}
+
+/// Convert a `serde_json` object map into a Python dict.
+pub fn json_map_to_py(
+    py: Python<'_>,
+    map: &serde_json::Map<String, serde_json::Value>,
+) -> PyResult<Py<PyAny>> {
+    use pyo3::IntoPyObjectExt;
+    use pyo3::types::PyDict;
+
+    let dict = PyDict::new(py);
+    for (key, value) in map {
+        dict.set_item(key, json_to_py(py, value)?)?;
+    }
+    dict.into_py_any(py)
+}

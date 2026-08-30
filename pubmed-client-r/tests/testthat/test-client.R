@@ -29,3 +29,31 @@ test_that("API functions reject non-client input", {
   expect_error(pmc_fulltext(42, "PMC1"), "pubmed_client")
   expect_error(pmc_to_markdown(NA, "PMC1"), "pubmed_client")
 })
+
+test_that("Europe PMC functions reject non-client input", {
+  expect_error(europepmc_search("not a client", "x"), "pubmed_client")
+  expect_error(europepmc_fulltext(list(), "PMC1"), "pubmed_client")
+  expect_error(europepmc_fulltext_xml(NULL, "PMC1"), "pubmed_client")
+  expect_error(europepmc_references(42, "PMC1"), "pubmed_client")
+  expect_error(europepmc_citations(NA, "PMC1"), "pubmed_client")
+  expect_error(europepmc_database_links("", "PMC1"), "pubmed_client")
+})
+
+# A Europe PMC record address is validated before any request is issued, so
+# these stay offline. They assert only that an error is raised: extendr is built
+# without its `result_condition` feature, so every error the Rust side returns
+# reaches R as "User function panicked: <fn>" rather than carrying its own
+# message. That applies to the PubMed and PMC functions too and is not specific
+# to Europe PMC.
+
+test_that("Europe PMC rejects an invalid record address", {
+  client <- pubmed_client()
+  expect_error(europepmc_references(client, "   "))
+  expect_error(europepmc_citations(client, "MED/"))
+  expect_error(europepmc_fulltext(client, "not-a-pmcid", source = "PMC"))
+})
+
+test_that("Europe PMC rejects an unknown result type", {
+  client <- pubmed_client()
+  expect_error(europepmc_search(client, "cancer", limit = 1, result_type = "verbose"))
+})

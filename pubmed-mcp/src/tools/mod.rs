@@ -12,6 +12,7 @@ pub mod convert;
 pub mod einfo;
 pub mod elink;
 pub mod espell;
+pub mod europe_pmc;
 pub mod export;
 pub mod figures;
 pub mod fulltext;

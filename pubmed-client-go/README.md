@@ -92,7 +92,9 @@ ESpell).
 ### API
 
 Every call takes a `context.Context` first. `Config` accepts `APIKey`, `Email`, `Tool`,
-`RateLimit`, `Timeout`, `UserAgent`, `BaseURL` and `Cache`; the zero value is valid.
+`RateLimit`, `Timeout`, `UserAgent`, `BaseURL`, `EuropePMCBaseURL` and `Cache`; the zero value is
+valid. `BaseURL` overrides the NCBI E-utilities endpoint only — Europe PMC is hosted by EBI
+elsewhere and has its own override.
 
 #### Lifecycle
 
@@ -154,6 +156,44 @@ The ELink calls take `[]uint32` rather than PMID strings, matching NCBI's own UI
 | `DownloadFiles(ctx, pmcid, dir)`                | Download an OA article's files              |
 | `ExtractFigures(ctx, pmcid, dir)`               | Download figures paired with their captions |
 | `ClearPMCCache(ctx)`                            | Drop cached PMC responses                   |
+
+#### Europe PMC
+
+[Europe PMC](https://europepmc.org) is a complementary index to the NCBI E-utilities: it covers
+preprints (`PPR`), patents (`PAT`), Agricola (`AGR`) and Chinese Biological Abstracts (`CBA`) as
+well as PubMed (`MED`) and PMC, and needs no API key.
+
+Records are addressed by a source database plus an id. Every method takes both; `source` may be
+empty, in which case a `PMC`-prefixed id is read as a PMC record and anything else as a PubMed
+record. An id in fully-qualified `"SOURCE/ID"` form wins over `source`.
+
+| Method                                                       | Description                                    |
+| ------------------------------------------------------------ | ---------------------------------------------- |
+| `EuropePMCSearch(ctx, query, limit)`                         | Search every Europe PMC source                 |
+| `EuropePMCSearchWithOptions(ctx, query, limit, options)`     | As above, with detail level, page size, sort   |
+| `EuropePMCSearchPage(ctx, query, options)`                   | One page, with the total count and next cursor |
+| `EuropePMCFetchFullText(ctx, id, source)`                    | Structured full text (PMC-sourced records)     |
+| `EuropePMCFetchXML(ctx, id, source)`                         | Raw JATS XML (any source with full text)       |
+| `EuropePMCReferences(ctx, id, source)`                       | Works cited by the record                      |
+| `EuropePMCCitations(ctx, id, source)`                        | Articles citing the record                     |
+| `EuropePMCDatabaseLinks(ctx, id, source)`                    | Cross-references to external databases         |
+| `EuropePMCDownloadSupplementaryFiles(ctx, id, source, path)` | Download the supplementary-files ZIP           |
+
+```go
+// Cross-source search, including preprints
+results, err := client.EuropePMCSearch(ctx, "TITLE:CRISPR AND SRC:PPR", 10)
+for _, result := range results {
+	fmt.Println(result.EuropePMCID, result.Title)
+}
+
+// Citation graph in both directions — broader than GetCitations, which sees
+// only PubMed-indexed articles
+references, err := client.EuropePMCReferences(ctx, "PMC3258128", "")
+citations, err := client.EuropePMCCitations(ctx, "33515491", "MED")
+```
+
+`EuropePMCCore` results carry far more fields than are modelled, and the set changes over time;
+whatever is not named on the struct lands in its `Extra map[string]any` rather than being dropped.
 
 #### Query builder and export
 
@@ -280,6 +320,7 @@ pubmed-client-go/
 │       ├── dto.rs     # projections of Rust models onto the JSON Go decodes
 │       ├── pubmed.rs  # E-utilities calls
 │       ├── pmc.rs     # PMC full text, XML, Markdown, OA downloads
+│       ├── europe_pmc.rs # Europe PMC search, full text, citation graphs
 │       ├── query.rs   # replay of the Go query builder onto SearchQuery
 │       └── export.rs  # citation export
 ├── include/         # C header consumed by cgo
@@ -287,6 +328,7 @@ pubmed-client-go/
 ├── client.go        # Client, Config, context plumbing
 ├── pubmed.go        # PubMed and E-utilities methods
 ├── pmc.go           # PMC methods and Markdown options
+├── europe_pmc.go    # Europe PMC methods and search options
 ├── query.go         # SearchQuery builder
 ├── export.go        # citation export
 ├── models.go        # Go structs mirroring the JSON boundary

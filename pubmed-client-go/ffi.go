@@ -377,6 +377,88 @@ func ffiClearPMCCache(h handle, t token) (string, error) {
 	})
 }
 
+// --- Europe PMC --------------------------------------------------------------
+
+func ffiEuropePmcSearch(h handle, t token, query string, limit int, optionsJSON string) (string, error) {
+	var args cargs
+	defer args.free()
+	cQuery, cOptions := args.str(query), args.opt(optionsJSON)
+
+	return invoke("EuropePMCSearch", func(outErr **C.char) *C.char {
+		return C.europe_pmc_search(h, cQuery, C.size_t(limit), cOptions, t, outErr)
+	})
+}
+
+func ffiEuropePmcSearchPage(h handle, t token, query, optionsJSON string) (string, error) {
+	var args cargs
+	defer args.free()
+	cQuery, cOptions := args.str(query), args.opt(optionsJSON)
+
+	return invoke("EuropePMCSearchPage", func(outErr **C.char) *C.char {
+		return C.europe_pmc_search_page(h, cQuery, cOptions, t, outErr)
+	})
+}
+
+func ffiEuropePmcFetchFullText(h handle, t token, id, source string) (string, error) {
+	var args cargs
+	defer args.free()
+	cID, cSource := args.str(id), args.opt(source)
+
+	return invoke("EuropePMCFetchFullText", func(outErr **C.char) *C.char {
+		return C.europe_pmc_fetch_full_text(h, cID, cSource, t, outErr)
+	})
+}
+
+func ffiEuropePmcFetchXML(h handle, t token, id, source string) (string, error) {
+	var args cargs
+	defer args.free()
+	cID, cSource := args.str(id), args.opt(source)
+
+	return invoke("EuropePMCFetchXML", func(outErr **C.char) *C.char {
+		return C.europe_pmc_fetch_xml(h, cID, cSource, t, outErr)
+	})
+}
+
+func ffiEuropePmcGetReferences(h handle, t token, id, source string) (string, error) {
+	var args cargs
+	defer args.free()
+	cID, cSource := args.str(id), args.opt(source)
+
+	return invoke("EuropePMCReferences", func(outErr **C.char) *C.char {
+		return C.europe_pmc_get_references(h, cID, cSource, t, outErr)
+	})
+}
+
+func ffiEuropePmcGetCitations(h handle, t token, id, source string) (string, error) {
+	var args cargs
+	defer args.free()
+	cID, cSource := args.str(id), args.opt(source)
+
+	return invoke("EuropePMCCitations", func(outErr **C.char) *C.char {
+		return C.europe_pmc_get_citations(h, cID, cSource, t, outErr)
+	})
+}
+
+func ffiEuropePmcGetDatabaseLinks(h handle, t token, id, source string) (string, error) {
+	var args cargs
+	defer args.free()
+	cID, cSource := args.str(id), args.opt(source)
+
+	return invoke("EuropePMCDatabaseLinks", func(outErr **C.char) *C.char {
+		return C.europe_pmc_get_database_links(h, cID, cSource, t, outErr)
+	})
+}
+
+func ffiEuropePmcDownloadSupplementaryFiles(h handle, t token, id, source, outputPath string) (string, error) {
+	var args cargs
+	defer args.free()
+	cID, cSource, cPath := args.str(id), args.opt(source), args.str(outputPath)
+
+	return invoke("EuropePMCDownloadSupplementaryFiles", func(outErr **C.char) *C.char {
+		return C.europe_pmc_download_supplementary_files(h, cID, cSource, cPath, t, outErr)
+	})
+}
+
 // ffiQueryBuild and ffiExportArticles need no client handle: both are pure
 // functions on the Rust side.
 

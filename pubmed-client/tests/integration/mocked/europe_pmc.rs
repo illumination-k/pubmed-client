@@ -119,7 +119,7 @@ const JATS_FULL_TEXT: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
 async fn test_fetch_full_text_parses_jats() {
     let mock_server = MockServer::start().await;
     Mock::given(method("GET"))
-        .and(path("/PMC/PMC10618641/fullTextXML"))
+        .and(path("/PMC10618641/fullTextXML"))
         .respond_with(
             ResponseTemplate::new(200)
                 .set_body_string(JATS_FULL_TEXT.to_string())
@@ -234,4 +234,52 @@ async fn test_get_database_links() {
     assert_eq!(links.len(), 1);
     assert_eq!(links[0].db_name.as_deref(), Some("UNIPROT"));
     assert_eq!(links[0].info[0].info1.as_deref(), Some("P12345"));
+}
+
+/// Europe PMC addresses full text and supplementary files by the record id
+/// alone, while the list endpoints take `(source, id)`. Mounting the mock on
+/// the exact expected path pins that asymmetry: a source-qualified path would
+/// fall through to wiremock's 404 and fail these tests.
+#[tokio::test]
+#[traced_test]
+async fn test_fetch_full_text_xml_uses_unqualified_path() {
+    let mock_server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/PMC10618641/fullTextXML"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_string(JATS_FULL_TEXT.to_string())
+                .insert_header("content-type", "application/xml"),
+        )
+        .mount(&mock_server)
+        .await;
+
+    let id = EuropePmcId::pmc("PMC10618641").unwrap();
+    let xml = client(&mock_server)
+        .fetch_full_text_xml(&id)
+        .await
+        .expect("full text XML should fetch");
+    assert!(xml.contains("A Europe PMC test article"));
+}
+
+#[tokio::test]
+#[traced_test]
+async fn test_fetch_supplementary_files_uses_unqualified_path() {
+    let mock_server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/PMC10618641/supplementaryFiles"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_bytes(b"PK\x03\x04zip".to_vec())
+                .insert_header("content-type", "application/zip"),
+        )
+        .mount(&mock_server)
+        .await;
+
+    let id = EuropePmcId::pmc("PMC10618641").unwrap();
+    let bytes = client(&mock_server)
+        .fetch_supplementary_files(&id)
+        .await
+        .expect("supplementary files should fetch");
+    assert_eq!(bytes, b"PK\x03\x04zip");
 }

@@ -106,6 +106,10 @@ for _, article := range articles {
 pubmed-cli search "covid-19" --max-results 10
 pubmed-cli markdown PMC7906746 > article.md
 pubmed-cli figures PMC7906746 --output figures/
+
+# Europe PMC — preprints, patents and non-PubMed sources, no API key needed
+pubmed-cli europe-pmc search "TITLE:CRISPR AND SRC:PPR" --max 10
+pubmed-cli europe-pmc citations PMC3258128
 ```
 
 ## Documentation

@@ -19,7 +19,7 @@ doctest = false
 pubmed-client = { workspace = true }
 
 # PyO3 for Python bindings
-pyo3 = { version = "0.28.2", features = ["extension-module"] }
+pyo3 = { version = "0.28.2" }
 
 # pyo3-stub-gen for automatic type stub generation
 # These must stay compatible with the pyo3 version above.
@@ -40,6 +40,12 @@ doc = false
 
 [features]
 default = []
+# Enabled by maturin when building the wheel (see `[tool.maturin] features` in
+# pyproject.toml). It must stay OFF for `cargo test`/`cargo run`: with
+# `extension-module` pyo3 omits the libpython link flags, so every non-cdylib
+# target (test harnesses, the `stub_gen` binary) fails to link with undefined
+# Py* symbols unless the linker happens to discard all pyo3 objects as dead.
+extension-module = ["pyo3/extension-module"]
 
 [lints]
 workspace = true

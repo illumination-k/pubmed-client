@@ -22,3 +22,15 @@ client_search_and_fetch <- function(client, query, limit) .Call(wrap__client_sea
 pmc_fetch_fulltext <- function(client, pmcid) .Call(wrap__pmc_fetch_fulltext, client, pmcid)
 
 pmc_markdown <- function(client, pmcid) .Call(wrap__pmc_markdown, client, pmcid)
+
+epmc_search <- function(client, query, limit, result_type, sort) .Call(wrap__epmc_search, client, query, limit, result_type, sort)
+
+epmc_fetch_fulltext <- function(client, id, source) .Call(wrap__epmc_fetch_fulltext, client, id, source)
+
+epmc_fetch_xml <- function(client, id, source) .Call(wrap__epmc_fetch_xml, client, id, source)
+
+epmc_references <- function(client, id, source) .Call(wrap__epmc_references, client, id, source)
+
+epmc_citations <- function(client, id, source) .Call(wrap__epmc_citations, client, id, source)
+
+epmc_database_links <- function(client, id, source) .Call(wrap__epmc_database_links, client, id, source)

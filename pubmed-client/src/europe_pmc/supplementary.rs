@@ -19,10 +19,12 @@ use super::id::EuropePmcId;
 impl EuropePmcClient {
     /// Fetch the supplementary-files ZIP archive for a record into memory.
     ///
-    /// Returns the raw bytes of the ZIP (`/{source}/{id}/supplementaryFiles`).
+    /// Returns the raw bytes of the ZIP. As with full text, Europe PMC
+    /// addresses this endpoint by the record id alone
+    /// (`/{id}/supplementaryFiles`) rather than by `(source, id)`.
     #[instrument(skip(self), fields(id = %id))]
     pub async fn fetch_supplementary_files(&self, id: &EuropePmcId) -> Result<Vec<u8>> {
-        let endpoint = format!("{}/{}/supplementaryFiles", id.source, id.id);
+        let endpoint = format!("{}/supplementaryFiles", id.id);
         let response = self
             .executor()
             .get_endpoint(&self.base_url, &endpoint, &[])

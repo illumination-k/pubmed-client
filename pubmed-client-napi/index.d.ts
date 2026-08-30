@@ -265,6 +265,88 @@ export declare class PubMedClient {
    * @returns Array of extracted figures with file metadata
    */
   extractFiguresWithCaptions(pmcid: string, outputDir: string): Promise<Array<ExtractedFigure>>
+  /**
+   * Search Europe PMC across every source it indexes
+   *
+   * @param query - Europe PMC query (e.g., "TITLE:CRISPR AND SRC:PPR")
+   * @param limit - Maximum number of records to return (default: 10)
+   * @param resultType - "idlist", "lite" (default) or "core"
+   * @param sort - Europe PMC sort expression (e.g., "CITED desc")
+   * @returns Array of Europe PMC records
+   */
+  europePmcSearch(query: string, limit?: number | undefined | null, resultType?: string | undefined | null, sort?: string | undefined | null): Promise<Array<EuropePmcSearchResult>>
+  /**
+   * Fetch a single page of Europe PMC search results
+   *
+   * Pass the returned `nextCursorMark` back as `cursorMark` to page through
+   * a result set; Europe PMC signals the end by returning the same cursor.
+   *
+   * @param query - Europe PMC query
+   * @param resultType - "idlist", "lite" (default) or "core"
+   * @param pageSize - Records per page, 1-1000 (default: 25)
+   * @param cursorMark - Cursor for the page to fetch; "*" (default) is the first page
+   * @param sort - Europe PMC sort expression
+   * @returns One page of records, with the total hit count and next cursor
+   */
+  europePmcSearchPage(query: string, resultType?: string | undefined | null, pageSize?: number | undefined | null, cursorMark?: string | undefined | null, sort?: string | undefined | null): Promise<EuropePmcSearchPage>
+  /**
+   * Fetch and parse the full text of a Europe PMC record
+   *
+   * Parsing into an article requires a PMC id, so this supports PMC-sourced
+   * records only; use `europePmcFetchFullTextXml` for other sources.
+   *
+   * @param id - Record id, bare or fully qualified
+   * @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+   * @returns Structured full-text article
+   */
+  europePmcFetchFullText(id: string, source?: string | undefined | null): Promise<FullTextArticle>
+  /**
+   * Fetch the raw JATS XML full text of a Europe PMC record
+   *
+   * @param id - Record id, bare or fully qualified
+   * @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+   * @returns JATS XML
+   */
+  europePmcFetchFullTextXml(id: string, source?: string | undefined | null): Promise<string>
+  /**
+   * List the works cited by a Europe PMC record
+   *
+   * @param id - Record id, bare or fully qualified
+   * @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+   * @returns Array of cited works
+   */
+  europePmcGetReferences(id: string, source?: string | undefined | null): Promise<Array<EuropePmcReferenceEntry>>
+  /**
+   * List the articles citing a Europe PMC record
+   *
+   * Broader coverage than `getCitations`, which is PubMed-only: includes
+   * preprints and other non-PubMed sources.
+   *
+   * @param id - Record id, bare or fully qualified
+   * @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+   * @returns Array of citing articles
+   */
+  europePmcGetCitations(id: string, source?: string | undefined | null): Promise<Array<EuropePmcCitationEntry>>
+  /**
+   * List cross-references from a Europe PMC record to external databases
+   *
+   * @param id - Record id, bare or fully qualified
+   * @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+   * @returns Array of per-database cross-reference groups
+   */
+  europePmcGetDatabaseLinks(id: string, source?: string | undefined | null): Promise<Array<EuropePmcDatabaseLinkEntry>>
+  /**
+   * Download a Europe PMC record's supplementary-files ZIP archive
+   *
+   * Europe PMC returns supplementary materials as a single ZIP; unpacking is
+   * left to the caller.
+   *
+   * @param id - Record id, bare or fully qualified
+   * @param outputPath - Full path of the ZIP file to write
+   * @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+   * @returns The written path
+   */
+  europePmcDownloadSupplementaryFiles(id: string, outputPath: string, source?: string | undefined | null): Promise<string>
 }
 
 /**
@@ -1180,6 +1262,117 @@ export interface EPostResult {
   webenv: string
   /** Query key for the uploaded IDs within the session */
   queryKey: string
+}
+
+/** An article citing a Europe PMC record */
+export interface EuropePmcCitationEntry {
+  /** Identifier of the citing record within its source database */
+  id?: string
+  /** Source database of the citing record */
+  source?: string
+  /** Citation type (e.g. "JOURNAL ARTICLE") */
+  citationType?: string
+  title?: string
+  authorString?: string
+  journalAbbreviation?: string
+  pubYear?: string
+  volume?: string
+  issue?: string
+  pageInfo?: string
+  /** Number of times the citing article has itself been cited */
+  citedByCount?: string
+  /** Fields not modelled above, as a JSON object string */
+  extraJson: string
+}
+
+/** Cross-references from a record to one external database */
+export interface EuropePmcDatabaseLinkEntry {
+  /** External database name (e.g. "UNIPROT", "EMBL", "PDB") */
+  dbName?: string
+  /** Number of cross-references reported for this database */
+  dbCount?: number
+  /** Individual cross-reference entries */
+  info: Array<EuropePmcDbCrossReference>
+}
+
+/**
+ * A single external-database cross-reference entry
+ *
+ * Europe PMC documents the four slots only positionally, and their meaning
+ * varies by database, so they are surfaced as-is rather than renamed.
+ */
+export interface EuropePmcDbCrossReference {
+  info1?: string
+  info2?: string
+  info3?: string
+  info4?: string
+}
+
+/** A work cited by a Europe PMC record */
+export interface EuropePmcReferenceEntry {
+  /** Source database of the cited record, when Europe PMC matched it */
+  source?: string
+  /** Identifier of the cited record, when Europe PMC matched it */
+  id?: string
+  /** Citation type (e.g. "JOURNAL ARTICLE") */
+  citationType?: string
+  title?: string
+  authorString?: string
+  journalAbbreviation?: string
+  pubYear?: string
+  volume?: string
+  issue?: string
+  pageInfo?: string
+  pmid?: string
+  doi?: string
+  /** Fields not modelled above, as a JSON object string */
+  extraJson: string
+}
+
+/** One page of Europe PMC search results */
+export interface EuropePmcSearchPage {
+  /** Total number of records matching the query, across all pages */
+  hitCount: number
+  /**
+   * Cursor to pass as `cursorMark` to fetch the next page.
+   *
+   * Europe PMC keeps returning the same value once the last page is
+   * reached, so a cursor equal to the one just used means "no more pages".
+   */
+  nextCursorMark?: string
+  /** Records on this page */
+  results: Array<EuropePmcSearchResult>
+}
+
+/** A Europe PMC search result record */
+export interface EuropePmcSearchResult {
+  /** Record identifier within its source database */
+  id: string
+  /** Source database code (MED, PMC, PPR, AGR, CBA, PAT, ...) */
+  source: string
+  /** Fully-qualified Europe PMC address ("SOURCE/ID") */
+  europePmcId: string
+  /** PubMed ID, when the record is linked to PubMed */
+  pmid?: string
+  /** PMC ID, when full text is in PMC */
+  pmcid?: string
+  /** Digital Object Identifier */
+  doi?: string
+  /** Article title */
+  title?: string
+  /** Comma-separated author list, as provided by Europe PMC */
+  authorString?: string
+  /** Journal title */
+  journalTitle?: string
+  /** Publication year */
+  pubYear?: string
+  /** Open access flag as reported by Europe PMC ("Y" / "N") */
+  isOpenAccess?: string
+  /**
+   * Fields Europe PMC returned but that are not modelled above, as a JSON
+   * object string. Populated mainly by `resultType: 'core'`.
+   */
+  extraJson: string
 }
 
 /** A figure extracted from a downloaded PMC OA Cloud article, with file metadata */

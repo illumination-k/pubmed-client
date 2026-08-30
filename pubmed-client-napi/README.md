@@ -15,6 +15,7 @@ This package provides high-performance native Node.js bindings to the Rust-based
 - **PubMed Search**: Search and retrieve article metadata from PubMed
 - **PMC Full-Text**: Access full-text articles from PubMed Central
 - **Markdown Conversion**: Convert PMC articles to well-formatted Markdown
+- **Europe PMC**: Cross-source search (preprints, patents, Agricola, CBA), JATS full text, reference and citation graphs, external database links — no API key needed
 - **SearchQuery Builder**: Build complex queries programmatically with filters
 - **High Performance**: Native Rust bindings via napi-rs
 - **TypeScript Support**: Full type definitions included
@@ -244,6 +245,47 @@ filtered.build(); // "(cancer treatment) NOT (animal studies)"
 | `fetchPmcAsMarkdown(pmcid, options?)` | Fetch PMC article as Markdown             |
 | `checkPmcAvailability(pmid)`          | Check if PMC full-text is available       |
 | `executeQuery(searchQuery)`           | Execute a SearchQuery and return articles |
+
+### Europe PMC
+
+[Europe PMC](https://europepmc.org) complements the NCBI E-utilities: it indexes preprints (`PPR`),
+patents (`PAT`), Agricola (`AGR`) and Chinese Biological Abstracts (`CBA`) alongside PubMed (`MED`)
+and PMC, and needs no API key.
+
+Records are addressed by a source database plus an id. Every method accepts the id bare
+(`'PMC3258128'`, `'33515491'`), with an explicit `source`, or fully qualified
+(`'PPR/PPR123456'`). Given no source, a `PMC`-prefixed id is read as a PMC record and anything
+else as a PubMed record.
+
+| Method                                                                   | Description                              |
+| ------------------------------------------------------------------------ | ---------------------------------------- |
+| `europePmcSearch(query, limit?, resultType?, sort?)`                     | Search every Europe PMC source           |
+| `europePmcSearchPage(query, resultType?, pageSize?, cursorMark?, sort?)` | One page, with the next cursor           |
+| `europePmcFetchFullText(id, source?)`                                    | Parsed full text (PMC-sourced records)   |
+| `europePmcFetchFullTextXml(id, source?)`                                 | Raw JATS XML (any source with full text) |
+| `europePmcGetReferences(id, source?)`                                    | Works cited by the record                |
+| `europePmcGetCitations(id, source?)`                                     | Articles citing the record               |
+| `europePmcGetDatabaseLinks(id, source?)`                                 | Cross-references to external databases   |
+| `europePmcDownloadSupplementaryFiles(id, path, source?)`                 | Download the supplementary-files ZIP     |
+
+```javascript
+const client = new PubMedClient()
+
+// Cross-source search, including preprints
+const results = await client.europePmcSearch('TITLE:CRISPR AND SRC:PPR', 10)
+for (const result of results) {
+  console.log(result.europePmcId, result.title)
+}
+
+// Citation graph in both directions
+const references = await client.europePmcGetReferences('PMC3258128')
+const citations = await client.europePmcGetCitations('33515491', 'MED')
+
+// `resultType: 'core'` returns far more than is modelled; the remainder crosses
+// as a JSON object string rather than a shape Europe PMC is free to change
+const core = await client.europePmcSearch('malaria vaccine', 5, 'core')
+console.log(JSON.parse(core[0].extraJson).citedByCount)
+```
 
 ### SearchQuery Builder
 

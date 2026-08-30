@@ -3,8 +3,9 @@
 R bindings for the Rust [`pubmed-client`](https://github.com/illumination-k/pubmed-client)
 library, built with [extendr](https://extendr.github.io/). This is an **MVP**:
 it covers the core PubMed/PMC operations (search, fetch metadata, full text,
-Markdown). The richer surface available in the Python/Node bindings can be
-added incrementally.
+Markdown) plus Europe PMC (cross-source search, full text, citation graphs,
+database links). The richer surface available in the Python/Node bindings can
+be added incrementally.
 
 ## Requirements
 
@@ -53,6 +54,47 @@ md   <- pmc_to_markdown(client, "PMC7906746")
 cat(md)
 ```
 
+### Europe PMC
+
+[Europe PMC](https://europepmc.org) is a complementary index to the NCBI
+E-utilities: it covers preprints (`PPR`), patents (`PAT`), Agricola (`AGR`) and
+Chinese Biological Abstracts (`CBA`) as well as PubMed (`MED`) and PMC, and
+needs no API key.
+
+Records are addressed by a source database plus an id. Every function takes
+both; `source` may be `NULL`, in which case a `PMC`-prefixed id is read as a PMC
+record and anything else as a PubMed record. An id given in fully-qualified
+`"SOURCE/ID"` form wins over `source`.
+
+```r
+# Cross-source search, including preprints
+results <- europepmc_search(client, "TITLE:CRISPR AND SRC:PPR", limit = 5)
+results[[1]]$europe_pmc_id
+results[[1]]$title
+
+# Full text, as summary metadata or as raw JATS XML
+info <- europepmc_fulltext(client, "PMC3258128")
+xml  <- europepmc_fulltext_xml(client, "PMC3258128")
+
+# Citation graph in both directions — broader than PubMed's own links, which
+# see only PubMed-indexed articles
+refs <- europepmc_references(client, "PMC3258128")
+cits <- europepmc_citations(client, "33515491", source = "MED")
+
+# Cross-references to external databases (UniProt, EMBL, PDB, ...)
+links <- europepmc_database_links(client, "PMC3258128")
+```
+
+`result_type = "core"` returns far more fields than are modelled, and the set
+changes over time; whatever is not named on the record is available as a JSON
+object string in its `extra_json`, ready for `jsonlite::fromJSON()`.
+
+Note that `europepmc_fulltext()` and `europepmc_fulltext_xml()` need
+`pubmed-client` 0.3.2 or later: 0.3.1 built the full-text URL with a
+source-qualified path, which Europe PMC answers with 404. The version
+requirement in `src/rust/Cargo.toml` picks up 0.3.2 automatically once it is
+published; the rest of the Europe PMC surface works against 0.3.1.
+
 ## Configuration
 
 `pubmed_client()` accepts optional `api_key`, `email`, `tool`, `rate_limit`,
@@ -80,3 +122,9 @@ rextendr::document("pubmed-client-r")
 
 Keep `R/extendr-wrappers.R` in sync with the `extendr_module!` block in
 `src/rust/src/lib.rs`.
+
+Errors returned by the Rust side currently surface in R as
+`"User function panicked: <fn>"` rather than carrying their own message:
+extendr only converts a `Result` into an R condition under its
+`result_condition` feature, which this crate does not enable. The offline tests
+therefore assert that an error is raised without matching on the message.

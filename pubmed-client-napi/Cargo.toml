@@ -17,6 +17,9 @@ napi-derive = "3"
 # napi is published to npm (not crates.io), so a path dep is sufficient.
 # default-features = false can't be set on an inherited workspace dep, so keep it direct.
 pubmed-client = { path = "../pubmed-client", default-features = false, features = ["rustls-tls"] }
+# Europe PMC returns more fields than are modelled (`resultType=core`); the
+# remainder crosses to JS as a JSON object string rather than a pinned shape.
+serde_json = { workspace = true }
 tokio = { version = "1", features = ["rt-multi-thread"] }
 
 [build-dependencies]

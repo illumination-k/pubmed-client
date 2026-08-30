@@ -98,7 +98,10 @@ jobs:
         uses: taiki-e/install-action@37f7c5781271959fb65b6b35224e28652ff2b63d # nextest
 
       - name: Run tests
-        run: cargo nextest run --all-features
+        # See the coverage job in ci-rust.yml: `--all-features` enables
+        # pubmed-client-py's `extension-module`, which breaks linking of its
+        # test harnesses. The crate has no Rust tests.
+        run: cargo nextest run --workspace --exclude pubmed-client-py --all-features
 
   # ── crates.io (dependency order enforced via needs) ──────────────────────────
   publish-parser:
