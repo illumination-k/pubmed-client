@@ -59,6 +59,8 @@ const config: Config = {
   email: 'your-email@example.com',       // Recommended by NCBI
   tool: 'my-app',                        // Your application name
   timeoutSeconds: 30,                    // Request timeout
+  rateLimit: 5,                          // Requests per second (defaults to the NCBI limit)
+  cache: true,                           // Enable the in-memory response cache
 };
 
 const client = PubMedClient.withConfig(config);
@@ -152,6 +154,18 @@ const query2 = new SearchQuery()
 const query3 = new SearchQuery()
   .query('CRISPR')
   .publishedAfter(2020);
+
+// Publication date range, open-ended without an end year
+const query4 = new SearchQuery()
+  .query('immunotherapy')
+  .dateRange(2020, 2023);
+
+// Entry date ([edat]) and modification date ([mdat]) accept a year or
+// `{ year, month?, day? }` for month/day precision
+const query5 = new SearchQuery()
+  .query('recent discoveries')
+  .entryDateBetween({ year: 2023, month: 3 }, { year: 2024, month: 12, day: 31 })
+  .modificationDateBetween(2023);
 ```
 
 #### Article Type Filtering
@@ -176,9 +190,24 @@ const query = new SearchQuery()
   .firstAuthor('Williams K')
   .affiliation('Harvard Medical School')
   .journal('Nature')
+  .journalAbbreviation('Nat Med')
+  .organismMesh('Mus musculus')
+  .isbn('978-0123456789')
+  .issn('1234-5678')
   .language('English')
   .humanStudiesOnly()
   .hasAbstract();
+```
+
+#### Validation and Optimization
+
+```typescript
+const query = new SearchQuery()
+  .query('covid-19')
+  .query('covid-19')
+  .optimize();     // de-duplicates terms and filters, dropping empty ones
+
+query.validate();  // throws if the query is empty, over-long, or unbalanced
 ```
 
 #### Boolean Logic
@@ -218,42 +247,51 @@ filtered.build(); // "(cancer treatment) NOT (animal studies)"
 
 ### SearchQuery Builder
 
-| Method                          | Description                       |
-| ------------------------------- | --------------------------------- |
-| `query(term)`                   | Add search term                   |
-| `terms(terms[])`                | Add multiple search terms         |
-| `setLimit(n)`                   | Set maximum results               |
-| `build()`                       | Build final query string          |
-| `publishedInYear(year)`         | Filter by publication year        |
-| `publishedBetween(start, end?)` | Filter by date range              |
-| `publishedAfter(year)`          | Filter to articles after year     |
-| `publishedBefore(year)`         | Filter to articles before year    |
-| `articleType(type)`             | Filter by article type            |
-| `articleTypes(types[])`         | Filter by multiple article types  |
-| `language(lang)`                | Filter by language                |
-| `freeFullTextOnly()`            | Filter to open access articles    |
-| `fullTextOnly()`                | Filter to articles with full text |
-| `pmcOnly()`                     | Filter to PMC articles            |
-| `hasAbstract()`                 | Filter to articles with abstracts |
-| `titleContains(text)`           | Search in titles                  |
-| `abstractContains(text)`        | Search in abstracts               |
-| `titleOrAbstract(text)`         | Search in title or abstract       |
-| `journal(name)`                 | Filter by journal                 |
-| `meshTerm(term)`                | Filter by MeSH term               |
-| `meshMajorTopic(term)`          | Filter by MeSH major topic        |
-| `meshTerms(terms[])`            | Filter by multiple MeSH terms     |
-| `author(name)`                  | Filter by author                  |
-| `firstAuthor(name)`             | Filter by first author            |
-| `lastAuthor(name)`              | Filter by last author             |
-| `affiliation(institution)`      | Filter by affiliation             |
-| `orcid(id)`                     | Filter by ORCID                   |
-| `humanStudiesOnly()`            | Filter to human studies           |
-| `animalStudiesOnly()`           | Filter to animal studies          |
-| `and(other)`                    | Combine with AND logic            |
-| `or(other)`                     | Combine with OR logic             |
-| `exclude(other)`                | Exclude matching articles         |
-| `negate()`                      | Negate the query                  |
-| `group()`                       | Add parentheses for grouping      |
+| Method                           | Description                       |
+| -------------------------------- | --------------------------------- |
+| `query(term)`                    | Add search term                   |
+| `terms(terms[])`                 | Add multiple search terms         |
+| `setLimit(n)`                    | Set maximum results               |
+| `build()`                        | Build final query string          |
+| `publishedInYear(year)`          | Filter by publication year        |
+| `publishedBetween(start, end?)`  | Filter by date range              |
+| `publishedAfter(year)`           | Filter to articles after year     |
+| `publishedBefore(year)`          | Filter to articles before year    |
+| `dateRange(start, end?)`         | Filter by publication date range  |
+| `entryDateBetween(start, end?)`  | Filter by Entrez entry date       |
+| `modificationDateBetween(s, e?)` | Filter by modification date       |
+| `articleType(type)`              | Filter by article type            |
+| `articleTypes(types[])`          | Filter by multiple article types  |
+| `language(lang)`                 | Filter by language                |
+| `freeFullTextOnly()`             | Filter to open access articles    |
+| `fullTextOnly()`                 | Filter to articles with full text |
+| `pmcOnly()`                      | Filter to PMC articles            |
+| `hasAbstract()`                  | Filter to articles with abstracts |
+| `titleContains(text)`            | Search in titles                  |
+| `abstractContains(text)`         | Search in abstracts               |
+| `titleOrAbstract(text)`          | Search in title or abstract       |
+| `journal(name)`                  | Filter by journal                 |
+| `journalAbbreviation(abbr)`      | Filter by journal abbreviation    |
+| `isbn(isbn)`                     | Filter by ISBN                    |
+| `issn(issn)`                     | Filter by ISSN                    |
+| `meshTerm(term)`                 | Filter by MeSH term               |
+| `meshMajorTopic(term)`           | Filter by MeSH major topic        |
+| `meshTerms(terms[])`             | Filter by multiple MeSH terms     |
+| `author(name)`                   | Filter by author                  |
+| `firstAuthor(name)`              | Filter by first author            |
+| `lastAuthor(name)`               | Filter by last author             |
+| `affiliation(institution)`       | Filter by affiliation             |
+| `orcid(id)`                      | Filter by ORCID                   |
+| `humanStudiesOnly()`             | Filter to human studies           |
+| `animalStudiesOnly()`            | Filter to animal studies          |
+| `organismMesh(organism)`         | Filter by organism MeSH term      |
+| `and(other)`                     | Combine with AND logic            |
+| `or(other)`                      | Combine with OR logic             |
+| `exclude(other)`                 | Exclude matching articles         |
+| `negate()`                       | Negate the query                  |
+| `group()`                        | Add parentheses for grouping      |
+| `validate()`                     | Throw if the query is invalid     |
+| `optimize()`                     | De-duplicate terms and filters    |
 
 ## Data Types
 
