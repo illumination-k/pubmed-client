@@ -3426,6 +3426,7 @@ dependencies = [
  "napi-build 1.2.1",
  "napi-derive",
  "pubmed-client",
+ "serde_json",
  "tokio",
 ]
 

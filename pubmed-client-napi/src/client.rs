@@ -1,10 +1,16 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
-use pubmed_client::{Client, ClientConfig, pmc::markdown::PmcMarkdownConverter};
+use pubmed_client::{
+    Client, ClientConfig, EuropePmcSearchOptions, pmc::markdown::PmcMarkdownConverter,
+};
 use std::sync::Arc;
 
 use crate::config::Config;
 use crate::error::to_napi_err;
+use crate::europe_pmc::{
+    EuropePmcCitationEntry, EuropePmcDatabaseLinkEntry, EuropePmcReferenceEntry,
+    EuropePmcSearchPage, EuropePmcSearchResult, parse_result_type, resolve_id,
+};
 use crate::models::{
     Article, CitationMatch, CitationQuery, Citations, DatabaseInfo, EPostResult, ExtractedFigure,
     FullTextArticle, GlobalQueryResults, MarkdownOptions, OaSubsetInfo, PmcLinks, RelatedArticles,
@@ -584,5 +590,240 @@ impl PubMedClient {
             .map_err(to_napi_err)?;
 
         Ok(figures.iter().map(ExtractedFigure::from).collect())
+    }
+
+    // ============================================================================================
+    // Europe PMC
+    // ============================================================================================
+    //
+    // Europe PMC is a complementary index to the NCBI E-utilities: it covers
+    // preprints (PPR), patents (PAT), Agricola (AGR) and Chinese Biological
+    // Abstracts (CBA) as well as PubMed (MED) and PMC, and needs no API key.
+    //
+    // Records are addressed by a source database plus an id. Every method here
+    // accepts the id bare ("PMC3258128", "33515491"), with an explicit
+    // `source`, or fully qualified ("PPR/PPR123456"). With no source, a
+    // PMC-prefixed id is read as a PMC record and anything else as a PubMed one.
+
+    /// Search Europe PMC across every source it indexes
+    ///
+    /// @param query - Europe PMC query (e.g., "TITLE:CRISPR AND SRC:PPR")
+    /// @param limit - Maximum number of records to return (default: 10)
+    /// @param resultType - "idlist", "lite" (default) or "core"
+    /// @param sort - Europe PMC sort expression (e.g., "CITED desc")
+    /// @returns Array of Europe PMC records
+    #[napi]
+    pub async fn europe_pmc_search(
+        &self,
+        query: String,
+        limit: Option<u32>,
+        result_type: Option<String>,
+        sort: Option<String>,
+    ) -> Result<Vec<EuropePmcSearchResult>> {
+        let limit = limit.unwrap_or(10) as usize;
+        let opts = EuropePmcSearchOptions {
+            result_type: parse_result_type(result_type.as_deref())?,
+            page_size: limit.clamp(1, 1000) as u32,
+            sort,
+            ..Default::default()
+        };
+
+        let results = self
+            .client
+            .europe_pmc
+            .search_all(&query, limit, &opts)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(results
+            .into_iter()
+            .map(EuropePmcSearchResult::from)
+            .collect())
+    }
+
+    /// Fetch a single page of Europe PMC search results
+    ///
+    /// Pass the returned `nextCursorMark` back as `cursorMark` to page through
+    /// a result set; Europe PMC signals the end by returning the same cursor.
+    ///
+    /// @param query - Europe PMC query
+    /// @param resultType - "idlist", "lite" (default) or "core"
+    /// @param pageSize - Records per page, 1-1000 (default: 25)
+    /// @param cursorMark - Cursor for the page to fetch; "*" (default) is the first page
+    /// @param sort - Europe PMC sort expression
+    /// @returns One page of records, with the total hit count and next cursor
+    #[napi]
+    pub async fn europe_pmc_search_page(
+        &self,
+        query: String,
+        result_type: Option<String>,
+        page_size: Option<u32>,
+        cursor_mark: Option<String>,
+        sort: Option<String>,
+    ) -> Result<EuropePmcSearchPage> {
+        let opts = EuropePmcSearchOptions {
+            result_type: parse_result_type(result_type.as_deref())?,
+            page_size: page_size.unwrap_or(25).clamp(1, 1000),
+            cursor_mark: cursor_mark.unwrap_or_else(|| "*".to_string()),
+            sort,
+        };
+
+        let page = self
+            .client
+            .europe_pmc
+            .search_page(&query, &opts)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(EuropePmcSearchPage::from(page))
+    }
+
+    /// Fetch and parse the full text of a Europe PMC record
+    ///
+    /// Parsing into an article requires a PMC id, so this supports PMC-sourced
+    /// records only; use `europePmcFetchFullTextXml` for other sources.
+    ///
+    /// @param id - Record id, bare or fully qualified
+    /// @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+    /// @returns Structured full-text article
+    #[napi]
+    pub async fn europe_pmc_fetch_full_text(
+        &self,
+        id: String,
+        source: Option<String>,
+    ) -> Result<FullTextArticle> {
+        let epmc_id = resolve_id(&id, source.as_deref())?;
+        let article = self
+            .client
+            .europe_pmc
+            .fetch_full_text(&epmc_id)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(FullTextArticle::from(article))
+    }
+
+    /// Fetch the raw JATS XML full text of a Europe PMC record
+    ///
+    /// @param id - Record id, bare or fully qualified
+    /// @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+    /// @returns JATS XML
+    #[napi]
+    pub async fn europe_pmc_fetch_full_text_xml(
+        &self,
+        id: String,
+        source: Option<String>,
+    ) -> Result<String> {
+        let epmc_id = resolve_id(&id, source.as_deref())?;
+        self.client
+            .europe_pmc
+            .fetch_full_text_xml(&epmc_id)
+            .await
+            .map_err(to_napi_err)
+    }
+
+    /// List the works cited by a Europe PMC record
+    ///
+    /// @param id - Record id, bare or fully qualified
+    /// @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+    /// @returns Array of cited works
+    #[napi]
+    pub async fn europe_pmc_get_references(
+        &self,
+        id: String,
+        source: Option<String>,
+    ) -> Result<Vec<EuropePmcReferenceEntry>> {
+        let epmc_id = resolve_id(&id, source.as_deref())?;
+        let references = self
+            .client
+            .europe_pmc
+            .get_references(&epmc_id)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(references
+            .into_iter()
+            .map(EuropePmcReferenceEntry::from)
+            .collect())
+    }
+
+    /// List the articles citing a Europe PMC record
+    ///
+    /// Broader coverage than `getCitations`, which is PubMed-only: includes
+    /// preprints and other non-PubMed sources.
+    ///
+    /// @param id - Record id, bare or fully qualified
+    /// @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+    /// @returns Array of citing articles
+    #[napi]
+    pub async fn europe_pmc_get_citations(
+        &self,
+        id: String,
+        source: Option<String>,
+    ) -> Result<Vec<EuropePmcCitationEntry>> {
+        let epmc_id = resolve_id(&id, source.as_deref())?;
+        let citations = self
+            .client
+            .europe_pmc
+            .get_citations(&epmc_id)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(citations
+            .into_iter()
+            .map(EuropePmcCitationEntry::from)
+            .collect())
+    }
+
+    /// List cross-references from a Europe PMC record to external databases
+    ///
+    /// @param id - Record id, bare or fully qualified
+    /// @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+    /// @returns Array of per-database cross-reference groups
+    #[napi]
+    pub async fn europe_pmc_get_database_links(
+        &self,
+        id: String,
+        source: Option<String>,
+    ) -> Result<Vec<EuropePmcDatabaseLinkEntry>> {
+        let epmc_id = resolve_id(&id, source.as_deref())?;
+        let links = self
+            .client
+            .europe_pmc
+            .get_database_links(&epmc_id)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(links
+            .into_iter()
+            .map(EuropePmcDatabaseLinkEntry::from)
+            .collect())
+    }
+
+    /// Download a Europe PMC record's supplementary-files ZIP archive
+    ///
+    /// Europe PMC returns supplementary materials as a single ZIP; unpacking is
+    /// left to the caller.
+    ///
+    /// @param id - Record id, bare or fully qualified
+    /// @param outputPath - Full path of the ZIP file to write
+    /// @param source - Source database (MED, PMC, PPR, AGR, CBA, PAT)
+    /// @returns The written path
+    #[napi]
+    pub async fn europe_pmc_download_supplementary_files(
+        &self,
+        id: String,
+        output_path: String,
+        source: Option<String>,
+    ) -> Result<String> {
+        let epmc_id = resolve_id(&id, source.as_deref())?;
+        let written = self
+            .client
+            .europe_pmc
+            .download_supplementary_files(&epmc_id, &output_path)
+            .await
+            .map_err(to_napi_err)?;
+
+        Ok(written.to_string_lossy().into_owned())
     }
 }

@@ -704,3 +704,224 @@ impl From<pubmed_client::SpellCheckResult> for JsSpellCheckResult {
         }
     }
 }
+
+// ================================================================================================
+// Europe PMC
+// ================================================================================================
+//
+// Europe PMC is deliberately lenient about its own schema: `resultType=core`
+// returns far more than is modelled, and the set changes over time. Each record
+// therefore carries an `extra_json` string with whatever was not modelled,
+// rather than pinning a shape Europe PMC is free to change.
+
+/// Serialize the unmodelled remainder of a Europe PMC record to a JSON object string.
+///
+/// Serializing an already-parsed JSON map cannot fail, so a failure falls back
+/// to an empty object rather than an error the caller cannot act on.
+fn extra_json(extra: &serde_json::Map<String, serde_json::Value>) -> String {
+    serde_json::to_string(extra).unwrap_or_else(|_| "{}".to_string())
+}
+
+/// JavaScript-friendly Europe PMC search result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsEuropePmcResult {
+    /// Record identifier within its source database
+    pub id: String,
+    /// Source database code (MED, PMC, PPR, AGR, CBA, PAT, ...)
+    pub source: String,
+    /// Fully-qualified Europe PMC address ("SOURCE/ID")
+    pub europe_pmc_id: String,
+    pub pmid: Option<String>,
+    pub pmcid: Option<String>,
+    pub doi: Option<String>,
+    pub title: Option<String>,
+    pub author_string: Option<String>,
+    pub journal_title: Option<String>,
+    pub pub_year: Option<String>,
+    /// Open access flag as reported by Europe PMC ("Y" / "N")
+    pub is_open_access: Option<String>,
+    /// Fields not modelled above, as a JSON object string
+    pub extra_json: String,
+}
+
+impl From<pubmed_client::EuropePmcResult> for JsEuropePmcResult {
+    fn from(result: pubmed_client::EuropePmcResult) -> Self {
+        Self {
+            europe_pmc_id: format!("{}/{}", result.source, result.id),
+            extra_json: extra_json(&result.extra),
+            id: result.id,
+            source: result.source,
+            pmid: result.pmid,
+            pmcid: result.pmcid,
+            doi: result.doi,
+            title: result.title,
+            author_string: result.author_string,
+            journal_title: result.journal_title,
+            pub_year: result.pub_year,
+            is_open_access: result.is_open_access,
+        }
+    }
+}
+
+/// JavaScript-friendly page of Europe PMC search results
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsEuropePmcSearchPage {
+    /// Total number of records matching the query, across all pages
+    pub hit_count: u64,
+    /// Cursor to pass back as `cursor_mark` to fetch the next page.
+    ///
+    /// Europe PMC keeps returning the same value once the last page is
+    /// reached, so a cursor equal to the one just used means "no more pages".
+    pub next_cursor_mark: Option<String>,
+    pub results: Vec<JsEuropePmcResult>,
+}
+
+impl From<pubmed_client::EuropePmcSearchResponse> for JsEuropePmcSearchPage {
+    fn from(response: pubmed_client::EuropePmcSearchResponse) -> Self {
+        Self {
+            hit_count: response.hit_count,
+            next_cursor_mark: response.next_cursor_mark,
+            results: response
+                .results
+                .into_iter()
+                .map(JsEuropePmcResult::from)
+                .collect(),
+        }
+    }
+}
+
+/// JavaScript-friendly Europe PMC reference (a work cited by a record)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsEuropePmcReference {
+    pub source: Option<String>,
+    pub id: Option<String>,
+    pub citation_type: Option<String>,
+    pub title: Option<String>,
+    pub author_string: Option<String>,
+    pub journal_abbreviation: Option<String>,
+    pub pub_year: Option<String>,
+    pub volume: Option<String>,
+    pub issue: Option<String>,
+    pub page_info: Option<String>,
+    pub pmid: Option<String>,
+    pub doi: Option<String>,
+    /// Fields not modelled above, as a JSON object string
+    pub extra_json: String,
+}
+
+impl From<pubmed_client::EuropePmcReference> for JsEuropePmcReference {
+    fn from(reference: pubmed_client::EuropePmcReference) -> Self {
+        Self {
+            extra_json: extra_json(&reference.extra),
+            source: reference.source,
+            id: reference.id,
+            citation_type: reference.citation_type,
+            title: reference.title,
+            author_string: reference.author_string,
+            journal_abbreviation: reference.journal_abbreviation,
+            pub_year: reference.pub_year,
+            volume: reference.volume,
+            issue: reference.issue,
+            page_info: reference.page_info,
+            pmid: reference.pmid,
+            doi: reference.doi,
+        }
+    }
+}
+
+/// JavaScript-friendly Europe PMC citation (an article citing a record)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsEuropePmcCitation {
+    pub id: Option<String>,
+    pub source: Option<String>,
+    pub citation_type: Option<String>,
+    pub title: Option<String>,
+    pub author_string: Option<String>,
+    pub journal_abbreviation: Option<String>,
+    pub pub_year: Option<String>,
+    pub volume: Option<String>,
+    pub issue: Option<String>,
+    pub page_info: Option<String>,
+    /// Number of times the citing article has itself been cited
+    pub cited_by_count: Option<String>,
+    /// Fields not modelled above, as a JSON object string
+    pub extra_json: String,
+}
+
+impl From<pubmed_client::EuropePmcCitation> for JsEuropePmcCitation {
+    fn from(citation: pubmed_client::EuropePmcCitation) -> Self {
+        Self {
+            extra_json: extra_json(&citation.extra),
+            id: citation.id,
+            source: citation.source,
+            citation_type: citation.citation_type,
+            title: citation.title,
+            author_string: citation.author_string,
+            journal_abbreviation: citation.journal_abbreviation,
+            pub_year: citation.pub_year,
+            volume: citation.volume,
+            issue: citation.issue,
+            page_info: citation.page_info,
+            cited_by_count: citation.cited_by_count,
+        }
+    }
+}
+
+/// JavaScript-friendly external-database cross-reference entry
+///
+/// Europe PMC documents the four slots only positionally, and their meaning
+/// varies by database, so they are surfaced as-is rather than renamed.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsEuropePmcDbCrossReferenceInfo {
+    pub info1: Option<String>,
+    pub info2: Option<String>,
+    pub info3: Option<String>,
+    pub info4: Option<String>,
+}
+
+impl From<pubmed_client::EuropePmcDbCrossReferenceInfo> for JsEuropePmcDbCrossReferenceInfo {
+    fn from(info: pubmed_client::EuropePmcDbCrossReferenceInfo) -> Self {
+        Self {
+            info1: info.info1,
+            info2: info.info2,
+            info3: info.info3,
+            info4: info.info4,
+        }
+    }
+}
+
+/// JavaScript-friendly cross-references from a record to one external database
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi, from_wasm_abi))]
+pub struct JsEuropePmcDatabaseLink {
+    /// External database name (e.g. "UNIPROT", "EMBL", "PDB")
+    pub db_name: Option<String>,
+    /// Number of cross-references reported for this database
+    pub db_count: Option<u32>,
+    pub info: Vec<JsEuropePmcDbCrossReferenceInfo>,
+}
+
+impl From<pubmed_client::EuropePmcDatabaseLink> for JsEuropePmcDatabaseLink {
+    fn from(link: pubmed_client::EuropePmcDatabaseLink) -> Self {
+        Self {
+            db_name: link.db_name,
+            db_count: link.db_count,
+            info: link
+                .info
+                .into_iter()
+                .map(JsEuropePmcDbCrossReferenceInfo::from)
+                .collect(),
+        }
+    }
+}

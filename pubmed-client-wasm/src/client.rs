@@ -1,12 +1,17 @@
-use pubmed_client::{Client, config::ClientConfig, pmc::PmcArticle};
+use pubmed_client::{
+    Client, EuropePmcId, EuropePmcSearchOptions, EuropePmcSource, ResultType, config::ClientConfig,
+    pmc::PmcArticle,
+};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
 use crate::config::WasmClientConfig;
 use crate::error::to_js_err;
 use crate::models::{
-    JsArticle, JsCitationMatch, JsCitationQuery, JsEPostResult, JsFullText, JsGlobalQueryResults,
-    JsMarkdownOptions, JsOaSubsetInfo, JsSpellCheckResult, JsSummary,
+    JsArticle, JsCitationMatch, JsCitationQuery, JsEPostResult, JsEuropePmcCitation,
+    JsEuropePmcDatabaseLink, JsEuropePmcReference, JsEuropePmcResult, JsEuropePmcSearchPage,
+    JsFullText, JsGlobalQueryResults, JsMarkdownOptions, JsOaSubsetInfo, JsSpellCheckResult,
+    JsSummary,
 };
 use crate::{
     JsPromiseArticle, JsPromiseArticles, JsPromiseFullText, JsPromiseOptString,
@@ -479,6 +484,242 @@ impl WasmPubMedClient {
                 Ok(info) => {
                     let js_info = JsOaSubsetInfo::from(info);
                     Ok(serde_wasm_bindgen::to_value(&js_info)?)
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+}
+
+// ================================================================================================
+// Europe PMC
+// ================================================================================================
+
+/// Resolve the `(source, id)` pair a call addresses.
+///
+/// Europe PMC identifies every record by a source database plus an id. Three
+/// spellings are accepted so callers rarely need to pass both:
+///
+/// * a fully-qualified `"SOURCE/ID"` string (e.g. `"PPR/PPR123456"`), which
+///   wins over any separate `source` argument;
+/// * an explicit `source` plus a bare id;
+/// * a bare id alone — a `PMC`-prefixed id implies the `PMC` source, anything
+///   else is treated as a PubMed (`MED`) record.
+fn resolve_europe_pmc_id(id: &str, source: Option<String>) -> Result<EuropePmcId, JsValue> {
+    let id = id.trim();
+    if id.is_empty() {
+        return Err(JsValue::from(js_sys::Error::new("id must not be empty")));
+    }
+
+    if id.contains('/') {
+        return id.parse::<EuropePmcId>().map_err(to_js_err);
+    }
+
+    let source = match source.as_deref() {
+        Some(source) if !source.trim().is_empty() => EuropePmcSource::from(source),
+        _ if id.to_ascii_uppercase().starts_with("PMC") => EuropePmcSource::Pmc,
+        _ => EuropePmcSource::Med,
+    };
+
+    if source == EuropePmcSource::Pmc {
+        return EuropePmcId::pmc(id).map_err(to_js_err);
+    }
+
+    Ok(EuropePmcId::new(source, id))
+}
+
+/// Map a `resultType` string onto the level of detail Europe PMC understands.
+fn parse_result_type(result_type: Option<String>) -> Result<ResultType, JsValue> {
+    match result_type
+        .as_deref()
+        .map(str::trim)
+        .unwrap_or("lite")
+        .to_lowercase()
+        .as_str()
+    {
+        "idlist" | "id_list" => Ok(ResultType::IdList),
+        "lite" => Ok(ResultType::Lite),
+        "core" => Ok(ResultType::Core),
+        other => Err(JsValue::from(js_sys::Error::new(&format!(
+            "invalid result_type '{other}': expected 'idlist', 'lite' or 'core'"
+        )))),
+    }
+}
+
+#[wasm_bindgen]
+impl WasmPubMedClient {
+    /// Search Europe PMC across every source it indexes
+    ///
+    /// Europe PMC covers preprints (PPR), patents (PAT), Agricola (AGR) and
+    /// Chinese Biological Abstracts (CBA) as well as PubMed (MED) and PMC, and
+    /// needs no API key.
+    ///
+    /// `result_type` is `"idlist"`, `"lite"` (default) or `"core"`; `sort` takes
+    /// a Europe PMC sort expression such as `"CITED desc"`.
+    ///
+    /// Resolves to `JsEuropePmcResult[]`.
+    pub fn europe_pmc_search(
+        &self,
+        query: String,
+        limit: usize,
+        result_type: Option<String>,
+        sort: Option<String>,
+    ) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let opts = EuropePmcSearchOptions {
+                result_type: parse_result_type(result_type)?,
+                page_size: limit.clamp(1, 1000) as u32,
+                sort,
+                ..Default::default()
+            };
+            match client.europe_pmc.search_all(&query, limit, &opts).await {
+                Ok(results) => {
+                    let js_results: Vec<JsEuropePmcResult> =
+                        results.into_iter().map(JsEuropePmcResult::from).collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_results)?)
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
+    /// Fetch a single page of Europe PMC search results
+    ///
+    /// Pass the returned `next_cursor_mark` back as `cursor_mark` to page
+    /// through a result set; Europe PMC signals the end by returning the same
+    /// cursor it was given.
+    ///
+    /// Resolves to `JsEuropePmcSearchPage`.
+    pub fn europe_pmc_search_page(
+        &self,
+        query: String,
+        result_type: Option<String>,
+        page_size: Option<u32>,
+        cursor_mark: Option<String>,
+        sort: Option<String>,
+    ) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let opts = EuropePmcSearchOptions {
+                result_type: parse_result_type(result_type)?,
+                page_size: page_size.unwrap_or(25).clamp(1, 1000),
+                cursor_mark: cursor_mark.unwrap_or_else(|| "*".to_string()),
+                sort,
+            };
+            match client.europe_pmc.search_page(&query, &opts).await {
+                Ok(page) => {
+                    let js_page = JsEuropePmcSearchPage::from(page);
+                    Ok(serde_wasm_bindgen::to_value(&js_page)?)
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
+    /// Fetch and parse the full text of a Europe PMC record
+    ///
+    /// Parsing into an article requires a PMC id, so this supports PMC-sourced
+    /// records only; use `europe_pmc_fetch_full_text_xml` for other sources.
+    ///
+    /// Resolves to `JsFullText`.
+    pub fn europe_pmc_fetch_full_text(
+        &self,
+        id: String,
+        source: Option<String>,
+    ) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let epmc_id = resolve_europe_pmc_id(&id, source)?;
+            match client.europe_pmc.fetch_full_text(&epmc_id).await {
+                Ok(article) => {
+                    let js_full_text = JsFullText::from(article);
+                    Ok(serde_wasm_bindgen::to_value(&js_full_text)?)
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
+    /// Fetch the raw JATS XML full text of a Europe PMC record
+    ///
+    /// Resolves to `string`.
+    pub fn europe_pmc_fetch_full_text_xml(
+        &self,
+        id: String,
+        source: Option<String>,
+    ) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let epmc_id = resolve_europe_pmc_id(&id, source)?;
+            match client.europe_pmc.fetch_full_text_xml(&epmc_id).await {
+                Ok(xml) => Ok(JsValue::from_str(&xml)),
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
+    /// List the works cited by a Europe PMC record
+    ///
+    /// Resolves to `JsEuropePmcReference[]`.
+    pub fn europe_pmc_get_references(&self, id: String, source: Option<String>) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let epmc_id = resolve_europe_pmc_id(&id, source)?;
+            match client.europe_pmc.get_references(&epmc_id).await {
+                Ok(references) => {
+                    let js_references: Vec<JsEuropePmcReference> = references
+                        .into_iter()
+                        .map(JsEuropePmcReference::from)
+                        .collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_references)?)
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
+    /// List the articles citing a Europe PMC record
+    ///
+    /// Broader coverage than `get_citations`, which is PubMed-only: includes
+    /// preprints and other non-PubMed sources.
+    ///
+    /// Resolves to `JsEuropePmcCitation[]`.
+    pub fn europe_pmc_get_citations(&self, id: String, source: Option<String>) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let epmc_id = resolve_europe_pmc_id(&id, source)?;
+            match client.europe_pmc.get_citations(&epmc_id).await {
+                Ok(citations) => {
+                    let js_citations: Vec<JsEuropePmcCitation> = citations
+                        .into_iter()
+                        .map(JsEuropePmcCitation::from)
+                        .collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_citations)?)
+                }
+                Err(e) => Err(to_js_err(e)),
+            }
+        })
+    }
+
+    /// List cross-references from a Europe PMC record to external databases
+    ///
+    /// Resolves to `JsEuropePmcDatabaseLink[]`.
+    pub fn europe_pmc_get_database_links(
+        &self,
+        id: String,
+        source: Option<String>,
+    ) -> js_sys::Promise {
+        let client = self.client.clone();
+        future_to_promise(async move {
+            let epmc_id = resolve_europe_pmc_id(&id, source)?;
+            match client.europe_pmc.get_database_links(&epmc_id).await {
+                Ok(links) => {
+                    let js_links: Vec<JsEuropePmcDatabaseLink> = links
+                        .into_iter()
+                        .map(JsEuropePmcDatabaseLink::from)
+                        .collect();
+                    Ok(serde_wasm_bindgen::to_value(&js_links)?)
                 }
                 Err(e) => Err(to_js_err(e)),
             }
