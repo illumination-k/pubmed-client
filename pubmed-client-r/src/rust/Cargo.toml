@@ -6,7 +6,7 @@
 
 [package]
 name = "pubmedclient"
-version = "0.2.0"
+version = "0.3.1"
 edition = "2021"
 publish = false
 
@@ -30,7 +30,10 @@ extendr-api = "0.7"
 # linked into the package's shared object. With native-tls the .so references
 # system OpenSSL symbols (e.g. PKCS5_PBKDF2_HMAC) that the R link line does not
 # resolve, so loading fails; rustls avoids needing -lssl/-lcrypto entirely.
-pubmed-client = { version = "0.2.0", default-features = false, features = ["rustls-tls"] }
+pubmed-client = { version = "0.3.1", default-features = false, features = ["rustls-tls"] }
+# Europe PMC returns more fields than are modelled (`result_type = "core"`);
+# the remainder reaches R as a JSON object string rather than a pinned shape.
+serde_json = "1"
 tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
 
 [profile.release]

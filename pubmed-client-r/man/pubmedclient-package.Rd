@@ -6,8 +6,11 @@
 \alias{pubmedclient-package}
 \title{pubmedclient: PubMed and PMC API Client}
 \description{
-R bindings for the Rust \code{pubmed-client} library. Search PubMed, fetch article
-metadata, and retrieve PMC full text or Markdown.
+R bindings for the Rust \code{pubmed-client} library. Provides access to
+the PubMed and PubMed Central (PMC) APIs for searching, fetching article
+metadata, and retrieving full text or Markdown, and to the Europe PMC REST
+API for cross-source search and citation graphs. Wraps the high-performance
+asynchronous Rust client behind a synchronous R interface.
 }
 \seealso{
 Useful links:

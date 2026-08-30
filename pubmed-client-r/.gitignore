@@ -3,6 +3,7 @@
 *.dll
 *.a
 src/rust/target/
+src/rust/Cargo.lock
 src/Makevars.ucrt
 .Rproj.user
 .Rhistory
