@@ -37,8 +37,8 @@ importers:
         specifier: ^19.2.17
         version: 19.2.18
       '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.7(@types/react@19.2.18)
+        specifier: ^19.2.4
+        version: 19.2.4(@types/react@19.2.18)
       prism-react-renderer:
         specifier: ^2.4.0
         version: 2.4.1(react@19.2.8)
@@ -1709,8 +1709,8 @@ packages:
   '@types/range-parser@1.2.7':
     resolution: {integrity: sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==}
 
-  '@types/react-dom@18.3.7':
-    resolution: {integrity: sha512-MEe3UeoENYVFXzoXEWsvcpg6ZvlrFNlOQ7EOsvhI3CfAXwzPfO8Qwuxd40nepsYKqyyVQnTdEfv68q91yLcKrQ==}
+  '@types/react-dom@19.2.4':
+    resolution: {integrity: sha512-Bsc+QHgp+P/F02XDzNCY9jnZNCUuLki36KT7VKrTXXLdHf+vHMNZnW1rVu5DNW/rCK+fya3DATySbLM4yhtKUw==}
     peerDependencies:
       '@types/react': ^19.2.17
 
@@ -7999,7 +7999,7 @@ snapshots:
 
   '@types/range-parser@1.2.7': {}
 
-  '@types/react-dom@18.3.7(@types/react@19.2.18)':
+  '@types/react-dom@19.2.4(@types/react@19.2.18)':
     dependencies:
       '@types/react': 19.2.18
 
