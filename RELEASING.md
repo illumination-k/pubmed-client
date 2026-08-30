@@ -45,15 +45,37 @@ which publishes in dependency order:
 | crates.io | `pubmed-parser` → `pubmed-formatter` → `pubmed-client` → `pubmed-cli`, `pubmed-mcp` |
 | npm       | `pubmed-client` (NAPI, + platform binaries), `pubmed-client-wasm`                   |
 | PyPI      | `pubmed-client-py`                                                                  |
+| GHCR      | `ghcr.io/illumination-k/pubmed-mcp` (linux/amd64 + linux/arm64)                     |
 
 It then creates the GitHub Release. Pre-release tags (`v0.3.0-rc.1`, `-alpha`, `-beta`)
 are marked as prereleases on GitHub and still publish to every registry.
+
+### Container image tags
+
+`_publish-docker.yml` builds `pubmed-mcp/Dockerfile` on native `amd64` and `arm64`
+runners, pushes each architecture by digest, and merges them into one manifest list
+tagged:
+
+- `X.Y.Z` — always
+- `X.Y` — final releases only (a prerelease must not move a stable tag)
+- `latest` — final releases only
+
+The image is **not** version-checked against a registry the way crates are: pushing an
+existing tag simply overwrites it, so re-running a failed release with the same tag is safe.
+
+> **One-time setup**: GHCR creates the package as **private** on the first push. After the
+> first release, set it to public under
+> [the package's settings](https://github.com/users/illumination-k/packages/container/pubmed-mcp/settings)
+> and link it to this repository (the `org.opencontainers.image.source` label does that
+> automatically once the package is public). No secret is needed — the job authenticates with
+> its own `GITHUB_TOKEN`.
 
 ## Dry-run rehearsal
 
 Trigger `release.yml` manually via **workflow_dispatch** (Actions tab) to run the entire
 pipeline without publishing: crates use `cargo publish --dry-run`, npm uses
-`npm publish --dry-run`, and Python publishes to **TestPyPI**.
+`npm publish --dry-run`, Python publishes to **TestPyPI**, and the container image is built
+for both architectures but never pushed.
 
 > **Dry-run caveat**: the crate dry-runs use `--no-verify`. Because nothing is actually
 > published during a dry-run, the verification build of a dependent crate (e.g.
@@ -69,7 +91,7 @@ crates.io publishing uses **Trusted Publishing** (OIDC) — there is **no** long
 via [`rust-lang/crates-io-auth-action`](https://github.com/rust-lang/crates-io-auth-action)
 (the job grants `id-token: write`). PyPI and npm publish jobs likewise use OIDC.
 
-All real publish jobs (crates.io, npm, PyPI) run in the **`release` GitHub Environment**, which
+All real publish jobs (crates.io, npm, PyPI, GHCR) run in the **`release` GitHub Environment**, which
 is restricted to `v*` tags (deployment tag policy). The OIDC token therefore carries an
 `environment: release` claim, and every Trusted Publisher (crates.io per-crate, npm per-package,
 PyPI) is pinned to that environment — so only a `v*`-tag-triggered run of `release.yml` can
@@ -111,5 +133,8 @@ wheels. (The TestPyPI dry-run publisher uses environment `testpypi` instead.)
 - `_publish-napi.yml` — reusable NAPI build matrix + npm publish.
 - `_publish-wasm.yml` — reusable wasm-pack build + npm publish.
 - `_publish-python.yml` — reusable wheel **build** matrix + test (no publish — see note above).
+- `_publish-docker.yml` — reusable multi-arch container build + GHCR push (per-arch digests
+  merged into one manifest list). Authenticates with the job's `GITHUB_TOKEN`
+  (`packages: write`) — no Trusted Publishing involved, and no secret to configure.
 
 CI workflows (`ci-napi.yml`, `ci-wasm.yml`, etc.) are build/test only and no longer publish.

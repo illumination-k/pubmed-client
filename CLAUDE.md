@@ -331,7 +331,15 @@ pnpm run typecheck    # tsc
 
 ### MCP Server (`pubmed-mcp/`)
 
-MCP server for AI assistants (Claude Desktop, etc.) built with rmcp. Communicates via stdio.
+MCP server for AI assistants (Claude Desktop, etc.) built with rmcp. Communicates via stdio, or over
+streamable HTTP at `/mcp` with `--port`.
+
+Released as a multi-arch container image to GHCR (`ghcr.io/illumination-k/pubmed-mcp`) alongside the
+crates.io publish, from `pubmed-mcp/Dockerfile` (build context is the **workspace root** — the crate
+depends on its siblings by path; `.dockerignore` at the root trims the context but must keep every
+workspace member, or the manifest fails to load). `ARG RUST_VERSION` must match `rust-toolchain.toml`;
+`ci-docker.yml` fails the build if it drifts and also smoke-tests the image (`--help` + an MCP
+`initialize` handshake over stdio).
 
 ```
 src/

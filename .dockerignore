@@ -1,0 +1,41 @@
+# Build context for pubmed-mcp/Dockerfile (built from the workspace root).
+# Everything a `cargo build -p pubmed-mcp` does not need is dropped here —
+# note that every Cargo workspace member must stay in the context, or the
+# manifest fails to load.
+
+.git/
+.github/
+.claude/
+
+# Rust build output
+target/
+**/target/
+
+# Test fixtures (Git LFS, not needed to build)
+test_data/
+
+# JS/TS tooling and generated artifacts
+node_modules/
+**/node_modules/
+website/
+**/dist/
+**/pkg/
+pubmed-client-napi/npm/
+pubmed-client-napi/docs/
+**/*.node
+**/*.wasm
+
+# Python artifacts
+**/__pycache__/
+**/.venv/
+**/*.so
+
+# Go build output (large static archives)
+pubmed-client-go/lib/
+
+# Not a workspace member; needs the R toolchain
+pubmed-client-r/
+
+# Docs site sources / local tooling state
+docs/
+.cache/
