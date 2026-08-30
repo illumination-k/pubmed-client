@@ -69,6 +69,10 @@ async fn test_mcp_server_list_tools() -> Result<()> {
         "search_pubmed should have a description"
     );
 
+    // Verify fetch_articles tool exists (issue #279)
+    let has_articles = tools.iter().any(|tool| tool.name == "fetch_articles");
+    assert!(has_articles, "fetch_articles tool should be available");
+
     // Verify get_pmc_markdown tool has description
     let markdown_tool = tools
         .iter()

@@ -22,8 +22,8 @@ struct Args {
 
     /// Tools to enable, comma-separated (default: all).
     /// Possible values: search, markdown, citmatch, gquery, espell, summary,
-    /// related-articles, citations, pmc-links, list-databases, database-info,
-    /// fulltext, figures, convert-id, export
+    /// articles, related-articles, citations, pmc-links, list-databases,
+    /// database-info, fulltext, figures, convert-id, export
     #[arg(short, long, value_delimiter = ',', value_enum)]
     tools: Vec<ToolName>,
 
@@ -39,6 +39,7 @@ enum ToolName {
     Gquery,
     Espell,
     Summary,
+    Articles,
     RelatedArticles,
     Citations,
     PmcLinks,
@@ -59,6 +60,7 @@ impl ToolName {
             ToolName::Gquery => "global_query",
             ToolName::Espell => "spell_check",
             ToolName::Summary => "fetch_summaries",
+            ToolName::Articles => "fetch_articles",
             ToolName::RelatedArticles => "get_related_articles",
             ToolName::Citations => "get_citations",
             ToolName::PmcLinks => "get_pmc_links",
@@ -132,6 +134,16 @@ impl PubMedServer {
         params: Parameters<tools::summary::SummaryRequest>,
     ) -> Result<CallToolResult, ErrorData> {
         tools::summary::fetch_summaries(self, params).await
+    }
+
+    #[tool(
+        description = "Fetch complete PubMed records by PubMed ID (PMID) using the EFetch API. Returns the full abstract, all authors (optionally with affiliations), journal details, MeSH headings, substances, keywords, article types, and identifiers. Use this when you already have PMIDs and need full metadata; search_pubmed only returns a 200-character abstract preview and fetch_summaries omits abstracts and MeSH terms entirely."
+    )]
+    async fn fetch_articles(
+        &self,
+        params: Parameters<tools::articles::ArticlesRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::articles::fetch_articles(self, params).await
     }
 
     #[tool(
@@ -317,6 +329,34 @@ mod tests {
     #[test]
     fn cli_definition_is_valid() {
         Args::command().debug_assert();
+    }
+
+    /// `--tools` filters by the *registered* tool name, so a `ToolName`
+    /// whose `as_str()` drifts from its `#[tool]` method silently removes
+    /// every tool instead of selecting one. Check the whole enum, not just
+    /// the tool of the day.
+    #[test]
+    fn every_tool_name_matches_a_registered_tool() {
+        let registered: Vec<String> = PubMedServer::tool_router()
+            .list_all()
+            .into_iter()
+            .map(|tool| tool.name.to_string())
+            .collect();
+
+        for variant in ToolName::value_variants() {
+            assert!(
+                registered.contains(&variant.as_str().to_string()),
+                "{:?} maps to `{}`, which no #[tool] method defines; registered: {registered:?}",
+                variant,
+                variant.as_str()
+            );
+        }
+
+        assert_eq!(
+            registered.len(),
+            ToolName::value_variants().len(),
+            "every registered tool should be selectable via --tools; registered: {registered:?}"
+        );
     }
 
     #[test]

@@ -350,6 +350,7 @@ src/
   tools/
     mod.rs             # PubMedServer definition
     search.rs          # search_pubmed tool (with study type/text availability filters)
+    articles.rs        # fetch_articles tool (EFetch — full records by PMID)
     markdown.rs        # get_pmc_markdown tool
     fulltext.rs        # Full-text retrieval tool
     figures.rs         # Figure extraction tool

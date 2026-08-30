@@ -12,6 +12,7 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - Filter by study type (RCT, meta-analysis, systematic review, etc.)
   - Filter by text availability (open access, free full text, PMC full text)
   - Support for all PubMed field tags and boolean operators
+- **Full PubMed Records**: Fetch complete metadata by PMID — full abstract, MeSH headings, keywords, affiliations, and identifiers
 - **PMC Markdown Conversion**: Convert PMC full-text articles to well-formatted markdown
   - Configurable metadata, table of contents, and figure captions
   - Proper handling of references, funding information, and acknowledgments
@@ -203,6 +204,37 @@ Search for free full text meta-analyses on cancer immunotherapy
 
 For detailed examples and filter combinations, see [SEARCH_FILTERS.md](SEARCH_FILTERS.md).
 
+#### `fetch_articles`
+
+Fetch complete PubMed records for PMIDs you already have (EFetch). Use this when
+`search_pubmed`'s 200-character abstract preview or `fetch_summaries`'
+bibliographic overview is not enough — this is the only tool that returns full
+abstracts and MeSH indexing.
+
+**Parameters:**
+
+- `pmids` (array of strings, required): PubMed IDs, e.g. `["31978945", "33515491"]`. At most 100 per call.
+- `include_abstract` (boolean, optional): Include the full abstract (default: true). Structured abstracts keep their `BACKGROUND`/`METHODS`/`RESULTS` labels.
+- `include_mesh` (boolean, optional): Include MeSH headings and chemical substances (default: true). Major topics are marked with `*`, qualifiers appear as `Descriptor/qualifier`.
+- `include_affiliations` (boolean, optional): Include author affiliations (default: false). Off by default because PubMed repeats a collaboration's entire affiliation string on every author; when enabled, each distinct affiliation is listed once with the authors that share it.
+
+**Returns:**
+
+Per article: title, PMID, PMC ID, DOI, journal (with volume/issue/pages, ISO
+abbreviation, ISSN, language), all authors, article types, full abstract,
+author keywords, MeSH terms, and substances. PMIDs that returned no record are
+listed under `Not found:` rather than silently omitted.
+
+**Examples:**
+
+```
+Get the full records for PMIDs 31978945 and 33515491
+```
+
+```
+What MeSH terms is PMID 31978945 indexed under?
+```
+
 #### `get_pmc_markdown`
 
 Convert a PMC (PubMed Central) full-text article to well-formatted Markdown.
@@ -252,6 +284,7 @@ pubmed-mcp/
 │   └── tools/           # Tools module
 │       ├── mod.rs       # PubMedServer definition
 │       ├── search.rs    # Search tool implementation
+│       ├── articles.rs  # Full PubMed record retrieval (EFetch)
 │       └── markdown.rs  # Markdown conversion tool
 ├── tests/
 │   └── integration_test.rs  # Integration tests
