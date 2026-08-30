@@ -495,7 +495,7 @@ pub struct Supplementary {
     #[command(flatten)]
     record: RecordId,
 
-    /// Path of the ZIP file to write (default: <ID>_supplementary.zip)
+    /// Path of the ZIP file to write (default: the record id plus "_supplementary.zip")
     #[arg(short, long)]
     output: Option<PathBuf>,
 }

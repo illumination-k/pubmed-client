@@ -61,7 +61,7 @@ fn search_options(
 
 /// Europe PMC client
 ///
-/// Europe PMC (https://europepmc.org) is a complementary index to the NCBI
+/// Europe PMC (<https://europepmc.org>) is a complementary index to the NCBI
 /// E-utilities: it covers preprints (PPR), patents (PAT), Agricola (AGR) and
 /// Chinese Biological Abstracts (CBA) as well as PubMed (MED) and PMC, and it
 /// requires no API key.
