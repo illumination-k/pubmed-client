@@ -2,7 +2,8 @@
 //!
 //! This module provides Python wrappers for the SearchQuery builder.
 
-use pubmed_client::pubmed::{ArticleType, SearchQuery, SortOrder};
+use crate::utils::to_py_err;
+use pubmed_client::pubmed::{ArticleType, Language, SearchQuery, SortOrder};
 use pubmed_client::validate_year as core_validate_year;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
@@ -22,6 +23,19 @@ fn str_to_sort_order(s: &str) -> PyResult<SortOrder> {
 
 fn str_to_article_type(s: &str) -> PyResult<ArticleType> {
     ArticleType::from_str_insensitive(s).map_err(PyValueError::new_err)
+}
+
+/// Trim a filter value, yielding `None` when nothing is left.
+///
+/// Field filters follow the same rule as `query()`: blank input adds no filter
+/// rather than emitting a dangling field tag such as `[ti]`.
+fn non_empty(value: &str) -> Option<&str> {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        None
+    } else {
+        Some(trimmed)
+    }
 }
 
 // ================================================================================================
@@ -610,5 +624,569 @@ impl PySearchQuery {
         let sort = str_to_sort_order(&sort_order)?;
         slf.inner = slf.inner.clone().sort(sort);
         Ok(slf)
+    }
+
+    // ============================================================================================
+    // Field Search Methods
+    // ============================================================================================
+
+    /// Filter by author name
+    ///
+    /// Uses the `[au]` field tag, which matches any author position.
+    /// Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     name: Author name (e.g. "Smith J")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("crispr").author("Doudna JA")
+    ///     >>> query.build()
+    ///     'crispr AND Doudna JA[au]'
+    fn author(mut slf: PyRefMut<Self>, name: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&name) {
+            slf.inner = slf.inner.clone().author(value);
+        }
+        slf
+    }
+
+    /// Filter by first author name
+    ///
+    /// Uses the `[1au]` field tag. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     name: First author name (e.g. "Smith J")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").first_author("Smith J")
+    ///     >>> query.build()
+    ///     'cancer AND Smith J[1au]'
+    fn first_author(mut slf: PyRefMut<Self>, name: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&name) {
+            slf.inner = slf.inner.clone().first_author(value);
+        }
+        slf
+    }
+
+    /// Filter by last author name
+    ///
+    /// Uses the `[lastau]` field tag, typically the senior author of a study.
+    /// Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     name: Last author name (e.g. "Smith J")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").last_author("Smith J")
+    ///     >>> query.build()
+    ///     'cancer AND Smith J[lastau]'
+    fn last_author(mut slf: PyRefMut<Self>, name: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&name) {
+            slf.inner = slf.inner.clone().last_author(value);
+        }
+        slf
+    }
+
+    /// Filter by journal name
+    ///
+    /// Uses the `[ta]` field tag, which accepts both full journal titles and
+    /// NLM abbreviations. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     name: Journal name (e.g. "Nature")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("genomics").journal("Nature")
+    ///     >>> query.build()
+    ///     'genomics AND Nature[ta]'
+    fn journal(mut slf: PyRefMut<Self>, name: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&name) {
+            slf.inner = slf.inner.clone().journal(value);
+        }
+        slf
+    }
+
+    /// Filter by journal abbreviation
+    ///
+    /// Uses the same `[ta]` field tag as journal(), spelled for NLM abbreviations.
+    /// Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     abbreviation: NLM journal abbreviation (e.g. "N Engl J Med")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("trial").journal_abbreviation("N Engl J Med")
+    ///     >>> query.build()
+    ///     'trial AND N Engl J Med[ta]'
+    fn journal_abbreviation(mut slf: PyRefMut<Self>, abbreviation: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&abbreviation) {
+            slf.inner = slf.inner.clone().journal_abbreviation(value);
+        }
+        slf
+    }
+
+    /// Filter by text appearing in the article title
+    ///
+    /// Uses the `[ti]` field tag. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     text: Text to search for in titles
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().title_contains("machine learning")
+    ///     >>> query.build()
+    ///     'machine learning[ti]'
+    fn title_contains(mut slf: PyRefMut<Self>, text: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&text) {
+            slf.inner = slf.inner.clone().title_contains(value);
+        }
+        slf
+    }
+
+    /// Filter by text appearing in the abstract
+    ///
+    /// Uses the `[tiab]` field tag (title/abstract). Empty or whitespace-only
+    /// values are silently ignored.
+    ///
+    /// Args:
+    ///     text: Text to search for in abstracts
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().abstract_contains("randomized")
+    ///     >>> query.build()
+    ///     'randomized[tiab]'
+    fn abstract_contains(mut slf: PyRefMut<Self>, text: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&text) {
+            slf.inner = slf.inner.clone().abstract_contains(value);
+        }
+        slf
+    }
+
+    /// Filter by text appearing in either the title or the abstract
+    ///
+    /// Uses the `[tiab]` field tag. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     text: Text to search for in titles or abstracts
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().title_or_abstract("gene therapy")
+    ///     >>> query.build()
+    ///     'gene therapy[tiab]'
+    fn title_or_abstract(mut slf: PyRefMut<Self>, text: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&text) {
+            slf.inner = slf.inner.clone().title_or_abstract(value);
+        }
+        slf
+    }
+
+    /// Filter to articles that have an abstract
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("genetics").has_abstract()
+    ///     >>> query.build()
+    ///     'genetics AND hasabstract'
+    fn has_abstract(mut slf: PyRefMut<Self>) -> PyRefMut<Self> {
+        slf.inner = slf.inner.clone().has_abstract();
+        slf
+    }
+
+    /// Filter by grant number
+    ///
+    /// Uses the `[gr]` field tag. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     grant_number: Grant number or funding identifier
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").grant_number("R01CA123456")
+    ///     >>> query.build()
+    ///     'cancer AND R01CA123456[gr]'
+    fn grant_number(mut slf: PyRefMut<Self>, grant_number: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&grant_number) {
+            slf.inner = slf.inner.clone().grant_number(value);
+        }
+        slf
+    }
+
+    /// Filter by ISBN
+    ///
+    /// Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     isbn: ISBN of the book or book chapter
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().isbn("978-0-12-800000-0")
+    ///     >>> query.build()
+    ///     '978-0-12-800000-0[ISBN]'
+    fn isbn(mut slf: PyRefMut<Self>, isbn: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&isbn) {
+            slf.inner = slf.inner.clone().isbn(value);
+        }
+        slf
+    }
+
+    /// Filter by ISSN
+    ///
+    /// Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     issn: ISSN of the journal
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().issn("0028-0836")
+    ///     >>> query.build()
+    ///     '0028-0836[ISSN]'
+    fn issn(mut slf: PyRefMut<Self>, issn: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&issn) {
+            slf.inner = slf.inner.clone().issn(value);
+        }
+        slf
+    }
+
+    /// Filter by publication language
+    ///
+    /// Accepts full English names ("english", "japanese", ...) and ISO 639-2
+    /// three-letter codes ("eng", "jpn", ...), case-insensitively. Unrecognized
+    /// values are passed through as-is, so any language PubMed indexes can be used.
+    /// Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     language: Language name or ISO 639-2 code
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").language("english")
+    ///     >>> query.build()
+    ///     'cancer AND English[la]'
+    fn language(mut slf: PyRefMut<Self>, language: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&language) {
+            slf.inner = slf
+                .inner
+                .clone()
+                .language(Language::from_str_insensitive(value));
+        }
+        slf
+    }
+
+    // ============================================================================================
+    // MeSH and Advanced Filtering Methods
+    // ============================================================================================
+
+    /// Filter by a MeSH term
+    ///
+    /// Uses the `[mh]` field tag. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     term: MeSH heading (e.g. "Neoplasms")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().mesh_term("Neoplasms")
+    ///     >>> query.build()
+    ///     'Neoplasms[mh]'
+    fn mesh_term(mut slf: PyRefMut<Self>, term: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&term) {
+            slf.inner = slf.inner.clone().mesh_term(value);
+        }
+        slf
+    }
+
+    /// Filter by multiple MeSH terms (AND logic)
+    ///
+    /// Each term is added as a separate `[mh]` filter, so all of them must match.
+    /// Empty and whitespace-only entries are silently ignored.
+    ///
+    /// Args:
+    ///     terms: List of MeSH headings
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().mesh_terms(["Neoplasms", "Antineoplastic Agents"])
+    ///     >>> query.build()
+    ///     'Neoplasms[mh] AND Antineoplastic Agents[mh]'
+    fn mesh_terms(mut slf: PyRefMut<Self>, terms: Vec<String>) -> PyRefMut<Self> {
+        for term in &terms {
+            if let Some(value) = non_empty(term) {
+                slf.inner = slf.inner.clone().mesh_term(value);
+            }
+        }
+        slf
+    }
+
+    /// Filter by a MeSH major topic
+    ///
+    /// Uses the `[majr]` field tag, restricting matches to articles where the term
+    /// is a major topic. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     term: MeSH heading to require as a major topic
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().mesh_major_topic("Diabetes Mellitus")
+    ///     >>> query.build()
+    ///     'Diabetes Mellitus[majr]'
+    fn mesh_major_topic(mut slf: PyRefMut<Self>, term: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&term) {
+            slf.inner = slf.inner.clone().mesh_major_topic(value);
+        }
+        slf
+    }
+
+    /// Filter by a MeSH subheading
+    ///
+    /// Uses the `[sh]` field tag. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     subheading: MeSH subheading (e.g. "drug therapy")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().mesh_term("Diabetes Mellitus").mesh_subheading("drug therapy")
+    ///     >>> query.build()
+    ///     'Diabetes Mellitus[mh] AND drug therapy[sh]'
+    fn mesh_subheading(mut slf: PyRefMut<Self>, subheading: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&subheading) {
+            slf.inner = slf.inner.clone().mesh_subheading(value);
+        }
+        slf
+    }
+
+    /// Filter by author affiliation
+    ///
+    /// Uses the `[ad]` field tag. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     institution: Institution, department, or place name
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("crispr").affiliation("Harvard")
+    ///     >>> query.build()
+    ///     'crispr AND Harvard[ad]'
+    fn affiliation(mut slf: PyRefMut<Self>, institution: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&institution) {
+            slf.inner = slf.inner.clone().affiliation(value);
+        }
+        slf
+    }
+
+    /// Filter by author ORCID identifier
+    ///
+    /// Uses the `[auid]` field tag. Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     orcid_id: ORCID iD (e.g. "0000-0002-1825-0097")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().orcid("0000-0002-1825-0097")
+    ///     >>> query.build()
+    ///     '0000-0002-1825-0097[auid]'
+    fn orcid(mut slf: PyRefMut<Self>, orcid_id: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&orcid_id) {
+            slf.inner = slf.inner.clone().orcid(value);
+        }
+        slf
+    }
+
+    /// Filter by organism using MeSH terms
+    ///
+    /// Accepts scientific or common names and maps them to the `[mh]` field tag
+    /// (PubMed has no `[organism]` tag). Empty or whitespace-only values are
+    /// silently ignored.
+    ///
+    /// Args:
+    ///     organism: Organism name (e.g. "Mus musculus" or "Mice")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("gene expression").organism_mesh("Mus musculus")
+    ///     >>> query.build()
+    ///     'gene expression AND Mus musculus[mh]'
+    fn organism_mesh(mut slf: PyRefMut<Self>, organism: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&organism) {
+            slf.inner = slf.inner.clone().organism_mesh(value);
+        }
+        slf
+    }
+
+    /// Filter to human studies only
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("drug treatment").human_studies_only()
+    ///     >>> query.build()
+    ///     'drug treatment AND humans[mh]'
+    fn human_studies_only(mut slf: PyRefMut<Self>) -> PyRefMut<Self> {
+        slf.inner = slf.inner.clone().human_studies_only();
+        slf
+    }
+
+    /// Filter to animal studies only
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("preclinical").animal_studies_only()
+    ///     >>> query.build()
+    ///     'preclinical AND animals[mh]'
+    fn animal_studies_only(mut slf: PyRefMut<Self>) -> PyRefMut<Self> {
+        slf.inner = slf.inner.clone().animal_studies_only();
+        slf
+    }
+
+    /// Filter by age group
+    ///
+    /// Age groups are MeSH headings, so this uses the `[mh]` field tag.
+    /// Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     age_group: Age group MeSH heading (e.g. "Child", "Adult", "Aged")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("pediatric medicine").age_group("Child")
+    ///     >>> query.build()
+    ///     'pediatric medicine AND Child[mh]'
+    fn age_group(mut slf: PyRefMut<Self>, age_group: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&age_group) {
+            slf.inner = slf.inner.clone().age_group(value);
+        }
+        slf
+    }
+
+    /// Add a raw filter in PubMed query syntax
+    ///
+    /// Use this as an escape hatch for field tags the builder does not wrap.
+    /// The string is inserted verbatim (no validation, no escaping).
+    /// Empty or whitespace-only values are silently ignored.
+    ///
+    /// Args:
+    ///     filter: Filter expression in PubMed syntax (e.g. "humans[mh]")
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("research").custom_filter("humans[mh]")
+    ///     >>> query.build()
+    ///     'research AND humans[mh]'
+    fn custom_filter(mut slf: PyRefMut<Self>, filter: String) -> PyRefMut<Self> {
+        if let Some(value) = non_empty(&filter) {
+            slf.inner = slf.inner.clone().custom_filter(value);
+        }
+        slf
+    }
+
+    // ============================================================================================
+    // Validation and Optimization Methods
+    // ============================================================================================
+
+    /// Validate the query structure and parameters
+    ///
+    /// Checks that the query is non-empty, the limit is within range, the built
+    /// query string is not excessively long (>4000 characters), and parentheses
+    /// are balanced.
+    ///
+    /// Raises:
+    ///     InvalidQueryException: If the query is invalid
+    ///
+    /// Example:
+    ///     >>> SearchQuery().query("covid-19").validate()  # no error
+    ///     >>> SearchQuery().validate()
+    ///     Traceback (most recent call last):
+    ///     pubmed_client.InvalidQueryException: Invalid query: Query cannot be empty
+    fn validate(&self) -> PyResult<()> {
+        self.inner.validate().map_err(to_py_err)
+    }
+
+    /// Optimize the query for better performance
+    ///
+    /// Removes duplicate and empty terms and filters. Note that terms and filters
+    /// are sorted as part of deduplication, so the built query string may reorder.
+    ///
+    /// Returns:
+    ///     SearchQuery: Self for method chaining
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("cancer").query("cancer").optimize()
+    ///     >>> query.build()
+    ///     'cancer'
+    fn optimize(mut slf: PyRefMut<Self>) -> PyRefMut<Self> {
+        slf.inner = slf.inner.clone().optimize();
+        slf
+    }
+
+    /// Get statistics about the query
+    ///
+    /// Returns:
+    ///     tuple[int, int, int]: (term_count, filter_count, estimated_complexity)
+    ///
+    /// Example:
+    ///     >>> query = SearchQuery().query("machine learning").free_full_text_only()
+    ///     >>> terms, filters, complexity = query.get_stats()
+    ///     >>> terms, filters
+    ///     (1, 1)
+    fn get_stats(&self) -> (usize, usize, usize) {
+        self.inner.get_stats()
     }
 }

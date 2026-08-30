@@ -171,6 +171,39 @@ for article in articles:
     print(f"[{article.pmid}] {article.title}")
 ```
 
+### Field, MeSH, and Validation Filters
+
+```python
+import pubmed_client
+
+query = (
+    pubmed_client.SearchQuery()
+    .title_or_abstract("gene therapy")
+    .author("Doudna JA")
+    .journal("Nature")
+    .mesh_term("Neoplasms")
+    .mesh_major_topic("Genetic Therapy")
+    .affiliation("Harvard")
+    .language("english")
+    .human_studies_only()
+    .has_abstract()
+)
+
+# Raises InvalidQueryException if the query is malformed
+query.validate()
+
+# Drop duplicate terms/filters, then inspect the query
+query.optimize()
+terms, filters, complexity = query.get_stats()
+
+print(query.build())
+```
+
+Also available: `first_author()`, `last_author()`, `journal_abbreviation()`,
+`title_contains()`, `abstract_contains()`, `grant_number()`, `isbn()`, `issn()`,
+`mesh_terms()`, `mesh_subheading()`, `orcid()`, `organism_mesh()`,
+`animal_studies_only()`, `age_group()`, and `custom_filter()` for raw PubMed syntax.
+
 ### Boolean Query Combinations
 
 ```python
