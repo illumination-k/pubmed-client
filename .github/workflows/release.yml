@@ -7,6 +7,7 @@ name: "Release (unified)"
 #   crates.io : pubmed-parser → pubmed-formatter → pubmed-client → pubmed-cli, pubmed-mcp
 #   npm       : pubmed-client (NAPI), pubmed-client-wasm
 #   PyPI      : pubmed-client-py
+#   GHCR      : pubmed-mcp (multi-arch container image)
 # and then creates the GitHub Release.
 #
 # workflow_dispatch runs the whole pipeline in dry-run mode (no real publishing,
@@ -193,6 +194,21 @@ jobs:
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
       environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
 
+  # ── GHCR (container image) ───────────────────────────────────────────────────
+  publish-docker:
+    name: GHCR · pubmed-mcp image
+    needs: [guard, test]
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/_publish-docker.yml
+    with:
+      version: ${{ needs.guard.outputs.version }}
+      # Prereleases publish their own tag but never move `latest`.
+      latest: ${{ needs.guard.outputs.is-prerelease == 'false' }}
+      dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
+      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+
   # ── PyPI ─────────────────────────────────────────────────────────────────────
   # Build wheels in the reusable workflow, but publish from a job defined HERE.
   # PyPI Trusted Publishing matches the OIDC `job_workflow_ref`, which for a
@@ -273,6 +289,7 @@ jobs:
       - publish-napi
       - publish-wasm
       - publish-python
+      - publish-docker
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     permissions:

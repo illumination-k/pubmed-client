@@ -1,0 +1,70 @@
+name: "CI / Docker"
+
+# Keeps pubmed-mcp/Dockerfile buildable between releases: the release pipeline
+# is the only other place it gets exercised, and a broken Dockerfile there is
+# found far too late. amd64 only — the release workflow covers arm64.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pubmed-mcp/**"
+      - "pubmed-client/**"
+      - "pubmed-formatter/**"
+      - "pubmed-parser/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".dockerignore"
+      - ".github/workflows/ci-docker.yml"
+      - ".github/workflows/_publish-docker.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "pubmed-mcp/**"
+      - "pubmed-client/**"
+      - "pubmed-formatter/**"
+      - "pubmed-parser/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".dockerignore"
+      - ".github/workflows/ci-docker.yml"
+      - ".github/workflows/_publish-docker.yml"
+
+jobs:
+  build:
+    name: Build image (linux/amd64)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: false # test_data/ is excluded from the build context
+          persist-credentials: false
+
+      - name: Dockerfile pins the rust-toolchain.toml version
+        run: |
+          pinned=$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\(.*\)"/\1/p' rust-toolchain.toml)
+          in_dockerfile=$(sed -n 's/^ARG RUST_VERSION=\(.*\)$/\1/p' pubmed-mcp/Dockerfile)
+          if [[ "$pinned" != "$in_dockerfile" ]]; then
+            echo "::error::pubmed-mcp/Dockerfile pins Rust ${in_dockerfile}, rust-toolchain.toml pins ${pinned}."
+            exit 1
+          fi
+
+      - name: Build image
+        run: docker buildx build --file pubmed-mcp/Dockerfile --tag pubmed-mcp:ci --load .
+
+      - name: Smoke test — CLI starts
+        run: docker run --rm pubmed-mcp:ci --help | grep -q "PubMed MCP Server"
+
+      - name: Smoke test — MCP handshake over stdio
+        run: |
+          init='{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"0"}}}'
+          # `head -n 1` closes the pipe once the response lands, which shuts the
+          # server down; `timeout` is only a backstop.
+          response=$(printf '%s\n' "$init" | timeout 60 docker run --rm -i pubmed-mcp:ci | head -n 1)
+          echo "$response"
+          echo "$response" | grep -q '"serverInfo"'

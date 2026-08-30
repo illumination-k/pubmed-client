@@ -1,0 +1,177 @@
+name: "Publish Docker Image"
+
+# Reusable workflow: build the pubmed-mcp container image and push it to GHCR
+# as a multi-arch (linux/amd64 + linux/arm64) manifest list.
+#
+# Built on native runners rather than under QEMU — an emulated arm64 release
+# build of this workspace takes the better part of an hour.
+#
+# Each architecture job pushes an *untagged* image by digest; the merge job then
+# assembles the tagged manifest list from those digests. This is the standard
+# multi-platform pattern (https://docs.docker.com/build/ci/github-actions/multi-platform/),
+# expressed with the docker CLI so no extra third-party actions are needed.
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version to tag the image with (no leading `v`)"
+        required: true
+        type: string
+      latest:
+        description: "Also point the `latest` tag at this image"
+        required: false
+        type: boolean
+        default: false
+      dry-run:
+        description: "Build only — never log in, push, or tag"
+        required: false
+        type: boolean
+        default: false
+      environment:
+        description: >-
+          GitHub Environment to push from. Empty string = no environment gate
+          (used for dry-runs).
+        required: false
+        type: string
+        default: ""
+
+env:
+  # GHCR requires a lowercase path; every use below lowercases it (`${VAR,,}`).
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/pubmed-mcp
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: false # test_data/ is excluded from the build context
+          persist-credentials: false
+
+      # The default `docker` driver cannot push by digest; a docker-container
+      # builder can.
+      - name: Set up Buildx builder
+        run: docker buildx create --name pubmed-mcp --driver docker-container --use
+
+      - name: Log in to GHCR
+        if: ${{ !inputs.dry-run }}
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+
+      - name: Build image
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          DRY_RUN: ${{ inputs.dry-run }}
+          VERSION: ${{ inputs.version }}
+          REVISION: ${{ github.sha }}
+          SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          IMAGE="${IMAGE_NAME,,}"
+          if [[ "$DRY_RUN" == "true" ]]; then
+            OUTPUT="type=cacheonly"
+          else
+            OUTPUT="type=image,name=${IMAGE},push-by-digest=true,name-canonical=true,push=true"
+          fi
+          # `--provenance=false`: a provenance attestation would add a second
+          # manifest that `imagetools create` cannot fold into the final list.
+          docker buildx build \
+            --file pubmed-mcp/Dockerfile \
+            --platform "$PLATFORM" \
+            --provenance=false \
+            --label "org.opencontainers.image.version=${VERSION}" \
+            --label "org.opencontainers.image.revision=${REVISION}" \
+            --label "org.opencontainers.image.source=${SOURCE_URL}" \
+            --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --metadata-file /tmp/build-metadata.json \
+            --output "$OUTPUT" \
+            .
+
+      - name: Export digest
+        id: digest
+        if: ${{ !inputs.dry-run }}
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          DIGEST=$(jq -r '."containerimage.digest"' /tmp/build-metadata.json)
+          mkdir -p /tmp/digests
+          touch "/tmp/digests/${DIGEST#sha256:}"
+          echo "slug=${PLATFORM//\//-}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload digest
+        if: ${{ !inputs.dry-run }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: docker-digest-${{ steps.digest.outputs.slug }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    name: Push manifest list
+    needs: [build]
+    if: ${{ !inputs.dry-run }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 15
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: docker-digest-*
+          path: /tmp/digests
+          merge-multiple: true
+
+      - name: Log in to GHCR
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+
+      - name: Create and push manifest list
+        env:
+          VERSION: ${{ inputs.version }}
+          LATEST: ${{ inputs.latest }}
+        run: |
+          IMAGE="${IMAGE_NAME,,}"
+
+          tags=(--tag "${IMAGE}:${VERSION}")
+          # A `X.Y` moving tag, but only for final releases — a prerelease must
+          # never take over the tag a stable version points at.
+          if [[ "$VERSION" =~ ^([0-9]+\.[0-9]+)\.[0-9]+$ ]]; then
+            tags+=(--tag "${IMAGE}:${BASH_REMATCH[1]}")
+          fi
+          if [[ "$LATEST" == "true" ]]; then
+            tags+=(--tag "${IMAGE}:latest")
+          fi
+
+          sources=()
+          for digest in /tmp/digests/*; do
+            sources+=("${IMAGE}@sha256:$(basename "$digest")")
+          done
+          if [[ ${#sources[@]} -eq 0 ]]; then
+            echo "::error::No digests were produced by the build jobs."
+            exit 1
+          fi
+
+          docker buildx imagetools create "${tags[@]}" "${sources[@]}"
+          docker buildx imagetools inspect "${IMAGE}:${VERSION}"

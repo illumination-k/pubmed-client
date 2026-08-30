@@ -24,14 +24,15 @@ Search and retrieve biomedical literature from [PubMed](https://pubmed.ncbi.nlm.
 
 ## Installation
 
-| Language         | Command                                |
-| ---------------- | -------------------------------------- |
-| Rust             | `cargo add pubmed-client`              |
-| Node.js (native) | `npm install pubmed-client`            |
-| WebAssembly      | `npm install pubmed-client-wasm`       |
-| Python           | `pip install pubmed-client-py`         |
-| Go               | [build from source](pubmed-client-go/) |
-| CLI              | `cargo install pubmed-cli`             |
+| Language         | Command                                         |
+| ---------------- | ----------------------------------------------- |
+| Rust             | `cargo add pubmed-client`                       |
+| Node.js (native) | `npm install pubmed-client`                     |
+| WebAssembly      | `npm install pubmed-client-wasm`                |
+| Python           | `pip install pubmed-client-py`                  |
+| Go               | [build from source](pubmed-client-go/)          |
+| CLI              | `cargo install pubmed-cli`                      |
+| MCP server       | `docker pull ghcr.io/illumination-k/pubmed-mcp` |
 
 ## Quick Start
 

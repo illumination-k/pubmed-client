@@ -22,6 +22,19 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
 
 ## Installation
 
+### Container image (GHCR)
+
+Every release publishes a multi-arch (`linux/amd64` + `linux/arm64`) image to the
+GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/illumination-k/pubmed-mcp:latest
+```
+
+Available tags: `latest`, `X.Y.Z` (immutable), and `X.Y` (moves with the newest
+patch of that minor). Prereleases publish `X.Y.Z-rc.N` only — they never move
+`latest` or `X.Y`.
+
 ### Building from Source
 
 ```bash
@@ -32,6 +45,13 @@ cargo build --release -p pubmed-mcp
 # target/release/pubmed-mcp
 ```
 
+Or build the image yourself — note the build context is the **workspace root**,
+since the crate depends on the sibling crates by path:
+
+```bash
+docker build -f pubmed-mcp/Dockerfile -t pubmed-mcp .
+```
+
 ## Usage
 
 ### Running the Server
@@ -40,6 +60,21 @@ The server communicates via standard input/output (stdio):
 
 ```bash
 cargo run -p pubmed-mcp
+
+# ...or from the container image (`-i` is required: stdio is the transport)
+docker run --rm -i ghcr.io/illumination-k/pubmed-mcp:latest
+```
+
+With `--port`, it serves the streamable HTTP transport at `/mcp` instead:
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/illumination-k/pubmed-mcp:latest --port 8080
+```
+
+`--tools` restricts which tools are exposed (comma-separated, default: all):
+
+```bash
+docker run --rm -i ghcr.io/illumination-k/pubmed-mcp:latest --tools search,markdown
 ```
 
 ### Configuration with Claude Desktop
@@ -54,6 +89,19 @@ Add to your Claude Desktop configuration file:
   "mcpServers": {
     "pubmed": {
       "command": "/path/to/pubmed-client/target/release/pubmed-mcp"
+    }
+  }
+}
+```
+
+Using the container image instead (no local Rust toolchain needed):
+
+```json
+{
+  "mcpServers": {
+    "pubmed": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i", "ghcr.io/illumination-k/pubmed-mcp:latest"]
     }
   }
 }
