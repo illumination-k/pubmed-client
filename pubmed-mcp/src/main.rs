@@ -21,7 +21,9 @@ struct Args {
     /// Tools to enable, comma-separated (default: all).
     /// Possible values: search, markdown, citmatch, gquery, espell, summary,
     /// related-articles, citations, pmc-links, list-databases, database-info,
-    /// fulltext, figures, convert-id, export
+    /// fulltext, figures, convert-id, export, europe-pmc-search,
+    /// europe-pmc-fulltext, europe-pmc-references, europe-pmc-citations,
+    /// europe-pmc-database-links
     #[arg(short, long, value_delimiter = ',', value_enum)]
     tools: Vec<ToolName>,
 }
@@ -43,6 +45,11 @@ enum ToolName {
     Figures,
     ConvertId,
     Export,
+    EuropePmcSearch,
+    EuropePmcFulltext,
+    EuropePmcReferences,
+    EuropePmcCitations,
+    EuropePmcDatabaseLinks,
 }
 
 impl ToolName {
@@ -63,6 +70,11 @@ impl ToolName {
             ToolName::Figures => "get_pmc_figures",
             ToolName::ConvertId => "pmid_to_pmcid",
             ToolName::Export => "export_citations",
+            ToolName::EuropePmcSearch => "europe_pmc_search",
+            ToolName::EuropePmcFulltext => "europe_pmc_fulltext",
+            ToolName::EuropePmcReferences => "europe_pmc_references",
+            ToolName::EuropePmcCitations => "europe_pmc_citations",
+            ToolName::EuropePmcDatabaseLinks => "europe_pmc_database_links",
         }
     }
 }
@@ -217,6 +229,56 @@ impl PubMedServer {
         params: Parameters<tools::export::ExportRequest>,
     ) -> Result<CallToolResult, ErrorData> {
         tools::export::export_citations(self, params).await
+    }
+
+    #[tool(
+        description = "Search Europe PMC across every source it indexes: PubMed/MEDLINE, PMC, preprints (PPR), patents (PAT), Agricola and Chinese Biological Abstracts. Complements search_pubmed by reaching preprints and non-PubMed literature, and needs no API key. Supports Europe PMC query syntax (e.g. 'TITLE:CRISPR AND SRC:PPR') and sort expressions such as 'CITED desc'."
+    )]
+    async fn europe_pmc_search(
+        &self,
+        params: Parameters<tools::europe_pmc::EuropePmcSearchRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::europe_pmc::europe_pmc_search(self, params).await
+    }
+
+    #[tool(
+        description = "Get the full text of a Europe PMC record as parsed sections, or as raw JATS XML with raw_xml=true. Europe PMC serves open-access full text for PMC records and for some sources PMC itself does not carry. Ids may be bare ('PMC3258128', '33515491') or qualified ('PPR/PPR123456')."
+    )]
+    async fn europe_pmc_fulltext(
+        &self,
+        params: Parameters<tools::europe_pmc::EuropePmcFullTextRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::europe_pmc::europe_pmc_fulltext(self, params).await
+    }
+
+    #[tool(
+        description = "List the works cited by a Europe PMC record (its reference list), with titles, authors, journal, PMID and DOI where Europe PMC has matched them. Works for PubMed (MED), PMC and preprint records alike."
+    )]
+    async fn europe_pmc_references(
+        &self,
+        params: Parameters<tools::europe_pmc::EuropePmcCitationGraphRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::europe_pmc::europe_pmc_references(self, params).await
+    }
+
+    #[tool(
+        description = "List the articles that cite a Europe PMC record. Broader coverage than get_citations (which is PubMed-only): includes preprints and non-PubMed sources, and reports each citing article's own citation count."
+    )]
+    async fn europe_pmc_citations(
+        &self,
+        params: Parameters<tools::europe_pmc::EuropePmcCitationGraphRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::europe_pmc::europe_pmc_citations(self, params).await
+    }
+
+    #[tool(
+        description = "List cross-references from a Europe PMC record to external biological databases (UniProt, EMBL, PDB, ChEBI, ArrayExpress, ...). Useful for finding the accessions and datasets a paper deposited or referenced."
+    )]
+    async fn europe_pmc_database_links(
+        &self,
+        params: Parameters<tools::europe_pmc::EuropePmcDatabaseLinksRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::europe_pmc::europe_pmc_database_links(self, params).await
     }
 }
 

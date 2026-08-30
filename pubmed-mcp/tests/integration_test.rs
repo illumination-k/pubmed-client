@@ -143,3 +143,72 @@ async fn test_mcp_server_capabilities() -> Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn test_mcp_server_lists_europe_pmc_tools() -> Result<()> {
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run").arg("-p").arg("pubmed-mcp").arg("--quiet");
+            },
+        ))?)
+        .await?;
+
+    let tools = client.list_all_tools().await?;
+    let names: Vec<&str> = tools.iter().map(|tool| tool.name.as_ref()).collect();
+
+    for expected in [
+        "europe_pmc_search",
+        "europe_pmc_fulltext",
+        "europe_pmc_references",
+        "europe_pmc_citations",
+        "europe_pmc_database_links",
+    ] {
+        assert!(
+            names.contains(&expected),
+            "{expected} should be available, got: {names:?}"
+        );
+        let tool = tools.iter().find(|tool| tool.name == expected).unwrap();
+        assert!(
+            tool.description.is_some(),
+            "{expected} should have a description"
+        );
+    }
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_mcp_server_europe_pmc_tool_filtering() -> Result<()> {
+    // The `--tools` CLI values must map onto the registered tool names; a typo
+    // in `ToolName::as_str` would silently leave the router empty here.
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--tools")
+                    .arg("europe-pmc-search,europe-pmc-fulltext,europe-pmc-references,europe-pmc-citations,europe-pmc-database-links");
+            },
+        ))?)
+        .await?;
+
+    let tools = client.list_all_tools().await?;
+    let mut names: Vec<&str> = tools.iter().map(|tool| tool.name.as_ref()).collect();
+    names.sort_unstable();
+    assert_eq!(
+        names,
+        [
+            "europe_pmc_citations",
+            "europe_pmc_database_links",
+            "europe_pmc_fulltext",
+            "europe_pmc_references",
+            "europe_pmc_search",
+        ]
+    );
+
+    Ok(())
+}

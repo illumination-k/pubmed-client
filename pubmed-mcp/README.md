@@ -16,6 +16,11 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - Configurable metadata, table of contents, and figure captions
   - Proper handling of references, funding information, and acknowledgments
   - Clean HTML entity decoding and content formatting
+- **Europe PMC Access**: Search and retrieve from Europe PMC alongside NCBI
+  - Cross-source search covering preprints (PPR), patents, Agricola and CBA as well as PubMed/PMC
+  - JATS full text (parsed or raw XML), reference and citation graphs
+  - Cross-references to external databases (UniProt, EMBL, PDB, ...)
+  - No API key required
 - **Modular Architecture**: Tools organized in separate modules for maintainability
 - Built with [rmcp](https://github.com/modelcontextprotocol/rust-sdk) - the official Rust SDK for MCP
 - Uses stdio transport for communication
@@ -183,6 +188,56 @@ Get markdown for PMC article 7906746 without table of contents
 Get markdown for PMC7906746 with minimal formatting (no metadata or captions)
 ```
 
+#### Europe PMC tools
+
+[Europe PMC](https://europepmc.org) is a complementary index to the NCBI E-utilities: it covers
+preprints, patents and agricultural literature in addition to PubMed and PMC, and needs no API key.
+
+Every Europe PMC record is addressed by a `(source, id)` pair. All of the tools below accept the id
+either bare (`"PMC3258128"`, `"33515491"`) or fully qualified (`"PPR/PPR123456"`), and take an
+optional `source` (`MED`, `PMC`, `PPR`, `AGR`, `CBA`, `PAT`). With no `source`, a `PMC`-prefixed id
+is read as a PMC record and anything else as a PubMed (`MED`) record.
+
+##### `europe_pmc_search`
+
+Search across every Europe PMC source.
+
+- `query` (string, required): Europe PMC query syntax, e.g. `"TITLE:CRISPR AND SRC:PPR"`
+- `max_results` (integer, optional): default 10, max 100
+- `result_type` (enum, optional): `id_list`, `lite` (default), or `core` (adds abstracts and citation counts)
+- `sort` (string, optional): Europe PMC sort expression, e.g. `"P_PDATE_D desc"`, `"CITED desc"`
+
+##### `europe_pmc_fulltext`
+
+Fetch full text for a record.
+
+- `id` (string, required), `source` (string, optional)
+- `raw_xml` (boolean, optional): return the raw JATS XML instead of parsed sections (default: false).
+  Required for non-`PMC` sources, since parsing into an article requires a PMC id.
+- `max_sections` (integer, optional): limit the number of body sections returned
+
+##### `europe_pmc_references`
+
+List the works cited by a record (title, authors, journal, PMID, DOI where matched).
+
+- `id` (string, required), `source` (string, optional)
+- `max_results` (integer, optional): default 50, max 100
+
+##### `europe_pmc_citations`
+
+List the articles citing a record. Broader than `get_citations`, which is PubMed-only.
+
+- `id` (string, required), `source` (string, optional)
+- `max_results` (integer, optional): default 50, max 100
+
+##### `europe_pmc_database_links`
+
+List cross-references from a record to external biological databases.
+
+- `id` (string, required), `source` (string, optional)
+- `db_name` (string, optional): filter to a single database, e.g. `"UNIPROT"`
+- `max_entries_per_db` (integer, optional): entries shown per database (default: 20)
+
 ## Development
 
 ### Project Structure
@@ -193,9 +248,10 @@ pubmed-mcp/
 ├── src/
 │   ├── main.rs          # MCP server implementation with tool router
 │   └── tools/           # Tools module
-│       ├── mod.rs       # PubMedServer definition
-│       ├── search.rs    # Search tool implementation
-│       └── markdown.rs  # Markdown conversion tool
+│       ├── mod.rs         # PubMedServer definition
+│       ├── search.rs      # Search tool implementation
+│       ├── markdown.rs    # Markdown conversion tool
+│       └── europe_pmc.rs  # Europe PMC search / full text / citation graph tools
 ├── tests/
 │   └── integration_test.rs  # Integration tests
 ├── README.md            # This file
