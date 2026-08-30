@@ -53,7 +53,10 @@ run = ["cargo check --workspace"]
 [tasks."coverage:rs"]
 description = "Generate HTML coverage report (llvm-cov)"
 run = [
-  "cargo llvm-cov nextest --workspace --all-features --no-report",
+  # pubmed-client-py is excluded for the same reason as `doctest:rs`: with
+  # `--all-features` its `extension-module` feature is on, so pyo3 omits the
+  # libpython link flags and its test harnesses fail to link.
+  "cargo llvm-cov nextest --workspace --exclude pubmed-client-py --all-features --no-report",
   "cargo llvm-cov report --html",
   "cargo llvm-cov report --text",
 ]
