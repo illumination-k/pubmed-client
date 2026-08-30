@@ -58,6 +58,10 @@
   },
   "overrides": [
     {
+      "includes": ["index.d.ts"],
+      "formatter": { "enabled": false }
+    },
+    {
       "includes": ["tests/**/*.ts", "examples/**/*.ts"],
       "linter": {
         "rules": {
