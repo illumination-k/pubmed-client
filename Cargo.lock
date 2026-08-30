@@ -2712,18 +2712,12 @@ dependencies = [
  "ctor",
  "futures",
  "libc",
- "napi-build 2.4.1",
+ "napi-build",
  "napi-sys",
  "nohash-hasher",
  "rustc-hash 2.1.1",
  "tokio",
 ]
-
-[[package]]
-name = "napi-build"
-version = "1.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ebd4419172727423cf30351406c54f6cc1b354a2cfb4f1dba3e6cd07f6d5522b"
 
 [[package]]
 name = "napi-build"
@@ -3423,7 +3417,7 @@ name = "pubmed-client-napi"
 version = "0.3.1"
 dependencies = [
  "napi",
- "napi-build 1.2.1",
+ "napi-build",
  "napi-derive",
  "pubmed-client",
  "serde_json",
