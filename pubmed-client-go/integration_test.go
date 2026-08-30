@@ -402,3 +402,118 @@ func TestLiveContextCancellation(t *testing.T) {
 		t.Errorf("SearchArticles with a cancelled context = %v, want context.Canceled", err)
 	}
 }
+
+// A stable Europe PMC open-access record, used as the citation-graph fixture.
+const liveEuropePMCID = "PMC3258128"
+
+func TestLiveEuropePMCSearch(t *testing.T) {
+	client, ctx := liveClient(t)
+
+	results, err := client.EuropePMCSearch(ctx, "malaria vaccine", 5)
+	if err != nil {
+		t.Fatalf("EuropePMCSearch failed: %v", err)
+	}
+	if len(results) == 0 {
+		t.Fatal("expected at least one result")
+	}
+	for _, result := range results {
+		if result.ID == "" || result.Source == "" {
+			t.Errorf("record is missing its address: %+v", result)
+		}
+		if want := result.Source + "/" + result.ID; result.EuropePMCID != want {
+			t.Errorf("EuropePMCID = %q, want %q", result.EuropePMCID, want)
+		}
+	}
+}
+
+func TestLiveEuropePMCSearchPage(t *testing.T) {
+	client, ctx := liveClient(t)
+
+	page, err := client.EuropePMCSearchPage(ctx, "malaria vaccine",
+		EuropePMCSearchOptions{PageSize: 5})
+	if err != nil {
+		t.Fatalf("EuropePMCSearchPage failed: %v", err)
+	}
+	if page.HitCount == 0 {
+		t.Error("expected a non-zero hit count")
+	}
+	// A first page of a large result set always has a follow-on cursor.
+	if page.NextCursorMark == "" {
+		t.Error("expected a next cursor mark")
+	}
+}
+
+func TestLiveEuropePMCPreprintSearch(t *testing.T) {
+	client, ctx := liveClient(t)
+
+	// The point of Europe PMC here is reach beyond PubMed; preprints are the
+	// clearest case.
+	results, err := client.EuropePMCSearch(ctx, "SRC:PPR AND TITLE:CRISPR", 3)
+	if err != nil {
+		t.Fatalf("EuropePMCSearch failed: %v", err)
+	}
+	for _, result := range results {
+		if result.Source != "PPR" {
+			t.Errorf("source = %q, want PPR", result.Source)
+		}
+	}
+}
+
+func TestLiveEuropePMCFullText(t *testing.T) {
+	client, ctx := liveClient(t)
+
+	article, err := client.EuropePMCFetchFullText(ctx, liveEuropePMCID, "")
+	if err != nil {
+		t.Fatalf("EuropePMCFetchFullText failed: %v", err)
+	}
+	if article.PMCID != liveEuropePMCID {
+		t.Errorf("PMCID = %q, want %q", article.PMCID, liveEuropePMCID)
+	}
+	if article.Title == "" {
+		t.Error("expected a title")
+	}
+
+	xml, err := client.EuropePMCFetchXML(ctx, liveEuropePMCID, "")
+	if err != nil {
+		t.Fatalf("EuropePMCFetchXML failed: %v", err)
+	}
+	if !strings.Contains(xml, "<article") {
+		t.Errorf("expected JATS XML, got %.60q", xml)
+	}
+}
+
+func TestLiveEuropePMCCitationGraph(t *testing.T) {
+	client, ctx := liveClient(t)
+
+	references, err := client.EuropePMCReferences(ctx, liveEuropePMCID, "")
+	if err != nil {
+		t.Fatalf("EuropePMCReferences failed: %v", err)
+	}
+	if len(references) == 0 {
+		t.Error("expected at least one reference")
+	}
+
+	citations, err := client.EuropePMCCitations(ctx, liveEuropePMCID, "")
+	if err != nil {
+		t.Fatalf("EuropePMCCitations failed: %v", err)
+	}
+	if len(citations) == 0 {
+		t.Error("expected at least one citing article")
+	}
+}
+
+func TestLiveEuropePMCDatabaseLinks(t *testing.T) {
+	client, ctx := liveClient(t)
+
+	// A record may legitimately have no cross-references, so assert on shape
+	// rather than presence.
+	links, err := client.EuropePMCDatabaseLinks(ctx, liveEuropePMCID, "")
+	if err != nil {
+		t.Fatalf("EuropePMCDatabaseLinks failed: %v", err)
+	}
+	for _, link := range links {
+		if link.DBName == "" {
+			t.Errorf("cross-reference group is missing its database name: %+v", link)
+		}
+	}
+}

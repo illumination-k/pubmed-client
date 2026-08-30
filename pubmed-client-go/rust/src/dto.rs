@@ -7,7 +7,11 @@
 
 use serde::{Deserialize, Serialize};
 
-use pubmed_client::{Author, Figure, JournalMeta, PmcArticle, PubMedArticle, Reference, Section};
+use pubmed_client::{
+    Author, EuropePmcCitation, EuropePmcDatabaseLink, EuropePmcDbCrossReferenceInfo,
+    EuropePmcReference, EuropePmcResult, EuropePmcSearchResponse, Figure, JournalMeta, PmcArticle,
+    PubMedArticle, Reference, Section,
+};
 
 /// Flattened projection of a [`PmcArticle`] for the Go bindings.
 ///
@@ -100,6 +104,165 @@ impl From<CitationQueryDto> for pubmed_client::CitationQuery {
             &dto.author_name,
             &dto.key,
         )
+    }
+}
+
+// ================================================================================================
+// Europe PMC
+// ================================================================================================
+//
+// The Europe PMC models flatten their unmodelled fields into the record itself
+// (`#[serde(flatten)] extra`), which would leave Go with no way to reach them:
+// a Go struct silently drops keys it has no field for. These projections nest
+// that remainder under `extra` instead, so Go can decode it as a map while the
+// modelled fields stay typed.
+
+/// Projection of a [`EuropePmcResult`] for the Go bindings.
+#[derive(Serialize)]
+pub struct EuropePmcResultDto<'a> {
+    id: &'a str,
+    source: &'a str,
+    /// Fully-qualified Europe PMC address ("SOURCE/ID").
+    europe_pmc_id: String,
+    pmid: Option<&'a str>,
+    pmcid: Option<&'a str>,
+    doi: Option<&'a str>,
+    title: Option<&'a str>,
+    author_string: Option<&'a str>,
+    journal_title: Option<&'a str>,
+    pub_year: Option<&'a str>,
+    is_open_access: Option<&'a str>,
+    extra: &'a serde_json::Map<String, serde_json::Value>,
+}
+
+impl<'a> From<&'a EuropePmcResult> for EuropePmcResultDto<'a> {
+    fn from(result: &'a EuropePmcResult) -> Self {
+        Self {
+            id: &result.id,
+            source: &result.source,
+            europe_pmc_id: format!("{}/{}", result.source, result.id),
+            pmid: result.pmid.as_deref(),
+            pmcid: result.pmcid.as_deref(),
+            doi: result.doi.as_deref(),
+            title: result.title.as_deref(),
+            author_string: result.author_string.as_deref(),
+            journal_title: result.journal_title.as_deref(),
+            pub_year: result.pub_year.as_deref(),
+            is_open_access: result.is_open_access.as_deref(),
+            extra: &result.extra,
+        }
+    }
+}
+
+/// Projection of one page of Europe PMC search results.
+#[derive(Serialize)]
+pub struct EuropePmcSearchPageDto<'a> {
+    hit_count: u64,
+    next_cursor_mark: Option<&'a str>,
+    results: Vec<EuropePmcResultDto<'a>>,
+}
+
+impl<'a> From<&'a EuropePmcSearchResponse> for EuropePmcSearchPageDto<'a> {
+    fn from(response: &'a EuropePmcSearchResponse) -> Self {
+        Self {
+            hit_count: response.hit_count,
+            next_cursor_mark: response.next_cursor_mark.as_deref(),
+            results: response.results.iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Projection of a [`EuropePmcReference`] for the Go bindings.
+#[derive(Serialize)]
+pub struct EuropePmcReferenceDto<'a> {
+    source: Option<&'a str>,
+    id: Option<&'a str>,
+    citation_type: Option<&'a str>,
+    title: Option<&'a str>,
+    author_string: Option<&'a str>,
+    journal_abbreviation: Option<&'a str>,
+    pub_year: Option<&'a str>,
+    volume: Option<&'a str>,
+    issue: Option<&'a str>,
+    page_info: Option<&'a str>,
+    pmid: Option<&'a str>,
+    doi: Option<&'a str>,
+    extra: &'a serde_json::Map<String, serde_json::Value>,
+}
+
+impl<'a> From<&'a EuropePmcReference> for EuropePmcReferenceDto<'a> {
+    fn from(reference: &'a EuropePmcReference) -> Self {
+        Self {
+            source: reference.source.as_deref(),
+            id: reference.id.as_deref(),
+            citation_type: reference.citation_type.as_deref(),
+            title: reference.title.as_deref(),
+            author_string: reference.author_string.as_deref(),
+            journal_abbreviation: reference.journal_abbreviation.as_deref(),
+            pub_year: reference.pub_year.as_deref(),
+            volume: reference.volume.as_deref(),
+            issue: reference.issue.as_deref(),
+            page_info: reference.page_info.as_deref(),
+            pmid: reference.pmid.as_deref(),
+            doi: reference.doi.as_deref(),
+            extra: &reference.extra,
+        }
+    }
+}
+
+/// Projection of a [`EuropePmcCitation`] for the Go bindings.
+#[derive(Serialize)]
+pub struct EuropePmcCitationDto<'a> {
+    id: Option<&'a str>,
+    source: Option<&'a str>,
+    citation_type: Option<&'a str>,
+    title: Option<&'a str>,
+    author_string: Option<&'a str>,
+    journal_abbreviation: Option<&'a str>,
+    pub_year: Option<&'a str>,
+    volume: Option<&'a str>,
+    issue: Option<&'a str>,
+    page_info: Option<&'a str>,
+    cited_by_count: Option<&'a str>,
+    extra: &'a serde_json::Map<String, serde_json::Value>,
+}
+
+impl<'a> From<&'a EuropePmcCitation> for EuropePmcCitationDto<'a> {
+    fn from(citation: &'a EuropePmcCitation) -> Self {
+        Self {
+            id: citation.id.as_deref(),
+            source: citation.source.as_deref(),
+            citation_type: citation.citation_type.as_deref(),
+            title: citation.title.as_deref(),
+            author_string: citation.author_string.as_deref(),
+            journal_abbreviation: citation.journal_abbreviation.as_deref(),
+            pub_year: citation.pub_year.as_deref(),
+            volume: citation.volume.as_deref(),
+            issue: citation.issue.as_deref(),
+            page_info: citation.page_info.as_deref(),
+            cited_by_count: citation.cited_by_count.as_deref(),
+            extra: &citation.extra,
+        }
+    }
+}
+
+/// Projection of a [`EuropePmcDatabaseLink`] for the Go bindings.
+///
+/// This one carries no `extra`; the link models have no flattened remainder.
+#[derive(Serialize)]
+pub struct EuropePmcDatabaseLinkDto<'a> {
+    db_name: Option<&'a str>,
+    db_count: Option<u32>,
+    info: &'a [EuropePmcDbCrossReferenceInfo],
+}
+
+impl<'a> From<&'a EuropePmcDatabaseLink> for EuropePmcDatabaseLinkDto<'a> {
+    fn from(link: &'a EuropePmcDatabaseLink) -> Self {
+        Self {
+            db_name: link.db_name.as_deref(),
+            db_count: link.db_count,
+            info: &link.info,
+        }
     }
 }
 

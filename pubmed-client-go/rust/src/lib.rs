@@ -34,6 +34,7 @@
 //! | [`dto`]    | Projections of Rust models onto the JSON shapes Go decodes    |
 //! | [`pubmed`] | E-utilities calls (ESearch, EFetch, ESummary, ELink, …)        |
 //! | [`pmc`]    | PMC full text, XML, Markdown, and Open Access downloads       |
+//! | [`europe_pmc`] | Europe PMC search, full text, and citation graphs         |
 //! | [`query`]  | Replay of the Go query builder onto `SearchQuery`             |
 //! | [`export`] | Citation export (BibTeX, RIS, CSL-JSON, NBIB)                 |
 
@@ -41,6 +42,7 @@ pub mod cancel;
 pub mod client;
 pub mod dto;
 pub mod error;
+pub mod europe_pmc;
 pub mod export;
 pub mod ffi;
 pub mod pmc;
@@ -52,6 +54,11 @@ pub mod query;
 pub use cancel::{PubmedCancel, pubmed_cancel_free, pubmed_cancel_new, pubmed_cancel_trigger};
 pub use client::{PubmedClient, pubmed_client_free, pubmed_client_new, pubmed_client_version};
 pub use error::{ErrorKind, ShimError};
+pub use europe_pmc::{
+    europe_pmc_download_supplementary_files, europe_pmc_fetch_full_text, europe_pmc_fetch_xml,
+    europe_pmc_get_citations, europe_pmc_get_database_links, europe_pmc_get_references,
+    europe_pmc_search, europe_pmc_search_page,
+};
 pub use export::pubmed_export_articles;
 pub use ffi::pubmed_string_free;
 pub use pmc::{

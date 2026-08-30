@@ -14,8 +14,8 @@
 //
 // The surface covers PubMed search and metadata (ESearch, EFetch, ESummary),
 // the discovery APIs (ELink, EInfo, EGQuery, ECitMatch, ESpell), PMC full text,
-// XML, Markdown and Open Access downloads, a query builder, and citation
-// export. Building this package requires the Rust static library; see the
+// XML, Markdown and Open Access downloads, Europe PMC search and citation
+// graphs, a query builder, and citation export. Building this package requires the Rust static library; see the
 // README.
 //
 // # Contexts
@@ -69,6 +69,10 @@ type Config struct {
 	// BaseURL overrides the NCBI E-utilities base URL. Mainly useful for
 	// pointing tests at a local server.
 	BaseURL string
+	// EuropePMCBaseURL overrides the Europe PMC REST base URL. Europe PMC is
+	// hosted by EBI on a different host from NCBI, so BaseURL does not reach
+	// it. Mainly useful for pointing tests at a local server.
+	EuropePMCBaseURL string
 	// Cache enables the in-memory response cache.
 	Cache bool
 }
@@ -83,7 +87,10 @@ type configPayload struct {
 	TimeoutSeconds *uint64  `json:"timeout_seconds,omitempty"`
 	UserAgent      *string  `json:"user_agent,omitempty"`
 	BaseURL        *string  `json:"base_url,omitempty"`
-	Cache          bool     `json:"cache"`
+
+	EuropePMCBaseURL *string `json:"europe_pmc_base_url,omitempty"`
+
+	Cache bool `json:"cache"`
 }
 
 func (c *Config) marshal() (string, error) {
@@ -114,6 +121,9 @@ func (c *Config) marshal() (string, error) {
 	}
 	if c.BaseURL != "" {
 		payload.BaseURL = &c.BaseURL
+	}
+	if c.EuropePMCBaseURL != "" {
+		payload.EuropePMCBaseURL = &c.EuropePMCBaseURL
 	}
 
 	encoded, err := json.Marshal(payload)
