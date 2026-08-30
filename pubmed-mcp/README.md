@@ -12,6 +12,7 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - Filter by study type (RCT, meta-analysis, systematic review, etc.)
   - Filter by text availability (open access, free full text, PMC full text)
   - Support for all PubMed field tags and boolean operators
+- **Full PubMed Records**: Fetch complete metadata by PMID — full abstract, MeSH headings, keywords, affiliations, and identifiers
 - **PMC Markdown Conversion**: Convert PMC full-text articles to well-formatted markdown
   - Configurable metadata, table of contents, and figure captions
   - Proper handling of references, funding information, and acknowledgments
@@ -22,6 +23,7 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - Cross-references to external databases (UniProt, EMBL, PDB, ...)
   - No API key required
 - **Modular Architecture**: Tools organized in separate modules for maintainability
+- **Configurable client**: NCBI API key, contact e-mail, tool name, rate limit, timeout, retries, and response caching, via CLI flags or environment variables
 - Built with [rmcp](https://github.com/modelcontextprotocol/rust-sdk) - the official Rust SDK for MCP
 - Uses stdio transport for communication
 
@@ -82,6 +84,40 @@ docker run --rm -p 8080:8080 ghcr.io/illumination-k/pubmed-mcp:latest --port 808
 docker run --rm -i ghcr.io/illumination-k/pubmed-mcp:latest --tools search,markdown
 ```
 
+### Client Configuration
+
+Every option below is available both as a CLI flag and as an environment
+variable, since MCP hosts differ in which one is easier to set. Flags win over
+environment variables.
+
+| Flag               | Environment variable        | Default                  | Description                                                                   |
+| ------------------ | --------------------------- | ------------------------ | ----------------------------------------------------------------------------- |
+| `--api-key`        | `NCBI_API_KEY`              | _(none)_                 | NCBI E-utilities API key. Raises the rate limit from 3 to 10 requests/second. |
+| `--email`          | `NCBI_EMAIL`                | _(none)_                 | Contact e-mail sent to NCBI (recommended by their usage guidelines).          |
+| `--tool`           | `NCBI_TOOL`                 | `pubmed-mcp`             | Tool name sent to NCBI.                                                       |
+| `--rate-limit`     | `NCBI_RATE_LIMIT`           | 3, or 10 with an API key | Requests per second. Overrides the API-key-based default.                     |
+| `--timeout`        | `PUBMED_MCP_TIMEOUT`        | `30`                     | HTTP request timeout, in seconds.                                             |
+| `--max-retries`    | `PUBMED_MCP_MAX_RETRIES`    | `3`                      | Retries for transient failures (exponential backoff).                         |
+| `--base-url`       | `PUBMED_MCP_BASE_URL`       | NCBI E-utilities         | Alternate E-utilities base URL, for proxies or test environments.             |
+| `--cache`          | `PUBMED_MCP_CACHE`          | off                      | Enable the in-memory response cache.                                          |
+| `--cache-capacity` | `PUBMED_MCP_CACHE_CAPACITY` | `1000`                   | Maximum number of cached responses. Implies `--cache`.                        |
+| `--cache-ttl`      | `PUBMED_MCP_CACHE_TTL`      | `604800` (7 days)        | Time-to-live for cached responses, in seconds. Implies `--cache`.             |
+
+`NCBI_API_KEY`, `NCBI_EMAIL`, and `NCBI_TOOL` are the same variables `pubmed-cli`
+reads, so a shell that is already set up for the CLI needs no extra
+configuration. `PUBMED_MCP_CACHE` accepts any boolish value (`1`, `true`,
+`yes`, `on`, and their negatives).
+
+Getting an API key is worthwhile for anything beyond casual use — it more than
+triples the request rate. Register at
+[NCBI account settings](https://www.ncbi.nlm.nih.gov/account/settings/).
+
+```bash
+# Authenticated, with responses cached for an hour
+NCBI_API_KEY=your_key NCBI_EMAIL=you@example.edu \
+  cargo run -p pubmed-mcp -- --cache --cache-ttl 3600
+```
+
 ### Configuration with Claude Desktop
 
 Add to your Claude Desktop configuration file:
@@ -93,20 +129,41 @@ Add to your Claude Desktop configuration file:
 {
   "mcpServers": {
     "pubmed": {
-      "command": "/path/to/pubmed-client/target/release/pubmed-mcp"
+      "command": "/path/to/pubmed-client/target/release/pubmed-mcp",
+      "env": {
+        "NCBI_API_KEY": "your_api_key_here",
+        "NCBI_EMAIL": "you@example.edu",
+        "PUBMED_MCP_CACHE": "true"
+      }
     }
   }
 }
 ```
 
-Using the container image instead (no local Rust toolchain needed):
+Using the container image instead (no local Rust toolchain needed). Note that
+`docker run` does not inherit the host environment, so the variables have to be
+forwarded with `-e`:
 
 ```json
 {
   "mcpServers": {
     "pubmed": {
       "command": "docker",
-      "args": ["run", "--rm", "-i", "ghcr.io/illumination-k/pubmed-mcp:latest"]
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "NCBI_API_KEY",
+        "-e",
+        "NCBI_EMAIL",
+        "ghcr.io/illumination-k/pubmed-mcp:latest",
+        "--cache"
+      ],
+      "env": {
+        "NCBI_API_KEY": "your_api_key_here",
+        "NCBI_EMAIL": "you@example.edu"
+      }
     }
   }
 }
@@ -151,6 +208,37 @@ Search for free full text meta-analyses on cancer immunotherapy
 ```
 
 For detailed examples and filter combinations, see [SEARCH_FILTERS.md](SEARCH_FILTERS.md).
+
+#### `fetch_articles`
+
+Fetch complete PubMed records for PMIDs you already have (EFetch). Use this when
+`search_pubmed`'s 200-character abstract preview or `fetch_summaries`'
+bibliographic overview is not enough — this is the only tool that returns full
+abstracts and MeSH indexing.
+
+**Parameters:**
+
+- `pmids` (array of strings, required): PubMed IDs, e.g. `["31978945", "33515491"]`. At most 100 per call.
+- `include_abstract` (boolean, optional): Include the full abstract (default: true). Structured abstracts keep their `BACKGROUND`/`METHODS`/`RESULTS` labels.
+- `include_mesh` (boolean, optional): Include MeSH headings and chemical substances (default: true). Major topics are marked with `*`, qualifiers appear as `Descriptor/qualifier`.
+- `include_affiliations` (boolean, optional): Include author affiliations (default: false). Off by default because PubMed repeats a collaboration's entire affiliation string on every author; when enabled, each distinct affiliation is listed once with the authors that share it.
+
+**Returns:**
+
+Per article: title, PMID, PMC ID, DOI, journal (with volume/issue/pages, ISO
+abbreviation, ISSN, language), all authors, article types, full abstract,
+author keywords, MeSH terms, and substances. PMIDs that returned no record are
+listed under `Not found:` rather than silently omitted.
+
+**Examples:**
+
+```
+Get the full records for PMIDs 31978945 and 33515491
+```
+
+```
+What MeSH terms is PMID 31978945 indexed under?
+```
 
 #### `get_pmc_markdown`
 
@@ -247,9 +335,11 @@ pubmed-mcp/
 ├── Cargo.toml           # Package configuration
 ├── src/
 │   ├── main.rs          # MCP server implementation with tool router
+│   ├── config.rs        # CLI flags / environment variables -> ClientConfig
 │   └── tools/           # Tools module
 │       ├── mod.rs         # PubMedServer definition
 │       ├── search.rs      # Search tool implementation
+│       ├── articles.rs    # Full PubMed record retrieval (EFetch)
 │       ├── markdown.rs    # Markdown conversion tool
 │       └── europe_pmc.rs  # Europe PMC search / full text / citation graph tools
 ├── tests/

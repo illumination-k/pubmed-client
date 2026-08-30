@@ -5,6 +5,7 @@ use rmcp::handler::server::router::tool::ToolRouter;
 use std::collections::HashSet;
 use std::sync::Arc;
 
+pub mod articles;
 pub mod citmatch;
 pub mod common;
 pub mod convert;

@@ -2,7 +2,7 @@
 
 import pytest
 
-from pubmed_client import SearchQuery
+from pubmed_client import InvalidQueryException, PubMedException, SearchQuery
 
 
 def test_searchquery_constructor_creates_empty_query() -> None:
@@ -542,3 +542,220 @@ def test_precedence_control_with_group() -> None:
     result = q1.and_(q2)
 
     assert result.build() == "(((a) OR (b))) AND (((c) OR (d)))"
+
+
+# ================================================================================================
+# Field Search Tests
+# ================================================================================================
+
+
+@pytest.mark.parametrize(
+    ("method_name", "value", "expected"),
+    [
+        ("author", "Doudna JA", "Doudna JA[au]"),
+        ("first_author", "Smith J", "Smith J[1au]"),
+        ("last_author", "Smith J", "Smith J[lastau]"),
+        ("journal", "Nature", "Nature[ta]"),
+        ("journal_abbreviation", "N Engl J Med", "N Engl J Med[ta]"),
+        ("title_contains", "machine learning", "machine learning[ti]"),
+        ("abstract_contains", "randomized", "randomized[tiab]"),
+        ("title_or_abstract", "gene therapy", "gene therapy[tiab]"),
+        ("grant_number", "R01CA123456", "R01CA123456[gr]"),
+        ("isbn", "978-0-12-800000-0", "978-0-12-800000-0[ISBN]"),
+        ("issn", "0028-0836", "0028-0836[ISSN]"),
+        ("mesh_term", "Neoplasms", "Neoplasms[mh]"),
+        ("mesh_major_topic", "Diabetes Mellitus", "Diabetes Mellitus[majr]"),
+        ("mesh_subheading", "drug therapy", "drug therapy[sh]"),
+        ("affiliation", "Harvard", "Harvard[ad]"),
+        ("orcid", "0000-0002-1825-0097", "0000-0002-1825-0097[auid]"),
+        ("organism_mesh", "Mus musculus", "Mus musculus[mh]"),
+        ("age_group", "Child", "Child[mh]"),
+        ("custom_filter", "humans[mh]", "humans[mh]"),
+    ],
+)
+def test_single_value_field_filters(method_name: str, value: str, expected: str) -> None:
+    """Test that each single-value field filter emits the right PubMed field tag."""
+    query = getattr(SearchQuery(), method_name)(value)
+    assert query.build() == expected
+
+
+@pytest.mark.parametrize(
+    "method_name",
+    [
+        "author",
+        "first_author",
+        "last_author",
+        "journal",
+        "journal_abbreviation",
+        "title_contains",
+        "abstract_contains",
+        "title_or_abstract",
+        "grant_number",
+        "isbn",
+        "issn",
+        "language",
+        "mesh_term",
+        "mesh_major_topic",
+        "mesh_subheading",
+        "affiliation",
+        "orcid",
+        "organism_mesh",
+        "age_group",
+        "custom_filter",
+    ],
+)
+def test_field_filters_ignore_blank_values(method_name: str) -> None:
+    """Test that blank values add no filter instead of a dangling field tag."""
+    query = SearchQuery().query("cancer")
+    getattr(query, method_name)("")
+    getattr(query, method_name)("   ")
+    assert query.build() == "cancer"
+
+
+@pytest.mark.parametrize(
+    "method_name",
+    ["author", "journal", "title_contains", "mesh_term", "custom_filter"],
+)
+def test_field_filters_trim_values(method_name: str) -> None:
+    """Test that surrounding whitespace is trimmed from filter values."""
+    query = getattr(SearchQuery(), method_name)("  cancer  ")
+    assert query.build().startswith("cancer")
+
+
+def test_has_abstract() -> None:
+    """Test filtering to articles that have an abstract."""
+    query = SearchQuery().query("genetics").has_abstract()
+    assert query.build() == "genetics AND hasabstract"
+
+
+def test_human_studies_only() -> None:
+    """Test filtering to human studies."""
+    query = SearchQuery().query("drug treatment").human_studies_only()
+    assert query.build() == "drug treatment AND humans[mh]"
+
+
+def test_animal_studies_only() -> None:
+    """Test filtering to animal studies."""
+    query = SearchQuery().query("preclinical").animal_studies_only()
+    assert query.build() == "preclinical AND animals[mh]"
+
+
+@pytest.mark.parametrize(
+    ("language", "expected"),
+    [
+        ("english", "English[la]"),
+        ("English", "English[la]"),
+        ("eng", "English[la]"),
+        ("jpn", "Japanese[la]"),
+        ("Klingon", "Klingon[la]"),
+    ],
+)
+def test_language_filter(language: str, expected: str) -> None:
+    """Test that language names and ISO 639-2 codes map to the [la] field tag."""
+    query = SearchQuery().query("cancer").language(language)
+    assert query.build() == f"cancer AND {expected}"
+
+
+def test_mesh_terms_multiple() -> None:
+    """Test that mesh_terms() adds one [mh] filter per term (AND logic)."""
+    query = SearchQuery().mesh_terms(["Neoplasms", "Antineoplastic Agents"])
+    assert query.build() == "Neoplasms[mh] AND Antineoplastic Agents[mh]"
+
+
+def test_mesh_terms_empty_list() -> None:
+    """Test that an empty mesh_terms() list adds no filters."""
+    query = SearchQuery().query("cancer").mesh_terms([])
+    assert query.build() == "cancer"
+
+
+def test_mesh_terms_skips_blank_entries() -> None:
+    """Test that blank entries in mesh_terms() are ignored."""
+    query = SearchQuery().mesh_terms(["Neoplasms", "", "   "])
+    assert query.build() == "Neoplasms[mh]"
+
+
+def test_field_filters_chain() -> None:
+    """Test that field filters chain and combine with AND."""
+    query = (
+        SearchQuery()
+        .query("crispr")
+        .author("Doudna JA")
+        .journal("Nature")
+        .published_after(2020)
+        .human_studies_only()
+    )
+    built = query.build()
+    assert built == "crispr AND Doudna JA[au] AND Nature[ta] AND 2020:3000[pdat] AND humans[mh]"
+
+
+def test_field_filter_returns_same_instance() -> None:
+    """Test that field filters mutate and return the same builder instance."""
+    query = SearchQuery().query("cancer")
+    assert query.author("Smith J") is query
+
+
+# ================================================================================================
+# Validation / Optimization Tests
+# ================================================================================================
+
+
+def test_validate_accepts_valid_query() -> None:
+    """Test that validate() raises nothing for a valid query."""
+    SearchQuery().query("covid-19").validate()
+
+
+def test_validate_rejects_empty_query() -> None:
+    """Test that validate() raises for an empty query."""
+    with pytest.raises(InvalidQueryException, match="Query cannot be empty"):
+        SearchQuery().validate()
+
+
+def test_validate_rejects_overlong_query() -> None:
+    """Test that validate() rejects a query string longer than 4000 characters."""
+    query = SearchQuery().query("x" * 4001)
+    with pytest.raises(InvalidQueryException, match="too long"):
+        query.validate()
+
+
+def test_validate_accepts_filter_only_query() -> None:
+    """Test that a query with only filters (no terms) is valid."""
+    SearchQuery().free_full_text_only().validate()
+
+
+def test_invalid_query_exception_is_a_pubmed_exception() -> None:
+    """Test that InvalidQueryException participates in the exception hierarchy."""
+    with pytest.raises(PubMedException):
+        SearchQuery().validate()
+
+
+def test_optimize_removes_duplicates() -> None:
+    """Test that optimize() removes duplicate terms and filters."""
+    query = (
+        SearchQuery()
+        .query("cancer")
+        .query("cancer")
+        .free_full_text_only()
+        .free_full_text_only()
+        .optimize()
+    )
+    assert query.build() == "cancer AND free full text[sb]"
+
+
+def test_optimize_returns_same_instance() -> None:
+    """Test that optimize() mutates and returns the same builder instance."""
+    query = SearchQuery().query("cancer")
+    assert query.optimize() is query
+
+
+def test_get_stats_counts_terms_and_filters() -> None:
+    """Test that get_stats() reports term count, filter count, and complexity."""
+    query = SearchQuery().query("machine learning").published_after(2020).free_full_text_only()
+    terms, filters, complexity = query.get_stats()
+    assert terms == 1
+    assert filters == 2
+    assert complexity > 0
+
+
+def test_get_stats_on_empty_query() -> None:
+    """Test that get_stats() works on an empty query."""
+    assert SearchQuery().get_stats() == (0, 0, 1)

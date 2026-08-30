@@ -1,6 +1,31 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
-use pubmed_client::pubmed::{ArticleType, Language, SearchQuery as RustSearchQuery, SortOrder};
+use pubmed_client::pubmed::{
+    ArticleType, Language, PubDate, SearchQuery as RustSearchQuery, SortOrder,
+};
+
+// ================================================================================================
+// Date Input
+// ================================================================================================
+
+/// A date at year, month or day precision
+///
+/// Used by the date-range methods that accept more than a bare year. Passing a
+/// plain number is equivalent to `{ year }`.
+///
+/// @example
+/// ```typescript
+/// query.entryDateBetween({ year: 2023, month: 3 }, { year: 2024, month: 12, day: 31 });
+/// ```
+#[napi(object)]
+pub struct DateInput {
+    /// Four-digit year (1800-3000)
+    pub year: u32,
+    /// Month, 1-12
+    pub month: Option<u32>,
+    /// Day of month, 1-31 (ignored unless `month` is also set)
+    pub day: Option<u32>,
+}
 
 // ================================================================================================
 // Helper Functions
@@ -8,6 +33,34 @@ use pubmed_client::pubmed::{ArticleType, Language, SearchQuery as RustSearchQuer
 
 fn validate_year(year: u32) -> Result<()> {
     pubmed_client::validate_year(year).map_err(Error::from_reason)
+}
+
+/// Convert a JS date argument into a `PubDate`, validating each component.
+fn to_pub_date(date: Either<u32, DateInput>) -> Result<PubDate> {
+    let (year, month, day) = match date {
+        Either::A(year) => (year, None, None),
+        Either::B(input) => (input.year, input.month, input.day),
+    };
+    validate_year(year)?;
+
+    let Some(month) = month else {
+        return Ok(PubDate::new(year));
+    };
+    if !(1..=12).contains(&month) {
+        return Err(Error::from_reason(format!(
+            "Month must be between 1 and 12, got {month}"
+        )));
+    }
+
+    let Some(day) = day else {
+        return Ok(PubDate::with_month(year, month));
+    };
+    if !(1..=31).contains(&day) {
+        return Err(Error::from_reason(format!(
+            "Day must be between 1 and 31, got {day}"
+        )));
+    }
+    Ok(PubDate::with_day(year, month, day))
 }
 
 fn str_to_article_type(s: &str) -> Result<ArticleType> {
@@ -272,6 +325,92 @@ impl SearchQuery {
         Ok(self)
     }
 
+    /// Filter by publication date range (`[pdat]`)
+    ///
+    /// Unlike publishedBetween(), an omitted end year is left open-ended.
+    ///
+    /// @param startYear - Start year (inclusive)
+    /// @param endYear - End year (inclusive, optional)
+    /// @returns Self for method chaining
+    /// @throws Error if years are outside the valid range or reversed
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery()
+    ///   .query("immunotherapy")
+    ///   .dateRange(2020, 2023);
+    /// ```
+    #[napi]
+    pub fn date_range(&mut self, start_year: u32, end_year: Option<u32>) -> Result<&Self> {
+        validate_year(start_year)?;
+
+        if let Some(end) = end_year {
+            validate_year(end)?;
+            if start_year > end {
+                return Err(Error::from_reason(format!(
+                    "Start year ({start_year}) must be <= end year ({end})"
+                )));
+            }
+        }
+
+        self.inner = self.inner.clone().date_range(start_year, end_year);
+        Ok(self)
+    }
+
+    /// Filter by Entrez entry date (`[edat]`) — when the record was added to PubMed
+    ///
+    /// @param start - Start date: a year, or `{ year, month?, day? }`
+    /// @param end - End date (optional, same format). Omit for an open-ended range.
+    /// @returns Self for method chaining
+    /// @throws Error if a date component is outside its valid range
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery()
+    ///   .query("recent discoveries")
+    ///   .entryDateBetween(2023, 2024);
+    ///
+    /// const precise = new SearchQuery()
+    ///   .query("outbreak")
+    ///   .entryDateBetween({ year: 2023, month: 3 }, { year: 2023, month: 12, day: 31 });
+    /// ```
+    #[napi]
+    pub fn entry_date_between(
+        &mut self,
+        start: Either<u32, DateInput>,
+        end: Option<Either<u32, DateInput>>,
+    ) -> Result<&Self> {
+        let start = to_pub_date(start)?;
+        let end = end.map(to_pub_date).transpose()?;
+        self.inner = self.inner.clone().entry_date_between(start, end);
+        Ok(self)
+    }
+
+    /// Filter by record modification date (`[mdat]`) — when the record was last updated
+    ///
+    /// @param start - Start date: a year, or `{ year, month?, day? }`
+    /// @param end - End date (optional, same format). Omit for an open-ended range.
+    /// @returns Self for method chaining
+    /// @throws Error if a date component is outside its valid range
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery()
+    ///   .query("updated articles")
+    ///   .modificationDateBetween(2023);
+    /// ```
+    #[napi]
+    pub fn modification_date_between(
+        &mut self,
+        start: Either<u32, DateInput>,
+        end: Option<Either<u32, DateInput>>,
+    ) -> Result<&Self> {
+        let start = to_pub_date(start)?;
+        let end = end.map(to_pub_date).transpose()?;
+        self.inner = self.inner.clone().modification_date_between(start, end);
+        Ok(self)
+    }
+
     // ============================================================================================
     // Article Type and Language Filtering Methods
     // ============================================================================================
@@ -512,6 +651,64 @@ impl SearchQuery {
         self
     }
 
+    /// Filter by journal abbreviation
+    ///
+    /// Uses the same `[ta]` field as journal(); pass the NLM title abbreviation.
+    ///
+    /// @param abbreviation - Journal abbreviation (e.g. "Nat Med")
+    /// @returns Self for method chaining
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery()
+    ///   .query("stem cells")
+    ///   .journalAbbreviation("Nat Med");
+    /// ```
+    #[napi]
+    pub fn journal_abbreviation(&mut self, abbreviation: String) -> &Self {
+        let trimmed = abbreviation.trim();
+        if !trimmed.is_empty() {
+            self.inner = self.inner.clone().journal_abbreviation(trimmed);
+        }
+        self
+    }
+
+    /// Filter by ISBN
+    ///
+    /// @param isbn - ISBN to search for
+    /// @returns Self for method chaining
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery().isbn("978-0123456789");
+    /// ```
+    #[napi]
+    pub fn isbn(&mut self, isbn: String) -> &Self {
+        let trimmed = isbn.trim();
+        if !trimmed.is_empty() {
+            self.inner = self.inner.clone().isbn(trimmed);
+        }
+        self
+    }
+
+    /// Filter by ISSN
+    ///
+    /// @param issn - ISSN to search for
+    /// @returns Self for method chaining
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery().issn("1234-5678");
+    /// ```
+    #[napi]
+    pub fn issn(&mut self, issn: String) -> &Self {
+        let trimmed = issn.trim();
+        if !trimmed.is_empty() {
+            self.inner = self.inner.clone().issn(trimmed);
+        }
+        self
+    }
+
     // ============================================================================================
     // Advanced Search Methods (MeSH, Author, etc.)
     // ============================================================================================
@@ -748,6 +945,26 @@ impl SearchQuery {
         self
     }
 
+    /// Filter by organism MeSH term
+    ///
+    /// @param organism - Scientific or common organism name (e.g. "Mus musculus", "Mice")
+    /// @returns Self for method chaining
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery()
+    ///   .query("gene expression")
+    ///   .organismMesh("Mus musculus");
+    /// ```
+    #[napi]
+    pub fn organism_mesh(&mut self, organism: String) -> &Self {
+        let trimmed = organism.trim();
+        if !trimmed.is_empty() {
+            self.inner = self.inner.clone().organism_mesh(trimmed);
+        }
+        self
+    }
+
     /// Add a custom filter
     ///
     /// @param filter - Custom filter string in PubMed syntax
@@ -881,5 +1098,53 @@ impl SearchQuery {
         let sort = str_to_sort_order(&sort_order)?;
         self.inner = self.inner.clone().sort(sort);
         Ok(self)
+    }
+
+    // ============================================================================================
+    // Validation and Optimization
+    // ============================================================================================
+
+    /// Validate the query structure and parameters
+    ///
+    /// Checks that the query is non-empty, the limit is in range, the built
+    /// string is under 4,000 characters, and parentheses are balanced.
+    ///
+    /// @returns Self for method chaining
+    /// @throws Error describing the first problem found
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery().query("covid-19");
+    /// query.validate(); // does not throw
+    ///
+    /// new SearchQuery().validate(); // throws: "Query cannot be empty"
+    /// ```
+    #[napi]
+    pub fn validate(&self) -> Result<&Self> {
+        self.inner
+            .validate()
+            .map_err(|e| Error::from_reason(e.to_string()))?;
+        Ok(self)
+    }
+
+    /// Optimize the query in place
+    ///
+    /// Sorts and de-duplicates terms and filters and drops empty ones. Note that
+    /// this reorders the built query string.
+    ///
+    /// @returns Self for method chaining
+    ///
+    /// @example
+    /// ```typescript
+    /// const query = new SearchQuery()
+    ///   .query("covid-19")
+    ///   .query("covid-19")
+    ///   .optimize();
+    /// query.build(); // "covid-19"
+    /// ```
+    #[napi]
+    pub fn optimize(&mut self) -> &Self {
+        self.inner = self.inner.clone().optimize();
+        self
     }
 }

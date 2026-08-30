@@ -41,8 +41,11 @@ impl PubMedClient {
     }
 
     /// Create a new PubMed client with custom configuration
+    ///
+    /// @param config - Client configuration
+    /// @throws Error if `rateLimit` is not a positive number
     #[napi(factory)]
-    pub fn with_config(config: Config) -> Self {
+    pub fn with_config(config: Config) -> Result<Self> {
         let mut client_config = ClientConfig::new();
 
         if let Some(api_key) = config.api_key {
@@ -57,10 +60,23 @@ impl PubMedClient {
         if let Some(timeout) = config.timeout_seconds {
             client_config = client_config.with_timeout_seconds(timeout as u64);
         }
-
-        PubMedClient {
-            client: Arc::new(Client::with_config(client_config)),
+        if let Some(rate_limit) = config.rate_limit {
+            // `ClientConfig::with_rate_limit` silently ignores non-positive rates;
+            // surface the mistake instead of leaving the default in place.
+            if !rate_limit.is_finite() || rate_limit <= 0.0 {
+                return Err(Error::from_reason(format!(
+                    "rateLimit must be a positive number, got {rate_limit}"
+                )));
+            }
+            client_config = client_config.with_rate_limit(rate_limit);
         }
+        if config.cache.unwrap_or(false) {
+            client_config = client_config.with_cache();
+        }
+
+        Ok(PubMedClient {
+            client: Arc::new(Client::with_config(client_config)),
+        })
     }
 
     /// Search PubMed and fetch article metadata

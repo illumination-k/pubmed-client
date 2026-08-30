@@ -102,6 +102,65 @@ describe('SearchQuery', () => {
       const query = new SearchQuery().query('cancer')
       expect(() => query.publishedBetween(2024, 2020)).toThrow()
     })
+
+    it('should filter by date range', () => {
+      const query = new SearchQuery().query('immunotherapy').dateRange(2020, 2023)
+
+      const result = query.build()
+      expect(result).toContain('2020:2023[pdat]')
+    })
+
+    it('should leave dateRange open-ended without an end year', () => {
+      const query = new SearchQuery().query('immunotherapy').dateRange(2020)
+
+      const result = query.build()
+      expect(result).toContain('2020:3000[pdat]')
+    })
+
+    it('should validate dateRange years', () => {
+      const query = new SearchQuery().query('cancer')
+      expect(() => query.dateRange(1700)).toThrow()
+      expect(() => query.dateRange(2020, 3500)).toThrow()
+      expect(() => query.dateRange(2024, 2020)).toThrow()
+    })
+
+    it('should filter by entry date between years', () => {
+      const query = new SearchQuery().query('recent discoveries').entryDateBetween(2023, 2024)
+
+      const result = query.build()
+      expect(result).toContain('2023:2024[edat]')
+    })
+
+    it('should leave entryDateBetween open-ended without an end date', () => {
+      const query = new SearchQuery().query('recent discoveries').entryDateBetween(2023)
+
+      const result = query.build()
+      expect(result).toContain('2023:3000[edat]')
+    })
+
+    it('should filter by entry date with month and day precision', () => {
+      const query = new SearchQuery()
+        .query('outbreak')
+        .entryDateBetween({ year: 2023, month: 3 }, { year: 2023, month: 12, day: 31 })
+
+      const result = query.build()
+      expect(result).toContain('2023/03:2023/12/31[edat]')
+    })
+
+    it('should filter by modification date', () => {
+      const query = new SearchQuery().query('updated articles').modificationDateBetween(2023, 2024)
+
+      const result = query.build()
+      expect(result).toContain('2023:2024[mdat]')
+    })
+
+    it('should validate date components', () => {
+      const query = new SearchQuery().query('cancer')
+      expect(() => query.entryDateBetween({ year: 1700 })).toThrow()
+      expect(() => query.entryDateBetween({ year: 2023, month: 13 })).toThrow()
+      expect(() => query.entryDateBetween({ year: 2023, month: 1, day: 32 })).toThrow()
+      expect(() => query.modificationDateBetween(2023, { year: 2024, month: 0 })).toThrow()
+    })
   })
 
   describe('Article Type and Language Filtering', () => {
@@ -226,6 +285,33 @@ describe('SearchQuery', () => {
       const result = query.build()
       expect(result).toContain('R01AI123456[gr]')
     })
+
+    it('should filter by journal abbreviation', () => {
+      const query = new SearchQuery().query('stem cells').journalAbbreviation('Nat Med')
+
+      const result = query.build()
+      expect(result).toContain('Nat Med[ta]')
+    })
+
+    it('should filter by ISBN', () => {
+      const query = new SearchQuery().isbn('978-0123456789')
+
+      const result = query.build()
+      expect(result).toContain('978-0123456789[ISBN]')
+    })
+
+    it('should filter by ISSN', () => {
+      const query = new SearchQuery().issn('1234-5678')
+
+      const result = query.build()
+      expect(result).toContain('1234-5678[ISSN]')
+    })
+
+    it('should ignore blank field values', () => {
+      const query = new SearchQuery().query('cancer').isbn('  ').issn('').journalAbbreviation('   ')
+
+      expect(query.build()).toBe('cancer')
+    })
   })
 
   describe('Advanced Search Methods', () => {
@@ -315,11 +401,47 @@ describe('SearchQuery', () => {
       expect(result).toContain('Child[mh]')
     })
 
+    it('should filter by organism MeSH term', () => {
+      const query = new SearchQuery().query('gene expression').organismMesh('Mus musculus')
+
+      const result = query.build()
+      expect(result).toContain('Mus musculus[mh]')
+    })
+
     it('should add custom filter', () => {
       const query = new SearchQuery().query('research').customFilter('humans[mh]')
 
       const result = query.build()
       expect(result).toContain('humans[mh]')
+    })
+  })
+
+  describe('Validation and Optimization', () => {
+    it('should accept a valid query', () => {
+      const query = new SearchQuery().query('covid-19')
+      expect(() => query.validate()).not.toThrow()
+    })
+
+    it('should reject an empty query', () => {
+      const query = new SearchQuery()
+      expect(() => query.validate()).toThrow(/empty/i)
+    })
+
+    it('should be chainable', () => {
+      const query = new SearchQuery().query('covid-19')
+      expect(query.validate().build()).toBe('covid-19')
+    })
+
+    it('should de-duplicate terms and filters with optimize()', () => {
+      const query = new SearchQuery()
+        .query('covid-19')
+        .query('covid-19')
+        .publishedInYear(2024)
+        .publishedInYear(2024)
+        .optimize()
+
+      const result = query.build()
+      expect(result).toBe('covid-19 AND 2024[pdat]')
     })
   })
 

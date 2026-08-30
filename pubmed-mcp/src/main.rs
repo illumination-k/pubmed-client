@@ -8,7 +8,9 @@ use std::collections::HashSet;
 use std::sync::Arc;
 use tracing::info;
 
+mod config;
 mod tools;
+use config::ClientArgs;
 use tools::PubMedServer;
 
 #[derive(Parser)]
@@ -20,12 +22,15 @@ struct Args {
 
     /// Tools to enable, comma-separated (default: all).
     /// Possible values: search, markdown, citmatch, gquery, espell, summary,
-    /// related-articles, citations, pmc-links, list-databases, database-info,
-    /// fulltext, figures, convert-id, export, europe-pmc-search,
-    /// europe-pmc-fulltext, europe-pmc-references, europe-pmc-citations,
-    /// europe-pmc-database-links
+    /// articles, related-articles, citations, pmc-links, list-databases,
+    /// database-info, fulltext, figures, convert-id, export,
+    /// europe-pmc-search, europe-pmc-fulltext, europe-pmc-references,
+    /// europe-pmc-citations, europe-pmc-database-links
     #[arg(short, long, value_delimiter = ',', value_enum)]
     tools: Vec<ToolName>,
+
+    #[command(flatten)]
+    client: ClientArgs,
 }
 
 #[derive(Clone, Debug, ValueEnum)]
@@ -36,6 +41,7 @@ enum ToolName {
     Gquery,
     Espell,
     Summary,
+    Articles,
     RelatedArticles,
     Citations,
     PmcLinks,
@@ -61,6 +67,7 @@ impl ToolName {
             ToolName::Gquery => "global_query",
             ToolName::Espell => "spell_check",
             ToolName::Summary => "fetch_summaries",
+            ToolName::Articles => "fetch_articles",
             ToolName::RelatedArticles => "get_related_articles",
             ToolName::Citations => "get_citations",
             ToolName::PmcLinks => "get_pmc_links",
@@ -139,6 +146,16 @@ impl PubMedServer {
         params: Parameters<tools::summary::SummaryRequest>,
     ) -> Result<CallToolResult, ErrorData> {
         tools::summary::fetch_summaries(self, params).await
+    }
+
+    #[tool(
+        description = "Fetch complete PubMed records by PubMed ID (PMID) using the EFetch API. Returns the full abstract, all authors (optionally with affiliations), journal details, MeSH headings, substances, keywords, article types, and identifiers. Use this when you already have PMIDs and need full metadata; search_pubmed only returns a 200-character abstract preview and fetch_summaries omits abstracts and MeSH terms entirely."
+    )]
+    async fn fetch_articles(
+        &self,
+        params: Parameters<tools::articles::ArticlesRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::articles::fetch_articles(self, params).await
     }
 
     #[tool(
@@ -320,8 +337,17 @@ async fn main() -> Result<()> {
         ))
     };
 
+    let client_config = args.client.build_config()?;
+    info!(
+        api_key = args.client.api_key.is_some(),
+        email = args.client.email.is_some(),
+        tool = %args.client.tool,
+        cache = args.client.cache_enabled(),
+        "Client configured"
+    );
+
     if let Some(port) = args.port {
-        let shared_client = Arc::new(pubmed_client::Client::new());
+        let shared_client = Arc::new(pubmed_client::Client::with_config(client_config));
         let et = enabled_tools.clone();
 
         use rmcp::transport::streamable_http_server::{
@@ -342,7 +368,7 @@ async fn main() -> Result<()> {
         axum::serve(listener, router).await?;
     } else {
         let service = tools::PubMedServer::with_options(
-            Arc::new(pubmed_client::Client::new()),
+            Arc::new(pubmed_client::Client::with_config(client_config)),
             enabled_tools.as_deref(),
         )
         .serve(stdio())
@@ -352,4 +378,85 @@ async fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::CommandFactory;
+
+    /// Catches clap definition mistakes (duplicate long names, a `--tool`
+    /// shadowed by `--tools`, bad defaults) that would otherwise only show up
+    /// as a panic when a user runs the server.
+    #[test]
+    fn cli_definition_is_valid() {
+        Args::command().debug_assert();
+    }
+
+    /// The container smoke test in `ci-docker.yml` greps `--help` for this
+    /// string. Flattening an `Args` struct silently copies *its* doc comment
+    /// onto the parent command's `about`, which drops the server's own
+    /// description from the first line of `--help`.
+    #[test]
+    fn help_output_keeps_the_server_description() {
+        let help = Args::command().render_long_help().to_string();
+        assert!(
+            help.starts_with("PubMed MCP Server"),
+            "--help must open with the server description, got:\n{help}"
+        );
+    }
+
+    /// `--tools` filters by the *registered* tool name, so a `ToolName`
+    /// whose `as_str()` drifts from its `#[tool]` method silently removes
+    /// every tool instead of selecting one. Check the whole enum, not just
+    /// the tool of the day.
+    #[test]
+    fn every_tool_name_matches_a_registered_tool() {
+        let registered: Vec<String> = PubMedServer::tool_router()
+            .list_all()
+            .into_iter()
+            .map(|tool| tool.name.to_string())
+            .collect();
+
+        for variant in ToolName::value_variants() {
+            assert!(
+                registered.contains(&variant.as_str().to_string()),
+                "{:?} maps to `{}`, which no #[tool] method defines; registered: {registered:?}",
+                variant,
+                variant.as_str()
+            );
+        }
+
+        assert_eq!(
+            registered.len(),
+            ToolName::value_variants().len(),
+            "every registered tool should be selectable via --tools; registered: {registered:?}"
+        );
+    }
+
+    #[test]
+    fn client_options_are_parsed_alongside_the_server_options() {
+        let args = Args::try_parse_from([
+            "pubmed-mcp",
+            "--port",
+            "8080",
+            "--tools",
+            "search,markdown",
+            "--api-key",
+            "secret",
+            "--email",
+            "researcher@example.edu",
+            "--tool",
+            "my-server",
+            "--cache",
+        ])
+        .expect("server and client options should coexist");
+
+        assert_eq!(args.port, Some(8080));
+        assert_eq!(args.tools.len(), 2);
+        assert_eq!(args.client.api_key.as_deref(), Some("secret"));
+        assert_eq!(args.client.email.as_deref(), Some("researcher@example.edu"));
+        assert_eq!(args.client.tool, "my-server");
+        assert!(args.client.cache);
+    }
 }
