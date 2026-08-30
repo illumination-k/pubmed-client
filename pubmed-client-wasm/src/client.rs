@@ -1,6 +1,5 @@
 use pubmed_client::{
-    Client, EuropePmcId, EuropePmcSearchOptions, EuropePmcSource, ResultType, config::ClientConfig,
-    pmc::PmcArticle,
+    Client, EuropePmcId, EuropePmcSearchOptions, ResultType, config::ClientConfig, pmc::PmcArticle,
 };
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
@@ -506,26 +505,7 @@ impl WasmPubMedClient {
 /// * a bare id alone — a `PMC`-prefixed id implies the `PMC` source, anything
 ///   else is treated as a PubMed (`MED`) record.
 fn resolve_europe_pmc_id(id: &str, source: Option<String>) -> Result<EuropePmcId, JsValue> {
-    let id = id.trim();
-    if id.is_empty() {
-        return Err(JsValue::from(js_sys::Error::new("id must not be empty")));
-    }
-
-    if id.contains('/') {
-        return id.parse::<EuropePmcId>().map_err(to_js_err);
-    }
-
-    let source = match source.as_deref() {
-        Some(source) if !source.trim().is_empty() => EuropePmcSource::from(source),
-        _ if id.to_ascii_uppercase().starts_with("PMC") => EuropePmcSource::Pmc,
-        _ => EuropePmcSource::Med,
-    };
-
-    if source == EuropePmcSource::Pmc {
-        return EuropePmcId::pmc(id).map_err(to_js_err);
-    }
-
-    Ok(EuropePmcId::new(source, id))
+    EuropePmcId::resolve(id, source.as_deref()).map_err(to_js_err)
 }
 
 /// Map a `resultType` string onto the level of detail Europe PMC understands.

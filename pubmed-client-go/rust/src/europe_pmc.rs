@@ -10,7 +10,7 @@ use std::path::Path;
 
 use serde::Deserialize;
 
-use pubmed_client::{EuropePmcId, EuropePmcSearchOptions, EuropePmcSource, ResultType};
+use pubmed_client::{EuropePmcId, EuropePmcSearchOptions, ResultType};
 
 use crate::cancel::{PubmedCancel, block_on};
 use crate::client::{PubmedClient, borrow_client};
@@ -74,29 +74,7 @@ fn parse_result_type(value: &str) -> ShimResult<ResultType> {
 /// * a bare id alone — a `PMC`-prefixed id implies the `PMC` source, anything
 ///   else is treated as a PubMed (`MED`) record.
 fn resolve_id(id: &str, source: Option<&str>) -> ShimResult<EuropePmcId> {
-    let id = id.trim();
-    if id.is_empty() {
-        return Err(ShimError::invalid_argument("id must not be empty"));
-    }
-
-    if id.contains('/') {
-        return id
-            .parse::<EuropePmcId>()
-            .map_err(|e| ShimError::invalid_argument(format!("invalid Europe PMC id: {e}")));
-    }
-
-    let source = match source {
-        Some(source) if !source.trim().is_empty() => EuropePmcSource::from(source),
-        _ if id.to_ascii_uppercase().starts_with("PMC") => EuropePmcSource::Pmc,
-        _ => EuropePmcSource::Med,
-    };
-
-    if source == EuropePmcSource::Pmc {
-        return EuropePmcId::pmc(id)
-            .map_err(|e| ShimError::invalid_argument(format!("invalid PMC id: {e}")));
-    }
-
-    Ok(EuropePmcId::new(source, id))
+    EuropePmcId::resolve(id, source).map_err(|e| ShimError::invalid_argument(e.to_string()))
 }
 
 /// Search Europe PMC across pages until `limit` records are collected. Returns
@@ -326,6 +304,7 @@ pub unsafe extern "C" fn europe_pmc_download_supplementary_files(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pubmed_client::EuropePmcSource;
 
     #[test]
     fn bare_pmc_id_defaults_to_pmc_source() {

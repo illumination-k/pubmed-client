@@ -10,9 +10,7 @@ use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
 use serde::Deserialize;
 use tracing::info;
 
-use pubmed_client::{
-    EuropePmcId, EuropePmcSearchOptions, EuropePmcSource, ResultType as EuropePmcResultType,
-};
+use pubmed_client::{EuropePmcId, EuropePmcSearchOptions, ResultType as EuropePmcResultType};
 
 use super::common::{internal_error, invalid_params, text_result};
 
@@ -55,29 +53,7 @@ const ABSTRACT_PREVIEW_CHARS: usize = 300;
 /// * a bare id alone, where a `PMC`-prefixed id implies the `PMC` source and
 ///   anything else is treated as a PubMed (`MED`) record.
 fn resolve_id(source: Option<&str>, id: &str) -> Result<EuropePmcId, ErrorData> {
-    let id = id.trim();
-    if id.is_empty() {
-        return Err(invalid_params("`id` must not be empty"));
-    }
-
-    if id.contains('/') {
-        return id
-            .parse::<EuropePmcId>()
-            .map_err(|e| invalid_params(format!("Invalid Europe PMC id {id:?}: {e}")));
-    }
-
-    let source = match source {
-        Some(source) if !source.trim().is_empty() => EuropePmcSource::from(source),
-        _ if id.to_ascii_uppercase().starts_with("PMC") => EuropePmcSource::Pmc,
-        _ => EuropePmcSource::Med,
-    };
-
-    if source == EuropePmcSource::Pmc {
-        return EuropePmcId::pmc(id)
-            .map_err(|e| invalid_params(format!("Invalid PMC id {id:?}: {e}")));
-    }
-
-    Ok(EuropePmcId::new(source, id))
+    EuropePmcId::resolve(id, source).map_err(|e| invalid_params(e.to_string()))
 }
 
 /// Truncate `text` to at most `limit` characters, appending an ellipsis.
@@ -519,6 +495,8 @@ pub async fn europe_pmc_database_links(
 
 #[cfg(test)]
 mod tests {
+    use pubmed_client::EuropePmcSource;
+
     use super::*;
 
     #[test]

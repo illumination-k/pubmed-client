@@ -9,7 +9,7 @@ use napi_derive::napi;
 
 use pubmed_client::{
     EuropePmcCitation, EuropePmcDatabaseLink, EuropePmcDbCrossReferenceInfo, EuropePmcId,
-    EuropePmcReference, EuropePmcResult, EuropePmcSearchResponse, EuropePmcSource, ResultType,
+    EuropePmcReference, EuropePmcResult, EuropePmcSearchResponse, ResultType,
 };
 
 /// Resolve the `(source, id)` pair a call addresses.
@@ -23,32 +23,7 @@ use pubmed_client::{
 /// * a bare id alone — a `PMC`-prefixed id implies the `PMC` source, anything
 ///   else is treated as a PubMed (`MED`) record.
 pub(crate) fn resolve_id(id: &str, source: Option<&str>) -> Result<EuropePmcId> {
-    let id = id.trim();
-    if id.is_empty() {
-        return Err(Error::new(
-            Status::InvalidArg,
-            "id must not be empty".to_string(),
-        ));
-    }
-
-    if id.contains('/') {
-        return id
-            .parse::<EuropePmcId>()
-            .map_err(|e| Error::new(Status::InvalidArg, format!("invalid Europe PMC id: {e}")));
-    }
-
-    let source = match source {
-        Some(source) if !source.trim().is_empty() => EuropePmcSource::from(source),
-        _ if id.to_ascii_uppercase().starts_with("PMC") => EuropePmcSource::Pmc,
-        _ => EuropePmcSource::Med,
-    };
-
-    if source == EuropePmcSource::Pmc {
-        return EuropePmcId::pmc(id)
-            .map_err(|e| Error::new(Status::InvalidArg, format!("invalid PMC id: {e}")));
-    }
-
-    Ok(EuropePmcId::new(source, id))
+    EuropePmcId::resolve(id, source).map_err(|e| Error::new(Status::InvalidArg, e.to_string()))
 }
 
 /// Map a `resultType` string onto the level of detail Europe PMC understands.

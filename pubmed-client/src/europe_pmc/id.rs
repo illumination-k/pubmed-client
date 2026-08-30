@@ -125,6 +125,69 @@ impl EuropePmcId {
         }
     }
 
+    /// Resolve the `(source, id)` pair a caller addressed.
+    ///
+    /// Europe PMC identifies every record by a source database plus an id, but
+    /// requiring callers to spell both out for the common cases would be
+    /// noise, so three forms are accepted:
+    ///
+    /// * a fully-qualified `"SOURCE/ID"` string (e.g. `"PPR/PPR123456"`),
+    ///   which takes precedence over any `source` argument;
+    /// * an explicit `source` plus a bare id;
+    /// * a bare id alone — a `PMC`-prefixed id implies the `PMC` source,
+    ///   anything else is treated as a PubMed (`MED`) record.
+    ///
+    /// Every language binding routes its own id arguments through this so the
+    /// three forms mean the same thing on every surface.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the id is blank, or if a qualified or `PMC`-sourced
+    /// id is malformed.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pubmed_client::{EuropePmcId, EuropePmcSource};
+    ///
+    /// // A bare PMC id implies the PMC source.
+    /// let id = EuropePmcId::resolve("PMC3258128", None)?;
+    /// assert_eq!(id.to_string(), "PMC/PMC3258128");
+    ///
+    /// // A bare non-PMC id is treated as a PubMed record.
+    /// let id = EuropePmcId::resolve("33515491", None)?;
+    /// assert_eq!(id.to_string(), "MED/33515491");
+    ///
+    /// // A qualified id wins over the source argument.
+    /// let id = EuropePmcId::resolve("PPR/PPR123456", Some("MED"))?;
+    /// assert_eq!(id.source, EuropePmcSource::Ppr);
+    /// # Ok::<(), pubmed_client::PubMedError>(())
+    /// ```
+    pub fn resolve(id: &str, source: Option<&str>) -> Result<Self> {
+        let id = id.trim();
+        if id.is_empty() {
+            return Err(PubMedError::InvalidQuery(
+                "Europe PMC id must not be empty".to_string(),
+            ));
+        }
+
+        if id.contains('/') {
+            return id.parse();
+        }
+
+        let source = match source {
+            Some(source) if !source.trim().is_empty() => EuropePmcSource::from(source),
+            _ if id.to_ascii_uppercase().starts_with("PMC") => EuropePmcSource::Pmc,
+            _ => EuropePmcSource::Med,
+        };
+
+        if source == EuropePmcSource::Pmc {
+            return Self::pmc(id);
+        }
+
+        Ok(Self::new(source, id))
+    }
+
     /// Return the PMC id (`PMCnnn`) for this address if it is PMC-sourced.
     pub(crate) fn pmcid(&self) -> Option<String> {
         match self.source {
@@ -206,5 +269,45 @@ mod tests {
 
         assert!("nodelimiter".parse::<EuropePmcId>().is_err());
         assert!("PMC/".parse::<EuropePmcId>().is_err());
+    }
+
+    #[test]
+    fn test_resolve_bare_pmc_id_defaults_to_pmc_source() {
+        let id = EuropePmcId::resolve("PMC3258128", None).unwrap();
+        assert_eq!(id.to_string(), "PMC/PMC3258128");
+    }
+
+    #[test]
+    fn test_resolve_bare_numeric_id_defaults_to_med_source() {
+        let id = EuropePmcId::resolve("33515491", None).unwrap();
+        assert_eq!(id.to_string(), "MED/33515491");
+    }
+
+    #[test]
+    fn test_resolve_explicit_pmc_source_normalizes_a_bare_number() {
+        assert_eq!(
+            EuropePmcId::resolve("3258128", Some("pmc"))
+                .unwrap()
+                .to_string(),
+            "PMC/PMC3258128"
+        );
+    }
+
+    #[test]
+    fn test_resolve_qualified_id_wins_over_source_argument() {
+        let id = EuropePmcId::resolve("PPR/PPR123456", Some("MED")).unwrap();
+        assert_eq!(id.source, EuropePmcSource::Ppr);
+    }
+
+    #[test]
+    fn test_resolve_blank_source_falls_back_to_the_bare_id_rule() {
+        let id = EuropePmcId::resolve("PMC3258128", Some("   ")).unwrap();
+        assert_eq!(id.source, EuropePmcSource::Pmc);
+    }
+
+    #[test]
+    fn test_resolve_rejects_invalid_ids() {
+        assert!(EuropePmcId::resolve("   ", None).is_err());
+        assert!(EuropePmcId::resolve("MED/", None).is_err());
     }
 }
