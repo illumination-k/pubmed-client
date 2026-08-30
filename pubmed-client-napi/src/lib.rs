@@ -13,4 +13,4 @@ pub use models::{
     EPostResult, ExtractedFigure, Figure, FullTextArticle, GlobalQueryResults, MarkdownOptions,
     OaSubsetInfo, PmcLinks, Reference, RelatedArticles, Section, SpellCheckResult, Summary,
 };
-pub use query::SearchQuery;
+pub use query::{DateInput, SearchQuery};

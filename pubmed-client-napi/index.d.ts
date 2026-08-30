@@ -4,7 +4,12 @@
 export declare class PubMedClient {
   /** Create a new PubMed client with default configuration */
   constructor()
-  /** Create a new PubMed client with custom configuration */
+  /**
+   * Create a new PubMed client with custom configuration
+   *
+   * @param config - Client configuration
+   * @throws Error if `rateLimit` is not a positive number
+   */
   static withConfig(config: Config): PubMedClient
   /**
    * Search PubMed and fetch article metadata
@@ -429,6 +434,60 @@ export declare class SearchQuery {
    */
   publishedBefore(year: number): this
   /**
+   * Filter by publication date range (`[pdat]`)
+   *
+   * Unlike publishedBetween(), an omitted end year is left open-ended.
+   *
+   * @param startYear - Start year (inclusive)
+   * @param endYear - End year (inclusive, optional)
+   * @returns Self for method chaining
+   * @throws Error if years are outside the valid range or reversed
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery()
+   *   .query("immunotherapy")
+   *   .dateRange(2020, 2023);
+   * ```
+   */
+  dateRange(startYear: number, endYear?: number | undefined | null): this
+  /**
+   * Filter by Entrez entry date (`[edat]`) — when the record was added to PubMed
+   *
+   * @param start - Start date: a year, or `{ year, month?, day? }`
+   * @param end - End date (optional, same format). Omit for an open-ended range.
+   * @returns Self for method chaining
+   * @throws Error if a date component is outside its valid range
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery()
+   *   .query("recent discoveries")
+   *   .entryDateBetween(2023, 2024);
+   *
+   * const precise = new SearchQuery()
+   *   .query("outbreak")
+   *   .entryDateBetween({ year: 2023, month: 3 }, { year: 2023, month: 12, day: 31 });
+   * ```
+   */
+  entryDateBetween(start: number | DateInput, end?: number | DateInput | undefined | null): this
+  /**
+   * Filter by record modification date (`[mdat]`) — when the record was last updated
+   *
+   * @param start - Start date: a year, or `{ year, month?, day? }`
+   * @param end - End date (optional, same format). Omit for an open-ended range.
+   * @returns Self for method chaining
+   * @throws Error if a date component is outside its valid range
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery()
+   *   .query("updated articles")
+   *   .modificationDateBetween(2023);
+   * ```
+   */
+  modificationDateBetween(start: number | DateInput, end?: number | DateInput | undefined | null): this
+  /**
    * Filter by a single article type
    *
    * @param typeName - Article type (case-insensitive)
@@ -596,6 +655,46 @@ export declare class SearchQuery {
    */
   grantNumber(grantNumber: string): this
   /**
+   * Filter by journal abbreviation
+   *
+   * Uses the same `[ta]` field as journal(); pass the NLM title abbreviation.
+   *
+   * @param abbreviation - Journal abbreviation (e.g. "Nat Med")
+   * @returns Self for method chaining
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery()
+   *   .query("stem cells")
+   *   .journalAbbreviation("Nat Med");
+   * ```
+   */
+  journalAbbreviation(abbreviation: string): this
+  /**
+   * Filter by ISBN
+   *
+   * @param isbn - ISBN to search for
+   * @returns Self for method chaining
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery().isbn("978-0123456789");
+   * ```
+   */
+  isbn(isbn: string): this
+  /**
+   * Filter by ISSN
+   *
+   * @param issn - ISSN to search for
+   * @returns Self for method chaining
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery().issn("1234-5678");
+   * ```
+   */
+  issn(issn: string): this
+  /**
    * Filter by MeSH term
    *
    * @param term - MeSH term to filter by
@@ -758,6 +857,20 @@ export declare class SearchQuery {
    */
   ageGroup(ageGroup: string): this
   /**
+   * Filter by organism MeSH term
+   *
+   * @param organism - Scientific or common organism name (e.g. "Mus musculus", "Mice")
+   * @returns Self for method chaining
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery()
+   *   .query("gene expression")
+   *   .organismMesh("Mus musculus");
+   * ```
+   */
+  organismMesh(organism: string): this
+  /**
    * Add a custom filter
    *
    * @param filter - Custom filter string in PubMed syntax
@@ -859,6 +972,42 @@ export declare class SearchQuery {
    * ```
    */
   sort(sortOrder: string): this
+  /**
+   * Validate the query structure and parameters
+   *
+   * Checks that the query is non-empty, the limit is in range, the built
+   * string is under 4,000 characters, and parentheses are balanced.
+   *
+   * @returns Self for method chaining
+   * @throws Error describing the first problem found
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery().query("covid-19");
+   * query.validate(); // does not throw
+   *
+   * new SearchQuery().validate(); // throws: "Query cannot be empty"
+   * ```
+   */
+  validate(): this
+  /**
+   * Optimize the query in place
+   *
+   * Sorts and de-duplicates terms and filters and drops empty ones. Note that
+   * this reorders the built query string.
+   *
+   * @returns Self for method chaining
+   *
+   * @example
+   * ```typescript
+   * const query = new SearchQuery()
+   *   .query("covid-19")
+   *   .query("covid-19")
+   *   .optimize();
+   * query.build(); // "covid-19"
+   * ```
+   */
+  optimize(): this
 }
 
 /** PubMed article metadata */
@@ -961,6 +1110,15 @@ export interface Config {
   tool?: string
   /** Request timeout in seconds */
   timeoutSeconds?: number
+  /**
+   * Requests per second allowed by the rate limiter
+   *
+   * Defaults to the NCBI limits (3/s without an API key, 10/s with one).
+   * Must be a positive number.
+   */
+  rateLimit?: number
+  /** Enable the in-memory response cache with its default settings */
+  cache?: boolean
 }
 
 /** Record count for a single NCBI database from the EGQuery API */
@@ -989,6 +1147,26 @@ export interface DatabaseInfo {
   count?: number
   /** Last update timestamp if available */
   lastUpdate?: string
+}
+
+/**
+ * A date at year, month or day precision
+ *
+ * Used by the date-range methods that accept more than a bare year. Passing a
+ * plain number is equivalent to `{ year }`.
+ *
+ * @example
+ * ```typescript
+ * query.entryDateBetween({ year: 2023, month: 3 }, { year: 2024, month: 12, day: 31 });
+ * ```
+ */
+export interface DateInput {
+  /** Four-digit year (1800-3000) */
+  year: number
+  /** Month, 1-12 */
+  month?: number
+  /** Day of month, 1-31 (ignored unless `month` is also set) */
+  day?: number
 }
 
 /**
