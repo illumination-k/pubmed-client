@@ -343,10 +343,14 @@ workspace member, or the manifest fails to load). `ARG RUST_VERSION` must match 
 
 ```
 src/
-  main.rs              # Server entry point
+  main.rs              # Server entry point (CLI args, transport selection)
+  config.rs            # ClientArgs — CLI flags / env vars -> ClientConfig
+                       # NCBI_API_KEY / NCBI_EMAIL / NCBI_TOOL / NCBI_RATE_LIMIT
+                       # PUBMED_MCP_TIMEOUT / _MAX_RETRIES / _BASE_URL / _CACHE*
   tools/
     mod.rs             # PubMedServer definition
     search.rs          # search_pubmed tool (with study type/text availability filters)
+    articles.rs        # fetch_articles tool (EFetch — full records by PMID)
     markdown.rs        # get_pmc_markdown tool
     fulltext.rs        # Full-text retrieval tool
     figures.rs         # Figure extraction tool
