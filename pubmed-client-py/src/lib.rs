@@ -7,6 +7,7 @@ use pyo3::prelude::*;
 // Module declarations
 mod client;
 mod config;
+mod europe_pmc;
 mod pmc;
 mod pubmed;
 mod query;
@@ -15,6 +16,11 @@ mod utils;
 // Re-export main types for convenience
 pub use client::PyClient;
 pub use config::PyClientConfig;
+pub use europe_pmc::{
+    PyEuropePmcCitation, PyEuropePmcClient, PyEuropePmcDatabaseLink,
+    PyEuropePmcDbCrossReferenceInfo, PyEuropePmcReference, PyEuropePmcResult,
+    PyEuropePmcSearchResponse,
+};
 pub use pmc::{
     PyArticleSection, PyExtractedFigure, PyFigure, PyOaSubsetInfo, PyPmcAffiliation, PyPmcAuthor,
     PyPmcClient, PyPmcFullText, PyReference, PyTable,
@@ -36,9 +42,10 @@ pub use query::PySearchQuery;
 /// for retrieving biomedical research articles.
 ///
 /// Main classes:
-///     Client: Combined client for both PubMed and PMC
+///     Client: Combined client for PubMed, PMC and Europe PMC
 ///     PubMedClient: Client for PubMed metadata
 ///     PmcClient: Client for PMC full-text articles
+///     EuropePmcClient: Client for the Europe PMC REST API
 ///     ClientConfig: Configuration for API clients
 ///
 /// Examples:
@@ -83,9 +90,18 @@ fn pubmed_client(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyPmcFullText>()?;
     m.add_class::<PyOaSubsetInfo>()?;
 
+    // Add Europe PMC models
+    m.add_class::<PyEuropePmcResult>()?;
+    m.add_class::<PyEuropePmcSearchResponse>()?;
+    m.add_class::<PyEuropePmcReference>()?;
+    m.add_class::<PyEuropePmcCitation>()?;
+    m.add_class::<PyEuropePmcDatabaseLink>()?;
+    m.add_class::<PyEuropePmcDbCrossReferenceInfo>()?;
+
     // Add clients
     m.add_class::<PyPubMedClient>()?;
     m.add_class::<PyPmcClient>()?;
+    m.add_class::<PyEuropePmcClient>()?;
     m.add_class::<PyClient>()?;
 
     // Add query builder

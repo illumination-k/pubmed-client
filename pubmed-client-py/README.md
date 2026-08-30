@@ -15,6 +15,7 @@ This package provides Python bindings to the Rust-based PubMed client library, e
 - **PubMed API**: Search and retrieve article metadata
 - **PMC API**: Access full-text articles from PubMed Central
 - **ELink API**: Get related articles, citations, and PMC links
+- **Europe PMC API**: Cross-source search (preprints, patents, Agricola, CBA), JATS full text, reference and citation graphs, external database links — no API key needed
 - **SearchQuery Builder**: Build complex queries programmatically with filters
 - **High Performance**: Built with Rust for speed and reliability
 - **Type-Safe**: Full type hints for better IDE support
@@ -214,6 +215,47 @@ for fig in figures:
     if fig.dimensions:
         print(f"Dimensions: {fig.dimensions[0]}x{fig.dimensions[1]}")
 ```
+
+### Europe PMC
+
+[Europe PMC](https://europepmc.org) complements the NCBI E-utilities: it indexes preprints (`PPR`),
+patents (`PAT`), Agricola (`AGR`) and Chinese Biological Abstracts (`CBA`) alongside PubMed (`MED`)
+and PMC, and needs no API key.
+
+Records are addressed by a source database plus an id. Every method accepts the id bare
+(`"PMC3258128"`, `"33515491"`), with an explicit `source`, or fully qualified
+(`"PPR/PPR123456"`). Given no source, a `PMC`-prefixed id is read as a PMC record and anything else
+as a PubMed record.
+
+```python
+import pubmed_client
+
+client = pubmed_client.Client()
+
+# Cross-source search, including preprints
+for result in client.europe_pmc.search("TITLE:CRISPR AND SRC:PPR", 5):
+    print(result.europe_pmc_id, result.title)
+
+# Full text as a parsed article, or as raw JATS XML for non-PMC sources
+article = client.europe_pmc.fetch_full_text("PMC3258128")
+xml = client.europe_pmc.fetch_full_text_xml("PMC3258128")
+
+# Citation graph in both directions
+references = client.europe_pmc.get_references("PMC3258128")
+citations = client.europe_pmc.get_citations("33515491", source="MED")
+
+# Cross-references to external databases (UniProt, EMBL, PDB, ...)
+for link in client.europe_pmc.get_database_links("PMC3258128"):
+    print(link.db_name, link.db_count)
+
+# `resultType="core"` returns far more than is modelled; the remainder is
+# available as a plain dict rather than pinned to a schema Europe PMC may change
+for result in client.europe_pmc.search_all("malaria vaccine", 10, result_type="core"):
+    print(result.extra().get("citedByCount"))
+```
+
+Paging is explicit where Europe PMC exposes it — `search_page` returns a `next_cursor_mark`, and
+`get_references_page` / `get_citations_page` return `(hit_count, entries)`.
 
 ## Configuration
 

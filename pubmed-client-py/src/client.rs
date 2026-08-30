@@ -9,6 +9,7 @@ use std::sync::Arc;
 use pubmed_client::Client;
 
 use crate::config::PyClientConfig;
+use crate::europe_pmc::PyEuropePmcClient;
 use crate::pmc::{PyPmcClient, PyPmcFullText};
 use crate::pubmed::{
     PyCitations, PyDatabaseInfo, PyPmcLinks, PyPubMedArticle, PyPubMedClient, PyRelatedArticles,
@@ -20,10 +21,11 @@ use crate::utils::{get_runtime, to_py_err};
 // Combined Client
 // ================================================================================================
 
-/// Combined client with both PubMed and PMC functionality
+/// Combined client with PubMed, PMC and Europe PMC functionality
 ///
-/// This is the main client you'll typically use. It provides access to both
-/// PubMed metadata searches and PMC full-text retrieval.
+/// This is the main client you'll typically use. It provides access to
+/// PubMed metadata searches, PMC full-text retrieval, and the Europe PMC
+/// REST API.
 ///
 /// Examples:
 ///     >>> client = Client()
@@ -31,6 +33,8 @@ use crate::utils::{get_runtime, to_py_err};
 ///     >>> articles = client.pubmed.search_and_fetch("covid-19", 10)
 ///     >>> # Access PMC client
 ///     >>> full_text = client.pmc.fetch_full_text("PMC7906746")
+///     >>> # Access Europe PMC client (covers preprints and non-PubMed sources)
+///     >>> preprints = client.europe_pmc.search("SRC:PPR AND covid-19", 5)
 ///     >>> # Search with full text
 ///     >>> results = client.search_with_full_text("covid-19", 5)
 #[gen_stub_pyclass]
@@ -71,6 +75,14 @@ impl PyClient {
     fn pmc(&self) -> PyPmcClient {
         PyPmcClient {
             client: Arc::new(self.client.pmc.clone()),
+        }
+    }
+
+    /// Get Europe PMC client for cross-source search and full-text operations
+    #[getter]
+    fn europe_pmc(&self) -> PyEuropePmcClient {
+        PyEuropePmcClient {
+            client: Arc::new(self.client.europe_pmc.clone()),
         }
     }
 

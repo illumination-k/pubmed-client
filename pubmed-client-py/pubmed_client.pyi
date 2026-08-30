@@ -18,6 +18,13 @@ __all__ = [
     "DatabaseCount",
     "DatabaseInfo",
     "EPostResult",
+    "EuropePmcCitation",
+    "EuropePmcClient",
+    "EuropePmcDatabaseLink",
+    "EuropePmcDbCrossReferenceInfo",
+    "EuropePmcReference",
+    "EuropePmcResult",
+    "EuropePmcSearchResponse",
     "ExtractedFigure",
     "Figure",
     "GlobalQueryResults",
@@ -260,10 +267,11 @@ class Citations:
 @typing.final
 class Client:
     r"""
-    Combined client with both PubMed and PMC functionality
+    Combined client with PubMed, PMC and Europe PMC functionality
 
-    This is the main client you'll typically use. It provides access to both
-    PubMed metadata searches and PMC full-text retrieval.
+    This is the main client you'll typically use. It provides access to
+    PubMed metadata searches, PMC full-text retrieval, and the Europe PMC
+    REST API.
 
     Examples:
         >>> client = Client()
@@ -271,6 +279,8 @@ class Client:
         >>> articles = client.pubmed.search_and_fetch("covid-19", 10)
         >>> # Access PMC client
         >>> full_text = client.pmc.fetch_full_text("PMC7906746")
+        >>> # Access Europe PMC client (covers preprints and non-PubMed sources)
+        >>> preprints = client.europe_pmc.search("SRC:PPR AND covid-19", 5)
         >>> # Search with full text
         >>> results = client.search_with_full_text("covid-19", 5)
     """
@@ -283,6 +293,11 @@ class Client:
     def pmc(self) -> PmcClient:
         r"""
         Get PMC client for full-text operations
+        """
+    @property
+    def europe_pmc(self) -> EuropePmcClient:
+        r"""
+        Get Europe PMC client for cross-source search and full-text operations
         """
     def __new__(cls) -> Client:
         r"""
@@ -450,6 +465,413 @@ class EPostResult:
     def webenv(self) -> builtins.str: ...
     @property
     def query_key(self) -> builtins.str: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class EuropePmcCitation:
+    r"""
+    Python wrapper for an article citing a Europe PMC record
+    """
+    @property
+    def id(self) -> typing.Optional[builtins.str]:
+        r"""
+        Identifier of the citing record within its source database
+        """
+    @property
+    def source(self) -> typing.Optional[builtins.str]:
+        r"""
+        Source database of the citing record
+        """
+    @property
+    def citation_type(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def title(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def author_string(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def journal_abbreviation(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def pub_year(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def volume(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def issue(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def page_info(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def cited_by_count(self) -> typing.Optional[builtins.str]:
+        r"""
+        Number of times the citing article has itself been cited
+        """
+    def extra(self) -> typing.Any:
+        r"""
+        Fields returned by Europe PMC but not modelled as attributes
+        """
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class EuropePmcClient:
+    r"""
+    Europe PMC client
+
+    Europe PMC (https://europepmc.org) is a complementary index to the NCBI
+    E-utilities: it covers preprints (PPR), patents (PAT), Agricola (AGR) and
+    Chinese Biological Abstracts (CBA) as well as PubMed (MED) and PMC, and it
+    requires no API key.
+
+    Records are addressed by a source database plus an id. Every method here
+    accepts the id bare ("PMC3258128", "33515491"), with an explicit `source`,
+    or fully qualified ("PPR/PPR123456"). With no source, a PMC-prefixed id is
+    read as a PMC record and anything else as a PubMed record.
+
+    Examples:
+        >>> client = EuropePmcClient()
+        >>> for result in client.search("malaria vaccine", 5):
+        ...     print(result.europe_pmc_id, result.title)
+        >>> article = client.fetch_full_text("PMC3258128")
+        >>> citations = client.get_citations("33515491")
+    """
+    def __new__(cls) -> EuropePmcClient:
+        r"""
+        Create a new Europe PMC client with default configuration
+        """
+    @staticmethod
+    def with_config(config: ClientConfig) -> EuropePmcClient:
+        r"""
+        Create a new Europe PMC client with custom configuration
+
+        Transport settings (timeout, user agent, retry, rate limit, cache) are
+        taken from the config; its `base_url` is the NCBI override and is not
+        used here.
+        """
+    def search(self, query: builtins.str, limit: builtins.int = 10) -> typing.Any:
+        r"""
+        Search Europe PMC and return up to `limit` results
+
+        Args:
+            query: Europe PMC query, e.g. "malaria vaccine" or "TITLE:CRISPR AND SRC:PPR"
+            limit: Maximum number of records to return (default: 10)
+
+        Returns:
+            List of EuropePmcResult
+
+        Examples:
+            >>> client = EuropePmcClient()
+            >>> results = client.search("malaria vaccine", 5)
+        """
+    def search_page(self, query: builtins.str, result_type: typing.Optional[builtins.str] = None, page_size: builtins.int = 25, cursor_mark: typing.Optional[builtins.str] = None, sort: typing.Optional[builtins.str] = None) -> EuropePmcSearchResponse:
+        r"""
+        Fetch a single page of search results
+
+        Use the returned `next_cursor_mark` as the `cursor_mark` of the
+        following call to page through a result set. Europe PMC signals the end
+        by returning the cursor it was given.
+
+        Args:
+            query: Europe PMC query
+            result_type: "idlist", "lite" (default) or "core"
+            page_size: Records per page, 1-1000 (default: 25)
+            cursor_mark: Cursor for the page to fetch; "*" (default) is the first page
+            sort: Europe PMC sort expression, e.g. "P_PDATE_D desc" or "CITED desc"
+
+        Returns:
+            EuropePmcSearchResponse
+        """
+    def search_all(self, query: builtins.str, max_results: builtins.int, result_type: typing.Optional[builtins.str] = None, page_size: builtins.int = 25, sort: typing.Optional[builtins.str] = None) -> typing.Any:
+        r"""
+        Fetch search results across pages until `max_results` or exhaustion
+
+        Args:
+            query: Europe PMC query
+            max_results: Maximum number of records to collect
+            result_type: "idlist", "lite" (default) or "core"
+            page_size: Records per request, 1-1000 (default: 25)
+            sort: Europe PMC sort expression
+
+        Returns:
+            List of EuropePmcResult
+        """
+    def fetch_full_text(self, id: builtins.str, source: typing.Optional[builtins.str] = None) -> PmcFullText:
+        r"""
+        Fetch and parse the full text of a Europe PMC record
+
+        Parsing into an article requires a PMC id, so this only supports
+        PMC-sourced records; use `fetch_full_text_xml` for other sources.
+
+        Args:
+            id: Record id, bare or fully qualified
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            PmcFullText
+        """
+    def fetch_full_text_xml(self, id: builtins.str, source: typing.Optional[builtins.str] = None) -> builtins.str:
+        r"""
+        Fetch the raw JATS XML full text of a Europe PMC record
+
+        Works for any source that has full text available.
+
+        Args:
+            id: Record id, bare or fully qualified
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            JATS XML as a string
+        """
+    def get_references(self, id: builtins.str, source: typing.Optional[builtins.str] = None) -> typing.Any:
+        r"""
+        Fetch all works cited by a record, following pages until exhausted
+
+        Args:
+            id: Record id, bare or fully qualified
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            List of EuropePmcReference
+        """
+    def get_references_page(self, id: builtins.str, page: builtins.int = 1, page_size: builtins.int = 100, source: typing.Optional[builtins.str] = None) -> tuple[builtins.int, typing.Any]:
+        r"""
+        Fetch one page of the reference list for a record
+
+        Args:
+            id: Record id, bare or fully qualified
+            page: 1-based page number
+            page_size: Entries per page (default: 100)
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            Tuple of (total hit count, list of EuropePmcReference)
+        """
+    def get_citations(self, id: builtins.str, source: typing.Optional[builtins.str] = None) -> typing.Any:
+        r"""
+        Fetch all articles citing a record, following pages until exhausted
+
+        Args:
+            id: Record id, bare or fully qualified
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            List of EuropePmcCitation
+        """
+    def get_citations_page(self, id: builtins.str, page: builtins.int = 1, page_size: builtins.int = 100, source: typing.Optional[builtins.str] = None) -> tuple[builtins.int, typing.Any]:
+        r"""
+        Fetch one page of the citation list for a record
+
+        Args:
+            id: Record id, bare or fully qualified
+            page: 1-based page number
+            page_size: Entries per page (default: 100)
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            Tuple of (total hit count, list of EuropePmcCitation)
+        """
+    def get_database_links(self, id: builtins.str, source: typing.Optional[builtins.str] = None) -> typing.Any:
+        r"""
+        Fetch all external database cross-references for a record
+
+        Args:
+            id: Record id, bare or fully qualified
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            List of EuropePmcDatabaseLink
+
+        Examples:
+            >>> client = EuropePmcClient()
+            >>> for link in client.get_database_links("PMC3258128"):
+            ...     print(link.db_name, link.db_count)
+        """
+    def fetch_supplementary_files(self, id: builtins.str, source: typing.Optional[builtins.str] = None) -> builtins.list[builtins.int]:
+        r"""
+        Fetch the supplementary-files ZIP archive for a record into memory
+
+        Europe PMC returns supplementary materials as a single ZIP; unpacking is
+        left to the caller (e.g. Python's `zipfile`).
+
+        Args:
+            id: Record id, bare or fully qualified
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            ZIP archive as bytes
+        """
+    def download_supplementary_files(self, id: builtins.str, output_path: builtins.str, source: typing.Optional[builtins.str] = None) -> builtins.str:
+        r"""
+        Download the supplementary-files ZIP archive for a record to a path
+
+        Parent directories are created if needed.
+
+        Args:
+            id: Record id, bare or fully qualified
+            output_path: Full path of the ZIP file to write
+            source: Source database (MED, PMC, PPR, AGR, CBA, PAT)
+
+        Returns:
+            The written path
+        """
+    def clear_cache(self) -> None:
+        r"""
+        Clear the full-text cache, if one is configured
+        """
+    def cache_entry_count(self) -> builtins.int:
+        r"""
+        Number of cached full-text entries (best effort)
+        """
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class EuropePmcDatabaseLink:
+    r"""
+    Python wrapper for cross-references to one external database
+    """
+    @property
+    def db_name(self) -> typing.Optional[builtins.str]:
+        r"""
+        External database name (e.g. "UNIPROT", "EMBL", "PDB")
+        """
+    @property
+    def db_count(self) -> typing.Optional[builtins.int]:
+        r"""
+        Number of cross-references reported for this database
+        """
+    def info(self) -> typing.Any:
+        r"""
+        Individual cross-reference entries
+        """
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class EuropePmcDbCrossReferenceInfo:
+    r"""
+    Python wrapper for a single external-database cross-reference entry
+
+    Europe PMC documents the four `info` slots only positionally, and their
+    meaning varies by database, so they are exposed as-is rather than renamed.
+    """
+    @property
+    def info1(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def info2(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def info3(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def info4(self) -> typing.Optional[builtins.str]: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class EuropePmcReference:
+    r"""
+    Python wrapper for a work cited by a Europe PMC record
+    """
+    @property
+    def source(self) -> typing.Optional[builtins.str]:
+        r"""
+        Source database of the cited record, when Europe PMC matched it
+        """
+    @property
+    def id(self) -> typing.Optional[builtins.str]:
+        r"""
+        Identifier of the cited record, when Europe PMC matched it
+        """
+    @property
+    def citation_type(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def title(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def author_string(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def journal_abbreviation(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def pub_year(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def volume(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def issue(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def page_info(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def pmid(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def doi(self) -> typing.Optional[builtins.str]: ...
+    def extra(self) -> typing.Any:
+        r"""
+        Fields returned by Europe PMC but not modelled as attributes
+        """
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class EuropePmcResult:
+    r"""
+    Python wrapper for a Europe PMC search result record
+    """
+    @property
+    def id(self) -> builtins.str:
+        r"""
+        Record identifier within its source database
+        """
+    @property
+    def source(self) -> builtins.str:
+        r"""
+        Source database code (MED, PMC, PPR, AGR, CBA, PAT, ...)
+        """
+    @property
+    def pmid(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def pmcid(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def doi(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def title(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def author_string(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def journal_title(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def pub_year(self) -> typing.Optional[builtins.str]: ...
+    @property
+    def is_open_access(self) -> typing.Optional[builtins.str]:
+        r"""
+        Open access flag as reported by Europe PMC ("Y" / "N")
+        """
+    @property
+    def europe_pmc_id(self) -> builtins.str:
+        r"""
+        Fully-qualified Europe PMC address of this record ("SOURCE/ID")
+        """
+    def extra(self) -> typing.Any:
+        r"""
+        Fields returned by Europe PMC but not modelled as attributes
+
+        `resultType="core"` returns dozens of extra fields (abstract text,
+        citation counts, MeSH terms, grant data, ...); they are surfaced here as
+        a plain dict rather than pinned to a schema that Europe PMC may change.
+        """
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class EuropePmcSearchResponse:
+    r"""
+    Python wrapper for one page of Europe PMC search results
+    """
+    @property
+    def hit_count(self) -> builtins.int:
+        r"""
+        Total number of records matching the query, across all pages
+        """
+    @property
+    def next_cursor_mark(self) -> typing.Optional[builtins.str]:
+        r"""
+        Cursor to pass as `cursor_mark` to fetch the next page
+
+        Europe PMC keeps returning the same value once the last page is
+        reached, so a cursor equal to the one just used means "no more pages".
+        """
+    def results(self) -> typing.Any:
+        r"""
+        Records on this page
+        """
+    def __len__(self) -> builtins.int: ...
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
