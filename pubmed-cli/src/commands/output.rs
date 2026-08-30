@@ -1,5 +1,5 @@
 use clap::ValueEnum;
-use pubmed_client::{ClientConfig, PmcClient, PubMedClient};
+use pubmed_client::{ClientConfig, EuropePmcClient, PmcClient, PubMedClient};
 
 #[derive(Clone, Debug, ValueEnum)]
 pub enum OutputFormat {
@@ -63,6 +63,15 @@ impl ClientContext<'_> {
 
     pub fn pubmed_client(&self) -> PubMedClient {
         PubMedClient::with_config(self.build_config())
+    }
+
+    /// Build a Europe PMC client.
+    ///
+    /// Europe PMC needs no API key; the shared config is still used so the
+    /// transport settings (tool name, timeout, retry, rate limit) match the
+    /// rest of the CLI.
+    pub fn europe_pmc_client(&self) -> EuropePmcClient {
+        EuropePmcClient::with_config(self.build_config())
     }
 
     pub fn pmc_client(&self) -> PmcClient {

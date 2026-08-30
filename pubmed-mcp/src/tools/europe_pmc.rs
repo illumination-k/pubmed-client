@@ -183,13 +183,8 @@ pub async fn europe_pmc_search(
             record.id
         ));
         push_field(&mut out, "Authors", record.author_string.as_deref());
-        let journal = match (record.journal_title.as_deref(), record.pub_year.as_deref()) {
-            (Some(journal), Some(year)) => Some(format!("{journal} ({year})")),
-            (Some(journal), None) => Some(journal.to_string()),
-            (None, Some(year)) => Some(year.to_string()),
-            (None, None) => None,
-        };
-        push_field(&mut out, "Journal", journal.as_deref());
+        push_field(&mut out, "Journal", record.journal_title.as_deref());
+        push_field(&mut out, "Year", record.pub_year.as_deref());
         push_field(&mut out, "PMID", record.pmid.as_deref());
         push_field(&mut out, "PMC", record.pmcid.as_deref());
         push_field(&mut out, "DOI", record.doi.as_deref());
@@ -345,16 +340,12 @@ pub async fn europe_pmc_references(
             reference.title.as_deref().unwrap_or("Untitled")
         ));
         push_field(&mut out, "Authors", reference.author_string.as_deref());
-        let journal = match (
+        push_field(
+            &mut out,
+            "Journal",
             reference.journal_abbreviation.as_deref(),
-            reference.pub_year.as_deref(),
-        ) {
-            (Some(journal), Some(year)) => Some(format!("{journal} ({year})")),
-            (Some(journal), None) => Some(journal.to_string()),
-            (None, Some(year)) => Some(year.to_string()),
-            (None, None) => None,
-        };
-        push_field(&mut out, "Journal", journal.as_deref());
+        );
+        push_field(&mut out, "Year", reference.pub_year.as_deref());
         push_field(
             &mut out,
             "Location",
@@ -406,16 +397,12 @@ pub async fn europe_pmc_citations(
             citation.title.as_deref().unwrap_or("Untitled")
         ));
         push_field(&mut out, "Authors", citation.author_string.as_deref());
-        let journal = match (
+        push_field(
+            &mut out,
+            "Journal",
             citation.journal_abbreviation.as_deref(),
-            citation.pub_year.as_deref(),
-        ) {
-            (Some(journal), Some(year)) => Some(format!("{journal} ({year})")),
-            (Some(journal), None) => Some(journal.to_string()),
-            (None, Some(year)) => Some(year.to_string()),
-            (None, None) => None,
-        };
-        push_field(&mut out, "Journal", journal.as_deref());
+        );
+        push_field(&mut out, "Year", citation.pub_year.as_deref());
         push_field(
             &mut out,
             "Location",

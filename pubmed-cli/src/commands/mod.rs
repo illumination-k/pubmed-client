@@ -3,6 +3,7 @@ pub mod citations;
 pub mod citmatch;
 pub mod convert;
 pub mod espell;
+pub mod europe_pmc;
 pub mod export;
 pub mod figures;
 pub mod gquery;
