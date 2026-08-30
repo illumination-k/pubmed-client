@@ -23,7 +23,17 @@ use std::time::Duration as StdDuration;
 /// [`Debug`] is implemented by hand so the API key is redacted: this struct is
 /// the one place in the server that holds a secret, and a stray `{:?}` in a
 /// log line would publish it to the host's stderr.
+///
+/// `about`/`long_about` are cleared explicitly: clap copies a flattened
+/// struct's doc comment onto the *parent* command, which would replace
+/// `pubmed-mcp`'s own "PubMed MCP Server" description in `--help` with the
+/// paragraph above.
 #[derive(Args, Clone)]
+#[command(
+    about = None,
+    long_about = None,
+    next_help_heading = "Client Configuration"
+)]
 pub struct ClientArgs {
     /// NCBI E-utilities API key (raises the rate limit from 3 to 10 req/s)
     #[arg(long, env = "NCBI_API_KEY")]

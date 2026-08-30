@@ -331,6 +331,19 @@ mod tests {
         Args::command().debug_assert();
     }
 
+    /// The container smoke test in `ci-docker.yml` greps `--help` for this
+    /// string. Flattening an `Args` struct silently copies *its* doc comment
+    /// onto the parent command's `about`, which drops the server's own
+    /// description from the first line of `--help`.
+    #[test]
+    fn help_output_keeps_the_server_description() {
+        let help = Args::command().render_long_help().to_string();
+        assert!(
+            help.starts_with("PubMed MCP Server"),
+            "--help must open with the server description, got:\n{help}"
+        );
+    }
+
     /// `--tools` filters by the *registered* tool name, so a `ToolName`
     /// whose `as_str()` drifts from its `#[tool]` method silently removes
     /// every tool instead of selecting one. Check the whole enum, not just
