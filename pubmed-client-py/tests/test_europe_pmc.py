@@ -48,7 +48,7 @@ class TestEuropePmcIdValidation:
 
     def test_non_numeric_pmc_id_is_rejected(self) -> None:
         client = pubmed_client.EuropePmcClient()
-        with pytest.raises(ValueError, match="invalid PMC id"):
+        with pytest.raises(ValueError, match="Invalid PMC ID format"):
             client.fetch_full_text("not-a-pmcid", source="PMC")
 
     def test_invalid_result_type_is_rejected(self) -> None:

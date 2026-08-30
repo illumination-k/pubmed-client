@@ -32,7 +32,7 @@ describe('Europe PMC', () => {
     it('should reject a non-numeric PMC id', async () => {
       const client = new PubMedClient()
       await expect(client.europePmcFetchFullText('not-a-pmcid', 'PMC')).rejects.toThrow(
-        /invalid PMC id/
+        /Invalid PMC ID format/
       )
     })
 

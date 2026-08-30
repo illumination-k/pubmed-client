@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Result, bail};
 use clap::{Args, Subcommand, ValueEnum};
 
-use pubmed_client::{EuropePmcId, EuropePmcSearchOptions, EuropePmcSource, ResultType};
+use pubmed_client::{EuropePmcId, EuropePmcSearchOptions, ResultType};
 
 use super::{ClientContext, OutputFormat};
 
@@ -54,29 +54,11 @@ pub struct RecordId {
 }
 
 impl RecordId {
+    /// Resolve the `(source, id)` pair this argument pair addresses.
+    ///
+    /// The accepted forms are defined by [`EuropePmcId::resolve`].
     fn resolve(&self) -> Result<EuropePmcId> {
-        let id = self.id.trim();
-        if id.is_empty() {
-            bail!("record id must not be empty");
-        }
-
-        if id.contains('/') {
-            return id
-                .parse::<EuropePmcId>()
-                .with_context(|| format!("invalid Europe PMC id '{id}'"));
-        }
-
-        let source = match self.source.as_deref() {
-            Some(source) if !source.trim().is_empty() => EuropePmcSource::from(source),
-            _ if id.to_ascii_uppercase().starts_with("PMC") => EuropePmcSource::Pmc,
-            _ => EuropePmcSource::Med,
-        };
-
-        if source == EuropePmcSource::Pmc {
-            return EuropePmcId::pmc(id).with_context(|| format!("invalid PMC id '{id}'"));
-        }
-
-        Ok(EuropePmcId::new(source, id))
+        EuropePmcId::resolve(&self.id, self.source.as_deref()).map_err(Into::into)
     }
 }
 
@@ -546,6 +528,7 @@ fn write_truncation_note(out: &mut impl Write, total: usize, max: usize) -> Resu
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pubmed_client::EuropePmcSource;
 
     fn record(id: &str, source: Option<&str>) -> RecordId {
         RecordId {

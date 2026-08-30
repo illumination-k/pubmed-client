@@ -32,7 +32,7 @@ Documentation = "https://illumination-k.github.io/pubmed-client/python/"
 [tool.maturin]
 # Rust lib name is pubmed_client_py, but Python module name is pubmed_client
 module-name = "pubmed_client_py.pubmed_client"
-features = []
+features = ["pyo3/extension-module"]
 # Include type stub files for IDE and mypy support
 include = ["pubmed_client.pyi"]
 
