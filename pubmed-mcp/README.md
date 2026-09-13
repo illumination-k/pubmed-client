@@ -22,6 +22,7 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - JATS full text (parsed or raw XML), reference and citation graphs
   - Cross-references to external databases (UniProt, EMBL, PDB, ...)
   - No API key required
+- **Structured output**: Every tool answers with JSON `structuredContent` and advertises the matching `outputSchema`
 - **Modular Architecture**: Tools organized in separate modules for maintainability
 - **Configurable client**: NCBI API key, contact e-mail, tool name, rate limit, timeout, retries, and response caching, via CLI flags or environment variables
 - Built with [rmcp](https://github.com/modelcontextprotocol/rust-sdk) - the official Rust SDK for MCP
@@ -171,6 +172,16 @@ forwarded with `-e`:
 
 ### Available Tools
 
+Every tool returns **structured output**: the answer is a JSON object in the
+response's `structuredContent`, and each tool advertises the JSON Schema for it
+as its `outputSchema`, so a client can validate or destructure the result
+instead of parsing prose. The same JSON is echoed as a text content block, so
+clients that only read `content` still receive the whole answer.
+
+Fields that have no value are omitted rather than sent as `null`; list fields
+are always present, empty when there is nothing to report (including when a
+flag such as `include_mesh` turned them off).
+
 #### `search_pubmed`
 
 Search PubMed for articles with advanced filtering options.
@@ -220,15 +231,17 @@ abstracts and MeSH indexing.
 
 - `pmids` (array of strings, required): PubMed IDs, e.g. `["31978945", "33515491"]`. At most 100 per call.
 - `include_abstract` (boolean, optional): Include the full abstract (default: true). Structured abstracts keep their `BACKGROUND`/`METHODS`/`RESULTS` labels.
-- `include_mesh` (boolean, optional): Include MeSH headings and chemical substances (default: true). Major topics are marked with `*`, qualifiers appear as `Descriptor/qualifier`.
-- `include_affiliations` (boolean, optional): Include author affiliations (default: false). Off by default because PubMed repeats a collaboration's entire affiliation string on every author; when enabled, each distinct affiliation is listed once with the authors that share it.
+- `include_mesh` (boolean, optional): Include MeSH headings and chemical substances (default: true). Each heading keeps its `major_topic` flag and its qualifiers.
+- `include_affiliations` (boolean, optional): Include author affiliations (default: false). Off by default because PubMed repeats a collaboration's entire affiliation string on every author; when enabled, each distinct affiliation appears once with the authors that share it.
 
 **Returns:**
 
-Per article: title, PMID, PMC ID, DOI, journal (with volume/issue/pages, ISO
-abbreviation, ISSN, language), all authors, article types, full abstract,
-author keywords, MeSH terms, and substances. PMIDs that returned no record are
-listed under `Not found:` rather than silently omitted.
+`{ requested, count, not_found, articles }`. Each article carries `pmid`,
+`title`, `pmc_id`, `doi`, a `journal` object (title, ISO abbreviation, ISSN,
+publication date, volume, issue, pages), `language`, `authors`, `author_count`,
+`affiliations`, `article_types`, `abstract_text` or `structured_abstract`,
+`keywords`, `mesh_terms` and `substances`. Requested PMIDs that returned no
+record are reported in `not_found` rather than silently omitted.
 
 **Examples:**
 
@@ -254,7 +267,9 @@ Convert a PMC (PubMed Central) full-text article to well-formatted Markdown.
 
 **Returns:**
 
-Well-formatted Markdown document containing:
+`{ pmc_id, title, markdown }`, where `markdown` is a whole document — this
+tool's product is prose, so it is not split into fields; use `get_pmc_fulltext`
+for the section tree. The document contains:
 
 - Article metadata (title, authors, journal, identifiers)
 - Full article text organized by sections
@@ -338,6 +353,7 @@ pubmed-mcp/
 │   ├── config.rs        # CLI flags / environment variables -> ClientConfig
 │   └── tools/           # Tools module
 │       ├── mod.rs         # PubMedServer definition
+│       ├── output.rs      # Structured output types shared by the tools
 │       ├── search.rs      # Search tool implementation
 │       ├── articles.rs    # Full PubMed record retrieval (EFetch)
 │       ├── markdown.rs    # Markdown conversion tool
@@ -353,7 +369,7 @@ pubmed-mcp/
 - **rmcp**: Official Rust SDK for Model Context Protocol
 - **pubmed-client**: Core library for PubMed/PMC API access
 - **tokio**: Async runtime
-- **schemars**: JSON schema generation for tool parameters
+- **schemars**: JSON schema generation for tool parameters and structured output
 - **tracing**: Structured logging
 
 ### Adding More Tools
@@ -365,11 +381,17 @@ To add additional tools, add methods to the `PubMedServer` impl block annotated 
 async fn your_tool(
     &self,
     Parameters(params): Parameters<YourRequestStruct>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<YourOutputStruct>, ErrorData> {
     // Implementation
-    Ok(CallToolResult::success(vec![Content::text(result)]))
+    Ok(Json(output))
 }
 ```
+
+Return `Json<T>`, never a bare `CallToolResult`: rmcp derives the tool's
+`outputSchema` from `T` and puts the serialized value in `structuredContent`.
+`T` needs `Serialize` and `schemars::JsonSchema`, and its root must be a
+struct — the MCP spec requires an object at the top level. Shapes reused by
+more than one tool live in `src/tools/output.rs`.
 
 ### Logging
 

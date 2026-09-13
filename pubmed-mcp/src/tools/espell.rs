@@ -1,10 +1,14 @@
 //! Spell check tool for PubMed MCP server
 
-use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
-use serde::Deserialize;
+use rmcp::{
+    handler::server::wrapper::{Json, Parameters},
+    model::*,
+    schemars,
+};
+use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use super::common::{internal_error, text_result};
+use super::common::internal_error;
 
 /// Spell check request parameters
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -20,11 +24,27 @@ pub struct SpellCheckRequest {
     pub db: Option<String>,
 }
 
+/// Structured answer of the `spell_check` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct SpellCheckOutput {
+    /// Database the term was checked against.
+    pub database: String,
+    /// The term as submitted.
+    pub query: String,
+    /// The term with ESpell's corrections applied; equal to `query` when
+    /// nothing needed correcting.
+    pub corrected_query: String,
+    /// Whether ESpell proposed any correction.
+    pub has_corrections: bool,
+    /// The individual replacement words ESpell suggested.
+    pub corrections: Vec<String>,
+}
+
 /// Check spelling of a search term using the NCBI ESpell API
 pub async fn spell_check(
     server: &super::PubMedServer,
     Parameters(params): Parameters<SpellCheckRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<SpellCheckOutput>, ErrorData> {
     let db = params.db.as_deref().unwrap_or("pubmed");
 
     info!(term = %params.term, db = %db, "Checking spelling");
@@ -36,19 +56,15 @@ pub async fn spell_check(
         .await
         .map_err(|e| internal_error(format!("Spell check failed: {}", e)))?;
 
-    let mut output = format!("Database: {}\n", result.database);
-    output.push_str(&format!("Original query: \"{}\"\n", result.query));
-    output.push_str(&format!(
-        "Corrected query: \"{}\"\n",
-        result.corrected_query
-    ));
-
-    if result.has_corrections() {
-        let replacements = result.replacements();
-        output.push_str(&format!("\nCorrections: {}\n", replacements.join(", ")));
-    } else {
-        output.push_str("\nNo spelling corrections needed.\n");
-    }
-
-    text_result(output)
+    Ok(Json(SpellCheckOutput {
+        has_corrections: result.has_corrections(),
+        corrections: result
+            .replacements()
+            .into_iter()
+            .map(str::to_string)
+            .collect(),
+        database: result.database,
+        query: result.query,
+        corrected_query: result.corrected_query,
+    }))
 }

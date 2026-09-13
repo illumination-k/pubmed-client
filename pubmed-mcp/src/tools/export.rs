@@ -1,14 +1,18 @@
 //! Citation export tool for PubMed MCP server
 
 use pubmed_client::ExportFormat as _;
-use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
-use serde::Deserialize;
+use rmcp::{
+    handler::server::wrapper::{Json, Parameters},
+    model::*,
+    schemars,
+};
+use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use super::common::{internal_error, invalid_params, text_result};
+use super::common::{internal_error, invalid_params};
 
 /// Export format for citations
-#[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
+#[derive(Debug, Clone, Copy, Deserialize, Serialize, schemars::JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExportFormat {
     /// BibTeX format (for LaTeX)
@@ -31,26 +35,38 @@ pub struct ExportRequest {
     pub format: Option<ExportFormat>,
 }
 
+/// Structured answer of the `export_citations` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct ExportOutput {
+    /// The format `content` is written in.
+    pub format: ExportFormat,
+    /// Number of PMIDs requested.
+    pub requested: usize,
+    /// Number of records actually exported.
+    pub count: usize,
+    /// PMIDs of the exported records, in export order.
+    pub pmids: Vec<String>,
+    /// The export payload. Each format is a text serialization meant to be
+    /// written to a file as-is — including `csl_json`, which arrives here as
+    /// pretty-printed JSON text rather than nested objects, so that every
+    /// format has the same shape.
+    pub content: String,
+}
+
 /// Export article citations in various standard formats (BibTeX, RIS, CSL-JSON, NBIB)
 pub async fn export_citations(
     server: &super::PubMedServer,
     Parameters(params): Parameters<ExportRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<ExportOutput>, ErrorData> {
     if params.pmids.is_empty() {
         return Err(invalid_params("At least one PMID is required"));
     }
 
     let format = params.format.unwrap_or(ExportFormat::Bibtex);
-    let format_name = match format {
-        ExportFormat::Bibtex => "BibTeX",
-        ExportFormat::Ris => "RIS",
-        ExportFormat::CslJson => "CSL-JSON",
-        ExportFormat::Nbib => "NBIB",
-    };
 
     info!(
         pmids_count = params.pmids.len(),
-        format = format_name,
+        format = ?format,
         "Exporting citations"
     );
 
@@ -62,11 +78,7 @@ pub async fn export_citations(
         .await
         .map_err(|e| internal_error(format!("Failed to fetch articles: {}", e)))?;
 
-    if articles.is_empty() {
-        return text_result("No articles found for the given PMIDs.");
-    }
-
-    let result = match format {
+    let content = match format {
         ExportFormat::Bibtex => pubmed_client::export::articles_to_bibtex(&articles),
         ExportFormat::Ris => pubmed_client::export::articles_to_ris(&articles),
         ExportFormat::CslJson => {
@@ -80,5 +92,11 @@ pub async fn export_citations(
             .join("\n\n"),
     };
 
-    text_result(result)
+    Ok(Json(ExportOutput {
+        format,
+        requested: pmid_refs.len(),
+        count: articles.len(),
+        pmids: articles.iter().map(|a| a.pmid.clone()).collect(),
+        content,
+    }))
 }

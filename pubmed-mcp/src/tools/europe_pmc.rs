@@ -6,13 +6,21 @@
 //! citation graphs and external database cross-references. None of it requires
 //! an API key, which pairs well with this server's unauthenticated default.
 
-use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
-use serde::Deserialize;
+use rmcp::{
+    handler::server::wrapper::{Json, Parameters},
+    model::*,
+    schemars,
+};
+use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use pubmed_client::{EuropePmcId, EuropePmcSearchOptions, ResultType as EuropePmcResultType};
+use pubmed_client::{
+    EuropePmcCitation, EuropePmcId, EuropePmcReference, EuropePmcSearchOptions,
+    ResultType as EuropePmcResultType,
+};
 
-use super::common::{internal_error, invalid_params, text_result};
+use super::common::{internal_error, invalid_params};
+use super::output::{SectionOut, sections_out};
 
 /// Level of detail requested from the Europe PMC `search` endpoint.
 #[derive(Debug, Clone, Copy, Deserialize, schemars::JsonSchema)]
@@ -67,31 +75,6 @@ fn preview(text: &str, limit: usize) -> String {
     }
 }
 
-/// Render an optional field as a labelled line, skipping empty values.
-fn push_field(out: &mut String, label: &str, value: Option<&str>) {
-    if let Some(value) = value.map(str::trim).filter(|v| !v.is_empty()) {
-        out.push_str(&format!("   {label}: {value}\n"));
-    }
-}
-
-/// Format the `volume(issue):pages` locator shared by references and citations.
-fn locator(volume: Option<&str>, issue: Option<&str>, page_info: Option<&str>) -> Option<String> {
-    let mut locator = String::new();
-    if let Some(volume) = volume {
-        locator.push_str(volume);
-    }
-    if let Some(issue) = issue {
-        locator.push_str(&format!("({issue})"));
-    }
-    if let Some(pages) = page_info {
-        if !locator.is_empty() {
-            locator.push(':');
-        }
-        locator.push_str(pages);
-    }
-    (!locator.is_empty()).then_some(locator)
-}
-
 /// Request parameters for the `europe_pmc_search` tool.
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub struct EuropePmcSearchRequest {
@@ -114,11 +97,62 @@ pub struct EuropePmcSearchRequest {
     pub sort: Option<String>,
 }
 
+/// One record from a Europe PMC search.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct EuropePmcRecordOut {
+    /// Source database code (MED, PMC, PPR, PAT, AGR, CBA).
+    pub source: String,
+    /// Identifier within that source; `source/id` addresses the record in the
+    /// other Europe PMC tools.
+    pub id: String,
+    /// Record title.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    /// Comma-separated author list, as Europe PMC returns it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub authors: Option<String>,
+    /// Journal title.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal: Option<String>,
+    /// Publication year.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pub_year: Option<String>,
+    /// PubMed ID, when the record has one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pmid: Option<String>,
+    /// PMC ID, when the record has one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pmcid: Option<String>,
+    /// DOI, when the record has one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub doi: Option<String>,
+    /// Whether Europe PMC flags the record as open access.
+    pub is_open_access: bool,
+    /// Citation count. Only `core` results carry it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cited_by_count: Option<u64>,
+    /// First 300 characters of the abstract, ellipsised when cut. Only
+    /// `core` results carry an abstract.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub abstract_preview: Option<String>,
+}
+
+/// Structured answer of the `europe_pmc_search` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct EuropePmcSearchOutput {
+    /// The query that was sent to Europe PMC.
+    pub query: String,
+    /// Number of records returned.
+    pub count: usize,
+    /// The matching records, in the order Europe PMC returned them.
+    pub results: Vec<EuropePmcRecordOut>,
+}
+
 /// Search Europe PMC across all of its sources.
 pub async fn europe_pmc_search(
     server: &super::PubMedServer,
     Parameters(params): Parameters<EuropePmcSearchRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<EuropePmcSearchOutput>, ErrorData> {
     if params.query.trim().is_empty() {
         return Err(invalid_params("`query` must not be empty"));
     }
@@ -148,40 +182,34 @@ pub async fn europe_pmc_search(
         .await
         .map_err(|e| internal_error(format!("Europe PMC search failed: {e}")))?;
 
-    let mut out = format!("Found {} Europe PMC records:\n\n", results.len());
+    let results: Vec<EuropePmcRecordOut> = results
+        .iter()
+        .map(|record| EuropePmcRecordOut {
+            source: record.source.clone(),
+            id: record.id.clone(),
+            title: record.title.clone(),
+            authors: record.author_string.clone(),
+            journal: record.journal_title.clone(),
+            pub_year: record.pub_year.clone(),
+            pmid: record.pmid.clone(),
+            pmcid: record.pmcid.clone(),
+            doi: record.doi.clone(),
+            is_open_access: record.is_open_access.as_deref() == Some("Y"),
+            // `resultType=core` carries these in the untyped `extra` map.
+            cited_by_count: record.extra.get("citedByCount").and_then(|v| v.as_u64()),
+            abstract_preview: record
+                .extra
+                .get("abstractText")
+                .and_then(|v| v.as_str())
+                .map(|text| preview(text, ABSTRACT_PREVIEW_CHARS)),
+        })
+        .collect();
 
-    for (i, record) in results.iter().enumerate() {
-        out.push_str(&format!(
-            "{}. {} ({}/{})\n",
-            i + 1,
-            record.title.as_deref().unwrap_or("Untitled"),
-            record.source,
-            record.id
-        ));
-        push_field(&mut out, "Authors", record.author_string.as_deref());
-        push_field(&mut out, "Journal", record.journal_title.as_deref());
-        push_field(&mut out, "Year", record.pub_year.as_deref());
-        push_field(&mut out, "PMID", record.pmid.as_deref());
-        push_field(&mut out, "PMC", record.pmcid.as_deref());
-        push_field(&mut out, "DOI", record.doi.as_deref());
-        if record.is_open_access.as_deref() == Some("Y") {
-            out.push_str("   Open access: yes\n");
-        }
-        // `resultType=core` carries these in the untyped `extra` map.
-        if let Some(cited_by) = record.extra.get("citedByCount") {
-            push_field(&mut out, "Cited by", Some(&cited_by.to_string()));
-        }
-        if let Some(abstract_text) = record.extra.get("abstractText").and_then(|v| v.as_str()) {
-            push_field(
-                &mut out,
-                "Abstract",
-                Some(&preview(abstract_text, ABSTRACT_PREVIEW_CHARS)),
-            );
-        }
-        out.push('\n');
-    }
-
-    text_result(out)
+    Ok(Json(EuropePmcSearchOutput {
+        query: params.query,
+        count: results.len(),
+        results,
+    }))
 }
 
 /// Request parameters for the `europe_pmc_fulltext` tool.
@@ -202,15 +230,47 @@ pub struct EuropePmcFullTextRequest {
     )]
     pub raw_xml: Option<bool>,
 
-    #[schemars(description = "Maximum number of sections to return (default: all)")]
+    #[schemars(description = "Maximum number of top-level sections to return (default: all)")]
     pub max_sections: Option<usize>,
+}
+
+/// Structured answer of the `europe_pmc_fulltext` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct EuropePmcFullTextOutput {
+    /// The `source/id` that was fetched.
+    pub europe_pmc_id: String,
+    /// PMC ID of the parsed article.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pmc_id: Option<String>,
+    /// Article title.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    /// DOI.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub doi: Option<String>,
+    /// Journal name.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal: Option<String>,
+    /// Author names, in author order.
+    pub authors: Vec<String>,
+    /// Abstract text, flattened across its parts.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub abstract_text: Option<String>,
+    /// Number of top-level body sections, before `max_sections` is applied.
+    pub section_count: usize,
+    /// Body sections with their subsections nested. Empty when `raw_xml` was
+    /// requested.
+    pub sections: Vec<SectionOut>,
+    /// The unparsed JATS XML, present only when `raw_xml` was requested.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raw_xml: Option<String>,
 }
 
 /// Fetch the full text of a Europe PMC record.
 pub async fn europe_pmc_fulltext(
     server: &super::PubMedServer,
     Parameters(params): Parameters<EuropePmcFullTextRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<EuropePmcFullTextOutput>, ErrorData> {
     let id = resolve_id(params.source.as_deref(), &params.id)?;
 
     info!(id = %id, raw_xml = ?params.raw_xml, "Fetching Europe PMC full text");
@@ -222,7 +282,18 @@ pub async fn europe_pmc_fulltext(
             .fetch_full_text_xml(&id)
             .await
             .map_err(|e| internal_error(format!("Failed to fetch Europe PMC full text: {e}")))?;
-        return text_result(xml);
+        return Ok(Json(EuropePmcFullTextOutput {
+            europe_pmc_id: id.to_string(),
+            pmc_id: None,
+            title: None,
+            doi: None,
+            journal: None,
+            authors: Vec::new(),
+            abstract_text: None,
+            section_count: 0,
+            sections: Vec::new(),
+            raw_xml: Some(xml),
+        }));
     }
 
     let article = server
@@ -232,43 +303,28 @@ pub async fn europe_pmc_fulltext(
         .await
         .map_err(|e| internal_error(format!("Failed to fetch Europe PMC full text: {e}")))?;
 
-    let mut out = String::new();
-    out.push_str(&format!(
-        "Title: {}\n",
-        article.title().unwrap_or("Untitled")
-    ));
-    out.push_str(&format!("Europe PMC ID: {id}\n"));
-    out.push_str(&format!("PMC ID: {}\n", article.pmcid()));
-    if let Some(doi) = article.doi() {
-        out.push_str(&format!("DOI: {doi}\n"));
-    }
-    if !article.authors().is_empty() {
-        let authors: Vec<&str> = article
+    let all_sections = article.sections();
+    let shown = match params.max_sections {
+        Some(max) => &all_sections[..max.min(all_sections.len())],
+        None => all_sections,
+    };
+
+    Ok(Json(EuropePmcFullTextOutput {
+        europe_pmc_id: id.to_string(),
+        pmc_id: Some(article.pmcid().to_string()),
+        title: article.title().map(str::to_string),
+        doi: article.doi().map(str::to_string),
+        journal: article.journal().title.clone(),
+        authors: article
             .authors()
             .iter()
-            .map(|a| a.full_name.as_str())
-            .collect();
-        out.push_str(&format!("Authors: {}\n", authors.join(", ")));
-    }
-    if let Some(journal) = article.journal().title.as_deref() {
-        out.push_str(&format!("Journal: {journal}\n"));
-    }
-
-    let sections = article.sections();
-    let shown = match params.max_sections {
-        Some(max) => &sections[..max.min(sections.len())],
-        None => sections,
-    };
-    for section in shown {
-        let title = section
-            .title
-            .as_deref()
-            .or(section.section_type.as_deref())
-            .unwrap_or("Untitled");
-        out.push_str(&format!("\n## {title}\n{}\n", section.content));
-    }
-
-    text_result(out)
+            .map(|author| author.full_name.clone())
+            .collect(),
+        abstract_text: article.abstract_text().map(str::to_string),
+        section_count: all_sections.len(),
+        sections: sections_out(shown),
+        raw_xml: None,
+    }))
 }
 
 /// Request parameters for the `europe_pmc_references` and
@@ -289,11 +345,111 @@ pub struct EuropePmcCitationGraphRequest {
     pub max_results: Option<usize>,
 }
 
+/// One work in a Europe PMC citation graph: either a work the record cites,
+/// or an article citing it.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct EuropePmcWorkOut {
+    /// Source database code of the matched record, when Europe PMC resolved
+    /// the entry to one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+    /// Identifier within that source.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    /// Title of the work.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    /// Comma-separated author list.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub authors: Option<String>,
+    /// Abbreviated journal name.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal: Option<String>,
+    /// Publication year.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pub_year: Option<String>,
+    /// Journal volume.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub volume: Option<String>,
+    /// Journal issue.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub issue: Option<String>,
+    /// Page range or electronic location.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page_info: Option<String>,
+    /// PubMed ID, when Europe PMC matched one. References carry it directly;
+    /// for citations it is the `id` of a `MED` record.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pmid: Option<String>,
+    /// DOI, when the entry carries one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub doi: Option<String>,
+    /// How often this work has itself been cited. Only citations carry it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cited_by_count: Option<String>,
+}
+
+impl From<&EuropePmcReference> for EuropePmcWorkOut {
+    fn from(reference: &EuropePmcReference) -> Self {
+        Self {
+            source: reference.source.clone(),
+            id: reference.id.clone(),
+            title: reference.title.clone(),
+            authors: reference.author_string.clone(),
+            journal: reference.journal_abbreviation.clone(),
+            pub_year: reference.pub_year.clone(),
+            volume: reference.volume.clone(),
+            issue: reference.issue.clone(),
+            page_info: reference.page_info.clone(),
+            pmid: reference.pmid.clone(),
+            doi: reference.doi.clone(),
+            cited_by_count: None,
+        }
+    }
+}
+
+impl From<&EuropePmcCitation> for EuropePmcWorkOut {
+    fn from(citation: &EuropePmcCitation) -> Self {
+        Self {
+            source: citation.source.clone(),
+            id: citation.id.clone(),
+            title: citation.title.clone(),
+            authors: citation.author_string.clone(),
+            journal: citation.journal_abbreviation.clone(),
+            pub_year: citation.pub_year.clone(),
+            volume: citation.volume.clone(),
+            issue: citation.issue.clone(),
+            page_info: citation.page_info.clone(),
+            // The citations endpoint has no dedicated pmid field: a citing
+            // record in MED *is* addressed by its PMID.
+            pmid: (citation.source.as_deref() == Some("MED"))
+                .then(|| citation.id.clone())
+                .flatten(),
+            doi: None,
+            cited_by_count: citation.cited_by_count.clone(),
+        }
+    }
+}
+
+/// Structured answer of the `europe_pmc_references` and
+/// `europe_pmc_citations` tools.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct EuropePmcCitationGraphOutput {
+    /// The `source/id` that was queried.
+    pub europe_pmc_id: String,
+    /// Total number of entries Europe PMC holds, before `max_results`.
+    pub total: usize,
+    /// Number of entries returned.
+    pub count: usize,
+    /// The entries, in the order Europe PMC returned them.
+    pub entries: Vec<EuropePmcWorkOut>,
+}
+
 /// List the works cited by a Europe PMC record.
 pub async fn europe_pmc_references(
     server: &super::PubMedServer,
     Parameters(params): Parameters<EuropePmcCitationGraphRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<EuropePmcCitationGraphOutput>, ErrorData> {
     let id = resolve_id(params.source.as_deref(), &params.id)?;
     let max = params.max_results.unwrap_or(50).clamp(1, MAX_RESULTS_CAP);
 
@@ -307,47 +463,25 @@ pub async fn europe_pmc_references(
         .map_err(|e| internal_error(format!("Failed to fetch Europe PMC references: {e}")))?;
 
     let total = references.len();
-    let mut out = format!("{id} cites {total} works (showing {}):\n\n", max.min(total));
+    let entries: Vec<EuropePmcWorkOut> = references
+        .iter()
+        .take(max)
+        .map(EuropePmcWorkOut::from)
+        .collect();
 
-    for (i, reference) in references.iter().take(max).enumerate() {
-        out.push_str(&format!(
-            "{}. {}\n",
-            i + 1,
-            reference.title.as_deref().unwrap_or("Untitled")
-        ));
-        push_field(&mut out, "Authors", reference.author_string.as_deref());
-        push_field(
-            &mut out,
-            "Journal",
-            reference.journal_abbreviation.as_deref(),
-        );
-        push_field(&mut out, "Year", reference.pub_year.as_deref());
-        push_field(
-            &mut out,
-            "Location",
-            locator(
-                reference.volume.as_deref(),
-                reference.issue.as_deref(),
-                reference.page_info.as_deref(),
-            )
-            .as_deref(),
-        );
-        push_field(&mut out, "PMID", reference.pmid.as_deref());
-        push_field(&mut out, "DOI", reference.doi.as_deref());
-    }
-
-    if total > max {
-        out.push_str(&format!("\n... and {} more\n", total - max));
-    }
-
-    text_result(out)
+    Ok(Json(EuropePmcCitationGraphOutput {
+        europe_pmc_id: id.to_string(),
+        total,
+        count: entries.len(),
+        entries,
+    }))
 }
 
 /// List the articles citing a Europe PMC record.
 pub async fn europe_pmc_citations(
     server: &super::PubMedServer,
     Parameters(params): Parameters<EuropePmcCitationGraphRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<EuropePmcCitationGraphOutput>, ErrorData> {
     let id = resolve_id(params.source.as_deref(), &params.id)?;
     let max = params.max_results.unwrap_or(50).clamp(1, MAX_RESULTS_CAP);
 
@@ -361,50 +495,18 @@ pub async fn europe_pmc_citations(
         .map_err(|e| internal_error(format!("Failed to fetch Europe PMC citations: {e}")))?;
 
     let total = citations.len();
-    let mut out = format!(
-        "{id} is cited by {total} articles (showing {}):\n\n",
-        max.min(total)
-    );
+    let entries: Vec<EuropePmcWorkOut> = citations
+        .iter()
+        .take(max)
+        .map(EuropePmcWorkOut::from)
+        .collect();
 
-    for (i, citation) in citations.iter().take(max).enumerate() {
-        out.push_str(&format!(
-            "{}. {}\n",
-            i + 1,
-            citation.title.as_deref().unwrap_or("Untitled")
-        ));
-        push_field(&mut out, "Authors", citation.author_string.as_deref());
-        push_field(
-            &mut out,
-            "Journal",
-            citation.journal_abbreviation.as_deref(),
-        );
-        push_field(&mut out, "Year", citation.pub_year.as_deref());
-        push_field(
-            &mut out,
-            "Location",
-            locator(
-                citation.volume.as_deref(),
-                citation.issue.as_deref(),
-                citation.page_info.as_deref(),
-            )
-            .as_deref(),
-        );
-        if let (Some(source), Some(cited_id)) = (citation.source.as_deref(), citation.id.as_deref())
-        {
-            push_field(
-                &mut out,
-                "Europe PMC ID",
-                Some(&format!("{source}/{cited_id}")),
-            );
-        }
-        push_field(&mut out, "Cited by", citation.cited_by_count.as_deref());
-    }
-
-    if total > max {
-        out.push_str(&format!("\n... and {} more\n", total - max));
-    }
-
-    text_result(out)
+    Ok(Json(EuropePmcCitationGraphOutput {
+        europe_pmc_id: id.to_string(),
+        total,
+        count: entries.len(),
+        entries,
+    }))
 }
 
 /// Request parameters for the `europe_pmc_database_links` tool.
@@ -431,11 +533,55 @@ pub struct EuropePmcDatabaseLinksRequest {
     pub max_entries_per_db: Option<usize>,
 }
 
+/// One cross-reference to an external database.
+///
+/// Europe PMC documents the four `info` slots only positionally, and their
+/// meaning varies by database, so they are passed through unlabelled rather
+/// than guessed at.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct EuropePmcCrossReferenceOut {
+    /// First positional value, usually the external accession.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub info1: Option<String>,
+    /// Second positional value.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub info2: Option<String>,
+    /// Third positional value.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub info3: Option<String>,
+    /// Fourth positional value.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub info4: Option<String>,
+}
+
+/// Cross-references from one record into one external database.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct EuropePmcDatabaseLinkOut {
+    /// External database name (e.g. "UNIPROT", "EMBL", "PDB").
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub db_name: Option<String>,
+    /// Total number of cross-references to this database.
+    pub total: usize,
+    /// The entries returned, capped by `max_entries_per_db`.
+    pub entries: Vec<EuropePmcCrossReferenceOut>,
+}
+
+/// Structured answer of the `europe_pmc_database_links` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct EuropePmcDatabaseLinksOutput {
+    /// The `source/id` that was queried.
+    pub europe_pmc_id: String,
+    /// Number of external databases reported.
+    pub count: usize,
+    /// One group per external database.
+    pub databases: Vec<EuropePmcDatabaseLinkOut>,
+}
+
 /// List external database cross-references for a Europe PMC record.
 pub async fn europe_pmc_database_links(
     server: &super::PubMedServer,
     Parameters(params): Parameters<EuropePmcDatabaseLinksRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<EuropePmcDatabaseLinksOutput>, ErrorData> {
     let id = resolve_id(params.source.as_deref(), &params.id)?;
     let max_entries = params.max_entries_per_db.unwrap_or(20).max(1);
 
@@ -449,48 +595,39 @@ pub async fn europe_pmc_database_links(
         .map_err(|e| internal_error(format!("Failed to fetch Europe PMC database links: {e}")))?;
 
     let filter = params.db_name.as_deref().map(str::to_ascii_uppercase);
-    let links: Vec<_> = links
+    let databases: Vec<EuropePmcDatabaseLinkOut> = links
         .iter()
         .filter(|link| match (&filter, link.db_name.as_deref()) {
             (Some(filter), Some(name)) => name.to_ascii_uppercase() == *filter,
             (Some(_), None) => false,
             (None, _) => true,
         })
+        .map(|link| EuropePmcDatabaseLinkOut {
+            db_name: link.db_name.clone(),
+            // `dbCount` is Europe PMC's own total; fall back to what actually
+            // arrived when the field is absent.
+            total: link
+                .db_count
+                .map_or(link.info.len(), |count| count as usize),
+            entries: link
+                .info
+                .iter()
+                .take(max_entries)
+                .map(|entry| EuropePmcCrossReferenceOut {
+                    info1: entry.info1.clone(),
+                    info2: entry.info2.clone(),
+                    info3: entry.info3.clone(),
+                    info4: entry.info4.clone(),
+                })
+                .collect(),
+        })
         .collect();
 
-    if links.is_empty() {
-        return text_result(format!("{id} has no external database cross-references.\n"));
-    }
-
-    let mut out = format!("{id} links to {} external database(s):\n\n", links.len());
-    for link in links {
-        let name = link.db_name.as_deref().unwrap_or("Unknown database");
-        let count = link.db_count.unwrap_or(link.info.len() as u32);
-        out.push_str(&format!("## {name} ({count} cross-reference(s))\n"));
-        for entry in link.info.iter().take(max_entries) {
-            // Europe PMC documents the four `info` slots only positionally, so
-            // render whichever are populated rather than guessing at labels.
-            let values: Vec<&str> = [
-                entry.info1.as_deref(),
-                entry.info2.as_deref(),
-                entry.info3.as_deref(),
-                entry.info4.as_deref(),
-            ]
-            .into_iter()
-            .flatten()
-            .filter(|v| !v.trim().is_empty())
-            .collect();
-            if !values.is_empty() {
-                out.push_str(&format!("- {}\n", values.join(" | ")));
-            }
-        }
-        if link.info.len() > max_entries {
-            out.push_str(&format!("... and {} more\n", link.info.len() - max_entries));
-        }
-        out.push('\n');
-    }
-
-    text_result(out)
+    Ok(Json(EuropePmcDatabaseLinksOutput {
+        europe_pmc_id: id.to_string(),
+        count: databases.len(),
+        databases,
+    }))
 }
 
 #[cfg(test)]
@@ -551,13 +688,23 @@ mod tests {
     }
 
     #[test]
-    fn locator_joins_only_the_present_parts() {
+    fn a_med_citation_exposes_its_id_as_a_pmid() {
+        let citation = EuropePmcCitation {
+            id: Some("33515491".to_string()),
+            source: Some("MED".to_string()),
+            ..Default::default()
+        };
         assert_eq!(
-            locator(Some("5"), Some("2"), Some("100-110")).as_deref(),
-            Some("5(2):100-110")
+            EuropePmcWorkOut::from(&citation).pmid.as_deref(),
+            Some("33515491")
         );
-        assert_eq!(locator(Some("5"), None, None).as_deref(), Some("5"));
-        assert_eq!(locator(None, None, Some("e1234")).as_deref(), Some("e1234"));
-        assert_eq!(locator(None, None, None), None);
+
+        // A preprint id is not a PMID, so it must not be reported as one.
+        let preprint = EuropePmcCitation {
+            id: Some("PPR123456".to_string()),
+            source: Some("PPR".to_string()),
+            ..Default::default()
+        };
+        assert_eq!(EuropePmcWorkOut::from(&preprint).pmid, None);
     }
 }

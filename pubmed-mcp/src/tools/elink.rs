@@ -1,10 +1,14 @@
 //! ELink tools for PubMed MCP server (related articles, citations, PMC links)
 
-use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
-use serde::Deserialize;
+use rmcp::{
+    handler::server::wrapper::{Json, Parameters},
+    model::*,
+    schemars,
+};
+use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use super::common::{internal_error, invalid_params, text_result};
+use super::common::{internal_error, invalid_params};
 
 /// Request parameters for get_related_articles tool
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -16,11 +20,24 @@ pub struct RelatedArticlesRequest {
     pub max_results: Option<usize>,
 }
 
+/// Structured answer of the `get_related_articles` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct RelatedArticlesOutput {
+    /// The PMIDs that were queried.
+    pub source_pmids: Vec<u32>,
+    /// ELink link name behind the result (e.g. "pubmed_pubmed").
+    pub link_type: String,
+    /// Number of related articles PubMed reported, before `max_results`.
+    pub total: usize,
+    /// The related PMIDs, truncated to `max_results`.
+    pub related_pmids: Vec<u32>,
+}
+
 /// Find related articles for given PMIDs using the ELink API
 pub async fn get_related_articles(
     server: &super::PubMedServer,
     Parameters(params): Parameters<RelatedArticlesRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<RelatedArticlesOutput>, ErrorData> {
     if params.pmids.is_empty() {
         return Err(invalid_params("At least one PMID is required"));
     }
@@ -40,25 +57,12 @@ pub async fn get_related_articles(
         .await
         .map_err(|e| internal_error(format!("Failed to get related articles: {}", e)))?;
 
-    let displayed: Vec<_> = related.related_pmids.iter().take(max).collect();
-    let total = related.related_pmids.len();
-
-    let mut result = format!(
-        "Source PMIDs: {:?}\nFound {} related articles (showing {}):\n\n",
-        related.source_pmids,
-        total,
-        displayed.len()
-    );
-
-    for pmid in &displayed {
-        result.push_str(&format!("- PMID: {}\n", pmid));
-    }
-
-    if total > max {
-        result.push_str(&format!("\n... and {} more", total - max));
-    }
-
-    text_result(result)
+    Ok(Json(RelatedArticlesOutput {
+        source_pmids: related.source_pmids,
+        link_type: related.link_type,
+        total: related.related_pmids.len(),
+        related_pmids: related.related_pmids.into_iter().take(max).collect(),
+    }))
 }
 
 /// Request parameters for get_citations tool
@@ -71,11 +75,26 @@ pub struct CitationsRequest {
     pub max_results: Option<usize>,
 }
 
+/// Structured answer of the `get_citations` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct CitationsOutput {
+    /// The PMIDs that were queried.
+    pub source_pmids: Vec<u32>,
+    /// ELink link name behind the result (e.g. "pubmed_pubmed_citedin").
+    pub link_type: String,
+    /// Number of citing articles PubMed reported, before `max_results`.
+    /// Counts PubMed-indexed articles only, so it can be lower than what
+    /// Google Scholar reports.
+    pub total: usize,
+    /// The citing PMIDs, truncated to `max_results`.
+    pub citing_pmids: Vec<u32>,
+}
+
 /// Get articles that cite the given PMIDs
 pub async fn get_citations(
     server: &super::PubMedServer,
     Parameters(params): Parameters<CitationsRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<CitationsOutput>, ErrorData> {
     if params.pmids.is_empty() {
         return Err(invalid_params("At least one PMID is required"));
     }
@@ -95,27 +114,12 @@ pub async fn get_citations(
         .await
         .map_err(|e| internal_error(format!("Failed to get citations: {}", e)))?;
 
-    let displayed: Vec<_> = citations.citing_pmids.iter().take(max).collect();
-    let total = citations.citing_pmids.len();
-
-    let mut result = format!(
-        "Source PMIDs: {:?}\nFound {} citing articles in PubMed (showing {}):\n\n",
-        citations.source_pmids,
-        total,
-        displayed.len()
-    );
-
-    for pmid in &displayed {
-        result.push_str(&format!("- PMID: {}\n", pmid));
-    }
-
-    if total > max {
-        result.push_str(&format!("\n... and {} more", total - max));
-    }
-
-    result.push_str("\nNote: Citation counts reflect PubMed-indexed articles only. Google Scholar and other sources may report higher counts.");
-
-    text_result(result)
+    Ok(Json(CitationsOutput {
+        source_pmids: citations.source_pmids,
+        link_type: citations.link_type,
+        total: citations.citing_pmids.len(),
+        citing_pmids: citations.citing_pmids.into_iter().take(max).collect(),
+    }))
 }
 
 /// Request parameters for get_pmc_links tool
@@ -127,11 +131,23 @@ pub struct PmcLinksRequest {
     pub pmids: Vec<u32>,
 }
 
+/// Structured answer of the `get_pmc_links` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct PmcLinksOutput {
+    /// The PMIDs that were queried.
+    pub source_pmids: Vec<u32>,
+    /// Number of PMC full-text versions found.
+    pub count: usize,
+    /// PMC IDs of the free full-text versions, `PMC`-prefixed and ready to
+    /// pass to the PMC tools.
+    pub pmc_ids: Vec<String>,
+}
+
 /// Check PMC full-text availability for given PMIDs
 pub async fn get_pmc_links(
     server: &super::PubMedServer,
     Parameters(params): Parameters<PmcLinksRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<PmcLinksOutput>, ErrorData> {
     if params.pmids.is_empty() {
         return Err(invalid_params("At least one PMID is required"));
     }
@@ -148,19 +164,17 @@ pub async fn get_pmc_links(
         .await
         .map_err(|e| internal_error(format!("Failed to get PMC links: {}", e)))?;
 
-    let mut result = format!(
-        "Checked {} PMIDs, found {} with PMC full text:\n\n",
-        pmc_links.source_pmids.len(),
-        pmc_links.pmc_ids.len()
-    );
+    // ELink reports the bare numeric id; the PMC tools expect the prefixed
+    // form, so hand back an id the caller can use as-is.
+    let pmc_ids: Vec<String> = pmc_links
+        .pmc_ids
+        .iter()
+        .map(|id| super::common::normalize_pmc_id(id))
+        .collect();
 
-    for pmc_id in &pmc_links.pmc_ids {
-        result.push_str(&format!("- PMC{}\n", pmc_id));
-    }
-
-    if pmc_links.pmc_ids.is_empty() {
-        result.push_str("No PMC full-text articles found for the given PMIDs.\n");
-    }
-
-    text_result(result)
+    Ok(Json(PmcLinksOutput {
+        source_pmids: pmc_links.source_pmids,
+        count: pmc_ids.len(),
+        pmc_ids,
+    }))
 }
