@@ -81,6 +81,16 @@ export function trackConfig<T extends { free?: () => void }>(config: T): T {
 }
 
 /**
+ * Live-API tests are opt-in, the same convention the Rust crates and the Go
+ * bindings use (`PUBMED_REAL_API_TESTS=1`). Tests that reach NCBI or Europe PMC
+ * depend on a third-party service being up: a maintenance window or an outage
+ * on one endpoint turns every pull request red for something this repository
+ * did not break. The scheduled `Integration Tests` workflow sets the variable
+ * and keeps the live coverage.
+ */
+export const REAL_API_TESTS = process.env.PUBMED_REAL_API_TESTS === '1'
+
+/**
  * Test configuration constants
  */
 export const TEST_CONFIG = {

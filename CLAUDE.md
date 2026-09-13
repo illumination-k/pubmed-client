@@ -269,10 +269,17 @@ Native Node.js bindings via napi-rs. Published as `pubmed-client` on npm. Pre-bu
 - TypeDoc generates HTML docs from `index.d.ts` via `pnpm run docs` (output: `docs/`, gitignored)
 - Config: `typedoc.json` + `tsconfig.typedoc.json` (separate tsconfig scoped to `index.d.ts`)
 - CI: `node-docs` job in `docs.yml` uploads artifact → merged into `website/build/node/` by `build-site`
+- Vitest suites that call the live NCBI / Europe PMC APIs are gated behind
+  `PUBMED_REAL_API_TESTS=1` (`REAL_API_TESTS` in `tests/setup.ts` + `describe.skipIf`), the same
+  opt-in convention as the Rust and Go tests. `ci-napi.yml` / `ci-wasm.yml` therefore run only the
+  offline suites; the live ones run in the scheduled `integration-tests.yml`
+  (`binding-integration-tests` job), so a Europe PMC outage can't turn every PR red.
 
 ### WASM Bindings (`pubmed-client-wasm/`)
 
 WebAssembly bindings via wasm-pack. Published as `pubmed-client-wasm` on npm. Key types: `WasmPubMedClient`, `WasmClientConfig`.
+
+- Live-API tests are opt-in behind `PUBMED_REAL_API_TESTS=1`, same as the NAPI bindings above.
 
 ### Python Bindings (`pubmed-client-py/`)
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { WasmPubMedClient } from '../pkg/pubmed_client_wasm.js'
+import { REAL_API_TESTS } from './setup'
 
 describe('Europe PMC', () => {
   describe('API surface', () => {
@@ -45,7 +46,8 @@ describe('Europe PMC', () => {
     })
   })
 
-  describe('Search', () => {
+  // Live Europe PMC calls: opt in with PUBMED_REAL_API_TESTS=1.
+  describe.skipIf(!REAL_API_TESTS)('Search', () => {
     it('should return records across sources', async () => {
       const client = WasmPubMedClient.new_for_testing()
       try {
@@ -76,7 +78,8 @@ describe('Europe PMC', () => {
     })
   })
 
-  describe('Records', () => {
+  // Live Europe PMC calls: opt in with PUBMED_REAL_API_TESTS=1.
+  describe.skipIf(!REAL_API_TESTS)('Records', () => {
     it('should fetch parsed full text for a PMC record', async () => {
       const client = WasmPubMedClient.new_for_testing()
       try {
