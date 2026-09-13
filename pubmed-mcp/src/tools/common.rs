@@ -1,7 +1,7 @@
 //! Shared helpers for MCP tool implementations
 
 use pubmed_client::{Figure, Section, Table};
-use rmcp::model::*;
+use rmcp::model::{ErrorCode, ErrorData};
 use std::borrow::Cow;
 use std::fmt::Display;
 
@@ -19,10 +19,6 @@ pub fn invalid_params(msg: impl Display) -> ErrorData {
         message: Cow::from(msg.to_string()),
         data: None,
     }
-}
-
-pub fn text_result(s: impl Into<String>) -> Result<CallToolResult, ErrorData> {
-    Ok(CallToolResult::success(vec![ContentBlock::text(s.into())]))
 }
 
 pub fn normalize_pmc_id(pmc_id: &str) -> String {

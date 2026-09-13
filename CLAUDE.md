@@ -334,6 +334,16 @@ pnpm run typecheck    # tsc
 MCP server for AI assistants (Claude Desktop, etc.) built with rmcp. Communicates via stdio, or over
 streamable HTTP at `/mcp` with `--port`.
 
+**Every tool returns structured output.** A tool function returns `Json<T>` (never a bare
+`CallToolResult`): rmcp then derives the tool's `outputSchema` from `T` and puts the serialized value
+in the response's `structuredContent`, echoing the same JSON as a text block for clients that read
+only `content`. `T` needs `Serialize` + `schemars::JsonSchema` and must be a struct (the MCP spec
+requires an object root). Per-tool output types live next to their tool; shapes shared by several
+tools (sections, figures, tables, references) live in `tools/output.rs`. Two tests guard this: a unit
+test in `main.rs` asserts every registered tool advertises an object `outputSchema`, and
+`tests/integration_test.rs` drives a whole `search_pubmed` call over stdio against a wiremock-stubbed
+E-utilities endpoint and asserts the `structuredContent` that comes back.
+
 Released as a multi-arch container image to GHCR (`ghcr.io/illumination-k/pubmed-mcp`) alongside the
 crates.io publish, from `pubmed-mcp/Dockerfile` (build context is the **workspace root** — the crate
 depends on its siblings by path; `.dockerignore` at the root trims the context but must keep every
@@ -349,6 +359,7 @@ src/
                        # PUBMED_MCP_TIMEOUT / _MAX_RETRIES / _BASE_URL / _CACHE*
   tools/
     mod.rs             # PubMedServer definition
+    output.rs          # Structured output types shared by the tools
     search.rs          # search_pubmed tool (with study type/text availability filters)
     articles.rs        # fetch_articles tool (EFetch — full records by PMID)
     markdown.rs        # get_pmc_markdown tool

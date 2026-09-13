@@ -1,9 +1,12 @@
 use anyhow::Result;
 use rmcp::{
     ServiceExt,
+    model::CallToolRequestParams,
     transport::{ConfigureCommandExt, TokioChildProcess},
 };
 use tokio::process::Command;
+use wiremock::matchers::{method, path};
+use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[tokio::test]
 async fn test_mcp_server_initialize() -> Result<()> {
@@ -212,6 +215,140 @@ async fn test_mcp_server_europe_pmc_tool_filtering() -> Result<()> {
             "europe_pmc_references",
             "europe_pmc_search",
         ]
+    );
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_every_tool_advertises_an_output_schema() -> Result<()> {
+    // Every tool answers with structured content, so the schema describing it
+    // has to survive the trip to the client: without it, a client cannot
+    // validate `structuredContent` and falls back to reading prose.
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run").arg("-p").arg("pubmed-mcp").arg("--quiet");
+            },
+        ))?)
+        .await?;
+
+    let tools = client.list_all_tools().await?;
+    assert!(!tools.is_empty(), "server should register tools");
+
+    for tool in &tools {
+        let schema = tool
+            .output_schema
+            .as_ref()
+            .unwrap_or_else(|| panic!("{} should advertise an outputSchema", tool.name));
+        assert_eq!(
+            schema.get("type").and_then(|ty| ty.as_str()),
+            Some("object"),
+            "{}'s outputSchema should describe a JSON object",
+            tool.name
+        );
+    }
+
+    Ok(())
+}
+
+/// Minimal ESearch answer: one PMID, so `search_pubmed` proceeds to EFetch.
+const ESEARCH_RESPONSE: &str = r#"{
+    "esearchresult": {
+        "count": "1",
+        "retmax": "1",
+        "retstart": "0",
+        "idlist": ["31978945"]
+    }
+}"#;
+
+/// Minimal EFetch answer for the PMID above.
+const EFETCH_RESPONSE: &str = r#"<?xml version="1.0" ?>
+<PubmedArticleSet>
+    <PubmedArticle>
+        <MedlineCitation>
+            <PMID Version="1">31978945</PMID>
+            <Article>
+                <Journal><Title>Journal of Things</Title></Journal>
+                <ArticleTitle>A study of things</ArticleTitle>
+                <Abstract><AbstractText>Things were studied.</AbstractText></Abstract>
+                <AuthorList>
+                    <Author>
+                        <LastName>Doe</LastName>
+                        <ForeName>Jane</ForeName>
+                    </Author>
+                </AuthorList>
+            </Article>
+        </MedlineCitation>
+    </PubmedArticle>
+</PubmedArticleSet>"#;
+
+#[tokio::test]
+async fn test_tool_call_returns_structured_content() -> Result<()> {
+    // Drive a whole call over stdio against a stubbed E-utilities endpoint:
+    // the unit tests cover the shape of the output type, this covers that the
+    // shape actually reaches the client as `structuredContent`.
+    let ncbi = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/esearch.fcgi"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(ESEARCH_RESPONSE))
+        .mount(&ncbi)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/efetch.fcgi"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(EFETCH_RESPONSE))
+        .mount(&ncbi)
+        .await;
+
+    let base_url = ncbi.uri();
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--base-url")
+                    .arg(&base_url)
+                    .arg("--tools")
+                    .arg("search");
+            },
+        ))?)
+        .await?;
+
+    let arguments = serde_json::json!({ "query": "things", "max_results": 1 });
+    let result = client
+        .call_tool(
+            CallToolRequestParams::new("search_pubmed").with_arguments(
+                arguments
+                    .as_object()
+                    .expect("arguments should be a JSON object")
+                    .clone(),
+            ),
+        )
+        .await?;
+
+    let structured = result
+        .structured_content
+        .expect("search_pubmed should answer with structuredContent");
+    assert_eq!(structured["count"], 1);
+    assert_eq!(structured["articles"][0]["pmid"], "31978945");
+    assert_eq!(structured["articles"][0]["title"], "A study of things");
+    assert_eq!(
+        structured["articles"][0]["abstract_preview"],
+        "Things were studied."
+    );
+
+    // The same JSON is echoed as a text block, so a client that only reads
+    // `content` still gets the whole answer rather than an empty result.
+    let text = match result.content.first() {
+        Some(rmcp::model::ContentBlock::Text(text)) => text.text.clone(),
+        other => panic!("expected a text content block, got: {other:?}"),
+    };
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&text)?,
+        structured
     );
 
     Ok(())

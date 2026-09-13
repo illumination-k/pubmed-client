@@ -1,10 +1,14 @@
 //! Search tool for PubMed MCP server
 
-use rmcp::{handler::server::wrapper::Parameters, model::*, schemars};
-use serde::Deserialize;
+use rmcp::{
+    handler::server::wrapper::{Json, Parameters},
+    model::*,
+    schemars,
+};
+use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use super::common::{internal_error, text_result};
+use super::common::internal_error;
 use pubmed_client::{ArticleType, SearchQuery, SortOrder};
 
 /// Study type filter for PubMed searches
@@ -157,11 +161,48 @@ fn abstract_preview(abstract_text: &str) -> String {
     }
 }
 
+/// One article in a `search_pubmed` answer.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct SearchArticle {
+    /// PubMed ID.
+    pub pmid: String,
+    /// Article title.
+    pub title: String,
+    /// PMC ID, when a free full-text version exists.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pmc_id: Option<String>,
+    /// Journal name.
+    pub journal: String,
+    /// Publication date as PubMed reports it (often just a year).
+    pub pub_date: String,
+    /// DOI, when the record carries one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub doi: Option<String>,
+    /// First 200 characters of the abstract, ellipsised when cut. Omitted
+    /// when `include_abstract` is false or the record has no abstract; use
+    /// `fetch_articles` for the full text.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub abstract_preview: Option<String>,
+}
+
+/// Structured answer of the `search_pubmed` tool.
+#[derive(Debug, Serialize, schemars::JsonSchema)]
+pub struct SearchOutput {
+    /// The PubMed query actually sent, with every filter applied.
+    pub query: String,
+    /// Human-readable summary of the filters folded into `query`.
+    pub filters_applied: Vec<String>,
+    /// Number of articles returned (never more than `max_results`).
+    pub count: usize,
+    /// The matching articles, in the order PubMed returned them.
+    pub articles: Vec<SearchArticle>,
+}
+
 /// Search PubMed for articles with advanced filtering
 pub async fn search_pubmed(
     server: &super::PubMedServer,
     Parameters(params): Parameters<SearchRequest>,
-) -> Result<CallToolResult, ErrorData> {
+) -> Result<Json<SearchOutput>, ErrorData> {
     let max = params.max_results.unwrap_or(10).min(100);
     let include_abstract = params.include_abstract.unwrap_or(true);
 
@@ -209,9 +250,6 @@ pub async fn search_pubmed(
         .await
         .map_err(|e| internal_error(format!("Search failed: {}", e)))?;
 
-    let mut result = String::new();
-
-    // Add filter information to the result
     let mut filters_applied = Vec::new();
     if let Some(ref study_type) = params.study_type {
         filters_applied.push(study_type.display_name().to_string());
@@ -230,43 +268,27 @@ pub async fn search_pubmed(
         filters_applied.push(format!("Sorted by {}", sort_order.display_name()));
     }
 
-    if !filters_applied.is_empty() {
-        result.push_str(&format!(
-            "Filters applied: {}\n",
-            filters_applied.join(", ")
-        ));
-    }
+    let articles: Vec<SearchArticle> = articles
+        .iter()
+        .map(|article| SearchArticle {
+            pmid: article.pmid.clone(),
+            title: article.title.clone(),
+            pmc_id: article.pmc_id.clone(),
+            journal: article.journal.clone(),
+            pub_date: article.pub_date.clone(),
+            doi: article.doi.clone(),
+            abstract_preview: include_abstract
+                .then(|| article.abstract_text.as_deref().map(abstract_preview))
+                .flatten(),
+        })
+        .collect();
 
-    result.push_str(&format!("Found {} articles:\n\n", articles.len()));
-
-    for (i, article) in articles.iter().enumerate() {
-        if let Some(ref pmc_id) = article.pmc_id {
-            result.push_str(&format!(
-                "{}. {} (PMID: {} | PMC: {})\n",
-                i + 1,
-                article.title,
-                article.pmid,
-                pmc_id
-            ));
-        } else {
-            result.push_str(&format!(
-                "{}. {} (PMID: {})\n",
-                i + 1,
-                article.title,
-                article.pmid
-            ));
-        }
-
-        if include_abstract && let Some(ref abstract_text) = article.abstract_text {
-            result.push_str(&format!(
-                "   Abstract: {}\n",
-                abstract_preview(abstract_text)
-            ));
-        }
-        result.push('\n');
-    }
-
-    text_result(result)
+    Ok(Json(SearchOutput {
+        query: query_string,
+        filters_applied,
+        count: articles.len(),
+        articles,
+    }))
 }
 
 #[cfg(test)]

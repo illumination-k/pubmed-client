@@ -18,6 +18,7 @@ pub mod figures;
 pub mod fulltext;
 pub mod gquery;
 pub mod markdown;
+pub mod output;
 pub mod search;
 pub mod summary;
 

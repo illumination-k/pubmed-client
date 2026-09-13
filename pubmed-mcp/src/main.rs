@@ -1,8 +1,11 @@
 use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use rmcp::{
-    ServerHandler, ServiceExt, handler::server::wrapper::Parameters, model::*, tool, tool_handler,
-    tool_router, transport::stdio,
+    ServerHandler, ServiceExt,
+    handler::server::wrapper::{Json, Parameters},
+    model::*,
+    tool, tool_handler, tool_router,
+    transport::stdio,
 };
 use std::collections::HashSet;
 use std::sync::Arc;
@@ -94,7 +97,7 @@ impl PubMedServer {
     async fn search_pubmed(
         &self,
         params: Parameters<tools::search::SearchRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::search::SearchOutput>, ErrorData> {
         tools::search::search_pubmed(self, params).await
     }
 
@@ -104,7 +107,7 @@ impl PubMedServer {
     async fn get_pmc_markdown(
         &self,
         params: Parameters<tools::markdown::MarkdownRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::markdown::MarkdownOutput>, ErrorData> {
         tools::markdown::get_pmc_markdown(self, params).await
     }
 
@@ -114,7 +117,7 @@ impl PubMedServer {
     async fn match_citations(
         &self,
         params: Parameters<tools::citmatch::CitMatchRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::citmatch::CitMatchOutput>, ErrorData> {
         tools::citmatch::match_citations(self, params).await
     }
 
@@ -124,7 +127,7 @@ impl PubMedServer {
     async fn global_query(
         &self,
         params: Parameters<tools::gquery::GlobalQueryRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::gquery::GlobalQueryOutput>, ErrorData> {
         tools::gquery::global_query(self, params).await
     }
 
@@ -134,7 +137,7 @@ impl PubMedServer {
     async fn spell_check(
         &self,
         params: Parameters<tools::espell::SpellCheckRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::espell::SpellCheckOutput>, ErrorData> {
         tools::espell::spell_check(self, params).await
     }
 
@@ -144,7 +147,7 @@ impl PubMedServer {
     async fn fetch_summaries(
         &self,
         params: Parameters<tools::summary::SummaryRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::summary::SummariesOutput>, ErrorData> {
         tools::summary::fetch_summaries(self, params).await
     }
 
@@ -154,7 +157,7 @@ impl PubMedServer {
     async fn fetch_articles(
         &self,
         params: Parameters<tools::articles::ArticlesRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::articles::ArticlesOutput>, ErrorData> {
         tools::articles::fetch_articles(self, params).await
     }
 
@@ -164,7 +167,7 @@ impl PubMedServer {
     async fn get_related_articles(
         &self,
         params: Parameters<tools::elink::RelatedArticlesRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::elink::RelatedArticlesOutput>, ErrorData> {
         tools::elink::get_related_articles(self, params).await
     }
 
@@ -174,7 +177,7 @@ impl PubMedServer {
     async fn get_citations(
         &self,
         params: Parameters<tools::elink::CitationsRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::elink::CitationsOutput>, ErrorData> {
         tools::elink::get_citations(self, params).await
     }
 
@@ -184,7 +187,7 @@ impl PubMedServer {
     async fn get_pmc_links(
         &self,
         params: Parameters<tools::elink::PmcLinksRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::elink::PmcLinksOutput>, ErrorData> {
         tools::elink::get_pmc_links(self, params).await
     }
 
@@ -194,7 +197,7 @@ impl PubMedServer {
     async fn list_databases(
         &self,
         params: Parameters<tools::einfo::ListDatabasesRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::einfo::DatabaseListOutput>, ErrorData> {
         tools::einfo::list_databases(self, params).await
     }
 
@@ -204,7 +207,7 @@ impl PubMedServer {
     async fn get_database_info(
         &self,
         params: Parameters<tools::einfo::DatabaseInfoRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::einfo::DatabaseInfoOutput>, ErrorData> {
         tools::einfo::get_database_info(self, params).await
     }
 
@@ -214,7 +217,7 @@ impl PubMedServer {
     async fn get_pmc_fulltext(
         &self,
         params: Parameters<tools::fulltext::FullTextRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::fulltext::FullTextOutput>, ErrorData> {
         tools::fulltext::get_pmc_fulltext(self, params).await
     }
 
@@ -224,7 +227,7 @@ impl PubMedServer {
     async fn get_pmc_figures(
         &self,
         params: Parameters<tools::figures::FiguresRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::figures::FiguresOutput>, ErrorData> {
         tools::figures::get_pmc_figures(self, params).await
     }
 
@@ -234,7 +237,7 @@ impl PubMedServer {
     async fn pmid_to_pmcid(
         &self,
         params: Parameters<tools::convert::ConvertIdRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::convert::ConvertIdOutput>, ErrorData> {
         tools::convert::pmid_to_pmcid(self, params).await
     }
 
@@ -244,7 +247,7 @@ impl PubMedServer {
     async fn export_citations(
         &self,
         params: Parameters<tools::export::ExportRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::export::ExportOutput>, ErrorData> {
         tools::export::export_citations(self, params).await
     }
 
@@ -254,7 +257,7 @@ impl PubMedServer {
     async fn europe_pmc_search(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcSearchRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::europe_pmc::EuropePmcSearchOutput>, ErrorData> {
         tools::europe_pmc::europe_pmc_search(self, params).await
     }
 
@@ -264,7 +267,7 @@ impl PubMedServer {
     async fn europe_pmc_fulltext(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcFullTextRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::europe_pmc::EuropePmcFullTextOutput>, ErrorData> {
         tools::europe_pmc::europe_pmc_fulltext(self, params).await
     }
 
@@ -274,7 +277,7 @@ impl PubMedServer {
     async fn europe_pmc_references(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcCitationGraphRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::europe_pmc::EuropePmcCitationGraphOutput>, ErrorData> {
         tools::europe_pmc::europe_pmc_references(self, params).await
     }
 
@@ -284,7 +287,7 @@ impl PubMedServer {
     async fn europe_pmc_citations(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcCitationGraphRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::europe_pmc::EuropePmcCitationGraphOutput>, ErrorData> {
         tools::europe_pmc::europe_pmc_citations(self, params).await
     }
 
@@ -294,7 +297,7 @@ impl PubMedServer {
     async fn europe_pmc_database_links(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcDatabaseLinksRequest>,
-    ) -> Result<CallToolResult, ErrorData> {
+    ) -> Result<Json<tools::europe_pmc::EuropePmcDatabaseLinksOutput>, ErrorData> {
         tools::europe_pmc::europe_pmc_database_links(self, params).await
     }
 }
@@ -432,6 +435,26 @@ mod tests {
             ToolName::value_variants().len(),
             "every registered tool should be selectable via --tools; registered: {registered:?}"
         );
+    }
+
+    /// Every tool answers with `Json<T>`, so every registered tool must
+    /// advertise an `outputSchema` describing `T`. A tool that regresses to a
+    /// bare text result loses the schema silently, and a client that relies on
+    /// `structuredContent` would have nothing to validate against.
+    #[test]
+    fn every_tool_advertises_an_object_output_schema() {
+        for tool in PubMedServer::tool_router().list_all() {
+            let schema = tool
+                .output_schema
+                .as_ref()
+                .unwrap_or_else(|| panic!("{} has no outputSchema", tool.name));
+            assert_eq!(
+                schema.get("type").and_then(|ty| ty.as_str()),
+                Some("object"),
+                "{}'s outputSchema should describe a JSON object, got: {schema:?}",
+                tool.name
+            );
+        }
     }
 
     #[test]
