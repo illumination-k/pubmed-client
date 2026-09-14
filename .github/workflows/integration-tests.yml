@@ -203,9 +203,61 @@ jobs:
             echo "- Individual test failures don't fail the workflow"
           } >> "$GITHUB_STEP_SUMMARY"
 
+  # Live API tests for the Node.js bindings. Their offline suites run in
+  # ci-napi.yml / ci-wasm.yml on every pull request; the network-backed Europe
+  # PMC suites are gated on PUBMED_REAL_API_TESTS and only run here.
+  binding-integration-tests:
+    needs: check-trigger
+    if: needs.check-trigger.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        binding: [napi, wasm]
+
+    env:
+      MISE_ENV: node
+      SKIP_POSTINSTALL: "1"
+      PUBMED_REAL_API_TESTS: "1"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-repo
+        with:
+          rust-target: ${{ matrix.binding == 'wasm' && 'wasm32-unknown-unknown' || '' }}
+          skip-postinstall: "true"
+
+      - name: Install wasm-pack
+        if: matrix.binding == 'wasm'
+        uses: jetli/wasm-pack-action@0d096b08b4e5a7de8c28de67e11e945404e9eefa # v0.4.0
+        with:
+          version: latest
+
+      - name: Install dependencies
+        working-directory: pubmed-client-${{ matrix.binding }}
+        run: pnpm install
+
+      - name: Build binding
+        working-directory: pubmed-client-${{ matrix.binding }}
+        run: pnpm run build
+
+      - name: Run live binding tests
+        working-directory: pubmed-client-${{ matrix.binding }}
+        run: pnpm run test
+        continue-on-error: true # Upstream outages must not fail the workflow
+
   # Notification job for scheduled runs
   notify-results:
-    needs: [check-trigger, integration-tests]
+    needs: [check-trigger, integration-tests, binding-integration-tests]
     if: always() && needs.check-trigger.outputs.should_run == 'true' && github.event_name == 'schedule'
     runs-on: ubuntu-latest
     permissions: {}
@@ -214,11 +266,13 @@ jobs:
       - name: Report scheduled test results
         env:
           TEST_RESULT: ${{ needs.integration-tests.result }}
+          BINDING_TEST_RESULT: ${{ needs.binding-integration-tests.result }}
         run: |
-          if [[ "$TEST_RESULT" == "success" ]]; then
+          if [[ "$TEST_RESULT" == "success" && "$BINDING_TEST_RESULT" == "success" ]]; then
             echo "✅ Scheduled integration tests completed successfully"
           else
             echo "⚠️ Scheduled integration tests encountered issues"
+            echo "Rust: $TEST_RESULT, Node.js bindings: $BINDING_TEST_RESULT"
             echo "This may indicate API changes or network issues"
             echo "Please review the test results and update if necessary"
           fi
