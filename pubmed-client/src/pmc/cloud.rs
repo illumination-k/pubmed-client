@@ -596,15 +596,21 @@ impl PmcCloudClient {
             .unwrap_or(false)
     }
 
-    /// Get image dimensions using the image crate
+    /// Read image dimensions from the file header.
+    ///
+    /// `imagesize` parses only the header, so this never decodes pixel data.
+    /// Formats it does not recognize (`svg`, `eps`, `pdf` among the extensions
+    /// figures are matched on) simply yield `None`.
     #[cfg(not(target_arch = "wasm32"))]
     async fn get_image_dimensions(file_path: &str) -> Option<(u32, u32)> {
         task::spawn_blocking({
             let file_path = file_path.to_string();
             move || {
-                image::open(&file_path)
-                    .ok()
-                    .map(|img| (img.width(), img.height()))
+                let size = imagesize::size(&file_path).ok()?;
+                Some((
+                    u32::try_from(size.width).ok()?,
+                    u32::try_from(size.height).ok()?,
+                ))
             }
         })
         .await
@@ -825,6 +831,55 @@ mod tests {
         let fig = figure("gr9", Some("Figure 9"), Some("missing.png"));
         assert_eq!(
             PmcCloudClient::find_matching_file(&fig, &files, IMAGE_EXTS),
+            None
+        );
+    }
+
+    /// A 3x2 PNG: signature + an IHDR chunk declaring the dimensions.
+    #[cfg(not(target_arch = "wasm32"))]
+    const PNG_3X2: &[u8] = &[
+        0x89, b'P', b'N', b'G', 0x0d, 0x0a, 0x1a, 0x0a, // signature
+        0x00, 0x00, 0x00, 0x0d, b'I', b'H', b'D', b'R', // chunk length + type
+        0x00, 0x00, 0x00, 0x03, // width  = 3
+        0x00, 0x00, 0x00, 0x02, // height = 2
+        0x08, 0x06, 0x00, 0x00, 0x00, // bit depth, color type, compression, filter, interlace
+        0x00, 0x00, 0x00, 0x00, // CRC (not validated when reading the header)
+    ];
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[tokio::test]
+    async fn test_get_image_dimensions_reads_png_header() {
+        use std::fs;
+
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("gr1.png");
+        fs::write(&path, PNG_3X2).unwrap();
+
+        assert_eq!(
+            PmcCloudClient::get_image_dimensions(&path.to_string_lossy()).await,
+            Some((3, 2))
+        );
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[tokio::test]
+    async fn test_get_image_dimensions_none_for_unsupported_and_missing() {
+        use std::fs;
+
+        let dir = tempfile::tempdir().unwrap();
+
+        // SVG / EPS / PDF are in the matched extension list but carry no
+        // readable raster header, so they yield `None`.
+        let svg = dir.path().join("gr1.svg");
+        fs::write(&svg, b"<svg width=\"10\" height=\"20\"></svg>").unwrap();
+        assert_eq!(
+            PmcCloudClient::get_image_dimensions(&svg.to_string_lossy()).await,
+            None
+        );
+
+        let missing = dir.path().join("does-not-exist.png");
+        assert_eq!(
+            PmcCloudClient::get_image_dimensions(&missing.to_string_lossy()).await,
             None
         );
     }
