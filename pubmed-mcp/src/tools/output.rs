@@ -1,10 +1,12 @@
 //! Structured output types shared by the MCP tools.
 //!
-//! Every tool answers with [`rmcp::handler::server::wrapper::Json`], so rmcp
-//! advertises the wrapped type's JSON schema as the tool's `outputSchema` and
-//! puts the serialized value in the response's `structuredContent` (the same
-//! JSON is echoed as a text content block for clients that only read
-//! `content`).
+//! Almost every tool answers with [`rmcp::handler::server::wrapper::Json`], so
+//! rmcp advertises the wrapped type's JSON schema as the tool's `outputSchema`
+//! and puts the serialized value in the response's `structuredContent` (the
+//! same JSON is echoed as a text content block for clients that only read
+//! `content`). `get_pmc_figure_images` builds its result by hand, because its
+//! `content` carries the images themselves — but it declares an `outputSchema`
+//! the same way, and reuses the shapes below.
 //!
 //! These shapes are defined here rather than reused from `pubmed-parser`
 //! because the wire format is a public contract of the server: the domain

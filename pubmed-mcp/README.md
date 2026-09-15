@@ -17,6 +17,9 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - Configurable metadata, table of contents, and figure captions
   - Proper handling of references, funding information, and acknowledgments
   - Clean HTML entity decoding and content formatting
+- **Figure Access**: Get an article's figures, not just their captions
+  - Inline image bytes, so an assistant can actually look at a figure
+  - Or downloaded to a directory you name, alongside the full Open Access package
 - **Europe PMC Access**: Search and retrieve from Europe PMC alongside NCBI
   - Cross-source search covering preprints (PPR), patents, Agricola and CBA as well as PubMed/PMC
   - JATS full text (parsed or raw XML), reference and citation graphs
@@ -91,18 +94,19 @@ Every option below is available both as a CLI flag and as an environment
 variable, since MCP hosts differ in which one is easier to set. Flags win over
 environment variables.
 
-| Flag               | Environment variable        | Default                  | Description                                                                   |
-| ------------------ | --------------------------- | ------------------------ | ----------------------------------------------------------------------------- |
-| `--api-key`        | `NCBI_API_KEY`              | _(none)_                 | NCBI E-utilities API key. Raises the rate limit from 3 to 10 requests/second. |
-| `--email`          | `NCBI_EMAIL`                | _(none)_                 | Contact e-mail sent to NCBI (recommended by their usage guidelines).          |
-| `--tool`           | `NCBI_TOOL`                 | `pubmed-mcp`             | Tool name sent to NCBI.                                                       |
-| `--rate-limit`     | `NCBI_RATE_LIMIT`           | 3, or 10 with an API key | Requests per second. Overrides the API-key-based default.                     |
-| `--timeout`        | `PUBMED_MCP_TIMEOUT`        | `30`                     | HTTP request timeout, in seconds.                                             |
-| `--max-retries`    | `PUBMED_MCP_MAX_RETRIES`    | `3`                      | Retries for transient failures (exponential backoff).                         |
-| `--base-url`       | `PUBMED_MCP_BASE_URL`       | NCBI E-utilities         | Alternate E-utilities base URL, for proxies or test environments.             |
-| `--cache`          | `PUBMED_MCP_CACHE`          | off                      | Enable the in-memory response cache.                                          |
-| `--cache-capacity` | `PUBMED_MCP_CACHE_CAPACITY` | `1000`                   | Maximum number of cached responses. Implies `--cache`.                        |
-| `--cache-ttl`      | `PUBMED_MCP_CACHE_TTL`      | `604800` (7 days)        | Time-to-live for cached responses, in seconds. Implies `--cache`.             |
+| Flag                  | Environment variable           | Default                  | Description                                                                            |
+| --------------------- | ------------------------------ | ------------------------ | -------------------------------------------------------------------------------------- |
+| `--api-key`           | `NCBI_API_KEY`                 | _(none)_                 | NCBI E-utilities API key. Raises the rate limit from 3 to 10 requests/second.          |
+| `--email`             | `NCBI_EMAIL`                   | _(none)_                 | Contact e-mail sent to NCBI (recommended by their usage guidelines).                   |
+| `--tool`              | `NCBI_TOOL`                    | `pubmed-mcp`             | Tool name sent to NCBI.                                                                |
+| `--rate-limit`        | `NCBI_RATE_LIMIT`              | 3, or 10 with an API key | Requests per second. Overrides the API-key-based default.                              |
+| `--timeout`           | `PUBMED_MCP_TIMEOUT`           | `30`                     | HTTP request timeout, in seconds.                                                      |
+| `--max-retries`       | `PUBMED_MCP_MAX_RETRIES`       | `3`                      | Retries for transient failures (exponential backoff).                                  |
+| `--base-url`          | `PUBMED_MCP_BASE_URL`          | NCBI E-utilities         | Alternate E-utilities base URL, for proxies or test environments.                      |
+| `--oa-cloud-base-url` | `PUBMED_MCP_OA_CLOUD_BASE_URL` | PMC OA Cloud (S3)        | Alternate PMC Open Access Cloud base URL, used by the download and figure-image tools. |
+| `--cache`             | `PUBMED_MCP_CACHE`             | off                      | Enable the in-memory response cache.                                                   |
+| `--cache-capacity`    | `PUBMED_MCP_CACHE_CAPACITY`    | `1000`                   | Maximum number of cached responses. Implies `--cache`.                                 |
+| `--cache-ttl`         | `PUBMED_MCP_CACHE_TTL`         | `604800` (7 days)        | Time-to-live for cached responses, in seconds. Implies `--cache`.                      |
 
 `NCBI_API_KEY`, `NCBI_EMAIL`, and `NCBI_TOOL` are the same variables `pubmed-cli`
 reads, so a shell that is already set up for the CLI needs no extra
@@ -176,7 +180,10 @@ Every tool returns **structured output**: the answer is a JSON object in the
 response's `structuredContent`, and each tool advertises the JSON Schema for it
 as its `outputSchema`, so a client can validate or destructure the result
 instead of parsing prose. The same JSON is echoed as a text content block, so
-clients that only read `content` still receive the whole answer.
+clients that only read `content` still receive the whole answer. The one
+exception is [`get_pmc_figure_images`](#get_pmc_figure_images), whose `content`
+carries the images themselves; its metadata still arrives as
+`structuredContent`.
 
 Fields that have no value are omitted rather than sent as `null`; list fields
 are always present, empty when there is nothing to report (including when a
@@ -289,6 +296,97 @@ Get markdown for PMC article 7906746 without table of contents
 
 ```
 Get markdown for PMC7906746 with minimal formatting (no metadata or captions)
+```
+
+#### `download_pmc_figures`
+
+Download a PMC article's figures from the PMC Open Access Cloud to a local
+directory. `get_pmc_figures` only reports what the XML says about a figure;
+this fetches the image itself.
+
+**Parameters:**
+
+- `pmc_id` (string, required): PMC ID with or without "PMC" prefix
+- `output_dir` (string, required): Directory to download into, created if missing
+
+`output_dir` is deliberately required: the server runs on your machine, so
+where the files land is your call, not its guess. Resolving `<fig>` elements
+against real files needs the whole Open Access package, so the article's XML,
+PDF and supplementary materials land in the same directory —
+[`get_pmc_figure_images`](#get_pmc_figure_images) is the way to get only the
+images.
+
+**Returns:**
+
+`{ pmc_id, output_dir, figure_count, figures }`. Each figure carries the same
+metadata as `get_pmc_figures` (`id`, `label`, `caption`, `alt_text`,
+`fig_type`, `graphic_href`) plus `file_path`, `file_size`, and `width`/`height`
+for formats that declare their dimensions.
+
+**Example:**
+
+```
+Download the figures of PMC7906746 into ./figures
+```
+
+#### `download_pmc_files`
+
+Download a PMC article's full Open Access package — full-text XML, figures,
+PDF, and supplementary materials — to a local directory.
+
+**Parameters:**
+
+- `pmc_id` (string, required): PMC ID with or without "PMC" prefix
+- `output_dir` (string, required): Directory to download into, created if missing
+
+**Returns:**
+
+`{ pmc_id, output_dir, file_count, files }`, where `files` lists the absolute
+paths of everything that was downloaded.
+
+**Example:**
+
+```
+Download the full Open Access package for PMC7906746 into ./pmc7906746
+```
+
+#### `get_pmc_figure_images`
+
+Get an article's figures as inline image data, with no directory involved. Use
+this when the assistant should _see_ a figure, or when the server has nowhere
+to write.
+
+**Parameters:**
+
+- `pmc_id` (string, required): PMC ID with or without "PMC" prefix
+- `figure_ids` (array of strings, optional): Figures to fetch, by id or label
+  (e.g. `["fig1", "Figure 2"]`). Matching ignores case, spaces and dots, so a
+  label read off a caption works as well as the XML id. Omit for all figures.
+- `max_figures` (integer, optional): Cap on figures returned, in document order
+  (default: 8). Figures beyond the cap are never downloaded.
+- `max_total_bytes` (integer, optional): Cap on inlined bytes before base64
+  encoding (default: 8388608, i.e. 8 MiB).
+
+**Returns:**
+
+The images as MCP content blocks — an `image` block for rasters (JPEG, PNG,
+GIF, WebP), an embedded resource blob for vector figures (SVG, PDF, EPS), which
+some journals deposit instead. Alongside them, `structuredContent` holds
+`{ pmc_id, figure_count, included_count, included_bytes, figures }`; each entry
+adds `file_name`, `mime_type`, `byte_size`, `width`/`height` and `included` to
+the usual figure metadata. A figure that would blow the byte budget is still
+described, with `included: false` and an `omitted_reason` — so you can raise
+`max_total_bytes` or ask for that figure on its own rather than wondering where
+it went.
+
+**Examples:**
+
+```
+Show me Figure 2 of PMC7906746
+```
+
+```
+What do the figures in PMC7906746 show?
 ```
 
 #### Europe PMC tools

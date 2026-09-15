@@ -21,6 +21,7 @@ tracing.workspace = true
 
 # MCP Server dependencies
 axum = "0.8"
+base64 = "0.22"
 clap = { version = "4", features = ["derive", "env"] }
 rmcp = { version = "3.1", features = ["server", "transport-io", "transport-streamable-http-server"] }
 schemars = "1.0"
@@ -29,6 +30,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [dev-dependencies]
 rmcp = { version = "3.1", features = ["client", "transport-child-process"] }
+tempfile = "3"
 wiremock = "0.6"
 
 [[bin]]

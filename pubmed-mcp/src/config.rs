@@ -63,6 +63,11 @@ pub struct ClientArgs {
     #[arg(long, env = "PUBMED_MCP_BASE_URL")]
     pub base_url: Option<String>,
 
+    /// Base URL for the PMC Open Access Cloud bucket, used by the download and
+    /// figure-image tools (for proxies or test environments)
+    #[arg(long, env = "PUBMED_MCP_OA_CLOUD_BASE_URL")]
+    pub oa_cloud_base_url: Option<String>,
+
     /// Enable the in-memory response cache
     ///
     /// Accepts an optional boolish value (`--cache`, `--cache=false`) so the
@@ -98,6 +103,7 @@ impl std::fmt::Debug for ClientArgs {
             .field("timeout", &self.timeout)
             .field("max_retries", &self.max_retries)
             .field("base_url", &self.base_url)
+            .field("oa_cloud_base_url", &self.oa_cloud_base_url)
             .field("cache", &self.cache)
             .field("cache_capacity", &self.cache_capacity)
             .field("cache_ttl", &self.cache_ttl)
@@ -146,6 +152,9 @@ impl ClientArgs {
         if let Some(base_url) = &self.base_url {
             config = config.with_base_url(base_url.clone());
         }
+        if let Some(oa_cloud_base_url) = &self.oa_cloud_base_url {
+            config = config.with_oa_cloud_base_url(oa_cloud_base_url.clone());
+        }
         if self.cache_enabled() {
             let defaults = CacheConfig::default();
             config = config.with_cache_config(CacheConfig {
@@ -178,6 +187,7 @@ mod tests {
             timeout: 30,
             max_retries: None,
             base_url: None,
+            oa_cloud_base_url: None,
             cache: false,
             cache_capacity: None,
             cache_ttl: None,
@@ -207,6 +217,7 @@ mod tests {
         assert_eq!(config.email, None);
         assert_eq!(config.rate_limit, None);
         assert_eq!(config.base_url, None);
+        assert_eq!(config.oa_cloud_base_url, None);
         assert_eq!(config.timeout.as_secs(), 30);
         assert_eq!(config.retry_config.max_retries, 3);
         assert!(config.cache_config.is_none());
@@ -222,6 +233,7 @@ mod tests {
             timeout: 120,
             max_retries: Some(5),
             base_url: Some("https://proxy.example.com/eutils".to_string()),
+            oa_cloud_base_url: Some("https://proxy.example.com/pmc-oa".to_string()),
             ..args()
         }
         .build_config()
@@ -236,6 +248,10 @@ mod tests {
         assert_eq!(
             config.base_url.as_deref(),
             Some("https://proxy.example.com/eutils")
+        );
+        assert_eq!(
+            config.oa_cloud_base_url.as_deref(),
+            Some("https://proxy.example.com/pmc-oa")
         );
     }
 

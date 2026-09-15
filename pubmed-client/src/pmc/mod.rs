@@ -19,6 +19,8 @@ pub use pubmed_formatter::pmc::markdown;
 pub use client::PmcClient;
 pub use cloud::PmcCloudClient;
 pub use extracted::ExtractedFigure;
+#[cfg(not(target_arch = "wasm32"))]
+pub use extracted::{FigureBlob, FigureSelection};
 pub use markdown::{
     FigureOptions, HeadingStyle, MarkdownConfig, MetadataOptions, PmcMarkdownConverter,
     ReferenceStyle,

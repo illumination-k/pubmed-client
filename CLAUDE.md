@@ -233,9 +233,11 @@ pubmed/                # PubMed E-utilities API
 
 pmc/                   # PMC (PubMed Central) API
   client.rs            # PmcClient - full-text fetch, availability check, figure extraction
-  cloud.rs             # PmcCloudClient - per-file download from the PMC OA Cloud (AWS S3)
+  cloud.rs             # PmcCloudClient - per-file download from the PMC OA Cloud (AWS S3);
+                       # also fetch_figures/fetch_figures_with, which pull only the JATS XML
+                       # and the images its <fig> elements reference, straight into memory
   common.rs            # Shared PMC helpers (normalize_pmcid, ...)
-  extracted.rs         # ExtractedFigure / downloaded-file result types
+  extracted.rs         # ExtractedFigure (on disk) / FigureBlob + FigureSelection (in memory)
 
 europe_pmc/            # Europe PMC REST API (EBI; complements NCBI E-utilities)
   client.rs            # EuropePmcClient - construction, cache, executor plumbing
@@ -253,7 +255,7 @@ europe_pmc/            # Europe PMC REST API (EBI; complements NCBI E-utilities)
 
 - `Client` — Unified client with `pubmed` and `pmc` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`
 - `PubMedClient` — Search, fetch metadata, ESummary, EPost/History, ELink, EInfo, ECitMatch, EGQuery, ESpell
-- `PmcClient` — Fetch full-text, check availability, extract figures, download OA files from the PMC OA Cloud (AWS S3)
+- `PmcClient` — Fetch full-text, check availability, extract figures (to a directory via `extract_figures_with_captions`, or into memory via `fetch_figures`), download OA files from the PMC OA Cloud (AWS S3)
 - `EuropePmcClient` — Europe PMC REST API: cross-source search, JATS full text, references/citations/database links, supplementary downloads. Addressed by `EuropePmcId` (`(source, id)`); needs no API key
 - `SearchQuery` — Builder pattern for complex queries with filters, date ranges, boolean logic
 - `PubMedArticle` — Article metadata (title, authors, abstract, MeSH, keywords, etc.) — defined in `pubmed-parser`
@@ -341,15 +343,21 @@ pnpm run typecheck    # tsc
 MCP server for AI assistants (Claude Desktop, etc.) built with rmcp. Communicates via stdio, or over
 streamable HTTP at `/mcp` with `--port`.
 
-**Every tool returns structured output.** A tool function returns `Json<T>` (never a bare
-`CallToolResult`): rmcp then derives the tool's `outputSchema` from `T` and puts the serialized value
-in the response's `structuredContent`, echoing the same JSON as a text block for clients that read
-only `content`. `T` needs `Serialize` + `schemars::JsonSchema` and must be a struct (the MCP spec
-requires an object root). Per-tool output types live next to their tool; shapes shared by several
-tools (sections, figures, tables, references) live in `tools/output.rs`. Two tests guard this: a unit
-test in `main.rs` asserts every registered tool advertises an object `outputSchema`, and
-`tests/integration_test.rs` drives a whole `search_pubmed` call over stdio against a wiremock-stubbed
-E-utilities endpoint and asserts the `structuredContent` that comes back.
+**Every tool returns structured output.** A tool function returns `Json<T>`: rmcp then derives the
+tool's `outputSchema` from `T` and puts the serialized value in the response's `structuredContent`,
+echoing the same JSON as a text block for clients that read only `content`. `T` needs `Serialize` +
+`schemars::JsonSchema` and must be a struct (the MCP spec requires an object root). Per-tool output
+types live next to their tool; shapes shared by several tools (sections, figures, tables,
+references) live in `tools/output.rs`. Two tests guard this: a unit test in `main.rs` asserts every
+registered tool advertises an object `outputSchema`, and `tests/integration_test.rs` drives a whole
+`search_pubmed` call over stdio against a wiremock-stubbed E-utilities endpoint and asserts the
+`structuredContent` that comes back.
+
+`get_pmc_figure_images` is the one tool that returns a bare `CallToolResult`, because its `content`
+carries the figure images (as `image` blocks, or embedded blobs for vector formats) rather than an
+echo of the JSON. It still advertises a schema — `#[tool(output_schema = ...schema_for_output::<T>())]`
+— and still fills `structured_content`, so the invariant above holds. Reach for that shape only when
+a tool's product genuinely is binary content; otherwise `Json<T>`.
 
 Released as a multi-arch container image to GHCR (`ghcr.io/illumination-k/pubmed-mcp`) alongside the
 crates.io publish, from `pubmed-mcp/Dockerfile` (build context is the **workspace root** — the crate
@@ -364,6 +372,7 @@ src/
   config.rs            # ClientArgs — CLI flags / env vars -> ClientConfig
                        # NCBI_API_KEY / NCBI_EMAIL / NCBI_TOOL / NCBI_RATE_LIMIT
                        # PUBMED_MCP_TIMEOUT / _MAX_RETRIES / _BASE_URL / _CACHE*
+                       # PUBMED_MCP_OA_CLOUD_BASE_URL (stubbable in tests)
   tools/
     mod.rs             # PubMedServer definition
     output.rs          # Structured output types shared by the tools
@@ -371,7 +380,9 @@ src/
     articles.rs        # fetch_articles tool (EFetch — full records by PMID)
     markdown.rs        # get_pmc_markdown tool
     fulltext.rs        # Full-text retrieval tool
-    figures.rs         # Figure extraction tool
+    figures.rs         # Figure/table metadata tool (no downloads)
+    download.rs        # download_pmc_figures / download_pmc_files (OA Cloud -> a local dir)
+    figure_images.rs   # get_pmc_figure_images (figures inline as image/blob content)
     summary.rs         # fetch_summaries tool (ESummary API)
     export.rs          # Citation export tool (BibTeX/RIS/CSL-JSON/NBIB)
     citmatch.rs        # Citation matching tool

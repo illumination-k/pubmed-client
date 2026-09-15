@@ -353,3 +353,238 @@ async fn test_tool_call_returns_structured_content() -> Result<()> {
 
     Ok(())
 }
+
+/// Minimal OA Cloud listing: the JATS XML, one figure image, and a
+/// supplementary PDF — `download_pmc_files` fetches all three, while
+/// `get_pmc_figure_images` only wants the two the figure resolves through.
+const OA_CLOUD_LISTING: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+<Contents><Key>PMC7906746.1/PMC7906746.1.xml</Key><Size>1</Size></Contents>
+<Contents><Key>PMC7906746.1/gr1_lrg.png</Key><Size>1</Size></Contents>
+<Contents><Key>PMC7906746.1/supplement.pdf</Key><Size>1</Size></Contents>
+</ListBucketResult>"#;
+
+/// Minimal JATS article carrying a single figure.
+const OA_ARTICLE_XML: &str = r#"<?xml version="1.0"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink">
+  <front>
+    <article-meta>
+      <title-group><article-title>A study of things</article-title></title-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="s1">
+      <title>Results</title>
+      <fig id="fig1">
+        <label>Figure 1</label>
+        <caption><p>Things, plotted.</p></caption>
+        <graphic xlink:href="gr1_lrg"/>
+      </fig>
+    </sec>
+  </body>
+</article>"#;
+
+/// A 4x3 PNG, so the tool has real pixel dimensions to report.
+const TINY_PNG: &[u8] = &[
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+    0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x03, 0x08, 0x02, 0x00, 0x00, 0x00, 0x3b, 0x96, 0x39,
+    0x91, 0x00, 0x00, 0x00, 0x10, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0xf8, 0xcf, 0xc0, 0x00,
+    0x47, 0x0c, 0x38, 0x39, 0x00, 0xf5, 0x31, 0x0b, 0xf5, 0x35, 0x7b, 0xfb, 0x82, 0x00, 0x00, 0x00,
+    0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+];
+
+async fn mock_oa_cloud() -> MockServer {
+    let server = MockServer::start().await;
+
+    Mock::given(method("GET"))
+        .and(path("/"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(OA_CLOUD_LISTING))
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/PMC7906746.1/PMC7906746.1.xml"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(OA_ARTICLE_XML))
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/PMC7906746.1/gr1_lrg.png"))
+        .respond_with(ResponseTemplate::new(200).set_body_bytes(TINY_PNG))
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/PMC7906746.1/supplement.pdf"))
+        .respond_with(ResponseTemplate::new(200).set_body_bytes(b"%PDF-1.4".to_vec()))
+        .mount(&server)
+        .await;
+
+    server
+}
+
+#[tokio::test]
+async fn test_figure_images_tool_returns_the_image_bytes_inline() -> Result<()> {
+    // The point of `get_pmc_figure_images` is that the bytes themselves reach
+    // the client: unit tests cover how a blob is wrapped, this covers that an
+    // image content block survives the trip over stdio alongside its metadata.
+    let cloud = mock_oa_cloud().await;
+    let cloud_url = cloud.uri();
+
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--oa-cloud-base-url")
+                    .arg(&cloud_url)
+                    .arg("--tools")
+                    .arg("figure-images");
+            },
+        ))?)
+        .await?;
+
+    let arguments = serde_json::json!({ "pmc_id": "PMC7906746" });
+    let result = client
+        .call_tool(
+            CallToolRequestParams::new("get_pmc_figure_images").with_arguments(
+                arguments
+                    .as_object()
+                    .expect("arguments should be a JSON object")
+                    .clone(),
+            ),
+        )
+        .await?;
+
+    let structured = result
+        .structured_content
+        .expect("get_pmc_figure_images should answer with structuredContent");
+    assert_eq!(structured["pmc_id"], "PMC7906746");
+    assert_eq!(structured["figure_count"], 1);
+    assert_eq!(structured["included_count"], 1);
+    assert_eq!(structured["included_bytes"], TINY_PNG.len());
+    assert_eq!(structured["figures"][0]["id"], "fig1");
+    assert_eq!(structured["figures"][0]["label"], "Figure 1");
+    assert_eq!(structured["figures"][0]["mime_type"], "image/png");
+    assert_eq!(structured["figures"][0]["width"], 4);
+    assert_eq!(structured["figures"][0]["height"], 3);
+    assert_eq!(structured["figures"][0]["included"], true);
+
+    let image = match result.content.first() {
+        Some(rmcp::model::ContentBlock::Image(image)) => image.clone(),
+        other => panic!("expected an image content block, got: {other:?}"),
+    };
+    assert_eq!(image.mime_type, "image/png");
+    let decoded = base64::Engine::decode(
+        &base64::engine::general_purpose::STANDARD,
+        image.data.as_bytes(),
+    )?;
+    assert_eq!(decoded, TINY_PNG);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_figure_images_tool_reports_figures_over_the_byte_budget() -> Result<()> {
+    // Over-budget figures must still be described, so the caller learns the
+    // figure exists and can ask for it with a larger budget — silently dropping
+    // it would look like the article has no figures.
+    let cloud = mock_oa_cloud().await;
+    let cloud_url = cloud.uri();
+
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--oa-cloud-base-url")
+                    .arg(&cloud_url)
+                    .arg("--tools")
+                    .arg("figure-images");
+            },
+        ))?)
+        .await?;
+
+    let arguments = serde_json::json!({ "pmc_id": "PMC7906746", "max_total_bytes": 1 });
+    let result = client
+        .call_tool(
+            CallToolRequestParams::new("get_pmc_figure_images").with_arguments(
+                arguments
+                    .as_object()
+                    .expect("arguments should be a JSON object")
+                    .clone(),
+            ),
+        )
+        .await?;
+
+    let structured = result
+        .structured_content
+        .expect("get_pmc_figure_images should answer with structuredContent");
+    assert_eq!(structured["figure_count"], 1);
+    assert_eq!(structured["included_count"], 0);
+    assert_eq!(structured["figures"][0]["included"], false);
+    assert!(
+        structured["figures"][0]["omitted_reason"].is_string(),
+        "an omitted figure should say why, got: {structured}"
+    );
+    assert!(
+        result.content.is_empty(),
+        "nothing should be inlined, got: {:?}",
+        result.content
+    );
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_download_figures_tool_writes_the_images_and_returns_their_paths() -> Result<()> {
+    let cloud = mock_oa_cloud().await;
+    let cloud_url = cloud.uri();
+    let output_dir = tempfile::tempdir()?;
+    let output_path = output_dir.path().to_string_lossy().to_string();
+
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--oa-cloud-base-url")
+                    .arg(&cloud_url)
+                    .arg("--tools")
+                    .arg("download-figures");
+            },
+        ))?)
+        .await?;
+
+    let arguments = serde_json::json!({ "pmc_id": "PMC7906746", "output_dir": output_path });
+    let result = client
+        .call_tool(
+            CallToolRequestParams::new("download_pmc_figures").with_arguments(
+                arguments
+                    .as_object()
+                    .expect("arguments should be a JSON object")
+                    .clone(),
+            ),
+        )
+        .await?;
+
+    let structured = result
+        .structured_content
+        .expect("download_pmc_figures should answer with structuredContent");
+    assert_eq!(structured["figure_count"], 1);
+    assert_eq!(structured["figures"][0]["id"], "fig1");
+    assert_eq!(structured["figures"][0]["caption"], "Things, plotted.");
+
+    let file_path = structured["figures"][0]["file_path"]
+        .as_str()
+        .expect("a downloaded figure should report where it landed");
+    assert_eq!(std::fs::read(file_path)?, TINY_PNG);
+
+    Ok(())
+}

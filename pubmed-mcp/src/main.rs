@@ -26,7 +26,8 @@ struct Args {
     /// Tools to enable, comma-separated (default: all).
     /// Possible values: search, markdown, citmatch, gquery, espell, summary,
     /// articles, related-articles, citations, pmc-links, list-databases,
-    /// database-info, fulltext, figures, convert-id, export,
+    /// database-info, fulltext, figures, download-figures, download-files,
+    /// figure-images, convert-id, export,
     /// europe-pmc-search, europe-pmc-fulltext, europe-pmc-references,
     /// europe-pmc-citations, europe-pmc-database-links
     #[arg(short, long, value_delimiter = ',', value_enum)]
@@ -52,6 +53,9 @@ enum ToolName {
     DatabaseInfo,
     Fulltext,
     Figures,
+    DownloadFigures,
+    DownloadFiles,
+    FigureImages,
     ConvertId,
     Export,
     EuropePmcSearch,
@@ -78,6 +82,9 @@ impl ToolName {
             ToolName::DatabaseInfo => "get_database_info",
             ToolName::Fulltext => "get_pmc_fulltext",
             ToolName::Figures => "get_pmc_figures",
+            ToolName::DownloadFigures => "download_pmc_figures",
+            ToolName::DownloadFiles => "download_pmc_files",
+            ToolName::FigureImages => "get_pmc_figure_images",
             ToolName::ConvertId => "pmid_to_pmcid",
             ToolName::Export => "export_citations",
             ToolName::EuropePmcSearch => "europe_pmc_search",
@@ -222,13 +229,44 @@ impl PubMedServer {
     }
 
     #[tool(
-        description = "Extract figure and table metadata from a PMC article. Returns figure IDs, labels, captions, and graphic URLs. Useful for understanding visual content without downloading full text."
+        description = "Extract figure and table metadata from a PMC article. Returns figure IDs, labels, captions, and graphic URLs, but no image data. Useful for understanding visual content without downloading full text; use get_pmc_figure_images to see the images themselves, or download_pmc_figures to write them to a directory."
     )]
     async fn get_pmc_figures(
         &self,
         params: Parameters<tools::figures::FiguresRequest>,
     ) -> Result<Json<tools::figures::FiguresOutput>, ErrorData> {
         tools::figures::get_pmc_figures(self, params).await
+    }
+
+    #[tool(
+        description = "Download a PMC article's figures to a local directory. Fetches the article's Open Access package from the PMC OA Cloud into output_dir and returns the local path of each figure alongside its caption and dimensions; the package's other files (full-text XML, PDF, supplementary materials) land in the same directory. Requires an explicit output_dir. Use get_pmc_figure_images instead to receive the images inline without writing anything."
+    )]
+    async fn download_pmc_figures(
+        &self,
+        params: Parameters<tools::download::DownloadFiguresRequest>,
+    ) -> Result<Json<tools::download::DownloadFiguresOutput>, ErrorData> {
+        tools::download::download_pmc_figures(self, params).await
+    }
+
+    #[tool(
+        description = "Download a PMC article's full Open Access package (full-text XML, figures, PDF, supplementary materials) to a local directory and return the downloaded file paths. Requires an explicit output_dir."
+    )]
+    async fn download_pmc_files(
+        &self,
+        params: Parameters<tools::download::DownloadFilesRequest>,
+    ) -> Result<Json<tools::download::DownloadFilesOutput>, ErrorData> {
+        tools::download::download_pmc_files(self, params).await
+    }
+
+    #[tool(
+        description = "Get a PMC article's figures as inline image data, with no directory needed. Returns each image as an MCP image content block (or an embedded blob for vector formats like PDF/EPS) plus its caption, MIME type and pixel dimensions. Select figures with figure_ids; the response is capped by max_figures and max_total_bytes.",
+        output_schema = rmcp::handler::server::tool::schema_for_output::<tools::figure_images::FigureImagesOutput>()
+    )]
+    async fn get_pmc_figure_images(
+        &self,
+        params: Parameters<tools::figure_images::FigureImagesRequest>,
+    ) -> Result<CallToolResult, ErrorData> {
+        tools::figure_images::get_pmc_figure_images(self, params).await
     }
 
     #[tool(
@@ -437,10 +475,13 @@ mod tests {
         );
     }
 
-    /// Every tool answers with `Json<T>`, so every registered tool must
-    /// advertise an `outputSchema` describing `T`. A tool that regresses to a
-    /// bare text result loses the schema silently, and a client that relies on
-    /// `structuredContent` would have nothing to validate against.
+    /// Every tool answers with structured content, so every registered tool
+    /// must advertise an `outputSchema` describing it. A tool that regresses to
+    /// a bare text result loses the schema silently, and a client that relies
+    /// on `structuredContent` would have nothing to validate against. Tools
+    /// returning `Json<T>` get the schema from `T`; one returning a
+    /// `CallToolResult` (to carry image content of its own) must pass
+    /// `output_schema` explicitly, and this catches it if it forgets.
     #[test]
     fn every_tool_advertises_an_object_output_schema() {
         for tool in PubMedServer::tool_router().list_all() {

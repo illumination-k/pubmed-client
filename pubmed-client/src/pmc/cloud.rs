@@ -4,7 +4,7 @@ use crate::common::PmcId;
 use crate::config::ClientConfig;
 use crate::error::{ParseError, PubMedError, Result};
 use crate::pmc::common;
-use crate::pmc::extracted::ExtractedFigure;
+use crate::pmc::extracted::{ExtractedFigure, FigureBlob, FigureSelection};
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
@@ -16,6 +16,15 @@ use reqwest::Client;
 #[cfg(not(target_arch = "wasm32"))]
 use reqwest::Response;
 use tracing::debug;
+
+/// File extensions a figure's graphic may use in the OA Cloud package.
+///
+/// Matching is case-insensitive; `pdf` and `eps` are included because some
+/// journals deposit vector figures rather than rasters.
+#[cfg(not(target_arch = "wasm32"))]
+const FIGURE_IMAGE_EXTENSIONS: &[&str] = &[
+    "jpg", "jpeg", "png", "gif", "tiff", "tif", "svg", "eps", "pdf",
+];
 
 #[cfg(not(target_arch = "wasm32"))]
 use futures_util::{StreamExt, TryStreamExt, stream};
@@ -397,6 +406,215 @@ impl PmcCloudClient {
         Ok(figures)
     }
 
+    /// Fetch an article's figures as in-memory blobs, without writing to disk.
+    ///
+    /// Unlike [`extract_figures_with_captions`], which downloads the whole OA
+    /// package into a directory, this lists the article's objects, fetches only
+    /// the JATS XML plus the images its `<fig>` elements resolve to, and returns
+    /// the bytes. Nothing touches the filesystem, so it is usable from a server
+    /// that has no writable directory to offer.
+    ///
+    /// [`extract_figures_with_captions`]: Self::extract_figures_with_captions
+    ///
+    /// # Arguments
+    ///
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    ///
+    /// # Errors
+    ///
+    /// * `ParseError::InvalidPmcid` - If the PMCID format is invalid
+    /// * `PubMedError::RequestError` - If an HTTP request fails
+    /// * `ParseError::PmcNotAvailable` - If the article is not in the OA Cloud
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::pmc::cloud::PmcCloudClient;
+    /// use pubmed_client::ClientConfig;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcCloudClient::new(ClientConfig::new());
+    ///     for blob in client.fetch_figures("PMC7906746").await? {
+    ///         println!("{} ({}, {} bytes)", blob.file_name, blob.content_type, blob.data.len());
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn fetch_figures(&self, pmcid: &str) -> Result<Vec<FigureBlob>> {
+        self.fetch_figures_with(pmcid, &FigureSelection::new())
+            .await
+    }
+
+    /// Fetch a chosen subset of an article's figures as in-memory blobs.
+    ///
+    /// See [`FigureSelection`] for how figures are named and capped. The
+    /// selection is resolved against the article's JATS XML *before* any image
+    /// is downloaded, so a `limit` bounds the bytes fetched, not just the bytes
+    /// returned.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::pmc::{FigureSelection, cloud::PmcCloudClient};
+    /// use pubmed_client::ClientConfig;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcCloudClient::new(ClientConfig::new());
+    ///     let selection = FigureSelection::new().with_ids(["Figure 1"]);
+    ///     let blobs = client.fetch_figures_with("PMC7906746", &selection).await?;
+    ///     println!("{} figure(s)", blobs.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn fetch_figures_with(
+        &self,
+        pmcid: &str,
+        selection: &FigureSelection,
+    ) -> Result<Vec<FigureBlob>> {
+        let pmc_id = PmcId::parse(pmcid)?;
+        let normalized_pmcid = pmc_id.as_str();
+
+        let keys = self.list_cloud_object_keys(&normalized_pmcid).await?;
+        if keys.is_empty() {
+            return Err(ParseError::PmcNotAvailable {
+                id: pmcid.to_string(),
+            }
+            .into());
+        }
+
+        let article = self.fetch_article_xml(&normalized_pmcid, &keys).await?;
+
+        let mut figures = Vec::new();
+        for section in article.sections() {
+            Self::collect_figures_recursive(section, &mut figures);
+        }
+        if !selection.ids.is_empty() {
+            figures.retain(|figure| Self::figure_matches_any_id(figure, &selection.ids));
+        }
+
+        // Resolve each figure to its object key first, so only the images an
+        // article actually references are downloaded — an OA package also holds
+        // the PDF and supplementary files, which a figure request never wants.
+        // The limit is applied here, before any byte is fetched.
+        let mut wanted: Vec<(Figure, String)> = figures
+            .into_iter()
+            .filter_map(|figure| {
+                Self::find_matching_file(&figure, &keys, FIGURE_IMAGE_EXTENSIONS)
+                    .map(|key| (figure, key))
+            })
+            .collect();
+        if let Some(limit) = selection.limit {
+            wanted.truncate(limit);
+        }
+
+        let base_url = self
+            .config
+            .effective_oa_cloud_base_url()
+            .trim_end_matches('/');
+        let concurrency = self.config.effective_oa_download_concurrency();
+
+        // Same reasoning as `download_cloud_files`: the OA Cloud bucket is not
+        // under the NCBI rate limit, and `buffered` keeps document order.
+        stream::iter(wanted)
+            .map(|(figure, key)| async move {
+                let file_name = key.rsplit('/').next().unwrap_or(key.as_str()).to_string();
+                let url = format!("{}/{}", base_url, key);
+                let response = self.s3_get(&url).await?;
+                let data = response.bytes().await.map_err(PubMedError::from)?.to_vec();
+                let dimensions = Self::blob_dimensions(&data);
+
+                debug!("Fetched figure blob: {} ({} bytes)", file_name, data.len());
+                Ok::<FigureBlob, PubMedError>(FigureBlob {
+                    content_type: FigureBlob::guess_content_type(&file_name),
+                    file_name,
+                    data,
+                    dimensions,
+                    figure,
+                })
+            })
+            .buffered(concurrency)
+            .try_collect()
+            .await
+    }
+
+    /// Whether `figure` is selected by any of the caller-supplied ids.
+    ///
+    /// Both the figure id and its label are normalized the same way (lowercased
+    /// with spaces and dots removed), so `"Figure 1."`, `"figure1"` and the raw
+    /// `"fig1"` id all select the same figure.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn figure_matches_any_id(figure: &Figure, ids: &[String]) -> bool {
+        fn normalize(value: &str) -> String {
+            value.to_lowercase().replace([' ', '.'], "")
+        }
+
+        let id = normalize(&figure.id);
+        let label = figure.label.as_deref().map(normalize);
+
+        ids.iter()
+            .map(|wanted| normalize(wanted))
+            .any(|wanted| wanted == id || label.as_deref().is_some_and(|label| label == wanted))
+    }
+
+    /// Read image dimensions from bytes already in memory.
+    ///
+    /// Header-only, like [`get_image_dimensions`]; formats `imagesize` does not
+    /// recognize (`svg`, `eps`, `pdf`) yield `None`.
+    ///
+    /// [`get_image_dimensions`]: Self::get_image_dimensions
+    #[cfg(not(target_arch = "wasm32"))]
+    fn blob_dimensions(data: &[u8]) -> Option<(u32, u32)> {
+        let size = imagesize::blob_size(data).ok()?;
+        Some((
+            u32::try_from(size.width).ok()?,
+            u32::try_from(size.height).ok()?,
+        ))
+    }
+
+    /// Fetch and parse the article's JATS XML straight from the OA Cloud.
+    ///
+    /// `keys` are the article's S3 object keys; the XML is downloaded on its own
+    /// rather than as part of a full package download. Falls back to eutils in
+    /// the unexpected case where the listing holds no XML, matching
+    /// [`parse_article_xml`]'s behavior.
+    ///
+    /// [`parse_article_xml`]: Self::parse_article_xml
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn fetch_article_xml(
+        &self,
+        normalized_pmcid: &str,
+        keys: &[String],
+    ) -> Result<PmcArticle> {
+        if let Some(key) = Self::find_article_xml(keys, normalized_pmcid) {
+            let base_url = self
+                .config
+                .effective_oa_cloud_base_url()
+                .trim_end_matches('/');
+            let xml_content = self
+                .s3_get(&format!("{}/{}", base_url, key))
+                .await?
+                .text()
+                .await?;
+            return Ok(parse_pmc_xml(&xml_content, normalized_pmcid)?);
+        }
+
+        debug!(
+            pmcid = %normalized_pmcid,
+            "OA Cloud listing had no XML; falling back to eutils fetch"
+        );
+        let xml_content = common::fetch_pmc_xml(
+            &self.executor(),
+            self.config.effective_base_url(),
+            normalized_pmcid,
+        )
+        .await?;
+        Ok(parse_pmc_xml(&xml_content, normalized_pmcid)?)
+    }
+
     /// Parse the article's JATS XML, preferring the copy already downloaded from
     /// the OA Cloud so no redundant eutils request is made.
     ///
@@ -410,7 +628,7 @@ impl PmcCloudClient {
         normalized_pmcid: &str,
         extracted_files: &[String],
     ) -> Result<PmcArticle> {
-        if let Some(xml_path) = Self::find_downloaded_xml(extracted_files, normalized_pmcid) {
+        if let Some(xml_path) = Self::find_article_xml(extracted_files, normalized_pmcid) {
             let xml_content =
                 tokio_fs::read_to_string(&xml_path)
                     .await
@@ -433,14 +651,16 @@ impl PmcCloudClient {
         Ok(parse_pmc_xml(&xml_content, normalized_pmcid)?)
     }
 
-    /// Find the downloaded article XML among the OA package's files.
+    /// Find the article's JATS XML among an OA package's entries.
     ///
     /// The JATS file is named `<PMCID>.<version>.xml`, so we match on a file
     /// name that ends in `.xml` and contains the PMCID (case-insensitive).
+    /// Entries may be local file paths (after a download) or S3 object keys
+    /// (before one) — only the last path segment is inspected either way.
     #[cfg(not(target_arch = "wasm32"))]
-    fn find_downloaded_xml(extracted_files: &[String], normalized_pmcid: &str) -> Option<String> {
+    fn find_article_xml(entries: &[String], normalized_pmcid: &str) -> Option<String> {
         let pmcid_lower = normalized_pmcid.to_lowercase();
-        extracted_files
+        entries
             .iter()
             .find(|path| {
                 let name = Path::new(path)
@@ -468,13 +688,9 @@ impl PmcCloudClient {
             Self::collect_figures_recursive(section, &mut all_figures);
         }
 
-        let image_extensions = [
-            "jpg", "jpeg", "png", "gif", "tiff", "tif", "svg", "eps", "pdf",
-        ];
-
         for figure in all_figures {
             let matching_file =
-                Self::find_matching_file(&figure, extracted_files, &image_extensions);
+                Self::find_matching_file(&figure, extracted_files, FIGURE_IMAGE_EXTENSIONS);
 
             if let Some(file_path) = matching_file {
                 let absolute_path =
@@ -715,27 +931,24 @@ mod tests {
 
     #[cfg(not(target_arch = "wasm32"))]
     #[test]
-    fn test_find_downloaded_xml() {
+    fn test_find_article_xml() {
         let files = vec![
             "/tmp/PMC9991720/gr1_lrg.jpg".to_string(),
             "/tmp/PMC9991720/PMC9991720.1.xml".to_string(),
             "/tmp/PMC9991720/PMC9991720.1.json".to_string(),
         ];
         assert_eq!(
-            PmcCloudClient::find_downloaded_xml(&files, "PMC9991720"),
+            PmcCloudClient::find_article_xml(&files, "PMC9991720"),
             Some("/tmp/PMC9991720/PMC9991720.1.xml".to_string())
         );
         // Case-insensitive on both the file name and the PMCID.
         assert_eq!(
-            PmcCloudClient::find_downloaded_xml(
-                &["/tmp/pmc9991720.1.XML".to_string()],
-                "PMC9991720"
-            ),
+            PmcCloudClient::find_article_xml(&["/tmp/pmc9991720.1.XML".to_string()], "PMC9991720"),
             Some("/tmp/pmc9991720.1.XML".to_string())
         );
         // No XML present -> None (triggers the eutils fallback).
         assert_eq!(
-            PmcCloudClient::find_downloaded_xml(
+            PmcCloudClient::find_article_xml(
                 &["/tmp/PMC9991720/gr1.jpg".to_string()],
                 "PMC9991720"
             ),
@@ -743,11 +956,17 @@ mod tests {
         );
         // An unrelated XML must not match.
         assert_eq!(
-            PmcCloudClient::find_downloaded_xml(
-                &["/tmp/PMC0000001.1.xml".to_string()],
+            PmcCloudClient::find_article_xml(&["/tmp/PMC0000001.1.xml".to_string()], "PMC9991720"),
+            None
+        );
+        // The same matching serves S3 object keys, which `fetch_figures` uses
+        // to pull the XML before anything has been downloaded.
+        assert_eq!(
+            PmcCloudClient::find_article_xml(
+                &["PMC9991720.1/PMC9991720.1.xml".to_string()],
                 "PMC9991720"
             ),
-            None
+            Some("PMC9991720.1/PMC9991720.1.xml".to_string())
         );
     }
 

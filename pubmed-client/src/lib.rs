@@ -295,6 +295,8 @@ pub use pmc::{
     Reference, ReferenceStyle, RelatedArticle, Section, SectionKind, SubjectGroup,
     SupplementaryMaterial, Table, TitleGroup, parse_pmc_xml,
 };
+#[cfg(not(target_arch = "wasm32"))]
+pub use pmc::{FigureBlob, FigureSelection};
 pub use pubmed::{
     AbstractSection, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,
     CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult,

@@ -5,6 +5,8 @@ use crate::common::PubMedId;
 use crate::config::ClientConfig;
 use crate::error::Result;
 use crate::pmc::extracted::ExtractedFigure;
+#[cfg(not(target_arch = "wasm32"))]
+use crate::pmc::extracted::{FigureBlob, FigureSelection};
 use crate::pmc::oa_api;
 use crate::pmc::oa_api::OaSubsetInfo;
 use crate::pmc::parser::parse_pmc_xml;
@@ -447,6 +449,58 @@ impl PmcClient {
         self.cloud_client
             .extract_figures_with_captions(pmcid, output_dir)
             .await
+    }
+
+    /// Fetch an article's figures as in-memory blobs, without writing to disk
+    ///
+    /// Downloads only the article's JATS XML and the images its `<fig>` elements
+    /// reference, rather than the whole OA package, and returns the bytes. Use
+    /// [`extract_figures_with_captions`] instead when the figures should land in
+    /// a directory.
+    ///
+    /// [`extract_figures_with_captions`]: Self::extract_figures_with_captions
+    ///
+    /// # Arguments
+    ///
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    ///
+    /// # Errors
+    ///
+    /// * `ParseError::InvalidPmcid` - If the PMCID format is invalid
+    /// * `PubMedError::RequestError` - If an HTTP request fails
+    /// * `ParseError::PmcNotAvailable` - If the article is not available in OA
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::PmcClient;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     for blob in client.fetch_figures("PMC7906746").await? {
+    ///         println!("{}: {} bytes", blob.file_name, blob.data.len());
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn fetch_figures(&self, pmcid: &str) -> Result<Vec<FigureBlob>> {
+        self.cloud_client.fetch_figures(pmcid).await
+    }
+
+    /// Fetch a chosen subset of an article's figures as in-memory blobs
+    ///
+    /// See [`FigureSelection`] for how figures are named and capped. The
+    /// selection is resolved before any image is downloaded, so a limit bounds
+    /// the bytes fetched, not just the bytes returned.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn fetch_figures_with(
+        &self,
+        pmcid: &str,
+        selection: &FigureSelection,
+    ) -> Result<Vec<FigureBlob>> {
+        self.cloud_client.fetch_figures_with(pmcid, selection).await
     }
 
     /// Clear all cached PMC data
