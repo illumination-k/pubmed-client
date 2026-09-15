@@ -440,7 +440,7 @@ See `.claude/skills/maturin-debugger/SKILL.md` for detailed troubleshooting.
 
 **pubmed-formatter**: `pubmed-parser`, `serde`, `serde_json`, `serde_norway` (maintained `serde_yaml` fork), `regex`, `tracing`.
 
-**pubmed-client**: `pubmed-parser`, `pubmed-formatter`, `tokio`, `reqwest`, `serde`, `moka` (caching), `rand`, `image`, `futures-util`. PMC OA files are downloaded per-file from the PMC OA Cloud (AWS S3) over plain HTTP via `reqwest` — no tar/gzip deps.
+**pubmed-client**: `pubmed-parser`, `pubmed-formatter`, `tokio`, `reqwest`, `serde`, `moka` (caching), `rand`, `imagesize` (header-only figure dimensions), `futures-util`. PMC OA files are downloaded per-file from the PMC OA Cloud (AWS S3) over plain HTTP via `reqwest` — no tar/gzip deps.
 
 Optional (pubmed-client): `redis` (feature: `cache-redis`), `rusqlite` (feature: `cache-sqlite`).
 
