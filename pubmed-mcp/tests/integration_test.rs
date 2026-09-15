@@ -580,11 +580,91 @@ async fn test_download_figures_tool_writes_the_images_and_returns_their_paths() 
     assert_eq!(structured["figure_count"], 1);
     assert_eq!(structured["figures"][0]["id"], "fig1");
     assert_eq!(structured["figures"][0]["caption"], "Things, plotted.");
+    assert_eq!(structured["output_dir"], output_path);
 
     let file_path = structured["figures"][0]["file_path"]
         .as_str()
         .expect("a downloaded figure should report where it landed");
     assert_eq!(std::fs::read(file_path)?, TINY_PNG);
+
+    // Only the figure is written: the article XML and the supplementary PDF are
+    // part of the OA package, but a figure download is not a package download.
+    let mut written: Vec<String> = std::fs::read_dir(output_dir.path())?
+        .map(|entry| Ok(entry?.file_name().to_string_lossy().to_string()))
+        .collect::<Result<Vec<_>>>()?;
+    written.sort();
+    assert_eq!(written, vec!["gr1_lrg.png".to_string()]);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_download_tools_accept_an_object_storage_destination() -> Result<()> {
+    // The bucket is never reachable here, so this cannot assert an upload. What
+    // it does assert is that an `s3://` destination is accepted and routed to
+    // object storage rather than being created as a directory named "s3:" next
+    // to the server — the failure mode a plain path check would let through.
+    let cloud = mock_oa_cloud().await;
+    let cloud_url = cloud.uri();
+    let cwd = std::env::current_dir()?;
+
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--oa-cloud-base-url")
+                    .arg(&cloud_url)
+                    .arg("--tools")
+                    .arg("download-figures");
+            },
+        ))?)
+        .await?;
+
+    let arguments = serde_json::json!({
+        "pmc_id": "PMC7906746",
+        "output_dir": "s3://pubmed-client-test-bucket/figures",
+    });
+    let result = client
+        .call_tool(
+            CallToolRequestParams::new("download_pmc_figures").with_arguments(
+                arguments
+                    .as_object()
+                    .expect("arguments should be a JSON object")
+                    .clone(),
+            ),
+        )
+        .await;
+
+    // Without credentials the upload fails; what matters is that it failed while
+    // talking to S3, not while parsing the destination, and that nothing was
+    // written locally.
+    match result {
+        Ok(response) => {
+            let structured = response
+                .structured_content
+                .expect("download_pmc_figures should answer with structuredContent");
+            assert_eq!(
+                structured["output_dir"],
+                "s3://pubmed-client-test-bucket/figures"
+            );
+        }
+        Err(err) => {
+            let message = err.to_string();
+            assert!(
+                !message.contains("Invalid output_dir"),
+                "an s3:// URI must parse as a destination, got: {message}"
+            );
+        }
+    }
+
+    assert!(
+        !cwd.join("s3:").exists(),
+        "an s3:// destination must never be created as a local directory"
+    );
 
     Ok(())
 }

@@ -15,7 +15,7 @@ path = "src/main.rs"
 
 [dependencies]
 # Core library
-pubmed-client = { workspace = true }
+pubmed-client = { workspace = true, features = ["storage-s3"] }
 
 # CLI framework
 clap = { version = "4.0", features = ["derive", "env", "string"] }
@@ -43,17 +43,8 @@ tracing-indicatif = "0.3"
 # Temporary files
 tempfile = "3.8"
 
-# AWS SDK for S3 support
-aws-config = { version = "1.5", features = ["behavior-version-latest"] }
-aws-sdk-s3 = "1.60"
-
-# Async trait for storage abstraction
-async-trait = "0.1"
-
 [dev-dependencies]
 # Testing utilities
-aws-smithy-mocks-experimental = "0.2"
-aws-smithy-runtime-api = "1.7"
 tempfile = "3.8"
 tokio-test = "0.4"
 

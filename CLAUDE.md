@@ -210,6 +210,13 @@ retry.rs               # Retry with exponential backoff
 time.rs                # Cross-platform time utilities (native + WASM)
 tls.rs                 # rustls crypto provider installation (rustls-tls feature)
 
+storage/               # Download destinations (non-WASM). One seam every PMC
+                       # download writes through, so the CLI and the MCP server
+                       # share one object-storage implementation.
+  mod.rs               # StorageBackend trait + Destination (local path vs s3:// URI)
+  local.rs             # LocalStorage
+  s3.rs                # S3Storage + S3Options (feature: storage-s3)
+
 pubmed/                # PubMed E-utilities API
   client/              # PubMedClient (split into focused modules)
     mod.rs             # Core client, search, EFetch
@@ -234,8 +241,9 @@ pubmed/                # PubMed E-utilities API
 pmc/                   # PMC (PubMed Central) API
   client.rs            # PmcClient - full-text fetch, availability check, figure extraction
   cloud.rs             # PmcCloudClient - per-file download from the PMC OA Cloud (AWS S3);
-                       # also fetch_figures/fetch_figures_with, which pull only the JATS XML
-                       # and the images its <fig> elements reference, straight into memory
+                       # fetch_figures/fetch_figures_with pull only the JATS XML and the
+                       # images its <fig> elements reference, straight into memory;
+                       # download_files_to/download_figures_to write to any StorageBackend
   common.rs            # Shared PMC helpers (normalize_pmcid, ...)
   extracted.rs         # ExtractedFigure (on disk) / FigureBlob + FigureSelection (in memory)
 
@@ -255,7 +263,8 @@ europe_pmc/            # Europe PMC REST API (EBI; complements NCBI E-utilities)
 
 - `Client` — Unified client with `pubmed` and `pmc` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`
 - `PubMedClient` — Search, fetch metadata, ESummary, EPost/History, ELink, EInfo, ECitMatch, EGQuery, ESpell
-- `PmcClient` — Fetch full-text, check availability, extract figures (to a directory via `extract_figures_with_captions`, or into memory via `fetch_figures`), download OA files from the PMC OA Cloud (AWS S3)
+- `PmcClient` — Fetch full-text, check availability, extract figures (to a directory via `extract_figures_with_captions`, into memory via `fetch_figures`, or to any destination via `download_figures_to`), download OA files from the PMC OA Cloud (AWS S3) to a directory (`download_files`) or a `StorageBackend` (`download_files_to`)
+- `StorageBackend` / `Destination` — Where a download lands: a local directory, or `s3://bucket/prefix` (S3, MinIO, R2, Ceph). `Destination::parse` reads either from one string, so a single CLI flag or tool argument covers both. S3 needs the `storage-s3` feature; endpoint and addressing style come from `S3Options::from_env` (`AWS_ENDPOINT_URL[_S3]`, `AWS_S3_FORCE_PATH_STYLE`), region and credentials from `aws-config` as usual
 - `EuropePmcClient` — Europe PMC REST API: cross-source search, JATS full text, references/citations/database links, supplementary downloads. Addressed by `EuropePmcId` (`(source, id)`); needs no API key
 - `SearchQuery` — Builder pattern for complex queries with filters, date ranges, boolean logic
 - `PubMedArticle` — Article metadata (title, authors, abstract, MeSH, keywords, etc.) — defined in `pubmed-parser`
@@ -364,7 +373,8 @@ crates.io publish, from `pubmed-mcp/Dockerfile` (build context is the **workspac
 depends on its siblings by path; `.dockerignore` at the root trims the context but must keep every
 workspace member, or the manifest fails to load). `ARG RUST_VERSION` must match `rust-toolchain.toml`;
 `ci-docker.yml` fails the build if it drifts and also smoke-tests the image (`--help` + an MCP
-`initialize` handshake over stdio).
+`initialize` handshake over stdio). The builder stage installs **cmake** as well as OpenSSL: the
+`storage-s3` feature brings in the AWS SDK, whose `aws-lc-sys` crypto backend builds C with cmake.
 
 ```
 src/
@@ -399,7 +409,8 @@ XML fixtures are in `test_data/` at the workspace root (pmc_xml/ and pubmed_xml/
 
 - **`pubmed-parser`** tests: Parsing PubMed XML, PMC XML, supplementary materials
 - **`pubmed-formatter`** tests: Markdown conversion, BibTeX/RIS/CSL-JSON/NBIB export, YAML frontmatter
-- **`pubmed-client`** tests: `comprehensive_pmc_tests`, `comprehensive_pubmed_tests`, `comprehensive_elink_tests`, `comprehensive_einfo_tests`, `test_figure_extraction`, `mocked_cloud` (PMC OA Cloud/S3 listing & download), `test_pmc_cache`, `test_webenv`, `test_batch_fetch_mocked`
+- **`pubmed-client`** tests: `comprehensive_pmc_tests`, `comprehensive_pubmed_tests`, `comprehensive_elink_tests`, `comprehensive_einfo_tests`, `test_figure_extraction`, `mocked_cloud` (PMC OA Cloud/S3 listing & download, incl. storage-backed
+  downloads against an in-memory `StorageBackend` double), `test_pmc_cache`, `test_webenv`, `test_batch_fetch_mocked`
 
 ## Guidelines
 
@@ -453,7 +464,11 @@ See `.claude/skills/maturin-debugger/SKILL.md` for detailed troubleshooting.
 
 **pubmed-client**: `pubmed-parser`, `pubmed-formatter`, `tokio`, `reqwest`, `serde`, `moka` (caching), `rand`, `imagesize` (header-only figure dimensions), `futures-util`. PMC OA files are downloaded per-file from the PMC OA Cloud (AWS S3) over plain HTTP via `reqwest` — no tar/gzip deps.
 
-Optional (pubmed-client): `redis` (feature: `cache-redis`), `rusqlite` (feature: `cache-sqlite`).
+Optional (pubmed-client): `redis` (feature: `cache-redis`), `rusqlite` (feature: `cache-sqlite`),
+`aws-config` + `aws-sdk-s3` (feature: `storage-s3`). `storage-s3` is off by default because the AWS
+SDK is a large tree; `pubmed-cli` and `pubmed-mcp` both enable it. The S3 code lives **only** in
+`pubmed-client/src/storage/s3.rs` — `pubmed-cli/src/commands/storage.rs` is now just the CLI's
+argument plumbing (`--output-dir` vs `--s3-path`) over the shared backends.
 
 Dev: `rstest`, `tracing-test`, `wiremock`, `tempfile`.
 
@@ -470,3 +485,4 @@ Dev: `rstest`, `tracing-test`, `wiremock`, `tempfile`.
 - Token bucket rate limiting for NCBI compliance
 - Response caching with moka (configurable TTL and capacity)
 - Cross-platform time abstraction for native and WASM targets
+- One `StorageBackend` seam for download destinations, so local and object storage are the same code path

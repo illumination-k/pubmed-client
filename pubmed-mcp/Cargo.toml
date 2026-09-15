@@ -13,7 +13,7 @@ description = "MCP (Model Context Protocol) server for PubMed and PMC APIs"
 [dependencies]
 # Workspace dependencies
 anyhow.workspace = true
-pubmed-client = { workspace = true }
+pubmed-client = { workspace = true, features = ["storage-s3"] }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

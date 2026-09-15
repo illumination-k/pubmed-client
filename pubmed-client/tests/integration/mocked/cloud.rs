@@ -118,6 +118,10 @@ const TINY_PNG: &[u8] = &[
     0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 ];
 
+/// A stand-in supplementary file: in the listing, referenced by no `<fig>`.
+#[cfg(not(target_arch = "wasm32"))]
+const SUPPLEMENT_PDF: &[u8] = b"%PDF-1.4 supplementary";
+
 #[cfg(not(target_arch = "wasm32"))]
 const ARTICLE_XML: &str = r#"<?xml version="1.0"?>
 <article xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -144,11 +148,12 @@ const ARTICLE_XML: &str = r#"<?xml version="1.0"?>
 </article>
 "#;
 
-/// Stub the OA Cloud bucket: one listing, the JATS XML, and two figure images.
+/// Stub the OA Cloud bucket: one listing, the JATS XML, two figure images, and a
+/// supplementary PDF.
 ///
-/// `supplement.pdf` is in the listing but referenced by no `<fig>`; no mock
-/// serves it, so a request for it would fail the test outright — which is the
-/// point, `fetch_figures` must not download the whole package.
+/// `supplement.pdf` is in the listing but referenced by no `<fig>`. It is served
+/// so the full-package download works, and the figure tests assert explicitly
+/// that it is never requested.
 #[cfg(not(target_arch = "wasm32"))]
 async fn mock_oa_cloud() -> wiremock::MockServer {
     use wiremock::matchers::{method, path, query_param};
@@ -184,6 +189,12 @@ async fn mock_oa_cloud() -> wiremock::MockServer {
             .mount(&server)
             .await;
     }
+
+    Mock::given(method("GET"))
+        .and(path("/PMC7906746.1/supplement.pdf"))
+        .respond_with(ResponseTemplate::new(200).set_body_bytes(SUPPLEMENT_PDF))
+        .mount(&server)
+        .await;
 
     server
 }
@@ -354,4 +365,209 @@ async fn fetch_figures_reports_an_article_absent_from_the_bucket() {
         ),
         "got: {err:?}"
     );
+}
+
+// --- Storage-backed downloads (`download_files_to` / `download_figures_to`) ---
+
+/// A `StorageBackend` that keeps everything in memory.
+///
+/// Stands in for object storage: it proves the download paths go through the
+/// backend rather than the filesystem, without needing AWS credentials or a
+/// MinIO container. `written` also records the order files arrive in.
+#[cfg(not(target_arch = "wasm32"))]
+#[derive(Debug, Default)]
+struct MemoryStorage {
+    files: std::sync::Mutex<std::collections::BTreeMap<String, Vec<u8>>>,
+    written: std::sync::Mutex<Vec<String>>,
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl MemoryStorage {
+    /// Take the lock, recovering from poisoning rather than unwrapping: a panic
+    /// in one test must not turn into a confusing lock error in the next.
+    fn files(&self) -> std::sync::MutexGuard<'_, std::collections::BTreeMap<String, Vec<u8>>> {
+        self.files
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    fn names(&self) -> Vec<String> {
+        self.files().keys().cloned().collect()
+    }
+
+    fn get(&self, path: &str) -> Option<Vec<u8>> {
+        self.files().get(path).cloned()
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[async_trait::async_trait]
+impl pubmed_client::StorageBackend for MemoryStorage {
+    async fn write_file(&self, path: &str, content: &[u8]) -> pubmed_client::Result<()> {
+        self.files().insert(path.to_string(), content.to_vec());
+        self.written
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .push(path.to_string());
+        Ok(())
+    }
+
+    async fn copy_file(
+        &self,
+        source: &std::path::Path,
+        dest_path: &str,
+    ) -> pubmed_client::Result<()> {
+        let content = std::fs::read(source).map_err(|e| ParseError::IoError {
+            message: format!("{}: {e}", source.display()),
+        })?;
+        self.write_file(dest_path, &content).await
+    }
+
+    async fn ensure_directory(&self, _path: &str) -> pubmed_client::Result<()> {
+        Ok(())
+    }
+
+    async fn file_exists(&self, path: &str) -> pubmed_client::Result<bool> {
+        Ok(self.files().contains_key(path))
+    }
+
+    async fn read_file(&self, path: &str) -> pubmed_client::Result<Option<Vec<u8>>> {
+        Ok(self.get(path))
+    }
+
+    fn get_full_path(&self, relative_path: &str) -> String {
+        format!("memory://{relative_path}")
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[tokio::test]
+async fn download_files_to_writes_the_whole_package_through_the_backend() {
+    let server = mock_oa_cloud().await;
+    let storage = MemoryStorage::default();
+
+    let written = cloud_client(&server)
+        .download_files_to("PMC7906746", &storage)
+        .await
+        .expect("the stubbed article should download");
+
+    // Every file in the listing, addressed by the backend's own scheme — nothing
+    // resolved against a local directory.
+    assert_eq!(
+        storage.names(),
+        vec![
+            "PMC7906746.1.xml".to_string(),
+            "gr1_lrg.png".to_string(),
+            "gr2_lrg.png".to_string(),
+            "supplement.pdf".to_string(),
+        ]
+    );
+    assert!(
+        written.iter().all(|path| path.starts_with("memory://")),
+        "returned locations should come from the backend, got: {written:?}"
+    );
+    assert_eq!(storage.get("gr1_lrg.png").as_deref(), Some(TINY_PNG));
+    assert_eq!(
+        storage.get("supplement.pdf").as_deref(),
+        Some(SUPPLEMENT_PDF)
+    );
+}
+
+/// The figure download must write *only* figures, whatever the destination —
+/// that is what distinguishes it from `extract_figures_with_captions`.
+#[cfg(not(target_arch = "wasm32"))]
+#[tokio::test]
+async fn download_figures_to_writes_only_the_figures() {
+    use pubmed_client::FigureSelection;
+
+    let server = mock_oa_cloud().await;
+    let storage = MemoryStorage::default();
+
+    let figures = cloud_client(&server)
+        .download_figures_to("PMC7906746", &storage, &FigureSelection::new())
+        .await
+        .expect("the stubbed article should yield figures");
+
+    assert_eq!(
+        storage.names(),
+        vec!["gr1_lrg.png".to_string(), "gr2_lrg.png".to_string()],
+        "neither the article XML nor the supplementary PDF belongs in a figure download"
+    );
+
+    assert_eq!(figures.len(), 2);
+    assert_eq!(figures[0].figure.id, "fig1");
+    assert_eq!(figures[0].extracted_file_path, "memory://gr1_lrg.png");
+    assert_eq!(figures[0].file_size, Some(TINY_PNG.len() as u64));
+    assert_eq!(figures[0].dimensions, Some((4, 3)));
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[tokio::test]
+async fn download_figures_to_honors_the_selection() {
+    use pubmed_client::FigureSelection;
+
+    let server = mock_oa_cloud().await;
+    let storage = MemoryStorage::default();
+
+    let figures = cloud_client(&server)
+        .download_figures_to(
+            "PMC7906746",
+            &storage,
+            &FigureSelection::new().with_ids(["Figure 2"]),
+        )
+        .await
+        .expect("selecting by label should work");
+
+    assert_eq!(figures.len(), 1);
+    assert_eq!(storage.names(), vec!["gr2_lrg.png".to_string()]);
+}
+
+/// `download_files` is `download_files_to` over a local directory, so the local
+/// path must keep reporting filesystem locations and actually create the files.
+#[cfg(not(target_arch = "wasm32"))]
+#[tokio::test]
+async fn download_files_still_writes_to_a_local_directory() {
+    let server = mock_oa_cloud().await;
+    let temp_dir = tempdir().expect("Failed to create temp dir");
+
+    let written = cloud_client(&server)
+        .download_files("PMC7906746", temp_dir.path())
+        .await
+        .expect("the stubbed article should download");
+
+    assert_eq!(written.len(), 4);
+    for path in &written {
+        assert!(
+            std::path::Path::new(path).is_file(),
+            "{path} should exist on disk"
+        );
+    }
+    assert_eq!(
+        std::fs::read(temp_dir.path().join("gr1_lrg.png")).unwrap(),
+        TINY_PNG
+    );
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[tokio::test]
+async fn a_destination_resolves_a_local_path_and_an_s3_uri() {
+    use pubmed_client::Destination;
+
+    let temp_dir = tempdir().expect("Failed to create temp dir");
+    let nested = temp_dir.path().join("a/b");
+
+    let destination = Destination::parse(&nested.to_string_lossy()).unwrap();
+    assert!(!destination.is_object_storage());
+    let storage = destination
+        .into_backend()
+        .await
+        .expect("a creatable path should resolve");
+    assert!(nested.is_dir(), "the directory should be created up front");
+
+    storage.write_file("file.txt", b"content").await.unwrap();
+    assert_eq!(std::fs::read(nested.join("file.txt")).unwrap(), b"content");
+
+    let s3 = Destination::parse("s3://bucket/pmc").unwrap();
+    assert!(s3.is_object_storage());
+    assert_eq!(s3.display(), "s3://bucket/pmc");
 }

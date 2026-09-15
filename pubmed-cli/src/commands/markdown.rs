@@ -134,7 +134,10 @@ impl Markdown {
         storage: &dyn StorageBackend,
         ctx: &ClientContext<'_>,
     ) -> Result<HashMap<String, String>, BatchItemError> {
-        let storage_err = |op: &str, e: anyhow::Error| {
+        // Takes the error by `Display` rather than a concrete type: storage
+        // failures arrive as `PubMedError` from the shared backends, while the
+        // surrounding code still works in `anyhow`.
+        let storage_err = |op: &str, e: &dyn std::fmt::Display| {
             BatchItemError::new(
                 pmcid,
                 FailureKind::StorageError {
@@ -164,7 +167,7 @@ impl Markdown {
         storage
             .ensure_directory(&figures_dir)
             .await
-            .map_err(|e| storage_err("ensure_directory", e))?;
+            .map_err(|e| storage_err("ensure_directory", &e))?;
 
         let mut figure_paths = HashMap::new();
         for fig in extracted_figures {
@@ -179,7 +182,7 @@ impl Markdown {
             storage
                 .copy_file(src, &storage_path)
                 .await
-                .map_err(|e| storage_err("copy_figure", e))?;
+                .map_err(|e| storage_err("copy_figure", &e))?;
 
             let relative_path = format!("./{}/figures/{}", pmcid, file_name);
             figure_paths.insert(fig.figure.id.clone(), relative_path);

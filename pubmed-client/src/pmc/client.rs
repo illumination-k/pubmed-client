@@ -12,6 +12,8 @@ use crate::pmc::oa_api::OaSubsetInfo;
 use crate::pmc::parser::parse_pmc_xml;
 use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
+#[cfg(not(target_arch = "wasm32"))]
+use crate::storage::StorageBackend;
 use crate::tls::install_default_crypto_provider;
 use pubmed_parser::pmc::PmcArticle;
 use reqwest::Client;
@@ -501,6 +503,76 @@ impl PmcClient {
         selection: &FigureSelection,
     ) -> Result<Vec<FigureBlob>> {
         self.cloud_client.fetch_figures_with(pmcid, selection).await
+    }
+
+    /// Download a PMC article's Open Access files to any [`StorageBackend`]
+    ///
+    /// Same as [`download_files`], but the destination can be object storage
+    /// (S3, MinIO, R2) rather than a directory. Returns the location of each
+    /// written file as the backend renders it.
+    ///
+    /// [`download_files`]: Self::download_files
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::{Destination, PmcClient};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     let storage = Destination::parse("s3://my-bucket/pmc")?.into_backend().await?;
+    ///     let files = client.download_files_to("PMC7906746", storage.as_ref()).await?;
+    ///     println!("{} file(s) uploaded", files.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn download_files_to(
+        &self,
+        pmcid: &str,
+        storage: &dyn StorageBackend,
+    ) -> Result<Vec<String>> {
+        self.cloud_client.download_files_to(pmcid, storage).await
+    }
+
+    /// Download a PMC article's figures to any [`StorageBackend`]
+    ///
+    /// Writes only the figures — unlike [`extract_figures_with_captions`], which
+    /// needs the whole OA package on disk — and accepts an object-storage
+    /// destination. See [`FigureSelection`] for choosing and capping figures.
+    ///
+    /// [`extract_figures_with_captions`]: Self::extract_figures_with_captions
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::{Destination, FigureSelection, PmcClient};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcClient::new();
+    ///     let storage = Destination::parse("./figures")?.into_backend().await?;
+    ///     let figures = client
+    ///         .download_figures_to("PMC7906746", storage.as_ref(), &FigureSelection::new())
+    ///         .await?;
+    ///
+    ///     for figure in figures {
+    ///         println!("{} -> {}", figure.figure.id, figure.extracted_file_path);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn download_figures_to(
+        &self,
+        pmcid: &str,
+        storage: &dyn StorageBackend,
+        selection: &FigureSelection,
+    ) -> Result<Vec<ExtractedFigure>> {
+        self.cloud_client
+            .download_figures_to(pmcid, storage, selection)
+            .await
     }
 
     /// Clear all cached PMC data

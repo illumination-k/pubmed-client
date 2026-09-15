@@ -22,9 +22,12 @@ ARG RUST_VERSION
 # the toolchain file, so no toolchain is re-downloaded.
 ENV RUSTUP_TOOLCHAIN=${RUST_VERSION}
 
-# pubmed-client's default `native-tls` feature links against system OpenSSL.
+# pubmed-client's default `native-tls` feature links against system OpenSSL, and
+# its `storage-s3` feature (object-storage download destinations) pulls in the AWS
+# SDK, whose `aws-lc-sys` crypto backend builds C with cmake.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+        cmake \
         pkg-config \
         libssl-dev \
     && rm -rf /var/lib/apt/lists/*

@@ -32,6 +32,10 @@ time = "0.3"
 tracing = { workspace = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+# Object-storage downloads (feature `storage-s3`). Optional because the AWS SDK
+# is a large dependency tree that a local-only download must not have to build.
+aws-config = { version = "1.5", features = ["behavior-version-latest"], optional = true }
+aws-sdk-s3 = { version = "1.60", optional = true }
 reqwest = { version = "0.13", default-features = false, features = ["json", "form"] }
 # Pulled in only by `rustls-tls`, to pick ring as the rustls crypto provider.
 # reqwest's own `rustls` feature would select aws-lc-rs, which builds C via
@@ -58,8 +62,10 @@ rustls-tls = ["reqwest/rustls-no-provider", "dep:rustls"]
 integration-tests = []
 cache-redis = ["dep:redis"]
 cache-sqlite = ["dep:rusqlite"]
+storage-s3 = ["dep:aws-config", "dep:aws-sdk-s3"]
 
 [dev-dependencies]
+async-trait = "0.1"
 chrono = "0.4"
 paste = "1.0"
 proptest = "1"

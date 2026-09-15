@@ -19,7 +19,10 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - Clean HTML entity decoding and content formatting
 - **Figure Access**: Get an article's figures, not just their captions
   - Inline image bytes, so an assistant can actually look at a figure
-  - Or downloaded to a directory you name, alongside the full Open Access package
+  - Or downloaded to a destination you name, along with the full Open Access package
+- **Object-storage destinations**: Downloads go to a local directory or to
+  `s3://bucket/prefix` — S3, and S3-compatible services (MinIO, Cloudflare R2, Ceph)
+  through the usual `AWS_*` environment variables
 - **Europe PMC Access**: Search and retrieve from Europe PMC alongside NCBI
   - Cross-source search covering preprints (PPR), patents, Agricola and CBA as well as PubMed/PMC
   - JATS full text (parsed or raw XML), reference and citation graphs
@@ -298,23 +301,41 @@ Get markdown for PMC article 7906746 without table of contents
 Get markdown for PMC7906746 with minimal formatting (no metadata or captions)
 ```
 
+#### Download destinations
+
+`download_pmc_figures` and `download_pmc_files` both take an `output_dir`, which
+is either:
+
+- a **local directory** — `./figures`, `/var/tmp/pmc` — created if missing; or
+- an **object-storage prefix** — `s3://bucket/prefix`.
+
+Object storage goes through the AWS SDK, so credentials, region and endpoint come
+from the usual sources: `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`,
+`AWS_REGION`, `~/.aws/config`, instance metadata. S3-compatible services work the
+same way — point `AWS_ENDPOINT_URL` at MinIO, Cloudflare R2 or Ceph.
+
+`output_dir` is deliberately required, with no default: the server runs on your
+machine (or your cluster), so where the files land is your call, not its guess.
+Returned locations are rendered the way the destination was addressed — an
+absolute path locally, an `s3://bucket/key` URI in object storage.
+
 #### `download_pmc_figures`
 
-Download a PMC article's figures from the PMC Open Access Cloud to a local
-directory. `get_pmc_figures` only reports what the XML says about a figure;
-this fetches the image itself.
+Download a PMC article's figures from the PMC Open Access Cloud.
+`get_pmc_figures` only reports what the XML says about a figure; this fetches the
+image itself.
 
 **Parameters:**
 
 - `pmc_id` (string, required): PMC ID with or without "PMC" prefix
-- `output_dir` (string, required): Directory to download into, created if missing
+- `output_dir` (string, required): A local directory or `s3://bucket/prefix` — see
+  [Download destinations](#download-destinations)
+- `figure_ids` (array of strings, optional): Figures to download, by id or label
+  (e.g. `["fig1", "Figure 2"]`). Omit for all figures.
 
-`output_dir` is deliberately required: the server runs on your machine, so
-where the files land is your call, not its guess. Resolving `<fig>` elements
-against real files needs the whole Open Access package, so the article's XML,
-PDF and supplementary materials land in the same directory —
-[`get_pmc_figure_images`](#get_pmc_figure_images) is the way to get only the
-images.
+Only the figures are written. `<fig>` elements are resolved against the Open
+Access package in memory, so the article's XML, PDF and supplementary materials
+never reach the destination — use `download_pmc_files` when you want those.
 
 **Returns:**
 
@@ -323,26 +344,31 @@ metadata as `get_pmc_figures` (`id`, `label`, `caption`, `alt_text`,
 `fig_type`, `graphic_href`) plus `file_path`, `file_size`, and `width`/`height`
 for formats that declare their dimensions.
 
-**Example:**
+**Examples:**
 
 ```
 Download the figures of PMC7906746 into ./figures
 ```
 
+```
+Put the figures of PMC7906746 in s3://my-papers/pmc7906746
+```
+
 #### `download_pmc_files`
 
 Download a PMC article's full Open Access package — full-text XML, figures,
-PDF, and supplementary materials — to a local directory.
+PDF, and supplementary materials.
 
 **Parameters:**
 
 - `pmc_id` (string, required): PMC ID with or without "PMC" prefix
-- `output_dir` (string, required): Directory to download into, created if missing
+- `output_dir` (string, required): A local directory or `s3://bucket/prefix` — see
+  [Download destinations](#download-destinations)
 
 **Returns:**
 
-`{ pmc_id, output_dir, file_count, files }`, where `files` lists the absolute
-paths of everything that was downloaded.
+`{ pmc_id, output_dir, file_count, files }`, where `files` lists where each
+downloaded file landed.
 
 **Example:**
 

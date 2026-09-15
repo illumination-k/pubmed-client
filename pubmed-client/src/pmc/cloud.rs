@@ -10,6 +10,8 @@ use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
 #[cfg(not(target_arch = "wasm32"))]
 use crate::request::fetch_with_retry;
+#[cfg(not(target_arch = "wasm32"))]
+use crate::storage::{LocalStorage, StorageBackend};
 use crate::tls::install_default_crypto_provider;
 use pubmed_parser::pmc::{Figure, PmcArticle, Section};
 use reqwest::Client;
@@ -143,18 +145,75 @@ impl PmcCloudClient {
         pmcid: &str,
         output_dir: P,
     ) -> Result<Vec<String>> {
-        let pmc_id = PmcId::parse(pmcid)?;
-        let normalized_pmcid = pmc_id.as_str();
-
         let output_path = output_dir.as_ref();
+        // Create the directory before downloading anything, so a caller learns
+        // straight away that the path is unusable — and so the directory exists
+        // even for an article the OA Cloud turns out not to have.
         tokio_fs::create_dir_all(output_path)
             .await
             .map_err(|e| ParseError::IoError {
                 message: format!("Failed to create output directory: {}", e),
             })?;
 
+        self.download_files_to(pmcid, &LocalStorage::new(output_path))
+            .await
+    }
+
+    /// Download a PMC article's files to any [`StorageBackend`].
+    ///
+    /// Same as [`download_files`], but the destination is a backend rather than
+    /// a directory, so the article's files can go to object storage (S3, MinIO,
+    /// R2) instead of — or as well as — the filesystem. Each file is streamed
+    /// through one at a time as it arrives, so memory use is bounded by the
+    /// download concurrency, not by the size of the package.
+    ///
+    /// [`download_files`]: Self::download_files
+    ///
+    /// # Arguments
+    ///
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    /// * `storage` - Where to write the article's files
+    ///
+    /// # Returns
+    ///
+    /// The location of each written file, as the backend renders it: an absolute
+    /// path for [`LocalStorage`], an `s3://bucket/key` URI for `S3Storage`.
+    ///
+    /// # Errors
+    ///
+    /// * `ParseError::InvalidPmcid` - If the PMCID format is invalid
+    /// * `PubMedError::RequestError` - If an HTTP request fails
+    /// * `ParseError::IoError` - If a write to `storage` fails
+    /// * `ParseError::PmcNotAvailable` - If the article is not in the OA Cloud
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::pmc::cloud::PmcCloudClient;
+    /// use pubmed_client::{ClientConfig, Destination};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcCloudClient::new(ClientConfig::new());
+    ///     let storage = Destination::parse("s3://my-bucket/pmc")?.into_backend().await?;
+    ///
+    ///     for file in client.download_files_to("PMC7906746", storage.as_ref()).await? {
+    ///         println!("Uploaded: {}", file);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn download_files_to(
+        &self,
+        pmcid: &str,
+        storage: &dyn StorageBackend,
+    ) -> Result<Vec<String>> {
+        let pmc_id = PmcId::parse(pmcid)?;
+        let normalized_pmcid = pmc_id.as_str();
+
         let files = self
-            .download_cloud_files(&normalized_pmcid, output_path)
+            .download_cloud_files(&normalized_pmcid, storage)
             .await?;
 
         if files.is_empty() {
@@ -170,14 +229,14 @@ impl PmcCloudClient {
     /// Download an article's files from the PMC OA Cloud (AWS S3) service.
     ///
     /// Lists the objects under the article's prefix in the `pmc-oa-opendata`
-    /// bucket, selects the latest version folder, and downloads each file into
-    /// `output_dir`. Returns the list of local file paths (empty if the article
+    /// bucket, selects the latest version folder, and writes each file to
+    /// `storage`. Returns the location of each written file (empty if the article
     /// is not present in the cloud bucket).
     #[cfg(not(target_arch = "wasm32"))]
     async fn download_cloud_files(
         &self,
         normalized_pmcid: &str,
-        output_dir: &Path,
+        storage: &dyn StorageBackend,
     ) -> Result<Vec<String>> {
         let keys = self.list_cloud_object_keys(normalized_pmcid).await?;
         if keys.is_empty() {
@@ -206,15 +265,11 @@ impl PmcCloudClient {
                 let response = self.s3_get(&url).await?;
                 let bytes = response.bytes().await.map_err(PubMedError::from)?;
 
-                let output_path = output_dir.join(file_name);
-                tokio_fs::write(&output_path, &bytes)
-                    .await
-                    .map_err(|e| ParseError::IoError {
-                        message: format!("Failed to write cloud file {}: {}", file_name, e),
-                    })?;
+                storage.write_file(file_name, &bytes).await?;
 
-                debug!("Downloaded cloud file: {}", output_path.display());
-                Ok(Some(output_path.to_string_lossy().to_string()))
+                let written = storage.get_full_path(file_name);
+                debug!("Downloaded cloud file: {}", written);
+                Ok(Some(written))
             })
             .buffered(concurrency)
             .try_filter_map(|opt| async move { Ok(opt) })
@@ -539,6 +594,78 @@ impl PmcCloudClient {
             .buffered(concurrency)
             .try_collect()
             .await
+    }
+
+    /// Download an article's figures to any [`StorageBackend`].
+    ///
+    /// Writes **only** the figures, unlike [`extract_figures_with_captions`],
+    /// which needs the whole OA package on disk to match `<fig>` elements against
+    /// files. Resolution happens in memory here, so nothing but the images is
+    /// written, and the destination can be object storage (S3, MinIO, R2) rather
+    /// than a directory.
+    ///
+    /// [`extract_figures_with_captions`]: Self::extract_figures_with_captions
+    ///
+    /// # Arguments
+    ///
+    /// * `pmcid` - PMC ID (with or without "PMC" prefix)
+    /// * `storage` - Where to write the figures
+    /// * `selection` - Which figures to fetch; see [`FigureSelection`]
+    ///
+    /// # Returns
+    ///
+    /// One [`ExtractedFigure`] per written figure, whose `extracted_file_path`
+    /// is the location as the backend renders it — an absolute path for
+    /// [`LocalStorage`], an `s3://bucket/key` URI for `S3Storage`.
+    ///
+    /// # Errors
+    ///
+    /// * `ParseError::InvalidPmcid` - If the PMCID format is invalid
+    /// * `PubMedError::RequestError` - If an HTTP request fails
+    /// * `ParseError::IoError` - If a write to `storage` fails
+    /// * `ParseError::PmcNotAvailable` - If the article is not in the OA Cloud
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::pmc::cloud::PmcCloudClient;
+    /// use pubmed_client::{ClientConfig, Destination, FigureSelection};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PmcCloudClient::new(ClientConfig::new());
+    ///     let storage = Destination::parse("s3://my-bucket/figures")?.into_backend().await?;
+    ///     let figures = client
+    ///         .download_figures_to("PMC7906746", storage.as_ref(), &FigureSelection::new())
+    ///         .await?;
+    ///
+    ///     for figure in figures {
+    ///         println!("{} -> {}", figure.figure.id, figure.extracted_file_path);
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn download_figures_to(
+        &self,
+        pmcid: &str,
+        storage: &dyn StorageBackend,
+        selection: &FigureSelection,
+    ) -> Result<Vec<ExtractedFigure>> {
+        let blobs = self.fetch_figures_with(pmcid, selection).await?;
+
+        let mut written = Vec::with_capacity(blobs.len());
+        for blob in blobs {
+            storage.write_file(&blob.file_name, &blob.data).await?;
+            written.push(ExtractedFigure {
+                extracted_file_path: storage.get_full_path(&blob.file_name),
+                file_size: Some(blob.data.len() as u64),
+                dimensions: blob.dimensions,
+                figure: blob.figure,
+            });
+        }
+
+        Ok(written)
     }
 
     /// Whether `figure` is selected by any of the caller-supplied ids.

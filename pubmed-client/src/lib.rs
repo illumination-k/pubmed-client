@@ -271,6 +271,10 @@ pub mod pubmed;
 pub mod rate_limit;
 pub(crate) mod request;
 pub mod retry;
+// Download destinations are a filesystem/network concern; WASM has neither a
+// filesystem nor the AWS SDK.
+#[cfg(not(target_arch = "wasm32"))]
+pub mod storage;
 pub mod time;
 pub(crate) mod tls;
 
@@ -305,6 +309,10 @@ pub use pubmed::{
     SpellCheckResult, SpelledQuerySegment, export, parse_article_from_xml, validate_year,
 };
 pub use rate_limit::RateLimiter;
+#[cfg(not(target_arch = "wasm32"))]
+pub use storage::{Destination, LocalStorage, StorageBackend};
+#[cfg(all(not(target_arch = "wasm32"), feature = "storage-s3"))]
+pub use storage::{S3Options, S3Storage};
 pub use time::{Duration, Instant, sleep};
 
 /// Convenience client that combines both PubMed and PMC functionality

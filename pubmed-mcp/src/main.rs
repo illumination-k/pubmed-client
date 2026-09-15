@@ -229,7 +229,7 @@ impl PubMedServer {
     }
 
     #[tool(
-        description = "Extract figure and table metadata from a PMC article. Returns figure IDs, labels, captions, and graphic URLs, but no image data. Useful for understanding visual content without downloading full text; use get_pmc_figure_images to see the images themselves, or download_pmc_figures to write them to a directory."
+        description = "Extract figure and table metadata from a PMC article. Returns figure IDs, labels, captions, and graphic URLs, but no image data. Useful for understanding visual content without downloading full text; use get_pmc_figure_images to see the images themselves, or download_pmc_figures to write them to a directory or object storage."
     )]
     async fn get_pmc_figures(
         &self,
@@ -239,7 +239,7 @@ impl PubMedServer {
     }
 
     #[tool(
-        description = "Download a PMC article's figures to a local directory. Fetches the article's Open Access package from the PMC OA Cloud into output_dir and returns the local path of each figure alongside its caption and dimensions; the package's other files (full-text XML, PDF, supplementary materials) land in the same directory. Requires an explicit output_dir. Use get_pmc_figure_images instead to receive the images inline without writing anything."
+        description = "Download a PMC article's figures from the PMC Open Access Cloud and return where each one landed, alongside its caption and dimensions. Only the figures are written. output_dir is required and may be a local directory or an object-storage prefix ('s3://bucket/prefix', also MinIO/R2 via AWS_* environment variables). Use get_pmc_figure_images instead to receive the images inline without writing anything."
     )]
     async fn download_pmc_figures(
         &self,
@@ -249,7 +249,7 @@ impl PubMedServer {
     }
 
     #[tool(
-        description = "Download a PMC article's full Open Access package (full-text XML, figures, PDF, supplementary materials) to a local directory and return the downloaded file paths. Requires an explicit output_dir."
+        description = "Download a PMC article's full Open Access package (full-text XML, figures, PDF, supplementary materials) and return where each file landed. output_dir is required and may be a local directory or an object-storage prefix ('s3://bucket/prefix', also MinIO/R2 via AWS_* environment variables)."
     )]
     async fn download_pmc_files(
         &self,
