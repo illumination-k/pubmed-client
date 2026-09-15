@@ -546,6 +546,8 @@ async fn test_download_figures_tool_writes_the_images_and_returns_their_paths() 
     let output_dir = tempfile::tempdir()?;
     let output_path = output_dir.path().to_string_lossy().to_string();
 
+    // `--allow-local-downloads` is required: writing to the host filesystem is
+    // opt-in, and the test below covers the refusal without it.
     let client = ()
         .serve(TokioChildProcess::new(Command::new("cargo").configure(
             |cmd| {
@@ -556,6 +558,7 @@ async fn test_download_figures_tool_writes_the_images_and_returns_their_paths() 
                     .arg("--")
                     .arg("--oa-cloud-base-url")
                     .arg(&cloud_url)
+                    .arg("--allow-local-downloads")
                     .arg("--tools")
                     .arg("download-figures");
             },
@@ -594,6 +597,71 @@ async fn test_download_figures_tool_writes_the_images_and_returns_their_paths() 
         .collect::<Result<Vec<_>>>()?;
     written.sort();
     assert_eq!(written, vec!["gr1_lrg.png".to_string()]);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_download_tools_refuse_a_local_destination_unless_the_server_opted_in() -> Result<()> {
+    // The default has to hold over the wire, not just in the resolver: a server
+    // launched the way a host config launches it must refuse to write to the
+    // machine it runs on, and must say how to proceed.
+    let cloud = mock_oa_cloud().await;
+    let cloud_url = cloud.uri();
+    let output_dir = tempfile::tempdir()?;
+    let target = output_dir.path().join("figures");
+    let target_arg = target.to_string_lossy().to_string();
+
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                // Cleared explicitly: the variable is the other way to turn this
+                // on, and a developer who exported it would otherwise see this
+                // test pass for the wrong reason.
+                cmd.env_remove("PUBMED_MCP_ALLOW_LOCAL_DOWNLOADS")
+                    .arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--oa-cloud-base-url")
+                    .arg(&cloud_url)
+                    .arg("--tools")
+                    .arg("download-figures");
+            },
+        ))?)
+        .await?;
+
+    let arguments = serde_json::json!({ "pmc_id": "PMC7906746", "output_dir": target_arg });
+    let result = client
+        .call_tool(
+            CallToolRequestParams::new("download_pmc_figures").with_arguments(
+                arguments
+                    .as_object()
+                    .expect("arguments should be a JSON object")
+                    .clone(),
+            ),
+        )
+        .await;
+
+    let Err(err) = result else {
+        panic!("a local output_dir must be refused by default");
+    };
+
+    let message = err.to_string();
+    assert!(
+        message.contains("--allow-local-downloads"),
+        "the refusal should name the flag that lifts it, got: {message}"
+    );
+    assert!(
+        message.contains("s3://"),
+        "the refusal should point at object storage as the alternative, got: {message}"
+    );
+    assert!(
+        !target.exists(),
+        "a refused download must not create its destination: {}",
+        target.display()
+    );
 
     Ok(())
 }

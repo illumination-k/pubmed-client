@@ -264,7 +264,7 @@ europe_pmc/            # Europe PMC REST API (EBI; complements NCBI E-utilities)
 - `Client` — Unified client with `pubmed` and `pmc` fields; convenience methods: `search_with_full_text`, `fetch_articles`, `fetch_summaries`, `search_and_fetch_summaries`, `get_related_articles`, `get_pmc_links`, `get_citations`, `match_citations`, `global_query`, `get_database_list`, `get_database_info`, `epost`, `fetch_all_by_pmids`, `spell_check`
 - `PubMedClient` — Search, fetch metadata, ESummary, EPost/History, ELink, EInfo, ECitMatch, EGQuery, ESpell
 - `PmcClient` — Fetch full-text, check availability, extract figures (to a directory via `extract_figures_with_captions`, into memory via `fetch_figures`, or to any destination via `download_figures_to`), download OA files from the PMC OA Cloud (AWS S3) to a directory (`download_files`) or a `StorageBackend` (`download_files_to`)
-- `StorageBackend` / `Destination` — Where a download lands: a local directory, or `s3://bucket/prefix` (S3, MinIO, R2, Ceph). `Destination::parse` reads either from one string, so a single CLI flag or tool argument covers both. S3 needs the `storage-s3` feature; endpoint and addressing style come from `S3Options::from_env` (`AWS_ENDPOINT_URL[_S3]`, `AWS_S3_FORCE_PATH_STYLE`), region and credentials from `aws-config` as usual
+- `StorageBackend` / `Destination` — Where a download lands: a local directory, or `s3://bucket/prefix` (S3, MinIO, R2, Ceph). `Destination::parse` reads either from one string, so a single CLI flag or tool argument covers both. S3 needs the `storage-s3` feature; endpoint and addressing style come from `S3Options::from_env` (`AWS_ENDPOINT_URL[_S3]`, `AWS_S3_FORCE_PATH_STYLE`), region and credentials from `aws-config` as usual. `Destination` itself allows both kinds — refusing local writes is `pubmed-mcp`'s policy, not the library's (the CLI's whole job is local files)
 - `EuropePmcClient` — Europe PMC REST API: cross-source search, JATS full text, references/citations/database links, supplementary downloads. Addressed by `EuropePmcId` (`(source, id)`); needs no API key
 - `SearchQuery` — Builder pattern for complex queries with filters, date ranges, boolean logic
 - `PubMedArticle` — Article metadata (title, authors, abstract, MeSH, keywords, etc.) — defined in `pubmed-parser`
@@ -368,6 +368,16 @@ echo of the JSON. It still advertises a schema — `#[tool(output_schema = ...sc
 — and still fills `structured_content`, so the invariant above holds. Reach for that shape only when
 a tool's product genuinely is binary content; otherwise `Json<T>`.
 
+**The download tools cannot write to the local filesystem unless the server was
+started with `--allow-local-downloads`** (`PUBMED_MCP_ALLOW_LOCAL_DOWNLOADS`).
+`s3://` destinations are always allowed: naming a bucket is a deliberate act,
+while a local path is a side effect on whatever machine launched the server from a
+host config nobody revisits. The gate lives in `download::resolve_destination`,
+the one seam both tools share, and runs _before_ `Destination::into_backend` —
+which creates the directory, so a later check would already have written to the
+host. Refusal is `invalid_params`, and the message names both ways forward so the
+model can retry against a bucket.
+
 Released as a multi-arch container image to GHCR (`ghcr.io/illumination-k/pubmed-mcp`) alongside the
 crates.io publish, from `pubmed-mcp/Dockerfile` (build context is the **workspace root** — the crate
 depends on its siblings by path; `.dockerignore` at the root trims the context but must keep every
@@ -383,15 +393,18 @@ src/
                        # NCBI_API_KEY / NCBI_EMAIL / NCBI_TOOL / NCBI_RATE_LIMIT
                        # PUBMED_MCP_TIMEOUT / _MAX_RETRIES / _BASE_URL / _CACHE*
                        # PUBMED_MCP_OA_CLOUD_BASE_URL (stubbable in tests)
+                       # Server policy (--port, --tools, --allow-local-downloads)
+                       # lives on `Args` in main.rs, not here
   tools/
-    mod.rs             # PubMedServer definition
+    mod.rs             # PubMedServer definition + ServerOptions (server policy)
     output.rs          # Structured output types shared by the tools
     search.rs          # search_pubmed tool (with study type/text availability filters)
     articles.rs        # fetch_articles tool (EFetch — full records by PMID)
     markdown.rs        # get_pmc_markdown tool
     fulltext.rs        # Full-text retrieval tool
     figures.rs         # Figure/table metadata tool (no downloads)
-    download.rs        # download_pmc_figures / download_pmc_files (OA Cloud -> a local dir)
+    download.rs        # download_pmc_figures / download_pmc_files (OA Cloud -> s3:// or,
+                       # with --allow-local-downloads, a local dir)
     figure_images.rs   # get_pmc_figure_images (figures inline as image/blob content)
     summary.rs         # fetch_summaries tool (ESummary API)
     export.rs          # Citation export tool (BibTeX/RIS/CSL-JSON/NBIB)

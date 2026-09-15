@@ -13,6 +13,12 @@
 //! Both require an explicit `output_dir`: an MCP server runs on the caller's
 //! machine, so guessing where to scatter downloaded files would be the wrong
 //! kind of helpful.
+//!
+//! Local destinations go further and are refused unless the server was started
+//! with `--allow-local-downloads`. See [`ServerOptions::allow_local_downloads`]
+//! for why the filesystem is opt-in while a bucket is not.
+//!
+//! [`ServerOptions::allow_local_downloads`]: super::ServerOptions::allow_local_downloads
 
 use pubmed_client::{Destination, FigureSelection, StorageBackend};
 use rmcp::{
@@ -36,7 +42,7 @@ pub struct DownloadFiguresRequest {
     )]
     pub figure_ids: Option<Vec<String>>,
     #[schemars(
-        description = "Where to write: a local directory, or an object-storage prefix as 's3://bucket/prefix' (S3, MinIO, R2 — credentials and region come from the usual AWS_* environment variables). Local directories are created if missing."
+        description = "Where to write: an object-storage prefix as 's3://bucket/prefix' (S3, MinIO, R2 — credentials and region come from the usual AWS_* environment variables), or a local directory if the server was started with --allow-local-downloads. Writing to the server's filesystem is off by default; local directories are created if missing."
     )]
     pub output_dir: String,
 }
@@ -47,7 +53,7 @@ pub struct DownloadFilesRequest {
     #[schemars(description = "PMC ID (e.g., 'PMC7906746' or '7906746')")]
     pub pmc_id: String,
     #[schemars(
-        description = "Where to write: a local directory, or an object-storage prefix as 's3://bucket/prefix' (S3, MinIO, R2 — credentials and region come from the usual AWS_* environment variables). Local directories are created if missing."
+        description = "Where to write: an object-storage prefix as 's3://bucket/prefix' (S3, MinIO, R2 — credentials and region come from the usual AWS_* environment variables), or a local directory if the server was started with --allow-local-downloads. Writing to the server's filesystem is off by default; local directories are created if missing."
     )]
     pub output_dir: String,
 }
@@ -104,11 +110,28 @@ pub struct DownloadFilesOutput {
 /// to the server process. A malformed `s3://` URI is likewise the caller's to
 /// fix; anything that goes wrong reaching the destination (an uncreatable
 /// directory, an unresolvable AWS config) is the server's problem to report.
+///
+/// `allow_local` gates filesystem destinations. The check runs *before*
+/// `into_backend`, which creates a local directory as its first act — the whole
+/// point is that a refused download leaves no trace on the host. Being told no
+/// is something the caller can act on (retry with an `s3://` prefix), so it is
+/// `invalid_params` rather than an internal error.
 pub(crate) async fn resolve_destination(
     output_dir: &str,
+    allow_local: bool,
 ) -> Result<(Destination, Box<dyn StorageBackend>), ErrorData> {
     let destination = Destination::parse(output_dir)
         .map_err(|e| invalid_params(format!("Invalid output_dir: {}", e)))?;
+
+    if !allow_local && !destination.is_object_storage() {
+        return Err(invalid_params(format!(
+            "Refusing to write to the local filesystem ({}): this server does not allow local \
+             download destinations. Pass an object-storage prefix such as \
+             's3://bucket/prefix' instead, or restart the server with \
+             --allow-local-downloads (PUBMED_MCP_ALLOW_LOCAL_DOWNLOADS=1).",
+            destination.display()
+        )));
+    }
 
     let storage = destination
         .clone()
@@ -129,7 +152,8 @@ pub async fn download_pmc_figures(
     Parameters(params): Parameters<DownloadFiguresRequest>,
 ) -> Result<Json<DownloadFiguresOutput>, ErrorData> {
     let pmc_id = normalize_pmc_id(&params.pmc_id);
-    let (destination, storage) = resolve_destination(&params.output_dir).await?;
+    let (destination, storage) =
+        resolve_destination(&params.output_dir, server.allow_local_downloads).await?;
 
     let mut selection = FigureSelection::new();
     if let Some(ids) = params.figure_ids {
@@ -175,7 +199,8 @@ pub async fn download_pmc_files(
     Parameters(params): Parameters<DownloadFilesRequest>,
 ) -> Result<Json<DownloadFilesOutput>, ErrorData> {
     let pmc_id = normalize_pmc_id(&params.pmc_id);
-    let (destination, storage) = resolve_destination(&params.output_dir).await?;
+    let (destination, storage) =
+        resolve_destination(&params.output_dir, server.allow_local_downloads).await?;
 
     info!(
         pmc_id = %pmc_id,
@@ -203,10 +228,14 @@ pub async fn download_pmc_files(
 mod tests {
     use super::*;
 
+    /// Local downloads enabled, for the tests that are about destination parsing
+    /// rather than the filesystem gate.
+    const ALLOW_LOCAL: bool = true;
+
     #[tokio::test]
     async fn a_blank_output_dir_is_rejected_rather_than_defaulted() {
         for blank in ["", "   "] {
-            let err = resolve_destination(blank)
+            let err = resolve_destination(blank, ALLOW_LOCAL)
                 .await
                 .err()
                 .map(|err| err.code)
@@ -219,7 +248,7 @@ mod tests {
     /// invalid_params — an internal error would be rendered opaquely by clients.
     #[tokio::test]
     async fn a_bucketless_s3_uri_is_a_parameter_error() {
-        let err = resolve_destination("s3://")
+        let err = resolve_destination("s3://", ALLOW_LOCAL)
             .await
             .err()
             .map(|err| err.code)
@@ -232,7 +261,7 @@ mod tests {
         let temp = tempfile::tempdir().unwrap();
         let nested = temp.path().join("nested/figures");
 
-        let (destination, storage) = resolve_destination(&nested.to_string_lossy())
+        let (destination, storage) = resolve_destination(&nested.to_string_lossy(), ALLOW_LOCAL)
             .await
             .expect("a creatable local path should resolve");
 
@@ -248,11 +277,49 @@ mod tests {
     /// recognized through it rather than treated as a directory named "s3:".
     #[tokio::test]
     async fn an_s3_destination_is_recognized_and_reported_as_a_uri() {
-        let (destination, _storage) = resolve_destination("  s3://bucket/pmc/figures  ")
-            .await
-            .expect("an S3 URI should resolve without contacting the bucket");
+        let (destination, _storage) =
+            resolve_destination("  s3://bucket/pmc/figures  ", ALLOW_LOCAL)
+                .await
+                .expect("an S3 URI should resolve without contacting the bucket");
 
         assert!(destination.is_object_storage());
         assert_eq!(destination.display(), "s3://bucket/pmc/figures");
+    }
+
+    /// The default refusal has to happen before the directory is created,
+    /// otherwise "we did not write anything" is already false.
+    #[tokio::test]
+    async fn a_local_destination_is_refused_by_default_without_touching_the_filesystem() {
+        let temp = tempfile::tempdir().unwrap();
+        let nested = temp.path().join("nested/figures");
+
+        let Err(err) = resolve_destination(&nested.to_string_lossy(), false).await else {
+            panic!("a local destination must be refused unless the server opted in");
+        };
+
+        assert_eq!(err.code, ErrorCode(-32602));
+        // The message is the caller's only route out of the refusal, so it must
+        // name both ways forward.
+        assert!(err.message.contains("s3://"), "{}", err.message);
+        assert!(
+            err.message.contains("--allow-local-downloads"),
+            "{}",
+            err.message
+        );
+        assert!(
+            !nested.exists(),
+            "a refused destination must not be created: {}",
+            nested.display()
+        );
+    }
+
+    /// Naming a bucket is itself deliberate, so object storage is never gated.
+    #[tokio::test]
+    async fn an_s3_destination_needs_no_local_download_permission() {
+        let (destination, _storage) = resolve_destination("s3://bucket/pmc", false)
+            .await
+            .expect("an s3:// destination must work without --allow-local-downloads");
+
+        assert!(destination.is_object_storage());
     }
 }

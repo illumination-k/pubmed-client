@@ -20,9 +20,10 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
 - **Figure Access**: Get an article's figures, not just their captions
   - Inline image bytes, so an assistant can actually look at a figure
   - Or downloaded to a destination you name, along with the full Open Access package
-- **Object-storage destinations**: Downloads go to a local directory or to
-  `s3://bucket/prefix` — S3, and S3-compatible services (MinIO, Cloudflare R2, Ceph)
-  through the usual `AWS_*` environment variables
+- **Object-storage destinations**: Downloads go to `s3://bucket/prefix` — S3, and
+  S3-compatible services (MinIO, Cloudflare R2, Ceph) through the usual `AWS_*`
+  environment variables — or to a local directory once you allow it
+  (`--allow-local-downloads`; writing to the server's filesystem is off by default)
 - **Europe PMC Access**: Search and retrieve from Europe PMC alongside NCBI
   - Cross-source search covering preprints (PPR), patents, Agricola and CBA as well as PubMed/PMC
   - JATS full text (parsed or raw XML), reference and citation graphs
@@ -97,24 +98,25 @@ Every option below is available both as a CLI flag and as an environment
 variable, since MCP hosts differ in which one is easier to set. Flags win over
 environment variables.
 
-| Flag                  | Environment variable           | Default                  | Description                                                                            |
-| --------------------- | ------------------------------ | ------------------------ | -------------------------------------------------------------------------------------- |
-| `--api-key`           | `NCBI_API_KEY`                 | _(none)_                 | NCBI E-utilities API key. Raises the rate limit from 3 to 10 requests/second.          |
-| `--email`             | `NCBI_EMAIL`                   | _(none)_                 | Contact e-mail sent to NCBI (recommended by their usage guidelines).                   |
-| `--tool`              | `NCBI_TOOL`                    | `pubmed-mcp`             | Tool name sent to NCBI.                                                                |
-| `--rate-limit`        | `NCBI_RATE_LIMIT`              | 3, or 10 with an API key | Requests per second. Overrides the API-key-based default.                              |
-| `--timeout`           | `PUBMED_MCP_TIMEOUT`           | `30`                     | HTTP request timeout, in seconds.                                                      |
-| `--max-retries`       | `PUBMED_MCP_MAX_RETRIES`       | `3`                      | Retries for transient failures (exponential backoff).                                  |
-| `--base-url`          | `PUBMED_MCP_BASE_URL`          | NCBI E-utilities         | Alternate E-utilities base URL, for proxies or test environments.                      |
-| `--oa-cloud-base-url` | `PUBMED_MCP_OA_CLOUD_BASE_URL` | PMC OA Cloud (S3)        | Alternate PMC Open Access Cloud base URL, used by the download and figure-image tools. |
-| `--cache`             | `PUBMED_MCP_CACHE`             | off                      | Enable the in-memory response cache.                                                   |
-| `--cache-capacity`    | `PUBMED_MCP_CACHE_CAPACITY`    | `1000`                   | Maximum number of cached responses. Implies `--cache`.                                 |
-| `--cache-ttl`         | `PUBMED_MCP_CACHE_TTL`         | `604800` (7 days)        | Time-to-live for cached responses, in seconds. Implies `--cache`.                      |
+| Flag                      | Environment variable               | Default                  | Description                                                                                                |
+| ------------------------- | ---------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `--api-key`               | `NCBI_API_KEY`                     | _(none)_                 | NCBI E-utilities API key. Raises the rate limit from 3 to 10 requests/second.                              |
+| `--email`                 | `NCBI_EMAIL`                       | _(none)_                 | Contact e-mail sent to NCBI (recommended by their usage guidelines).                                       |
+| `--tool`                  | `NCBI_TOOL`                        | `pubmed-mcp`             | Tool name sent to NCBI.                                                                                    |
+| `--rate-limit`            | `NCBI_RATE_LIMIT`                  | 3, or 10 with an API key | Requests per second. Overrides the API-key-based default.                                                  |
+| `--timeout`               | `PUBMED_MCP_TIMEOUT`               | `30`                     | HTTP request timeout, in seconds.                                                                          |
+| `--max-retries`           | `PUBMED_MCP_MAX_RETRIES`           | `3`                      | Retries for transient failures (exponential backoff).                                                      |
+| `--base-url`              | `PUBMED_MCP_BASE_URL`              | NCBI E-utilities         | Alternate E-utilities base URL, for proxies or test environments.                                          |
+| `--oa-cloud-base-url`     | `PUBMED_MCP_OA_CLOUD_BASE_URL`     | PMC OA Cloud (S3)        | Alternate PMC Open Access Cloud base URL, used by the download and figure-image tools.                     |
+| `--cache`                 | `PUBMED_MCP_CACHE`                 | off                      | Enable the in-memory response cache.                                                                       |
+| `--cache-capacity`        | `PUBMED_MCP_CACHE_CAPACITY`        | `1000`                   | Maximum number of cached responses. Implies `--cache`.                                                     |
+| `--cache-ttl`             | `PUBMED_MCP_CACHE_TTL`             | `604800` (7 days)        | Time-to-live for cached responses, in seconds. Implies `--cache`.                                          |
+| `--allow-local-downloads` | `PUBMED_MCP_ALLOW_LOCAL_DOWNLOADS` | off                      | Let the download tools write to the local filesystem. See [Download destinations](#download-destinations). |
 
 `NCBI_API_KEY`, `NCBI_EMAIL`, and `NCBI_TOOL` are the same variables `pubmed-cli`
 reads, so a shell that is already set up for the CLI needs no extra
-configuration. `PUBMED_MCP_CACHE` accepts any boolish value (`1`, `true`,
-`yes`, `on`, and their negatives).
+configuration. `PUBMED_MCP_CACHE` and `PUBMED_MCP_ALLOW_LOCAL_DOWNLOADS` accept
+any boolish value (`1`, `true`, `yes`, `on`, and their negatives).
 
 Getting an API key is worthwhile for anything beyond casual use — it more than
 triples the request rate. Register at
@@ -306,8 +308,9 @@ Get markdown for PMC7906746 with minimal formatting (no metadata or captions)
 `download_pmc_figures` and `download_pmc_files` both take an `output_dir`, which
 is either:
 
-- a **local directory** — `./figures`, `/var/tmp/pmc` — created if missing; or
-- an **object-storage prefix** — `s3://bucket/prefix`.
+- an **object-storage prefix** — `s3://bucket/prefix`; or
+- a **local directory** — `./figures`, `/var/tmp/pmc` — created if missing, and
+  **only if the server allows local downloads** (see below).
 
 Object storage goes through the AWS SDK, so credentials, region and endpoint come
 from the usual sources: `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`,
@@ -319,6 +322,22 @@ machine (or your cluster), so where the files land is your call, not its guess.
 Returned locations are rendered the way the destination was addressed — an
 absolute path locally, an `s3://bucket/key` URI in object storage.
 
+**Writing to the local filesystem is off by default.** Start the server with
+`--allow-local-downloads` (or `PUBMED_MCP_ALLOW_LOCAL_DOWNLOADS=1`) to permit it;
+without it a local `output_dir` is refused before anything is created, and the
+error names both ways forward:
+
+```bash
+cargo run -p pubmed-mcp -- --allow-local-downloads
+```
+
+Naming a bucket is already a deliberate act — you configured credentials and a
+destination — so `s3://` prefixes need no such flag. A local path is not: an MCP
+server is usually launched by a host config nobody revisits, and files scattered
+over the machine that launched it are a side effect no one asked for. Leave the
+flag off for a server that only answers questions, and off in a container unless
+you have mounted a volume for it to write into.
+
 #### `download_pmc_figures`
 
 Download a PMC article's figures from the PMC Open Access Cloud.
@@ -328,7 +347,8 @@ image itself.
 **Parameters:**
 
 - `pmc_id` (string, required): PMC ID with or without "PMC" prefix
-- `output_dir` (string, required): A local directory or `s3://bucket/prefix` — see
+- `output_dir` (string, required): `s3://bucket/prefix`, or a local directory if
+  the server allows local downloads — see
   [Download destinations](#download-destinations)
 - `figure_ids` (array of strings, optional): Figures to download, by id or label
   (e.g. `["fig1", "Figure 2"]`). Omit for all figures.
@@ -362,7 +382,8 @@ PDF, and supplementary materials.
 **Parameters:**
 
 - `pmc_id` (string, required): PMC ID with or without "PMC" prefix
-- `output_dir` (string, required): A local directory or `s3://bucket/prefix` — see
+- `output_dir` (string, required): `s3://bucket/prefix`, or a local directory if
+  the server allows local downloads — see
   [Download destinations](#download-destinations)
 
 **Returns:**

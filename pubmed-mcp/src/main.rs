@@ -1,4 +1,5 @@
 use anyhow::Result;
+use clap::builder::BoolishValueParser;
 use clap::{Parser, ValueEnum};
 use rmcp::{
     ServerHandler, ServiceExt,
@@ -14,7 +15,7 @@ use tracing::info;
 mod config;
 mod tools;
 use config::ClientArgs;
-use tools::PubMedServer;
+use tools::{PubMedServer, ServerOptions};
 
 #[derive(Parser)]
 #[command(name = "pubmed-mcp", about = "PubMed MCP Server")]
@@ -32,6 +33,23 @@ struct Args {
     /// europe-pmc-citations, europe-pmc-database-links
     #[arg(short, long, value_delimiter = ',', value_enum)]
     tools: Vec<ToolName>,
+
+    /// Let the download tools write to this machine's filesystem
+    ///
+    /// Off by default: `download_pmc_figures` and `download_pmc_files` accept
+    /// only `s3://bucket/prefix` destinations unless this is set, so a server
+    /// dropped into a host config cannot litter the filesystem of whoever
+    /// launched it. Boolish like `--cache`, so
+    /// `PUBMED_MCP_ALLOW_LOCAL_DOWNLOADS=1` works as well as `=true`.
+    #[arg(
+        long,
+        env = "PUBMED_MCP_ALLOW_LOCAL_DOWNLOADS",
+        num_args = 0..=1,
+        default_value_t = false,
+        default_missing_value = "true",
+        value_parser = BoolishValueParser::new(),
+    )]
+    allow_local_downloads: bool,
 
     #[command(flatten)]
     client: ClientArgs,
@@ -239,7 +257,7 @@ impl PubMedServer {
     }
 
     #[tool(
-        description = "Download a PMC article's figures from the PMC Open Access Cloud and return where each one landed, alongside its caption and dimensions. Only the figures are written. output_dir is required and may be a local directory or an object-storage prefix ('s3://bucket/prefix', also MinIO/R2 via AWS_* environment variables). Use get_pmc_figure_images instead to receive the images inline without writing anything."
+        description = "Download a PMC article's figures from the PMC Open Access Cloud and return where each one landed, alongside its caption and dimensions. Only the figures are written. output_dir is required: an object-storage prefix ('s3://bucket/prefix', also MinIO/R2 via AWS_* environment variables), or a local directory if the server was started with --allow-local-downloads (writing to the server's filesystem is off by default). Use get_pmc_figure_images instead to receive the images inline without writing anything."
     )]
     async fn download_pmc_figures(
         &self,
@@ -249,7 +267,7 @@ impl PubMedServer {
     }
 
     #[tool(
-        description = "Download a PMC article's full Open Access package (full-text XML, figures, PDF, supplementary materials) and return where each file landed. output_dir is required and may be a local directory or an object-storage prefix ('s3://bucket/prefix', also MinIO/R2 via AWS_* environment variables)."
+        description = "Download a PMC article's full Open Access package (full-text XML, figures, PDF, supplementary materials) and return where each file landed. output_dir is required: an object-storage prefix ('s3://bucket/prefix', also MinIO/R2 via AWS_* environment variables), or a local directory if the server was started with --allow-local-downloads (writing to the server's filesystem is off by default)."
     )]
     async fn download_pmc_files(
         &self,
@@ -384,8 +402,11 @@ async fn main() -> Result<()> {
         email = args.client.email.is_some(),
         tool = %args.client.tool,
         cache = args.client.cache_enabled(),
+        allow_local_downloads = args.allow_local_downloads,
         "Client configured"
     );
+
+    let allow_local_downloads = args.allow_local_downloads;
 
     if let Some(port) = args.port {
         let shared_client = Arc::new(pubmed_client::Client::with_config(client_config));
@@ -397,7 +418,13 @@ async fn main() -> Result<()> {
         let service = StreamableHttpService::new(
             move || {
                 let client = Arc::clone(&shared_client);
-                Ok(tools::PubMedServer::with_options(client, et.as_deref()))
+                Ok(tools::PubMedServer::with_options(
+                    client,
+                    ServerOptions {
+                        enabled_tools: et.as_deref(),
+                        allow_local_downloads,
+                    },
+                ))
             },
             LocalSessionManager::default().into(),
             Default::default(),
@@ -410,7 +437,10 @@ async fn main() -> Result<()> {
     } else {
         let service = tools::PubMedServer::with_options(
             Arc::new(pubmed_client::Client::with_config(client_config)),
-            enabled_tools.as_deref(),
+            ServerOptions {
+                enabled_tools: enabled_tools.as_deref(),
+                allow_local_downloads,
+            },
         )
         .serve(stdio())
         .await?;
@@ -496,6 +526,41 @@ mod tests {
                 tool.name
             );
         }
+    }
+
+    /// The default here is a promise: a server launched from a host config with
+    /// no flags cannot write to the machine it runs on. `PUBMED_MCP_*` variables
+    /// are boolish because MCP host configs and container runtimes all spell a
+    /// flag differently, so check the spellings rather than just `=true`.
+    #[test]
+    fn local_downloads_are_off_unless_asked_for() {
+        assert!(
+            !Args::try_parse_from(["pubmed-mcp"])
+                .expect("the server should start with no arguments")
+                .allow_local_downloads,
+            "writing to the host filesystem must be opt-in"
+        );
+
+        for enabling in [
+            "--allow-local-downloads",
+            "--allow-local-downloads=true",
+            "--allow-local-downloads=1",
+            "--allow-local-downloads=yes",
+            "--allow-local-downloads=on",
+        ] {
+            assert!(
+                Args::try_parse_from(["pubmed-mcp", enabling])
+                    .unwrap_or_else(|e| panic!("{enabling} should parse: {e}"))
+                    .allow_local_downloads,
+                "{enabling} should enable local downloads"
+            );
+        }
+
+        assert!(
+            !Args::try_parse_from(["pubmed-mcp", "--allow-local-downloads=false"])
+                .expect("an explicit false should parse")
+                .allow_local_downloads
+        );
     }
 
     #[test]
