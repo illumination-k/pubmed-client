@@ -79,6 +79,19 @@ With `--port`, it serves the streamable HTTP transport at `/mcp` instead:
 docker run --rm -p 8080:8080 ghcr.io/illumination-k/pubmed-mcp:latest --port 8080
 ```
 
+The HTTP transport only accepts requests whose `Host` header is a loopback
+name (`localhost`, `127.0.0.1`, `::1`) and answers anything else with
+`403 Forbidden`, as protection against DNS rebinding. Behind a reverse proxy,
+load balancer, or container platform ingress, pass the name clients use with
+`--allowed-hosts` (or `PUBMED_MCP_ALLOWED_HOSTS`), comma-separated, as `host`
+or `host:port`. The list replaces the loopback default, so add `localhost`
+too if local clients still need to connect:
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/illumination-k/pubmed-mcp:latest \
+  --port 8080 --allowed-hosts mcp.example.com,localhost
+```
+
 `--tools` restricts which tools are exposed (comma-separated, default: all):
 
 ```bash

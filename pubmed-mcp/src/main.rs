@@ -32,6 +32,13 @@ struct Args {
     #[arg(short, long, value_delimiter = ',', value_enum)]
     tools: Vec<ToolName>,
 
+    /// Host header values accepted in HTTP mode, comma-separated
+    /// (`host` or `host:port`). Replaces the default, which accepts only
+    /// loopback hosts as DNS-rebinding protection; set it to the name clients
+    /// use when the server sits behind a reverse proxy or load balancer.
+    #[arg(long, env = "PUBMED_MCP_ALLOWED_HOSTS", value_delimiter = ',')]
+    allowed_hosts: Vec<String>,
+
     #[command(flatten)]
     client: ClientArgs,
 }
@@ -316,6 +323,33 @@ impl ServerHandler for PubMedServer {
     }
 }
 
+/// The streamable HTTP transport mounted at `/mcp`. An empty `allowed_hosts`
+/// keeps rmcp's loopback-only default rather than disabling the check.
+fn http_router(
+    client: Arc<pubmed_client::Client>,
+    enabled_tools: Option<Arc<HashSet<String>>>,
+    allowed_hosts: &[String],
+) -> axum::Router {
+    use rmcp::transport::streamable_http_server::{
+        StreamableHttpServerConfig, StreamableHttpService, session::local::LocalSessionManager,
+    };
+    let mut config = StreamableHttpServerConfig::default();
+    if !allowed_hosts.is_empty() {
+        config = config.with_allowed_hosts(allowed_hosts.iter().cloned());
+    }
+    let service = StreamableHttpService::new(
+        move || {
+            Ok(tools::PubMedServer::with_options(
+                Arc::clone(&client),
+                enabled_tools.as_deref(),
+            ))
+        },
+        LocalSessionManager::default().into(),
+        config,
+    );
+    axum::Router::new().nest_service("/mcp", service)
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
@@ -350,22 +384,11 @@ async fn main() -> Result<()> {
     );
 
     if let Some(port) = args.port {
-        let shared_client = Arc::new(pubmed_client::Client::with_config(client_config));
-        let et = enabled_tools.clone();
-
-        use rmcp::transport::streamable_http_server::{
-            StreamableHttpService, session::local::LocalSessionManager,
-        };
-        let service = StreamableHttpService::new(
-            move || {
-                let client = Arc::clone(&shared_client);
-                Ok(tools::PubMedServer::with_options(client, et.as_deref()))
-            },
-            LocalSessionManager::default().into(),
-            Default::default(),
+        let router = http_router(
+            Arc::new(pubmed_client::Client::with_config(client_config)),
+            enabled_tools,
+            &args.allowed_hosts,
         );
-
-        let router = axum::Router::new().nest_service("/mcp", service);
         let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
         info!("HTTP MCP server listening on port {port}");
         axum::serve(listener, router).await?;
@@ -387,6 +410,62 @@ async fn main() -> Result<()> {
 mod tests {
     use super::*;
     use clap::CommandFactory;
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+    /// Serves `http_router` on an ephemeral loopback port and returns the
+    /// status code of an `initialize` POST carrying the given `Host` header.
+    async fn initialize_status(allowed_hosts: &[String], host: &str) -> u16 {
+        let router = http_router(Arc::new(pubmed_client::Client::new()), None, allowed_hosts);
+        let listener = tokio::net::TcpListener::bind(("127.0.0.1", 0))
+            .await
+            .unwrap();
+        let addr = listener.local_addr().unwrap();
+        tokio::spawn(async move { axum::serve(listener, router).await });
+
+        let body = r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"test","version":"0"}}}"#;
+        let request = format!(
+            "POST /mcp HTTP/1.1\r\nHost: {host}\r\nContent-Type: application/json\r\nAccept: application/json, text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+            body.len()
+        );
+        let mut stream = tokio::net::TcpStream::connect(addr).await.unwrap();
+        stream.write_all(request.as_bytes()).await.unwrap();
+        let mut status_line = [0u8; 12];
+        stream.read_exact(&mut status_line).await.unwrap();
+        std::str::from_utf8(&status_line[9..12])
+            .unwrap()
+            .parse()
+            .unwrap()
+    }
+
+    #[tokio::test]
+    async fn allowed_hosts_controls_the_host_header_check() {
+        let proxied = vec!["mcp.example.com".to_string()];
+        let cases: [(&str, &[String], &str, bool); 4] = [
+            ("default accepts loopback", &[], "127.0.0.1", true),
+            (
+                "default rejects a proxied name",
+                &[],
+                "mcp.example.com",
+                false,
+            ),
+            (
+                "configured name is accepted",
+                &proxied,
+                "mcp.example.com",
+                true,
+            ),
+            (
+                "configured list replaces loopback",
+                &proxied,
+                "localhost",
+                false,
+            ),
+        ];
+        for (name, allowed, host, accepted) in cases {
+            let status = initialize_status(allowed, host).await;
+            assert_eq!(status == 200, accepted, "{name}: got HTTP {status}");
+        }
+    }
 
     /// Catches clap definition mistakes (duplicate long names, a `--tool`
     /// shadowed by `--tools`, bad defaults) that would otherwise only show up
