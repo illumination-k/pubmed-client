@@ -2955,7 +2955,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-cli"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2980,7 +2980,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-client"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -3022,7 +3022,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-client-go"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "pubmed-client",
  "serde",
@@ -3032,7 +3032,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-client-napi"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "napi",
  "napi-build",
@@ -3044,7 +3044,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-client-py"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "pubmed-client",
@@ -3058,7 +3058,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-client-wasm"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "console_error_panic_hook",
@@ -3078,7 +3078,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-formatter"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "pubmed-parser",
  "pubmed-test-utils",
@@ -3094,7 +3094,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-mcp"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "anyhow",
  "axum",
@@ -3113,7 +3113,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-parser"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "criterion",
  "insta",
@@ -3132,7 +3132,7 @@ dependencies = [
 
 [[package]]
 name = "pubmed-test-utils"
-version = "0.4.0"
+version = "0.4.1"
 
 [[package]]
 name = "pyo3"
