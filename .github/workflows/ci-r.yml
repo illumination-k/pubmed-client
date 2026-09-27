@@ -86,6 +86,31 @@ jobs:
         with:
           workspaces: "pubmed-client-r/src/rust -> target"
 
+      # The inner crate depends on the *published* `pubmed-client` (a path
+      # dependency cannot resolve from the isolated tarball copy R CMD check
+      # builds in). Redirect that to this checkout via a `[patch.crates-io]`
+      # entry in $CARGO_HOME/config.toml, which applies wherever cargo runs —
+      # including the temp directory R CMD check unpacks into.
+      #
+      # Two reasons: a release PR bumps the requirement to a version that is
+      # not on crates.io yet (the tag publishes it), so the check could only
+      # ever fail; and without the patch this job would silently verify the R
+      # bindings against the last release rather than the code in the PR.
+      - name: Patch pubmed-client to this checkout
+        run: |
+          config="${CARGO_HOME:-$HOME/.cargo}/config.toml"
+          mkdir -p "$(dirname "$config")"
+          # Appending a second [patch.crates-io] table would make cargo reject
+          # the whole config, so fail loudly instead of emitting a broken file.
+          if [ -f "$config" ] && grep -q '\[patch\.crates-io\]' "$config"; then
+            echo "error: $config already has a [patch.crates-io] table" >&2
+            exit 1
+          fi
+          cat >>"$config" <<EOF
+          [patch.crates-io]
+          pubmed-client = { path = "${{ github.workspace }}/pubmed-client" }
+          EOF
+
       - name: Install R
         run: |
           sudo apt-get update

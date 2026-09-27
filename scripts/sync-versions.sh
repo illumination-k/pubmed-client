@@ -9,6 +9,10 @@ set -euo pipefail
 #   - pubmed-client-napi/package.json  (version + optionalDependencies.*)
 #   - pubmed-client-wasm/package.json  (version)
 #   - pubmed-client-py/pyproject.toml  ([project] version)
+#   - pubmed-client-r/DESCRIPTION      (Version:)
+#   - pubmed-client-r/src/rust/Cargo.toml ([package] version + the pubmed-client
+#     requirement, which must be a version the release publishes: the crate is
+#     not a workspace member, so it depends on the published pubmed-client)
 #
 # Usage:
 #   sync-versions.sh <version>   Bump the workspace version, then propagate everywhere.
@@ -24,6 +28,8 @@ ROOT_CARGO="${ROOT}/Cargo.toml"
 NAPI_PKG="${ROOT}/pubmed-client-napi/package.json"
 WASM_PKG="${ROOT}/pubmed-client-wasm/package.json"
 PY_PYPROJECT="${ROOT}/pubmed-client-py/pyproject.toml"
+R_DESCRIPTION="${ROOT}/pubmed-client-r/DESCRIPTION"
+R_CARGO="${ROOT}/pubmed-client-r/src/rust/Cargo.toml"
 
 # Note: the napi pnpm-lock.yaml does NOT pin the per-platform binary versions —
 # they are listed under pnpm.ignoredOptionalDependencies in package.json so a
@@ -48,17 +54,37 @@ die() {
 	exit 1
 }
 
-# Read the version from [workspace.package] in the root Cargo.toml.
-read_workspace_version() {
-	awk '
-		/^\[workspace\.package\]/ { in_section = 1; next }
+# Read the first version key inside a named TOML table.
+read_toml_table_version() {
+	local file="$1" table="$2"
+	awk -v table="[$table]" '
+		$0 == table { in_section = 1; next }
 		/^\[/ { in_section = 0 }
 		in_section && /^version[[:space:]]*=/ {
 			match($0, /"[^"]+"/)
 			print substr($0, RSTART + 1, RLENGTH - 2)
 			exit
 		}
-	' "$ROOT_CARGO"
+	' "$file"
+}
+
+# Read the version from [workspace.package] in the root Cargo.toml.
+read_workspace_version() {
+	read_toml_table_version "$ROOT_CARGO" "workspace.package"
+}
+
+# Read the version requirement of a dependency line, e.g.
+#   pubmed-client = { version = "0.4.0", default-features = false }
+read_dep_requirement() {
+	local file="$1" crate="$2"
+	grep -E "^${crate}\s*=\s*\{" "$file" |
+		grep -oE 'version\s*=\s*"[^"]+"' | grep -oE '"[^"]+"' | tr -d '"'
+}
+
+# Set the version requirement on a dependency line (leaves the rest untouched).
+set_dep_requirement() {
+	local file="$1" crate="$2" version="$3"
+	perl -i -pe "s/^(\\Q${crate}\\E\\s*=\\s*\\{[^}]*version\\s*=\\s*)\"[^\"]+\"/\${1}\"${version}\"/" "$file"
 }
 
 # Set the version inside a named TOML table (only the first version key in that table).
@@ -83,8 +109,15 @@ set_internal_crate_versions() {
 	local version="$1" crate
 	for crate in "${INTERNAL_CRATES[@]}"; do
 		# Match lines like: pubmed-client = { path = "pubmed-client", version = "X" }
-		perl -i -pe "s/^(\\Q${crate}\\E\\s*=\\s*\\{[^}]*version\\s*=\\s*)\"[^\"]+\"/\${1}\"${version}\"/" "$ROOT_CARGO"
+		set_dep_requirement "$ROOT_CARGO" "$crate" "$version"
 	done
+}
+
+# The R package's DESCRIPTION carries the unified version on its single
+# `Version:` field (DCF, so one line, no table to scope to).
+set_description_version() {
+	local version="$1"
+	perl -i -pe "s/^Version:.*/Version: ${version}/" "$R_DESCRIPTION"
 }
 
 set_json_version() {
@@ -112,6 +145,11 @@ propagate() {
 	set_napi_optional_deps "$version"
 	set_json_version "$WASM_PKG" "$version"
 	set_toml_table_version "$PY_PYPROJECT" "project" "$version"
+	set_description_version "$version"
+	set_toml_table_version "$R_CARGO" "package" "$version"
+	# The R crate is not a workspace member, so it names the published
+	# pubmed-client explicitly; that requirement moves with the release.
+	set_dep_requirement "$R_CARGO" "pubmed-client" "$version"
 	echo "Synced all packages to ${version}"
 }
 
@@ -120,20 +158,15 @@ collect_versions() {
 	local crate
 	printf 'workspace.package\t%s\n' "$(read_workspace_version)"
 	for crate in "${INTERNAL_CRATES[@]}"; do
-		local v
-		v="$(grep -E "^${crate}\s*=\s*\{" "$ROOT_CARGO" | grep -oE 'version\s*=\s*"[^"]+"' | grep -oE '"[^"]+"' | tr -d '"')"
-		printf 'workspace.deps.%s\t%s\n' "$crate" "$v"
+		printf 'workspace.deps.%s\t%s\n' "$crate" "$(read_dep_requirement "$ROOT_CARGO" "$crate")"
 	done
 	printf 'napi.version\t%s\n' "$(jq -r '.version' "$NAPI_PKG")"
 	jq -r '.optionalDependencies | to_entries[] | "napi.opt." + .key + "\t" + .value' "$NAPI_PKG"
 	printf 'wasm.version\t%s\n' "$(jq -r '.version' "$WASM_PKG")"
-	printf 'py.version\t%s\n' "$(awk '
-		/^\[project\]/ { in_section = 1; next }
-		/^\[/ { in_section = 0 }
-		in_section && /^version[[:space:]]*=/ {
-			match($0, /"[^"]+"/); print substr($0, RSTART + 1, RLENGTH - 2); exit
-		}
-	' "$PY_PYPROJECT")"
+	printf 'py.version\t%s\n' "$(read_toml_table_version "$PY_PYPROJECT" "project")"
+	printf 'r.description\t%s\n' "$(awk '/^Version:/ { print $2; exit }' "$R_DESCRIPTION")"
+	printf 'r.crate.version\t%s\n' "$(read_toml_table_version "$R_CARGO" "package")"
+	printf 'r.crate.deps.pubmed-client\t%s\n' "$(read_dep_requirement "$R_CARGO" "pubmed-client")"
 }
 
 check() {
