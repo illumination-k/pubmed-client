@@ -24,4 +24,9 @@ run = ["shfmt -w ./**/*.sh"]
 
 [tasks."lint:root"]
 description = "Lint Rust and GitHub Actions (dprint, clippy, actionlint, ghalint, zizmor)"
-run = ["actionlint", "ghalint run", "zizmor .", "dprint check"]
+# zizmor is scoped to .github rather than the repo root: the root also holds
+# .pre-commit-config.yaml, which zizmor collects and then fails to parse because
+# prek's `repo: builtin` is not a repo kind upstream pre-commit (and so zizmor's
+# schema) knows about — a fatal error that aborts the whole audit. Everything
+# zizmor audits (workflows + composite actions) lives under .github anyway.
+run = ["actionlint", "ghalint run", "zizmor .github", "dprint check"]

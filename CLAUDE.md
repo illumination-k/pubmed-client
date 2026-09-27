@@ -315,7 +315,7 @@ R bindings via [extendr](https://extendr.github.io/). R package name: `pubmedcli
 - The inner crate depends on the **published `pubmed-client`** (crates.io), not a workspace path — `R CMD check`/source-tarball installs build in an isolated copy where a relative path outside the package can't resolve. Keep its version in lock-step with the workspace; for local dev against unpublished changes, temporarily switch to `{ path = "../../../pubmed-client" }`.
 - Build/install: `R CMD INSTALL pubmed-client-r` or `remotes::install_local("pubmed-client-r")` (requires `cargo`/`rustc`).
 - Tests: `testthat` (edition 3) in `tests/testthat/`. Offline tests cover client construction + input validation; live-API tests are gated behind `PUBMED_REAL_API_TESTS=1` (same convention as the Rust crate).
-- CI: `.github/workflows/ci-r.yml` — `rust-fmt` job (rustfmt over the non-workspace inner crate) + `R-CMD-check` (ubuntu, R via apt + Posit binary CRAN mirror; runs `rcmdcheck`). Avoids `r-lib/actions` so every action stays pinned to a full commit SHA (enforced by `ghalint`).
+- CI: `.github/workflows/ci-r.yml` — `rust-fmt` job (rustfmt over the non-workspace inner crate) + `R-CMD-check` (ubuntu, R via apt + Posit binary CRAN mirror; runs `rcmdcheck`). Avoids `r-lib/actions` so every action stays pinned to a full commit SHA (enforced by `ghalint`). `R-CMD-check` writes a `[patch.crates-io]` entry into `$CARGO_HOME/config.toml` redirecting `pubmed-client` to the checkout — cargo honours that config from the temp directory R CMD check builds in, so the job tests the PR's code and a release PR (whose requirement is not on crates.io until the tag publishes it) can pass.
 
 ### Website (`website/`)
 
