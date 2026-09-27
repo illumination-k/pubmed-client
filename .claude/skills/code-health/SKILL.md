@@ -93,12 +93,12 @@ number.** The open findings, with their evidence, live under the umbrella issue
 [#254](https://github.com/illumination-k/pubmed-client/issues/254).
 
 - **`pubmed-parser/src/pmc/parser/` is the complexity epicentre**, and has been across
-  successive sweeps. `metadata.rs` and `section.rs` take the top two `hotspot` slots
-  (both ~1300-1450 LOC, `commits × cognitive_max` within a few points of each other),
-  and the workspace's densest Rust functions are the JATS element readers inside them —
-  `metadata.rs:extract_abstract`, `section.rs:extract_body_sections`,
-  `section.rs:read_paragraph_with_inline`. Genuine parsing logic, so the fix is
-  splitting by JATS element group, not clever-ing the loops (#205, #249).
+  successive sweeps. `section/` has already been split by JATS element group
+  (`body.rs`, `paragraph.rs`, `figure.rs`, …); `metadata.rs` (~1450 LOC) is the
+  remaining monolith. The densest Rust functions are the JATS element readers —
+  `metadata.rs:extract_abstract`, `section/body.rs:extract_body_sections`,
+  `section/paragraph.rs:read_paragraph_with_inline`. Genuine parsing logic, so the fix
+  is splitting by JATS element group, not clever-ing the loops (#205, #249).
   - Ignore the `cognitive` max in the raw report if it points at
     `pubmed-client-py/examples/*.py` — the Python examples are deliberately linear
     display code and outrank every Rust function.
@@ -116,8 +116,8 @@ number.** The open findings, with their evidence, live under the umbrella issue
     `pubmed-client/src/europe_pmc/paged.rs`: one private generic helper plus a small
     trait, with the per-endpoint public methods kept as-is so the API does not move.
 - **`wrapper` to shared helpers** is actionable when a thin per-module wrapper exists
-  only to forward to a canonical helper (e.g. `PmcClient::normalize_pmcid` →
-  `common::normalize_pmcid`). The repo prefers one unified helper over parallel variants.
+  only to forward to a canonical helper (`pmc::common::normalize_pmcid` is the
+  canonical one for PMC ids). The repo prefers one unified helper over parallel variants.
 - **`visibility` is worth a periodic pass on `pubmed-parser`.** Parser-internal helpers
   (`pmc/parser/reader_utils.rs`, `common/xml_utils.rs`) are `pub` while every caller is
   in-crate, so they are published API by accident. Narrowing is compiler-verified — a
