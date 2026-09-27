@@ -10,7 +10,11 @@ source ./common.sh
 
 cd ../..
 
-export PATH="$HOME/.local/bin:$PATH"
+# Appended, not prepended: mise env (below) prepends the pinned tool dirs to
+# whatever PATH it inherits, so a leading ~/.local/bin would shadow them and the
+# hook would silently lint with different tool versions than CI (e.g. a
+# uv-installed zizmor instead of the version pinned in mise.root.toml).
+export PATH="$PATH:$HOME/.local/bin"
 
 if ! check_command mise; then
 	echo "mise command not found. Please install mise to use this hook."
