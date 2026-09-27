@@ -122,7 +122,7 @@ jobs:
       package-path: pubmed-parser
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+      environment: ${{ needs.guard.outputs.dry-run != 'true' && 'release' || '' }}
 
   publish-formatter:
     name: crates.io · pubmed-formatter
@@ -136,7 +136,7 @@ jobs:
       package-path: pubmed-formatter
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+      environment: ${{ needs.guard.outputs.dry-run != 'true' && 'release' || '' }}
 
   publish-client:
     name: crates.io · pubmed-client
@@ -150,7 +150,7 @@ jobs:
       package-path: pubmed-client
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+      environment: ${{ needs.guard.outputs.dry-run != 'true' && 'release' || '' }}
 
   publish-cli:
     name: crates.io · pubmed-cli
@@ -164,7 +164,7 @@ jobs:
       package-path: pubmed-cli
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+      environment: ${{ needs.guard.outputs.dry-run != 'true' && 'release' || '' }}
 
   publish-mcp:
     name: crates.io · pubmed-mcp
@@ -178,7 +178,7 @@ jobs:
       package-path: pubmed-mcp
       check-version: ${{ github.event_name == 'push' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+      environment: ${{ needs.guard.outputs.dry-run != 'true' && 'release' || '' }}
 
   # ── npm ──────────────────────────────────────────────────────────────────────
   publish-napi:
@@ -190,7 +190,7 @@ jobs:
     uses: ./.github/workflows/_publish-napi.yml
     with:
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+      environment: ${{ needs.guard.outputs.dry-run != 'true' && 'release' || '' }}
 
   publish-wasm:
     name: npm · pubmed-client-wasm
@@ -201,7 +201,7 @@ jobs:
     uses: ./.github/workflows/_publish-wasm.yml
     with:
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+      environment: ${{ needs.guard.outputs.dry-run != 'true' && 'release' || '' }}
 
   # ── GHCR (container image) ───────────────────────────────────────────────────
   publish-docker:
@@ -216,7 +216,7 @@ jobs:
       # Prereleases publish their own tag but never move `latest`.
       latest: ${{ needs.guard.outputs.is-prerelease == 'false' }}
       dry-run: ${{ needs.guard.outputs.dry-run == 'true' }}
-      environment: ${{ needs.guard.outputs.dry-run == 'true' && '' || 'release' }}
+      environment: ${{ needs.guard.outputs.dry-run != 'true' && 'release' || '' }}
 
   # ── PyPI ─────────────────────────────────────────────────────────────────────
   # Build wheels in the reusable workflow, but publish from a job defined HERE.
@@ -309,12 +309,20 @@ jobs:
         id: tag
         run: echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
 
+      # `gh release create` rather than actions/create-release: that action's
+      # repository is archived (unmaintained since 2021), and gh is preinstalled
+      # on GitHub-hosted runners, so this drops a third-party dependency from the
+      # release path. GH_REPO is required because this job has no checkout.
       - name: Create Release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          release_name: Release ${{ steps.tag.outputs.tag }}
-          draft: false
-          prerelease: ${{ needs.guard.outputs.is-prerelease == 'true' }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.tag.outputs.tag }}
+          IS_PRERELEASE: ${{ needs.guard.outputs.is-prerelease }}
+        run: |
+          flags=()
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            flags+=(--prerelease)
+          fi
+          # --notes "" keeps the body empty, as actions/create-release left it.
+          gh release create "$TAG" --title "Release $TAG" --notes "" "${flags[@]}"
