@@ -47,10 +47,9 @@ When binding-crate noise drowns the core, re-run scoped to the Rust core:
 
 ## What IS worth reporting
 
-Genuine logic complexity (epicentre: `pubmed-parser/src/pmc/parser/` — `author.rs`,
-`section.rs`, `metadata.rs`, plus `pubmed-client/src/pmc/tar.rs`), accidental duplicates
-_within a single core crate_ (e.g. `format_first_pub_date` across the two markdown
-modules, `format_author_name` across parser modules), thin wrappers that should collapse
+Genuine logic complexity (epicentre: `pubmed-parser/src/pmc/parser/` — `metadata.rs`,
+`author.rs`, `section/`), accidental duplicates _within a single core crate_ (e.g.
+`try_from_u32` on both ID types in `common/ids.rs`), thin wrappers that should collapse
 onto a canonical shared helper, and — for coupling — any **cycle (count > 0)** or new
 dependency that inverts the `parser → formatter → client` layering.
 
@@ -60,5 +59,5 @@ Return a prioritized list, not raw dumps. For each finding:
 `file:line` · one-line description · why it's actionable (or why a flagged item is
 benign, if the user asked about it) · suggested action. Order by impact (hotspot rank ×
 severity). End with a one-line summary (e.g. "0 cycles; layering intact; 2 real
-duplicates; top refactor target = author.rs:extract_reference_authors cog=50"). Do not
+duplicates; top refactor target = metadata.rs:extract_abstract"). Do not
 edit code — you investigate and report; the caller decides what to change.

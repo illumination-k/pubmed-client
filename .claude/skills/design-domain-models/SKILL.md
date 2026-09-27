@@ -82,30 +82,15 @@ Domain models MUST be pure — they represent **what the data is**, not how it's
 
 ### 3. Backward Compatibility — Do Not Break Existing Applications
 
-Domain models are a new layer that will eventually replace parser models. During this transition, they MUST NOT break existing consumers.
+The domain models are the published API of `pubmed-parser` (re-exported by `pubmed-client` and every binding), so changes to them are semver-visible to downstream consumers.
 
 **Rules**:
 
 - Adding new domain types is always safe (additive change)
-- Adding new `parse_*_domain()` functions alongside existing ones is safe
 - NEVER remove or rename existing public parser functions (`parse_pmc_xml`, `parse_article_from_xml`)
 - NEVER change the return type of existing public functions
 - NEVER remove existing re-exports from `pubmed-client/src/lib.rs`
 - New domain types can be re-exported alongside existing types — use distinct names to avoid conflicts
-- `TryFrom<ParserModel> for DomainModel` bridges both worlds without modifying the parser model
-
-**Safe introduction pattern**:
-
-```rust
-// Existing function — untouched
-pub fn parse_pmc_xml(xml: &str, pmcid: &str) -> Result<PmcFullText> { ... }
-
-// New function — added alongside
-pub fn parse_pmc_xml_domain(xml: &str, pmcid: &str) -> Result<PmcArticle> {
-    let parsed = parse_pmc_xml(xml, pmcid)?;
-    PmcArticle::try_from(parsed).map_err(Into::into)
-}
-```
 
 ### 4. DDD: Aggregates, Entities, and Value Objects
 
@@ -422,11 +407,11 @@ pub struct PmcArticle {
 ## Adding a New Domain Type — Step by Step
 
 1. **Verify DTD source**: Check JATS tag library for the element
-2. **Choose location**: `common/`, `pmc/domain.rs`, or `pubmed/domain.rs`
+2. **Choose location**: `common/models.rs`, `pmc/domain.rs`, or `pubmed/models.rs`
 3. **Define the struct**: Map DTD elements to fields with documentation comments
 4. **Add derives**: `Debug, Clone, Serialize, Deserialize, PartialEq`
 5. **Add domain methods**: Pure queries/transformations relevant to text mining
-6. **Implement `TryFrom`**: Convert from existing parser model if applicable
+6. **Populate it in the parser**: extend `pubmed-parser/src/pmc/parser/` (or `pubmed/parser/`) to fill the new fields
 7. **Update module exports**: `mod.rs` in the appropriate module
 8. **Add re-exports**: `pubmed-client/src/lib.rs` if public-facing
 9. **Test**: `cargo test -p pubmed-parser` and `cargo test -p pubmed-client`
@@ -434,15 +419,14 @@ pub struct PmcArticle {
 
 ## Quick Reference: File Locations
 
-| File                                     | Purpose                                     |
-| ---------------------------------------- | ------------------------------------------- |
-| `pubmed-parser/src/common/ids.rs`        | Type-safe identifiers (`PmcId`, `PubMedId`) |
-| `pubmed-parser/src/common/models.rs`     | Shared types (`Author`, `Affiliation`)      |
-| `pubmed-parser/src/pmc/domain.rs`        | PMC domain models (DTD-faithful)            |
-| `pubmed-parser/src/pmc/parser/models.rs` | PMC parser models (being replaced)          |
-| `pubmed-parser/src/pmc/parser/mod.rs`    | `parse_pmc_xml()`, `parse_pmc_xml_domain()` |
-| `pubmed-parser/src/pubmed/models.rs`     | PubMed metadata models                      |
-| `pubmed-client/src/lib.rs`               | Re-exports for public API                   |
+| File                                  | Purpose                                     |
+| ------------------------------------- | ------------------------------------------- |
+| `pubmed-parser/src/common/ids.rs`     | Type-safe identifiers (`PmcId`, `PubMedId`) |
+| `pubmed-parser/src/common/models.rs`  | Shared types (`Author`, `Affiliation`)      |
+| `pubmed-parser/src/pmc/domain.rs`     | PMC domain models (DTD-faithful)            |
+| `pubmed-parser/src/pmc/parser/mod.rs` | `parse_pmc_xml()` (returns `PmcArticle`)    |
+| `pubmed-parser/src/pubmed/models.rs`  | PubMed metadata models                      |
+| `pubmed-client/src/lib.rs`            | Re-exports for public API                   |
 
 ## Success Indicators
 
@@ -451,7 +435,6 @@ After following this skill, verify:
 - Every new field traces to a DTD element or attribute
 - No I/O, persistence, or extraction artifacts in domain models
 - Existing public APIs and tests remain unmodified and passing
-- `TryFrom` conversions exist between parser and domain models
 - Types are in the correct crate layer and bounded context
 - Shared types are in `common/`, context-specific types in `pmc/` or `pubmed/`
 - Domain types have meaningful methods, not just data fields

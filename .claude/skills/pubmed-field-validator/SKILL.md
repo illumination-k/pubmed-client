@@ -28,7 +28,7 @@ Is the task related to PubMed field tags?
 └─ No → Exit skill
 
 Are you implementing a NEW field tag?
-├─ Yes → ⚠️ START WITH STEP 0 (Validation Workflow) - REQUIRED!
+├─ Yes → Start with Step 0 (Validation Workflow)
 └─ No → Continue
 
 Are you debugging a search query that fails?
@@ -355,7 +355,7 @@ python .claude/skills/pubmed-field-validator/scripts/validate_field_tags.py \
 ```bash
 # Run integration test with real API
 cd pubmed-client
-PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pubmed_api_tests
+PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test api_pubmed
 
 # Or test manually via CLI
 cargo run -p pubmed-cli -- search "cancer[ti] AND therapy[tw]"

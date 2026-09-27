@@ -35,23 +35,23 @@ pubmed-client-rs/                    # Cargo workspace root
 ```bash
 # Workspace-wide
 cargo build                          # Build all
-cargo test                           # Test all (or: mise r test)
+cargo test                           # Test all (or: MISE_ENV=rust mise r test:rs)
 cargo nextest run --workspace        # Test with nextest (preferred)
 cargo check                          # Check all
 
 # Parser crate
 cargo test -p pubmed-parser
+cargo test -p pubmed-parser --test parsing_pmc
+cargo test -p pubmed-parser --test parsing_pubmed
 
 # Formatter crate
 cargo test -p pubmed-formatter
 
 # Client crate
 cargo test -p pubmed-client
-cargo test --test comprehensive_pmc_tests -p pubmed-client
-cargo test --test comprehensive_pubmed_tests -p pubmed-client
 
 # Real API tests (opt-in, requires network)
-cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test pubmed_api_tests
+cd pubmed-client && PUBMED_REAL_API_TESTS=1 cargo test --features integration-tests --test api_pubmed
 
 # Single unit test
 cargo test --lib -p pubmed-parser pubmed::parser::tests::test_mesh_term_parsing
@@ -117,7 +117,7 @@ mise r fmt:go                        # gofmt -w
 ### Code Coverage
 
 ```bash
-mise r coverage                      # HTML report
+MISE_ENV=rust mise r coverage:rs    # HTML report
 cargo llvm-cov nextest -p pubmed-client --all-features --html
 ```
 
@@ -161,9 +161,8 @@ pmc/                   # PMC XML parsing
     author.rs          # Author extraction
     metadata.rs        # Metadata extraction
     reference.rs       # Reference extraction
-    section.rs         # Section parsing
-    reader_utils.rs    # quick-xml reader helpers shared by metadata.rs / section.rs
-    xml_utils.rs       # Re-export shim over common/xml_utils.rs
+    section/           # Section parsing (abstracts, body, paragraph, figure, table)
+    reader_utils.rs    # quick-xml reader helpers shared by metadata.rs / section/
 
 europe_pmc/            # Europe PMC JSON response models & parsers
   models.rs            # EuropePmcResult and shared record fields
@@ -388,7 +387,7 @@ XML fixtures are in `test_data/` at the workspace root (pmc_xml/ and pubmed_xml/
 
 - **`pubmed-parser`** tests: Parsing PubMed XML, PMC XML, supplementary materials
 - **`pubmed-formatter`** tests: Markdown conversion, BibTeX/RIS/CSL-JSON/NBIB export, YAML frontmatter
-- **`pubmed-client`** tests: `comprehensive_pmc_tests`, `comprehensive_pubmed_tests`, `comprehensive_elink_tests`, `comprehensive_einfo_tests`, `test_figure_extraction`, `mocked_cloud` (PMC OA Cloud/S3 listing & download), `test_pmc_cache`, `test_webenv`, `test_batch_fetch_mocked`
+- **`pubmed-client`** tests (targets declared in `pubmed-client/Cargo.toml`): `parsing_*` (E-utilities response parsing), `mocked_*` (wiremock-stubbed, e.g. `mocked_figures`, `mocked_cloud` for PMC OA Cloud/S3 listing & download, `mocked_cache`, `mocked_batch_fetch`), and `api_*` (live API, opt-in via `PUBMED_REAL_API_TESTS=1` + `--features integration-tests`)
 
 ## Guidelines
 

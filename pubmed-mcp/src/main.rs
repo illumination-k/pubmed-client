@@ -99,7 +99,7 @@ impl ToolName {
 #[tool_router]
 impl PubMedServer {
     #[tool(
-        description = "Search PubMed for articles with filters (study type: randomized_controlled_trial, clinical_trial, meta_analysis, systematic_review, review, observational_study, case_report; text availability: free_full_text, full_text, pmc_only; date range: start_year and end_year for publication date filtering)"
+        description = "Search PubMed for articles with filters (study type: randomized_controlled_trial, clinical_trial, meta_analysis, systematic_review, review, observational_study, case_report; text availability: free_full_text, full_text, pmc_only; date range: start_year and end_year for publication date filtering). Returns PMIDs with title, authors, journal, date and a 200-character abstract preview (max 100 results); use fetch_articles for full abstracts and MeSH terms."
     )]
     async fn search_pubmed(
         &self,
@@ -139,7 +139,7 @@ impl PubMedServer {
     }
 
     #[tool(
-        description = "Check spelling of a search term using the NCBI ESpell API. Returns spelling suggestions and corrected query. Use before searching to improve accuracy."
+        description = "Check spelling of a search term using the NCBI ESpell API. Returns spelling suggestions and the corrected query. Use it when a query may contain misspellings or a search returned unexpectedly few results."
     )]
     async fn spell_check(
         &self,
