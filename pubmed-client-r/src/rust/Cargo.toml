@@ -26,6 +26,13 @@ extendr-api = "0.7"
 # switch this to `{ path = "../../../pubmed-client", default-features = false,
 # features = ["rustls-tls"] }`.
 #
+# CI does not switch it: `ci-r.yml` adds a `[patch.crates-io]` entry pointing at
+# the checkout to `$CARGO_HOME/config.toml`, which applies from the temp
+# directory R CMD check builds in. That is what lets a release PR (which bumps
+# this requirement to a version the tag has not published yet) pass, and it
+# makes the job verify the bindings against the PR's code rather than the last
+# release.
+#
 # rustls-tls (not the default native-tls) keeps TLS pure-Rust and statically
 # linked into the package's shared object. With native-tls the .so references
 # system OpenSSL symbols (e.g. PKCS5_PBKDF2_HMAC) that the R link line does not
