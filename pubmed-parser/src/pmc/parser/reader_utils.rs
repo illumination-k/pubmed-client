@@ -102,6 +102,78 @@ pub(super) fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -
     Ok(trim_in_place(text))
 }
 
+/// Read the text inside the current element like [`read_text_content`], but
+/// separate block-level children with a space and collapse whitespace runs.
+///
+/// Captions and footnotes are made of `<title>` / `<p>` / `<fn>` blocks that
+/// usually sit next to each other with no whitespace in between, so plain
+/// concatenation reads `<title>Results.</title><p>Mean values</p>` as
+/// "Results.Mean values". The reader must have just consumed `Event::Start`
+/// for `parent_tag`.
+pub(super) fn read_block_text(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> Result<String> {
+    let mut text = String::new();
+    let mut depth: u32 = 1;
+
+    loop {
+        match reader.read_event() {
+            Ok(Event::Start(ref e)) => {
+                let name = e.name();
+                if name.as_ref() == parent_tag {
+                    depth += 1;
+                }
+                if is_text_block(name.as_ref()) {
+                    text.push(' ');
+                }
+            }
+            Ok(Event::Text(ref e)) => {
+                let decoded = e
+                    .decode()
+                    .map_err(|err| ParseError::XmlError(err.to_string()))?;
+                text.push_str(&decoded);
+            }
+            Ok(Event::GeneralRef(ref e)) => {
+                text.push_str(&resolve_general_ref(e)?);
+            }
+            Ok(Event::End(ref e)) => {
+                let name = e.name();
+                if name.as_ref() == parent_tag {
+                    depth -= 1;
+                    if depth == 0 {
+                        break;
+                    }
+                }
+                if is_text_block(name.as_ref()) {
+                    text.push(' ');
+                }
+            }
+            Ok(Event::Eof) => break,
+            Err(e) => return Err(ParseError::XmlError(e.to_string())),
+            _ => {}
+        }
+    }
+
+    Ok(text.split_whitespace().collect::<Vec<_>>().join(" "))
+}
+
+/// Elements whose text forms its own block (a heading, paragraph, footnote,
+/// list item, ...), as opposed to inline markup such as `<italic>` or `<sup>`.
+fn is_text_block(tag: &[u8]) -> bool {
+    matches!(
+        tag,
+        b"title"
+            | b"p"
+            | b"fn"
+            | b"label"
+            | b"list-item"
+            | b"def-item"
+            | b"attrib"
+            | b"disp-quote"
+            | b"td"
+            | b"th"
+            | b"tr"
+    )
+}
+
 /// Trim leading/trailing whitespace from an owned `String` in place, reusing its
 /// allocation rather than allocating a fresh `String` (as `trim().to_string()`
 /// would). On the hot PMC parsing path this saves one allocation per text node.

@@ -21,16 +21,16 @@ mod paragraph;
 mod table;
 
 use crate::pmc::domain::{Figure, Section, Table};
-use crate::pmc::parser::reader_utils::{make_reader, read_text_content, skip_element};
+use crate::pmc::parser::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
 use quick_xml::Reader;
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::name::QName;
 
 use abstracts::extract_abstract_section;
-use body::{extract_body_sections, parse_section_from_body};
+use body::{extract_body_sections, parse_section_from_body, parse_sectioned_element};
 use figure::{FigAttrs, extract_figures_from_content, parse_figure_inner};
 use paragraph::read_paragraph_with_inline;
-use table::{TableAttrs, parse_table_inner};
+use table::{TableAttrs, extract_tables_from_content, parse_table_inner};
 
 /// Extract all sections from PMC XML content
 pub(crate) fn extract_sections_enhanced(content: &str) -> Vec<Section> {
@@ -49,16 +49,19 @@ pub(crate) fn extract_sections_enhanced(content: &str) -> Vec<Section> {
         sections.extend(extract_body_sections(body_content));
     }
 
-    // Extract figures from floats-group and add to first section
+    // Figures and tables collected in <floats-group> (common for Elsevier and
+    // SAGE content) are attached to the first section
     if let Some(floats_start) = content.find("<floats-group>")
         && let Some(floats_end) = content[floats_start..].find("</floats-group>")
     {
         let floats_content =
             &content[floats_start..floats_start + floats_end + "</floats-group>".len()];
         let float_figures = extract_figures_from_content(floats_content);
-        if !float_figures.is_empty() {
+        let float_tables = extract_tables_from_content(floats_content);
+        if !float_figures.is_empty() || !float_tables.is_empty() {
             if let Some(first_section) = sections.first_mut() {
                 first_section.figures.extend(float_figures);
+                first_section.tables.extend(float_tables);
             } else {
                 sections.push(Section {
                     id: None,
@@ -68,7 +71,7 @@ pub(crate) fn extract_sections_enhanced(content: &str) -> Vec<Section> {
                     content: String::new(),
                     subsections: Vec::new(),
                     figures: float_figures,
-                    tables: Vec::new(),
+                    tables: float_tables,
                     formulas: Vec::new(),
                     cited_reference_ids: Vec::new(),
                 });
@@ -77,6 +80,31 @@ pub(crate) fn extract_sections_enhanced(content: &str) -> Vec<Section> {
     }
 
     sections
+}
+
+/// Extract appendices (`<app>`, usually inside `<app-group>`) from back matter.
+///
+/// Each `<app>` has the `<sec>` content model and becomes a [`Section`] with
+/// `section_type` `"appendix"`.
+pub(crate) fn extract_appendices(back: &str) -> Vec<Section> {
+    let mut reader = make_reader(back);
+    let mut appendices = Vec::new();
+
+    loop {
+        match reader.read_event() {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"app" => {
+                let id = get_attr(e, b"id");
+                if let Some(mut section) = parse_sectioned_element(&mut reader, id, b"app") {
+                    section.section_type = Some("appendix".to_string());
+                    appendices.push(section);
+                }
+            }
+            Ok(Event::Eof) | Err(_) => break,
+            _ => {}
+        }
+    }
+
+    appendices
 }
 
 /// What to do with an element encountered inside a `<body>` or a `<sec>`.
@@ -256,4 +284,36 @@ fn scan_elements<A, T>(
     }
 
     results
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_extract_appendices() {
+        let back = r#"
+        <back>
+            <ref-list><ref id="r1"><mixed-citation>Ref.</mixed-citation></ref></ref-list>
+            <app-group>
+                <app id="app1">
+                    <title>Appendix A</title>
+                    <p>Questionnaire items.</p>
+                    <table-wrap id="tA1"><label>Table A1</label><caption><p>Items.</p></caption></table-wrap>
+                    <sec id="app1s1"><title>Scoring</title><p>Sum of items.</p></sec>
+                </app>
+            </app-group>
+        </back>
+        "#;
+
+        let apps = extract_appendices(back);
+        assert_eq!(apps.len(), 1);
+        let app = &apps[0];
+        assert_eq!(app.id.as_deref(), Some("app1"));
+        assert_eq!(app.section_type.as_deref(), Some("appendix"));
+        assert_eq!(app.title.as_deref(), Some("Appendix A"));
+        assert_eq!(app.content, "Questionnaire items.");
+        assert_eq!(app.tables.len(), 1);
+        assert_eq!(app.subsections[0].title.as_deref(), Some("Scoring"));
+    }
 }
