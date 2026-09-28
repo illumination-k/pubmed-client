@@ -46,7 +46,7 @@ expression: article
         "copyright_statement": null,
         "license": {
           "href": "https://creativecommons.org/publicdomain/mark/1.0/",
-          "text": "https://creativecommons.org/publicdomain/mark/1.0/\n          This work is free of known copyright restrictions. For more information, please see PMC Back Issue Digitization."
+          "text": "This work is free of known copyright restrictions. For more information, please see PMC Back Issue Digitization."
         }
       },
       "abstracts": [],

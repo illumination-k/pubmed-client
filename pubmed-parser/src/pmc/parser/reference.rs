@@ -1,433 +1,80 @@
+//! JATS `<ref-list>` / `<ref>` parsing.
+//!
+//! References are read with a streaming `quick_xml::Reader` rather than serde
+//! deserialization: real PMC reference lists mix free text with tagged fields
+//! (`<mixed-citation>`), wrap alternatives in `<citation-alternatives>`, use
+//! `<string-name>` outside any `<person-group>`, and carry attribute-bearing
+//! inline markup (`<italic toggle="yes">`). A single such `<ref>` used to make
+//! the whole list fail to deserialize; the streaming parser simply picks the
+//! fields it knows and walks past everything else.
+
 use crate::common::Author;
-use crate::common::xml_utils::strip_inline_html_tags;
 use crate::error::Result;
 use crate::pmc::domain::Reference;
-use quick_xml::de::from_str;
-use serde::Deserialize;
-use std::borrow::Cow;
-use tracing;
+use crate::pmc::parser::reader_utils::{get_attr, make_reader, read_text_content, skip_element};
+use quick_xml::Reader;
+use quick_xml::events::Event;
 
-/// XML structure for ref-list element
-#[derive(Debug, Deserialize)]
-#[serde(rename = "ref-list")]
-struct RefList {
-    #[serde(rename = "@id", default)]
-    #[allow(dead_code)]
-    id: Option<String>,
-
-    #[serde(rename = "title", default)]
-    #[allow(dead_code)]
-    title: Option<String>,
-
-    #[serde(rename = "ref", default)]
-    refs: Vec<Ref>,
-}
-
-/// XML structure for ref element
-#[derive(Debug, Deserialize)]
-struct Ref {
-    #[serde(rename = "@id")]
-    id: Option<String>,
-
-    #[serde(rename = "label", default)]
-    #[allow(dead_code)]
-    label: Option<String>,
-
-    #[serde(rename = "element-citation", default)]
-    element_citation: Option<ElementCitation>,
-
-    #[serde(rename = "mixed-citation", default)]
-    mixed_citation: Option<MixedCitation>,
-}
-
-/// XML structure for element-citation
-#[derive(Debug, Deserialize)]
-#[serde(rename = "element-citation")]
-struct ElementCitation {
-    #[serde(rename = "@publication-type")]
-    publication_type: Option<String>,
-
-    #[serde(rename = "@id", default)]
-    #[allow(dead_code)]
-    citation_id: Option<String>,
-
-    #[serde(rename = "article-title", default)]
-    article_title: Option<String>,
-
-    #[serde(rename = "source", default)]
-    source: Option<String>,
-
-    #[serde(rename = "year", default)]
-    year: Option<String>,
-
-    #[serde(rename = "volume", default)]
-    volume: Option<String>,
-
-    #[serde(rename = "issue", default)]
-    issue: Option<String>,
-
-    #[serde(rename = "fpage", default)]
-    fpage: Option<String>,
-
-    #[serde(rename = "lpage", default)]
-    lpage: Option<String>,
-
-    #[serde(rename = "elocation-id", default)]
-    elocation_id: Option<String>,
-
-    #[serde(rename = "publisher-name", default)]
-    publisher_name: Option<String>,
-
-    #[serde(rename = "publisher-loc", default)]
-    publisher_loc: Option<String>,
-
-    #[serde(rename = "edition", default)]
-    edition: Option<String>,
-
-    #[serde(rename = "isbn", default)]
-    isbn: Option<String>,
-
-    #[serde(rename = "conf-name", default)]
-    conf_name: Option<String>,
-
-    #[serde(rename = "pub-id", default)]
-    pub_ids: Vec<PubId>,
-
-    #[serde(rename = "person-group", default)]
-    person_groups: Vec<PersonGroup>,
-}
-
-/// XML structure for mixed-citation (alternative citation format)
-#[derive(Debug, Deserialize)]
-#[serde(rename = "mixed-citation")]
-struct MixedCitation {
-    #[serde(rename = "@publication-type")]
-    publication_type: Option<String>,
-
-    #[serde(rename = "@id", default)]
-    #[allow(dead_code)]
-    citation_id: Option<String>,
-
-    #[serde(rename = "article-title", default)]
-    article_title: Option<String>,
-
-    #[serde(rename = "source", default)]
-    source: Option<String>,
-
-    #[serde(rename = "year", default)]
-    year: Option<String>,
-
-    #[serde(rename = "volume", default)]
-    volume: Option<String>,
-
-    #[serde(rename = "issue", default)]
-    issue: Option<String>,
-
-    #[serde(rename = "fpage", default)]
-    fpage: Option<String>,
-
-    #[serde(rename = "lpage", default)]
-    lpage: Option<String>,
-
-    #[serde(rename = "elocation-id", default)]
-    elocation_id: Option<String>,
-
-    #[serde(rename = "publisher-name", default)]
-    publisher_name: Option<String>,
-
-    #[serde(rename = "publisher-loc", default)]
-    publisher_loc: Option<String>,
-
-    #[serde(rename = "edition", default)]
-    edition: Option<String>,
-
-    #[serde(rename = "isbn", default)]
-    isbn: Option<String>,
-
-    #[serde(rename = "conf-name", default)]
-    conf_name: Option<String>,
-
-    #[serde(rename = "pub-id", default)]
-    pub_ids: Vec<PubId>,
-
-    #[serde(rename = "person-group", default)]
-    person_groups: Vec<PersonGroup>,
-}
-
-/// XML structure for pub-id element
-#[derive(Debug, Deserialize)]
-struct PubId {
-    #[serde(rename = "@pub-id-type")]
-    pub_id_type: Option<String>,
-
-    #[serde(rename = "$text")]
-    value: Option<String>,
-}
-
-/// XML structure for person-group element
-#[derive(Debug, Deserialize)]
-#[serde(rename = "person-group")]
-struct PersonGroup {
-    #[serde(rename = "@person-group-type")]
-    person_group_type: Option<String>,
-
-    #[serde(rename = "name", default)]
-    names: Vec<Name>,
-
-    #[serde(rename = "etal", default)]
-    #[allow(dead_code)]
-    etal: Option<String>,
-
-    #[serde(rename = "collab", default)]
-    #[allow(dead_code)]
-    collab: Option<String>,
-}
-
-/// XML structure for name element
-#[derive(Debug, Deserialize)]
-struct Name {
-    #[serde(rename = "@name-style", default)]
-    #[allow(dead_code)]
-    name_style: Option<String>,
-
-    #[serde(rename = "surname", default)]
-    surname: Option<String>,
-
-    #[serde(rename = "given-names", default)]
-    given_names: Option<String>,
-
-    #[serde(rename = "suffix", default)]
-    #[allow(dead_code)]
-    suffix: Option<String>,
-}
-
-/// Strip `<comment>...</comment>` elements from XML content.
+/// Extract every `<ref>` in `content` (normally the `<back>` slice).
 ///
-/// These elements cause "duplicate field" errors in quick-xml serde deserialization
-/// when multiple `<comment>` elements appear in the same citation.
-fn strip_comment_tags(content: &str) -> Cow<'_, str> {
-    use regex::Regex;
-    use std::sync::OnceLock;
-
-    // Skip the regex entirely when there is no `<comment` substring — the common
-    // case — so we return the input borrowed without allocating a full copy.
-    if !content.contains("<comment") {
-        return Cow::Borrowed(content);
-    }
-
-    static COMMENT_RE: OnceLock<Option<Regex>> = OnceLock::new();
-    match COMMENT_RE.get_or_init(|| Regex::new(r"<comment[^>]*>.*?</comment>").ok()) {
-        Some(re) => re.replace_all(content, ""),
-        // If the (constant) pattern somehow failed to compile, leave the input untouched.
-        None => Cow::Borrowed(content),
-    }
-}
-
-/// Extract detailed references from ref-list or alternative reference structures
+/// Nested and repeated `<ref-list>`s are all covered because `<ref>` elements
+/// are matched wherever they appear. A `<ref>` with no citation child is
+/// dropped.
 pub(crate) fn extract_references_detailed(content: &str) -> Result<Vec<Reference>> {
-    // Try multiple reference extraction strategies to handle different PMC XML formats
-
-    // Strategy 1: Standard <ref-list> structure
-    if let Some(references) = try_extract_from_ref_list(content)? {
-        tracing::debug!(
-            count = references.len(),
-            "Extracted references from ref-list"
-        );
-        return Ok(references);
-    }
-
-    // Strategy 2: Alternative <references> structure
-    if let Some(references) = try_extract_from_references_tag(content)? {
-        tracing::debug!(
-            count = references.len(),
-            "Extracted references from references tag"
-        );
-        return Ok(references);
-    }
-
-    // Strategy 3: Direct <ref> tags in <back> section
-    if let Some(references) = try_extract_from_back_section(content)? {
-        tracing::debug!(
-            count = references.len(),
-            "Extracted references from back section"
-        );
-        return Ok(references);
-    }
-
-    // No references found with any strategy
-    Ok(Vec::new())
-}
-
-/// Try to extract references from standard <ref-list> structure
-fn try_extract_from_ref_list(content: &str) -> Result<Option<Vec<Reference>>> {
-    let ref_list_content = if let Some(start) = content.find("<ref-list") {
-        if let Some(end) = content[start..].find("</ref-list>") {
-            &content[start..start + end + 11] // +11 for "</ref-list>"
-        } else {
-            return Ok(None);
-        }
-    } else {
-        return Ok(None);
-    };
-
-    // Parse the ref-list (strip inline HTML tags and comment tags first)
-    let cleaned_content = strip_inline_html_tags(ref_list_content);
-    let cleaned_content = strip_comment_tags(&cleaned_content);
-    match from_str::<RefList>(&cleaned_content) {
-        Ok(ref_list) => {
-            let references = ref_list
-                .refs
-                .into_iter()
-                .filter_map(parse_ref_to_reference)
-                .collect();
-            Ok(Some(references))
-        }
-        Err(e) => {
-            tracing::debug!("Failed to parse ref-list as whole: {}", e);
-            Ok(None)
-        }
-    }
-}
-
-/// Try to extract references from alternative <references> structure
-fn try_extract_from_references_tag(content: &str) -> Result<Option<Vec<Reference>>> {
-    // Some PMC articles use <references> instead of <ref-list>
-    let references_content = if let Some(start) = content.find("<references") {
-        if let Some(end) = content[start..].find("</references>") {
-            &content[start..start + end + 13] // +13 for "</references>"
-        } else {
-            return Ok(None);
-        }
-    } else {
-        return Ok(None);
-    };
-
-    // Try to adapt the content to ref-list format for parsing
-    let adapted_content = references_content
-        .replace("<references", "<ref-list")
-        .replace("</references>", "</ref-list>");
-
-    let cleaned_adapted = strip_inline_html_tags(&adapted_content);
-    let cleaned_adapted = strip_comment_tags(&cleaned_adapted);
-    match from_str::<RefList>(&cleaned_adapted) {
-        Ok(ref_list) => {
-            let references = ref_list
-                .refs
-                .into_iter()
-                .filter_map(parse_ref_to_reference)
-                .collect();
-            Ok(Some(references))
-        }
-        Err(_) => Ok(None),
-    }
-}
-
-/// Try to extract references from direct <ref> tags in <back> section
-fn try_extract_from_back_section(content: &str) -> Result<Option<Vec<Reference>>> {
-    // Extract the back section
-    let back_content = if let Some(start) = content.find("<back>") {
-        if let Some(end) = content[start..].find("</back>") {
-            &content[start..start + end + 7] // +7 for "</back>"
-        } else {
-            return Ok(None);
-        }
-    } else {
-        return Ok(None);
-    };
-
-    // Look for <ref> tags directly in the back section
+    let mut reader = make_reader(content);
     let mut references = Vec::new();
-    let mut pos = 0;
 
-    while let Some(ref_start) = back_content[pos..].find("<ref ") {
-        let ref_start = pos + ref_start;
-        if let Some(ref_end) = back_content[ref_start..].find("</ref>") {
-            let ref_end = ref_start + ref_end + 6; // +6 for "</ref>"
-            let ref_content = &back_content[ref_start..ref_end];
-
-            // Wrap the ref in a temporary ref-list structure to reuse existing parsing
-            let wrapped_content = format!("<ref-list>{}</ref-list>", ref_content);
-            let cleaned_wrapped = strip_inline_html_tags(&wrapped_content);
-            let cleaned_wrapped = strip_comment_tags(&cleaned_wrapped);
-
-            if let Ok(ref_list) = from_str::<RefList>(&cleaned_wrapped) {
-                for ref_item in ref_list.refs {
-                    if let Some(reference) = parse_ref_to_reference(ref_item) {
-                        references.push(reference);
-                    }
+    loop {
+        match reader.read_event() {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"ref" => {
+                let id = get_attr(e, b"id");
+                if let Some(reference) = parse_ref(&mut reader, id) {
+                    references.push(reference);
                 }
             }
-
-            pos = ref_end;
-        } else {
-            break;
-        }
-    }
-
-    if references.is_empty() {
-        Ok(None)
-    } else {
-        Ok(Some(references))
-    }
-}
-
-/// Convert a Ref struct to a domain Reference
-fn parse_ref_to_reference(ref_elem: Ref) -> Option<Reference> {
-    let id = ref_elem.id.unwrap_or_else(|| String::from("unknown"));
-
-    // Try element-citation first, then mixed-citation
-    let citation = ref_elem
-        .element_citation
-        .map(Citation::Element)
-        .or_else(|| ref_elem.mixed_citation.map(Citation::Mixed));
-
-    let citation: NormalizedCitation = citation?.into();
-
-    let mut doi = None;
-    let mut pmid = None;
-    for pub_id in citation.pub_ids {
-        if let (Some(id_type), Some(value)) = (pub_id.pub_id_type, pub_id.value) {
-            match id_type.as_str() {
-                "doi" => doi = Some(value),
-                "pmid" => pmid = Some(value),
-                _ => {}
+            Ok(Event::Eof) => break,
+            Err(e) => {
+                tracing::debug!("Stopped reading references at XML error: {e}");
+                break;
             }
+            _ => {}
         }
     }
 
-    Some(Reference {
-        id,
-        publication_type: citation.publication_type,
-        title: citation.article_title,
-        authors: extract_persons(&citation.person_groups, &["author", ""]),
-        editors: extract_persons(&citation.person_groups, &["editor"]),
-        source: citation.source,
-        year: citation.year,
-        volume: citation.volume,
-        issue: citation.issue,
-        pages: format_pages(citation.fpage, citation.lpage),
-        elocation_id: citation.elocation_id,
-        publisher_name: citation.publisher_name,
-        publisher_loc: citation.publisher_loc,
-        edition: citation.edition,
-        isbn: citation.isbn,
-        conf_name: citation.conf_name,
-        pmid,
-        doi,
-    })
+    tracing::debug!(count = references.len(), "Extracted references");
+    Ok(references)
 }
 
-/// Helper enum to handle both citation types uniformly
-enum Citation {
-    Element(ElementCitation),
-    Mixed(MixedCitation),
+/// Kind of citation element, in order of preference when a `<ref>` carries
+/// several (e.g. inside `<citation-alternatives>`).
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum CitationKind {
+    /// `<element-citation>`: fully tagged, no free text.
+    Element,
+    /// `<nlm-citation>` / `<citation>`: tagged citations from older DTDs.
+    Legacy,
+    /// `<mixed-citation>`: tagged fields interleaved with punctuation text.
+    Mixed,
 }
 
-/// Fields shared by `<element-citation>` and `<mixed-citation>`, normalized so
-/// the two formats are handled uniformly.
-struct NormalizedCitation {
+impl CitationKind {
+    fn from_tag(tag: &[u8]) -> Option<Self> {
+        match tag {
+            b"element-citation" => Some(Self::Element),
+            b"nlm-citation" | b"citation" => Some(Self::Legacy),
+            b"mixed-citation" => Some(Self::Mixed),
+            _ => None,
+        }
+    }
+}
+
+/// Fields collected from one citation element. Each scalar keeps the first
+/// occurrence.
+#[derive(Default)]
+struct Citation {
     publication_type: Option<String>,
     article_title: Option<String>,
+    chapter_title: Option<String>,
     source: Option<String>,
     year: Option<String>,
     volume: Option<String>,
@@ -440,39 +87,266 @@ struct NormalizedCitation {
     edition: Option<String>,
     isbn: Option<String>,
     conf_name: Option<String>,
-    pub_ids: Vec<PubId>,
-    person_groups: Vec<PersonGroup>,
+    doi: Option<String>,
+    pmid: Option<String>,
+    authors: Vec<Author>,
+    editors: Vec<Author>,
 }
 
-impl From<Citation> for NormalizedCitation {
-    fn from(citation: Citation) -> Self {
-        macro_rules! normalize {
-            ($c:expr) => {
-                NormalizedCitation {
-                    publication_type: $c.publication_type,
-                    article_title: $c.article_title,
-                    source: $c.source,
-                    year: $c.year,
-                    volume: $c.volume,
-                    issue: $c.issue,
-                    fpage: $c.fpage,
-                    lpage: $c.lpage,
-                    elocation_id: $c.elocation_id,
-                    publisher_name: $c.publisher_name,
-                    publisher_loc: $c.publisher_loc,
-                    edition: $c.edition,
-                    isbn: $c.isbn,
-                    conf_name: $c.conf_name,
-                    pub_ids: $c.pub_ids,
-                    person_groups: $c.person_groups,
-                }
-            };
-        }
-        match citation {
-            Citation::Element(elem) => normalize!(elem),
-            Citation::Mixed(mixed) => normalize!(mixed),
+impl Citation {
+    /// Number of tagged fields, used to break ties between citations of the same kind.
+    fn richness(&self) -> usize {
+        [
+            &self.article_title,
+            &self.chapter_title,
+            &self.source,
+            &self.year,
+            &self.volume,
+            &self.fpage,
+            &self.doi,
+            &self.pmid,
+        ]
+        .iter()
+        .filter(|f| f.is_some())
+        .count()
+            + usize::from(!self.authors.is_empty())
+    }
+
+    fn into_reference(self, id: String) -> Reference {
+        Reference {
+            id,
+            publication_type: self.publication_type,
+            title: self.article_title.or(self.chapter_title),
+            authors: self.authors,
+            source: self.source,
+            year: self.year,
+            volume: self.volume,
+            issue: self.issue,
+            pages: format_pages(self.fpage, self.lpage),
+            elocation_id: self.elocation_id,
+            editors: self.editors,
+            publisher_name: self.publisher_name,
+            publisher_loc: self.publisher_loc,
+            edition: self.edition,
+            isbn: self.isbn,
+            conf_name: self.conf_name,
+            pmid: self.pmid,
+            doi: self.doi,
         }
     }
+}
+
+/// Parse one `<ref>`; the reader has just consumed its start tag.
+fn parse_ref(reader: &mut Reader<&[u8]>, id: Option<String>) -> Option<Reference> {
+    let mut best: Option<(CitationKind, Citation)> = None;
+
+    loop {
+        match reader.read_event() {
+            Ok(Event::Start(ref e)) => {
+                let tag = e.name().as_ref().to_vec();
+                let Some(kind) = CitationKind::from_tag(&tag) else {
+                    // `<label>`, `<citation-alternatives>`, `<note>`, ... —
+                    // descend so wrapped citations are still found.
+                    continue;
+                };
+                let publication_type =
+                    get_attr(e, b"publication-type").or_else(|| get_attr(e, b"citation-type"));
+                let citation = parse_citation(reader, &tag, publication_type);
+                let better = match &best {
+                    None => true,
+                    Some((best_kind, best_citation)) => {
+                        kind < *best_kind
+                            || (kind == *best_kind
+                                && citation.richness() > best_citation.richness())
+                    }
+                };
+                if better {
+                    best = Some((kind, citation));
+                }
+            }
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"ref" => break,
+            Ok(Event::Eof) | Err(_) => break,
+            _ => {}
+        }
+    }
+
+    let (_, citation) = best?;
+    Some(citation.into_reference(id.unwrap_or_else(|| String::from("unknown"))))
+}
+
+/// Parse a citation element named `tag`; the reader has just consumed its start tag.
+fn parse_citation(
+    reader: &mut Reader<&[u8]>,
+    tag: &[u8],
+    publication_type: Option<String>,
+) -> Citation {
+    let mut c = Citation {
+        publication_type,
+        ..Citation::default()
+    };
+
+    loop {
+        let e = match reader.read_event() {
+            Ok(Event::Start(e)) => e,
+            Ok(Event::End(ref e)) if e.name().as_ref() == tag => break,
+            Ok(Event::Eof) | Err(_) => break,
+            _ => continue,
+        };
+        let name = e.name();
+        let child = name.as_ref();
+
+        let slot = match child {
+            b"article-title" => &mut c.article_title,
+            b"chapter-title" => &mut c.chapter_title,
+            b"source" => &mut c.source,
+            b"year" => &mut c.year,
+            b"volume" => &mut c.volume,
+            b"issue" => &mut c.issue,
+            b"fpage" => &mut c.fpage,
+            b"lpage" => &mut c.lpage,
+            b"elocation-id" => &mut c.elocation_id,
+            b"publisher-name" => &mut c.publisher_name,
+            b"publisher-loc" => &mut c.publisher_loc,
+            b"edition" => &mut c.edition,
+            b"isbn" => &mut c.isbn,
+            b"conf-name" => &mut c.conf_name,
+            b"pub-id" => match get_attr(&e, b"pub-id-type").as_deref() {
+                Some("doi") => &mut c.doi,
+                Some("pmid") => &mut c.pmid,
+                _ => {
+                    let _ = skip_element(reader, name);
+                    continue;
+                }
+            },
+            b"person-group" => {
+                let group_type = get_attr(&e, b"person-group-type");
+                let people = parse_person_group(reader);
+                match group_type.as_deref() {
+                    None | Some("author") => c.authors.extend(people),
+                    Some("editor") => c.editors.extend(people),
+                    // compiler, translator, inventor, ...: not modeled
+                    Some(_) => {}
+                }
+                continue;
+            }
+            // Names outside a `<person-group>` (common in `<mixed-citation>`) are authors.
+            b"name" | b"string-name" => {
+                if let Some(author) = parse_name(reader, child) {
+                    c.authors.push(author);
+                }
+                continue;
+            }
+            b"collab" => {
+                if let Some(text) = read_field(reader, child) {
+                    c.authors.push(Author::collaboration(text));
+                }
+                continue;
+            }
+            // Access dates and free-text notes carry `<year>`s and ids that are
+            // not the publication's own.
+            b"date-in-citation" | b"comment" => {
+                let _ = skip_element(reader, name);
+                continue;
+            }
+            // Anything else (inline markup, `<etal>`, `<uri>`, ...): descend.
+            _ => continue,
+        };
+
+        let value = read_field(reader, child);
+        if slot.is_none() {
+            *slot = value;
+        }
+    }
+
+    c
+}
+
+/// Parse a `<person-group>`; the reader has just consumed its start tag.
+fn parse_person_group(reader: &mut Reader<&[u8]>) -> Vec<Author> {
+    let mut people = Vec::new();
+
+    loop {
+        let e = match reader.read_event() {
+            Ok(Event::Start(e)) => e,
+            Ok(Event::End(ref e)) if e.name().as_ref() == b"person-group" => break,
+            Ok(Event::Eof) | Err(_) => break,
+            _ => continue,
+        };
+        let name = e.name();
+        match name.as_ref() {
+            tag @ (b"name" | b"string-name") => {
+                if let Some(author) = parse_name(reader, tag) {
+                    people.push(author);
+                }
+            }
+            b"collab" => {
+                if let Some(text) = read_field(reader, b"collab") {
+                    people.push(Author::collaboration(text));
+                }
+            }
+            b"etal" => {
+                let _ = skip_element(reader, name);
+            }
+            _ => {}
+        }
+    }
+
+    people
+}
+
+/// Parse a `<name>` or `<string-name>`; the reader has just consumed its start tag.
+///
+/// A `<string-name>` without `<surname>`/`<given-names>` children is kept as an
+/// unstructured full name.
+fn parse_name(reader: &mut Reader<&[u8]>, tag: &[u8]) -> Option<Author> {
+    let mut surname = None;
+    let mut given_names = None;
+    let mut suffix = None;
+    let mut loose_text = String::new();
+
+    loop {
+        match reader.read_event() {
+            Ok(Event::Start(ref e)) => {
+                let child = e.name().as_ref().to_vec();
+                let value = read_field(reader, &child);
+                match child.as_slice() {
+                    b"surname" => surname = surname.or(value),
+                    b"given-names" => given_names = given_names.or(value),
+                    b"suffix" => suffix = suffix.or(value),
+                    _ => {}
+                }
+            }
+            Ok(Event::Text(ref t)) => {
+                if let Ok(text) = t.decode() {
+                    loose_text.push_str(&text);
+                }
+            }
+            Ok(Event::End(ref e)) if e.name().as_ref() == tag => break,
+            Ok(Event::Eof) | Err(_) => break,
+            _ => {}
+        }
+    }
+
+    if surname.is_none() && given_names.is_none() {
+        let full_name = collapse_whitespace(&loose_text);
+        return (!full_name.is_empty()).then(|| Author::from_full_name(full_name));
+    }
+
+    let mut author = Author::new(surname, given_names);
+    author.suffix = suffix;
+    Some(author)
+}
+
+/// Read the text of the element `tag` (reader just past its start tag),
+/// collapsing whitespace runs. `None` for empty text.
+fn read_field(reader: &mut Reader<&[u8]>, tag: &[u8]) -> Option<String> {
+    let text = read_text_content(reader, tag).ok()?;
+    let text = collapse_whitespace(&text);
+    (!text.is_empty()).then_some(text)
+}
+
+fn collapse_whitespace(text: &str) -> String {
+    text.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 /// Format page range from first and last page
@@ -482,31 +356,6 @@ fn format_pages(fpage: Option<String>, lpage: Option<String>) -> Option<String> 
         (Some(f), None) => Some(f),
         _ => None,
     }
-}
-
-/// Extract people from person groups whose `person-group-type` is one of
-/// `wanted` (use `""` to also match groups with no type attribute). `<collab>`
-/// group entries are captured as collaboration authors.
-fn extract_persons(person_groups: &[PersonGroup], wanted: &[&str]) -> Vec<Author> {
-    let mut people = Vec::new();
-
-    for group in person_groups {
-        let group_type = group.person_group_type.as_deref().unwrap_or("");
-        if !wanted.contains(&group_type) {
-            continue;
-        }
-        for name in &group.names {
-            people.push(Author::new(name.surname.clone(), name.given_names.clone()));
-        }
-        if let Some(collab) = &group.collab {
-            let collab = collab.trim();
-            if !collab.is_empty() {
-                people.push(Author::collaboration(collab.to_string()));
-            }
-        }
-    }
-
-    people
 }
 
 #[cfg(test)]
@@ -627,5 +476,68 @@ mod tests {
         assert_eq!(ref3.source, Some("MedRxiv".to_string()));
         assert_eq!(ref3.authors.len(), 1);
         assert_eq!(ref3.authors[0].surname, Some("Alvarez".to_string()));
+    }
+
+    #[test]
+    fn test_citation_alternatives_prefers_element_citation() {
+        // Springer-style: <citation-alternatives> with both forms, and inline
+        // markup carrying attributes (`<italic toggle="yes">`) in the title.
+        let content = r#"<ref-list><ref id="CR1"><citation-alternatives><element-citation id="ec-CR1" publication-type="journal"><person-group person-group-type="author"><name name-style="western"><surname>Abe</surname><given-names>F</given-names></name><name name-style="western"><surname>Usui</surname><given-names>K</given-names></name></person-group><article-title>Fluconazole modulates membrane rigidity in <italic toggle="yes">Saccharomyces cerevisiae</italic></article-title><source>Biochemistry</source><year>2009</year><volume>48</volume><issue>36</issue><fpage>8494</fpage><lpage>8504</lpage><pub-id pub-id-type="doi">10.1021/bi900578y</pub-id><pub-id pub-id-type="pmid">19670905</pub-id></element-citation><mixed-citation id="mc-CR1" publication-type="journal">Abe F, Usui K (2009) Fluconazole modulates membrane rigidity. Biochemistry 48(36):8494-8504</mixed-citation></citation-alternatives></ref></ref-list>"#;
+
+        let refs = extract_references_detailed(content).unwrap();
+        assert_eq!(refs.len(), 1);
+        let r = &refs[0];
+        assert_eq!(
+            r.title.as_deref(),
+            Some("Fluconazole modulates membrane rigidity in Saccharomyces cerevisiae")
+        );
+        assert_eq!(r.authors.len(), 2);
+        assert_eq!(r.pages.as_deref(), Some("8494-8504"));
+        assert_eq!(r.doi.as_deref(), Some("10.1021/bi900578y"));
+        assert_eq!(r.pmid.as_deref(), Some("19670905"));
+    }
+
+    #[test]
+    fn test_mixed_citation_with_string_names_and_collab() {
+        let content = r#"<ref-list><title>References</title>
+<ref id="ref1"><label>1.</label><mixed-citation publication-type="journal" id="r1">
+<string-name name-style="western">
+<surname>van Oldenborgh</surname>
+<given-names>GJ</given-names>
+</string-name>, <string-name name-style="western"><surname>Krikken</surname><given-names>F</given-names></string-name>
+<etal>et al.</etal> (<year>2021</year>) <article-title>Attribution of the Australian bushfire risk</article-title>. <source>Nat Hazards Earth Syst Sci</source>
+<volume>21</volume>, <fpage>941</fpage>&#8211;<lpage>960</lpage>.</mixed-citation></ref>
+<ref id="ref2"><mixed-citation publication-type="gov"><collab>National Center for Health Statistics</collab>; <collab>CDC</collab>. <source>Survey</source>. <comment>Accessed <year>2023</year></comment></mixed-citation></ref>
+</ref-list>"#;
+
+        let refs = extract_references_detailed(content).unwrap();
+        assert_eq!(refs.len(), 2);
+
+        let r1 = &refs[0];
+        let names: Vec<&str> = r1.authors.iter().map(|a| a.full_name.as_str()).collect();
+        assert_eq!(names, ["GJ van Oldenborgh", "F Krikken"]);
+        assert_eq!(r1.year.as_deref(), Some("2021"));
+        assert_eq!(r1.pages.as_deref(), Some("941-960"));
+
+        let r2 = &refs[1];
+        assert_eq!(r2.authors.len(), 2);
+        assert!(r2.authors.iter().all(|a| a.is_collaboration()));
+        // `<year>` inside `<comment>` is an access date, not the publication year.
+        assert_eq!(r2.year, None);
+    }
+
+    #[test]
+    fn test_one_bad_ref_does_not_drop_the_list_and_nested_lists_are_read() {
+        let content = r#"<back><sec><title>Further Reading</title><ref-list>
+<ref id="a"><element-citation publication-type="journal"><article-title>First</article-title><comment>x</comment><comment>y</comment></element-citation></ref>
+<ref id="b"><mixed-citation>Unstructured citation text only.</mixed-citation></ref>
+<ref id="c"><element-citation publication-type="book"><chapter-title>A chapter</chapter-title><source>A book</source></element-citation></ref>
+</ref-list></sec></back>"#;
+
+        let refs = extract_references_detailed(content).unwrap();
+        let ids: Vec<&str> = refs.iter().map(|r| r.id.as_str()).collect();
+        assert_eq!(ids, ["a", "b", "c"]);
+        assert_eq!(refs[0].title.as_deref(), Some("First"));
+        assert_eq!(refs[2].title.as_deref(), Some("A chapter"));
     }
 }

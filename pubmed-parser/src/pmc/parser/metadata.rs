@@ -299,7 +299,9 @@ struct SectionParts {
     text_parts: Vec<String>,
 }
 
-fn read_section_parts(reader: &mut Reader<&[u8]>) -> SectionParts {
+/// Collect the title and paragraph text of a `<sec>`-like element; the reader
+/// has just consumed the start tag of `end_tag`.
+fn read_section_parts(reader: &mut Reader<&[u8]>, end_tag: &[u8]) -> SectionParts {
     let mut parts = SectionParts::default();
 
     loop {
@@ -308,7 +310,7 @@ fn read_section_parts(reader: &mut Reader<&[u8]>) -> SectionParts {
                 b"title" | b"p" | b"sec" => TextAction::Read(e.name().as_ref().to_vec()),
                 other => TextAction::ReadSkip(other.to_vec()),
             },
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"sec" => TextAction::Break,
+            Ok(Event::End(ref e)) if e.name().as_ref() == end_tag => TextAction::Break,
             Ok(Event::Eof) => TextAction::Break,
             Err(_) => TextAction::Break,
             _ => TextAction::Continue,
@@ -330,7 +332,7 @@ fn read_section_parts(reader: &mut Reader<&[u8]>) -> SectionParts {
                 }
             }
             TextAction::Read(name) if name.as_slice() == b"sec" => {
-                let nested = read_section_parts(reader);
+                let nested = read_section_parts(reader, b"sec");
                 parts.paragraphs.extend(nested.paragraphs);
                 parts.text_parts.extend(nested.text_parts);
             }
@@ -840,7 +842,7 @@ pub(crate) fn extract_conflict_of_interest(content: &str) -> Option<String> {
         };
 
         if is_section {
-            let parts = read_section_parts(&mut reader);
+            let parts = read_section_parts(&mut reader, b"sec");
             if let Some(title) = parts.title {
                 let lower = title.to_lowercase();
                 if lower.contains("conflict") || lower.contains("competing") {
@@ -857,56 +859,132 @@ pub(crate) fn extract_conflict_of_interest(content: &str) -> Option<String> {
 /// Extract acknowledgments
 ///
 /// Strips XML tags and decodes XML entities (e.g., `&#231;` → `ç`).
+///
+/// The `<title>` ("Acknowledgements") is a heading, not part of the statement,
+/// so only the paragraphs are joined; an `<ack>` without `<p>` children falls
+/// back to its whole text.
 pub(crate) fn extract_acknowledgments(content: &str) -> Option<String> {
-    read_first_text(content, b"ack").map(|s| decode_xml_entities(&s).into_owned())
-}
-
-/// Extract data availability statement
-pub(crate) fn extract_data_availability(content: &str) -> Option<String> {
     let mut reader = make_reader(content);
-
     loop {
-        let action = match reader.read_event() {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"sec" => {
-                TextAction::Read(e.name().as_ref().to_vec())
-            }
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"supplementary-material" => {
-                TextAction::Read(e.name().as_ref().to_vec())
-            }
-            Ok(Event::Eof) => TextAction::Break,
-            Err(_) => TextAction::Break,
-            _ => TextAction::Continue,
-        };
-
-        match action {
-            TextAction::Read(name) if name.as_slice() == b"sec" => {
-                let parts = read_section_parts(&mut reader);
-                if let Some(text) = clean_text(parts.text_parts.join(" ")) {
-                    let lower = text.to_lowercase();
-                    if lower.contains("data") && lower.contains("availab") {
-                        return Some(text);
-                    }
-                }
-            }
-            TextAction::Read(name) if name.as_slice() == b"supplementary-material" => {
-                if let Ok(text) = read_text_content(&mut reader, &name)
-                    && let Some(text) = clean_text(text)
-                {
-                    let lower = text.to_lowercase();
-                    if lower.contains("data") && lower.contains("availab") {
-                        return Some(text);
-                    }
-                }
-            }
-            TextAction::Read(name) | TextAction::ReadSkip(name) => {
-                let _ = skip_element(&mut reader, QName(&name));
-            }
-            TextAction::Break => break,
-            TextAction::Continue => {}
+        match reader.read_event() {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == b"ack" => break,
+            Ok(Event::Eof) | Err(_) => return None,
+            _ => {}
         }
     }
 
-    None
+    let parts = read_section_parts(&mut reader, b"ack");
+    let text = if parts.paragraphs.is_empty() {
+        read_first_text(content, b"ack")?
+    } else {
+        parts.paragraphs.join(" ")
+    };
+    Some(decode_xml_entities(&text).into_owned())
+}
+
+/// Extract data availability statement
+///
+/// Structural markup wins: a `<sec sec-type>`, `<notes notes-type>` or
+/// `<fn fn-type>` typed as a data-availability statement. Otherwise the first
+/// `<sec>`/`<notes>` whose own title names one ("Data availability",
+/// "Availability of data and materials", ...) is used. Only the statement's
+/// paragraphs are returned, without its title.
+pub(crate) fn extract_data_availability(content: &str) -> Option<String> {
+    let mut reader = make_reader(content);
+    let mut by_title: Option<String> = None;
+
+    loop {
+        let (tag, typed) = match reader.read_event() {
+            Ok(Event::Start(ref e)) => {
+                let tag = e.name().as_ref().to_vec();
+                let type_attr: &[u8] = match tag.as_slice() {
+                    b"sec" => b"sec-type",
+                    b"notes" => b"notes-type",
+                    b"fn" => b"fn-type",
+                    _ => continue,
+                };
+                let typed = get_attr(e, type_attr).is_some_and(|t| is_data_availability_type(&t));
+                (tag, typed)
+            }
+            Ok(Event::Eof) | Err(_) => break,
+            _ => continue,
+        };
+
+        // Untyped elements qualify only by their own title. Peek at it on a
+        // cloned reader so a non-matching element is still descended into —
+        // the statement is often a sub-section of a "Declarations" block.
+        let titled = !typed
+            && by_title.is_none()
+            && tag.as_slice() != b"fn"
+            && peek_title(&reader).is_some_and(|t| is_data_availability_title(&t));
+        if !typed && !titled {
+            continue;
+        }
+
+        let parts = read_section_parts(&mut reader, &tag);
+        let text = if parts.paragraphs.is_empty() {
+            let title = parts.title.as_deref();
+            parts
+                .text_parts
+                .into_iter()
+                .filter(|t| Some(t.as_str()) != title)
+                .collect::<Vec<_>>()
+                .join(" ")
+        } else {
+            parts.paragraphs.join(" ")
+        };
+        let Some(text) = clean_text(text) else {
+            continue;
+        };
+        if typed {
+            return Some(text);
+        }
+        by_title = Some(text);
+    }
+
+    by_title
+}
+
+/// Whether a `sec-type` / `notes-type` / `fn-type` value denotes a data
+/// availability statement (`data-availability`, `data_availability`,
+/// `Data Availability Statement`, `availability-of-data`, ...).
+fn is_data_availability_type(value: &str) -> bool {
+    let normalized = value.trim().to_lowercase().replace(['_', ' '], "-");
+    normalized.contains("data-availab")
+        || normalized.contains("availability-of-data")
+        || normalized == "data-sharing"
+}
+
+/// Whether a section title names a data availability statement.
+fn is_data_availability_title(title: &str) -> bool {
+    let title = title.to_lowercase();
+    // Long titles are table captions or prose headings that merely mention data.
+    title.len() <= 80
+        && title.contains("data")
+        && (title.contains("availab") || title.contains("accessib") || title.contains("sharing"))
+}
+
+/// Return the element's leading `<title>` (after an optional `<label>`)
+/// without advancing `reader`.
+fn peek_title(reader: &Reader<&[u8]>) -> Option<String> {
+    let mut peek = reader.clone();
+    loop {
+        match peek.read_event() {
+            Ok(Event::Start(ref e)) => match e.name().as_ref() {
+                b"title" => {
+                    return read_text_content(&mut peek, b"title")
+                        .ok()
+                        .and_then(clean_text);
+                }
+                b"label" => {
+                    let _ = skip_element(&mut peek, e.name());
+                }
+                _ => return None,
+            },
+            Ok(Event::Text(_)) => {}
+            _ => return None,
+        }
+    }
 }
 
 /// Extract supplementary materials
@@ -964,8 +1042,17 @@ pub(crate) fn extract_copyright(content: &str) -> Option<String> {
 }
 
 /// Extract license information
+///
+/// Joins the `<license-p>` paragraphs so the machine-readable
+/// `<ali:license_ref>` URL (exposed separately as the license URL) is not
+/// glued onto the front of the prose.
 pub(crate) fn extract_license(content: &str) -> Option<String> {
-    read_first_text(content, b"license")
+    let paragraphs = read_texts_within_parent(content, b"license", b"license-p");
+    if paragraphs.is_empty() {
+        read_first_text(content, b"license")
+    } else {
+        Some(paragraphs.join(" "))
+    }
 }
 
 /// Extract abstract text from article metadata
@@ -1447,5 +1534,56 @@ mod tests {
     fn test_extract_elocation_id_missing() {
         let content = r#"<fpage>100</fpage>"#;
         assert!(extract_elocation_id(content).is_none());
+    }
+
+    #[test]
+    fn test_data_availability_typed_notes() {
+        let content = r#"<back><notes notes-type="data-availability"><title>Data availability</title><p>No datasets were generated.</p></notes></back>"#;
+        assert_eq!(
+            extract_data_availability(content).as_deref(),
+            Some("No datasets were generated.")
+        );
+    }
+
+    #[test]
+    fn test_data_availability_by_nested_title_only() {
+        // A section merely mentioning available data is not the statement.
+        let content = r#"
+        <body><sec><title>Results</title><p>The data are available in many forms.</p></sec></body>
+        <back><sec><title>Declarations</title>
+            <sec><title>Availability of data and materials</title><p>Data are on Zenodo.</p></sec>
+        </sec></back>"#;
+        assert_eq!(
+            extract_data_availability(content).as_deref(),
+            Some("Data are on Zenodo.")
+        );
+        assert_eq!(
+            extract_data_availability(
+                "<body><sec><title>Results</title><p>Data availability varies.</p></sec></body>"
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn test_acknowledgments_exclude_title() {
+        let content = r#"<back><ack><title>Acknowledgements</title><p>We thank <italic toggle="yes">all</italic> participants.</p></ack></back>"#;
+        assert_eq!(
+            extract_acknowledgments(content).as_deref(),
+            Some("We thank all participants.")
+        );
+    }
+
+    #[test]
+    fn test_license_text_excludes_license_ref() {
+        let content = r#"<permissions><license><ali:license_ref xmlns:ali="http://www.niso.org/schemas/ali/1.0/">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>This is an Open Access article.</license-p></license></permissions>"#;
+        assert_eq!(
+            extract_license(content).as_deref(),
+            Some("This is an Open Access article.")
+        );
+        assert_eq!(
+            extract_license_url(content).as_deref(),
+            Some("https://creativecommons.org/licenses/by/4.0/")
+        );
     }
 }
