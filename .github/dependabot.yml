@@ -6,6 +6,10 @@
 #   lock-step with the workspace by scripts/sync-versions.sh, not by Dependabot.
 # - Minor/patch updates are grouped per ecosystem to keep PR noise down;
 #   major updates still get individual PRs.
+# - Every ecosystem sets a 7-day cooldown: a freshly published version is not
+#   proposed until it has been out a week, which is the window in which a
+#   compromised or yanked release is usually caught. zizmor's
+#   dependabot-cooldown audit enforces that this stays set.
 version: 2
 updates:
   - package-ecosystem: "cargo"
@@ -15,6 +19,8 @@ updates:
     groups:
       cargo-minor-patch:
         update-types: ["minor", "patch"]
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -23,6 +29,8 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "npm"
     directory: "/pubmed-client-napi"
@@ -34,6 +42,8 @@ updates:
     groups:
       napi-minor-patch:
         update-types: ["minor", "patch"]
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "npm"
     directory: "/pubmed-client-wasm"
@@ -42,6 +52,8 @@ updates:
     groups:
       wasm-minor-patch:
         update-types: ["minor", "patch"]
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "npm"
     directory: "/website"
@@ -50,6 +62,8 @@ updates:
     groups:
       website-minor-patch:
         update-types: ["minor", "patch"]
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "uv"
     directory: "/pubmed-client-py"
@@ -58,3 +72,5 @@ updates:
     groups:
       py-minor-patch:
         update-types: ["minor", "patch"]
+    cooldown:
+      default-days: 7

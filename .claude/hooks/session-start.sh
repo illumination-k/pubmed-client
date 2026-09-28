@@ -10,14 +10,14 @@ cd ../..
 
 if ! check_command mise; then
 	curl https://mise.run | sh
-	export PATH="$HOME/.local/bin:$PATH"
+	export PATH="$PATH:$HOME/.local/bin"
 fi
 
 mise trust --all
 
 # write all MISE_ENV into .miserc.toml
 
-cat <<EOF > ~/.miserc.toml
+cat <<EOF >~/.miserc.toml
 env = ["root", "rust", "node", "python"]
 EOF
 
@@ -42,12 +42,11 @@ if check_command rustup && [ -f rust-toolchain.toml ]; then
 	fi
 fi
 
-
 DETECTED_SHELL=${CLAUDE_CODE_SHELL:-$(basename "$SHELL")}
 
 if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
 	# initialize
-	echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >"$CLAUDE_ENV_FILE"
+	echo "export PATH=\"\$PATH:\$HOME/.local/bin\"" >"$CLAUDE_ENV_FILE"
 	case "$DETECTED_SHELL" in
 	bash | zsh)
 		mise env -s "$DETECTED_SHELL" >>"$CLAUDE_ENV_FILE"
