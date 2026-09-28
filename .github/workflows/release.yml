@@ -99,7 +99,7 @@ jobs:
         # (`@nextest`) only when the input is absent, and pinning to a SHA leaves
         # it with nothing to read — the step then succeeds having installed
         # nothing, and the next step fails with "no such command: `nextest`".
-        uses: taiki-e/install-action@37f7c5781271959fb65b6b35224e28652ff2b63d # v2.87.0
+        uses: taiki-e/install-action@94c31af3204a9f15ab40b35ad084410b905bbc73 # v2.87.17
         with:
           tool: nextest
 
