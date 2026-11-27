@@ -26,8 +26,8 @@ pub(crate) fn extract_references_detailed(content: &str) -> Result<Vec<Reference
 
     loop {
         match reader.read_event() {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"ref" => {
-                let id = get_attr(e, b"id");
+            Ok(Event::Start(ref e)) if e.name().as_ref() == "ref" => {
+                let id = get_attr(e, "id");
                 if let Some(reference) = parse_ref(&mut reader, id) {
                     references.push(reference);
                 }
@@ -58,11 +58,11 @@ enum CitationKind {
 }
 
 impl CitationKind {
-    fn from_tag(tag: &[u8]) -> Option<Self> {
+    fn from_tag(tag: &str) -> Option<Self> {
         match tag {
-            b"element-citation" => Some(Self::Element),
-            b"nlm-citation" | b"citation" => Some(Self::Legacy),
-            b"mixed-citation" => Some(Self::Mixed),
+            "element-citation" => Some(Self::Element),
+            "nlm-citation" | "citation" => Some(Self::Legacy),
+            "mixed-citation" => Some(Self::Mixed),
             _ => None,
         }
     }
@@ -143,14 +143,14 @@ fn parse_ref(reader: &mut Reader<&[u8]>, id: Option<String>) -> Option<Reference
     loop {
         match reader.read_event() {
             Ok(Event::Start(ref e)) => {
-                let tag = e.name().as_ref().to_vec();
+                let tag = e.name().as_ref().to_owned();
                 let Some(kind) = CitationKind::from_tag(&tag) else {
                     // `<label>`, `<citation-alternatives>`, `<note>`, ... —
                     // descend so wrapped citations are still found.
                     continue;
                 };
                 let publication_type =
-                    get_attr(e, b"publication-type").or_else(|| get_attr(e, b"citation-type"));
+                    get_attr(e, "publication-type").or_else(|| get_attr(e, "citation-type"));
                 let citation = parse_citation(reader, &tag, publication_type);
                 let better = match &best {
                     None => true,
@@ -164,7 +164,7 @@ fn parse_ref(reader: &mut Reader<&[u8]>, id: Option<String>) -> Option<Reference
                     best = Some((kind, citation));
                 }
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"ref" => break,
+            Ok(Event::End(ref e)) if e.name().as_ref() == "ref" => break,
             Ok(Event::Eof) | Err(_) => break,
             _ => {}
         }
@@ -177,7 +177,7 @@ fn parse_ref(reader: &mut Reader<&[u8]>, id: Option<String>) -> Option<Reference
 /// Parse a citation element named `tag`; the reader has just consumed its start tag.
 fn parse_citation(
     reader: &mut Reader<&[u8]>,
-    tag: &[u8],
+    tag: &str,
     publication_type: Option<String>,
 ) -> Citation {
     let mut c = Citation {
@@ -196,21 +196,21 @@ fn parse_citation(
         let child = name.as_ref();
 
         let slot = match child {
-            b"article-title" => &mut c.article_title,
-            b"chapter-title" => &mut c.chapter_title,
-            b"source" => &mut c.source,
-            b"year" => &mut c.year,
-            b"volume" => &mut c.volume,
-            b"issue" => &mut c.issue,
-            b"fpage" => &mut c.fpage,
-            b"lpage" => &mut c.lpage,
-            b"elocation-id" => &mut c.elocation_id,
-            b"publisher-name" => &mut c.publisher_name,
-            b"publisher-loc" => &mut c.publisher_loc,
-            b"edition" => &mut c.edition,
-            b"isbn" => &mut c.isbn,
-            b"conf-name" => &mut c.conf_name,
-            b"pub-id" => match get_attr(&e, b"pub-id-type").as_deref() {
+            "article-title" => &mut c.article_title,
+            "chapter-title" => &mut c.chapter_title,
+            "source" => &mut c.source,
+            "year" => &mut c.year,
+            "volume" => &mut c.volume,
+            "issue" => &mut c.issue,
+            "fpage" => &mut c.fpage,
+            "lpage" => &mut c.lpage,
+            "elocation-id" => &mut c.elocation_id,
+            "publisher-name" => &mut c.publisher_name,
+            "publisher-loc" => &mut c.publisher_loc,
+            "edition" => &mut c.edition,
+            "isbn" => &mut c.isbn,
+            "conf-name" => &mut c.conf_name,
+            "pub-id" => match get_attr(&e, "pub-id-type").as_deref() {
                 Some("doi") => &mut c.doi,
                 Some("pmid") => &mut c.pmid,
                 _ => {
@@ -218,8 +218,8 @@ fn parse_citation(
                     continue;
                 }
             },
-            b"person-group" => {
-                let group_type = get_attr(&e, b"person-group-type");
+            "person-group" => {
+                let group_type = get_attr(&e, "person-group-type");
                 let people = parse_person_group(reader);
                 match group_type.as_deref() {
                     None | Some("author") => c.authors.extend(people),
@@ -230,13 +230,13 @@ fn parse_citation(
                 continue;
             }
             // Names outside a `<person-group>` (common in `<mixed-citation>`) are authors.
-            b"name" | b"string-name" => {
+            "name" | "string-name" => {
                 if let Some(author) = parse_name(reader, child) {
                     c.authors.push(author);
                 }
                 continue;
             }
-            b"collab" => {
+            "collab" => {
                 if let Some(text) = read_field(reader, child) {
                     c.authors.push(Author::collaboration(text));
                 }
@@ -244,7 +244,7 @@ fn parse_citation(
             }
             // Access dates and free-text notes carry `<year>`s and ids that are
             // not the publication's own.
-            b"date-in-citation" | b"comment" => {
+            "date-in-citation" | "comment" => {
                 let _ = skip_element(reader, name);
                 continue;
             }
@@ -268,23 +268,23 @@ fn parse_person_group(reader: &mut Reader<&[u8]>) -> Vec<Author> {
     loop {
         let e = match reader.read_event() {
             Ok(Event::Start(e)) => e,
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"person-group" => break,
+            Ok(Event::End(ref e)) if e.name().as_ref() == "person-group" => break,
             Ok(Event::Eof) | Err(_) => break,
             _ => continue,
         };
         let name = e.name();
         match name.as_ref() {
-            tag @ (b"name" | b"string-name") => {
+            tag @ ("name" | "string-name") => {
                 if let Some(author) = parse_name(reader, tag) {
                     people.push(author);
                 }
             }
-            b"collab" => {
-                if let Some(text) = read_field(reader, b"collab") {
+            "collab" => {
+                if let Some(text) = read_field(reader, "collab") {
                     people.push(Author::collaboration(text));
                 }
             }
-            b"etal" => {
+            "etal" => {
                 let _ = skip_element(reader, name);
             }
             _ => {}
@@ -298,7 +298,7 @@ fn parse_person_group(reader: &mut Reader<&[u8]>) -> Vec<Author> {
 ///
 /// A `<string-name>` without `<surname>`/`<given-names>` children is kept as an
 /// unstructured full name.
-fn parse_name(reader: &mut Reader<&[u8]>, tag: &[u8]) -> Option<Author> {
+fn parse_name(reader: &mut Reader<&[u8]>, tag: &str) -> Option<Author> {
     let mut surname = None;
     let mut given_names = None;
     let mut suffix = None;
@@ -307,19 +307,17 @@ fn parse_name(reader: &mut Reader<&[u8]>, tag: &[u8]) -> Option<Author> {
     loop {
         match reader.read_event() {
             Ok(Event::Start(ref e)) => {
-                let child = e.name().as_ref().to_vec();
+                let child = e.name().as_ref().to_owned();
                 let value = read_field(reader, &child);
-                match child.as_slice() {
-                    b"surname" => surname = surname.or(value),
-                    b"given-names" => given_names = given_names.or(value),
-                    b"suffix" => suffix = suffix.or(value),
+                match child.as_str() {
+                    "surname" => surname = surname.or(value),
+                    "given-names" => given_names = given_names.or(value),
+                    "suffix" => suffix = suffix.or(value),
                     _ => {}
                 }
             }
             Ok(Event::Text(ref t)) => {
-                if let Ok(text) = t.decode() {
-                    loose_text.push_str(&text);
-                }
+                loose_text.push_str(t);
             }
             Ok(Event::End(ref e)) if e.name().as_ref() == tag => break,
             Ok(Event::Eof) | Err(_) => break,
@@ -339,7 +337,7 @@ fn parse_name(reader: &mut Reader<&[u8]>, tag: &[u8]) -> Option<Author> {
 
 /// Read the text of the element `tag` (reader just past its start tag),
 /// collapsing whitespace runs. `None` for empty text.
-fn read_field(reader: &mut Reader<&[u8]>, tag: &[u8]) -> Option<String> {
+fn read_field(reader: &mut Reader<&[u8]>, tag: &str) -> Option<String> {
     let text = read_text_content(reader, tag).ok()?;
     let text = collapse_whitespace(&text);
     (!text.is_empty()).then_some(text)
@@ -530,13 +528,13 @@ mod tests {
     fn test_one_bad_ref_does_not_drop_the_list_and_nested_lists_are_read() {
         let content = r#"<back><sec><title>Further Reading</title><ref-list>
 <ref id="a"><element-citation publication-type="journal"><article-title>First</article-title><comment>x</comment><comment>y</comment></element-citation></ref>
-<ref id="b"><mixed-citation>Unstructured citation text only.</mixed-citation></ref>
+<ref id=""><mixed-citation>Unstructured citation text only.</mixed-citation></ref>
 <ref id="c"><element-citation publication-type="book"><chapter-title>A chapter</chapter-title><source>A book</source></element-citation></ref>
 </ref-list></sec></back>"#;
 
         let refs = extract_references_detailed(content).unwrap();
         let ids: Vec<&str> = refs.iter().map(|r| r.id.as_str()).collect();
-        assert_eq!(ids, ["a", "b", "c"]);
+        assert_eq!(ids, ["a", "", "c"]);
         assert_eq!(refs[0].title.as_deref(), Some("First"));
         assert_eq!(refs[2].title.as_deref(), Some("A chapter"));
     }

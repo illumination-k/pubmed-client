@@ -260,11 +260,11 @@ impl PmcCloudClient {
 
         loop {
             match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) if e.name().as_ref() == b"Key" => {
+                Ok(Event::Start(ref e)) if e.name().as_ref() == "Key" => {
                     in_key = true;
                     key.clear();
                 }
-                Ok(Event::End(ref e)) if e.name().as_ref() == b"Key" => {
+                Ok(Event::End(ref e)) if e.name().as_ref() == "Key" => {
                     in_key = false;
                     // Skip folder-marker keys (zero-byte objects ending in `/`).
                     if !key.is_empty() && !key.ends_with('/') {
@@ -272,10 +272,7 @@ impl PmcCloudClient {
                     }
                 }
                 Ok(Event::Text(ref e)) if in_key => {
-                    let text = e.decode().map_err(|err| {
-                        ParseError::XmlError(format!("Invalid UTF-8 in S3 Key: {}", err))
-                    })?;
-                    key.push_str(&text);
+                    key.push_str(e);
                 }
                 Ok(Event::GeneralRef(ref e)) if in_key => {
                     let char_ref = e.resolve_char_ref().map_err(|err| {
@@ -283,13 +280,8 @@ impl PmcCloudClient {
                     })?;
                     if let Some(ch) = char_ref {
                         key.push(ch);
-                    } else {
-                        let name = e.decode().map_err(|err| {
-                            ParseError::XmlError(format!("Invalid UTF-8 in S3 Key: {}", err))
-                        })?;
-                        if let Some(text) = resolve_predefined_entity(&name) {
-                            key.push_str(text);
-                        }
+                    } else if let Some(text) = resolve_predefined_entity(e) {
+                        key.push_str(text);
                     }
                 }
                 Ok(Event::Eof) => break,

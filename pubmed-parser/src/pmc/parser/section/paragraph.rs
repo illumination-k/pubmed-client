@@ -23,25 +23,25 @@ pub(super) struct Paragraph {
 
 /// Whether `tag` is a JATS block-level (`%para-level;`) element whose text we
 /// extract inline rather than skipping. Shared by the body and `<sec>` parsers.
-pub(super) fn is_block_level(tag: &[u8]) -> bool {
+pub(super) fn is_block_level(tag: &str) -> bool {
     matches!(
         tag,
-        b"list"
-            | b"def-list"
-            | b"disp-formula"
-            | b"disp-formula-group"
-            | b"disp-quote"
-            | b"boxed-text"
-            | b"code"
-            | b"preformat"
-            | b"media"
-            | b"supplementary-material"
-            | b"speech"
-            | b"statement"
-            | b"verse-group"
-            | b"array"
-            | b"graphic"
-            | b"fn-group"
+        "list"
+            | "def-list"
+            | "disp-formula"
+            | "disp-formula-group"
+            | "disp-quote"
+            | "boxed-text"
+            | "code"
+            | "preformat"
+            | "media"
+            | "supplementary-material"
+            | "speech"
+            | "statement"
+            | "verse-group"
+            | "array"
+            | "graphic"
+            | "fn-group"
     )
 }
 
@@ -62,23 +62,21 @@ pub(super) fn read_paragraph_with_inline(reader: &mut Reader<&[u8]>) -> Paragrap
     loop {
         match reader.read_event() {
             Ok(Event::Start(ref e)) => {
-                if e.name().as_ref() == b"p" {
+                if e.name().as_ref() == "p" {
                     depth += 1;
                 } else {
                     inline.note_start(e);
                 }
             }
             Ok(Event::Text(ref e)) => {
-                if let Ok(decoded) = e.decode() {
-                    text.push_str(&decoded);
-                }
+                text.push_str(e);
             }
             Ok(Event::GeneralRef(ref e)) => {
                 if let Ok(resolved) = resolve_general_ref(e) {
                     text.push_str(&resolved);
                 }
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"p" => {
+            Ok(Event::End(ref e)) if e.name().as_ref() == "p" => {
                 depth -= 1;
                 if depth == 0 {
                     break;
@@ -118,9 +116,9 @@ impl InlineContent {
     /// its text still arrives as `Event::Text` and lands in the paragraph.
     fn note_start(&mut self, e: &BytesStart) {
         match e.name().as_ref() {
-            b"xref" => self.collect_bibr_rids(e),
-            b"fig" => self.pending_figs.push(FigAttrs::from_start(e)),
-            b"table-wrap" => self.pending_tables.push(TableAttrs::from_start(e)),
+            "xref" => self.collect_bibr_rids(e),
+            "fig" => self.pending_figs.push(FigAttrs::from_start(e)),
+            "table-wrap" => self.pending_tables.push(TableAttrs::from_start(e)),
             _ => {}
         }
     }
@@ -134,10 +132,10 @@ impl InlineContent {
     /// each id separately. The `<xref>`'s visible text (the citation marker) is
     /// left in the surrounding paragraph content untouched.
     fn collect_bibr_rids(&mut self, e: &BytesStart) {
-        if get_attr(e, b"ref-type").as_deref() != Some("bibr") {
+        if get_attr(e, "ref-type").as_deref() != Some("bibr") {
             return;
         }
-        if let Some(rid) = get_attr(e, b"rid") {
+        if let Some(rid) = get_attr(e, "rid") {
             self.cited_reference_ids
                 .extend(rid.split_whitespace().map(str::to_string));
         }
