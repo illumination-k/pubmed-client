@@ -1,1 +1,3 @@
-n engl j med|2020|382|727|zhu n|covid1|31978945
+version https://git-lfs.github.com/spec/v1
+oid sha256:16c2336dbc95b584d8dc3adf5f5260a33bdbf10a6e7f746684f6ffabf9b98cd4
+size 48
