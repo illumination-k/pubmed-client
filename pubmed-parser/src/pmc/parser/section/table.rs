@@ -17,7 +17,7 @@ impl TableAttrs {
     /// Capture the attributes of a `<table-wrap>` start event.
     pub(super) fn from_start(e: &BytesStart) -> Self {
         Self {
-            id: get_attr(e, b"id"),
+            id: get_attr(e, "id"),
         }
     }
 }
@@ -26,7 +26,7 @@ impl TableAttrs {
 pub(super) fn extract_tables_from_content(content: &str) -> Vec<Table> {
     super::scan_elements(
         content,
-        b"table-wrap",
+        "table-wrap",
         TableAttrs::from_start,
         parse_table_inner,
     )
@@ -50,15 +50,15 @@ pub(super) fn parse_table_inner(
     loop {
         let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
-                b"label" => TableAction::ReadLabel,
-                b"caption" => TableAction::ReadCaption,
-                b"table" => TableAction::ReadTable,
-                b"table-wrap-foot" => TableAction::ReadFootnote,
+                "label" => TableAction::ReadLabel,
+                "caption" => TableAction::ReadCaption,
+                "table" => TableAction::ReadTable,
+                "table-wrap-foot" => TableAction::ReadFootnote,
                 // Wrappers around the table itself: descend.
-                b"alternatives" | b"oasis:table" => TableAction::Continue,
-                other => TableAction::Skip(other.to_vec()),
+                "alternatives" | "oasis:table" => TableAction::Continue,
+                other => TableAction::Skip(other.to_owned()),
             },
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"table-wrap" => TableAction::Done,
+            Ok(Event::End(ref e)) if e.name().as_ref() == "table-wrap" => TableAction::Done,
             Ok(Event::Eof) => TableAction::Done,
             Err(_) => TableAction::Done,
             _ => TableAction::Continue,
@@ -66,10 +66,10 @@ pub(super) fn parse_table_inner(
 
         match action {
             TableAction::ReadLabel => {
-                label = read_text_content(reader, b"label").ok();
+                label = read_text_content(reader, "label").ok();
             }
             TableAction::ReadCaption => {
-                caption = match read_block_text(reader, b"caption") {
+                caption = match read_block_text(reader, "caption") {
                     Ok(text) => Some(text),
                     Err(e) => {
                         warn!(
@@ -122,8 +122,8 @@ fn read_table_rows(
     loop {
         match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
-                b"thead" => in_head = true,
-                b"tr" => {
+                "thead" => in_head = true,
+                "tr" => {
                     let row = read_table_row(reader);
                     if !row.cells.is_empty() {
                         if in_head {
@@ -136,8 +136,8 @@ fn read_table_rows(
                 _ => {}
             },
             Ok(Event::End(ref e)) => match e.name().as_ref() {
-                b"thead" => in_head = false,
-                b"table" => break,
+                "thead" => in_head = false,
+                "table" => break,
                 _ => {}
             },
             Ok(Event::Eof) | Err(_) => break,
@@ -152,11 +152,11 @@ fn read_table_row(reader: &mut quick_xml::Reader<&[u8]>) -> TableRow {
 
     loop {
         match reader.read_event() {
-            Ok(Event::Start(ref e)) if matches!(e.name().as_ref(), b"td" | b"th") => {
-                let is_header = e.name().as_ref() == b"th";
-                let colspan = get_attr(e, b"colspan").and_then(|v| v.trim().parse().ok());
-                let rowspan = get_attr(e, b"rowspan").and_then(|v| v.trim().parse().ok());
-                let tag: &[u8] = if is_header { b"th" } else { b"td" };
+            Ok(Event::Start(ref e)) if matches!(e.name().as_ref(), "td" | "th") => {
+                let is_header = e.name().as_ref() == "th";
+                let colspan = get_attr(e, "colspan").and_then(|v| v.trim().parse().ok());
+                let rowspan = get_attr(e, "rowspan").and_then(|v| v.trim().parse().ok());
+                let tag: &str = if is_header { "th" } else { "td" };
                 let content = read_block_text(reader, tag).unwrap_or_default();
                 cells.push(TableCell {
                     content,
@@ -165,7 +165,7 @@ fn read_table_row(reader: &mut quick_xml::Reader<&[u8]>) -> TableRow {
                     rowspan,
                 });
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"tr" => break,
+            Ok(Event::End(ref e)) if e.name().as_ref() == "tr" => break,
             Ok(Event::Eof) | Err(_) => break,
             _ => {}
         }
@@ -182,8 +182,8 @@ fn read_table_footnotes(reader: &mut quick_xml::Reader<&[u8]>) -> Vec<String> {
 
     loop {
         match reader.read_event() {
-            Ok(Event::Start(ref e)) if matches!(e.name().as_ref(), b"fn" | b"p") => {
-                let tag = e.name().as_ref().to_vec();
+            Ok(Event::Start(ref e)) if matches!(e.name().as_ref(), "fn" | "p") => {
+                let tag = e.name().as_ref().to_owned();
                 if let Ok(text) = read_block_text(reader, &tag)
                     && !text.is_empty()
                 {
@@ -191,11 +191,9 @@ fn read_table_footnotes(reader: &mut quick_xml::Reader<&[u8]>) -> Vec<String> {
                 }
             }
             Ok(Event::Text(ref t)) => {
-                if let Ok(text) = t.decode() {
-                    loose.push_str(&text);
-                }
+                loose.push_str(t);
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"table-wrap-foot" => break,
+            Ok(Event::End(ref e)) if e.name().as_ref() == "table-wrap-foot" => break,
             Ok(Event::Eof) | Err(_) => break,
             _ => {}
         }
@@ -215,7 +213,7 @@ enum TableAction {
     ReadCaption,
     ReadTable,
     ReadFootnote,
-    Skip(Vec<u8>),
+    Skip(String),
 }
 
 #[cfg(test)]

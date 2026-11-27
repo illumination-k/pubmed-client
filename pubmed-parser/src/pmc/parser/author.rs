@@ -72,23 +72,23 @@ pub(crate) fn extract_authors(content: &str) -> Result<Vec<Author>> {
     loop {
         let tag_start = reader.buffer_position() as usize;
         match reader.read_event() {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"contrib" => {
-                let is_author = get_attr(e, b"contrib-type")
+            Ok(Event::Start(ref e)) if e.name().as_ref() == "contrib" => {
+                let is_author = get_attr(e, "contrib-type")
                     .is_none_or(|t| t.trim().eq_ignore_ascii_case("author"));
                 if !is_author {
                     let _ = skip_element(&mut reader, e.name());
                     continue;
                 }
-                let corresp = get_attr(e, b"corresp").is_some_and(|c| c == "yes");
+                let corresp = get_attr(e, "corresp").is_some_and(|c| c == "yes");
                 if let Some(author) = parse_contrib(&mut reader, content, corresp, &aff_index) {
                     authors.push(author);
                 }
             }
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"contrib-group" => {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == "contrib-group" => {
                 group_start = Some(authors.len());
                 group_affs.clear();
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"contrib-group" => {
+            Ok(Event::End(ref e)) if e.name().as_ref() == "contrib-group" => {
                 // An `<aff>` placed in a `<contrib-group>` whose contributors
                 // link none (no `<xref>`, no inline `<aff>`) applies to all of them.
                 if let Some(start) = group_start.take()
@@ -101,15 +101,15 @@ pub(crate) fn extract_authors(content: &str) -> Result<Vec<Author>> {
                     }
                 }
             }
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"aff-alternatives" => {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == "aff-alternatives" => {
                 in_aff_alternatives = true;
                 alternative_taken = false;
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"aff-alternatives" => {
+            Ok(Event::End(ref e)) if e.name().as_ref() == "aff-alternatives" => {
                 in_aff_alternatives = false;
             }
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"aff" => {
-                let id = get_attr(e, b"id");
+            Ok(Event::Start(ref e)) if e.name().as_ref() == "aff" => {
+                let id = get_attr(e, "id");
                 let _ = skip_element(&mut reader, e.name());
                 if in_aff_alternatives && mem::replace(&mut alternative_taken, true) {
                     continue;
@@ -178,43 +178,43 @@ fn parse_contrib(
         let tag_start = reader.buffer_position() as usize;
         let e = match reader.read_event() {
             Ok(Event::Start(e)) => e,
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"contrib" => break,
+            Ok(Event::End(ref e)) if e.name().as_ref() == "contrib" => break,
             Ok(Event::Eof) | Err(_) => break,
             _ => continue,
         };
         let qname = e.name();
         match qname.as_ref() {
-            b"contrib-id" => {
-                let is_orcid = get_attr(&e, b"contrib-id-type").as_deref() == Some("orcid");
-                let value = read_trimmed(reader, b"contrib-id");
+            "contrib-id" => {
+                let is_orcid = get_attr(&e, "contrib-id-type").as_deref() == Some("orcid");
+                let value = read_trimmed(reader, "contrib-id");
                 if is_orcid && orcid.is_none() {
                     orcid = value;
                 }
             }
             // The first name wins; inside `<name-alternatives>` that is the
             // primary (usually romanized) form.
-            tag @ (b"name" | b"string-name") => {
+            tag @ ("name" | "string-name") => {
                 let parts = parse_name_parts(reader, tag);
                 if name.is_none() {
                     name = Some(parts);
                 }
             }
-            b"collab" => {
+            "collab" => {
                 let text = read_collab_text(reader);
                 if collab.is_none() && !text.is_empty() {
                     collab = Some(text);
                 }
             }
-            b"email" => {
-                let value = read_trimmed(reader, b"email");
+            "email" => {
+                let value = read_trimmed(reader, "email");
                 if email.is_none() {
                     email = value;
                 }
             }
-            b"role" => roles.extend(read_trimmed(reader, b"role")),
-            b"xref" => {
-                let ref_type = get_attr(&e, b"ref-type");
-                let rid = get_attr(&e, b"rid");
+            "role" => roles.extend(read_trimmed(reader, "role")),
+            "xref" => {
+                let ref_type = get_attr(&e, "ref-type");
+                let rid = get_attr(&e, "rid");
                 let _ = skip_element(reader, qname);
                 match ref_type.as_deref() {
                     Some("corresp") => is_corresponding = true,
@@ -239,8 +239,8 @@ fn parse_contrib(
                 }
             }
             // Inline `<aff>` inside `<contrib>`.
-            b"aff" => {
-                let id = get_attr(&e, b"id");
+            "aff" => {
+                let id = get_attr(&e, "id");
                 let _ = skip_element(reader, qname);
                 let tag_end = reader.buffer_position() as usize;
                 if let Some(block) = content.get(tag_start..tag_end)
@@ -249,7 +249,7 @@ fn parse_contrib(
                     affiliations.push(resolved);
                 }
             }
-            b"bio" | b"author-comment" | b"on-behalf-of" | b"fn" => {
+            "bio" | "author-comment" | "on-behalf-of" | "fn" => {
                 let _ = skip_element(reader, qname);
             }
             // Wrappers such as `<name-alternatives>` or `<address>`: descend.
@@ -277,7 +277,7 @@ fn parse_contrib(
 }
 
 /// Parse `<name>` / `<string-name>`; the reader has just consumed its start tag.
-fn parse_name_parts(reader: &mut Reader<&[u8]>, tag: &[u8]) -> NameParts {
+fn parse_name_parts(reader: &mut Reader<&[u8]>, tag: &str) -> NameParts {
     let mut parts = NameParts {
         surname: None,
         given_names: None,
@@ -287,12 +287,12 @@ fn parse_name_parts(reader: &mut Reader<&[u8]>, tag: &[u8]) -> NameParts {
     loop {
         match reader.read_event() {
             Ok(Event::Start(ref e)) => {
-                let child = e.name().as_ref().to_vec();
+                let child = e.name().as_ref().to_owned();
                 let value = read_trimmed(reader, &child);
-                let slot = match child.as_slice() {
-                    b"surname" => &mut parts.surname,
-                    b"given-names" => &mut parts.given_names,
-                    b"suffix" => &mut parts.suffix,
+                let slot = match child.as_str() {
+                    "surname" => &mut parts.surname,
+                    "given-names" => &mut parts.given_names,
+                    "suffix" => &mut parts.suffix,
                     _ => continue,
                 };
                 if slot.is_none() {
@@ -318,23 +318,21 @@ fn read_collab_text(reader: &mut Reader<&[u8]>) -> String {
     loop {
         match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
-                b"contrib-group" | b"xref" | b"fn" | b"address" | b"email" => {
+                "contrib-group" | "xref" | "fn" | "address" | "email" => {
                     let _ = skip_element(reader, e.name());
                 }
-                b"collab" => depth += 1,
+                "collab" => depth += 1,
                 _ => {}
             },
             Ok(Event::Text(ref t)) => {
-                if let Ok(decoded) = t.decode() {
-                    text.push_str(&decoded);
-                }
+                text.push_str(t);
             }
             Ok(Event::GeneralRef(ref r)) => {
                 if let Ok(resolved) = resolve_general_ref(r) {
                     text.push_str(&resolved);
                 }
             }
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"collab" => {
+            Ok(Event::End(ref e)) if e.name().as_ref() == "collab" => {
                 depth -= 1;
                 if depth == 0 {
                     break;
@@ -349,7 +347,7 @@ fn read_collab_text(reader: &mut Reader<&[u8]>) -> String {
 }
 
 /// Read the text of `tag` (reader just past its start tag), `None` when empty.
-fn read_trimmed(reader: &mut Reader<&[u8]>, tag: &[u8]) -> Option<String> {
+fn read_trimmed(reader: &mut Reader<&[u8]>, tag: &str) -> Option<String> {
     read_text_content(reader, tag)
         .ok()
         .map(|t| t.trim().to_string())
