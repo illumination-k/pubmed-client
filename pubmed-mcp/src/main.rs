@@ -314,8 +314,8 @@ impl PubMedServer {
 // `Self::tool_router()`, which would ignore the `--tools` filtering.
 #[tool_handler(router = self.tool_router)]
 impl ServerHandler for PubMedServer {
-    fn get_info(&self) -> ServerInfo {
-        ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
+    fn get_info(&self) -> ServerConfig {
+        ServerConfig::new(ServerCapabilities::builder().enable_tools().build())
             .with_server_info(Implementation::new("pubmed-mcp", env!("CARGO_PKG_VERSION")))
             .with_instructions(
                 "PubMed MCP Server - Search and retrieve biomedical literature from PubMed and PMC databases.",
