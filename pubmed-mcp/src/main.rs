@@ -316,11 +316,33 @@ impl PubMedServer {
 impl ServerHandler for PubMedServer {
     fn get_info(&self) -> ServerConfig {
         ServerConfig::new(ServerCapabilities::builder().enable_tools().build())
-            .with_server_info(Implementation::new("pubmed-mcp", env!("CARGO_PKG_VERSION")))
+            .with_server_info(server_implementation())
             .with_instructions(
                 "PubMed MCP Server - Search and retrieve biomedical literature from PubMed and PMC databases.",
             )
     }
+}
+
+/// The server icon, embedded so it reaches the client over stdio with no
+/// network fetch. SVG is one image, scalable to any size the client wants.
+const ICON_SVG: &[u8] = include_bytes!("../assets/icon.svg");
+
+/// `serverInfo` for the `initialize` response: name/version plus the display
+/// metadata (title, icon, website) a client shows in its server list.
+fn server_implementation() -> Implementation {
+    use base64::Engine as _;
+    let icon = Icon::new(format!(
+        "data:image/svg+xml;base64,{}",
+        base64::engine::general_purpose::STANDARD.encode(ICON_SVG)
+    ))
+    .with_mime_type("image/svg+xml")
+    .with_sizes(vec!["any".to_string()]);
+
+    Implementation::new("pubmed-mcp", env!("CARGO_PKG_VERSION"))
+        .with_title("PubMed")
+        .with_description(env!("CARGO_PKG_DESCRIPTION"))
+        .with_icons(vec![icon])
+        .with_website_url("https://illumination-k.github.io/pubmed-client/")
 }
 
 /// The streamable HTTP transport mounted at `/mcp`. An empty `allowed_hosts`

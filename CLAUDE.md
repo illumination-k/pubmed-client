@@ -350,6 +350,11 @@ test in `main.rs` asserts every registered tool advertises an object `outputSche
 `tests/integration_test.rs` drives a whole `search_pubmed` call over stdio against a wiremock-stubbed
 E-utilities endpoint and asserts the `structuredContent` that comes back.
 
+`serverInfo` carries display metadata for client UIs — `title`, `websiteUrl` and one icon
+(`server_implementation()` in `main.rs`). The icon is `assets/icon.svg`, embedded with
+`include_bytes!` and sent as a base64 `data:` URI so a stdio client can render it with no network
+fetch.
+
 Released as a multi-arch container image to GHCR (`ghcr.io/illumination-k/pubmed-mcp`) alongside the
 crates.io publish, from `pubmed-mcp/Dockerfile` (build context is the **workspace root** — the crate
 depends on its siblings by path; `.dockerignore` at the root trims the context but must keep every
