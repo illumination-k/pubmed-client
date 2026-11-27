@@ -31,6 +31,12 @@ async fn test_mcp_server_initialize() -> Result<()> {
     assert_eq!(server_info.name, "pubmed-mcp");
     assert_eq!(server_info.version, env!("CARGO_PKG_VERSION"));
 
+    // The icon travels inline, so a stdio client can render it offline.
+    let icons = server_info.icons.as_deref().unwrap_or_default();
+    assert_eq!(icons.len(), 1);
+    assert!(icons[0].src.starts_with("data:image/svg+xml;base64,"));
+    assert_eq!(icons[0].mime_type.as_deref(), Some("image/svg+xml"));
+
     Ok(())
 }
 
