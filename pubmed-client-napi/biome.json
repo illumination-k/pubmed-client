@@ -52,7 +52,8 @@
       "!**/src",
       "!**/*.node",
       "!index.js",
-      "!**/docs"
+      "!**/docs",
+      "!**/*.md"
     ],
     "ignoreUnknown": false
   },
