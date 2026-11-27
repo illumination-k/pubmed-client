@@ -67,6 +67,7 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
     // Back matter
     let conflict_of_interest = metadata::extract_conflict_of_interest(back);
     let acknowledgments = metadata::extract_acknowledgments(back);
+    let appendices = section::extract_appendices(back);
 
     // These can appear in body or back, so search full content
     let data_availability = metadata::extract_data_availability(xml_content);
@@ -149,14 +150,16 @@ pub fn parse_pmc_xml(xml_content: &str, pmcid: &str) -> Result<PmcArticle> {
         None
     };
 
-    let has_back_content =
-        acknowledgments.is_some() || conflict_of_interest.is_some() || !references.is_empty();
+    let has_back_content = acknowledgments.is_some()
+        || conflict_of_interest.is_some()
+        || !references.is_empty()
+        || !appendices.is_empty();
     let back = if !back.is_empty() || has_back_content {
         Some(Back {
             acknowledgments,
             conflict_of_interest,
             references,
-            appendices: Vec::new(),
+            appendices,
             glossary: Vec::new(),
         })
     } else {

@@ -4,6 +4,7 @@ use crate::pmc::domain::Section;
 use crate::pmc::parser::reader_utils::{get_attr, make_reader};
 use quick_xml::Reader;
 use quick_xml::events::{BytesStart, Event};
+use std::mem;
 
 use super::figure::FigAttrs;
 use super::paragraph::is_block_level;
@@ -12,27 +13,26 @@ use super::{SectionAction, SectionParts};
 
 /// Extract body sections using Reader with depth-aware `<sec>` parsing.
 ///
-/// A `<body>` is either sectioned or loose, and which one it is only becomes
-/// known when the first `<sec>` shows up. Both shapes are therefore tracked in
-/// one pass: `<sec>` children are parsed into `sections`, and everything else
-/// accumulates into `loose`, which is turned into a single synthetic "body"
-/// section only if no `<sec>` was ever seen.
+/// `<sec>` children become sections. Everything else directly under `<body>`
+/// — lead paragraphs before the first `<sec>` (editorials, commentaries),
+/// paragraphs between sections, or a body with no `<sec>` at all — is
+/// collected into `loose` and flushed, in document order, as an untitled
+/// synthetic "body" section whenever a `<sec>` starts or the body ends.
 pub(super) fn extract_body_sections(content: &str) -> Vec<Section> {
     let mut reader = make_reader(content);
     let mut sections = Vec::new();
     let mut loose = SectionParts::default();
-    let mut has_sec_tags = false;
 
     loop {
         let action = match reader.read_event() {
-            Ok(Event::Start(ref e)) => classify_body_child(e, has_sec_tags),
+            Ok(Event::Start(ref e)) => classify_body_child(e),
             Ok(Event::Eof) => SectionAction::Break,
             Err(_) => SectionAction::Break,
             _ => SectionAction::Continue,
         };
 
         if let SectionAction::ReadSection(id) = action {
-            has_sec_tags = true;
+            flush_loose(&mut loose, &mut sections);
             if let Some(section) = parse_section_from_body(&mut reader, id) {
                 sections.push(section);
             }
@@ -44,36 +44,41 @@ pub(super) fn extract_body_sections(content: &str) -> Vec<Section> {
         }
     }
 
-    if sections.is_empty()
-        && let Some(body) = loose.into_body_section()
-    {
-        sections.push(body);
-    }
-
+    flush_loose(&mut loose, &mut sections);
     sections
 }
 
-/// Classify a start element encountered directly under `<body>`.
+/// Move the loose `<body>` children collected so far into `sections`.
 ///
-/// Once a `<sec>` has been seen the body is sectioned, so loose children are
-/// left alone — they belong to a `<sec>` and are consumed by
-/// [`parse_section_from_body`].
-fn classify_body_child(e: &BytesStart, has_sec_tags: bool) -> SectionAction {
-    let name = e.name();
-    let tag = name.as_ref();
-
-    if tag == b"sec" {
-        return SectionAction::ReadSection(get_attr(e, b"id"));
+/// Text becomes a synthetic "body" section. Figures and tables without any
+/// surrounding text are floating displays placed between sections; they are
+/// attached to the preceding section, or kept pending until one exists.
+fn flush_loose(loose: &mut SectionParts, sections: &mut Vec<Section>) {
+    if loose.content_parts.is_empty() {
+        if let Some(previous) = sections.last_mut() {
+            let parts = mem::take(loose);
+            previous.figures.extend(parts.figures);
+            previous.tables.extend(parts.tables);
+            previous
+                .cited_reference_ids
+                .extend(parts.cited_reference_ids);
+        }
+        return;
     }
-    if has_sec_tags {
-        return SectionAction::Continue;
-    }
 
-    match tag {
+    if let Some(section) = mem::take(loose).into_body_section() {
+        sections.push(section);
+    }
+}
+
+/// Classify a start element encountered directly under `<body>`.
+fn classify_body_child(e: &BytesStart) -> SectionAction {
+    match e.name().as_ref() {
+        b"sec" => SectionAction::ReadSection(get_attr(e, b"id")),
         b"p" => SectionAction::ReadParagraph,
         b"fig" => SectionAction::ReadFigure(FigAttrs::from_start(e)),
         b"table-wrap" => SectionAction::ReadTable(TableAttrs::from_start(e)),
-        // Block-level elements per JATS %para-level; — extract text in no-sec bodies
+        // Block-level elements per JATS %para-level; — extract their text
         other if is_block_level(other) => SectionAction::ReadTextElement(other.to_vec()),
         _ => SectionAction::Continue,
     }
@@ -104,12 +109,22 @@ pub(super) fn parse_section_from_body(
     reader: &mut Reader<&[u8]>,
     id: Option<String>,
 ) -> Option<Section> {
+    parse_sectioned_element(reader, id, b"sec")
+}
+
+/// Parse any element with the `<sec>` content model (`<sec>`, `<app>`, ...),
+/// ending at the close tag `end_tag`. The reader has just consumed its start tag.
+pub(super) fn parse_sectioned_element(
+    reader: &mut Reader<&[u8]>,
+    id: Option<String>,
+    end_tag: &[u8],
+) -> Option<Section> {
     let mut parts = SectionParts::default();
 
     loop {
         let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => classify_section_child(e),
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"sec" => SectionAction::Break,
+            Ok(Event::End(ref e)) if e.name().as_ref() == end_tag => SectionAction::Break,
             Ok(Event::Eof) => SectionAction::Break,
             Err(_) => SectionAction::Break,
             _ => SectionAction::Continue,
@@ -154,6 +169,31 @@ mod tests {
             Some("Study Design".to_string())
         );
         assert!(methods.subsections[0].content.contains("Inner content"));
+    }
+
+    #[test]
+    fn test_lead_paragraphs_before_first_section_are_kept() {
+        let content = r#"
+        <body>
+            <p>Lead paragraph of an editorial.</p>
+            <fig id="f1"><label>Figure 1</label><caption><p>Lead figure.</p></caption></fig>
+            <sec id="s1"><title>Background</title><p>Section text.</p></sec>
+            <table-wrap id="t1"><label>Table 1</label><caption><p>Floating table.</p></caption></table-wrap>
+            <sec id="s2"><title>Outlook</title><p>More text.</p></sec>
+            <p>Closing remark.</p>
+        </body>
+        "#;
+
+        let sections = extract_sections_enhanced(content);
+        let titles: Vec<Option<&str>> = sections.iter().map(|s| s.title.as_deref()).collect();
+        assert_eq!(titles, [None, Some("Background"), Some("Outlook"), None]);
+
+        assert_eq!(sections[0].section_type.as_deref(), Some("body"));
+        assert_eq!(sections[0].content, "Lead paragraph of an editorial.");
+        assert_eq!(sections[0].figures.len(), 1);
+        // A display element with no surrounding text joins the preceding section.
+        assert_eq!(sections[1].tables.len(), 1);
+        assert_eq!(sections[3].content, "Closing remark.");
     }
 
     #[test]
