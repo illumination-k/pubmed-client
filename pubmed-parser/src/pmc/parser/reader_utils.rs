@@ -37,10 +37,8 @@ pub(super) fn resolve_general_ref(r: &BytesRef) -> Result<String> {
     {
         return Ok(ch.to_string());
     }
-    let name = r
-        .decode()
-        .map_err(|e| ParseError::XmlError(e.to_string()))?;
-    if let Some(text) = resolve_predefined_entity(&name) {
+    let name: &str = r;
+    if let Some(text) = resolve_predefined_entity(name) {
         return Ok(text.to_string());
     }
     Ok(format!("&{name};"))
@@ -57,7 +55,7 @@ pub(super) fn resolve_general_ref(r: &BytesRef) -> Result<String> {
 /// Uses the borrowing `read_event()` (zero-copy from the source slice) rather than
 /// `read_event_into(&mut buf)`, which would copy every event's bytes into a scratch
 /// `Vec`. On the hot PMC path this avoids a large amount of `memmove` traffic.
-pub(super) fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> Result<String> {
+pub(super) fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &str) -> Result<String> {
     let mut text = String::new();
     let mut depth: u32 = 1;
 
@@ -73,10 +71,7 @@ pub(super) fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -
                 // Mixed content (e.g. "<p>text <b>bold</b> more</p>") arrives as
                 // multiple Text events; the source whitespace around inline tags
                 // is preserved in the events, so we simply concatenate.
-                let decoded = e
-                    .decode()
-                    .map_err(|err| ParseError::XmlError(err.to_string()))?;
-                text.push_str(&decoded);
+                text.push_str(e);
             }
             Ok(Event::GeneralRef(ref e)) => {
                 text.push_str(&resolve_general_ref(e)?);
@@ -110,7 +105,7 @@ pub(super) fn read_text_content(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -
 /// concatenation reads `<title>Results.</title><p>Mean values</p>` as
 /// "Results.Mean values". The reader must have just consumed `Event::Start`
 /// for `parent_tag`.
-pub(super) fn read_block_text(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> Result<String> {
+pub(super) fn read_block_text(reader: &mut Reader<&[u8]>, parent_tag: &str) -> Result<String> {
     let mut text = String::new();
     let mut depth: u32 = 1;
 
@@ -126,10 +121,7 @@ pub(super) fn read_block_text(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> 
                 }
             }
             Ok(Event::Text(ref e)) => {
-                let decoded = e
-                    .decode()
-                    .map_err(|err| ParseError::XmlError(err.to_string()))?;
-                text.push_str(&decoded);
+                text.push_str(e);
             }
             Ok(Event::GeneralRef(ref e)) => {
                 text.push_str(&resolve_general_ref(e)?);
@@ -157,20 +149,20 @@ pub(super) fn read_block_text(reader: &mut Reader<&[u8]>, parent_tag: &[u8]) -> 
 
 /// Elements whose text forms its own block (a heading, paragraph, footnote,
 /// list item, ...), as opposed to inline markup such as `<italic>` or `<sup>`.
-fn is_text_block(tag: &[u8]) -> bool {
+fn is_text_block(tag: &str) -> bool {
     matches!(
         tag,
-        b"title"
-            | b"p"
-            | b"fn"
-            | b"label"
-            | b"list-item"
-            | b"def-item"
-            | b"attrib"
-            | b"disp-quote"
-            | b"td"
-            | b"th"
-            | b"tr"
+        "title"
+            | "p"
+            | "fn"
+            | "label"
+            | "list-item"
+            | "def-item"
+            | "attrib"
+            | "disp-quote"
+            | "td"
+            | "th"
+            | "tr"
     )
 }
 
@@ -196,10 +188,10 @@ pub(super) fn trim_in_place(mut text: String) -> String {
 /// Extract an attribute value from a `BytesStart` event.
 ///
 /// Returns `Some(String)` if the attribute exists, `None` otherwise.
-pub(super) fn get_attr(e: &BytesStart, name: &[u8]) -> Option<String> {
+pub(super) fn get_attr(e: &BytesStart, name: &str) -> Option<String> {
     e.try_get_attribute(name)
         .ok()?
-        .map(|a| String::from_utf8_lossy(&a.value).into_owned())
+        .map(|a| a.value.into_owned())
 }
 
 /// Skip an entire element. The reader must have just consumed `Event::Start` for the tag.
@@ -218,7 +210,7 @@ mod tests {
     use super::*;
 
     /// Advance the reader until a `Start` event for `tag` is consumed.
-    fn advance_to(reader: &mut Reader<&[u8]>, tag: &[u8]) {
+    fn advance_to(reader: &mut Reader<&[u8]>, tag: &str) {
         loop {
             match reader.read_event() {
                 Ok(Event::Start(ref e)) if e.name().as_ref() == tag => break,
@@ -232,9 +224,9 @@ mod tests {
     fn test_read_text_content_simple() {
         let xml = "<root><title>Hello World</title></root>";
         let mut reader = make_reader(xml);
-        advance_to(&mut reader, b"title");
+        advance_to(&mut reader, "title");
 
-        let text = read_text_content(&mut reader, b"title").unwrap();
+        let text = read_text_content(&mut reader, "title").unwrap();
         assert_eq!(text, "Hello World");
     }
 
@@ -242,9 +234,9 @@ mod tests {
     fn test_read_text_content_mixed() {
         let xml = "<p>Normal <b>bold</b> text</p>";
         let mut reader = make_reader(xml);
-        advance_to(&mut reader, b"p");
+        advance_to(&mut reader, "p");
 
-        let text = read_text_content(&mut reader, b"p").unwrap();
+        let text = read_text_content(&mut reader, "p").unwrap();
         assert_eq!(text, "Normal bold text");
     }
 
@@ -252,9 +244,9 @@ mod tests {
     fn test_read_text_content_nested_same_tag() {
         let xml = "<sec><sec><title>Inner</title></sec></sec>";
         let mut reader = make_reader(xml);
-        advance_to(&mut reader, b"sec");
+        advance_to(&mut reader, "sec");
 
-        let text = read_text_content(&mut reader, b"sec").unwrap();
+        let text = read_text_content(&mut reader, "sec").unwrap();
         assert_eq!(text, "Inner");
     }
 
@@ -262,9 +254,9 @@ mod tests {
     fn test_read_text_content_entities() {
         let xml = "<p>CO&amp;2 &lt;levels&gt;</p>";
         let mut reader = make_reader(xml);
-        advance_to(&mut reader, b"p");
+        advance_to(&mut reader, "p");
 
-        let text = read_text_content(&mut reader, b"p").unwrap();
+        let text = read_text_content(&mut reader, "p").unwrap();
         assert_eq!(text, "CO&2 <levels>");
     }
 
@@ -274,12 +266,12 @@ mod tests {
         let mut reader = make_reader(xml);
 
         if let Ok(Event::Start(ref e)) = reader.read_event() {
-            assert_eq!(get_attr(e, b"id"), Some("test-id".to_string()));
+            assert_eq!(get_attr(e, "id"), Some("test-id".to_string()));
             assert_eq!(
-                get_attr(e, b"article-type"),
+                get_attr(e, "article-type"),
                 Some("research-article".to_string())
             );
-            assert_eq!(get_attr(e, b"nonexistent"), None);
+            assert_eq!(get_attr(e, "nonexistent"), None);
         } else {
             panic!("expected Start event");
         }
@@ -292,7 +284,7 @@ mod tests {
 
         // expand_empty_elements turns this into Start + End
         if let Ok(Event::Start(ref e)) = reader.read_event() {
-            assert_eq!(get_attr(e, b"xlink:href"), Some("fig1.jpg".to_string()));
+            assert_eq!(get_attr(e, "xlink:href"), Some("fig1.jpg".to_string()));
         } else {
             panic!("expected Start event");
         }
@@ -308,8 +300,8 @@ mod tests {
 
         // Read <skip> — clone name to avoid borrow conflict
         let skip_name = if let Ok(Event::Start(ref e)) = reader.read_event() {
-            assert_eq!(e.name().as_ref(), b"skip");
-            e.name().0.to_vec()
+            assert_eq!(e.name().as_ref(), "skip");
+            e.name().0.to_owned()
         } else {
             panic!("expected <skip>");
         };
@@ -317,8 +309,8 @@ mod tests {
 
         // Next should be <target>
         if let Ok(Event::Start(ref e)) = reader.read_event() {
-            assert_eq!(e.name().as_ref(), b"target");
-            let text = read_text_content(&mut reader, b"target").unwrap();
+            assert_eq!(e.name().as_ref(), "target");
+            let text = read_text_content(&mut reader, "target").unwrap();
             assert_eq!(text, "found");
         } else {
             panic!("expected <target>");
@@ -329,9 +321,9 @@ mod tests {
     fn test_read_text_content_empty_element() {
         let xml = "<root><title></title></root>";
         let mut reader = make_reader(xml);
-        advance_to(&mut reader, b"title");
+        advance_to(&mut reader, "title");
 
-        let text = read_text_content(&mut reader, b"title").unwrap();
+        let text = read_text_content(&mut reader, "title").unwrap();
         assert_eq!(text, "");
     }
 }

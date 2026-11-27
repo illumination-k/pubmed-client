@@ -74,12 +74,12 @@ fn flush_loose(loose: &mut SectionParts, sections: &mut Vec<Section>) {
 /// Classify a start element encountered directly under `<body>`.
 fn classify_body_child(e: &BytesStart) -> SectionAction {
     match e.name().as_ref() {
-        b"sec" => SectionAction::ReadSection(get_attr(e, b"id")),
-        b"p" => SectionAction::ReadParagraph,
-        b"fig" => SectionAction::ReadFigure(FigAttrs::from_start(e)),
-        b"table-wrap" => SectionAction::ReadTable(TableAttrs::from_start(e)),
+        "sec" => SectionAction::ReadSection(get_attr(e, "id")),
+        "p" => SectionAction::ReadParagraph,
+        "fig" => SectionAction::ReadFigure(FigAttrs::from_start(e)),
+        "table-wrap" => SectionAction::ReadTable(TableAttrs::from_start(e)),
         // Block-level elements per JATS %para-level; — extract their text
-        other if is_block_level(other) => SectionAction::ReadTextElement(other.to_vec()),
+        other if is_block_level(other) => SectionAction::ReadTextElement(other.to_owned()),
         _ => SectionAction::Continue,
     }
 }
@@ -88,14 +88,14 @@ fn classify_body_child(e: &BytesStart) -> SectionAction {
 /// to consume it. Keeps the tag dispatch out of the main parse loop.
 fn classify_section_child(e: &BytesStart) -> SectionAction {
     match e.name().as_ref() {
-        b"title" => SectionAction::ReadTitle,
-        b"p" => SectionAction::ReadParagraph,
-        b"sec" => SectionAction::ReadSection(get_attr(e, b"id")),
-        b"fig" => SectionAction::ReadFigure(FigAttrs::from_start(e)),
-        b"table-wrap" => SectionAction::ReadTable(TableAttrs::from_start(e)),
+        "title" => SectionAction::ReadTitle,
+        "p" => SectionAction::ReadParagraph,
+        "sec" => SectionAction::ReadSection(get_attr(e, "id")),
+        "fig" => SectionAction::ReadFigure(FigAttrs::from_start(e)),
+        "table-wrap" => SectionAction::ReadTable(TableAttrs::from_start(e)),
         // Block-level elements per JATS %para-level; — extract text instead of skipping
-        other if is_block_level(other) => SectionAction::ReadTextElement(other.to_vec()),
-        other => SectionAction::SkipTag(other.to_vec()),
+        other if is_block_level(other) => SectionAction::ReadTextElement(other.to_owned()),
+        other => SectionAction::SkipTag(other.to_owned()),
     }
 }
 
@@ -109,7 +109,7 @@ pub(super) fn parse_section_from_body(
     reader: &mut Reader<&[u8]>,
     id: Option<String>,
 ) -> Option<Section> {
-    parse_sectioned_element(reader, id, b"sec")
+    parse_sectioned_element(reader, id, "sec")
 }
 
 /// Parse any element with the `<sec>` content model (`<sec>`, `<app>`, ...),
@@ -117,7 +117,7 @@ pub(super) fn parse_section_from_body(
 pub(super) fn parse_sectioned_element(
     reader: &mut Reader<&[u8]>,
     id: Option<String>,
-    end_tag: &[u8],
+    end_tag: &str,
 ) -> Option<Section> {
     let mut parts = SectionParts::default();
 

@@ -21,8 +21,8 @@ impl FigAttrs {
     /// Capture the attributes of a `<fig>` start event.
     pub(super) fn from_start(e: &BytesStart) -> Self {
         Self {
-            id: get_attr(e, b"id"),
-            fig_type: get_attr(e, b"fig-type"),
+            id: get_attr(e, "id"),
+            fig_type: get_attr(e, "fig-type"),
         }
     }
 }
@@ -30,7 +30,7 @@ impl FigAttrs {
 /// Extract all `<fig>` elements from content using Reader.
 /// Scans the entire content string regardless of nesting depth.
 pub(super) fn extract_figures_from_content(content: &str) -> Vec<Figure> {
-    super::scan_elements(content, b"fig", FigAttrs::from_start, parse_figure_inner)
+    super::scan_elements(content, "fig", FigAttrs::from_start, parse_figure_inner)
 }
 
 /// Parse figure content after `Event::Start` for `<fig>` has been consumed.
@@ -46,16 +46,16 @@ pub(super) fn parse_figure_inner(
     loop {
         let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
-                b"label" => FigAction::ReadLabel,
-                b"caption" => FigAction::ReadCaption,
-                b"alt-text" => FigAction::ReadAltText,
-                b"graphic" => {
-                    let href = get_attr(e, b"xlink:href").or_else(|| get_attr(e, b"href"));
+                "label" => FigAction::ReadLabel,
+                "caption" => FigAction::ReadCaption,
+                "alt-text" => FigAction::ReadAltText,
+                "graphic" => {
+                    let href = get_attr(e, "xlink:href").or_else(|| get_attr(e, "href"));
                     FigAction::ReadGraphic(href)
                 }
-                other => FigAction::Skip(other.to_vec()),
+                other => FigAction::Skip(other.to_owned()),
             },
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"fig" => FigAction::Done,
+            Ok(Event::End(ref e)) if e.name().as_ref() == "fig" => FigAction::Done,
             Ok(Event::Eof) => FigAction::Done,
             Err(_) => FigAction::Done,
             _ => FigAction::Continue,
@@ -63,10 +63,10 @@ pub(super) fn parse_figure_inner(
 
         match action {
             FigAction::ReadLabel => {
-                label = read_text_content(reader, b"label").ok();
+                label = read_text_content(reader, "label").ok();
             }
             FigAction::ReadCaption => {
-                caption = match read_block_text(reader, b"caption") {
+                caption = match read_block_text(reader, "caption") {
                     Ok(text) => Some(text),
                     Err(e) => {
                         warn!(
@@ -79,11 +79,11 @@ pub(super) fn parse_figure_inner(
                 };
             }
             FigAction::ReadAltText => {
-                alt_text = read_text_content(reader, b"alt-text").ok();
+                alt_text = read_text_content(reader, "alt-text").ok();
             }
             FigAction::ReadGraphic(href) => {
                 file_name = href;
-                let _ = skip_element(reader, QName(b"graphic"));
+                let _ = skip_element(reader, QName("graphic"));
             }
             FigAction::Skip(name) => {
                 let _ = skip_element(reader, QName(&name));
@@ -117,7 +117,7 @@ enum FigAction {
     ReadCaption,
     ReadAltText,
     ReadGraphic(Option<String>),
-    Skip(Vec<u8>),
+    Skip(String),
 }
 
 #[cfg(test)]

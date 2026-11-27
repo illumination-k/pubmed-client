@@ -35,12 +35,12 @@ pub(super) fn extract_abstract_section(content: &str) -> Option<Section> {
     loop {
         let action = match reader.read_event() {
             Ok(Event::Start(ref e)) => match e.name().as_ref() {
-                b"abstract" => AbstractAction::Enter,
-                b"p" if in_abstract => AbstractAction::ReadParagraph,
-                b"title" if in_abstract => AbstractAction::SkipTitle,
+                "abstract" => AbstractAction::Enter,
+                "p" if in_abstract => AbstractAction::ReadParagraph,
+                "title" if in_abstract => AbstractAction::SkipTitle,
                 _ => AbstractAction::Continue,
             },
-            Ok(Event::End(ref e)) if e.name().as_ref() == b"abstract" => AbstractAction::Break,
+            Ok(Event::End(ref e)) if e.name().as_ref() == "abstract" => AbstractAction::Break,
             Ok(Event::Eof) => AbstractAction::Break,
             Err(_) => AbstractAction::Break,
             _ => AbstractAction::Continue,
@@ -49,7 +49,7 @@ pub(super) fn extract_abstract_section(content: &str) -> Option<Section> {
         match action {
             AbstractAction::Enter => in_abstract = true,
             AbstractAction::ReadParagraph => {
-                if let Ok(text) = read_text_content(&mut reader, b"p") {
+                if let Ok(text) = read_text_content(&mut reader, "p") {
                     // `read_text_content` already returns trimmed text.
                     if !text.is_empty() {
                         text_parts.push(text);
@@ -57,7 +57,7 @@ pub(super) fn extract_abstract_section(content: &str) -> Option<Section> {
                 }
             }
             AbstractAction::SkipTitle => {
-                let _ = read_text_content(&mut reader, b"title");
+                let _ = read_text_content(&mut reader, "title");
             }
             AbstractAction::Break => break,
             AbstractAction::Continue => {}

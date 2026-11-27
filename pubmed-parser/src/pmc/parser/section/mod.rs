@@ -92,9 +92,9 @@ pub(crate) fn extract_appendices(back: &str) -> Vec<Section> {
 
     loop {
         match reader.read_event() {
-            Ok(Event::Start(ref e)) if e.name().as_ref() == b"app" => {
-                let id = get_attr(e, b"id");
-                if let Some(mut section) = parse_sectioned_element(&mut reader, id, b"app") {
+            Ok(Event::Start(ref e)) if e.name().as_ref() == "app" => {
+                let id = get_attr(e, "id");
+                if let Some(mut section) = parse_sectioned_element(&mut reader, id, "app") {
                     section.section_type = Some("appendix".to_string());
                     appendices.push(section);
                 }
@@ -121,8 +121,8 @@ enum SectionAction {
     ReadFigure(FigAttrs),
     ReadTable(TableAttrs),
     /// Extract text content from a block-level element (list, def-list, formula, etc.)
-    ReadTextElement(Vec<u8>),
-    SkipTag(Vec<u8>),
+    ReadTextElement(String),
+    SkipTag(String),
 }
 
 /// Accumulators filled while parsing the children of a single `<sec>`.
@@ -152,7 +152,7 @@ impl SectionParts {
         match action {
             SectionAction::ReadTitle => {
                 // `read_text_content` already returns trimmed text.
-                if let Ok(t) = read_text_content(reader, b"title")
+                if let Ok(t) = read_text_content(reader, "title")
                     && !t.is_empty()
                 {
                     self.title = Some(t);
@@ -261,7 +261,7 @@ impl SectionParts {
 /// inner parser.
 fn scan_elements<A, T>(
     content: &str,
-    tag: &[u8],
+    tag: &str,
     extract_attrs: impl Fn(&BytesStart) -> A,
     parse_inner: impl Fn(&mut Reader<&[u8]>, A) -> Option<T>,
 ) -> Vec<T> {
