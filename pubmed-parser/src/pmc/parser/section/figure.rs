@@ -1,7 +1,9 @@
 //! JATS `<fig>` parsing.
 
 use crate::pmc::domain::Figure;
-use crate::pmc::parser::reader_utils::{get_attr, read_text_content, skip_element};
+use crate::pmc::parser::reader_utils::{
+    get_attr, read_block_text, read_text_content, skip_element,
+};
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::name::QName;
 use tracing::warn;
@@ -64,7 +66,7 @@ pub(super) fn parse_figure_inner(
                 label = read_text_content(reader, b"label").ok();
             }
             FigAction::ReadCaption => {
-                caption = match read_text_content(reader, b"caption") {
+                caption = match read_block_text(reader, b"caption") {
                     Ok(text) => Some(text),
                     Err(e) => {
                         warn!(
