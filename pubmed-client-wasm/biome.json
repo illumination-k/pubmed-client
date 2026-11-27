@@ -51,7 +51,8 @@
       "!**/*.wasm",
       "!**/pnpm-lock.yaml",
       "!**/Cargo.lock",
-      "!**/src"
+      "!**/src",
+      "!**/*.md"
     ],
     "ignoreUnknown": false
   },
