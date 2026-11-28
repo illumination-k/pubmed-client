@@ -221,12 +221,7 @@ pub async fn fetch_articles(
     );
 
     let pmid_refs: Vec<&str> = params.pmids.iter().map(|s| s.as_str()).collect();
-    let articles = server
-        .client
-        .pubmed
-        .fetch_articles(&pmid_refs)
-        .await
-        .map_err(|e| internal_error(format!("Failed to fetch articles: {}", e)))?;
+    let articles = fetch_visible_articles(server, &pmid_refs).await?;
 
     let not_found = missing_pmids(&pmid_refs, &articles)
         .into_iter()
@@ -251,6 +246,47 @@ pub async fn fetch_articles(
         not_found,
         articles,
     }))
+}
+
+/// EFetch the given PMIDs, leaving out the ones `--as-of` hides.
+///
+/// Hidden PMIDs are dropped *before* the fetch, so to the caller they are in
+/// every respect PMIDs that EFetch has no record for.
+pub(super) async fn fetch_visible_articles(
+    server: &super::PubMedServer,
+    pmids: &[&str],
+) -> Result<Vec<PubMedArticle>, ErrorData> {
+    let fetch_error = |e| internal_error(format!("Failed to fetch articles: {}", e));
+    let Some(as_of) = server.as_of else {
+        return server
+            .client
+            .pubmed
+            .fetch_articles(pmids)
+            .await
+            .map_err(fetch_error);
+    };
+
+    // An unparseable PMID is the caller's mistake, not a hidden record: let
+    // the client report it exactly as it does without --as-of.
+    let parsed: Vec<u32> = pmids
+        .iter()
+        .map(|pmid| PubMedId::parse(pmid).map(|id| id.as_u32()))
+        .collect::<Result<_, _>>()
+        .map_err(|e| fetch_error(e.into()))?;
+    let visible = server.visible_pmids(as_of, parsed.iter().copied()).await?;
+    let visible_pmids: Vec<&str> = pmids
+        .iter()
+        .zip(&parsed)
+        .filter(|(_, pmid)| visible.contains(pmid))
+        .map(|(pmid, _)| *pmid)
+        .collect();
+
+    server
+        .client
+        .pubmed
+        .fetch_articles(&visible_pmids)
+        .await
+        .map_err(fetch_error)
 }
 
 /// Requested PMIDs that EFetch returned no record for.

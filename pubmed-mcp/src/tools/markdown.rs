@@ -8,7 +8,7 @@ use rmcp::{
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use super::common::{internal_error, normalize_pmc_id};
+use super::common::{fetch_pmc_article, normalize_pmc_id};
 use pubmed_client::PmcMarkdownConverter;
 
 /// Request parameters for PMC markdown conversion
@@ -46,12 +46,7 @@ pub async fn get_pmc_markdown(
 
     info!(pmc_id = %pmc_id, "Fetching PMC article for markdown conversion");
 
-    let article = server
-        .client
-        .pmc
-        .fetch_full_text(&pmc_id)
-        .await
-        .map_err(|e| internal_error(format!("Failed to fetch PMC article: {}", e)))?;
+    let article = fetch_pmc_article(server, &pmc_id).await?;
 
     let converter = PmcMarkdownConverter::new()
         .with_include_metadata(params.include_metadata.unwrap_or(true))

@@ -8,7 +8,7 @@ use rmcp::{
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use super::common::{collect_figures, collect_tables, internal_error, normalize_pmc_id};
+use super::common::{collect_figures, collect_tables, fetch_pmc_article, normalize_pmc_id};
 use super::output::{FigureOut, TableOut};
 
 /// Request parameters for get_pmc_figures tool
@@ -45,12 +45,7 @@ pub async fn get_pmc_figures(
 
     info!(pmc_id = %pmc_id, "Extracting figures from PMC article");
 
-    let article = server
-        .client
-        .pmc
-        .fetch_full_text(&pmc_id)
-        .await
-        .map_err(|e| internal_error(format!("Failed to fetch PMC article: {}", e)))?;
+    let article = fetch_pmc_article(server, &pmc_id).await?;
 
     let figures: Vec<FigureOut> = collect_figures(article.sections())
         .into_iter()

@@ -104,6 +104,13 @@ pub async fn fetch_summaries(
 
     let summaries: Vec<ArticleSummaryOut> = summaries
         .iter()
+        // ESummary carries the Entrez date itself, so the answer is its own
+        // date lookup under --as-of.
+        .filter(|summary| {
+            server
+                .as_of
+                .is_none_or(|as_of| as_of.admits(super::as_of::pubmed_available_on(summary)))
+        })
         .map(|summary| ArticleSummaryOut {
             pmid: summary.pmid.clone(),
             title: summary.title.clone(),

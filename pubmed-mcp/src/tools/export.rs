@@ -9,7 +9,7 @@ use rmcp::{
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use super::common::{internal_error, invalid_params};
+use super::common::invalid_params;
 
 /// Export format for citations
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, schemars::JsonSchema)]
@@ -71,12 +71,7 @@ pub async fn export_citations(
     );
 
     let pmid_refs: Vec<&str> = params.pmids.iter().map(|s| s.as_str()).collect();
-    let articles = server
-        .client
-        .pubmed
-        .fetch_articles(&pmid_refs)
-        .await
-        .map_err(|e| internal_error(format!("Failed to fetch articles: {}", e)))?;
+    let articles = super::articles::fetch_visible_articles(server, &pmid_refs).await?;
 
     let content = match format {
         ExportFormat::Bibtex => pubmed_client::export::articles_to_bibtex(&articles),

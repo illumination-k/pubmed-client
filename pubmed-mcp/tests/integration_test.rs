@@ -5,7 +5,7 @@ use rmcp::{
     transport::{ConfigureCommandExt, TokioChildProcess},
 };
 use tokio::process::Command;
-use wiremock::matchers::{method, path};
+use wiremock::matchers::{method, path, query_param};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[tokio::test]
@@ -355,6 +355,91 @@ async fn test_tool_call_returns_structured_content() -> Result<()> {
     assert_eq!(
         serde_json::from_str::<serde_json::Value>(&text)?,
         structured
+    );
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_as_of_bounds_the_search_and_is_reported() -> Result<()> {
+    // `--as-of` end to end: the flag reaches ESearch as an Entrez-date bound,
+    // the answer says which day the server runs as of, and the one tool that
+    // cannot be bounded is not listed.
+    let ncbi = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/esearch.fcgi"))
+        .and(query_param("datetype", "crdt"))
+        .and(query_param("mindate", "1000/01/01"))
+        .and(query_param("maxdate", "2020/01/31"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(ESEARCH_RESPONSE))
+        .mount(&ncbi)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/efetch.fcgi"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(EFETCH_RESPONSE))
+        .mount(&ncbi)
+        .await;
+
+    // Each hit's own dates are checked before it is fetched.
+    Mock::given(method("GET"))
+        .and(path("/esummary.fcgi"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(
+            r#"{"result":{"uids":["31978945"],"31978945":{"uid":"31978945","history":[{"pubstatus":"pubmed","date":"2020/01/25 06:00"},{"pubstatus":"entrez","date":"2020/01/25 06:00"}]}}}"#,
+        ))
+        .mount(&ncbi)
+        .await;
+
+    let base_url = ncbi.uri();
+    let client = ()
+        .serve(TokioChildProcess::new(Command::new("cargo").configure(
+            |cmd| {
+                cmd.arg("run")
+                    .arg("-p")
+                    .arg("pubmed-mcp")
+                    .arg("--quiet")
+                    .arg("--")
+                    .arg("--base-url")
+                    .arg(&base_url)
+                    // Set through the environment, as an MCP host config would.
+                    .env("PUBMED_MCP_AS_OF", "2020-02-01");
+            },
+        ))?)
+        .await?;
+
+    let tools = client.list_all_tools().await?;
+    assert!(tools.iter().any(|tool| tool.name == "search_pubmed"));
+    assert!(
+        !tools.iter().any(|tool| tool.name == "global_query"),
+        "global_query cannot be bounded by date and must not be offered"
+    );
+    let instructions = client
+        .peer_info()
+        .and_then(|info| info.instructions.clone())
+        .unwrap_or_default();
+    assert!(instructions.contains("As of 2020-02-01"), "{instructions}");
+
+    let arguments = serde_json::json!({ "query": "things", "max_results": 1 });
+    let result = client
+        .call_tool(
+            CallToolRequestParams::new("search_pubmed").with_arguments(
+                arguments
+                    .as_object()
+                    .expect("arguments should be a JSON object")
+                    .clone(),
+            ),
+        )
+        .await?;
+
+    let structured = result
+        .structured_content
+        .expect("search_pubmed should answer with structuredContent");
+    assert_eq!(structured["as_of"], "2020-02-01");
+    assert_eq!(structured["count"], 1);
+    assert!(
+        structured["filters_applied"][0]
+            .as_str()
+            .is_some_and(|filter| filter.starts_with("As of 2020-02-01")),
+        "{structured}"
     );
 
     Ok(())

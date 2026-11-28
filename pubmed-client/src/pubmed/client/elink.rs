@@ -2,6 +2,7 @@
 
 use crate::error::Result;
 use crate::pubmed::models::{Citations, PmcLinks, RelatedArticles};
+use crate::pubmed::query::SearchDateRange;
 use crate::pubmed::responses::ELinkResponse;
 use tracing::{debug, info, instrument};
 
@@ -33,6 +34,27 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(pmids_count = pmids.len()))]
     pub async fn get_related_articles(&self, pmids: &[u32]) -> Result<RelatedArticles> {
+        self.related_articles(pmids, None).await
+    }
+
+    /// Find related articles whose date of the given type falls inside a range
+    ///
+    /// Same as [`get_related_articles`](Self::get_related_articles), with the
+    /// range applied by ELink itself (`datetype` / `mindate` / `maxdate`).
+    #[instrument(skip(self, range), fields(pmids_count = pmids.len()))]
+    pub async fn get_related_articles_in_date_range(
+        &self,
+        pmids: &[u32],
+        range: &SearchDateRange,
+    ) -> Result<RelatedArticles> {
+        self.related_articles(pmids, Some(range)).await
+    }
+
+    async fn related_articles(
+        &self,
+        pmids: &[u32],
+        range: Option<&SearchDateRange>,
+    ) -> Result<RelatedArticles> {
         if pmids.is_empty() {
             return Ok(RelatedArticles {
                 source_pmids: Vec::new(),
@@ -41,7 +63,9 @@ impl PubMedClient {
             });
         }
 
-        let elink_response = self.elink_request(pmids, "pubmed", "pubmed_pubmed").await?;
+        let elink_response = self
+            .elink_request(pmids, "pubmed", "pubmed_pubmed", range)
+            .await?;
 
         let mut all_related_pmids = Self::collect_linked_pmids(elink_response, "pubmed_pubmed");
         // Drop the original PMIDs from their own related set
@@ -92,7 +116,7 @@ impl PubMedClient {
             });
         }
 
-        let elink_response = self.elink_request(pmids, "pmc", "pubmed_pmc").await?;
+        let elink_response = self.elink_request(pmids, "pmc", "pubmed_pmc", None).await?;
 
         let mut pmc_ids = Vec::new();
 
@@ -165,6 +189,25 @@ impl PubMedClient {
     /// ```
     #[instrument(skip(self), fields(pmids_count = pmids.len()))]
     pub async fn get_citations(&self, pmids: &[u32]) -> Result<Citations> {
+        self.citations(pmids, None).await
+    }
+
+    /// Get citing articles whose date of the given type falls inside a range
+    ///
+    /// Same as [`get_citations`](Self::get_citations), with the range applied
+    /// by ELink itself (`datetype` / `mindate` / `maxdate`). A heavily cited
+    /// article has tens of thousands of citing records; bounding them at the
+    /// source avoids transferring all of them to filter locally.
+    #[instrument(skip(self, range), fields(pmids_count = pmids.len()))]
+    pub async fn get_citations_in_date_range(
+        &self,
+        pmids: &[u32],
+        range: &SearchDateRange,
+    ) -> Result<Citations> {
+        self.citations(pmids, Some(range)).await
+    }
+
+    async fn citations(&self, pmids: &[u32], range: Option<&SearchDateRange>) -> Result<Citations> {
         if pmids.is_empty() {
             return Ok(Citations {
                 source_pmids: Vec::new(),
@@ -174,7 +217,7 @@ impl PubMedClient {
         }
 
         let elink_response = self
-            .elink_request(pmids, "pubmed", "pubmed_pubmed_citedin")
+            .elink_request(pmids, "pubmed", "pubmed_pubmed_citedin", range)
             .await?;
 
         let citing_pmids = Self::collect_linked_pmids(elink_response, "pubmed_pubmed_citedin");
@@ -226,24 +269,26 @@ impl PubMedClient {
         pmids: &[u32],
         target_db: &str,
         link_name: &str,
+        range: Option<&SearchDateRange>,
     ) -> Result<ELinkResponse> {
         // Convert PMIDs to strings and join with commas
         let id_list: Vec<String> = pmids.iter().map(|id| id.to_string()).collect();
         let ids = id_list.join(",");
 
         debug!("Making ELink API request");
-        let response = self
-            .get_eutils(
-                "elink.fcgi",
-                &[
-                    ("dbfrom", "pubmed"),
-                    ("db", target_db),
-                    ("id", ids.as_str()),
-                    ("linkname", link_name),
-                    ("retmode", "json"),
-                ],
-            )
-            .await?;
+        let mut params = vec![
+            ("dbfrom", "pubmed"),
+            ("db", target_db),
+            ("id", ids.as_str()),
+            ("linkname", link_name),
+            ("retmode", "json"),
+        ];
+        if let Some(range) = range {
+            params.push(("datetype", range.date_type.as_api_param()));
+            params.push(("mindate", range.min_date.as_str()));
+            params.push(("maxdate", range.max_date.as_str()));
+        }
+        let response = self.get_eutils("elink.fcgi", &params).await?;
 
         let elink_response: ELinkResponse = response.json().await?;
         Ok(elink_response)

@@ -10,6 +10,42 @@ use tracing::info;
 
 use super::common::{internal_error, invalid_params};
 
+/// The PMIDs to send to ELink: all of them, or under `--as-of` only the
+/// visible ones. A hidden source PMID then contributes no links, which is
+/// what ELink answers for a PMID it does not know.
+///
+/// The tools echo the *requested* PMIDs as `source_pmids` either way, as
+/// ELink itself does, so the echo says nothing about which were hidden.
+async fn visible_sources(
+    server: &super::PubMedServer,
+    pmids: &[u32],
+) -> Result<Vec<u32>, ErrorData> {
+    let Some(as_of) = server.as_of else {
+        return Ok(pmids.to_vec());
+    };
+    let visible = server.visible_pmids(as_of, pmids.iter().copied()).await?;
+    Ok(pmids
+        .iter()
+        .copied()
+        .filter(|pmid| visible.contains(pmid))
+        .collect())
+}
+
+/// Drop the linked PMIDs that `--as-of` hides, keeping ELink's order.
+async fn visible_links(
+    server: &super::PubMedServer,
+    linked: Vec<u32>,
+) -> Result<Vec<u32>, ErrorData> {
+    let Some(as_of) = server.as_of else {
+        return Ok(linked);
+    };
+    let visible = server.visible_pmids(as_of, linked.iter().copied()).await?;
+    Ok(linked
+        .into_iter()
+        .filter(|pmid| visible.contains(pmid))
+        .collect())
+}
+
 /// Request parameters for get_related_articles tool
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub struct RelatedArticlesRequest {
@@ -50,18 +86,26 @@ pub async fn get_related_articles(
         "Finding related articles"
     );
 
-    let related = server
-        .client
-        .pubmed
-        .get_related_articles(&params.pmids)
-        .await
-        .map_err(|e| internal_error(format!("Failed to get related articles: {}", e)))?;
+    let sources = visible_sources(server, &params.pmids).await?;
+    let pubmed = &server.client.pubmed;
+    // Under --as-of ELink narrows the list at the source; `visible_links`
+    // then applies the whole rule to what is left.
+    let related = match server.as_of {
+        Some(as_of) => {
+            pubmed
+                .get_related_articles_in_date_range(&sources, &as_of.eutils_range())
+                .await
+        }
+        None => pubmed.get_related_articles(&sources).await,
+    }
+    .map_err(|e| internal_error(format!("Failed to get related articles: {}", e)))?;
+    let related_pmids = visible_links(server, related.related_pmids).await?;
 
     Ok(Json(RelatedArticlesOutput {
-        source_pmids: related.source_pmids,
+        source_pmids: params.pmids,
         link_type: related.link_type,
-        total: related.related_pmids.len(),
-        related_pmids: related.related_pmids.into_iter().take(max).collect(),
+        total: related_pmids.len(),
+        related_pmids: related_pmids.into_iter().take(max).collect(),
     }))
 }
 
@@ -107,18 +151,27 @@ pub async fn get_citations(
         "Finding citing articles"
     );
 
-    let citations = server
-        .client
-        .pubmed
-        .get_citations(&params.pmids)
-        .await
-        .map_err(|e| internal_error(format!("Failed to get citations: {}", e)))?;
+    let sources = visible_sources(server, &params.pmids).await?;
+    let pubmed = &server.client.pubmed;
+    // A heavily cited article has tens of thousands of citing records, nearly
+    // all later than D: ELink narrows the list at the source, and
+    // `visible_links` applies the whole rule to what is left.
+    let citations = match server.as_of {
+        Some(as_of) => {
+            pubmed
+                .get_citations_in_date_range(&sources, &as_of.eutils_range())
+                .await
+        }
+        None => pubmed.get_citations(&sources).await,
+    }
+    .map_err(|e| internal_error(format!("Failed to get citations: {}", e)))?;
+    let citing_pmids = visible_links(server, citations.citing_pmids).await?;
 
     Ok(Json(CitationsOutput {
-        source_pmids: citations.source_pmids,
+        source_pmids: params.pmids,
         link_type: citations.link_type,
-        total: citations.citing_pmids.len(),
-        citing_pmids: citations.citing_pmids.into_iter().take(max).collect(),
+        total: citing_pmids.len(),
+        citing_pmids: citing_pmids.into_iter().take(max).collect(),
     }))
 }
 
@@ -157,10 +210,11 @@ pub async fn get_pmc_links(
         "Checking PMC availability"
     );
 
+    let sources = visible_sources(server, &params.pmids).await?;
     let pmc_links = server
         .client
         .pubmed
-        .get_pmc_links(&params.pmids)
+        .get_pmc_links(&sources)
         .await
         .map_err(|e| internal_error(format!("Failed to get PMC links: {}", e)))?;
 
@@ -173,7 +227,7 @@ pub async fn get_pmc_links(
         .collect();
 
     Ok(Json(PmcLinksOutput {
-        source_pmids: pmc_links.source_pmids,
+        source_pmids: params.pmids,
         count: pmc_ids.len(),
         pmc_ids,
     }))

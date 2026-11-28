@@ -9,12 +9,13 @@ use rmcp::{
 };
 use std::collections::HashSet;
 use std::sync::Arc;
-use tracing::info;
+use tracing::{info, warn};
 
 mod config;
 mod tools;
 use config::ClientArgs;
 use tools::PubMedServer;
+use tools::as_of::{AsOf, Bounded};
 
 #[derive(Parser)]
 #[command(name = "pubmed-mcp", about = "PubMed MCP Server")]
@@ -38,6 +39,13 @@ struct Args {
     /// use when the server sits behind a reverse proxy or load balancer.
     #[arg(long, env = "PUBMED_MCP_ALLOWED_HOSTS", value_delimiter = ',')]
     allowed_hosts: Vec<String>,
+
+    /// Behave as if the server ran on this day (YYYY-MM-DD), for backtests.
+    /// No tool returns a record that became available on or after it (PubMed
+    /// Entrez date, Europe PMC first index date), and such a record looks
+    /// exactly like one that does not exist. `global_query` is not offered.
+    #[arg(long, env = "PUBMED_MCP_AS_OF", value_name = "YYYY-MM-DD")]
+    as_of: Option<AsOf>,
 
     #[command(flatten)]
     client: ClientArgs,
@@ -104,8 +112,8 @@ impl PubMedServer {
     async fn search_pubmed(
         &self,
         params: Parameters<tools::search::SearchRequest>,
-    ) -> Result<Json<tools::search::SearchOutput>, ErrorData> {
-        tools::search::search_pubmed(self, params).await
+    ) -> Result<Json<Bounded<tools::search::SearchOutput>>, ErrorData> {
+        self.bounded(tools::search::search_pubmed(self, params).await)
     }
 
     #[tool(
@@ -114,8 +122,8 @@ impl PubMedServer {
     async fn get_pmc_markdown(
         &self,
         params: Parameters<tools::markdown::MarkdownRequest>,
-    ) -> Result<Json<tools::markdown::MarkdownOutput>, ErrorData> {
-        tools::markdown::get_pmc_markdown(self, params).await
+    ) -> Result<Json<Bounded<tools::markdown::MarkdownOutput>>, ErrorData> {
+        self.bounded(tools::markdown::get_pmc_markdown(self, params).await)
     }
 
     #[tool(
@@ -124,8 +132,8 @@ impl PubMedServer {
     async fn match_citations(
         &self,
         params: Parameters<tools::citmatch::CitMatchRequest>,
-    ) -> Result<Json<tools::citmatch::CitMatchOutput>, ErrorData> {
-        tools::citmatch::match_citations(self, params).await
+    ) -> Result<Json<Bounded<tools::citmatch::CitMatchOutput>>, ErrorData> {
+        self.bounded(tools::citmatch::match_citations(self, params).await)
     }
 
     #[tool(
@@ -134,8 +142,8 @@ impl PubMedServer {
     async fn global_query(
         &self,
         params: Parameters<tools::gquery::GlobalQueryRequest>,
-    ) -> Result<Json<tools::gquery::GlobalQueryOutput>, ErrorData> {
-        tools::gquery::global_query(self, params).await
+    ) -> Result<Json<Bounded<tools::gquery::GlobalQueryOutput>>, ErrorData> {
+        self.bounded(tools::gquery::global_query(self, params).await)
     }
 
     #[tool(
@@ -144,8 +152,8 @@ impl PubMedServer {
     async fn spell_check(
         &self,
         params: Parameters<tools::espell::SpellCheckRequest>,
-    ) -> Result<Json<tools::espell::SpellCheckOutput>, ErrorData> {
-        tools::espell::spell_check(self, params).await
+    ) -> Result<Json<Bounded<tools::espell::SpellCheckOutput>>, ErrorData> {
+        self.bounded(tools::espell::spell_check(self, params).await)
     }
 
     #[tool(
@@ -154,8 +162,8 @@ impl PubMedServer {
     async fn fetch_summaries(
         &self,
         params: Parameters<tools::summary::SummaryRequest>,
-    ) -> Result<Json<tools::summary::SummariesOutput>, ErrorData> {
-        tools::summary::fetch_summaries(self, params).await
+    ) -> Result<Json<Bounded<tools::summary::SummariesOutput>>, ErrorData> {
+        self.bounded(tools::summary::fetch_summaries(self, params).await)
     }
 
     #[tool(
@@ -164,8 +172,8 @@ impl PubMedServer {
     async fn fetch_articles(
         &self,
         params: Parameters<tools::articles::ArticlesRequest>,
-    ) -> Result<Json<tools::articles::ArticlesOutput>, ErrorData> {
-        tools::articles::fetch_articles(self, params).await
+    ) -> Result<Json<Bounded<tools::articles::ArticlesOutput>>, ErrorData> {
+        self.bounded(tools::articles::fetch_articles(self, params).await)
     }
 
     #[tool(
@@ -174,8 +182,8 @@ impl PubMedServer {
     async fn get_related_articles(
         &self,
         params: Parameters<tools::elink::RelatedArticlesRequest>,
-    ) -> Result<Json<tools::elink::RelatedArticlesOutput>, ErrorData> {
-        tools::elink::get_related_articles(self, params).await
+    ) -> Result<Json<Bounded<tools::elink::RelatedArticlesOutput>>, ErrorData> {
+        self.bounded(tools::elink::get_related_articles(self, params).await)
     }
 
     #[tool(
@@ -184,8 +192,8 @@ impl PubMedServer {
     async fn get_citations(
         &self,
         params: Parameters<tools::elink::CitationsRequest>,
-    ) -> Result<Json<tools::elink::CitationsOutput>, ErrorData> {
-        tools::elink::get_citations(self, params).await
+    ) -> Result<Json<Bounded<tools::elink::CitationsOutput>>, ErrorData> {
+        self.bounded(tools::elink::get_citations(self, params).await)
     }
 
     #[tool(
@@ -194,8 +202,8 @@ impl PubMedServer {
     async fn get_pmc_links(
         &self,
         params: Parameters<tools::elink::PmcLinksRequest>,
-    ) -> Result<Json<tools::elink::PmcLinksOutput>, ErrorData> {
-        tools::elink::get_pmc_links(self, params).await
+    ) -> Result<Json<Bounded<tools::elink::PmcLinksOutput>>, ErrorData> {
+        self.bounded(tools::elink::get_pmc_links(self, params).await)
     }
 
     #[tool(
@@ -204,8 +212,8 @@ impl PubMedServer {
     async fn list_databases(
         &self,
         params: Parameters<tools::einfo::ListDatabasesRequest>,
-    ) -> Result<Json<tools::einfo::DatabaseListOutput>, ErrorData> {
-        tools::einfo::list_databases(self, params).await
+    ) -> Result<Json<Bounded<tools::einfo::DatabaseListOutput>>, ErrorData> {
+        self.bounded(tools::einfo::list_databases(self, params).await)
     }
 
     #[tool(
@@ -214,8 +222,8 @@ impl PubMedServer {
     async fn get_database_info(
         &self,
         params: Parameters<tools::einfo::DatabaseInfoRequest>,
-    ) -> Result<Json<tools::einfo::DatabaseInfoOutput>, ErrorData> {
-        tools::einfo::get_database_info(self, params).await
+    ) -> Result<Json<Bounded<tools::einfo::DatabaseInfoOutput>>, ErrorData> {
+        self.bounded(tools::einfo::get_database_info(self, params).await)
     }
 
     #[tool(
@@ -224,8 +232,8 @@ impl PubMedServer {
     async fn get_pmc_fulltext(
         &self,
         params: Parameters<tools::fulltext::FullTextRequest>,
-    ) -> Result<Json<tools::fulltext::FullTextOutput>, ErrorData> {
-        tools::fulltext::get_pmc_fulltext(self, params).await
+    ) -> Result<Json<Bounded<tools::fulltext::FullTextOutput>>, ErrorData> {
+        self.bounded(tools::fulltext::get_pmc_fulltext(self, params).await)
     }
 
     #[tool(
@@ -234,8 +242,8 @@ impl PubMedServer {
     async fn get_pmc_figures(
         &self,
         params: Parameters<tools::figures::FiguresRequest>,
-    ) -> Result<Json<tools::figures::FiguresOutput>, ErrorData> {
-        tools::figures::get_pmc_figures(self, params).await
+    ) -> Result<Json<Bounded<tools::figures::FiguresOutput>>, ErrorData> {
+        self.bounded(tools::figures::get_pmc_figures(self, params).await)
     }
 
     #[tool(
@@ -244,8 +252,8 @@ impl PubMedServer {
     async fn pmid_to_pmcid(
         &self,
         params: Parameters<tools::convert::ConvertIdRequest>,
-    ) -> Result<Json<tools::convert::ConvertIdOutput>, ErrorData> {
-        tools::convert::pmid_to_pmcid(self, params).await
+    ) -> Result<Json<Bounded<tools::convert::ConvertIdOutput>>, ErrorData> {
+        self.bounded(tools::convert::pmid_to_pmcid(self, params).await)
     }
 
     #[tool(
@@ -254,8 +262,8 @@ impl PubMedServer {
     async fn export_citations(
         &self,
         params: Parameters<tools::export::ExportRequest>,
-    ) -> Result<Json<tools::export::ExportOutput>, ErrorData> {
-        tools::export::export_citations(self, params).await
+    ) -> Result<Json<Bounded<tools::export::ExportOutput>>, ErrorData> {
+        self.bounded(tools::export::export_citations(self, params).await)
     }
 
     #[tool(
@@ -264,8 +272,8 @@ impl PubMedServer {
     async fn europe_pmc_search(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcSearchRequest>,
-    ) -> Result<Json<tools::europe_pmc::EuropePmcSearchOutput>, ErrorData> {
-        tools::europe_pmc::europe_pmc_search(self, params).await
+    ) -> Result<Json<Bounded<tools::europe_pmc::EuropePmcSearchOutput>>, ErrorData> {
+        self.bounded(tools::europe_pmc::europe_pmc_search(self, params).await)
     }
 
     #[tool(
@@ -274,8 +282,8 @@ impl PubMedServer {
     async fn europe_pmc_fulltext(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcFullTextRequest>,
-    ) -> Result<Json<tools::europe_pmc::EuropePmcFullTextOutput>, ErrorData> {
-        tools::europe_pmc::europe_pmc_fulltext(self, params).await
+    ) -> Result<Json<Bounded<tools::europe_pmc::EuropePmcFullTextOutput>>, ErrorData> {
+        self.bounded(tools::europe_pmc::europe_pmc_fulltext(self, params).await)
     }
 
     #[tool(
@@ -284,8 +292,8 @@ impl PubMedServer {
     async fn europe_pmc_references(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcCitationGraphRequest>,
-    ) -> Result<Json<tools::europe_pmc::EuropePmcCitationGraphOutput>, ErrorData> {
-        tools::europe_pmc::europe_pmc_references(self, params).await
+    ) -> Result<Json<Bounded<tools::europe_pmc::EuropePmcCitationGraphOutput>>, ErrorData> {
+        self.bounded(tools::europe_pmc::europe_pmc_references(self, params).await)
     }
 
     #[tool(
@@ -294,8 +302,8 @@ impl PubMedServer {
     async fn europe_pmc_citations(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcCitationGraphRequest>,
-    ) -> Result<Json<tools::europe_pmc::EuropePmcCitationGraphOutput>, ErrorData> {
-        tools::europe_pmc::europe_pmc_citations(self, params).await
+    ) -> Result<Json<Bounded<tools::europe_pmc::EuropePmcCitationGraphOutput>>, ErrorData> {
+        self.bounded(tools::europe_pmc::europe_pmc_citations(self, params).await)
     }
 
     #[tool(
@@ -304,8 +312,8 @@ impl PubMedServer {
     async fn europe_pmc_database_links(
         &self,
         params: Parameters<tools::europe_pmc::EuropePmcDatabaseLinksRequest>,
-    ) -> Result<Json<tools::europe_pmc::EuropePmcDatabaseLinksOutput>, ErrorData> {
-        tools::europe_pmc::europe_pmc_database_links(self, params).await
+    ) -> Result<Json<Bounded<tools::europe_pmc::EuropePmcDatabaseLinksOutput>>, ErrorData> {
+        self.bounded(tools::europe_pmc::europe_pmc_database_links(self, params).await)
     }
 }
 
@@ -315,11 +323,13 @@ impl PubMedServer {
 #[tool_handler(router = self.tool_router)]
 impl ServerHandler for PubMedServer {
     fn get_info(&self) -> ServerConfig {
+        let mut instructions = "PubMed MCP Server - Search and retrieve biomedical literature from PubMed and PMC databases.".to_string();
+        if let Some(as_of) = self.as_of {
+            instructions.push_str(&format!(" {}.", as_of.describe()));
+        }
         ServerConfig::new(ServerCapabilities::builder().enable_tools().build())
             .with_server_info(server_implementation())
-            .with_instructions(
-                "PubMed MCP Server - Search and retrieve biomedical literature from PubMed and PMC databases.",
-            )
+            .with_instructions(instructions)
     }
 }
 
@@ -350,6 +360,7 @@ fn server_implementation() -> Implementation {
 fn http_router(
     client: Arc<pubmed_client::Client>,
     enabled_tools: Option<Arc<HashSet<String>>>,
+    as_of: Option<AsOf>,
     allowed_hosts: &[String],
 ) -> axum::Router {
     use rmcp::transport::streamable_http_server::{
@@ -364,6 +375,7 @@ fn http_router(
             Ok(tools::PubMedServer::with_options(
                 Arc::clone(&client),
                 enabled_tools.as_deref(),
+                as_of,
             ))
         },
         LocalSessionManager::default().into(),
@@ -405,10 +417,23 @@ async fn main() -> Result<()> {
         "Client configured"
     );
 
+    if let Some(as_of) = args.as_of {
+        info!(%as_of, "Running as of a past date; later records are hidden");
+        for tool in &args.tools {
+            if tools::UNAVAILABLE_AS_OF.contains(&tool.as_str()) {
+                warn!(
+                    tool = tool.as_str(),
+                    "Tool cannot be bounded by --as-of and is not offered"
+                );
+            }
+        }
+    }
+
     if let Some(port) = args.port {
         let router = http_router(
             Arc::new(pubmed_client::Client::with_config(client_config)),
             enabled_tools,
+            args.as_of,
             &args.allowed_hosts,
         );
         let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
@@ -418,6 +443,7 @@ async fn main() -> Result<()> {
         let service = tools::PubMedServer::with_options(
             Arc::new(pubmed_client::Client::with_config(client_config)),
             enabled_tools.as_deref(),
+            args.as_of,
         )
         .serve(stdio())
         .await?;
@@ -437,7 +463,12 @@ mod tests {
     /// Serves `http_router` on an ephemeral loopback port and returns the
     /// status code of an `initialize` POST carrying the given `Host` header.
     async fn initialize_status(allowed_hosts: &[String], host: &str) -> u16 {
-        let router = http_router(Arc::new(pubmed_client::Client::new()), None, allowed_hosts);
+        let router = http_router(
+            Arc::new(pubmed_client::Client::new()),
+            None,
+            None,
+            allowed_hosts,
+        );
         let listener = tokio::net::TcpListener::bind(("127.0.0.1", 0))
             .await
             .unwrap();
@@ -555,6 +586,65 @@ mod tests {
                 "{}'s outputSchema should describe a JSON object, got: {schema:?}",
                 tool.name
             );
+        }
+    }
+
+    /// The as-of date is how an agent and the person reading its transcript
+    /// learn that the view is bounded, so no tool may answer without a place
+    /// for it — including the tools whose data `--as-of` leaves unchanged.
+    #[test]
+    fn every_tool_can_report_the_as_of_date() {
+        for tool in PubMedServer::tool_router().list_all() {
+            let schema = tool.output_schema.as_ref().unwrap();
+            assert!(
+                schema
+                    .get("properties")
+                    .and_then(|properties| properties.get("as_of"))
+                    .is_some(),
+                "{}'s outputSchema has no `as_of` property: {schema:?}",
+                tool.name
+            );
+        }
+    }
+
+    #[test]
+    fn answers_carry_the_as_of_date_only_when_one_is_set() {
+        let answer = |as_of: Option<AsOf>| {
+            let server =
+                PubMedServer::with_options(Arc::new(pubmed_client::Client::new()), None, as_of);
+            let Ok(Json(bounded)) = server.bounded(Ok(Json(tools::convert::ConvertIdOutput {
+                pmid: "1".to_string(),
+                available: false,
+                pmcid: None,
+            }))) else {
+                panic!("an Ok answer stays Ok");
+            };
+            serde_json::to_value(bounded).unwrap()
+        };
+
+        assert_eq!(
+            answer("2020-02-01".parse().ok()),
+            serde_json::json!({ "pmid": "1", "available": false, "as_of": "2020-02-01" })
+        );
+        assert_eq!(
+            answer(None),
+            serde_json::json!({ "pmid": "1", "available": false })
+        );
+    }
+
+    #[test]
+    fn as_of_must_be_an_iso_date() {
+        let args = Args::try_parse_from(["pubmed-mcp", "--as-of", "2020-02-01"]).unwrap();
+        assert_eq!(
+            args.as_of.map(|as_of| as_of.to_string()).as_deref(),
+            Some("2020-02-01")
+        );
+
+        for invalid in ["2020", "2020-02-30", "02/01/2020", ""] {
+            let Err(err) = Args::try_parse_from(["pubmed-mcp", "--as-of", invalid]) else {
+                panic!("`--as-of {invalid}` must be rejected, not ignored");
+            };
+            assert!(err.to_string().contains("YYYY-MM-DD"), "{err}");
         }
     }
 

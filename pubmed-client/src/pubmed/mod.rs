@@ -28,11 +28,14 @@ pub use pubmed_formatter::pubmed::export;
 pub use client::PubMedClient;
 pub use export::ExportFormat;
 pub use models::{
-    AbstractSection, Affiliation, ArticleSummary, Author, ChemicalConcept, CitationMatch,
-    CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo,
-    EPostResult, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo, MeshHeading,
-    MeshQualifier, MeshTerm, PmcLinks, PubMedArticle, RelatedArticles, SearchResult,
+    AbstractSection, Affiliation, ArticleHistoryDate, ArticleSummary, Author, ChemicalConcept,
+    CitationMatch, CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount,
+    DatabaseInfo, EPostResult, FieldInfo, GlobalQueryResults, HistorySession, LinkInfo,
+    MeshHeading, MeshQualifier, MeshTerm, PmcLinks, PubMedArticle, RelatedArticles, SearchResult,
     SpellCheckResult, SpelledQuerySegment, SupplementalConcept,
 };
 pub use parser::{parse_article_from_xml, parse_articles_from_xml};
-pub use query::{ArticleType, Language, PubDate, SearchQuery, SortOrder, validate_year};
+pub use query::{
+    ArticleType, Language, PubDate, SearchDateRange, SearchDateType, SearchQuery, SortOrder,
+    validate_year,
+};

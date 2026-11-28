@@ -1,0 +1,124 @@
+[
+  {
+    "id": "2014248",
+    "source": "MED",
+    "pmid": "2014248",
+    "pmcid": "PMC51423",
+    "fullTextIdList": {
+      "fullTextId": [
+        "PMC51423"
+      ]
+    },
+    "doi": "10.1073/pnas.88.8.3248",
+    "title": "Sequence of a cysteine-rich galactose-specific lectin of Entamoeba histolytica.",
+    "authorString": "Mann BJ, Torian BE, Vedvick TS, Petri WA.",
+    "journalTitle": "Proc Natl Acad Sci U S A",
+    "issue": "8",
+    "journalVolume": "88",
+    "pubYear": "1991",
+    "journalIssn": "0027-8424; 1091-6490; ",
+    "pageInfo": "3248-3252",
+    "pubType": "research support, u.s. gov't, p.h.s.; research support, non-u.s. gov't; research-article; journal article",
+    "isOpenAccess": "N",
+    "inEPMC": "Y",
+    "inPMC": "Y",
+    "citedByCount": 91,
+    "hasReferences": "Y",
+    "hasTextMinedTerms": "Y",
+    "hasDbCrossReferences": "Y",
+    "dbCrossReferenceList": {
+      "dbName": [
+        "EMBL"
+      ]
+    },
+    "hasPDF": "Y",
+    "hasBook": "N",
+    "hasSuppl": "N",
+    "hasLabsLinks": "Y",
+    "hasTMAccessionNumbers": "N",
+    "firstPublicationDate": "1991-04-01",
+    "firstIndexDate": "2009-12-24"
+  },
+  {
+    "id": "31978945",
+    "source": "MED",
+    "pmid": "31978945",
+    "pmcid": "PMC7092803",
+    "fullTextIdList": {
+      "fullTextId": [
+        "PMC7092803"
+      ]
+    },
+    "doi": "10.1056/nejmoa2001017",
+    "title": "A Novel Coronavirus from Patients with Pneumonia in China, 2019.",
+    "authorString": "Zhu N, Zhang D, Wang W, Li X, Yang B, Song J, Zhao X, Huang B, Shi W, Lu R, Niu P, Zhan F, Ma X, Wang D, Xu W, Wu G, Gao GF, Tan W, China Novel Coronavirus Investigating and Research Team.",
+    "journalTitle": "N Engl J Med",
+    "issue": "8",
+    "journalVolume": "382",
+    "pubYear": "2020",
+    "journalIssn": "0028-4793; 1533-4406; ",
+    "pageInfo": "727-733",
+    "pubType": "research-article; journal article",
+    "isOpenAccess": "Y",
+    "inEPMC": "Y",
+    "inPMC": "Y",
+    "citedByCount": 18524,
+    "hasReferences": "Y",
+    "hasTextMinedTerms": "Y",
+    "hasDbCrossReferences": "N",
+    "hasPDF": "Y",
+    "hasBook": "N",
+    "hasSuppl": "Y",
+    "hasLabsLinks": "Y",
+    "hasTMAccessionNumbers": "Y",
+    "tmAccessionTypeList": {
+      "accessionType": [
+        "gen",
+        "gisaid",
+        "doi"
+      ]
+    },
+    "firstPublicationDate": "2020-01-24",
+    "firstIndexDate": "2020-01-28"
+  },
+  {
+    "id": "33515491",
+    "source": "MED",
+    "pmid": "33515491",
+    "pmcid": "PMC7906746",
+    "fullTextIdList": {
+      "fullTextId": [
+        "PMC7906746"
+      ]
+    },
+    "doi": "10.1016/s0140-6736(21)00183-5",
+    "title": "Resurgence of COVID-19 in Manaus, Brazil, despite high seroprevalence.",
+    "authorString": "Sabino EC, Buss LF, Carvalho MPS, Prete CA, Crispim MAE, Fraiji NA, Pereira RHM, Parag KV, da Silva Peixoto P, Kraemer MUG, Oikawa MK, Salomon T, Cucunuba ZM, Castro MC, de Souza Santos AA, Nascimento VH, Pereira HS, Ferguson NM, Pybus OG, Kucharski A, Busch MP, Dye C, Faria NR.",
+    "journalTitle": "Lancet",
+    "issue": "10273",
+    "journalVolume": "397",
+    "pubYear": "2021",
+    "journalIssn": "0140-6736; 1474-547x; ",
+    "pageInfo": "452-455",
+    "pubType": "research support, non-u.s. gov't; discussion; journal article",
+    "isOpenAccess": "Y",
+    "inEPMC": "Y",
+    "inPMC": "Y",
+    "citedByCount": 640,
+    "hasReferences": "Y",
+    "hasTextMinedTerms": "Y",
+    "hasDbCrossReferences": "N",
+    "hasPDF": "Y",
+    "hasBook": "N",
+    "hasSuppl": "N",
+    "hasLabsLinks": "Y",
+    "hasTMAccessionNumbers": "Y",
+    "tmAccessionTypeList": {
+      "accessionType": [
+        "doi"
+      ]
+    },
+    "firstPublicationDate": "2021-01-27",
+    "firstIndexDate": "2021-01-31"
+  }
+]
