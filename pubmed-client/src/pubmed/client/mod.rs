@@ -14,7 +14,7 @@ use crate::config::ClientConfig;
 use crate::error::{ParseError, PubMedError, Result};
 use crate::pubmed::models::PubMedArticle;
 use crate::pubmed::parser::parse_articles_from_xml;
-use crate::pubmed::query::SortOrder;
+use crate::pubmed::query::{SearchDateRange, SortOrder};
 use crate::pubmed::responses::ESearchResult;
 use crate::rate_limit::RateLimiter;
 use crate::request::RequestExecutor;
@@ -277,6 +277,50 @@ impl PubMedClient {
         limit: usize,
         sort: Option<&SortOrder>,
     ) -> Result<Vec<String>> {
+        self.esearch_pmids(query, limit, sort, None).await
+    }
+
+    /// Search for articles whose date of the given type falls inside a range
+    ///
+    /// Same as [`search_articles`](Self::search_articles), but the range is sent
+    /// as ESearch's own `datetype` / `mindate` / `maxdate` parameters instead of
+    /// being written into the query term, so nothing in `query` can widen it.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use pubmed_client::{PubMedClient, SearchDateRange, SearchDateType};
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let client = PubMedClient::new();
+    ///     // Records that entered PubMed on or before 2019-12-31
+    ///     let range = SearchDateRange::until(SearchDateType::Entrez, "2019/12/31");
+    ///     let pmids = client
+    ///         .search_articles_in_date_range("coronavirus", 10, None, &range)
+    ///         .await?;
+    ///     println!("Found {} articles", pmids.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    #[instrument(skip(self, sort, range), fields(query = %query, limit = limit))]
+    pub async fn search_articles_in_date_range(
+        &self,
+        query: &str,
+        limit: usize,
+        sort: Option<&SortOrder>,
+        range: &SearchDateRange,
+    ) -> Result<Vec<String>> {
+        self.esearch_pmids(query, limit, sort, Some(range)).await
+    }
+
+    async fn esearch_pmids(
+        &self,
+        query: &str,
+        limit: usize,
+        sort: Option<&SortOrder>,
+        range: Option<&SearchDateRange>,
+    ) -> Result<Vec<String>> {
         // PubMed limits: retstart cannot exceed 9998, and retmax is capped at 9999
         // This means we can only retrieve the first 9,999 results (indices 0-9998)
         const MAX_RETRIEVABLE: usize = 9999;
@@ -303,6 +347,11 @@ impl PubMedClient {
         ];
         if let Some(sort_order) = sort {
             params.push(("sort", sort_order.as_api_param()));
+        }
+        if let Some(range) = range {
+            params.push(("datetype", range.date_type.as_api_param()));
+            params.push(("mindate", range.min_date.as_str()));
+            params.push(("maxdate", range.max_date.as_str()));
         }
 
         debug!("Making initial ESearch API request");

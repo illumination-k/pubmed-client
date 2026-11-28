@@ -3,7 +3,7 @@
 //! These tests verify that sort parameters are passed correctly to the API
 //! and that query translation is parsed from the response.
 
-use pubmed_client::pubmed::SortOrder;
+use pubmed_client::pubmed::{SearchDateRange, SearchDateType, SortOrder};
 use pubmed_client::{ClientConfig, PubMedClient, SearchQuery};
 use tracing_test::traced_test;
 use wiremock::matchers::{method, query_param};
@@ -371,4 +371,66 @@ fn test_search_query_sort_override() {
 fn test_search_query_no_sort_by_default() {
     let query = SearchQuery::new().query("test");
     assert_eq!(query.get_sort(), None);
+}
+
+// ================================================================================================
+// Date Range Tests
+// ================================================================================================
+
+/// ESearch ignores `maxdate` when `mindate` is absent, so the range has to
+/// arrive as all three parameters or it bounds nothing.
+#[tokio::test]
+async fn test_search_articles_in_date_range_sends_all_three_date_params() {
+    let mock_server = MockServer::start().await;
+
+    Mock::given(method("GET"))
+        .and(query_param("term", "coronavirus"))
+        .and(query_param("datetype", "edat"))
+        .and(query_param("mindate", "1000/01/01"))
+        .and(query_param("maxdate", "2019/12/31"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(
+            esearch_json_response_with_translation(&["111"], 1, "coronavirus[All Fields]"),
+        ))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    let client = create_test_client(&mock_server.uri());
+    let range = SearchDateRange::until(SearchDateType::Entrez, "2019/12/31");
+
+    let pmids = client
+        .search_articles_in_date_range("coronavirus", 10, None, &range)
+        .await
+        .unwrap();
+
+    assert_eq!(pmids, vec!["111"]);
+}
+
+/// ELink applies the same three date parameters; a citing-article list is
+/// bounded at the source rather than fetched whole and filtered.
+#[tokio::test]
+async fn test_get_citations_in_date_range_sends_the_date_params() {
+    let mock_server = MockServer::start().await;
+
+    Mock::given(method("GET"))
+        .and(query_param("linkname", "pubmed_pubmed_citedin"))
+        .and(query_param("datetype", "crdt"))
+        .and(query_param("mindate", "1000/01/01"))
+        .and(query_param("maxdate", "2020/01/31"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(
+            r#"{"linksets":[{"dbfrom":"pubmed","ids":["31978945"],"linksetdbs":[{"dbto":"pubmed","linkname":"pubmed_pubmed_citedin","links":["31991079","31978944"]}]}]}"#,
+        ))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    let client = create_test_client(&mock_server.uri());
+    let range = SearchDateRange::until(SearchDateType::Create, "2020/01/31");
+
+    let citations = client
+        .get_citations_in_date_range(&[31978945], &range)
+        .await
+        .unwrap();
+
+    assert_eq!(citations.citing_pmids, vec![31978944, 31991079]);
 }

@@ -61,6 +61,73 @@ impl SortOrder {
     }
 }
 
+/// Which date an E-utilities date range applies to (the `datetype` parameter).
+///
+/// See: <https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch>
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SearchDateType {
+    /// Create date (`crdt`): the day the PubMed record was created
+    Create,
+    /// Entrez date (`edat`): the day the record entered PubMed. Not always
+    /// the day it was created: a record added more than a year after its
+    /// publication has its Entrez date set back to the publication date.
+    Entrez,
+    /// Publication date (`pdat`)
+    Publication,
+    /// Modification date (`mdat`)
+    Modification,
+}
+
+impl SearchDateType {
+    /// Get the API parameter value for this date type
+    pub(crate) fn as_api_param(&self) -> &'static str {
+        match self {
+            SearchDateType::Create => "crdt",
+            SearchDateType::Entrez => "edat",
+            SearchDateType::Publication => "pdat",
+            SearchDateType::Modification => "mdat",
+        }
+    }
+}
+
+/// A date range sent as the `datetype` / `mindate` / `maxdate` parameters of
+/// ESearch and ELink.
+///
+/// Both ends are always sent: ESearch silently ignores `maxdate` (or
+/// `mindate`) when it arrives without the other.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SearchDateRange {
+    /// The date the range applies to
+    pub date_type: SearchDateType,
+    /// Inclusive lower bound, as `YYYY`, `YYYY/MM` or `YYYY/MM/DD`
+    pub min_date: String,
+    /// Inclusive upper bound, as `YYYY`, `YYYY/MM` or `YYYY/MM/DD`
+    pub max_date: String,
+}
+
+impl SearchDateRange {
+    /// Lower bound used by [`SearchDateRange::until`]: earlier than any PubMed record.
+    pub const EARLIEST: &'static str = "1000/01/01";
+
+    /// A range between two inclusive dates (`YYYY`, `YYYY/MM` or `YYYY/MM/DD`)
+    pub fn new(
+        date_type: SearchDateType,
+        min_date: impl Into<String>,
+        max_date: impl Into<String>,
+    ) -> Self {
+        Self {
+            date_type,
+            min_date: min_date.into(),
+            max_date: max_date.into(),
+        }
+    }
+
+    /// Everything up to and including `max_date`
+    pub fn until(date_type: SearchDateType, max_date: impl Into<String>) -> Self {
+        Self::new(date_type, Self::EARLIEST, max_date)
+    }
+}
+
 /// Article types that can be filtered in PubMed searches
 #[derive(Debug, Clone, PartialEq)]
 pub enum ArticleType {

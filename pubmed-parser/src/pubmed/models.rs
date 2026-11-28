@@ -960,6 +960,33 @@ pub struct ArticleSummary {
     pub pmc_ref_count: u64,
     /// Record status (e.g., "PubMed - indexed for MEDLINE")
     pub record_status: String,
+    /// Milestone dates of the record (received, accepted, entrez, pubmed, medline, ...).
+    ///
+    /// The `entrez` entry is the Entrez date (`EDAT`): the day the record
+    /// became available in PubMed, which for an epub-ahead-of-print article
+    /// precedes its issue date.
+    #[serde(default)]
+    pub history: Vec<ArticleHistoryDate>,
+}
+
+/// One milestone in a PubMed record's history, as ESummary reports it.
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct ArticleHistoryDate {
+    /// Milestone name (e.g., "received", "accepted", "entrez", "pubmed", "medline")
+    pub pub_status: String,
+    /// Date as ESummary formats it (e.g., "2020/01/25 06:00")
+    pub date: String,
+}
+
+impl ArticleSummary {
+    /// The Entrez date (`EDAT`) as ESummary formats it (e.g., "2020/01/25 06:00"),
+    /// if the record's history carries one.
+    pub fn entrez_date(&self) -> Option<&str> {
+        self.history
+            .iter()
+            .find(|entry| entry.pub_status.eq_ignore_ascii_case("entrez"))
+            .map(|entry| entry.date.as_str())
+    }
 }
 
 #[cfg(test)]

@@ -1,7 +1,7 @@
 //! ESummary API operations for fetching lightweight article metadata
 
 use crate::error::{ParseError, PubMedError, Result};
-use crate::pubmed::models::ArticleSummary;
+use crate::pubmed::models::{ArticleHistoryDate, ArticleSummary};
 use crate::pubmed::query::SortOrder;
 use crate::pubmed::responses::{ESummaryDocSum, ESummaryResponse};
 use tracing::{instrument, warn};
@@ -213,6 +213,14 @@ impl PubMedClient {
                 sort_pub_date: doc.sortpubdate,
                 pmc_ref_count: doc.pmcrefcount,
                 record_status: doc.recordstatus,
+                history: doc
+                    .history
+                    .into_iter()
+                    .map(|entry| ArticleHistoryDate {
+                        pub_status: entry.pubstatus,
+                        date: entry.date,
+                    })
+                    .collect(),
             });
         }
 
@@ -223,6 +231,39 @@ impl PubMedClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_parse_esummary_response_history() {
+        let json = r#"{"result":{"uids":["31978945"],"31978945":{"uid":"31978945","pubdate":"2020 Feb 20","epubdate":"2020 Jan 24","history":[{"pubstatus":"pubmed","date":"2020/01/25 06:00"},{"pubstatus":"medline","date":"2020/03/07 06:00"},{"pubstatus":"entrez","date":"2020/01/25 06:00"}]}}}"#;
+
+        let summaries = PubMedClient::parse_esummary_response(json).unwrap();
+
+        assert_eq!(summaries[0].history.len(), 3);
+        assert_eq!(summaries[0].entrez_date(), Some("2020/01/25 06:00"));
+    }
+
+    /// A record with no PMC citations reports `"pmcrefcount": ""`; it must not
+    /// be dropped from the answer for that.
+    #[test]
+    fn test_parse_esummary_response_blank_pmcrefcount() {
+        let json = r#"{"result":{"uids":["31910999","2"],"31910999":{"uid":"31910999","title":"t","pmcrefcount":""},"2":{"uid":"2","title":"u","pmcrefcount":"7"}}}"#;
+
+        let summaries = PubMedClient::parse_esummary_response(json).unwrap();
+
+        assert_eq!(summaries.len(), 2);
+        assert_eq!(summaries[0].pmc_ref_count, 0);
+        assert_eq!(summaries[1].pmc_ref_count, 7);
+    }
+
+    #[test]
+    fn test_parse_esummary_response_without_history() {
+        let json = r#"{"result":{"uids":["1"],"1":{"uid":"1","title":"t"}}}"#;
+
+        let summaries = PubMedClient::parse_esummary_response(json).unwrap();
+
+        assert!(summaries[0].history.is_empty());
+        assert_eq!(summaries[0].entrez_date(), None);
+    }
 
     #[test]
     fn test_parse_esummary_response_basic() {

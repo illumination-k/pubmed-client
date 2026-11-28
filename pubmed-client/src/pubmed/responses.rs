@@ -171,10 +171,38 @@ pub(crate) struct ESummaryDocSum {
     pub fulljournalname: String,
     #[serde(default)]
     pub sortpubdate: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "count_or_blank")]
     pub pmcrefcount: u64,
     #[serde(default)]
     pub recordstatus: String,
+    #[serde(default)]
+    pub history: Vec<ESummaryHistoryDate>,
+}
+
+/// ESummary reports a count as a number when there is one and as `""` when
+/// there is none (a record nothing in PMC cites has `"pmcrefcount": ""`).
+fn count_or_blank<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<u64, D::Error> {
+    use serde::de::Error as _;
+    match serde_json::Value::deserialize(deserializer)? {
+        serde_json::Value::Number(count) => count
+            .as_u64()
+            .ok_or_else(|| D::Error::custom(format!("invalid count: {count}"))),
+        serde_json::Value::String(text) if text.trim().is_empty() => Ok(0),
+        serde_json::Value::String(text) => text
+            .trim()
+            .parse()
+            .map_err(|_| D::Error::custom(format!("invalid count: {text:?}"))),
+        serde_json::Value::Null => Ok(0),
+        other => Err(D::Error::custom(format!("invalid count: {other}"))),
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ESummaryHistoryDate {
+    #[serde(default)]
+    pub pubstatus: String,
+    #[serde(default)]
+    pub date: String,
 }
 
 // ELink API response structures

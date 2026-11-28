@@ -296,11 +296,12 @@ pub use pmc::{
     SupplementaryMaterial, Table, TitleGroup, parse_pmc_xml,
 };
 pub use pubmed::{
-    AbstractSection, ArticleSummary, ArticleType, CitationMatch, CitationMatchStatus,
-    CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo, EPostResult,
-    ExportFormat, FieldInfo, GlobalQueryResults, HistorySession, Language, LinkInfo, PmcLinks,
-    PubMedArticle, PubMedClient, RelatedArticles, SearchQuery, SearchResult, SortOrder,
-    SpellCheckResult, SpelledQuerySegment, export, parse_article_from_xml, validate_year,
+    AbstractSection, ArticleHistoryDate, ArticleSummary, ArticleType, CitationMatch,
+    CitationMatchStatus, CitationMatches, CitationQuery, Citations, DatabaseCount, DatabaseInfo,
+    EPostResult, ExportFormat, FieldInfo, GlobalQueryResults, HistorySession, Language, LinkInfo,
+    PmcLinks, PubMedArticle, PubMedClient, RelatedArticles, SearchDateRange, SearchDateType,
+    SearchQuery, SearchResult, SortOrder, SpellCheckResult, SpelledQuerySegment, export,
+    parse_article_from_xml, validate_year,
 };
 pub use rate_limit::RateLimiter;
 pub use time::{Duration, Instant, sleep};
