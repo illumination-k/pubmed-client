@@ -8,7 +8,7 @@ use rmcp::{
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use super::common::{collect_figures, collect_tables, internal_error, normalize_pmc_id};
+use super::common::{collect_figures, collect_tables, fetch_pmc_article, normalize_pmc_id};
 use super::output::{FigureOut, ReferenceOut, SectionOut, TableOut, sections_out};
 
 /// Request parameters for get_pmc_fulltext tool
@@ -68,12 +68,7 @@ pub async fn get_pmc_fulltext(
 
     info!(pmc_id = %pmc_id, "Fetching PMC full text (structured)");
 
-    let article = server
-        .client
-        .pmc
-        .fetch_full_text(&pmc_id)
-        .await
-        .map_err(|e| internal_error(format!("Failed to fetch PMC article: {}", e)))?;
+    let article = fetch_pmc_article(server, &pmc_id).await?;
 
     let all_sections = article.sections();
     let shown = match params.max_sections {

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use tracing::info;
 
 use super::common::internal_error;
-use pubmed_client::{CitationMatchStatus, CitationQuery};
+use pubmed_client::{CitationMatch, CitationMatchStatus, CitationQuery};
 
 /// Single citation input for matching
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -141,24 +141,49 @@ pub async fn match_citations(
         .await
         .map_err(|e| internal_error(format!("Citation match failed: {}", e)))?;
 
+    // Under --as-of a citation that resolves to a hidden record is reported
+    // as not found.
+    let matched_pmid = |m: &CitationMatch| m.pmid.as_deref().and_then(|p| p.trim().parse().ok());
+    let visible = match server.as_of {
+        Some(as_of) => Some(
+            server
+                .visible_pmids(as_of, results.matches.iter().filter_map(matched_pmid))
+                .await?,
+        ),
+        None => None,
+    };
+
     let matches: Vec<CitationMatchOut> = results
         .matches
         .iter()
-        .map(|m| CitationMatchOut {
-            key: m.key.clone(),
-            journal: m.journal.clone(),
-            year: m.year.clone(),
-            volume: m.volume.clone(),
-            first_page: m.first_page.clone(),
-            author_name: m.author_name.clone(),
-            status: MatchStatus::from(&m.status),
-            pmid: m.pmid.clone(),
+        .map(|m| {
+            let hidden = m.pmid.is_some()
+                && visible.as_ref().is_some_and(|visible| {
+                    !matched_pmid(m).is_some_and(|pmid| visible.contains(&pmid))
+                });
+            CitationMatchOut {
+                key: m.key.clone(),
+                journal: m.journal.clone(),
+                year: m.year.clone(),
+                volume: m.volume.clone(),
+                first_page: m.first_page.clone(),
+                author_name: m.author_name.clone(),
+                status: if hidden {
+                    MatchStatus::NotFound
+                } else {
+                    MatchStatus::from(&m.status)
+                },
+                pmid: m.pmid.clone().filter(|_| !hidden),
+            }
         })
         .collect();
 
     Ok(Json(CitMatchOutput {
         count: matches.len(),
-        found: results.found_count(),
+        found: matches
+            .iter()
+            .filter(|m| matches!(m.status, MatchStatus::Found))
+            .count(),
         matches,
     }))
 }

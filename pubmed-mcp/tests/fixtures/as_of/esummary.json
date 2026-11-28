@@ -1,0 +1,715 @@
+{
+  "2014248": {
+    "uid": "2014248",
+    "pubdate": "1991 Apr 15",
+    "epubdate": "",
+    "source": "Proc Natl Acad Sci U S A",
+    "authors": [
+      {
+        "name": "Mann BJ",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Torian BE",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Vedvick TS",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Petri WA Jr",
+        "authtype": "Author",
+        "clusterid": ""
+      }
+    ],
+    "lastauthor": "Petri WA Jr",
+    "title": "Sequence of a cysteine-rich galactose-specific lectin of Entamoeba histolytica.",
+    "sorttitle": "sequence of a cysteine rich galactose specific lectin of entamoeba histolytica",
+    "volume": "88",
+    "issue": "8",
+    "pages": "3248-52",
+    "lang": [
+      "eng"
+    ],
+    "nlmuniqueid": "7505876",
+    "issn": "0027-8424",
+    "essn": "1091-6490",
+    "pubtype": [
+      "Journal Article",
+      "Research Support, Non-U.S. Gov't",
+      "Research Support, U.S. Gov't, P.H.S."
+    ],
+    "recordstatus": "PubMed - indexed for MEDLINE",
+    "pubstatus": "4",
+    "articleids": [
+      {
+        "idtype": "pubmed",
+        "idtypen": 1,
+        "value": "2014248"
+      },
+      {
+        "idtype": "pmc",
+        "idtypen": 8,
+        "value": "PMC51423"
+      },
+      {
+        "idtype": "pmcid",
+        "idtypen": 5,
+        "value": "pmc-id: PMC51423;"
+      },
+      {
+        "idtype": "doi",
+        "idtypen": 3,
+        "value": "10.1073/pnas.88.8.3248"
+      }
+    ],
+    "history": [
+      {
+        "pubstatus": "pubmed",
+        "date": "1991/04/15 00:00"
+      },
+      {
+        "pubstatus": "medline",
+        "date": "2001/03/28 10:01"
+      },
+      {
+        "pubstatus": "entrez",
+        "date": "1991/04/15 00:00"
+      },
+      {
+        "pubstatus": "pmc-release",
+        "date": "1991/10/15 00:00"
+      }
+    ],
+    "references": [],
+    "attributes": [
+      "Has Abstract"
+    ],
+    "pmcrefcount": 32,
+    "fulljournalname": "Proceedings of the National Academy of Sciences of the United States of America",
+    "elocationid": "",
+    "doctype": "citation",
+    "srccontriblist": [],
+    "booktitle": "",
+    "medium": "",
+    "edition": "",
+    "publisherlocation": "",
+    "publishername": "",
+    "srcdate": "",
+    "reportnumber": "",
+    "availablefromurl": "",
+    "locationlabel": "",
+    "doccontriblist": [],
+    "docdate": "",
+    "bookname": "",
+    "chapter": "",
+    "sortpubdate": "1991/04/15 00:00",
+    "sortfirstauthor": "Mann BJ",
+    "vernaculartitle": ""
+  },
+  "31978945": {
+    "uid": "31978945",
+    "pubdate": "2020 Feb 20",
+    "epubdate": "2020 Jan 24",
+    "source": "N Engl J Med",
+    "authors": [
+      {
+        "name": "Zhu N",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Zhang D",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Wang W",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Li X",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Yang B",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Song J",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Zhao X",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Huang B",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Shi W",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Lu R",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Niu P",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Zhan F",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Ma X",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Wang D",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Xu W",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Wu G",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Gao GF",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Tan W",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "China Novel Coronavirus Investigating and Research Team",
+        "authtype": "CollectiveName",
+        "clusterid": ""
+      }
+    ],
+    "lastauthor": "Tan W",
+    "title": "A Novel Coronavirus from Patients with Pneumonia in China, 2019.",
+    "sorttitle": "novel coronavirus from patients with pneumonia in china 2019",
+    "volume": "382",
+    "issue": "8",
+    "pages": "727-733",
+    "lang": [
+      "eng"
+    ],
+    "nlmuniqueid": "0255562",
+    "issn": "0028-4793",
+    "essn": "1533-4406",
+    "pubtype": [
+      "Journal Article"
+    ],
+    "recordstatus": "PubMed - indexed for MEDLINE",
+    "pubstatus": "256",
+    "articleids": [
+      {
+        "idtype": "pubmed",
+        "idtypen": 1,
+        "value": "31978945"
+      },
+      {
+        "idtype": "pmc",
+        "idtypen": 8,
+        "value": "PMC7092803"
+      },
+      {
+        "idtype": "pmcid",
+        "idtypen": 5,
+        "value": "pmc-id: PMC7092803;"
+      },
+      {
+        "idtype": "doi",
+        "idtypen": 3,
+        "value": "10.1056/NEJMoa2001017"
+      }
+    ],
+    "history": [
+      {
+        "pubstatus": "pubmed",
+        "date": "2020/01/25 06:00"
+      },
+      {
+        "pubstatus": "medline",
+        "date": "2020/03/07 06:00"
+      },
+      {
+        "pubstatus": "entrez",
+        "date": "2020/01/25 06:00"
+      },
+      {
+        "pubstatus": "pmc-release",
+        "date": "2020/03/24 00:00"
+      }
+    ],
+    "references": [
+      {
+        "refsource": "N Engl J Med. 2020 Feb 20;382(8):760-762. doi: 10.1056/NEJMe2001126.",
+        "reftype": "Comment in",
+        "pmid": 31978944,
+        "note": ""
+      },
+      {
+        "refsource": "Lancet. 2020 Feb 8;395(10222):391-393. doi: 10.1016/S0140-6736(20)30300-7.",
+        "reftype": "Comment in",
+        "pmid": 32035533,
+        "note": ""
+      },
+      {
+        "refsource": "J Med Virol. 2020 May;92(5):461-463. doi: 10.1002/jmv.25711.",
+        "reftype": "Comment in",
+        "pmid": 32073161,
+        "note": ""
+      },
+      {
+        "refsource": "J Infect Dev Ctries. 2020 Jan 31;14(1):1-2. doi: 10.3855/jidc.12496.",
+        "reftype": "Comment in",
+        "pmid": 32088678,
+        "note": ""
+      },
+      {
+        "refsource": "J Diabetes. 2020 Apr;12(4):347-348. doi: 10.1111/1753-0407.13027.",
+        "reftype": "Comment in",
+        "pmid": 32162476,
+        "note": ""
+      },
+      {
+        "refsource": "Haemophilia. 2020 May;26(3):371-372. doi: 10.1111/hae.14001.",
+        "reftype": "Comment in",
+        "pmid": 32246879,
+        "note": ""
+      },
+      {
+        "refsource": "Crit Care. 2020 Apr 7;24(1):135. doi: 10.1186/s13054-020-02863-0.",
+        "reftype": "Comment in",
+        "pmid": 32264974,
+        "note": ""
+      },
+      {
+        "refsource": "G Ital Cardiol (Rome). 2020 May;21(5):317-320. doi: 10.1714/3343.33126.",
+        "reftype": "Comment in",
+        "pmid": 32310914,
+        "note": ""
+      },
+      {
+        "refsource": "J Neurol Neurosurg Psychiatry. 2020 Jun;91(6):568-570. doi: 10.1136/jnnp-2020-323414.",
+        "reftype": "Comment in",
+        "pmid": 32312872,
+        "note": ""
+      },
+      {
+        "refsource": "Int J Infect Dis. 2020 Jun;95:361-362. doi: 10.1016/j.ijid.2020.04.056.",
+        "reftype": "Comment in",
+        "pmid": 32339717,
+        "note": ""
+      },
+      {
+        "refsource": "Euro Surveill. 2020 Jun;25(23). doi: 10.2807/1560-7917.ES.2020.25.23.2000272.",
+        "reftype": "Comment in",
+        "pmid": 32553062,
+        "note": ""
+      },
+      {
+        "refsource": "Br Dent J. 2020 Jun;228(12):971-975. doi: 10.1038/s41415-020-1747-8.",
+        "reftype": "Comment in",
+        "pmid": 32591714,
+        "note": ""
+      },
+      {
+        "refsource": "Radiologe. 2020 Oct;60(10):891-892. doi: 10.1007/s00117-020-00750-x.",
+        "reftype": "Comment in",
+        "pmid": 32995967,
+        "note": ""
+      }
+    ],
+    "attributes": [
+      "Has Abstract"
+    ],
+    "pmcrefcount": 17,
+    "fulljournalname": "The New England journal of medicine",
+    "elocationid": "doi: 10.1056/NEJMoa2001017",
+    "doctype": "citation",
+    "srccontriblist": [],
+    "booktitle": "",
+    "medium": "",
+    "edition": "",
+    "publisherlocation": "",
+    "publishername": "",
+    "srcdate": "",
+    "reportnumber": "",
+    "availablefromurl": "",
+    "locationlabel": "",
+    "doccontriblist": [],
+    "docdate": "",
+    "bookname": "",
+    "chapter": "",
+    "sortpubdate": "2020/02/20 00:00",
+    "sortfirstauthor": "Zhu N",
+    "vernaculartitle": ""
+  },
+  "33515491": {
+    "uid": "33515491",
+    "pubdate": "2021 Feb 6",
+    "epubdate": "2021 Jan 27",
+    "source": "Lancet",
+    "authors": [
+      {
+        "name": "Sabino EC",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Buss LF",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Carvalho MPS",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Prete CA Jr",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Crispim MAE",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Fraiji NA",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Pereira RHM",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Parag KV",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "da Silva Peixoto P",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Kraemer MUG",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Oikawa MK",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Salomon T",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Cucunuba ZM",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Castro MC",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "de Souza Santos AA",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Nascimento VH",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Pereira HS",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Ferguson NM",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Pybus OG",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Kucharski A",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Busch MP",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Dye C",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Faria NR",
+        "authtype": "Author",
+        "clusterid": ""
+      }
+    ],
+    "lastauthor": "Faria NR",
+    "title": "Resurgence of COVID-19 in Manaus, Brazil, despite high seroprevalence.",
+    "sorttitle": "resurgence of covid 19 in manaus brazil despite high seroprevalence",
+    "volume": "397",
+    "issue": "10273",
+    "pages": "452-455",
+    "lang": [
+      "eng"
+    ],
+    "nlmuniqueid": "2985213R",
+    "issn": "0140-6736",
+    "essn": "1474-547X",
+    "pubtype": [
+      "Journal Article",
+      "Research Support, Non-U.S. Gov't"
+    ],
+    "recordstatus": "PubMed - indexed for MEDLINE",
+    "pubstatus": "256",
+    "articleids": [
+      {
+        "idtype": "pubmed",
+        "idtypen": 1,
+        "value": "33515491"
+      },
+      {
+        "idtype": "pmc",
+        "idtypen": 8,
+        "value": "PMC7906746"
+      },
+      {
+        "idtype": "pmcid",
+        "idtypen": 5,
+        "value": "pmc-id: PMC7906746;"
+      },
+      {
+        "idtype": "doi",
+        "idtypen": 3,
+        "value": "10.1016/S0140-6736(21)00183-5"
+      },
+      {
+        "idtype": "pii",
+        "idtypen": 4,
+        "value": "S0140-6736(21)00183-5"
+      }
+    ],
+    "history": [
+      {
+        "pubstatus": "received",
+        "date": "2021/01/22 00:00"
+      },
+      {
+        "pubstatus": "accepted",
+        "date": "2021/01/22 00:00"
+      },
+      {
+        "pubstatus": "pubmed",
+        "date": "2021/01/31 06:00"
+      },
+      {
+        "pubstatus": "medline",
+        "date": "2021/02/26 06:00"
+      },
+      {
+        "pubstatus": "entrez",
+        "date": "2021/01/30 20:08"
+      },
+      {
+        "pubstatus": "pmc-release",
+        "date": "2021/01/27 00:00"
+      }
+    ],
+    "references": [],
+    "attributes": [],
+    "pmcrefcount": 22,
+    "fulljournalname": "Lancet (London, England)",
+    "elocationid": "doi: 10.1016/S0140-6736(21)00183-5",
+    "doctype": "citation",
+    "srccontriblist": [],
+    "booktitle": "",
+    "medium": "",
+    "edition": "",
+    "publisherlocation": "",
+    "publishername": "",
+    "srcdate": "",
+    "reportnumber": "",
+    "availablefromurl": "",
+    "locationlabel": "",
+    "doccontriblist": [],
+    "docdate": "",
+    "bookname": "",
+    "chapter": "",
+    "sortpubdate": "2021/02/06 00:00",
+    "sortfirstauthor": "Sabino EC",
+    "vernaculartitle": ""
+  },
+  "34695337": {
+    "uid": "34695337",
+    "pubdate": "2020 Sep 21",
+    "epubdate": "",
+    "source": "Rev Med Inst Mex Seguro Soc",
+    "authors": [
+      {
+        "name": "Montaño-Luna VE",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Pacheco-Rosas DO",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Vázquez-Rosales JG",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Labra-Zamora MG",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Fuentes-Pacheco Y",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Sámano-Aviña M",
+        "authtype": "Author",
+        "clusterid": ""
+      },
+      {
+        "name": "Miranda-Novales MG",
+        "authtype": "Author",
+        "clusterid": ""
+      }
+    ],
+    "lastauthor": "Miranda-Novales MG",
+    "title": "[Clinical management of COVID-19 paediatric cases].",
+    "sorttitle": "clinical management of covid 19 paediatric cases",
+    "volume": "58",
+    "issue": "Supl 2",
+    "pages": "S246-259",
+    "lang": [
+      "spa"
+    ],
+    "nlmuniqueid": "101243727",
+    "issn": "0443-5117",
+    "essn": "2448-5667",
+    "pubtype": [
+      "Journal Article"
+    ],
+    "recordstatus": "PubMed",
+    "pubstatus": "4",
+    "articleids": [
+      {
+        "idtype": "pubmed",
+        "idtypen": 1,
+        "value": "34695337"
+      },
+      {
+        "idtype": "doi",
+        "idtypen": 3,
+        "value": "10.24875/RMIMSS.M20000136"
+      },
+      {
+        "idtype": "pii",
+        "idtypen": 4,
+        "value": "j58/Supl 2/S246"
+      }
+    ],
+    "history": [
+      {
+        "pubstatus": "entrez",
+        "date": "2021/10/25 17:36"
+      },
+      {
+        "pubstatus": "pubmed",
+        "date": "2020/01/01 00:00"
+      },
+      {
+        "pubstatus": "medline",
+        "date": "2020/01/01 00:01"
+      }
+    ],
+    "references": [],
+    "attributes": [
+      "Has Abstract"
+    ],
+    "pmcrefcount": "",
+    "fulljournalname": "Revista medica del Instituto Mexicano del Seguro Social",
+    "elocationid": "doi: 10.24875/RMIMSS.M20000136",
+    "doctype": "citation",
+    "srccontriblist": [],
+    "booktitle": "",
+    "medium": "",
+    "edition": "",
+    "publisherlocation": "",
+    "publishername": "",
+    "srcdate": "",
+    "reportnumber": "",
+    "availablefromurl": "",
+    "locationlabel": "",
+    "doccontriblist": [],
+    "docdate": "",
+    "bookname": "",
+    "chapter": "",
+    "sortpubdate": "2020/09/21 00:00",
+    "sortfirstauthor": "Montaño-Luna VE",
+    "vernaculartitle": "Manejo clínico de casos pediátricos de COVID-19."
+  },
+  "999999999": {
+    "uid": "999999999",
+    "error": "cannot get document summary"
+  }
+}

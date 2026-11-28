@@ -222,8 +222,18 @@ pub async fn search_pubmed(
         };
     }
 
+    // Under --as-of a publication-year range cannot usefully reach past the
+    // last visible day, so a later `end_year` is pulled back to it (never
+    // below `start_year`, which would make the range unsatisfiable).
+    let end_year = match (server.as_of, params.start_year, params.end_year) {
+        (Some(as_of), Some(start), Some(end)) => {
+            Some(end.min(u32::from(as_of.last_visible_day().year()).max(start)))
+        }
+        (_, _, end) => end,
+    };
+
     if let Some(start_year) = params.start_year {
-        search_query = search_query.date_range(start_year, params.end_year);
+        search_query = search_query.date_range(start_year, end_year);
     }
 
     if let Some(ref sort_order) = params.sort {
@@ -238,17 +248,45 @@ pub async fn search_pubmed(
         study_type = ?params.study_type,
         text_availability = ?params.text_availability,
         start_year = ?params.start_year,
-        end_year = ?params.end_year,
+        end_year = ?end_year,
         sort = ?params.sort,
         "Searching PubMed with filters"
     );
 
-    let articles = server
-        .client
-        .pubmed
-        .search_and_fetch(&query_string, max, search_query.get_sort())
-        .await
-        .map_err(|e| internal_error(format!("Search failed: {}", e)))?;
+    let pubmed = &server.client.pubmed;
+    let articles = match server.as_of {
+        None => {
+            pubmed
+                .search_and_fetch(&query_string, max, search_query.get_sort())
+                .await
+        }
+        // The bound travels as ESearch's own date parameters rather than as
+        // query text, so nothing in the model's query can widen it.
+        Some(as_of) => match pubmed
+            .search_articles_in_date_range(
+                &query_string,
+                max,
+                search_query.get_sort(),
+                &as_of.eutils_range(),
+            )
+            .await
+        {
+            Ok(pmids) => {
+                // ESearch bounds one date type; the full rule is applied to
+                // what it returned before anything is fetched.
+                let hits: Vec<u32> = pmids.iter().filter_map(|p| p.parse().ok()).collect();
+                let visible = server.visible_pmids(as_of, hits).await?;
+                let pmid_refs: Vec<&str> = pmids
+                    .iter()
+                    .filter(|pmid| pmid.parse().is_ok_and(|pmid: u32| visible.contains(&pmid)))
+                    .map(String::as_str)
+                    .collect();
+                pubmed.fetch_articles(&pmid_refs).await
+            }
+            Err(e) => Err(e),
+        },
+    }
+    .map_err(|e| internal_error(format!("Search failed: {}", e)))?;
 
     let mut filters_applied = Vec::new();
     if let Some(ref study_type) = params.study_type {
@@ -258,7 +296,7 @@ pub async fn search_pubmed(
         filters_applied.push(text_availability.display_name().to_string());
     }
     if let Some(start) = params.start_year {
-        if let Some(end) = params.end_year {
+        if let Some(end) = end_year {
             filters_applied.push(format!("Published {}-{}", start, end));
         } else {
             filters_applied.push(format!("Published after {}", start));
@@ -266,6 +304,9 @@ pub async fn search_pubmed(
     }
     if let Some(ref sort_order) = params.sort {
         filters_applied.push(format!("Sorted by {}", sort_order.display_name()));
+    }
+    if let Some(as_of) = server.as_of {
+        filters_applied.push(as_of.describe());
     }
 
     let articles: Vec<SearchArticle> = articles

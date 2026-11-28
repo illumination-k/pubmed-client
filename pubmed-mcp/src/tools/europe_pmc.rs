@@ -15,10 +15,11 @@ use serde::{Deserialize, Serialize};
 use tracing::info;
 
 use pubmed_client::{
-    EuropePmcCitation, EuropePmcId, EuropePmcReference, EuropePmcSearchOptions,
+    EuropePmcCitation, EuropePmcId, EuropePmcReference, EuropePmcResult, EuropePmcSearchOptions,
     ResultType as EuropePmcResultType,
 };
 
+use super::as_of::{AsOf, europe_pmc_available_on, is_balanced_query, not_available};
 use super::common::{internal_error, invalid_params};
 use super::output::{SectionOut, sections_out};
 
@@ -128,7 +129,8 @@ pub struct EuropePmcRecordOut {
     pub doi: Option<String>,
     /// Whether Europe PMC flags the record as open access.
     pub is_open_access: bool,
-    /// Citation count. Only `core` results carry it.
+    /// Citation count. Only `core` results carry it, and never under
+    /// `--as-of` (it would be today's count).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cited_by_count: Option<u64>,
     /// First 300 characters of the abstract, ellipsised when cut. Only
@@ -140,12 +142,38 @@ pub struct EuropePmcRecordOut {
 /// Structured answer of the `europe_pmc_search` tool.
 #[derive(Debug, Serialize, schemars::JsonSchema)]
 pub struct EuropePmcSearchOutput {
-    /// The query that was sent to Europe PMC.
+    /// The query that was sent to Europe PMC, including any date bound the
+    /// server added.
     pub query: String,
     /// Number of records returned.
     pub count: usize,
     /// The matching records, in the order Europe PMC returned them.
     pub results: Vec<EuropePmcRecordOut>,
+}
+
+/// The query to send under `--as-of`: the caller's, ANDed with the date bound.
+fn bounded_query(as_of: AsOf, params: &EuropePmcSearchRequest) -> Result<String, ErrorData> {
+    if !is_balanced_query(&params.query) {
+        return Err(invalid_params(
+            "`query` has unbalanced parentheses or quotes",
+        ));
+    }
+    // Ordering by today's citation counts would rank the visible records by
+    // what happened to them afterwards.
+    if params
+        .sort
+        .as_deref()
+        .is_some_and(|sort| sort.to_ascii_uppercase().contains("CITED"))
+    {
+        return Err(invalid_params(
+            "sorting by citation count is not available on this server",
+        ));
+    }
+    Ok(format!(
+        "({}) AND {}",
+        params.query,
+        as_of.europe_pmc_clause()
+    ))
 }
 
 /// Search Europe PMC across all of its sources.
@@ -168,8 +196,19 @@ pub async fn europe_pmc_search(
         "Searching Europe PMC"
     );
 
+    let as_of = server.as_of;
+    let query = match as_of {
+        Some(as_of) => bounded_query(as_of, &params)?,
+        None => params.query,
+    };
+
     let opts = EuropePmcSearchOptions {
-        result_type: detail.to_result_type(),
+        // `idlist` records carry no dates, and under --as-of every record's
+        // own date is checked below.
+        result_type: match (as_of, detail) {
+            (Some(_), EuropePmcResultDetail::IdList) => EuropePmcResultType::Lite,
+            _ => detail.to_result_type(),
+        },
         page_size: max as u32,
         sort: params.sort.clone(),
         ..Default::default()
@@ -178,12 +217,16 @@ pub async fn europe_pmc_search(
     let results = server
         .client
         .europe_pmc
-        .search_all(&params.query, max, &opts)
+        .search_all(&query, max, &opts)
         .await
         .map_err(|e| internal_error(format!("Europe PMC search failed: {e}")))?;
 
     let results: Vec<EuropePmcRecordOut> = results
         .iter()
+        // The query is already bounded; this re-check keeps the guarantee
+        // from resting on query syntax alone.
+        .filter(|record| as_of.is_none_or(|as_of| as_of.admits(europe_pmc_available_on(record))))
+        .take(max)
         .map(|record| EuropePmcRecordOut {
             source: record.source.clone(),
             id: record.id.clone(),
@@ -196,7 +239,12 @@ pub async fn europe_pmc_search(
             doi: record.doi.clone(),
             is_open_access: record.is_open_access.as_deref() == Some("Y"),
             // `resultType=core` carries these in the untyped `extra` map.
-            cited_by_count: record.extra.get("citedByCount").and_then(|v| v.as_u64()),
+            // Today's citation count describes the future of an as-of view.
+            cited_by_count: record
+                .extra
+                .get("citedByCount")
+                .and_then(|v| v.as_u64())
+                .filter(|_| as_of.is_none()),
             abstract_preview: record
                 .extra
                 .get("abstractText")
@@ -206,7 +254,7 @@ pub async fn europe_pmc_search(
         .collect();
 
     Ok(Json(EuropePmcSearchOutput {
-        query: params.query,
+        query,
         count: results.len(),
         results,
     }))
@@ -274,6 +322,15 @@ pub async fn europe_pmc_fulltext(
     let id = resolve_id(params.source.as_deref(), &params.id)?;
 
     info!(id = %id, raw_xml = ?params.raw_xml, "Fetching Europe PMC full text");
+
+    if let Some(as_of) = server.as_of
+        && !server.europe_pmc_record_is_visible(as_of, &id).await?
+    {
+        return Err(not_available(
+            "Failed to fetch Europe PMC full text",
+            &id.to_string(),
+        ));
+    }
 
     if params.raw_xml.unwrap_or(false) {
         let xml = server
@@ -384,7 +441,8 @@ pub struct EuropePmcWorkOut {
     /// DOI, when the entry carries one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub doi: Option<String>,
-    /// How often this work has itself been cited. Only citations carry it.
+    /// How often this work has itself been cited. Only citations carry it,
+    /// and never under `--as-of` (it would be today's count).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cited_by_count: Option<String>,
 }
@@ -445,6 +503,140 @@ pub struct EuropePmcCitationGraphOutput {
     pub entries: Vec<EuropePmcWorkOut>,
 }
 
+/// A citing record found by search, in the shape the `citations` endpoint
+/// gives. Without its citation count: this conversion is only used under
+/// `--as-of`, where today's count is withheld.
+impl From<&EuropePmcResult> for EuropePmcWorkOut {
+    fn from(record: &EuropePmcResult) -> Self {
+        let extra = |name: &str| {
+            record
+                .extra
+                .get(name)
+                .and_then(|value| value.as_str())
+                .map(str::to_string)
+        };
+        Self {
+            source: Some(record.source.clone()),
+            id: Some(record.id.clone()),
+            title: record.title.clone(),
+            authors: record.author_string.clone(),
+            journal: record.journal_title.clone(),
+            pub_year: record.pub_year.clone(),
+            volume: extra("journalVolume"),
+            issue: extra("issue"),
+            page_info: extra("pageInfo"),
+            pmid: record.pmid.clone(),
+            doi: None,
+            cited_by_count: None,
+        }
+    }
+}
+
+impl EuropePmcCitationGraphOutput {
+    /// What Europe PMC answers for a record it does not have — and so what a
+    /// record hidden by `--as-of` answers too.
+    fn empty(id: &EuropePmcId) -> Self {
+        Self {
+            europe_pmc_id: id.to_string(),
+            total: 0,
+            count: 0,
+            entries: Vec::new(),
+        }
+    }
+}
+
+/// Whether the record a tool was asked about may be reported on. Always true
+/// without `--as-of`.
+async fn record_is_visible(
+    server: &super::PubMedServer,
+    id: &EuropePmcId,
+) -> Result<bool, ErrorData> {
+    match server.as_of {
+        Some(as_of) => server.europe_pmc_record_is_visible(as_of, id).await,
+        None => Ok(true),
+    }
+}
+
+/// Apply `--as-of` to the entries of a citation graph.
+///
+/// An entry Europe PMC matched to a record is kept only when that record is
+/// visible. An unmatched entry is kept: it is just the citation as printed in
+/// the (visible) source record, with nothing from a later index behind it.
+/// Citation counts are today's, so they are removed.
+async fn visible_works(
+    server: &super::PubMedServer,
+    works: Vec<EuropePmcWorkOut>,
+) -> Result<Vec<EuropePmcWorkOut>, ErrorData> {
+    let Some(as_of) = server.as_of else {
+        return Ok(works);
+    };
+    let key = |work: &EuropePmcWorkOut| work.source.clone().zip(work.id.clone());
+    let visible = server
+        .visible_europe_pmc_records(as_of, works.iter().filter_map(key))
+        .await?;
+
+    Ok(works
+        .into_iter()
+        .filter(|work| key(work).is_none_or(|key| visible.contains(&key)))
+        .map(|work| EuropePmcWorkOut {
+            cited_by_count: None,
+            ..work
+        })
+        .collect())
+}
+
+/// The citing records visible under `--as-of`.
+///
+/// Asked as a search (`CITES:`) rather than through the `citations`
+/// endpoint: a search can carry the date bound, so a heavily cited record
+/// costs one request instead of a walk through tens of thousands of later
+/// citations that would all be discarded.
+async fn citations_as_of(
+    server: &super::PubMedServer,
+    as_of: AsOf,
+    id: &EuropePmcId,
+    max: usize,
+) -> Result<EuropePmcCitationGraphOutput, ErrorData> {
+    let Some(cited) = server.visible_europe_pmc_record(as_of, id).await? else {
+        return Ok(EuropePmcCitationGraphOutput::empty(id));
+    };
+
+    let query = format!(
+        "CITES:{}_{} AND {}",
+        cited.id,
+        cited.source,
+        as_of.europe_pmc_clause()
+    );
+    let opts = EuropePmcSearchOptions {
+        page_size: max as u32,
+        ..Default::default()
+    };
+    let page = server
+        .client
+        .europe_pmc
+        .search_page(&query, &opts)
+        .await
+        .map_err(|e| internal_error(format!("Failed to fetch Europe PMC citations: {e}")))?;
+
+    let returned = page.results.len();
+    let entries: Vec<EuropePmcWorkOut> = page
+        .results
+        .iter()
+        .filter(|record| as_of.admits(europe_pmc_available_on(record)))
+        .take(max)
+        .map(EuropePmcWorkOut::from)
+        .collect();
+
+    Ok(EuropePmcCitationGraphOutput {
+        europe_pmc_id: id.to_string(),
+        // Europe PMC's count of the bounded query, less anything the
+        // per-record check removed from this page.
+        total: (page.hit_count as usize).saturating_sub(returned - entries.len()),
+        count: entries.len(),
+        entries,
+    })
+}
+
 /// List the works cited by a Europe PMC record.
 pub async fn europe_pmc_references(
     server: &super::PubMedServer,
@@ -455,6 +647,10 @@ pub async fn europe_pmc_references(
 
     info!(id = %id, max_results = max, "Fetching Europe PMC references");
 
+    if !record_is_visible(server, &id).await? {
+        return Ok(Json(EuropePmcCitationGraphOutput::empty(&id)));
+    }
+
     let references = server
         .client
         .europe_pmc
@@ -462,12 +658,11 @@ pub async fn europe_pmc_references(
         .await
         .map_err(|e| internal_error(format!("Failed to fetch Europe PMC references: {e}")))?;
 
-    let total = references.len();
-    let entries: Vec<EuropePmcWorkOut> = references
-        .iter()
-        .take(max)
-        .map(EuropePmcWorkOut::from)
-        .collect();
+    let works: Vec<EuropePmcWorkOut> = references.iter().map(EuropePmcWorkOut::from).collect();
+    let works = visible_works(server, works).await?;
+
+    let total = works.len();
+    let entries: Vec<EuropePmcWorkOut> = works.into_iter().take(max).collect();
 
     Ok(Json(EuropePmcCitationGraphOutput {
         europe_pmc_id: id.to_string(),
@@ -486,6 +681,10 @@ pub async fn europe_pmc_citations(
     let max = params.max_results.unwrap_or(50).clamp(1, MAX_RESULTS_CAP);
 
     info!(id = %id, max_results = max, "Fetching Europe PMC citations");
+
+    if let Some(as_of) = server.as_of {
+        return citations_as_of(server, as_of, &id, max).await.map(Json);
+    }
 
     let citations = server
         .client
@@ -586,6 +785,14 @@ pub async fn europe_pmc_database_links(
     let max_entries = params.max_entries_per_db.unwrap_or(20).max(1);
 
     info!(id = %id, db_name = ?params.db_name, "Fetching Europe PMC database links");
+
+    if !record_is_visible(server, &id).await? {
+        return Ok(Json(EuropePmcDatabaseLinksOutput {
+            europe_pmc_id: id.to_string(),
+            count: 0,
+            databases: Vec::new(),
+        }));
+    }
 
     let links = server
         .client

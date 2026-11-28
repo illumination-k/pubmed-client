@@ -350,6 +350,30 @@ test in `main.rs` asserts every registered tool advertises an object `outputSche
 `tests/integration_test.rs` drives a whole `search_pubmed` call over stdio against a wiremock-stubbed
 E-utilities endpoint and asserts the `structuredContent` that comes back.
 
+**`--as-of YYYY-MM-DD` / `PUBMED_MCP_AS_OF` pins the whole server to a past day**, for backtests
+(`tools/as_of.rs`; behaviour per tool is tabulated in `pubmed-mcp/README.md`). No tool may return a
+record that became available on or after the date, and a hidden record must be indistinguishable
+from one that does not exist — never report how many were held back.
+
+- The date rule has **one implementation**: `pubmed_available_on` / `europe_pmc_available_on`. Tools
+  only ask `visible_pmids` / `visible_europe_pmc_records` "which of these are visible?". A new tool
+  that returns or accepts record ids must go through them (or be listed in `UNAVAILABLE_AS_OF`, as
+  `global_query` is), and gets a row in `tools/as_of_tests.rs`.
+- **PubMed's date is the later of the create date and the Entrez date, not `EDAT` alone.** `EDAT` is
+  set back to the publication date for records added over a year late (year-only dates become
+  Jan 1), so an `[edat]` bound leaks later papers. NCBI's naming is inverted between APIs: the
+  search field `[crdt]` is the ESummary history entry with status `entrez`, and `[edat]` is the
+  entry with status `pubmed`.
+- **ESearch and ELink ignore `maxdate` unless `mindate` is sent too** — `SearchDateRange` always
+  carries both. Their date bound is only a prefilter (one date type per request); the local check
+  on each returned id is what enforces the rule.
+- Every tool returns `Json<Bounded<T>>` (wrapped by `PubMedServer::bounded` in `main.rs`), which
+  flattens an optional `as_of` field into the output; a unit test asserts every tool's schema has
+  it.
+- `as_of_tests.rs` runs the real tool functions against stand-in services that answer whatever
+  they are asked from fixtures recorded off the live APIs (`tests/fixtures/as_of/`), so a tool that
+  forgets the bound gets the later record back and fails.
+
 `serverInfo` carries display metadata for client UIs — `title`, `websiteUrl` and one icon
 (`server_implementation()` in `main.rs`). The icon is `assets/icon.svg`, embedded with
 `include_bytes!` and sent as a base64 `data:` URI so a stdio client can render it with no network
@@ -368,8 +392,12 @@ src/
   config.rs            # ClientArgs — CLI flags / env vars -> ClientConfig
                        # NCBI_API_KEY / NCBI_EMAIL / NCBI_TOOL / NCBI_RATE_LIMIT
                        # PUBMED_MCP_TIMEOUT / _MAX_RETRIES / _BASE_URL / _CACHE*
+                       # (server-level flags, incl. --as-of / PUBMED_MCP_AS_OF, live in main.rs)
   tools/
     mod.rs             # PubMedServer definition
+    as_of.rs           # --as-of: date rule, visibility lookups, Bounded<T> output wrapper
+    as_of_tests.rs     # One test per tool for --as-of, against recorded fixtures
+    europe_pmc.rs      # Europe PMC tools (search, full text, references, citations, links)
     output.rs          # Structured output types shared by the tools
     search.rs          # search_pubmed tool (with study type/text availability filters)
     articles.rs        # fetch_articles tool (EFetch — full records by PMID)

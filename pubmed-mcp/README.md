@@ -24,6 +24,7 @@ This MCP server provides tools for interacting with the PubMed and PMC APIs thro
   - No API key required
 - **Structured output**: Every tool answers with JSON `structuredContent` and advertises the matching `outputSchema`
 - **Modular Architecture**: Tools organized in separate modules for maintainability
+- **Backtesting**: `--as-of` pins the whole server to a past day, so no tool returns a record that became available later
 - **Configurable client**: NCBI API key, contact e-mail, tool name, rate limit, timeout, retries, and response caching, via CLI flags or environment variables
 - Built with [rmcp](https://github.com/modelcontextprotocol/rust-sdk) - the official Rust SDK for MCP
 - Uses stdio transport for communication
@@ -97,6 +98,76 @@ docker run --rm -p 8080:8080 ghcr.io/illumination-k/pubmed-mcp:latest \
 ```bash
 docker run --rm -i ghcr.io/illumination-k/pubmed-mcp:latest --tools search,markdown
 ```
+
+### Backtesting: `--as-of`
+
+`--as-of YYYY-MM-DD` (or `PUBMED_MCP_AS_OF`) makes the server behave as if it
+ran on that day. It is meant for backtests — "given only what was available
+before date D, would an agent have found X?" — where the date has to be
+enforced by the server rather than left to the model to remember:
+
+```bash
+docker run --rm -i ghcr.io/illumination-k/pubmed-mcp:latest --as-of 2020-02-01
+```
+
+No tool returns a record that became available **on or after** D, and such a
+record looks exactly like one that does not exist: the same empty result,
+`not_found` entry or "not available" error. Nothing reports how many records
+were held back, because that count would itself reveal that later evidence
+exists. What every answer does carry is an `as_of` field with the date (it is
+also in the server's `instructions`, and in `search_pubmed`'s
+`filters_applied`), so the agent and the person reading its transcript know the
+view is bounded. The date must be a full ISO date; anything else stops the
+server from starting.
+
+| Tool                                                      | With `--as-of D`                                                                                                                                                                |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search_pubmed`                                           | Bounded by ESearch's own date parameters (`datetype=crdt`, up to D-1), then each hit is checked. A later `end_year` is pulled back to D-1's year. `count` is the bounded count. |
+| `fetch_articles`, `fetch_summaries`, `export_citations`   | Later records are left out (`fetch_articles` lists them under `not_found`).                                                                                                     |
+| `get_pmc_markdown`, `get_pmc_fulltext`, `get_pmc_figures` | Refused unless the article's PubMed record is visible.                                                                                                                          |
+| `get_related_articles`, `get_citations`, `get_pmc_links`  | Later records are dropped, and `total` counts only what is left. A later source PMID yields nothing.                                                                            |
+| `match_citations`, `pmid_to_pmcid`                        | A citation or PMID that resolves to a later record resolves to nothing.                                                                                                         |
+| `europe_pmc_search`                                       | `FIRST_IDATE:[* TO D-1]` is ANDed onto the query, then each record is checked.                                                                                                  |
+| `europe_pmc_citations`, `europe_pmc_references`           | Empty for a later record; entries matched to a later record are dropped.                                                                                                        |
+| `europe_pmc_fulltext`, `europe_pmc_database_links`        | Refused / empty for a later record.                                                                                                                                             |
+| `global_query`                                            | **Not offered**: per-database hit counts cannot all be bounded by date.                                                                                                         |
+| `spell_check`, `list_databases`, `get_database_info`      | Unchanged (they report on today's databases).                                                                                                                                   |
+
+**Which date.** "Available" means the earliest day a reader could have found
+the record, not its publication date — an epub-ahead-of-print article is in
+PubMed before the issue it belongs to, and is returned even when that issue is
+dated after D.
+
+- **PubMed:** the later of the record's _create date_ (`CRDT`) and its _Entrez
+  date_ (`EDAT`). The Entrez date alone is not safe: a record added to PubMed
+  more than a year after publication has its `EDAT` set back to the publication
+  date, and a year-only publication date becomes January 1st. PMID 34695337,
+  published in September 2020 and added in October 2021, carries `EDAT`
+  2020-01-01 and would otherwise be handed to a backtest pinned at February 2020. The create date is when the record really appeared; requiring both
+  to precede D admits nothing that either would refuse.
+- **Europe PMC:** the first index date (`firstIndexDate`, the `FIRST_IDATE`
+  search field).
+
+A record lacking these falls back to the earliest of its other history dates,
+and a record with no usable date at all is hidden.
+
+**Limits worth knowing.**
+
+- The rule errs towards hiding. A paper published before D but added to PubMed
+  after it is hidden, and Europe PMC only began indexing around 2007–2010, so
+  with an early D its tools return very little (a 1991 article has a first
+  index date in 2009).
+- Records are returned **as they are today**. MeSH headings, corrections,
+  retraction notices and PMC IDs added after D are still in a visible record,
+  and PMC full text is today's version. Europe PMC citation counts are the
+  exception: they are removed, and sorting `europe_pmc_search` by citation
+  count is refused, since both describe what happened to a record afterwards.
+- Only the returned records are bounded. Relevance ranking is computed by NCBI
+  and Europe PMC over today's corpus.
+- `europe_pmc_search` rejects a query with unbalanced parentheses or quotes,
+  which could otherwise close the bound's parenthesis early.
+- Each bounded call costs one or two extra requests for the date lookup (an
+  ESummary per 200 PMIDs, or a Europe PMC search).
 
 ### Client Configuration
 
